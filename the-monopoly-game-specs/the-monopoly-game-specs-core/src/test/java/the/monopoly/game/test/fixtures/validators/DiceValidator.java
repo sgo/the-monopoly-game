@@ -1,4 +1,4 @@
-package the.monopoly.game.test.fixtures;
+package the.monopoly.game.test.fixtures.validators;
 
 import org.springframework.stereotype.Service;
 import the.monopoly.game.components.dice.Dice;
@@ -7,7 +7,6 @@ import the.monopoly.game.test.fixtures.model.DiceRollReport.FaceResult;
 import the.monopoly.game.test.fixtures.repository.CurrentDiceTypeRepository;
 import the.monopoly.game.test.fixtures.repository.DiceRollReportRepository;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 

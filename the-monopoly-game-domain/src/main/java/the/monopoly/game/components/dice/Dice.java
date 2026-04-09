@@ -7,8 +7,10 @@ import java.util.stream.Stream;
 public class Dice {
   private final ThreadLocal<Random> random = ThreadLocal.withInitial(Random::new);
   private final Face[] faces;
+  private final Type type;
 
-  public Dice(Face... faces) {
+  public Dice(Type type, Face... faces) {
+    this.type = type;
     this.faces = faces;
   }
 
@@ -18,6 +20,10 @@ public class Dice {
 
   public Face roll() {
     return faces[random.get().nextInt(6)];
+  }
+
+  public Type type() {
+    return type;
   }
 
   public record Face(String symbol) {
@@ -33,7 +39,7 @@ public class Dice {
     }
 
     public Dice create() {
-      return new Dice(faces);
+      return new Dice(this, faces);
     }
   }
 }
