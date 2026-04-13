@@ -8,3 +8,7 @@ Functionaliteit: : officiële regels
       | type     |
       | 6 zijdig |
       | 6 zijdig |
+
+  Scenario: het spel wordt gespeeld met een minimum van 2 tot een maximum van 8 spelers
+    Gegeven de officiële regels
+    Dan spelen we met 2 tot 8 spelers

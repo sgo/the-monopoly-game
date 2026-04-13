@@ -1,6 +1,7 @@
 package the.monopoly.game.rules;
 
 import the.monopoly.game.components.dice.Dice;
+import the.monopoly.game.components.players.Player;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -24,11 +25,16 @@ public class Rule {
   public interface Set {
     Stream<Dice> dice();
 
+    Player.Pool players();
+
     interface Factory {
       Set create();
     }
 
-    record Simple(List<Dice> diceBuffer) implements Set {
+    record Simple(
+        List<Dice> diceBuffer,
+        Player.Pool players
+    ) implements Set {
       @Override
       public Stream<Dice> dice() {
         return diceBuffer.stream();

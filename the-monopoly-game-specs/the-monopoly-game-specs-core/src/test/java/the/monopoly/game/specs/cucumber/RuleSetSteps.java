@@ -1,6 +1,7 @@
 package the.monopoly.game.specs.cucumber;
 
 import io.cucumber.java.ParameterType;
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.nl.Dan;
@@ -41,5 +42,11 @@ public class RuleSetSteps {
       case "officiële" -> official;
       default -> Rule.Type.valueOf(type);
     };
+  }
+
+  @Then("we play with {int} to {int} players")
+  @Dan("spelen we met {int} tot {int} spelers")
+  public void wePlayWithToPlayers(int min, int max) {
+    validator.assertPlayWithMinMaxPlayers(min, max);
   }
 }

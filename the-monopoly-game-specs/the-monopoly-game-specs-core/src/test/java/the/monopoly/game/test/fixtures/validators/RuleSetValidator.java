@@ -2,6 +2,8 @@ package the.monopoly.game.test.fixtures.validators;
 
 import org.springframework.stereotype.Service;
 import the.monopoly.game.components.dice.Dice;
+import the.monopoly.game.components.players.Player;
+import the.monopoly.game.rules.Rule;
 import the.monopoly.game.test.fixtures.repository.CurrentRuleTypeRepository;
 import the.monopoly.game.test.fixtures.repository.RuleSetRepository;
 
@@ -20,8 +22,21 @@ public class RuleSetValidator {
   }
 
   public void assertPlayWithDice(List<Dice.Type> expectations) {
-    assertThat(ruleSetRepository.get(currentRuleTypeRepository.get()).dice())
+    assertThat(currentRuleSet().dice())
         .extracting(Dice::type)
         .containsExactlyElementsOf(expectations);
+  }
+
+  private Rule.Set currentRuleSet() {
+    return ruleSetRepository.get(currentRuleTypeRepository.get());
+  }
+
+  public void assertPlayWithMinMaxPlayers(int min, int max) {
+    assertThat(currentRuleSet().players())
+        .extracting(Player.Pool::min)
+        .isEqualTo(min);
+    assertThat(currentRuleSet().players())
+        .extracting(Player.Pool::max)
+        .isEqualTo(max);
   }
 }

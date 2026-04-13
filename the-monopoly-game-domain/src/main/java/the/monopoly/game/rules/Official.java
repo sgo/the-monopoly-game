@@ -1,6 +1,7 @@
 package the.monopoly.game.rules;
 
 import the.monopoly.game.components.dice.Dice;
+import the.monopoly.game.components.players.Player;
 
 import java.util.stream.Stream;
 
@@ -10,7 +11,8 @@ public class Official implements Rule.Set.Factory {
   @Override
   public Rule.Set create() {
     return new Rule.Set.Simple(
-        Stream.of(six, six).map(Dice.Type::create).toList()
+        Stream.of(six, six).map(Dice.Type::create).toList(),
+        new Player.Pool(2, 8)
     );
   }
 }
