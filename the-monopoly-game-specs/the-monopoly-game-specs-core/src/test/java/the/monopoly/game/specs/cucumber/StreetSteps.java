@@ -1,7 +1,6 @@
 package the.monopoly.game.specs.cucumber;
 
 import io.cucumber.java.ParameterType;
-import io.cucumber.java.PendingException;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.nl.Dan;
@@ -40,14 +39,5 @@ public class StreetSteps {
       case "Start" -> start;
       default -> throw new IllegalArgumentException("Unknown dice type! [" + type + "]");
     };
-  }
-
-  // TODO - move to MoneySteps or FinanceSteps
-  @ParameterType(".*")
-  public Money money(String amount) {
-    int modifier = 1;
-    if (amount.startsWith("-"))
-      modifier = -1;
-    return new Money(Integer.parseInt(amount.substring(modifier > 0 ? 1 : 2)) * modifier);
   }
 }

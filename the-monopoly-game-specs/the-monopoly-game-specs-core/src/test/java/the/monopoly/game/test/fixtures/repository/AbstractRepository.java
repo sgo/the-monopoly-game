@@ -1,10 +1,10 @@
 package the.monopoly.game.test.fixtures.repository;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.stream.Stream;
 
 public class AbstractRepository<Key, Value> {
-  private Map<Key, Value> records = new HashMap<>();
+  private LinkedHashMap<Key, Value> records = new LinkedHashMap<>();
 
   public Value get(Key key) {
     return records.get(key);
@@ -12,5 +12,9 @@ public class AbstractRepository<Key, Value> {
 
   public void put(Key key, Value value) {
     records.put(key, value);
+  }
+
+  public Stream<Value> all() {
+    return records.values().stream();
   }
 }

@@ -15,11 +15,10 @@ import the.monopoly.game.test.fixtures.validators.DiceValidator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 import static java.lang.Integer.parseInt;
 import static the.monopoly.game.components.dice.Dice.Type.six;
+import static the.monopoly.game.specs.cucumber.ConversionUtils.value;
 
 public class DiceSteps {
   private final DiceService service;
@@ -84,9 +83,5 @@ public class DiceSteps {
 
   private static String symbol(Map<String, String> record) {
     return value(record, "symbol", "symbool");
-  }
-
-  private static String value(Map<String, String> record, String... keys) {
-    return Stream.of(keys).map(it -> record.get(it)).filter(Objects::nonNull).findFirst().get();
   }
 }

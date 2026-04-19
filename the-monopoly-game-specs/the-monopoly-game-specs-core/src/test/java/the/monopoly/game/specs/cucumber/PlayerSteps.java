@@ -1,0 +1,53 @@
+package the.monopoly.game.specs.cucumber;
+
+import io.cucumber.java.DataTableType;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import io.cucumber.java.nl.Als;
+import io.cucumber.java.nl.Dan;
+import the.monopoly.game.components.players.Player;
+import the.monopoly.game.test.fixtures.services.PlayerService;
+import the.monopoly.game.test.fixtures.validators.PlayerValidator;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import static the.monopoly.game.specs.cucumber.ConversionUtils.value;
+
+public class PlayerSteps {
+  private final PlayerService service;
+  private final PlayerValidator validator;
+
+  public PlayerSteps(PlayerService service, PlayerValidator validator) {
+    this.service = service;
+    this.validator = validator;
+  }
+
+  @And("a player")
+  public void aPlayer() {
+    service.createAtLeastOnePLayer();
+  }
+
+  @When("we select {int} players")
+  @Als("we {int} spelers kiezen")
+  public void weSelectPlayers(int numberOfPlayers) {
+    service.create(numberOfPlayers);
+  }
+
+  @Then("the following pawns are at play")
+  public void theFollowingPawnsAreAtPlay(List<Player.ID> expectations) {
+    validator.assertPawnsAtPlay(expectations, Locale.forLanguageTag("en"));
+  }
+
+  @Dan("staan de volgende pionnen in het spel")
+  public void staanDeVolgendePionnenInHetSpel(List<Player.ID> expectations) {
+    validator.assertPawnsAtPlay(expectations, Locale.forLanguageTag("nl"));
+  }
+
+  @DataTableType
+  public Player.ID playerID(Map<String, String> record) {
+    return new Player.ID(value(record, "name", "naam"));
+  }
+}
