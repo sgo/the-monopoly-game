@@ -9,13 +9,17 @@ import java.util.stream.Stream;
 public interface Bank {
   Stream<Account> accounts();
 
-  void createAccountFor(Player player);
+  void createAccountFor(Player.ID id);
 
-  Account accountOf(Player player);
+  Account accountOf(Player.ID id);
 
   record Account(Owner owner, Balance balance) {
     public void deposit(Money amount) {
       balance.incrementWith(amount);
+    }
+
+    public void credit(Money amount) {
+      balance.decrementWith(amount);
     }
 
     public record Owner(String name) {
@@ -34,6 +38,10 @@ public interface Bank {
 
       public void incrementWith(Money amount) {
         this.amount = this.amount.plus(amount);
+      }
+
+      public void decrementWith(Money amount) {
+        this.amount = this.amount.minus(amount);
       }
 
       @Override
@@ -64,18 +72,18 @@ public interface Bank {
     }
 
     @Override
-    public void createAccountFor(Player player) {
+    public void createAccountFor(Player.ID id) {
       accountsBuffer.add(new Account(
-          new Account.Owner(player.id().value()),
+          new Account.Owner(id.value()),
           Balance.of(0)
       ));
     }
 
     @Override
     @SuppressWarnings("OptionalGetWithoutIsPresent")
-    public Account accountOf(Player player) {
+    public Account accountOf(Player.ID id) {
       return accounts()
-          .filter(it -> it.owner.name().equals(player.id().value()))
+          .filter(it -> it.owner.name().equals(id.value()))
           .findAny()
           .get();
     }

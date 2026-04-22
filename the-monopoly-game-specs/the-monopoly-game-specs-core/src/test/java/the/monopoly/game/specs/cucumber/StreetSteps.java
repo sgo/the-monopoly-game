@@ -3,6 +3,7 @@ package the.monopoly.game.specs.cucumber;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import io.cucumber.java.nl.Dan;
 import io.cucumber.java.nl.Gegeven;
 import the.monopoly.game.components.finance.Money;
@@ -39,5 +40,10 @@ public class StreetSteps {
       case "Start" -> start;
       default -> throw new IllegalArgumentException("Unknown dice type! [" + type + "]");
     };
+  }
+
+  @ParameterType("\"(.*)\"")
+  public Street street(String type) {
+    return streetType(type).create();
   }
 }

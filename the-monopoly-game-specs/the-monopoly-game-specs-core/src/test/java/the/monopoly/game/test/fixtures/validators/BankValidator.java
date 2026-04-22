@@ -2,9 +2,13 @@ package the.monopoly.game.test.fixtures.validators;
 
 import org.springframework.stereotype.Service;
 import the.monopoly.game.components.finance.Bank;
+import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.finance.Bank.Account.Owner;
+import the.monopoly.game.components.players.Player;
 import the.monopoly.game.rules.Rule;
+import the.monopoly.game.test.fixtures.repository.CurrentPlayerRepository;
 import the.monopoly.game.test.fixtures.repository.CurrentRuleTypeRepository;
+import the.monopoly.game.test.fixtures.repository.PlayerRepository;
 import the.monopoly.game.test.fixtures.repository.RuleSetRepository;
 
 import java.util.Comparator;
@@ -18,15 +22,18 @@ public class BankValidator {
   private final CurrentRuleTypeRepository currentRuleTypeRepository;
   private final RuleSetRepository ruleSetRepository;
   private final NormalisationUtils normaliser;
+  private final CurrentPlayerRepository currentPlayerRepository;
 
   public BankValidator(
       CurrentRuleTypeRepository currentRuleTypeRepository,
       RuleSetRepository ruleSetRepository,
-      NormalisationUtils normaliser
+      NormalisationUtils normaliser,
+      CurrentPlayerRepository currentPlayerRepository
   ) {
     this.currentRuleTypeRepository = currentRuleTypeRepository;
     this.ruleSetRepository = ruleSetRepository;
     this.normaliser = normaliser;
+    this.currentPlayerRepository = currentPlayerRepository;
   }
 
   public void assertBankAccountsAtPlay(List<BankAccountExpectation> expectation, Locale locale) {
@@ -41,7 +48,11 @@ public class BankValidator {
     return ruleSetRepository.get(currentRuleTypeRepository.get());
   }
 
-  public record BankAccountExpectation(Owner owner, Bank.Account.Balance balance) {
+  public void assertAccountBalanceEquals(Balance expectation) {
+    assertThat(ruleSet().bank().accountOf(currentPlayerRepository.get()).balance()).isEqualTo(expectation);
+  }
+
+  public record BankAccountExpectation(Owner owner, Balance balance) {
     public static BankAccountExpectation of(Bank.Account account) {
       return new BankAccountExpectation(account.owner(), account.balance());
     }

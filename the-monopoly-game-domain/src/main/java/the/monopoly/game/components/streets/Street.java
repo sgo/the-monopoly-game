@@ -2,7 +2,7 @@ package the.monopoly.game.components.streets;
 
 import the.monopoly.game.components.finance.Money;
 
-public record Street(Money value) {
+public record Street(Money toll) {
   public enum Type implements Factory {
     start(new Start());
 

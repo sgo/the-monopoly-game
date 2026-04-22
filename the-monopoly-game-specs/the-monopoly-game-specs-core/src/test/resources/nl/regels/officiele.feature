@@ -27,7 +27,7 @@ Functionaliteit: : officiële regels
       | strijkijzer |
       | vingerhoed  |
 
-  Scenario: each player starts the game with starting capital
+  Scenario: elke speler begint het spel met een start kapitaal
     Gegeven de officiële regels
     Als we 8 spelers kiezen
     Dan bestaan de volgende bank rekeningen in het spel
@@ -40,3 +40,10 @@ Functionaliteit: : officiële regels
       | schoen      | €1500  |
       | strijkijzer | €1500  |
       | vingerhoed  | €1500  |
+
+  Scenario: spelers ontvangen een loon wanneer ze passeren langs start
+    Gegeven de officiële regels
+    En een speler
+    * met €1500 in zijn bank rekening
+    Wanneer de speler langs de straat "Start" passeert
+    Dan is de balans van de speler zijn bank rekening €1700

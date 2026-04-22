@@ -2,8 +2,10 @@ package the.monopoly.game.specs.cucumber;
 
 import io.cucumber.java.DataTableType;
 import io.cucumber.java.ParameterType;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.nl.Dan;
+import io.cucumber.java.nl.En;
 import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.test.fixtures.validators.BankValidator;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static java.lang.Integer.parseInt;
 import static the.monopoly.game.specs.cucumber.ConversionUtils.value;
 
 public class BankSteps {
@@ -32,12 +35,28 @@ public class BankSteps {
     validator.assertBankAccountsAtPlay(expectation, Locale.forLanguageTag("nl"));
   }
 
+  @And("with ${money} in his account")
+  @En("met €{money} in zijn bank rekening")
+  public void withMoneyInHisAccount(Money money) {
+  }
+
+  @Then("the player's account balance is ${balance}")
+  @Dan("is de balans van de speler zijn bank rekening €{balance}")
+  public void thePlayerSAccountBalanceIs$(Bank.Account.Balance expectation) {
+    validator.assertAccountBalanceEquals(expectation);
+  }
+
   @ParameterType(".*")
   public Money money(String amount) {
     int modifier = 1;
     if (amount.startsWith("-"))
       modifier = -1;
-    return new Money(Integer.parseInt(amount.substring(modifier > 0 ? 1 : 2)) * modifier);
+    return new Money(parseInt(amount.substring(modifier > 0 ? 1 : 2)) * modifier);
+  }
+
+  @ParameterType(".*")
+  public Bank.Account.Balance balance(String balance) {
+    return Bank.Account.Balance.of(ConversionUtils.money(balance).amount());
   }
 
   @DataTableType

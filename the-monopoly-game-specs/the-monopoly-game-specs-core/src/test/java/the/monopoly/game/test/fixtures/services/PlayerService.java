@@ -1,6 +1,8 @@
 package the.monopoly.game.test.fixtures.services;
 
 import org.springframework.stereotype.Service;
+import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.test.fixtures.repository.CurrentPlayerRepository;
 import the.monopoly.game.test.fixtures.repository.CurrentRuleTypeRepository;
@@ -27,7 +29,19 @@ public class PlayerService {
   }
 
   public void createAtLeastOnePLayer() {
-    currentRules().players().select(currentRules().players().min());
+    create(currentRules().players().min());
+    playerRepository.all()
+        .limit(1)
+        .map(Player::id)
+        .forEach(currentPlayerRepository::set);
+  }
+
+  public void pass(Street street) {
+    currentPlayer().pass(street);
+  }
+
+  private Player currentPlayer() {
+    return playerRepository.get(currentPlayerRepository.get());
   }
 
   private Rule.Set currentRules() {

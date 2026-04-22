@@ -18,6 +18,6 @@ public class StreetValidator {
   }
 
   public void assertValueEquals(Money amount) {
-    assertThat(streetRepository.get(currentStreetTypeRepository.get()).value()).isEqualTo(amount);
+    assertThat(streetRepository.get(currentStreetTypeRepository.get()).toll()).isEqualTo(amount);
   }
 }
