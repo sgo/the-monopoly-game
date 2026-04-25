@@ -38,12 +38,12 @@ public class StreetSteps {
   public Street.Type streetType(String type) {
     return switch (type) {
       case "Start" -> start;
-      default -> throw new IllegalArgumentException("Unknown dice type! [" + type + "]");
+      default -> throw new IllegalArgumentException("Unknown street type! [" + type + "]");
     };
   }
 
   @ParameterType("\"(.*)\"")
   public Street street(String type) {
-    return streetType(type).create();
+    return service.create(streetType(type));
   }
 }

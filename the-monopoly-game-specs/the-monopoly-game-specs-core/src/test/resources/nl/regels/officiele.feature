@@ -47,3 +47,11 @@ Functionaliteit: : officiële regels
     * met €1500 in zijn bank rekening
     Wanneer de speler langs de straat "Start" passeert
     Dan is de balans van de speler zijn bank rekening €1700
+
+  Scenario: spelers ontvangen een dubbel loon wanneer ze landen op start
+    Gegeven de officiële regels
+    En met optionele dubbel loon bij het landen op Start regel
+    En een speler
+    * met €1500 in zijn bank rekening
+    Wanneer de speler op de straat "Start" land
+    Dan is de balans van de speler zijn bank rekening €1900

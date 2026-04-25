@@ -1,6 +1,7 @@
 package the.monopoly.game.specs.cucumber;
 
 import io.cucumber.java.DataTableType;
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -59,5 +60,11 @@ public class PlayerSteps {
   @DataTableType
   public Player.ID playerID(Map<String, String> record) {
     return new Player.ID(value(record, "name", "naam"));
+  }
+
+  @When("the player lands on the street {street}")
+  @Wanneer("de speler op de straat {street} land")
+  public void thePlayerLandsOnTheStreet(Street street) {
+    service.visit(street);
   }
 }

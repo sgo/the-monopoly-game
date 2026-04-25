@@ -15,8 +15,16 @@ public class RuleSetService {
     this.currentRuleTypeRepository = currentRuleTypeRepository;
   }
 
-  public void selectRuleSet(Rule.Type type) {
+  public void selectRuleSet(Rule.Set.Type type) {
     currentRuleTypeRepository.set(type);
     ruleSetRepository.put(type, type.create());
+  }
+
+  public void withOptionalRule(Rule.Type type) {
+    currentRuleSet().activate(type);
+  }
+
+  private Rule.Set currentRuleSet() {
+    return ruleSetRepository.get(currentRuleTypeRepository.get());
   }
 }

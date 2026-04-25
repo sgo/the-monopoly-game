@@ -53,4 +53,8 @@ public class PlayerService {
         playerRepository.put(player.id(), player)
     );
   }
+
+  public void visit(Street street) {
+    currentPlayer().visit(street);
+  }
 }

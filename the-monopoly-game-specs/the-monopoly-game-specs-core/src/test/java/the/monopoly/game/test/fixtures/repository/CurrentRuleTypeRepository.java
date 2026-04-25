@@ -6,5 +6,5 @@ import the.monopoly.game.rules.Rule;
 
 @Repository
 @ScenarioScope
-public class CurrentRuleTypeRepository extends AbstractSingleResultRepository<Rule.Type> {
+public class CurrentRuleTypeRepository extends AbstractSingleResultRepository<Rule.Set.Type> {
 }

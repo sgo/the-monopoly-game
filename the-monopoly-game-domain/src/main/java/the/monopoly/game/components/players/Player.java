@@ -13,6 +13,10 @@ public record Player(ID id, Bank.Account account) {
     account.credit(street.toll());
   }
 
+  public void visit(Street street) {
+    account.credit(street.rent());
+  }
+
   public record ID(String value) {
     public static class Comparators {
       public static Comparator<Player.ID> natural() {

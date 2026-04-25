@@ -2,9 +2,11 @@ package the.monopoly.game.specs.cucumber;
 
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.PendingException;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.nl.Dan;
+import io.cucumber.java.nl.En;
 import io.cucumber.java.nl.Gegeven;
 import the.monopoly.game.components.dice.Dice;
 import the.monopoly.game.rules.Rule;
@@ -13,7 +15,8 @@ import the.monopoly.game.test.fixtures.validators.RuleSetValidator;
 
 import java.util.List;
 
-import static the.monopoly.game.rules.Rule.Type.official;
+import static the.monopoly.game.rules.Rule.Set.Type.official;
+import static the.monopoly.game.rules.Rule.Type.double_salary_when_landing_on_start;
 
 public class RuleSetSteps {
   private final RuleSetService service;
@@ -26,7 +29,7 @@ public class RuleSetSteps {
 
   @Given("the {ruleset} rule set")
   @Gegeven("de {ruleset} regels")
-  public void theRuleSet(Rule.Type type) {
+  public void theRuleSet(Rule.Set.Type type) {
     service.selectRuleSet(type);
   }
 
@@ -37,10 +40,10 @@ public class RuleSetSteps {
   }
 
   @ParameterType(".*")
-  public Rule.Type ruleset(String type) {
+  public Rule.Set.Type ruleset(String type) {
     return switch (type) {
       case "officiële" -> official;
-      default -> Rule.Type.valueOf(type);
+      default -> Rule.Set.Type.valueOf(type);
     };
   }
 
@@ -48,5 +51,11 @@ public class RuleSetSteps {
   @Dan("spelen we met {int} tot {int} spelers")
   public void wePlayWithToPlayers(int min, int max) {
     validator.assertPlayWithMinMaxPlayers(min, max);
+  }
+
+  @And("with optional double salary when landing on Start rule")
+  @En("met optionele dubbel loon bij het landen op Start regel")
+  public void withOptionalDoubleSalaryWhenLandingOnStartRule() {
+    service.withOptionalRule(double_salary_when_landing_on_start);
   }
 }
