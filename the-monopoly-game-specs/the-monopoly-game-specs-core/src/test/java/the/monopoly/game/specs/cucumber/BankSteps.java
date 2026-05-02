@@ -51,7 +51,8 @@ public class BankSteps {
     int modifier = 1;
     if (amount.startsWith("-"))
       modifier = -1;
-    return new Money(parseInt(amount.substring(modifier > 0 ? 1 : 2)) * modifier);
+    amount = amount.replaceAll("[\\$€]", "");
+    return new Money(parseInt(amount.substring(modifier > 0 ? 0 : 1)) * modifier);
   }
 
   @ParameterType(".*")
@@ -60,7 +61,7 @@ public class BankSteps {
   }
 
   @DataTableType
-  public BankAccountExpectation playerID(Map<String, String> record) {
+  public BankAccountExpectation bankAccountExpectation(Map<String, String> record) {
     return new BankAccountExpectation(
         new Bank.Account.Owner(value(record, "owner", "eigenaar")),
         new Bank.Account.Balance(money(value(record, "balance", "balans")))

@@ -1,6 +1,7 @@
 package the.monopoly.game.test.fixtures.services;
 
 import org.springframework.stereotype.Service;
+import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.test.fixtures.repository.CurrentRuleTypeRepository;

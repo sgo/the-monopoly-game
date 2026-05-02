@@ -1,6 +1,6 @@
 # language: nl
 
-Functionaliteit: : Monopoly
+Functionaliteit: Monopoly
 
   Scenario: het spel eindigt altijd met een monopolie
     Gegeven er zijn 8 spelers

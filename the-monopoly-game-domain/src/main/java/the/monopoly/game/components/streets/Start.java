@@ -4,11 +4,9 @@ import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.rules.Official;
 import the.monopoly.game.rules.Rule;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Set;
-import java.util.stream.IntStream;
 
+import static the.monopoly.game.components.finance.Money.ZERO;
 import static the.monopoly.game.components.streets.Street.Type.start;
 
 public class Start implements Street.Factory {
@@ -24,10 +22,10 @@ public class Start implements Street.Factory {
   }
 
   private static class RentFactory implements Money.Factory.Rent, Rule.Processor<Integer> {
-    private final Money base;
+    private final Money vacant;
 
-    public RentFactory(Money base) {
-      this.base = base;
+    public RentFactory(Money vacant) {
+      this.vacant = vacant;
     }
 
     @Override
@@ -40,7 +38,37 @@ public class Start implements Street.Factory {
 
     @Override
     public Integer process(Official.DoubleSalaryWhenLandingOnStart rule) {
-        return base.amount() * 2;
+      return vacant.amount() * 2;
+    }
+
+    @Override
+    public Money vacant() {
+      return vacant;
+    }
+
+    @Override
+    public Money forOneHouse() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Money forTwoHouses() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Money forThreeHouses() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Money forFourHouses() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Money forOneHotel() {
+      throw new UnsupportedOperationException();
     }
   }
 
