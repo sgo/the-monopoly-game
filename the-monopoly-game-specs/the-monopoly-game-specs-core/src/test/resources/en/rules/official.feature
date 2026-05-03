@@ -13,6 +13,13 @@ Feature: official rules
     Given the official rule set
     Then we play with 2 to 8 players
 
+  Scenario: gameboard layout
+    Given the official rule set
+    Then the gameboard layout is
+      | street names      |
+      | Start             |
+      | Rue Grande Dinant |
+
   Scenario: the players in the game can be identified by their pawn
     Given the official rule set
     When we select 8 players

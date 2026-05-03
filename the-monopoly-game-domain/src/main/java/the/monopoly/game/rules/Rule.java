@@ -1,5 +1,6 @@
 package the.monopoly.game.rules;
 
+import the.monopoly.game.components.board.Board;
 import the.monopoly.game.components.dice.Dice;
 import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.players.Player;
@@ -31,6 +32,8 @@ public interface Rule {
 
     Street create(Street.Type type);
 
+    Board gameboard();
+
     enum Type implements Factory {
       official(new Official());
 
@@ -51,13 +54,13 @@ public interface Rule {
     }
 
     record Simple(
+        Board board,
         List<Dice> diceBuffer,
         Player.Pool players,
         Bank bank,
         java.util.Set<Rule> activatedRules,
         Map<Rule.Type, Rule> optionalRules
     ) implements Set {
-
       @Override
       public Stream<Dice> dice() {
         return diceBuffer.stream();
@@ -71,6 +74,11 @@ public interface Rule {
       @Override
       public Street create(Street.Type type) {
         return type.create(activatedRules);
+      }
+
+      @Override
+      public Board gameboard() {
+        return board;
       }
     }
   }

@@ -3,6 +3,7 @@ package the.monopoly.game.test.fixtures.validators;
 import org.springframework.stereotype.Service;
 import the.monopoly.game.components.dice.Dice;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.test.fixtures.repository.CurrentRuleTypeRepository;
 import the.monopoly.game.test.fixtures.repository.RuleSetRepository;
@@ -38,5 +39,11 @@ public class RuleSetValidator {
     assertThat(currentRuleSet().players())
         .extracting(Player.Pool::max)
         .isEqualTo(max);
+  }
+
+  public void assertGameboardEquals(List<Street.Type> expectation) {
+    assertThat(currentRuleSet().gameboard().streets())
+        .extracting(Street::type)
+        .containsExactlyElementsOf(expectation);
   }
 }

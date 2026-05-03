@@ -1,7 +1,7 @@
 package the.monopoly.game.specs.cucumber;
 
+import io.cucumber.java.DataTableType;
 import io.cucumber.java.ParameterType;
-import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -13,8 +13,11 @@ import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.test.fixtures.services.StreetService;
 import the.monopoly.game.test.fixtures.validators.StreetValidator;
 
+import java.util.Map;
+
 import static the.monopoly.game.components.streets.Street.Type.RueGrandeDinant;
 import static the.monopoly.game.components.streets.Street.Type.start;
+import static the.monopoly.game.specs.cucumber.ConversionUtils.value;
 
 public class StreetSteps {
   private final StreetService service;
@@ -49,6 +52,11 @@ public class StreetSteps {
       case "Rue Grande Dinant" -> RueGrandeDinant;
       default -> throw new IllegalArgumentException("Unknown street type! [" + type + "]");
     };
+  }
+
+  @DataTableType
+  public Street.Type streetType(Map<String, String> row) {
+    return streetType(value(row, "street names", "straat namen"));
   }
 
   @ParameterType("\"(.*)\"")

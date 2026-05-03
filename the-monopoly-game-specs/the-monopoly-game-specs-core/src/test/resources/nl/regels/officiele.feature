@@ -13,6 +13,13 @@ Functionaliteit: : officiële regels
     Gegeven de officiële regels
     Dan spelen we met 2 tot 8 spelers
 
+  Scenario: layout van het spelbord
+    Gegeven de officiële regels
+    Dan is de layout van het spelbord
+      | straat namen      |
+      | Start             |
+      | Rue Grande Dinant |
+
   Scenario: de spelers in het spel kunnen geïdentificeerd worden aan de hand van hun pion
     Gegeven de officiële regels
     Als we 8 spelers kiezen

@@ -57,6 +57,10 @@ public class Street {
     this(type, emptySet(), rent, new Money.Factory.Fixed(toll), constructionCost, ZERO);
   }
 
+  public Type type() {
+    return type;
+  }
+
   public Money toll() {
     return toll.create(activatedRules);
   }

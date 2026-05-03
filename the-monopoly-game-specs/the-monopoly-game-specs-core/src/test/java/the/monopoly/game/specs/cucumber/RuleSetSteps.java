@@ -9,6 +9,7 @@ import io.cucumber.java.nl.Dan;
 import io.cucumber.java.nl.En;
 import io.cucumber.java.nl.Gegeven;
 import the.monopoly.game.components.dice.Dice;
+import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.test.fixtures.services.RuleSetService;
 import the.monopoly.game.test.fixtures.validators.RuleSetValidator;
@@ -57,5 +58,11 @@ public class RuleSetSteps {
   @En("met optionele dubbel loon bij het landen op Start regel")
   public void withOptionalDoubleSalaryWhenLandingOnStartRule() {
     service.withOptionalRule(double_salary_when_landing_on_start);
+  }
+
+  @Then("the gameboard layout is")
+  @Dan("is de layout van het spelbord")
+  public void theGameboardLayoutIs(List<Street.Type> expectation) {
+    validator.assertGameboardEquals(expectation);
   }
 }
