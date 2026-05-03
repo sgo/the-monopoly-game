@@ -123,7 +123,8 @@ public class Street {
 
   public enum Type implements Factory {
     start(new Start()),
-    RueGrandeDinant(new RueGrandeDinant());
+    RueGrandeDinant(new RueGrandeDinant()),
+    DiestsestraatLeuven(new DiestsestraatLeuven());
 
     private final Factory factory;
 

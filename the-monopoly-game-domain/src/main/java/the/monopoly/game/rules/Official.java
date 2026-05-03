@@ -7,12 +7,14 @@ import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.Street;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static the.monopoly.game.components.dice.Dice.Type.six;
-import static the.monopoly.game.components.streets.Street.Type.RueGrandeDinant;
-import static the.monopoly.game.components.streets.Street.Type.start;
+import static the.monopoly.game.components.streets.Street.Type.*;
 import static the.monopoly.game.rules.Rule.Type.double_salary_when_landing_on_start;
 
 public class Official implements Rule.Set.Factory {
@@ -21,7 +23,8 @@ public class Official implements Rule.Set.Factory {
     Bank.Simple bank = new Bank.Simple(new HashSet<>());
     Board board = new Board(List.of(
         start,
-        RueGrandeDinant
+        RueGrandeDinant,
+        DiestsestraatLeuven
     ));
     Rule.Set.Simple ruleSet = new Rule.Set.Simple(
         board,

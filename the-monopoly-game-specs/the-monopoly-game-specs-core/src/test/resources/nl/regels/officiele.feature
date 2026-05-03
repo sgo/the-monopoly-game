@@ -16,9 +16,10 @@ Functionaliteit: : officiële regels
   Scenario: layout van het spelbord
     Gegeven de officiële regels
     Dan is de layout van het spelbord
-      | straat namen      |
-      | Start             |
-      | Rue Grande Dinant |
+      | straat namen         |
+      | Start                |
+      | Rue Grande Dinant    |
+      | Diestsestraat Leuven |
 
   Scenario: de spelers in het spel kunnen geïdentificeerd worden aan de hand van hun pion
     Gegeven de officiële regels
