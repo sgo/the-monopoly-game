@@ -17,4 +17,8 @@ public class AbstractRepository<Key, Value> {
   public Stream<Value> all() {
     return records.values().stream();
   }
+
+  public boolean isEmpty() {
+    return records.isEmpty();
+  }
 }

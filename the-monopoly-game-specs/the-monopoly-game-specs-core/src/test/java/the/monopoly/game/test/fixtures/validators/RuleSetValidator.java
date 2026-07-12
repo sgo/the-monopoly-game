@@ -41,9 +41,12 @@ public class RuleSetValidator {
         .isEqualTo(max);
   }
 
-  public void assertGameboardEquals(List<Street.Type> expectation) {
+  public void assertGameboardEquals(List<BoardLayoutExpectation> expectation) {
     assertThat(currentRuleSet().gameboard().streets())
-        .extracting(Street::type)
+        .extracting(it -> new BoardLayoutExpectation(it.type(), it.colour()))
         .containsExactlyElementsOf(expectation);
+  }
+
+  public record BoardLayoutExpectation(Street.Type type, Street.Colour colour) {
   }
 }

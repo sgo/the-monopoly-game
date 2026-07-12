@@ -13,6 +13,7 @@ import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.test.fixtures.services.RuleSetService;
 import the.monopoly.game.test.fixtures.validators.RuleSetValidator;
+import the.monopoly.game.test.fixtures.validators.RuleSetValidator.BoardLayoutExpectation;
 
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class RuleSetSteps {
 
   @Then("the gameboard layout is")
   @Dan("is de layout van het spelbord")
-  public void theGameboardLayoutIs(List<Street.Type> expectation) {
+  public void theGameboardLayoutIs(List<BoardLayoutExpectation> expectation) {
     validator.assertGameboardEquals(expectation);
   }
 }

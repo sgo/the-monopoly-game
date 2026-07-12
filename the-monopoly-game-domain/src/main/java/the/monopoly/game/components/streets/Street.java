@@ -121,6 +121,10 @@ public class Street {
     return type.hashCode();
   }
 
+  public Colour colour() {
+    return null;
+  }
+
   public enum Type implements Factory {
     start(new Start()),
     RueGrandeDinant(new RueGrandeDinant()),
@@ -136,6 +140,10 @@ public class Street {
     public Street create(Set<Rule> activatedRules) {
       return factory.create(activatedRules);
     }
+  }
+
+  public enum Colour {
+    brown
   }
 
   public interface Factory {

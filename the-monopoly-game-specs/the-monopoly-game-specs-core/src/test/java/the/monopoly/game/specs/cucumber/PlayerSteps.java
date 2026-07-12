@@ -3,6 +3,7 @@ package the.monopoly.game.specs.cucumber;
 import io.cucumber.java.DataTableType;
 import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.cucumber.java.nl.Als;

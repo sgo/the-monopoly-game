@@ -16,10 +16,10 @@ Feature: official rules
   Scenario: gameboard layout
     Given the official rule set
     Then the gameboard layout is
-      | street names         |
-      | Start                |
-      | Rue Grande Dinant    |
-      | Diestsestraat Leuven |
+      | street names         | colour group |
+      | Start                |              |
+      | Rue Grande Dinant    | brown        |
+      | Diestsestraat Leuven | brown        |
 
   Scenario: the players in the game can be identified by their pawn
     Given the official rule set
