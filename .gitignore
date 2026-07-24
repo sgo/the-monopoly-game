@@ -1,4 +1,6 @@
 .idea
+.claude
+.git
 *.iml
 *.swp
 target
