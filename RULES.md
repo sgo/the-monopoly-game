@@ -234,6 +234,48 @@ used or sold for an agreed price. Note: if a card instructs you to move and this
 takes you past "START", you collect €200 — unless the card sends you directly to
 jail, in which case you do not pass "START" and collect nothing.
 
+### Chance Cards
+
+1. Ga door naar Nieuwstraat (Brussel) / Rue Neuve (Bruxelles).
+2. Ga door naar START (Ontvang M200).
+3. Ga door naar Grand Place (Mons). Als je langs START komt, ontvang je M200.
+4. Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200.
+5. Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.
+6. Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.
+7. Ga door naar het dichtsbijzijnde nutsbedrijf. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, rol de dobbelsteen en betaal de eigenaar tien keer de gerolde waarde.
+8. De bank betaald je een dividend van M50.
+9. Verlaat de gevangenis zonder te betalen.
+10. Keer 3 stappen terug.
+11. Ga naar de gevangenis. Passeer niet langs START, je ontvangt geen M200.
+12. Renoveer al je eigendommen. Je betaald M25 voor ek huis. en M100 voor elk hotel.
+13. Boete voor te snel rijden. Betaal M15.
+14. Ga door naar Noord Station / Gare du Nord. If you pass START, collect M200.
+15. Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50.
+16. Je lening is afbetaald. Je ontvangt M150.
+
+### Community Chest Cards
+
+1. Je maakt elke week tijd vrij voor je bejaarde buurman — Je hebt geweldige verhalen gehoord! Je ontvant M100.
+2. Je organiseert een groep om de voetpaden op te ruimen. Je ontvangt M50.
+3. Je bent vrijwilliger bij het rode kruis. Er waren gratis koekjes! Je ontvangt M10.
+4. Je koopt wat koekjes op het schoolfestival. Lekker! Je betaald M50.
+5. Je hebt een puppy gered — en je voelt voldoening! Verlaat de gevangenis zonder betalen. Bewaar deze kaart tot je ze nodig hebt. Je kan de kaart ook ruilen of verkopen.
+6. je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen.
+   Je ontvangt M10 van elke speler.
+7. Luide muziek diep in de nacht? Je buren zijn boos. Ga naar de gevangenis. Je komt niet langs start START. Je ontvangt geen M200.
+8. Je helpt jouw buur met haar boodschappen. Ze bedankt je met een lekkere lunch! Je ontvangt M20.
+9. Je helpt met het bouwen van een nieuwe speelplaats!
+   Je ontvangt M100.
+10. Je speelt de hele dag met de kinderen in het kinderhospitaal.
+    Je ontvangt M100.
+11. Je ging naar de car wash inzamelactie van de school — Maar je vergat de ramen te sluiten! je betaald M100.
+12. Net wanneer je denkt dat je geen stap verder kan, bereik je de finish! Ga door naar START. je ontvangt M200.
+13. Je helpt je buren hun tuin opruimen na het onweer. Je ontvangt M200.
+14. Je vrienden in het dierenasiel zijn je dankbaar voor je gulheid.
+    je betaald M50.
+15. Je had beter deelgenomen aan het renovatie project — je zou waardevolle vaardigheden geleerd hebben! Betaal M40 voor elk huis wat je bezit. M115 voor elk hotel.
+16. je organiseert een wafelbak voor de plaatstelijke school. Je ontvangt M25.
+
 ## Taxes
 
 Landing on "Income Tax" requires paying the indicated amount to the bank.
