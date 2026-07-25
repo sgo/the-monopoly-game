@@ -76,3 +76,30 @@ left untouched.
 Verification: 49 domain unit tests and 31 generated acceptance tests pass.
 The acceptance tests were checked against a mutated expected value and
 failed as they should, so they are not passing vacuously.
+
+## 2026-07-25T19:30:35Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260725T193035Z_000001_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 31c818a1a2
+created_at: 2026-07-25T19:30:35.387145Z
+enqueued_at: 2026-07-25T19:30:36.052883Z
+task: full-board-layout
+
+Re-read your role and constitution.
+
+merge_and_process coder 31c818a1a2
+```
+
+Action taken: merged coder commit `31c818a1a2` into `swarmforge-refactorer`
+(fast-forward), bringing in the full 40-space board layout. Proceeding to
+apply refactorer role rules (CRAP/DRY/mutation analysis, property-test
+coverage) to the merged state.
