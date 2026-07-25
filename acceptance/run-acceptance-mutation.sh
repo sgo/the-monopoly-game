@@ -33,8 +33,24 @@ if [[ ! -f "$APS/bb.edn" ]]; then
   exit 1
 fi
 
-# Warm the local repository so the offline per-mutation test runs resolve.
-(cd "$ROOT" && mvn -B -q -pl the-monopoly-game-specs/the-monopoly-game-specs-core -am -DskipTests install >/dev/null)
+mkdir -p "$WORK"
+
+# The runner adapter hosts JUnit itself, so it needs the module's test
+# classpath and its compiled classes. Build both once, not once per mutation.
+echo "preparing test classpath"
+(cd "$ROOT" && mvn -B -q -pl the-monopoly-game-specs/the-monopoly-game-specs-core -am -DskipTests test-compile)
+(cd "$ROOT" && mvn -B -q -pl the-monopoly-game-specs/the-monopoly-game-specs-core \
+  dependency:build-classpath -Dmdep.outputFile="$WORK/classpath.txt")
+
+CP="$SPECS/target/test-classes:$SPECS/target/classes:$(cat "$WORK/classpath.txt")"
+
+# --runner-worker takes a single command, so wrap the invocation.
+WORKER="$WORK/runner-worker.sh"
+cat > "$WORKER" <<EOF
+#!/usr/bin/env bash
+exec java -cp "$CP" "$ROOT/acceptance/mutation-runner/AcceptanceMutationRunner.java" "$ROOT"
+EOF
+chmod +x "$WORKER"
 
 status=0
 for feature in "${FEATURE_FILES[@]}"; do
@@ -56,8 +72,8 @@ for feature in "${FEATURE_FILES[@]}"; do
     --feature "$FEATURES/$feature" \
     --work-dir "$work_dir" \
     --generated-dir "$generated" \
-    --runner-worker "$ROOT/acceptance/acceptance-mutation-runner.bb" \
-    --workers 1 \
+    --runner-worker "$WORKER" \
+    --workers 4 \
     --status-interval 30s \
     --level "$LEVEL") || status=$?
 done

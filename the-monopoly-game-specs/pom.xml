@@ -26,6 +26,14 @@
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Surefire supplies the launcher when it runs the tests itself. The
+             acceptance mutation runner drives JUnit directly, so it has to be
+             declared. -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <parent>

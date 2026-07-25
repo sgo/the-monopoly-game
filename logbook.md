@@ -305,3 +305,85 @@ path is ever wanted back.
 - `mvn test -Pproperty-tests`: 7 property tests pass.
 - `acceptance/run-acceptance.sh`: 31/31 pass, matching the refactorer's
   baseline, and verified non-vacuous as described above.
+
+## 2026-07-25T21:35:00Z — architect: ten features are on no pipeline
+
+For the specifier. The architecture question the coder raised is settled: the
+APS pipeline under `specs/acceptance` is the only acceptance path, and the
+Cucumber path is gone. What remains is a specification question, which is not
+the architect's to answer.
+
+Four of the fourteen feature files run. Ten do not, and nothing else verifies
+them:
+
+- `en/rules/official.feature` — carries the 40-space board layout as a
+  step-attached data table, along with the dice, pawn and bank account tables.
+  APS parses the step but drops the table, so a generated test would assert
+  nothing at all. The board layout itself is covered by the domain's
+  `BoardLayoutTest`, so it is not unverified, but the specification of it is
+  not what verifies it.
+- `en/components/dice.feature`, `en/monopoly.feature` — same step-attached
+  table shape.
+- `nl/` (7 files) — Dutch mirrors. The APS parser rejects them outright with
+  `missing feature declaration`; it does not support localized keywords.
+
+Reshaping a feature means rewriting the specification, which belongs to the
+specifier, not to me. The constraint to write against is: APS reads
+`Scenario Outline` plus an `Examples:` table, and reads neither
+step-attached data tables nor `*` continuation steps nor localized keywords.
+Whether the Dutch features should be dropped, kept as untested translations,
+or handled some other way is likewise a specification call.
+
+### Correction to the coder's report
+
+The coder recorded that placeholder names containing spaces, such as
+`<vacant rent>`, are not recognised as IR parameters and that "the mutator
+cannot mutate those columns until the columns are renamed". Measured, this is
+not so. The parser emits the spaced names as example keys, and the mutator
+mutates by example key: `streets.feature` yields exactly 220 mutations, which
+is its 22 example rows times 10 columns, spaced column names included. The
+step handlers resolve `<vacant rent>` from the step text, so no rename is
+needed and none was done.
+
+## 2026-07-26T00:20:00Z — architect: verification made reproducible and faster
+
+### `mvn test` did not mean one thing
+
+The generated acceptance entry points were compiled by the default build and
+landed in `target/test-classes`, so `mvn test` ran 68 tests on a clean tree
+and 99 on a tree where `run-acceptance.sh` had been run since the last clean.
+Nothing said which had happened. This surfaced as a spurious `[ERROR]` during
+verification here, and it is the kind of thing that makes two agents report
+different counts for the same commit.
+
+`add-test-source` now sits in an `acceptance` profile rather than the default
+build, and `run-acceptance.sh` removes the compiled entry points on exit
+through a trap, so a failed run cleans up too. `mvn test` is 68 either way;
+`run-acceptance.sh` is 31 and still exits non-zero when a scenario fails.
+
+### Acceptance mutation runner rebuilt around a hot JVM
+
+The first adapter shelled out to `mvn test` per mutation, paying roughly
+twenty seconds of Maven and JVM startup to run assertions that take
+milliseconds; a soft run over the four pipeline features took about ninety
+minutes. The adapter is now a long-lived JVM that generates the entry point,
+compiles it in process, and runs it through the JUnit Platform launcher, with
+a fresh class loader per mutation so no mutation sees the previous one's
+constants. `junit-platform-launcher` had to be declared: surefire supplies it
+when surefire is the one running the tests, and here it is not.
+
+A full run — every mutation, no differential skipping — now takes about
+fifteen minutes for 230 mutations. Per mutation the speedup is smaller than a
+microbenchmark suggests, because `streets.feature` compiles to a large entry
+point and javac dominates.
+
+### Verification
+
+- `mvn test`: 68 unit tests pass, clean tree or dirty.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 31/31 pass; exits 1 on a mutated
+  expectation and leaves no compiled entry points behind.
+- `mutate4java` over every domain source: 0 survivors, 0 uncovered.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level full`: 230 mutations,
+  230 killed, 0 survived, 0 errors.
