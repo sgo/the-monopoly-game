@@ -4,3 +4,8 @@
 *.iml
 *.swp
 target
+.env
+.claude/
+.swarmforge/
+.worktrees/
+swarmforge/scripts/

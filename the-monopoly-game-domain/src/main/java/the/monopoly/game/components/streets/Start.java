@@ -15,6 +15,7 @@ public class Start implements Street.Factory {
     Money base = new Money(-200);
     return new Street(
         start,
+        null,
         activatedRules,
         new RentFactory(base),
         new TollFactory(base)

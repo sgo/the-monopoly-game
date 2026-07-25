@@ -1,7 +1,7 @@
 package the.monopoly.game.specs.cucumber;
 
+import io.cucumber.java.DataTableType;
 import io.cucumber.java.ParameterType;
-import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -9,16 +9,17 @@ import io.cucumber.java.nl.Dan;
 import io.cucumber.java.nl.En;
 import io.cucumber.java.nl.Gegeven;
 import the.monopoly.game.components.dice.Dice;
-import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.test.fixtures.services.RuleSetService;
 import the.monopoly.game.test.fixtures.validators.RuleSetValidator;
 import the.monopoly.game.test.fixtures.validators.RuleSetValidator.BoardLayoutExpectation;
 
 import java.util.List;
+import java.util.Map;
 
 import static the.monopoly.game.rules.Rule.Set.Type.official;
 import static the.monopoly.game.rules.Rule.Type.double_salary_when_landing_on_start;
+import static the.monopoly.game.specs.cucumber.ConversionUtils.*;
 
 public class RuleSetSteps {
   private final RuleSetService service;
@@ -65,5 +66,13 @@ public class RuleSetSteps {
   @Dan("is de layout van het spelbord")
   public void theGameboardLayoutIs(List<BoardLayoutExpectation> expectation) {
     validator.assertGameboardEquals(expectation);
+  }
+
+  @DataTableType
+  public BoardLayoutExpectation boardLayoutExpectation(Map<String, String> it) {
+    return new BoardLayoutExpectation(
+        streetType(value(it, "street names", "straat namen")),
+        colour(value(it, "colour group", "kleur groep"))
+    );
   }
 }

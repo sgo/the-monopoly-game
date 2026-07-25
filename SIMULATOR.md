@@ -1,0 +1,68 @@
+# Monopoly Simulator
+
+Run a complete simulated game of Monopoly from the command line, with each
+player driven by a pluggable behavior strategy, and produce a human-readable report of
+everything that happened.
+
+## Scope for this phase
+
+- **Pluggable player strategy.** Computer players decide their actions through
+  a strategy abstraction, so the decision logic for any player can be swapped
+  independently of the game engine and of other players' strategies.
+- **One strategy for now: "Buy All".** When a player lands on an unowned,
+  purchasable space (street, station, or utility) and can afford the listed
+  price, it buys. Otherwise it declines, and the space goes to auction as
+  normal (per [Buying Land](RULES.md#buying-land)).
+- **Journal.** Every game event (dice rolls, moves, purchases, rent payments,
+  card draws, jail entry/exit, bankruptcies, the eventual winner, etc.) is
+  recorded to a journal.
+- **Game report.** The journal can be rendered as a human-readable account of
+  the game — a chronological narrative, not raw structured data — for someone
+  to read after the fact.
+- **CLI.** An entry point to start a simulated game, letting the user choose:
+  - the number of players (2–8, per [Setup](RULES.md#setup));
+  - the strategy used for each player, defaulting to Buy All if not specified.
+
+  The CLI runs the game and prints the game report.
+
+## Out of scope for now (future work)
+
+- Additional strategies beyond Buy All (e.g. selective buying, trading,
+  strategic building) — the strategy abstraction should allow adding these
+  later without changing the CLI, journal, or engine.
+- Human/interactive players.
+- Persisting, replaying, or comparing results across many simulated games
+  (the existing `en/monopoly.feature` 1000-game scenario already exercises
+  repeated simulation at the spec level, but that's a correctness check, not a
+  reporting feature).
+
+## Key concepts
+
+### Player Behavior Strategy
+
+An abstraction the game engine consults at each decision point a player faces.
+The interface should be shaped so adding a decision point later doesn't require 
+reshaping the ones already there.
+
+The supported behavioral strategies are...
+
+#### Agree if affordable
+
+This strategy will pay to buy, win an auction, build, take out a mortgage if 
+funds drop too low, trade, jail exit choice, ...
+
+Provided it has the financial means to do so.
+
+### Journal and report
+
+As the game is played, game events should be written to a journal and included
+in the game result report shown at the end of the game.
+
+The game result report and journal should have a human-readable format.
+
+### CLI
+
+- prompts for or accepts the number of players and a strategy per player
+  (defaulting to "Agree if affordable");
+- runs one game
+- prints the rendered game report to console

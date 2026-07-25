@@ -10,6 +10,7 @@ import static the.monopoly.game.components.finance.Money.ZERO;
 
 public class Street {
   private final Type type;
+  private final Colour colourGroup;
   private final Set<Rule> activatedRules;
   private final Money.Factory.Rent rent;
   private final Money.Factory.Toll toll;
@@ -18,6 +19,7 @@ public class Street {
 
   public Street(
       Type type,
+      Colour colourGroup,
       Set<Rule> activatedRules,
       Money.Factory.Rent rent,
       Money.Factory.Toll toll,
@@ -25,6 +27,7 @@ public class Street {
       Money landMortgageValue
   ) {
     this.type = type;
+    this.colourGroup = colourGroup;
     this.activatedRules = activatedRules;
     this.rent = rent;
     this.toll = toll;
@@ -34,27 +37,28 @@ public class Street {
 
   public Street(
       Type type,
+      Colour colourGroup,
       Set<Rule> activatedRules,
       Money.Factory.Rent rent,
       Money.Factory.Toll toll
   ) {
-    this(type, activatedRules, rent, toll, new Money.Factory.Fixed(ZERO), ZERO);
+    this(type, colourGroup, activatedRules, rent, toll, new Money.Factory.Fixed(ZERO), ZERO);
   }
 
-  public Street(Type type, Money rent) {
-    this(type, new Money.Factory.Fixed(rent));
+  public Street(Type type, Colour colourGroup, Money rent) {
+    this(type, colourGroup, new Money.Factory.Fixed(rent));
   }
 
-  private Street(Type type, Money.Factory.Fixed rent) {
-    this(type, emptySet(), rent, rent, new Money.Factory.Fixed(ZERO), ZERO);
+  private Street(Type type, Colour colourGroup, Money.Factory.Fixed rent) {
+    this(type, colourGroup, emptySet(), rent, rent, new Money.Factory.Fixed(ZERO), ZERO);
   }
 
-  public Street(Type type, Money.Factory.Rent rent, Money toll) {
-    this(type, emptySet(), rent, new Money.Factory.Fixed(toll), new Money.Factory.Fixed(ZERO), ZERO);
+  public Street(Type type, Colour colourGroup, Money.Factory.Rent rent, Money toll) {
+    this(type, colourGroup, emptySet(), rent, new Money.Factory.Fixed(toll), new Money.Factory.Fixed(ZERO), ZERO);
   }
 
-  public Street(Type type, Money.Factory.Rent rent, Money toll, Money.Factory.ConstructionCost constructionCost) {
-    this(type, emptySet(), rent, new Money.Factory.Fixed(toll), constructionCost, ZERO);
+  public Street(Type type, Colour colourGroup, Money.Factory.Rent rent, Money toll, Money.Factory.ConstructionCost constructionCost) {
+    this(type, colourGroup, emptySet(), rent, new Money.Factory.Fixed(toll), constructionCost, ZERO);
   }
 
   public Type type() {
@@ -121,8 +125,8 @@ public class Street {
     return type.hashCode();
   }
 
-  public Colour colour() {
-    return null;
+  public Colour colourGroup() {
+    return colourGroup;
   }
 
   public enum Type implements Factory {

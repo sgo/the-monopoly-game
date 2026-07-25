@@ -17,7 +17,7 @@ Functionaliteit: : officiële regels
     Gegeven de officiële regels
     Dan is de layout van het spelbord
       | straat namen         | kleur groep |
-      | Start                |             |
+      | Start                | -           |
       | Rue Grande Dinant    | bruin       |
       | Diestsestraat Leuven | bruin       |
 

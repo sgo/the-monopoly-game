@@ -17,7 +17,7 @@ Feature: official rules
     Given the official rule set
     Then the gameboard layout is
       | street names         | colour group |
-      | Start                |              |
+      | Start                | -            |
       | Rue Grande Dinant    | brown        |
       | Diestsestraat Leuven | brown        |
 

@@ -43,7 +43,7 @@ public class RuleSetValidator {
 
   public void assertGameboardEquals(List<BoardLayoutExpectation> expectation) {
     assertThat(currentRuleSet().gameboard().streets())
-        .extracting(it -> new BoardLayoutExpectation(it.type(), it.colour()))
+        .extracting(it -> new BoardLayoutExpectation(it.type(), it.colourGroup()))
         .containsExactlyElementsOf(expectation);
   }
 

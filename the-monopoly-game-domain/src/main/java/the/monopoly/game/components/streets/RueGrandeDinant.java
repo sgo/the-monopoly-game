@@ -5,11 +5,14 @@ import the.monopoly.game.rules.Rule;
 
 import java.util.Set;
 
+import static the.monopoly.game.components.streets.Street.Colour.brown;
+
 public class RueGrandeDinant implements Street.Factory {
   @Override
   public Street create(Set<Rule> activatedRules) {
     return new Street(
         Street.Type.RueGrandeDinant,
+        brown,
         activatedRules,
         new RentFactory(
             new Money(2),

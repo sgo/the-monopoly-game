@@ -15,7 +15,6 @@ import the.monopoly.game.test.fixtures.validators.StreetValidator;
 
 import java.util.Map;
 
-import static the.monopoly.game.components.streets.Street.Type.*;
 import static the.monopoly.game.specs.cucumber.ConversionUtils.value;
 
 public class StreetSteps {
@@ -46,12 +45,7 @@ public class StreetSteps {
 
   @ParameterType("\"(.*)\"")
   public Street.Type streetType(String type) {
-    return switch (type) {
-      case "Start" -> start;
-      case "Rue Grande Dinant" -> RueGrandeDinant;
-      case "Diestsestraat Leuven" -> DiestsestraatLeuven;
-      default -> throw new IllegalArgumentException("Unknown street type! [" + type + "]");
-    };
+    return ConversionUtils.streetType(type);
   }
 
   @DataTableType
