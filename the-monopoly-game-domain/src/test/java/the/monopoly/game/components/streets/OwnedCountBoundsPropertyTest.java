@@ -29,7 +29,7 @@ class OwnedCountBoundsPropertyTest {
   @Test
   void stationRentIsDefinedOnlyWithinBoardBounds() {
     PropertyChecker.forAll(Generator.zipWith(stationTypes(), OWNED_COUNTS, Case::new), c -> {
-      Street station = ruleSet.create(c.type());
+      Station station = (Station) ruleSet.create(c.type());
       return isBoundedByOwnedOnBoard(c.owned(), STATIONS_ON_BOARD, () -> station.rentForOwning(c.owned()));
     });
   }
@@ -37,7 +37,7 @@ class OwnedCountBoundsPropertyTest {
   @Test
   void utilityRentMultiplierIsDefinedOnlyWithinBoardBounds() {
     PropertyChecker.forAll(Generator.zipWith(utilityTypes(), OWNED_COUNTS, Case::new), c -> {
-      Street utility = ruleSet.create(c.type());
+      Utility utility = (Utility) ruleSet.create(c.type());
       return isBoundedByOwnedOnBoard(c.owned(), UTILITIES_ON_BOARD, () -> utility.rentDiceMultiplierForOwning(c.owned()));
     });
   }

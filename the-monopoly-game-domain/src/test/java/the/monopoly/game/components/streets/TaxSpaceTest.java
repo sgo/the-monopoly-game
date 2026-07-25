@@ -13,7 +13,7 @@ class TaxSpaceTest {
 
   @Test
   void incomeTaxCostsTwoHundred() {
-    Street space = ruleSet.create(InkomstenBelasting);
+    TaxSpace space = taxSpace(InkomstenBelasting);
 
     assertThat(space.kind()).isEqualTo(Street.Kind.tax);
     assertThat(space.tax()).isEqualTo(new Money(200));
@@ -21,9 +21,13 @@ class TaxSpaceTest {
 
   @Test
   void luxuryTaxCostsOneHundred() {
-    Street space = ruleSet.create(ExtraBelasting);
+    TaxSpace space = taxSpace(ExtraBelasting);
 
     assertThat(space.kind()).isEqualTo(Street.Kind.tax);
     assertThat(space.tax()).isEqualTo(new Money(100));
+  }
+
+  private TaxSpace taxSpace(Street.Type type) {
+    return (TaxSpace) ruleSet.create(type);
   }
 }

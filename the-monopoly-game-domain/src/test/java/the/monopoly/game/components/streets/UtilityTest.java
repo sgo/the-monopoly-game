@@ -16,17 +16,17 @@ class UtilityTest {
   @ParameterizedTest
   @EnumSource(names = {"Elektriciteitscentrale", "Watermaatschappij"})
   void everyUtilityCostsOneHundredFiftyAndMortgagesForSeventyFive(Street.Type type) {
-    Street utility = ruleSet.create(type);
+    Utility utility = utility(type);
 
     assertThat(utility.kind()).isEqualTo(Street.Kind.utility);
-    assertThat(utility.toll()).isEqualTo(new Money(150));
+    assertThat(utility.price()).isEqualTo(new Money(150));
     assertThat(utility.landMortgageValue()).isEqualTo(new Money(75));
   }
 
   @ParameterizedTest
   @EnumSource(names = {"Elektriciteitscentrale", "Watermaatschappij"})
   void utilityRentIsAMultipleOfTheDiceRoll(Street.Type type) {
-    Street utility = ruleSet.create(type);
+    Utility utility = utility(type);
 
     assertThat(utility.rentDiceMultiplierForOwning(1)).isEqualTo(4);
     assertThat(utility.rentDiceMultiplierForOwning(2)).isEqualTo(10);
@@ -34,12 +34,16 @@ class UtilityTest {
 
   @Test
   void owningNoUtilitiesEarnsNoRent() {
-    assertThat(ruleSet.create(Elektriciteitscentrale).rentDiceMultiplierForOwning(0)).isZero();
+    assertThat(utility(Elektriciteitscentrale).rentDiceMultiplierForOwning(0)).isZero();
   }
 
   @Test
   void thereIsNoMultiplierForMoreUtilitiesThanExistOnTheBoard() {
-    assertThatThrownBy(() -> ruleSet.create(Elektriciteitscentrale).rentDiceMultiplierForOwning(3))
+    assertThatThrownBy(() -> utility(Elektriciteitscentrale).rentDiceMultiplierForOwning(3))
         .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  private Utility utility(Street.Type type) {
+    return (Utility) ruleSet.create(type);
   }
 }

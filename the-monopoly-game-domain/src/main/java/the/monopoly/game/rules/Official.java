@@ -63,7 +63,7 @@ public class Official implements Rule.Set.Factory {
         ExtraBelasting,
         NieuwstraatBrussel
     ));
-    Rule.Set.Simple ruleSet = new Rule.Set.Simple(
+    return new Rule.Set.Simple(
         board,
         Stream.of(six, six).map(Dice.Type::create).toList(),
         new Player.Pool(2, 8, bank, new Money(1500)),
@@ -73,8 +73,6 @@ public class Official implements Rule.Set.Factory {
             double_salary_when_landing_on_start, new DoubleSalaryWhenLandingOnStart()
         )
     );
-    board.ruleSet(ruleSet);
-    return ruleSet;
   }
 
   public static class DoubleSalaryWhenLandingOnStart implements Rule {

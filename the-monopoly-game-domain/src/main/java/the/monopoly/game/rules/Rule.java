@@ -34,6 +34,9 @@ public interface Rule {
 
     Board gameboard();
 
+    /** The board laid out as playable spaces under the rules now in force. */
+    Stream<Street> streets();
+
     enum Type implements Factory {
       official(new Official());
 
@@ -79,6 +82,11 @@ public interface Rule {
       @Override
       public Board gameboard() {
         return board;
+      }
+
+      @Override
+      public Stream<Street> streets() {
+        return board.spaces().map(this::create);
       }
     }
   }

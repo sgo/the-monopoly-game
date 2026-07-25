@@ -2,19 +2,20 @@ package the.monopoly.game.components.players;
 
 import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.finance.Money;
-import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.components.streets.ColourStreet;
+import the.monopoly.game.components.streets.StartSpace;
 
 import java.util.Comparator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public record Player(ID id, Bank.Account account) {
-  public void pass(Street street) {
-    account.credit(street.toll());
+  public void pass(StartSpace start) {
+    account.deposit(start.salary());
   }
 
-  public void visit(Street street) {
-    account.credit(street.rent());
+  public void visit(ColourStreet street) {
+    account.credit(street.vacantRent());
   }
 
   public record ID(String value) {

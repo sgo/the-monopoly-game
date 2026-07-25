@@ -9,6 +9,7 @@ import the.monopoly.game.rules.Rule;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static the.monopoly.game.components.streets.Street.Type.*;
 
 class ColourStreetFinancesTest {
@@ -44,14 +45,15 @@ class ColourStreetFinancesTest {
   @ParameterizedTest
   @MethodSource("officialStreetFinances")
   void theStreetCarriesItsOfficialFinancialFigures(Finances expected) {
-    Street street = ruleSet.create(expected.type());
+    ColourStreet street = colourStreet(expected.type());
 
-    assertThat(street.toll()).isEqualTo(new Money(expected.value()));
+    assertThat(street.price()).isEqualTo(new Money(expected.value()));
     assertThat(street.vacantRent()).isEqualTo(new Money(expected.vacantRent()));
-    assertThat(street.rentForOneHouse()).isEqualTo(new Money(expected.oneHouse()));
-    assertThat(street.rentForTwoHouses()).isEqualTo(new Money(expected.twoHouses()));
-    assertThat(street.rentForThreeHouses()).isEqualTo(new Money(expected.threeHouses()));
-    assertThat(street.rentForFourHouses()).isEqualTo(new Money(expected.fourHouses()));
+    assertThat(street.rentForHouses(0)).isEqualTo(new Money(expected.vacantRent()));
+    assertThat(street.rentForHouses(1)).isEqualTo(new Money(expected.oneHouse()));
+    assertThat(street.rentForHouses(2)).isEqualTo(new Money(expected.twoHouses()));
+    assertThat(street.rentForHouses(3)).isEqualTo(new Money(expected.threeHouses()));
+    assertThat(street.rentForHouses(4)).isEqualTo(new Money(expected.fourHouses()));
     assertThat(street.rentForOneHotel()).isEqualTo(new Money(expected.oneHotel()));
     assertThat(street.houseConstructionCost()).isEqualTo(new Money(expected.constructionCost()));
     assertThat(street.hotelConstructionCost()).isEqualTo(new Money(expected.constructionCost()));
@@ -59,19 +61,29 @@ class ColourStreetFinancesTest {
   }
 
   @Test
+  void aStreetNeverHoldsMoreThanFourHouses() {
+    assertThatThrownBy(() -> colourStreet(RueGrandeDinant).rentForHouses(5))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
   void aHotelAlwaysReplacesFourHouses() {
-    assertThat(ruleSet.create(RueGrandeDinant).hotelConstructionRequiresNumberOfHouses()).isEqualTo(4);
+    assertThat(colourStreet(RueGrandeDinant).hotelConstructionRequiresNumberOfHouses()).isEqualTo(4);
   }
 
   @Test
   void everyColourStreetOnTheBoardIsCovered() {
     assertThat(officialStreetFinances().map(Finances::type))
         .containsExactlyInAnyOrderElementsOf(
-            ruleSet.gameboard().streets()
-                .filter(it -> it.kind() == Street.Kind.street)
+            ruleSet.streets()
+                .filter(ColourStreet.class::isInstance)
                 .map(Street::type)
                 .toList()
         );
+  }
+
+  private ColourStreet colourStreet(Street.Type type) {
+    return (ColourStreet) ruleSet.create(type);
   }
 
   record Finances(

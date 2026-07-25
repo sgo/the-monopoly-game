@@ -1,40 +1,59 @@
 package the.monopoly.game.components.streets;
 
 import the.monopoly.game.components.finance.Money;
-import the.monopoly.game.rules.Rule;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * A buildable street in a colour group. Every such street differs only in its
  * financial figures, so they are all built from this one data-driven factory.
  */
-class ColourStreet implements Street.Factory {
-  private final Street.Colour colourGroup;
-  private final Money price;
-  private final Money.Factory.Rent rent;
-  private final Money.Factory.ConstructionCost constructionCost;
-  private final Money landMortgageValue;
+public record ColourStreet(
+    Street.Type type,
+    Street.Colour colourGroup,
+    Money price,
+    List<Money> rentByHouses,
+    Money rentForOneHotel,
+    Money constructionCost,
+    Money landMortgageValue
+) implements Ownable {
+  /** A street holds four houses before a hotel replaces them. */
+  public static final int HOUSES_PER_HOTEL = 4;
 
-  private ColourStreet(
-      Street.Colour colourGroup,
-      Money price,
-      Money.Factory.Rent rent,
-      Money.Factory.ConstructionCost constructionCost,
-      Money landMortgageValue
-  ) {
-    this.colourGroup = colourGroup;
-    this.price = price;
-    this.rent = rent;
-    this.constructionCost = constructionCost;
-    this.landMortgageValue = landMortgageValue;
+  @Override
+  public Street.Kind kind() {
+    return Street.Kind.street;
+  }
+
+  /**
+   * Rent owed by a visitor, which depends on how far the street has been built
+   * up. Nought houses is the vacant rent.
+   */
+  public Money rentForHouses(int houses) {
+    return rentByHouses.get(OwnedCount.checked(houses, rentByHouses, type, "houses"));
+  }
+
+  public Money vacantRent() {
+    return rentForHouses(0);
   }
 
   /**
    * A hotel costs the same as a house on the official board, so one
    * construction cost covers both.
    */
-  static ColourStreet of(
+  public Money houseConstructionCost() {
+    return constructionCost;
+  }
+
+  public Money hotelConstructionCost() {
+    return constructionCost;
+  }
+
+  public int hotelConstructionRequiresNumberOfHouses() {
+    return HOUSES_PER_HOTEL;
+  }
+
+  static Street.Factory of(
       Street.Colour colourGroup,
       int price,
       int vacantRent,
@@ -46,55 +65,21 @@ class ColourStreet implements Street.Factory {
       int constructionCost,
       int landMortgageValue
   ) {
-    return new ColourStreet(
+    List<Money> rentByHouses = List.of(
+        new Money(vacantRent),
+        new Money(rentForOneHouse),
+        new Money(rentForTwoHouses),
+        new Money(rentForThreeHouses),
+        new Money(rentForFourHouses)
+    );
+    return (type, activatedRules) -> new ColourStreet(
+        type,
         colourGroup,
         new Money(price),
-        new HouseRent(
-            new Money(vacantRent),
-            new Money(rentForOneHouse),
-            new Money(rentForTwoHouses),
-            new Money(rentForThreeHouses),
-            new Money(rentForFourHouses),
-            new Money(rentForOneHotel)
-        ),
-        new ConstructionCosts(new Money(constructionCost)),
+        rentByHouses,
+        new Money(rentForOneHotel),
+        new Money(constructionCost),
         new Money(landMortgageValue)
     );
-  }
-
-  @Override
-  public Street create(Street.Type type, Set<Rule> activatedRules) {
-    return Street.colourStreet(type, colourGroup, activatedRules, rent, price, constructionCost, landMortgageValue);
-  }
-
-  private record HouseRent(
-      Money vacant,
-      Money forOneHouse,
-      Money forTwoHouses,
-      Money forThreeHouses,
-      Money forFourHouses,
-      Money forOneHotel
-  ) implements Money.Factory.Rent {
-    @Override
-    public Money create(Set<Rule> rules) {
-      return vacant;
-    }
-  }
-
-  private record ConstructionCosts(Money cost) implements Money.Factory.ConstructionCost {
-    @Override
-    public Money create(Set<Rule> rules) {
-      return cost;
-    }
-
-    @Override
-    public Money house() {
-      return cost;
-    }
-
-    @Override
-    public Money hotel() {
-      return cost;
-    }
   }
 }
