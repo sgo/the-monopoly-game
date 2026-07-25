@@ -9,3 +9,6 @@ target
 .swarmforge/
 .worktrees/
 swarmforge/scripts/
+build/
+tmp/
+pending-messages/

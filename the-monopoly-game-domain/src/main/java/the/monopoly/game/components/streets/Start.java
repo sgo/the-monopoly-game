@@ -6,16 +6,12 @@ import the.monopoly.game.rules.Rule;
 
 import java.util.Set;
 
-import static the.monopoly.game.components.finance.Money.ZERO;
-import static the.monopoly.game.components.streets.Street.Type.start;
-
-public class Start implements Street.Factory {
+class Start implements Street.Factory {
   @Override
-  public Street create(Set<Rule> activatedRules) {
+  public Street create(Street.Type type, Set<Rule> activatedRules) {
     Money base = new Money(-200);
-    return new Street(
-        start,
-        null,
+    return Street.startSpace(
+        type,
         activatedRules,
         new RentFactory(base),
         new TollFactory(base)

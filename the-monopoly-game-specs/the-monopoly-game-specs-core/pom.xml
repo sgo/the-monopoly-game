@@ -34,6 +34,30 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <!-- Generated acceptance entry points are kept out of the hand
+                 written test sources; see acceptance/run-acceptance.sh. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-test-sources/acceptance</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <parent>
         <groupId>the.monopoly.game</groupId>
         <artifactId>the-monopoly-game-specs</artifactId>
