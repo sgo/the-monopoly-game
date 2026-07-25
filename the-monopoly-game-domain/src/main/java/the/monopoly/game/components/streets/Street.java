@@ -86,10 +86,9 @@ public class Street {
       Money landMortgageValue,
       List<Money> rentByOwnedCount
   ) {
-    return new Street(
-        type, Kind.station, null, activatedRules,
-        null, new Money.Factory.Fixed(price), null, landMortgageValue,
-        rentByOwnedCount, null, null
+    return ownedCountStreet(
+        type, Kind.station, activatedRules, price, landMortgageValue,
+        rentByOwnedCount, null
     );
   }
 
@@ -100,10 +99,25 @@ public class Street {
       Money landMortgageValue,
       List<Integer> diceMultiplierByOwnedCount
   ) {
+    return ownedCountStreet(
+        type, Kind.utility, activatedRules, price, landMortgageValue,
+        null, diceMultiplierByOwnedCount
+    );
+  }
+
+  private static Street ownedCountStreet(
+      Type type,
+      Kind kind,
+      Set<Rule> activatedRules,
+      Money price,
+      Money landMortgageValue,
+      List<Money> rentByOwnedCount,
+      List<Integer> diceMultiplierByOwnedCount
+  ) {
     return new Street(
-        type, Kind.utility, null, activatedRules,
+        type, kind, null, activatedRules,
         null, new Money.Factory.Fixed(price), null, landMortgageValue,
-        null, diceMultiplierByOwnedCount, null
+        rentByOwnedCount, diceMultiplierByOwnedCount, null
     );
   }
 
