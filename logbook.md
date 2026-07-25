@@ -76,3 +76,26 @@ left untouched.
 Verification: 49 domain unit tests and 31 generated acceptance tests pass.
 The acceptance tests were checked against a mutated expected value and
 failed as they should, so they are not passing vacuously.
+
+## 2026-07-25T19:30:35Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260725T193035Z_000001_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: full-board-layout
+commit: 31c818a1a2
+created_at: 2026-07-25T19:30:35.387145Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 31c818a1a2
+```
+
+Summary: hands the completed `full-board-layout` slice on branch
+`swarmforge-coder` at commit `31c818a1a2` to the refactorer.
