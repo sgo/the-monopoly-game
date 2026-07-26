@@ -24,9 +24,46 @@ public class Official implements Rule.Set.Factory {
     Board board = new Board(List.of(
         start,
         RueGrandeDinant,
-        DiestsestraatLeuven
+        AlgemeenFonds,
+        DiestsestraatLeuven,
+        InkomstenBelasting,
+        NoordStation,
+        SteenstraatBrugge,
+        Kans,
+        PlaceDuMonumentSpa,
+        KapellestraatOostende,
+        OpBezoek,
+        RueDeDiekirchArlon,
+        Elektriciteitscentrale,
+        BruulMechelen,
+        PlaceVerteVerviers,
+        CentraalStation,
+        LippenslaanKnokke,
+        AlgemeenFonds,
+        RueRoyaleTournai,
+        GroenplaatsAntwerpen,
+        GratisParkeren,
+        RueStLeonardLiege,
+        Kans,
+        LangeSteenstraatKortrijk,
+        GrandPlaceMons,
+        Buurtspoorwegen,
+        GroteMarktHasselt,
+        PlaceDeLAngeNamur,
+        Watermaatschappij,
+        HoogstraatBrussel,
+        NaarDeGevangenis,
+        BoulevardTirouCharleroi,
+        VeldstraatGent,
+        AlgemeenFonds,
+        BoulevardDAvroyLiege,
+        ZuidStation,
+        Kans,
+        MeirAntwerpen,
+        ExtraBelasting,
+        NieuwstraatBrussel
     ));
-    Rule.Set.Simple ruleSet = new Rule.Set.Simple(
+    return new Rule.Set.Simple(
         board,
         Stream.of(six, six).map(Dice.Type::create).toList(),
         new Player.Pool(2, 8, bank, new Money(1500)),
@@ -36,8 +73,6 @@ public class Official implements Rule.Set.Factory {
             double_salary_when_landing_on_start, new DoubleSalaryWhenLandingOnStart()
         )
     );
-    board.ruleSet(ruleSet);
-    return ruleSet;
   }
 
   public static class DoubleSalaryWhenLandingOnStart implements Rule {

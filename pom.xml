@@ -30,6 +30,23 @@
                 <artifactId>logback-classic</artifactId>
                 <version>1.5.32</version>
             </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>jetCheck</artifactId>
+                <version>${jetcheck.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -67,10 +84,18 @@
                     <target>25</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.5</version>
+            </plugin>
         </plugins>
     </build>
 
     <properties>
         <toolchain.jdk.version>[25,)</toolchain.jdk.version>
+        <junit.version>6.0.3</junit.version>
+        <assertj.version>3.27.7</assertj.version>
+        <jetcheck.version>0.3.0</jetcheck.version>
     </properties>
 </project>
