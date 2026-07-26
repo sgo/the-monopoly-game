@@ -422,30 +422,41 @@ coverage of the domain, and a reproducible `mvn test`. The specifier also has
 an open question waiting in this logbook — ten feature files are on no
 pipeline, and reshaping them is a specification decision, not mine.
 
-## 2026-07-26T00:15:00Z — architect: notify-agent.sh now exists
+## 2026-07-26T00:20:00Z — architect: the handoff helper the constitution named did not exist
 
-The constitution told every role to send handoffs with
-`./swarmtools/notify-agent.sh`. No such file existed in any checkout, so the
-handoffs above went out through `swarmforge/scripts/swarm_handoff.sh`
-directly, after checking they reached all three inboxes.
+`workflow.prompt` told every role to send handoffs with
+`./swarmtools/notify-agent.sh`. No such file existed in any checkout, and
+`swarmtools/` had never been tracked on any branch. Every role reached that
+line, found nothing, and used `swarmforge/scripts/swarm_handoff.sh` instead;
+all three earlier handoffs of `full-board-layout` were delivered that way. The
+instruction cost a detour rather than a failure, which is why it survived three
+agents without being reported.
 
-The startup script was the wrong place to fix it. `swarmforge/scripts/` is
-gitignored and vendored from `unclebob/swarm-forge` by `./swarm`: an edit
-there would not commit, would not reach the other worktrees, and would be
-overwritten the next time the scripts were fetched. That version of
-`swarmforge.bb` has no notion of `swarmtools/` at all — its
-`sync-worktree-scripts!` copies the script directory and creates
-`.swarmforge/notify`, and nothing else.
+I first added the missing helper as a tracked script. That was the wrong fix.
+Every guarantee it offered — rejecting a commit that is not in the repository,
+rejecting a malformed priority, requiring `SWARMFORGE_ROLE` — `swarm_handoff.sh`
+already enforces, as a direct test of each case confirmed. It duplicated three
+validations to add one flag, and it parsed prose back into headers so the tool
+could regenerate that same prose. Reverted.
 
-So the helper is tracked in the repository instead. Git puts it in every
-checkout and linked worktree, it resolves its own paths, and `./swarm` cannot
-clobber it.
+The constitution is corrected instead, to describe the mechanism that has been
+in use all along: a draft file of headers, sent with `swarm_handoff.sh`, whose
+body the tool writes. Three further lines were wrong in the same way and are
+also corrected: handoffs never carried a sender field, never carried a branch
+name, and never carried a hand-written body.
 
-It takes the interface the constitution already specified —
-`notify-agent.sh <role> --file <message-file>` — and reads the task name and
-commit hash back out of the message file, so the message and what is
-delivered cannot disagree. It refuses a commit that is not in the repository,
-a priority that is not two digits, and a missing `SWARMFORGE_ROLE`. `--dry-run`
-prints the handoff without sending it.
+Note on the fix to the startup script that was not made: `swarmforge/scripts/`
+is gitignored and vendored from `unclebob/swarm-forge` by `./swarm`. Anything
+written there is untracked, invisible to the other worktrees, and replaced on
+the next fetch.
 
-`workflow.prompt` said startup creates this helper. It now says git does.
+### A duplicate handoff was sent by accident
+
+Verifying the corrected instructions by following them literally queued a real
+second `git_handoff` to the coder for `full-board-layout` at commit
+`acada6cd6b` — the same commit as the handoff already sent. It reached the
+coder's `inbox/new` before it could be withdrawn. It is an exact duplicate, so
+processing it would re-merge an already-merged commit and do nothing, but it is
+noise the coder did not ask for. Verifying a send-side tool against a live
+queue was careless; a dry run belonged there.
+
