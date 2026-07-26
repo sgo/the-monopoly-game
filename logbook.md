@@ -540,3 +540,47 @@ assume still holds:
 
 No further refactoring needed; the merged state already satisfies this
 role's gates. Handing back to the architect.
+
+## 2026-07-26T00:25:00Z — architect received handoff from refactorer
+
+Handoff message received:
+
+```
+id: 20260726T002157Z_000002_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 78ae535994
+created_at: 2026-07-26T00:21:57.909993Z
+enqueued_at: 2026-07-26T00:21:58.260409Z
+task: full-board-layout
+dequeued_at: 2026-07-26T00:22:01.437177Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 78ae535994
+```
+
+Action taken: merged `78ae535994`. Only `logbook.md` conflicted, both sides
+having appended at the same point; kept both threads in timestamp order.
+
+The handoff carries no code. The `the-monopoly-game-domain/src`,
+`the-monopoly-game-specs` and `acceptance` trees all hash identical to
+`eb61011`, the commit the full verification sequence was run against, so there
+is nothing new to review against the architectural phases and nothing for the
+tools to find that they have not already been told about this exact source.
+The mutation, DRY and Gherkin mutation results stand: 0 survivors and 0
+uncovered sites, no production duplication, 230 of 230 acceptance mutations
+killed. Differential mutation would skip every scope, so re-running the
+sequence was not time well spent and was not done. `mvn test` was re-run as a
+cheap check that the merge itself was sound: 68 pass.
+
+The refactorer's own re-verification is recorded above. Worth noting from it:
+CRAP fell from 6.0 to 3.0 across the `Street` split, its maximum now being
+`OwnedCount.checked`.
+
+Not forwarded. The role rule is to run `done_with_current.sh` and take the
+next task when the completed work produced no changes, and this produced none.
