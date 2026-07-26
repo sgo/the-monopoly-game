@@ -176,6 +176,30 @@ Added:
 
 Handing off to the architect.
 
+## 2026-07-25T20:27:43Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260725T202743Z_000001_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: full-board-layout
+commit: 1f213ba1ad
+created_at: 2026-07-25T20:27:43.762683Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 1f213ba1ad
+```
+
+Summary: refactorer's CRAP/DRY/mutation/property-test pass on the
+full-board-layout work is committed at `1f213ba1ad` on
+`swarmforge-refactorer`; handing off to the architect for review.
+
 ## 2026-07-25T20:27:46Z — architect received handoff from refactorer
 
 Handoff message received:
@@ -464,3 +488,55 @@ Withdrawn from the coder's `inbox/new` before it was read, on the user's
 direction. Their real `full-board-layout` handoff is untouched and still in
 `in_process`.
 
+## 2026-07-26T00:20:45Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260726T000045Z_000001_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: full-board-layout
+commit: acada6cd6b
+created_at: (see queued handoff)
+
+Re-read your role and constitution.
+
+merge_and_process architect acada6cd6b
+```
+
+Action taken: merged architect commit `acada6cd6b` into `swarmforge-refactorer`.
+Only `logbook.md` conflicted (both sides had appended entries at the same
+point); resolved by keeping both append-only threads in chronological order.
+Every code file auto-merged cleanly.
+
+Re-ran the refactorer's own gates against the merged state, since the
+architect's `Street` split is a large enough change to recheck rather than
+assume still holds:
+
+- CRAP: max is now 3.0 (`OwnedCount.checked`), down from 6.0 before the
+  architect's split — the sealed hierarchy has no method left above that.
+- DRY: no production duplication (matches the architect's own report). Same
+  incidental test-shape duplicates as before, still judged not worth
+  collapsing.
+- Mutation scan (count-only): largest changed file is `Street.java` at 38
+  sites, well under the 100-site split threshold.
+- Property tests: `OwnedCountBoundsPropertyTest` was already adapted by the
+  merge (cast to the new `Station`/`Utility` types) and passes.
+  `MoneyPropertyTest` still passes against the slimmed-down `Money` (the
+  architect removed `multipliedBy` and the `Factory` machinery, neither of
+  which the property tests touched). The architect's new `MoneyTest` is
+  complementary, not redundant — worked examples for the same laws, added
+  specifically because property tests sit outside normal verification.
+
+### Verification
+
+- `mvn test`: 68 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 31/31 pass.
+
+No further refactoring needed; the merged state already satisfies this
+role's gates. Handing back to the architect.
