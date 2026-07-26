@@ -421,3 +421,31 @@ dependency direction, the single acceptance path, full mutation and DRY
 coverage of the domain, and a reproducible `mvn test`. The specifier also has
 an open question waiting in this logbook — ten feature files are on no
 pipeline, and reshaping them is a specification decision, not mine.
+
+## 2026-07-26T00:15:00Z — architect: notify-agent.sh now exists
+
+The constitution told every role to send handoffs with
+`./swarmtools/notify-agent.sh`. No such file existed in any checkout, so the
+handoffs above went out through `swarmforge/scripts/swarm_handoff.sh`
+directly, after checking they reached all three inboxes.
+
+The startup script was the wrong place to fix it. `swarmforge/scripts/` is
+gitignored and vendored from `unclebob/swarm-forge` by `./swarm`: an edit
+there would not commit, would not reach the other worktrees, and would be
+overwritten the next time the scripts were fetched. That version of
+`swarmforge.bb` has no notion of `swarmtools/` at all — its
+`sync-worktree-scripts!` copies the script directory and creates
+`.swarmforge/notify`, and nothing else.
+
+So the helper is tracked in the repository instead. Git puts it in every
+checkout and linked worktree, it resolves its own paths, and `./swarm` cannot
+clobber it.
+
+It takes the interface the constitution already specified —
+`notify-agent.sh <role> --file <message-file>` — and reads the task name and
+commit hash back out of the message file, so the message and what is
+delivered cannot disagree. It refuses a commit that is not in the repository,
+a priority that is not two digits, and a missing `SWARMFORGE_ROLE`. `--dry-run`
+prints the handoff without sending it.
+
+`workflow.prompt` said startup creates this helper. It now says git does.
