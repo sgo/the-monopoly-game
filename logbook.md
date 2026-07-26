@@ -471,3 +471,28 @@ merge_and_process architect acada6cd6b
 Action taken: merged architect commit `acada6cd6b` into `swarmforge-coder`,
 resolving a `logbook.md` conflict by keeping both the coder's sent entry and
 the refactorer's received entry, then applied coder rules to the merged state.
+
+## 2026-07-26T00:15:00Z — coder verification of the merged architect state
+
+Re-ran the project's verification commands against the merge commit in this
+worktree, to confirm the handed-over state holds here and not only on
+`swarmforge-architect`:
+
+- `mvn test`: 68 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 31/31 pass, exits 0, and leaves no compiled
+  entry points behind.
+- `mvn test` re-run immediately after the acceptance run: 68 again, so the
+  count no longer depends on whether the acceptance script has been run.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+The architect's correction is accepted: spaced example column names such as
+`<vacant rent>` are mutable after all, because the mutator works from example
+keys rather than from the IR `parameters` array. The earlier coder note above
+was wrong on that point; no rename is needed.
+
+No new behavior slice arrived with this handoff, so there is nothing for the
+coder to implement. The outstanding question — ten feature files on no
+pipeline — is the specifier's to answer.
