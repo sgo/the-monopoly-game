@@ -460,3 +460,7 @@ processing it would re-merge an already-merged commit and do nothing, but it is
 noise the coder did not ask for. Verifying a send-side tool against a live
 queue was careless; a dry run belonged there.
 
+Withdrawn from the coder's `inbox/new` before it was read, on the user's
+direction. Their real `full-board-layout` handoff is untouched and still in
+`in_process`.
+
