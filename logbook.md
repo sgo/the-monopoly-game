@@ -445,3 +445,56 @@ dependency direction, the single acceptance path, full mutation and DRY
 coverage of the domain, and a reproducible `mvn test`. The specifier also has
 an open question waiting in this logbook — ten feature files are on no
 pipeline, and reshaping them is a specification decision, not mine.
+
+## 2026-07-26T00:20:45Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260726T000045Z_000001_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: full-board-layout
+commit: acada6cd6b
+created_at: (see queued handoff)
+
+Re-read your role and constitution.
+
+merge_and_process architect acada6cd6b
+```
+
+Action taken: merged architect commit `acada6cd6b` into `swarmforge-refactorer`.
+Only `logbook.md` conflicted (both sides had appended entries at the same
+point); resolved by keeping both append-only threads in chronological order.
+Every code file auto-merged cleanly.
+
+Re-ran the refactorer's own gates against the merged state, since the
+architect's `Street` split is a large enough change to recheck rather than
+assume still holds:
+
+- CRAP: max is now 3.0 (`OwnedCount.checked`), down from 6.0 before the
+  architect's split — the sealed hierarchy has no method left above that.
+- DRY: no production duplication (matches the architect's own report). Same
+  incidental test-shape duplicates as before, still judged not worth
+  collapsing.
+- Mutation scan (count-only): largest changed file is `Street.java` at 38
+  sites, well under the 100-site split threshold.
+- Property tests: `OwnedCountBoundsPropertyTest` was already adapted by the
+  merge (cast to the new `Station`/`Utility` types) and passes.
+  `MoneyPropertyTest` still passes against the slimmed-down `Money` (the
+  architect removed `multipliedBy` and the `Factory` machinery, neither of
+  which the property tests touched). The architect's new `MoneyTest` is
+  complementary, not redundant — worked examples for the same laws, added
+  specifically because property tests sit outside normal verification.
+
+### Verification
+
+- `mvn test`: 68 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 31/31 pass.
+
+No further refactoring needed; the merged state already satisfies this
+role's gates. Handing back to the architect.
