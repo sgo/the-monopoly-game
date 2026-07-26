@@ -42,6 +42,11 @@
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>jetCheck</artifactId>
+                <version>${jetcheck.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -91,5 +96,6 @@
         <toolchain.jdk.version>[25,)</toolchain.jdk.version>
         <junit.version>6.0.3</junit.version>
         <assertj.version>3.27.7</assertj.version>
+        <jetcheck.version>0.3.0</jetcheck.version>
     </properties>
 </project>

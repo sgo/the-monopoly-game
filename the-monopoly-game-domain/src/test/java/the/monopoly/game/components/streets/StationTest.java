@@ -8,25 +8,30 @@ import the.monopoly.game.rules.Rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static the.monopoly.game.components.streets.Street.Type.*;
+import static the.monopoly.game.components.streets.Street.Type.NoordStation;
 
+/**
+ * A station cannot be built on. That is not asserted here: house rent and
+ * construction cost do not exist on {@link Station} at all, so asking for them
+ * does not compile.
+ */
 class StationTest {
   private final Rule.Set ruleSet = Rule.Set.Type.official.create();
 
   @ParameterizedTest
   @EnumSource(names = {"NoordStation", "CentraalStation", "Buurtspoorwegen", "ZuidStation"})
   void everyStationCostsTwoHundredAndMortgagesForOneHundred(Street.Type type) {
-    Street station = ruleSet.create(type);
+    Station station = station(type);
 
     assertThat(station.kind()).isEqualTo(Street.Kind.station);
-    assertThat(station.toll()).isEqualTo(new Money(200));
+    assertThat(station.price()).isEqualTo(new Money(200));
     assertThat(station.landMortgageValue()).isEqualTo(new Money(100));
   }
 
   @ParameterizedTest
   @EnumSource(names = {"NoordStation", "CentraalStation", "Buurtspoorwegen", "ZuidStation"})
   void stationRentDoublesWithEachAdditionalStationOwned(Street.Type type) {
-    Street station = ruleSet.create(type);
+    Station station = station(type);
 
     assertThat(station.rentForOwning(1)).isEqualTo(new Money(25));
     assertThat(station.rentForOwning(2)).isEqualTo(new Money(50));
@@ -36,20 +41,16 @@ class StationTest {
 
   @Test
   void owningNoStationsEarnsNoRent() {
-    assertThat(ruleSet.create(NoordStation).rentForOwning(0)).isEqualTo(Money.ZERO);
+    assertThat(station(NoordStation).rentForOwning(0)).isEqualTo(Money.ZERO);
   }
 
   @Test
   void thereIsNoRentForMoreStationsThanExistOnTheBoard() {
-    assertThatThrownBy(() -> ruleSet.create(NoordStation).rentForOwning(5))
+    assertThatThrownBy(() -> station(NoordStation).rentForOwning(5))
         .isInstanceOf(IllegalArgumentException.class);
   }
 
-  @Test
-  void aStationCannotBeBuiltOn() {
-    Street station = ruleSet.create(NoordStation);
-
-    assertThatThrownBy(station::rentForOneHouse).isInstanceOf(UnsupportedOperationException.class);
-    assertThatThrownBy(station::houseConstructionCost).isInstanceOf(UnsupportedOperationException.class);
+  private Station station(Street.Type type) {
+    return (Station) ruleSet.create(type);
   }
 }

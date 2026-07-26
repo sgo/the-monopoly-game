@@ -1,0 +1,37 @@
+package the.monopoly.game.components.finance;
+
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * Worked examples for the arithmetic. {@link MoneyPropertyTest} states the
+ * same behaviour as laws over generated amounts, but property tests are kept
+ * out of normal verification, so the arithmetic needs cover here too.
+ */
+class MoneyTest {
+  @Test
+  void amountsAdd() {
+    assertThat(new Money(60).plus(new Money(140))).isEqualTo(new Money(200));
+  }
+
+  @Test
+  void amountsSubtract() {
+    assertThat(new Money(200).minus(new Money(140))).isEqualTo(new Money(60));
+  }
+
+  @Test
+  void anAmountCanFallBelowNothing() {
+    assertThat(new Money(50).minus(new Money(75))).isEqualTo(new Money(-25));
+  }
+
+  @Test
+  void addingNothingChangesNothing() {
+    assertThat(new Money(1500).plus(Money.ZERO)).isEqualTo(new Money(1500));
+  }
+
+  @Test
+  void nothingIsWorthNothing() {
+    assertThat(Money.ZERO.amount()).isZero();
+  }
+}

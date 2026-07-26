@@ -1,10 +1,12 @@
 package the.monopoly.game.components.board;
 
 import org.junit.jupiter.api.Test;
+import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Rule;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static the.monopoly.game.components.streets.Street.Colour.*;
@@ -95,35 +97,42 @@ class BoardLayoutTest {
     assertThat(colourOf(NieuwstraatBrussel)).isEqualTo(dark_blue);
   }
 
+  /**
+   * Only a {@link ColourStreet} carries a colour group at all, so this holds by
+   * construction. It is asserted to pin down the other half of that bargain:
+   * the spaces that are colour streets are exactly the ones of kind street.
+   */
   @Test
   void onlyStreetsBelongToAColourGroup() {
     assertThat(layout())
-        .filteredOn(it -> it.kind() != street)
-        .extracting(Street::colourGroup)
-        .containsOnlyNulls();
+        .filteredOn(it -> it instanceof ColourStreet)
+        .extracting(Street::kind)
+        .containsOnly(street);
+    assertThat(layout())
+        .filteredOn(it -> it.kind() == street)
+        .allMatch(it -> it instanceof ColourStreet);
   }
 
   @Test
   void eachColourGroupHasTheOfficialNumberOfStreets() {
-    assertThat(layout())
-        .filteredOn(it -> it.kind() == street)
-        .filteredOn(it -> it.colourGroup() == brown)
-        .hasSize(2);
-    assertThat(layout())
-        .filteredOn(it -> it.kind() == street)
-        .filteredOn(it -> it.colourGroup() == dark_blue)
-        .hasSize(2);
-    assertThat(layout())
-        .filteredOn(it -> it.kind() == street)
-        .filteredOn(it -> it.colourGroup() == light_blue)
-        .hasSize(3);
+    assertThat(colourStreetsOf(brown)).hasSize(2);
+    assertThat(colourStreetsOf(dark_blue)).hasSize(2);
+    assertThat(colourStreetsOf(light_blue)).hasSize(3);
+  }
+
+  private List<ColourStreet> colourStreetsOf(Street.Colour colour) {
+    return colourStreets().filter(it -> it.colourGroup() == colour).toList();
+  }
+
+  private Stream<ColourStreet> colourStreets() {
+    return layout().stream().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast);
   }
 
   private Street.Colour colourOf(Street.Type type) {
-    return ruleSet.create(type).colourGroup();
+    return ((ColourStreet) ruleSet.create(type)).colourGroup();
   }
 
   private List<Street> layout() {
-    return ruleSet.gameboard().streets().toList();
+    return ruleSet.streets().toList();
   }
 }

@@ -1,22 +1,18 @@
 package the.monopoly.game.components.streets;
 
 import the.monopoly.game.components.finance.Money;
-import the.monopoly.game.rules.Rule;
-
-import java.util.Set;
 
 /**
- * A space that charges whoever lands on it a fixed amount.
+ * A space that charges whoever lands on it a fixed amount. Nobody can buy it.
  */
-class TaxSpace implements Street.Factory {
-  private final Money tax;
-
-  TaxSpace(int tax) {
-    this.tax = new Money(tax);
+public record TaxSpace(Street.Type type, Money tax) implements Street {
+  @Override
+  public Street.Kind kind() {
+    return Street.Kind.tax;
   }
 
-  @Override
-  public Street create(Street.Type type, Set<Rule> activatedRules) {
-    return Street.taxSpace(type, activatedRules, tax);
+  static Street.Factory of(int tax) {
+    Money amount = new Money(tax);
+    return (type, activatedRules) -> new TaxSpace(type, amount);
   }
 }
