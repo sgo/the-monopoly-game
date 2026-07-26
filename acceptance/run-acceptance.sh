@@ -40,5 +40,16 @@ done
 
 echo "running generated acceptance tests"
 cd "$ROOT"
-exec mvn -B -pl the-monopoly-game-specs/the-monopoly-game-specs-core -am \
-  -Dtest='*AcceptanceTest' -Dsurefire.failIfNoSpecifiedTests=false test
+
+# The compiled entry points must not outlive this run. They land in
+# target/test-classes, where a later plain `mvn test` would find and run them,
+# making the size of the default suite depend on whether this script had been
+# run since the last clean.
+compiled="$SPECS/target/test-classes/the/monopoly/game/specs/acceptance/generated"
+trap 'rm -rf "$compiled"' EXIT
+
+status=0
+mvn -B -Pacceptance -pl the-monopoly-game-specs/the-monopoly-game-specs-core -am \
+  -Dtest='*AcceptanceTest' -Dsurefire.failIfNoSpecifiedTests=false test || status=$?
+
+exit $status

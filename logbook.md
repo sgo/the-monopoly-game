@@ -199,3 +199,249 @@ merge_and_process refactorer 1f213ba1ad
 Summary: refactorer's CRAP/DRY/mutation/property-test pass on the
 full-board-layout work is committed at `1f213ba1ad` on
 `swarmforge-refactorer`; handing off to the architect for review.
+
+## 2026-07-25T20:27:46Z — architect received handoff from refactorer
+
+Handoff message received:
+
+```
+id: 20260725T202743Z_000001_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 1f213ba1ad
+created_at: 2026-07-25T20:27:43.762683Z
+enqueued_at: 2026-07-25T20:27:44.217480Z
+task: full-board-layout
+dequeued_at: 2026-07-25T20:27:46.573396Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 1f213ba1ad
+```
+
+Delivered as a one-item batch. Action taken: merged refactorer commit
+`1f213ba1ad` into `swarmforge-architect` (fast-forward), confirmed the
+merged state green, then applied the architectural review phases below.
+
+## 2026-07-25T20:47:00Z — architect review of full-board-layout
+
+### UI/Core separation
+
+The domain module has no UI or IO, and every acceptance step runs against
+the domain directly. Nothing to separate. One leak noted but not addressed:
+`Game.Journal` logs through slf4j from inside the domain, and its `entries`
+list is written by nobody — see open items.
+
+### Dependency rule
+
+`components.board` and `rules` depended on each other. `Board` held a
+mutable `Rule.Set` installed by a setter *after* construction, so
+`Official.create()` had to build the board, build the rule set around it,
+and then back-patch `board.ruleSet(ruleSet)`. Any `Board` observed between
+those steps threw `NullPointerException` from `streets()`.
+
+Fixed by giving the dependency one direction. `Board` is now an immutable
+record of `Street.Type` in board order and knows nothing about rules;
+materialising a space under the rules in force moved to `Rule.Set.streets()`,
+which is where the activated rules already live. `Board` no longer imports
+`rules`, and the setter is gone.
+
+`Money` also imported `rules.Rule`, purely to host the space-money factories.
+Those moved (see below), so `components.finance.Money` is now a plain value
+type with no dependencies at all.
+
+### Information hiding and encapsulation
+
+`Street` was one class covering six unrelated kinds of space: 11 fields, of
+which any given instance left most `null`, plus a `require()` helper that
+turned each inapplicable field into a runtime `UnsupportedOperationException`.
+The nullable-slot representation *was* the public contract — a caller had to
+know out of band that `rentForOneHouse()` is legal on a colour street and
+fatal on a station.
+
+Replaced with a sealed hierarchy that states which space can do what:
+
+- `Street` — sealed; `type()` and `kind()`, the two things every space has.
+- `Ownable` — sealed; `price()` and `landMortgageValue()`.
+- `ColourStreet` — the rent ladder, construction costs, colour group.
+- `Station` — `rentForOwning(int)`.
+- `Utility` — `rentDiceMultiplierForOwning(int)`.
+- `TaxSpace` — `tax()`.
+- `StartSpace` — `salary()`.
+- `UnownableSpace` — chance, community chest, jail, free parking, go to jail.
+
+Asking a station for its house rent is now a compile error, so
+`StationTest.aStationCannotBeBuiltOn` was deleted: it asserted at run time
+what the type system now refuses to compile. Six `rentForOneHouse()` …
+`rentForFourHouses()` methods collapsed into `rentForHouses(int)`, which also
+removed the `switch` that the step handler needed to reach them; a new test
+pins the upper bound that collapse introduced.
+
+`Money.Factory` and its `Toll`/`Rent`/`ConstructionCost` sub-interfaces are
+gone. `Money.Factory.Fixed` implemented all three and threw
+`UnsupportedOperationException` from eight of its eleven methods; nothing
+needs it now that each space holds its own figures directly. The one genuinely
+rule-dependent amount, the Start salary, is computed by `StartSpace` itself.
+
+`Board` and `Money` became immutable records in the process.
+
+### Local code quality
+
+- `Street.ownedCount` guarded station and utility lookups; the same guard now
+  also covers the house-rent ladder, so it moved to `OwnedCount.checked` and
+  reports which quantity was out of range.
+- The Start salary was stored as `Money(-200)` and read back through
+  `Player.pass`, which called `account.credit(...)`; a negative charge is what
+  made the player richer. `StartSpace.salary()` now returns a positive `+200`
+  and `Player.pass` calls `account.deposit(...)`. The acceptance step keeps
+  asserting "your salary is $200" and was verified non-vacuous by mutating the
+  expected value to $999 and watching it fail.
+- `StartSpace` previously returned `Money(0)` from `rent()` whenever no
+  optional rules were active, because it summed over an empty rule set. The
+  replacement returns the base salary and doubles it only when the
+  double-salary rule is on. Nothing covered the old behaviour.
+
+### Dead specification code removed
+
+`specs/cucumber` (9 files) and `test/fixtures` (27 files) were a closed,
+self-referential cluster: the fixtures were used only by the Cucumber steps,
+the steps were used by nothing. No `@Suite` / `@IncludeEngines("cucumber")`
+class exists anywhere in the tree, so the Cucumber engine was never started
+and none of it had ever executed — which is exactly why the specs module
+reported `BUILD SUCCESS` while testing nothing.
+
+The coder flagged the keep-or-replace call as an architecture decision. Both
+packages are deleted, along with the Spring/Cucumber properties files they
+alone read, and the now-unused `cucumber-*`, `spring-*` and
+`junit-platform-suite` dependencies. The APS pipeline under `specs/acceptance`
+is the single acceptance path. The `.feature` files are untouched: they are
+the specification, not dead code. Git retains the deleted work if the Cucumber
+path is ever wanted back.
+
+### Verification
+
+- `mvn test`: 49 unit tests pass — the same 49 as the merged baseline, with
+  one test removed (now a compile error) and one added (house-count bound).
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 31/31 pass, matching the refactorer's
+  baseline, and verified non-vacuous as described above.
+
+## 2026-07-25T21:35:00Z — architect: ten features are on no pipeline
+
+For the specifier. The architecture question the coder raised is settled: the
+APS pipeline under `specs/acceptance` is the only acceptance path, and the
+Cucumber path is gone. What remains is a specification question, which is not
+the architect's to answer.
+
+Four of the fourteen feature files run. Ten do not, and nothing else verifies
+them:
+
+- `en/rules/official.feature` — carries the 40-space board layout as a
+  step-attached data table, along with the dice, pawn and bank account tables.
+  APS parses the step but drops the table, so a generated test would assert
+  nothing at all. The board layout itself is covered by the domain's
+  `BoardLayoutTest`, so it is not unverified, but the specification of it is
+  not what verifies it.
+- `en/components/dice.feature`, `en/monopoly.feature` — same step-attached
+  table shape.
+- `nl/` (7 files) — Dutch mirrors. The APS parser rejects them outright with
+  `missing feature declaration`; it does not support localized keywords.
+
+Reshaping a feature means rewriting the specification, which belongs to the
+specifier, not to me. The constraint to write against is: APS reads
+`Scenario Outline` plus an `Examples:` table, and reads neither
+step-attached data tables nor `*` continuation steps nor localized keywords.
+Whether the Dutch features should be dropped, kept as untested translations,
+or handled some other way is likewise a specification call.
+
+### Correction to the coder's report
+
+The coder recorded that placeholder names containing spaces, such as
+`<vacant rent>`, are not recognised as IR parameters and that "the mutator
+cannot mutate those columns until the columns are renamed". Measured, this is
+not so. The parser emits the spaced names as example keys, and the mutator
+mutates by example key: `streets.feature` yields exactly 220 mutations, which
+is its 22 example rows times 10 columns, spaced column names included. The
+step handlers resolve `<vacant rent>` from the step text, so no rename is
+needed and none was done.
+
+## 2026-07-26T00:20:00Z — architect: verification made reproducible and faster
+
+### `mvn test` did not mean one thing
+
+The generated acceptance entry points were compiled by the default build and
+landed in `target/test-classes`, so `mvn test` ran 68 tests on a clean tree
+and 99 on a tree where `run-acceptance.sh` had been run since the last clean.
+Nothing said which had happened. This surfaced as a spurious `[ERROR]` during
+verification here, and it is the kind of thing that makes two agents report
+different counts for the same commit.
+
+`add-test-source` now sits in an `acceptance` profile rather than the default
+build, and `run-acceptance.sh` removes the compiled entry points on exit
+through a trap, so a failed run cleans up too. `mvn test` is 68 either way;
+`run-acceptance.sh` is 31 and still exits non-zero when a scenario fails.
+
+### Acceptance mutation runner rebuilt around a hot JVM
+
+The first adapter shelled out to `mvn test` per mutation, paying roughly
+twenty seconds of Maven and JVM startup to run assertions that take
+milliseconds; a soft run over the four pipeline features took about ninety
+minutes. The adapter is now a long-lived JVM that generates the entry point,
+compiles it in process, and runs it through the JUnit Platform launcher, with
+a fresh class loader per mutation so no mutation sees the previous one's
+constants. `junit-platform-launcher` had to be declared: surefire supplies it
+when surefire is the one running the tests, and here it is not.
+
+A full run — every mutation, no differential skipping — now takes about
+fifteen minutes for 230 mutations. Per mutation the speedup is smaller than a
+microbenchmark suggests, because `streets.feature` compiles to a large entry
+point and javac dominates.
+
+### Verification
+
+- `mvn test`: 68 unit tests pass, clean tree or dirty.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 31/31 pass; exits 1 on a mutated
+  expectation and leaves no compiled entry points behind.
+- `mutate4java` over every domain source: 0 survivors, 0 uncovered.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level full`: 230 mutations,
+  230 killed, 0 survived, 0 errors.
+
+## 2026-07-25T23:59:00Z — architect handoffs for full-board-layout
+
+Sent to coder and refactorer at priority `00`, and to the specifier because
+the work carries functional commits for review.
+
+Draft sent to coder and refactorer:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: full-board-layout
+commit: <branch tip at time of send; recorded below>
+```
+
+Draft sent to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: full-board-layout
+commit: <branch tip at time of send; recorded below>
+```
+
+Each expands to the standard body: `Re-read your role and constitution.` and
+`merge_and_process architect <commit>`.
+
+Summary of the state handed over: the `Street` hierarchy, the board/rules
+dependency direction, the single acceptance path, full mutation and DRY
+coverage of the domain, and a reproducible `mvn test`. The specifier also has
+an open question waiting in this logbook — ten feature files are on no
+pipeline, and reshaping them is a specification decision, not mine.
