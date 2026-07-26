@@ -387,3 +387,37 @@ point and javac dominates.
 - `dry4java`: no duplication in production code.
 - `acceptance/run-acceptance-mutation.sh --level full`: 230 mutations,
   230 killed, 0 survived, 0 errors.
+
+## 2026-07-25T23:59:00Z — architect handoffs for full-board-layout
+
+Sent to coder and refactorer at priority `00`, and to the specifier because
+the work carries functional commits for review.
+
+Draft sent to coder and refactorer:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: full-board-layout
+commit: <branch tip at time of send; recorded below>
+```
+
+Draft sent to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: full-board-layout
+commit: <branch tip at time of send; recorded below>
+```
+
+Each expands to the standard body: `Re-read your role and constitution.` and
+`merge_and_process architect <commit>`.
+
+Summary of the state handed over: the `Street` hierarchy, the board/rules
+dependency direction, the single acceptance path, full mutation and DRY
+coverage of the domain, and a reproducible `mvn test`. The specifier also has
+an open question waiting in this logbook — ten feature files are on no
+pipeline, and reshaping them is a specification decision, not mine.
