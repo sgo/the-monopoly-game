@@ -3647,3 +3647,18 @@ role histories, and verified the merged turn-loop wiring.
 Verification: CRAP maximum 1.0 for `Game`, no production duplicates from
 DRY analysis, four mutation sites in `Game.java`, `mvn test` 120 passing,
 property tests 10 passing, and acceptance 102/102 passing.
+
+## 2026-07-27T21:14:30Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-loop-wiring
+commit: (commit recorded by the handoff draft)
+```
+
+Summary: merged and verified the coder's turn-loop wiring; all refactorer
+quality gates and unit, property, and acceptance verification are green.
