@@ -4220,3 +4220,33 @@ itself.
 
 - `mvn test`: 130 unit tests pass.
 - `acceptance/run-acceptance.sh`: 108/108 across eleven pipeline features.
+
+## 2026-07-27T22:22:17Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260727T222023Z_000009_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 1ef11c9695
+created_at: 2026-07-27T22:20:23Z
+task: phase3-journal-report
+
+Re-read your role and constitution.
+
+merge_and_process coder 1ef11c9695
+```
+
+Action taken: merged coder commit `1ef11c9695` into `swarmforge-refactorer`.
+`Report.line` exceeded the CRAP ceiling at 8.0, so its sealed-entry switch was
+replaced with a report-local dispatch table and individual renderers, preserving
+all wording and output order while reducing every `Report` method to CRAP 1.0.
+
+Verification: DRY found only two unrelated constructor shapes; mutation scans
+found 5 sites in `Game`, 0 in `Report`, 6 in `Player`, and 13 in `Turn`; 130
+unit tests, 10 property tests, and 108/108 acceptance scenarios pass.
