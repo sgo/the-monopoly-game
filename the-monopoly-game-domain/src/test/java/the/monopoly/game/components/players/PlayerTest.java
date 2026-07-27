@@ -105,6 +105,30 @@ class PlayerTest {
     assertThat(natural.compare(new Player.ID("1"), new Player.ID("1"))).isZero();
   }
 
+  @Test
+  void aPlayerJoinsTheGameOnStart() {
+    assertThat(playerWith(1500).position()).isEqualTo(new Player.Position(0));
+    assertThat(playerWith(1500).position().index()).isZero();
+  }
+
+  @Test
+  void twoPawnsAreOnTheSameSpaceWhenTheirPositionsMatch() {
+    assertThat(new Player.Position(7)).isEqualTo(new Player.Position(7));
+    assertThat(new Player.Position(7)).hasSameHashCodeAs(new Player.Position(7));
+    assertThat(new Player.Position(7)).isNotEqualTo(new Player.Position(8));
+    assertThat(new Player.Position(7)).isNotEqualTo("7");
+  }
+
+  @Test
+  void aPawnCarriesItsPositionRatherThanBeingReplaced() {
+    Player.Position position = new Player.Position(3);
+
+    position.moveTo(11);
+
+    assertThat(position.index()).isEqualTo(11);
+    assertThat(position).isEqualTo(new Player.Position(11));
+  }
+
   private Player playerWith(int startingCapital) {
     Player.ID id = new Player.ID("0");
     bank.createAccountFor(id);
