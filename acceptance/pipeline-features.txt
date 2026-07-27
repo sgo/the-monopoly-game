@@ -19,6 +19,8 @@ en/components/stations.feature
 en/components/utilities.feature
 en/components/tax.feature
 en/rules/official.feature
+en/rules/movement.feature
+en/rules/initiative.feature
 
 # Held back from mutation: the fairness scenario asserts that each face comes
 # up about 100000 times within a 1% margin, so it accepts anything in a 1000
@@ -27,5 +29,3 @@ en/rules/official.feature
 # Narrowing the margin enough to kill that mutant would make the scenario fail
 # on honest dice. The scenario still runs on every acceptance pass.
 en/components/dice.feature !no-mutation
-en/rules/movement.feature
-en/rules/initiative.feature

@@ -1702,6 +1702,29 @@ the pipeline contribute nothing to acceptance mutation, and two of them,
 double-salary ruling this round implemented. They assert exact amounts, so a
 one-row `Examples:` table would bring them under the gate.
 
+## 2026-07-27T11:48:46Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T114846Z_000004_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: pipeline-compatible-specs
+commit: 1addc00b74
+created_at: 2026-07-27T11:48:46.785594Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 1addc00b74
+```
+
+Summary: hands the step-handler changes for the last six reshaped scenarios on
+branch `swarmforge-coder` at commit `1addc00b74` to the refactorer.
+
 ## 2026-07-27T11:52:07Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -1746,6 +1769,33 @@ re-ran them on the domain module anyway to confirm no regression:
 - `acceptance/run-acceptance.sh`: 93/93 pass.
 
 No refactoring needed. Handing back to the architect.
+
+## 2026-07-27T11:52:27Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260727T115227Z_000007_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: pipeline-compatible-specs
+commit: 78c0ac34d0
+created_at: 2026-07-27T11:52:27.518341Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 78c0ac34d0
+```
+
+Summary: confirmed the specifier's final six scenario reshapes and the
+coder's step-handler updates touch no domain main source; re-ran the
+refactorer's gates on the domain module anyway as a regression check — CRAP,
+DRY unchanged, no changes needed. Committed at `78c0ac34d0` on
+`swarmforge-refactorer`; handing back to the architect.
+
 ## 2026-07-27T11:55:00Z — coder: the last six scenarios reach the mutation gate
 
 The specifier converted the remaining six plain `Scenario`s to single-row
@@ -1780,29 +1830,32 @@ unreachable before and are killable now.
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
 architect.
 
+## 2026-07-27T11:58:05Z — coder received handoff from architect
 
-## 2026-07-27T11:48:46Z — coder sent handoff to refactorer
-
-Handoff message sent:
+Handoff message received:
 
 ```
-id: 20260727T114846Z_000004_from_coder
-from: coder
-to: refactorer
-priority: 50
+id: 20260727T115758Z_000008_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
 type: git_handoff
-role: coder
+role: architect
+commit: b21adccd94
+created_at: 2026-07-27T11:57:58.266462Z
+enqueued_at: 2026-07-27T11:57:58.964016Z
 task: pipeline-compatible-specs
-commit: 1addc00b74
-created_at: 2026-07-27T11:48:46.785594Z
+dequeued_at: 2026-07-27T11:58:05.044157Z
 
 Re-read your role and constitution.
 
-merge_and_process coder 1addc00b74
+merge_and_process architect b21adccd94
 ```
 
-Summary: hands the step-handler changes for the last six reshaped scenarios on
-branch `swarmforge-coder` at commit `1addc00b74` to the refactorer.
+Action taken: merged architect commit `b21adccd94` into `swarmforge-coder`,
+resolving the `logbook.md` conflict by keeping both the coder's sent entry and
+the architect's review, then re-verified the merged state here.
 
 ## 2026-07-27T12:00:00Z — architect review of the last plain scenarios
 
@@ -1852,14 +1905,7 @@ and it was not gotten wrong.
 - `mutate4java`: not re-run; no domain source changed since `1f7a5a6`, where
   it reported 0 survivors and 0 uncovered.
 
-## 2026-07-27T12:05:00Z — architect handoffs for the last plain scenarios
-
-Sent to coder and refactorer at priority `00`, and to the specifier. No
-question is outstanding from this role: the two raised earlier, on where the
-double-salary rule belongs and on the scenarios the mutation gate could not
-reach, are both answered and closed.
-
-## 2026-07-27T11:58:05Z — coder received handoff from architect
+## 2026-07-27T12:04:19Z — refactorer received handoff from architect
 
 Handoff message received:
 
@@ -1867,25 +1913,111 @@ Handoff message received:
 id: 20260727T115758Z_000008_from_architect
 from: architect
 to: coder,refactorer
-recipient: coder
 priority: 00
 type: git_handoff
 role: architect
-commit: b21adccd94
-created_at: 2026-07-27T11:57:58.266462Z
-enqueued_at: 2026-07-27T11:57:58.964016Z
 task: pipeline-compatible-specs
-dequeued_at: 2026-07-27T11:58:05.044157Z
+commit: b21adccd94
 
 Re-read your role and constitution.
 
 merge_and_process architect b21adccd94
 ```
 
-Action taken: merged architect commit `b21adccd94` into `swarmforge-coder`,
-resolving the `logbook.md` conflict by keeping both the coder's sent entry and
-the architect's review, then re-verified the merged state here.
+Action taken: merged architect commit `b21adccd94` into `swarmforge-refactorer`.
+One `logbook.md` conflict region, but with a real problem this time: the
+auto-merged (non-conflicting) part of the file silently dropped the "coder:
+the last six scenarios reach the mutation gate" entry that had been correctly
+placed by the previous round's resolution, while a byte-identical copy of
+that same entry reappeared duplicated inside the new conflict block. Caught
+by the two-way header check (every header in the incoming branch present
+exactly once, and separately every header in this worktree's own pre-merge
+history present exactly once) — the first check alone would have passed with
+the duplicate still in the wrong place. Restored the entry to its correct
+position between "coder received handoff from specifier" and "architect
+received handoff from refactorer", then removed the duplicate from the
+conflict block, keeping only the architect's two genuinely new entries.
+Both header checks pass clean now. Worth carrying forward: check both
+directions, not just the incoming branch, on every future logbook merge.
 
+No domain main source changed in this commit (feature-file comment/example
+tweaks only). Re-ran CRAP and DRY on the domain module as a regression check
+anyway:
+
+- CRAP: unchanged, 3.0 max (`OwnedCount.checked`).
+- DRY: unchanged, same 6 test-shape duplicates, none in production code.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 pass.
+
+No refactoring needed. Handing back to the architect.
+
+## 2026-07-27T12:04:40Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260727T120440Z_000008_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: pipeline-compatible-specs
+commit: 4efe2d8b10
+created_at: 2026-07-27T12:04:40.836471Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 4efe2d8b10
+```
+
+Summary: caught and fixed a merge-induced content loss in this round's
+logbook resolution (see entry above), then re-verified the domain module's
+CRAP/DRY gates — unchanged, no changes needed. Committed at `4efe2d8b10` on
+`swarmforge-refactorer`; handing back to the architect.
+
+## 2026-07-27T12:05:00Z — architect handoffs for the last plain scenarios
+
+Sent to coder and refactorer at priority `00`, and to the specifier. No
+question is outstanding from this role: the two raised earlier, on where the
+double-salary rule belongs and on the scenarios the mutation gate could not
+reach, are both answered and closed.
+
+## 2026-07-27T12:10:00Z — architect received handoff from refactorer
+
+Handoff message received:
+
+```
+id: 20260727T120440Z_000008_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 4efe2d8b10
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T12:04:45Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 4efe2d8b10
+```
+
+Action taken: merged `4efe2d8b10`, a fast-forward carrying only logbook
+entries. The domain, specs and acceptance trees all hash identical to
+`ce4d6a0`, so the mutation, DRY and Gherkin mutation results stand. `mvn test`
+re-run as a check the merge was sound: 78 pass. Not forwarded; no changes.
+
+The diff reported 28 deleted lines, which in an append-only logbook would be a
+real problem. It was not one: the entry concerned is present in both versions,
+their file carries every heading in mine plus two, and the deletions were this
+worktree's timestamp-sorted order being compared against their append order.
+Checked before raising it rather than after.
 ## 2026-07-27T12:15:00Z — coder verification of the merged architect state
 
 - `mvn test`: 78 unit tests pass.
@@ -1937,6 +2069,75 @@ merge_and_process specifier e7f0fc1cbb
 Action taken: merged specifier commit `e7f0fc1cbb` into `swarmforge-coder`
 (clean), then implemented Phase 2.
 
+## 2026-07-27T12:52:20Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260727T124208Z_000005_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase2-turn-loop
+commit: fbc5f7ca52
+
+Re-read your role and constitution.
+
+merge_and_process coder fbc5f7ca52
+```
+
+Action taken: merged coder commit `fbc5f7ca52` into `swarmforge-refactorer`,
+the coder's Phase 2 turn-loop implementation (`Cup`, `Roll`, `Turn`,
+`Initiative`, pawn positions on `Player`). Three `logbook.md` conflict
+regions. The largest one hid a mistake of my own mid-resolution: an edit
+meant to relabel one thread's continuation instead spliced it onto the wrong
+thread's header, producing a dangling sentence ("...into `swarmforge-coder`,
+One `logbook.md` conflict region..."). Caught it on the read-back before
+running the header checks, not by the checks themselves — the checks confirm
+every entry is present once, not that prose reads correctly — so re-read the
+whole reconstructed span this time before trusting the counts. Rebuilt the
+region as two complete, self-contained threads (coder's, then this worktree's
+own) and reran both the incoming-header and own-history header checks; both
+clean.
+
+Ran the refactorer's gates on the changed sources, `Cup`, `Roll`, `Player`,
+`Initiative`, `Turn`:
+
+- CRAP: max is now 5.0 (`Turn.take`, CC=5, 100% coverage), still within
+  bounds. `OwnedCount.checked` (3.0) is no longer the ceiling.
+- DRY: found and fixed a real one this round, distinct in kind from the
+  test-shape duplicates left alone so far. `InitiativeTest` had two literal
+  roll fixtures — the clear-winner map and the tied-pair map — each copied
+  verbatim into three and two `@Test` methods respectively, to assert
+  different things about the *same* initiative run rather than to test
+  different scenarios. Extracted `orderWithAClearWinner()` and
+  `orderWithATie()`; each test now names the fixture it needs instead of
+  restating it. DRY duplicate count for the file dropped from 12 to 9 project
+  wide; `TurnTest`'s flagged pairs are the usual different-scenario-same-shape
+  pattern and stay as they are.
+- Mutation scan: `Cup.java` 5, `Roll.java` 2, `Player.java` 6,
+  `Initiative.java` 4, `Turn.java` 12 sites — all trivial.
+
+### Property tests
+
+`Roll.total()`/`isDouble()` were only example-tested, the same gap `Money`
+had before this role added property tests for it. Added
+`RollPropertyTest`: total is the sum of both dice, and `isDouble` holds
+exactly when the two dice match, both over the full `int` range via jetCheck,
+tagged `property-test` and excluded from normal verification the same way as
+the existing two property test classes.
+
+### Verification
+
+- `mvn test`: 101 unit tests pass (unchanged after the `InitiativeTest`
+  extraction — same tests, same shape, less repeated literal).
+- `mvn test -Pproperty-tests`: 9 property tests pass (7 before this round,
+  plus 2 new).
+- `acceptance/run-acceptance.sh`: 100/100 pass.
+
+Handing back to the architect.
 ## 2026-07-27T13:10:00Z — coder implementation of phase2-turn-loop
 
 Acceptance goes from 93 to 100 scenarios and unit tests from 78 to 101.
@@ -2023,6 +2224,7 @@ The behaviour itself is not unverified — `TurnTest` covers three doubles going
 to jail, the third move being taken away, and a pawn jailed after passing Start
 keeping the salary it had already earned.
 
+
 ## 2026-07-27T12:42:08Z — coder sent handoff to refactorer
 
 Handoff message sent:
@@ -2045,3 +2247,84 @@ merge_and_process coder fbc5f7ca52
 
 Summary: hands the Phase 2 turn loop, movement, and initiative on branch
 `swarmforge-coder` at commit `fbc5f7ca52` to the refactorer.
+
+## 2026-07-27T13:30:00Z — architect review of phase2-turn-loop
+
+Merged `490d7c3d4d`. First round in which language mutation found real gaps:
+seven survivors across the new code. Six are now dead and the seventh was
+removed by restructuring.
+
+### The seam is in the right place
+
+`Cup` is a functional interface producing a `Roll`, with one implementation
+over real dice and one over a scripted sequence. Randomness therefore sits
+behind a single abstraction that the rules never reach past, which is what
+lets `Turn` and `Initiative` be tested exactly rather than statistically.
+`Initiative.Rolls` does the same for the initiative throw. Both are in the
+component packages with `rules` depending inward on them; the direction is
+right.
+
+### Killing the survivors
+
+- `Cup` took `die1` and `die2` from `dice.get(0)` and `dice.get(1)`, and
+  swapping the indices changed nothing observable, because the board is played
+  with two identical dice. `CupTest` now builds two dice whose faces all read
+  differently, so which one the cup reached for is visible. Both mutants dead,
+  along with the arity guard and the exhausted-scripted-cup case.
+- Nothing asserted that a player joins the game on Start. Moving the starting
+  index off zero went unnoticed. `PlayerTest` now pins it, along with
+  `Position` equality and that a position is carried rather than replaced.
+- `Turn.positionOf` guards a board with no jail on it. The guard fired only
+  for `indexOf` returning -1, so widening it to `<= 0` or `< 1` changed
+  nothing. Two tests now bracket it: a board with no jail at all, which must
+  refuse, and a board whose jail is the very first space, which must not.
+
+### The seventh was a design smell, not a missing test
+
+`move` read `if (to == 0) land; else if (from + steps >= spaces) pass;`.
+Changing `>=` to `>` was undetectable, and provably so: the else-if is reached
+only when `to != 0`, and with at most twelve steps on a forty space board
+`to == 0` holds exactly when `from + steps == spaces`, so the boundary the two
+operators disagree about cannot occur there. The comparison was carrying a
+case the branch above had already taken.
+
+Restructured to ask the question once — whether Start was reached at all — and
+only then which of the two ways. Behaviour is identical, the redundancy is
+gone, and the comparison became killable: `>` now fails to pay a player who
+lands exactly on Start, which the existing tests catch. 11 of 11.
+
+Writing the test to fit the tool would have been the wrong move here; the
+mutant was pointing at the code.
+
+### Verification
+
+- `mvn test`: 110 unit tests pass.
+- `mvn test -Pproperty-tests`: 9 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+- `mutate4java` on `Roll`, `Cup`, `Initiative`, `Turn` and `Player`: 0
+  survivors. One uncovered site remains, the `true` of `while (true)`, which
+  is not a branch JaCoCo instruments.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level soft`: 29 mutations in
+  `movement.feature` and 18 in `initiative.feature`, all killed, exit 0.
+
+Also moved the two new features above the dice exemption comment in
+`pipeline-features.txt`, where they had been appended underneath it and read
+as though they were exempt too.
+
+## 2026-07-27T13:35:00Z — architect handoffs for phase2-turn-loop
+
+Sent to coder and refactorer at priority `00`, and to the specifier. Two
+observations for whoever picks them up, neither of them blocking:
+
+`Dice.roll()` indexes its faces with `random.nextInt(6)` rather than
+`nextInt(faces.length)`. Only `Dice.Type.six` exists, so nothing can reach it
+today, but a dice with any other number of faces would either throw or never
+show its later faces. The specifications now carry the face count as an
+example value, so this is a step nearer being reachable than it was.
+
+`Initiative` re-rolls ties in an unbounded loop. Against real dice that
+terminates; against a source that keeps returning the same total it would not.
+The test fixture throws when its script runs out rather than repeating, so the
+suite cannot hang on it today. Bounding it would mean inventing a rule
+`RULES.md` does not state, so it is left as it is and noted.

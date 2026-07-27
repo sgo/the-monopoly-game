@@ -18,47 +18,23 @@ class InitiativeTest {
 
   @Test
   void theHighestRollTakesTheFirstTurn() {
-    List<Player> order = order(Map.of(
-        Pawn.dog, List.of(4),
-        Pawn.high_hat, List.of(10),
-        Pawn.iron_box, List.of(6)
-    ));
-
-    assertThat(order.getFirst().id()).isEqualTo(Pawn.high_hat.id());
+    assertThat(orderWithAClearWinner().getFirst().id()).isEqualTo(Pawn.high_hat.id());
   }
 
   @Test
   void playThenContinuesClockwiseFromTheWinner() {
-    List<Player> order = order(Map.of(
-        Pawn.dog, List.of(4),
-        Pawn.high_hat, List.of(10),
-        Pawn.iron_box, List.of(6)
-    ));
-
-    assertThat(order).extracting(Player::id)
+    assertThat(orderWithAClearWinner()).extracting(Player::id)
         .containsExactly(Pawn.high_hat.id(), Pawn.iron_box.id(), Pawn.dog.id());
   }
 
   @Test
   void everyPlayerTakesATurnInTheOrder() {
-    List<Player> order = order(Map.of(
-        Pawn.dog, List.of(4),
-        Pawn.high_hat, List.of(10),
-        Pawn.iron_box, List.of(6)
-    ));
-
-    assertThat(order).containsExactlyInAnyOrderElementsOf(players);
+    assertThat(orderWithAClearWinner()).containsExactlyInAnyOrderElementsOf(players);
   }
 
   @Test
   void onlyTheTiedPlayersRollAgain() {
-    List<Player> order = order(Map.of(
-        Pawn.dog, List.of(8, 6),
-        Pawn.high_hat, List.of(8, 9),
-        Pawn.iron_box, List.of(5)
-    ));
-
-    assertThat(order.getFirst().id()).isEqualTo(Pawn.high_hat.id());
+    assertThat(orderWithATie().getFirst().id()).isEqualTo(Pawn.high_hat.id());
   }
 
   @Test
@@ -74,14 +50,24 @@ class InitiativeTest {
 
   @Test
   void aPlayerWhoLostTheFirstRoundDoesNotRollAgain() {
-    List<Player> order = order(Map.of(
+    assertThat(orderWithATie()).extracting(Player::id)
+        .containsExactly(Pawn.high_hat.id(), Pawn.iron_box.id(), Pawn.dog.id());
+  }
+
+  private List<Player> orderWithAClearWinner() {
+    return order(Map.of(
+        Pawn.dog, List.of(4),
+        Pawn.high_hat, List.of(10),
+        Pawn.iron_box, List.of(6)
+    ));
+  }
+
+  private List<Player> orderWithATie() {
+    return order(Map.of(
         Pawn.dog, List.of(8, 6),
         Pawn.high_hat, List.of(8, 9),
         Pawn.iron_box, List.of(5)
     ));
-
-    assertThat(order).extracting(Player::id)
-        .containsExactly(Pawn.high_hat.id(), Pawn.iron_box.id(), Pawn.dog.id());
   }
 
   private List<Player> order(Map<Pawn, List<Integer>> rolls) {
