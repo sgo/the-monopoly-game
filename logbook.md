@@ -1517,3 +1517,64 @@ the pipeline contribute nothing to acceptance mutation, and two of them,
 `official-rules-7` and `official-rules-8`, are the pair encoding the
 double-salary ruling this round implemented. They assert exact amounts, so a
 one-row `Examples:` table would bring them under the gate.
+
+## 2026-07-27T11:40:59Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T114052Z_000004_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 0ed538365f
+created_at: 2026-07-27T11:40:52.772450Z
+enqueued_at: 2026-07-27T11:40:53.650639Z
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T11:40:59.705232Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 0ed538365f
+```
+
+Action taken: merged specifier commit `0ed538365f` into `swarmforge-coder`
+(clean), then taught the step handlers the two shapes the reshaped scenarios
+introduced.
+
+## 2026-07-27T11:55:00Z — coder: the last six scenarios reach the mutation gate
+
+The specifier converted the remaining six plain `Scenario`s to single-row
+`Scenario Outline`s, so their literal values became example values. Running
+acceptance against the merged specs failed exactly two scenarios, both
+reported by the runtime as `Unsupported step` rather than passing quietly:
+
+- `dice 1 is <die 1 type>` — the handler matched `dice ([0-9]+) is ([0-9]+)
+  faced`, which a placeholder cannot satisfy. It now captures the whole
+  description and reads the face count out of `"6 faced"`, so the dice type
+  travels as one example value rather than as a number wedged mid-sentence.
+- `we play with <minimum> to <maximum> players` — the handler required digits
+  where a placeholder now stands. Both bounds use the shared value pattern.
+
+Every other reshaped step already went through that pattern, which accepts a
+literal or a placeholder, so five of the seven changed scenarios needed no
+handler change at all.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 pass, exits 0.
+
+The point of the reshape was to make these values visible to acceptance
+mutation, so that is what was checked rather than only that the suite is
+green. Mutating each newly promoted value in the IR — the Start salary, the
+dice type, the minimum player count, and all three salary balances — fails
+exactly the six corresponding scenarios and nothing else. They were
+unreachable before and are killable now.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
