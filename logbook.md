@@ -3556,3 +3556,30 @@ Action taken: merged coder commit `3a831f8dd1` into `main`, preserving both
 roles' complete append-only log histories while resolving the sole conflict
 in `logbook.md`. Began specifier review of the reported mismatch between the
 two selected pawns and the rolls named by `turn-loop.feature`.
+
+## 2026-07-27T21:06:04Z — specifier sent corrected handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T210559Z_000008_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: turn-loop-wiring
+commit: 3ae7065e2e
+created_at: 2026-07-27T21:05:59.377586Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3ae7065e2e
+```
+
+Summary: corrected `turn-loop.feature` so its two selected pawns are `dog`
+and `high hat`, normalized all placeholders to the APS-supported identifier
+form, and replaced `turn-loop-2`'s incidental second-pawn dice values with
+`every other player can complete their turn`. The feature parses cleanly;
+`gherkin-ir-dry-checker` reports no actionable duplication. User explicitly
+approved this corrected `turn-loop-wiring` handoff.
