@@ -21,7 +21,9 @@ fi
 # pipeline-features.txt.
 PIPELINE_FEATURES=()
 while IFS= read -r feature_line; do
-  PIPELINE_FEATURES+=("$feature_line")
+  # Features marked !no-mutation are held back; see pipeline-features.txt.
+  case "$feature_line" in *" !no-mutation") continue ;; esac
+  PIPELINE_FEATURES+=("${feature_line%% !*}")
 done < <(grep -vE '^[[:space:]]*(#|$)' "$ROOT/acceptance/pipeline-features.txt")
 FEATURE_FILES=("$@")
 if [[ ${#FEATURE_FILES[@]} -eq 0 ]]; then
