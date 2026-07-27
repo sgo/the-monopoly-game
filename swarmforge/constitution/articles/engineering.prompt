@@ -16,6 +16,7 @@
 - Gherkin acceptance mutation means running `gherkin-mutator` to mutate Gherkin example values.
 - Gherkin acceptance mutation runs must report periodic progress/status so agents can distinguish normal long-running work from a hang.
 - Before running language, build, or test commands, prefer project-local cache/configuration paths inside the assigned worktree. Avoid default cache locations that write outside the project and may trigger sandbox or permission restrictions.
+- Address files by absolute path, or by a path relative to your assigned worktree root, rather than by changing directory first. Do not open a shell command with `cd`. The shell working directory persists between commands, so a `cd` silently changes where every later command runs; and a command that begins with `cd` cannot be matched against permission rules, so it prompts every time no matter how ordinary the work is. Where a tool insists on being run from a particular directory, pass that directory to the tool as an argument if it takes one.
 - Run acceptance generation and acceptance tests sequentially.
 - Avoid running whole-suite language test commands concurrently with acceptance generation.
 - Run the relevant local verification command before handoff whenever the project has one.

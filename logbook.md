@@ -584,3 +584,24 @@ CRAP fell from 6.0 to 3.0 across the `Street` split, its maximum now being
 
 Not forwarded. The role rule is to run `done_with_current.sh` and take the
 next task when the completed work produced no changes, and this produced none.
+
+## 2026-07-27T09:50:00Z — architect: absolute paths instead of `cd`
+
+Added to `engineering.prompt`, on the user's direction, after measuring the
+cost of the habit across the swarm's own transcripts: of 544 shell commands
+run by the four roles, 119 opened with `cd` and 384 were compound. A command
+beginning with `cd` cannot be matched against a permission rule, so every one
+of those asked the user to confirm work that was otherwise unremarkable.
+
+The correctness cost is the worse of the two. The shell working directory
+persists between commands, so a `cd` changes where every later command runs.
+That happened here: after descending into the streets package to read some
+sources, a later `cat pom.xml` failed with no such file, and the reflex fix
+was another `cd` back to the root, which produced another prompt.
+
+Also relevant to anyone reading this later: permission rules now live in the
+user-level `~/.claude/settings.json` rather than a project `.claude/`, because
+`.claude/` is gitignored and each role runs from its own directory, so a
+project-level file would have had to be maintained four times over and would
+not have covered a worktree made later. The swarm poll is deliberately not on
+the allowlist; it dequeues a handoff, so it is not read-only.
