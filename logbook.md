@@ -2224,3 +2224,67 @@ The behaviour itself is not unverified — `TurnTest` covers three doubles going
 to jail, the third move being taken away, and a pawn jailed after passing Start
 keeping the salary it had already earned.
 
+
+## 2026-07-27T13:30:00Z — architect review of phase2-turn-loop
+
+Merged `490d7c3d4d`. First round in which language mutation found real gaps:
+seven survivors across the new code. Six are now dead and the seventh was
+removed by restructuring.
+
+### The seam is in the right place
+
+`Cup` is a functional interface producing a `Roll`, with one implementation
+over real dice and one over a scripted sequence. Randomness therefore sits
+behind a single abstraction that the rules never reach past, which is what
+lets `Turn` and `Initiative` be tested exactly rather than statistically.
+`Initiative.Rolls` does the same for the initiative throw. Both are in the
+component packages with `rules` depending inward on them; the direction is
+right.
+
+### Killing the survivors
+
+- `Cup` took `die1` and `die2` from `dice.get(0)` and `dice.get(1)`, and
+  swapping the indices changed nothing observable, because the board is played
+  with two identical dice. `CupTest` now builds two dice whose faces all read
+  differently, so which one the cup reached for is visible. Both mutants dead,
+  along with the arity guard and the exhausted-scripted-cup case.
+- Nothing asserted that a player joins the game on Start. Moving the starting
+  index off zero went unnoticed. `PlayerTest` now pins it, along with
+  `Position` equality and that a position is carried rather than replaced.
+- `Turn.positionOf` guards a board with no jail on it. The guard fired only
+  for `indexOf` returning -1, so widening it to `<= 0` or `< 1` changed
+  nothing. Two tests now bracket it: a board with no jail at all, which must
+  refuse, and a board whose jail is the very first space, which must not.
+
+### The seventh was a design smell, not a missing test
+
+`move` read `if (to == 0) land; else if (from + steps >= spaces) pass;`.
+Changing `>=` to `>` was undetectable, and provably so: the else-if is reached
+only when `to != 0`, and with at most twelve steps on a forty space board
+`to == 0` holds exactly when `from + steps == spaces`, so the boundary the two
+operators disagree about cannot occur there. The comparison was carrying a
+case the branch above had already taken.
+
+Restructured to ask the question once — whether Start was reached at all — and
+only then which of the two ways. Behaviour is identical, the redundancy is
+gone, and the comparison became killable: `>` now fails to pay a player who
+lands exactly on Start, which the existing tests catch. 11 of 11.
+
+Writing the test to fit the tool would have been the wrong move here; the
+mutant was pointing at the code.
+
+### Verification
+
+- `mvn test`: 110 unit tests pass.
+- `mvn test -Pproperty-tests`: 9 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+- `mutate4java` on `Roll`, `Cup`, `Initiative`, `Turn` and `Player`: 0
+  survivors. One uncovered site remains, the `true` of `while (true)`, which
+  is not a branch JaCoCo instruments.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level soft`: 29 mutations in
+  `movement.feature` and 18 in `initiative.feature`, all killed, exit 0.
+
+Also moved the two new features above the dice exemption comment in
+`pipeline-features.txt`, where they had been appended underneath it and read
+as though they were exempt too.
