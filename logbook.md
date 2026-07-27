@@ -2340,6 +2340,38 @@ Action taken: merged architect commit `e535d0508c` into `swarmforge-coder`,
 resolving the `logbook.md` conflict by keeping both the coder's sent entry and
 the architect's review, then re-verified the merged state here.
 
+## 2026-07-27T13:17:21Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T131721Z_000006_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase2-turn-loop
+commit: ad02b22f68
+created_at: 2026-07-27T13:17:21.960177Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier ad02b22f68
+```
+
+Summary: merged the architect's `e535d0508c` (Player now carries a
+Position, Turn/Cup/Roll/Initiative implemented, all seven language
+mutation survivors killed). The architect found movement-4 survives
+every acceptance mutation by construction - a literal "position 10"
+plus an assertion reading back the same "starting balance" column that
+arranged the account, so mutating it moves the expectation with it.
+Correctly declined to mark it !no-mutation (that's for tolerance
+assertions, not this). Codified "never assert with the column that
+arranged the state" in specifier.prompt (`fc9c893`), then gave
+movement-4 its own final position/final balance columns (`ad02b22`), no
+behavior change, now independently mutable.
+
 ## 2026-07-27T13:19:37Z — coder received handoff from specifier
 
 Handoff message received:
@@ -2816,6 +2848,37 @@ in this merge, so the jail scenario's stored `scenario_hash` no longer matches
 the scenario. The next mutation run will re-test it rather than skip it, which
 is the run that will say whether the two new columns are killed in the gate as
 they are when measured by hand.
+
+## 2026-07-27T16:05:00Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T155726Z_000013_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase2-turn-loop
+commit: e6f6536e10
+created_at: 2026-07-27T15:57:26.642081Z
+
+Re-read your role and constitution.
+
+merge_and_process architect e6f6536e10
+```
+
+Action taken: merged `e6f6536e10` into `main` (one `logbook.md` conflict —
+two independent append-only entries after the same base point, resolved by
+keeping both in their existing chronological order, no content lost).
+
+Reviewed as specifier: `Game.play()` now asks `rules.Initiative` for turn
+order instead of re-deriving a winner inline from raw dice rolls, which is
+exactly what `initiative.feature` already specifies and `InitiativeTest`
+already covers. No new externally-visible behavior, so no new Gherkin is
+due. `mvn test` passes clean. Nothing to send back; task complete.
 
 ## 2026-07-27T16:16:41Z — refactorer sent handoff to architect
 
@@ -3299,3 +3362,65 @@ manifest now records index 3 at 7 mutations, 7 killed, tested at `16:28:53`,
 where it had recorded 5. That is the same count and the same verdict as the
 by-hand measurement at `15:55`, from the tool rather than from an argument.
 Nothing is outstanding on this from here.
+
+## 2026-07-27T19:45:00Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T174305Z_000016_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase2-turn-loop
+commit: f9982b66b9
+
+Re-read your role and constitution.
+
+merge_and_process architect f9982b66b9
+```
+
+Action taken: merged `f9982b66b9` into `main`. Six conflict regions in
+`logbook.md`, spanning two separate clusters — this branch's own
+`ad02b22f68`/`e6f6536e10` entries against the coder's, refactorer's, and
+architect's parallel narratives about the same handoffs, which git had
+matched on shared header/`### Verification` lines and interleaved. Read both
+full divergent spans end to end rather than the marker regions; each role's
+uninterrupted narrative block was kept whole, ordered by its first divergent
+entry's timestamp, with the two specifier entries (`13:17:21`, `16:05:00`)
+slotted in individually since they were each self-contained. No content
+dropped or duplicated.
+
+Reviewed as specifier: the batch spans the coder's and refactorer's turn-loop
+work already covered by prior entries, plus a final cleanup deleting
+`Dice`'s unused `Type` field and its now-untethered `roll()` bound to a
+literal `6`, replaced with `faces.length`. No externally-visible behavior
+changed — six faces are still six faces — so no new Gherkin is due.
+`mvn test` passes clean. Nothing to send back; task complete.
+
+## 2026-07-27T18:05:28Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T180528Z_000007_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: turn-loop-wiring
+commit: d7eaa20ce5
+
+Re-read your role and constitution.
+
+merge_and_process specifier d7eaa20ce5
+```
+
+Action taken: merged specifier commit `d7eaa20ce5` into `swarmforge-coder`,
+resolving the `logbook.md` conflict as the union of two disjoint appends in
+timestamp order, then implemented the turn-loop wiring.
