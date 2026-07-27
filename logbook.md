@@ -1714,3 +1714,29 @@ re-ran them on the domain module anyway to confirm no regression:
 - `acceptance/run-acceptance.sh`: 93/93 pass.
 
 No refactoring needed. Handing back to the architect.
+
+## 2026-07-27T11:52:27Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260727T115227Z_000007_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: pipeline-compatible-specs
+commit: 78c0ac34d0
+created_at: 2026-07-27T11:52:27.518341Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 78c0ac34d0
+```
+
+Summary: confirmed the specifier's final six scenario reshapes and the
+coder's step-handler updates touch no domain main source; re-ran the
+refactorer's gates on the domain module anyway as a regression check — CRAP,
+DRY unchanged, no changes needed. Committed at `78c0ac34d0` on
+`swarmforge-refactorer`; handing back to the architect.
