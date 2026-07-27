@@ -1084,3 +1084,66 @@ the architect: whether the double-salary rule should apply to passing Start
 (which decides how `Player.pass` and `Player.land` collapse), and whether
 `dice.feature` should become a one-row `Scenario Outline` so its numbers come
 under acceptance mutation.
+
+## 2026-07-27T09:50:00Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T094714Z_000003_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 3abaace865
+created_at: 2026-07-27T09:47:14.263602Z
+enqueued_at: 2026-07-27T09:47:15.086689Z
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T09:50:00.213601Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3abaace865
+```
+
+Action taken: merged specifier commit `3abaace865` into `swarmforge-coder`
+(clean), then implemented the behaviour change `official-rules-8` requires.
+
+## 2026-07-27T10:05:00Z — coder: passing Start no longer pays double
+
+The specifier settled the question this role raised: only landing exactly on
+Start is ever doubled, so `official-rules-8` pins passing Start at $1700 even
+with the optional rule active.
+
+The doubling was carried by `StartSpace.salary()`, which both moves read, so
+passing Start paid $1900 too. Split it: `salary()` is what passing pays and is
+never doubled, `salaryForLanding()` is what landing pays and the optional rule
+pays twice over. `Player.pass` and `Player.land` now read one each, so the two
+methods that the architect deliberately left duplicated are no longer the same
+call — the duplication is resolved by the answer rather than by picking a side.
+
+`PlayerTest.theDoubleSalaryRuleDoublesWhatPassingStartPays` asserted the old
+reading and is inverted accordingly, and a new `StartSpaceTest` covers the two
+amounts directly.
+
+The specifier also reshaped `dice.feature` into a one-row `Scenario Outline`,
+which needs no handler change: its numbers were already read through the
+`<expected count>` and `<margin>` placeholders, and they are example values
+now, so acceptance mutation can reach them.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 pass, exits 0.
+
+Checked that the new scenario discriminates rather than merely passing: with
+`salary()` put back the way it was, exactly two unit tests fail
+(`theDoubleSalaryRuleLeavesWhatPassingStartPaysAlone` and
+`theOptionalRuleLeavesTheSalaryForPassingStartAlone`) and exactly one
+acceptance scenario fails, `official-rules-8`. Restored afterwards.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.

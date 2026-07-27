@@ -31,13 +31,13 @@ class PlayerTest {
   }
 
   @Test
-  void theDoubleSalaryRuleDoublesWhatPassingStartPays() {
+  void theDoubleSalaryRuleLeavesWhatPassingStartPaysAlone() {
     ruleSet.activate(double_salary_when_landing_on_start);
     Player player = playerWith(1500);
 
     player.pass((StartSpace) ruleSet.create(Street.Type.start));
 
-    assertThat(player.account().balance()).isEqualTo(Balance.of(1900));
+    assertThat(player.account().balance()).isEqualTo(Balance.of(1700));
   }
 
   @Test

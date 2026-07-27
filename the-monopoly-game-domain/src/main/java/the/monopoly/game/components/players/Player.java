@@ -14,12 +14,11 @@ public record Player(ID id, Bank.Account account) {
   }
 
   /**
-   * Landing on Start pays the same salary as passing it. The two are separate
-   * moves because the rules distinguish them, even though nothing yet pays them
-   * differently: the double-salary rule is carried by {@link StartSpace}.
+   * Landing exactly on Start is the only move the optional double-salary rule
+   * pays twice over; passing Start keeps paying the single salary.
    */
   public void land(StartSpace start) {
-    account.deposit(start.salary());
+    account.deposit(start.salaryForLanding());
   }
 
   public void visit(ColourStreet street) {
