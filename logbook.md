@@ -2174,6 +2174,33 @@ the existing two property test classes.
 - `acceptance/run-acceptance.sh`: 100/100 pass.
 
 Handing back to the architect.
+
+## 2026-07-27T12:54:59Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260727T125459Z_000009_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase2-turn-loop
+commit: 490d7c3d4d
+created_at: 2026-07-27T12:54:59.107940Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 490d7c3d4d
+```
+
+Summary: deduplicated `InitiativeTest`'s two literal roll fixtures (12 to 9
+DRY duplicates project wide), added `RollPropertyTest` for the same
+property-test gap `Money` had before, CRAP/mutation re-verified within
+bounds. Committed at `490d7c3d4d` on `swarmforge-refactorer`; handing back
+to the architect.
+
 ## 2026-07-27T13:10:00Z — coder implementation of phase2-turn-loop
 
 Acceptance goes from 93 to 100 scenarios and unit tests from 78 to 101.
@@ -2392,6 +2419,98 @@ Action taken: merged architect commit `e535d0508c` into `swarmforge-coder`,
 resolving the `logbook.md` conflict by keeping both the coder's sent entry and
 the architect's review, then re-verified the merged state here.
 
+## 2026-07-27T13:19:37Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T131721Z_000006_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: ad02b22f68
+created_at: 2026-07-27T13:17:21.960177Z
+enqueued_at: 2026-07-27T13:17:22.173229Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T13:19:37.571938Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier ad02b22f68
+```
+
+Action taken: merged specifier commit `ad02b22f68` into `swarmforge-coder`, then
+verified the reshaped `movement-4` scenario against the existing step handlers.
+No production or step-handler change was needed: `the player is at position
+<value>` and `the player's account balance is $<value>` are already regex
+handlers, so the two new columns bind without new code.
+
+## 2026-07-27T13:20:49Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T131211Z_000010_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase2-turn-loop
+commit: e535d0508c
+
+Re-read your role and constitution.
+
+merge_and_process architect e535d0508c
+```
+
+Action taken: merged architect commit `e535d0508c` into `swarmforge-refactorer`
+(the architect's mutation-killing round on the turn loop). One `logbook.md`
+conflict region, but a wider one than the marker count suggested: about
+two-thirds of the HEAD side turned out to be a verbatim duplicate of content
+already committed earlier in this same file (my whole `12:52:20`–`12:54:59`
+thread from last round), and the remaining piece — my `12:54:59` sent-handoff
+entry — had gotten wedged, by an earlier bad edit of mine, between the two
+halves of an unrelated architect entry it has no relation to. Applying my own
+lesson from the previous round, read the entire reconstructed span end to end
+before running any header check: found both problems that way, not by the
+counts. Deleted the duplicate span, moved the sent-handoff entry to its
+correct chronological slot (immediately after this worktree's own
+`12:52:20` entry, before the coder's `13:10:00` implementation entry), and
+let the architect's two observations stand next to each other as they were
+written. Both the incoming-header and own-history header checks pass clean,
+and this time so does a full read-through.
+
+Ran the refactorer's gates on the architect's changes to `Cup`, `Roll`,
+`Player`, `Initiative`, `Turn` (mutation-driven fixes: `CupTest` now
+distinguishes which die a cup reached for, `Turn.move`'s redundant
+comparison collapsed):
+
+- CRAP: unchanged, 5.0 max (`Turn.take`).
+- DRY: found a real one. The architect's new `CupTest` duplicates two of
+  `RollTest`'s existing Cup-behaviour tests — one exact match
+  (`aCupYieldsTheRollsItWasGivenInOrder` / `aScriptedCupYieldsItsRollsInOrder`)
+  and one near match differing only by a dropped message assertion. `Cup`
+  now has its own test class for exactly this behaviour, so `RollTest`
+  should own only `Roll`'s own arithmetic and stay there. Removed all three
+  Cup-related tests from `RollTest` (down to the two that test `Roll`
+  itself), folded the dropped message assertion into `CupTest`'s exhaustion
+  test, and moved the one test `CupTest` didn't yet have (dice stay within
+  their declared faces) across intact. Net two fewer tests, same coverage,
+  no behaviour touched. DRY duplicate count back down to 9.
+- Mutation scan: unchanged from last round, all trivial.
+
+### Verification
+
+- `mvn test`: 108 unit tests pass (110 minus the two removed duplicates).
+- `mvn test -Pproperty-tests`: 9 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 pass.
+
+Handing back to the architect.
+
 ## 2026-07-27T13:50:00Z — coder verification of the merged architect state
 
 - `mvn test`: 110 unit tests pass.
@@ -2449,34 +2568,24 @@ The scenario itself is worth reshaping too — a distinct `final balance` column
 and an explicit `final position` instead of the literal 10 would make it
 killable — but that is the specifier's, and secondary to the scoring question.
 
-## 2026-07-27T13:19:37Z — coder received handoff from specifier
-
-Handoff message received:
+## 2026-07-27T15:46:02Z — architect received refactorer handoff
 
 ```
-id: 20260727T131721Z_000006_from_specifier
-from: specifier
-to: coder
-recipient: coder
-priority: 50
 type: git_handoff
-role: specifier
-commit: ad02b22f68
-created_at: 2026-07-27T13:17:21.960177Z
-enqueued_at: 2026-07-27T13:17:22.173229Z
+from: refactorer
+to: architect
+priority: 50
 task: phase2-turn-loop
-dequeued_at: 2026-07-27T13:19:37.571938Z
+commit: 34a7410341
 
 Re-read your role and constitution.
 
-merge_and_process specifier ad02b22f68
+merge_and_process refactorer 34a7410341
 ```
 
-Action taken: merged specifier commit `ad02b22f68` into `swarmforge-coder`, then
-verified the reshaped `movement-4` scenario against the existing step handlers.
-No production or step-handler change was needed: `the player is at position
-<value>` and `the player's account balance is $<value>` are already regex
-handlers, so the two new columns bind without new code.
+Merged `34a7410341` and reviewed it. The move is right: `CupTest` now owns
+every test of `Cup`, `RollTest` only `Roll`'s arithmetic, and the two
+duplicated cases are gone. Nothing to send back.
 
 ## 2026-07-27T15:55:00Z — coder verification of movement-4's new outcome columns
 
@@ -2511,6 +2620,71 @@ It is moot for `movement-4` now that the columns are split.
 it generates from, so the two agree and the naming does not by itself explain
 the gate's 29-of-29. That question stays open and stays the architect's.
 
+## 2026-07-27T15:56:00Z — architect review of phase2-turn-loop
+
+Reviewing the merge sent the review outward, to the one place the turn-loop
+work had not reached: `Game`.
+
+### The top level was carrying its own copy of a rule the rules already had
+
+`Game.play()` grouped players by `rules.dice().map(Dice::roll).toList()` and
+logged it, under a `// TODO - there are no tests to assert that the code below
+is correct`. `Game.Journal.Entry.RollForInitiative` then derived a winner from
+that map a second time, by parsing `Dice.Face` symbols back into integers and
+taking the highest.
+
+So the same rule existed three times over: once in `rules.Initiative`, which is
+specified by `initiative.feature` and covered by `InitiativeTest`; once
+inline in `play()`, which settled no ties and produced no order; and once in
+the journal entry, which knew how a roll totals. Only the first was correct.
+
+Two boundaries were wrong as a result. `Game` sits at the top and reached all
+the way down to the concrete `Dice`, past the `Cup` abstraction that exists to
+keep exactly that from happening. And `Dice.Face`'s representation — a symbol
+that happens to spell a number — leaked out of the dice package into the
+journal, which had to know to parse it.
+
+`Game` now asks `Initiative` and records what it answers. The `Dice` import is
+gone; a `Cup` is all it needs.
+
+### A game now says where its rolls come from
+
+`Game` takes the `Cup` as a third component, with the two-argument constructor
+building one from the dice the rules call for. That is the same seam `Turn`
+already has, and it is what makes the top level testable at all: `GameTest`
+plays a scripted game and reads the order back.
+
+`Result` carries that order. It was an empty record, so nothing `play()`
+worked out could be observed, and the journal — the one record of what
+happened — was written to a logger and dropped. `Result` now carries the
+entries as data. Rendering them stays somebody else's job, which is what
+Phase 3 asks for.
+
+`Journal.Entry.Start` held its players in a varargs array. Records compare
+array components by identity, so two `Start` entries listing the same players
+were never equal. It holds a `List` now.
+
+### Verification
+
+- `mvn test`: 113 unit tests pass (108, plus 5 new in `GameTest`).
+- `mvn test -Pproperty-tests`: 9 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+- `mutate4java` on `Game`: 4 sites, 4 killed, 0 survived, 0 uncovered.
+- `dry4java`: no duplication in production code. The nine candidates it
+  reports in tests are arrange-act-assert triples that differ only in their
+  literals, including one across `StationTest` and `UtilityTest`; extracting
+  those would couple two independent test classes to hide the shape a test is
+  supposed to have.
+- `acceptance/run-acceptance-mutation.sh --level soft`: exit 0. No feature
+  changed, so every scenario was skipped against its manifest.
+
+### Left alone, deliberately
+
+`Initiative` re-rolls ties in an unbounded loop, so `GameTest`'s one test of
+the real-dice constructor terminates with probability one rather than by
+construction. That was noted at the last handoff and `RULES.md` still states no
+bound, so it stays as it is.
+
 ## 2026-07-27T15:57:05Z — coder sent handoff to refactorer
 
 Handoff message sent:
@@ -2534,3 +2708,54 @@ merge_and_process coder 6a03de66b1
 Summary: `movement-4`'s reshaped scenario, verified against the existing step
 handlers with no production or step-handler change. 110 unit tests and 100
 acceptance tests pass.
+
+## 2026-07-27T15:57:42Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T155726Z_000012_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: e6f6536e10
+created_at: 2026-07-27T15:57:26.565432Z
+enqueued_at: 2026-07-27T15:57:27.520827Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T15:57:42.513306Z
+
+Re-read your role and constitution.
+
+merge_and_process architect e6f6536e10
+```
+
+Action taken: merged architect commit `e6f6536e10` into `swarmforge-coder`.
+One `logbook.md` conflict, both sides appends: rebuilt the tail from the two
+appended blocks in timestamp order rather than side order, so the coder,
+refactorer, and architect entries from this round read as one thread. Nothing
+was dropped; the three entries merged clean before the conflict region are
+still there. Then verified the merged state.
+
+## 2026-07-27T16:05:00Z — coder verification of the merged architect state
+
+- `mvn test`: 113 unit tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+The finding against this role's work is accepted. `Game.play()` grouped players
+by a roll it took from `rules.dice()` directly and never settled a tie, and the
+journal entry worked the winner out a second time by parsing `Dice.Face`
+symbols back into numbers. `rules.Initiative` already had that rule, specified
+and covered. Two of those three copies were mine to not have written: the turn
+loop was built underneath `Game` without `Game` being made to ask for it.
+
+The specifier's split of `movement-4` and the architect's manifest refresh met
+in this merge, so the jail scenario's stored `scenario_hash` no longer matches
+the scenario. The next mutation run will re-test it rather than skip it, which
+is the run that will say whether the two new columns are killed in the gate as
+they are when measured by hand.
