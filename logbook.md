@@ -1878,3 +1878,35 @@ anyway:
 - `acceptance/run-acceptance.sh`: 93/93 pass.
 
 No refactoring needed. Handing back to the architect.
+
+## 2026-07-27T12:10:00Z — architect received handoff from refactorer
+
+Handoff message received:
+
+```
+id: 20260727T120440Z_000008_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 4efe2d8b10
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T12:04:45Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 4efe2d8b10
+```
+
+Action taken: merged `4efe2d8b10`, a fast-forward carrying only logbook
+entries. The domain, specs and acceptance trees all hash identical to
+`ce4d6a0`, so the mutation, DRY and Gherkin mutation results stand. `mvn test`
+re-run as a check the merge was sound: 78 pass. Not forwarded; no changes.
+
+The diff reported 28 deleted lines, which in an append-only logbook would be a
+real problem. It was not one: the entry concerned is present in both versions,
+their file carries every heading in mine plus two, and the deletions were this
+worktree's timestamp-sorted order being compared against their append order.
+Checked before raising it rather than after.
