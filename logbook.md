@@ -1669,3 +1669,48 @@ Summary: re-verified the architect's `StartSpace` comment fix and the
 `dice.feature` mutation exemption against the refactorer's gates — CRAP,
 DRY, mutation scan all green, no changes needed. Committed at `05d7808dff`
 on `swarmforge-refactorer`; handing back to the architect.
+
+## 2026-07-27T11:52:07Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260727T114846Z_000004_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: pipeline-compatible-specs
+commit: 1addc00b74
+
+Re-read your role and constitution.
+
+merge_and_process coder 1addc00b74
+```
+
+Action taken: merged coder commit `1addc00b74` into `swarmforge-refactorer`.
+Four `logbook.md` conflict regions, the same append-only-file pattern as
+previous rounds, including one region where two threads' verification
+sections shared identical leading bullets before diverging; resolved by
+writing out each thread's full narrative in full rather than trying to
+further diff-merge the fragments, then cross-checked every incoming header
+appears exactly once before committing.
+
+This commit touched no domain main source — only `MonopolyStepHandlers.java`
+in the specs module and feature files, reshaping the last six plain
+`Scenario`s into single-row `Scenario Outline`s so their values reach
+acceptance mutation. Nothing here is in the refactorer's gates' scope, but
+re-ran them on the domain module anyway to confirm no regression:
+
+- CRAP: unchanged, 3.0 max (`OwnedCount.checked`).
+- DRY: unchanged, same 6 test-shape duplicates as before, none in production
+  code.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 pass.
+
+No refactoring needed. Handing back to the architect.
