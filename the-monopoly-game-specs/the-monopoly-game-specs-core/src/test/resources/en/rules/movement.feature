@@ -60,9 +60,9 @@ Feature: movement
     And the next roll will be <second double> and <second double>
     And the next roll will be <third double> and <third double>
     When the player takes a turn
-    Then the player is at position 10
-    And the player's account balance is $<starting balance>
+    Then the player is at position <final position>
+    And the player's account balance is $<final balance>
 
     Examples:
-      | starting balance | starting position | first double | second double | third double |
-      | 1500              | 0                  | 2             | 5              | 1            |
+      | starting balance | starting position | first double | second double | third double | final position | final balance |
+      | 1500              | 0                  | 2             | 5              | 1            | 10              | 1500          |

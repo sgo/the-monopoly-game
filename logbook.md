@@ -2043,6 +2043,42 @@ coder to implement, and no open question is outstanding for this role. The
 now has its values under the acceptance mutation gate, except `dice.feature`,
 whose tolerance assertion is exempt by construction and marked `!no-mutation`.
 
+## 2026-07-27T12:27:10Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T122710Z_000005_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase2-turn-loop
+commit: e7f0fc1cbb
+created_at: 2026-07-27T12:27:10.917671Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e7f0fc1cbb
+```
+
+Summary: pipeline-compatible-specs closed out clean (architect confirmed
+the class of gap was fixed, not just the six instances). Started a new
+task, phase2-turn-loop, per tasks.md's Phase 2 (turn loop and pawn
+movement). Committed `17feb21` (RULES.md: tied initiative rolls re-roll
+among themselves - a rule gap RULES.md never covered, resolved by user
+decision before writing the tie-break scenario) and `e7f0fc1` (two new
+files: movement.feature - position, wraparound, salary on
+passing/landing via a new "the next roll will be X and Y" deterministic-
+dice test seam, doubles granting another roll, three doubles sending the
+player to jail instead of a third move; initiative.feature - highest
+roll goes first then clockwise, and the new tie-break rule, reusing the
+same per-pawn roll step twice for a re-roll rather than inventing new
+vocabulary). Deliberately scoped out: no separate jail-state flag
+(Phase 12's job), no "rule inactive" landing-vs-passing scenario (both
+pay the same, so it wouldn't catch a pass/land mix-up).
+
 ## 2026-07-27T12:27:21Z — coder received handoff from specifier
 
 Handoff message received:
@@ -2251,6 +2287,28 @@ The behaviour itself is not unverified — `TurnTest` covers three doubles going
 to jail, the third move being taken away, and a pawn jailed after passing Start
 keeping the salary it had already earned.
 
+## 2026-07-27T12:42:08Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T124208Z_000005_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase2-turn-loop
+commit: fbc5f7ca52
+created_at: 2026-07-27T12:42:08.576404Z
+
+Re-read your role and constitution.
+
+merge_and_process coder fbc5f7ca52
+```
+
+Summary: hands the Phase 2 turn loop, movement, and initiative on branch
+`swarmforge-coder` at commit `fbc5f7ca52` to the refactorer.
 
 ## 2026-07-27T13:30:00Z — architect review of phase2-turn-loop
 
@@ -2332,6 +2390,152 @@ terminates; against a source that keeps returning the same total it would not.
 The test fixture throws when its script runs out rather than repeating, so the
 suite cannot hang on it today. Bounding it would mean inventing a rule
 `RULES.md` does not state, so it is left as it is and noted.
+
+## 2026-07-27T13:12:17Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T131211Z_000010_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: e535d0508c
+created_at: 2026-07-27T13:12:11.154798Z
+enqueued_at: 2026-07-27T13:12:12.048434Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T13:12:17.815160Z
+
+Re-read your role and constitution.
+
+merge_and_process architect e535d0508c
+```
+
+Action taken: merged architect commit `e535d0508c` into `swarmforge-coder`,
+resolving the `logbook.md` conflict by keeping both the coder's sent entry and
+the architect's review, then re-verified the merged state here.
+
+## 2026-07-27T13:50:00Z — coder verification of the merged architect state
+
+- `mvn test`: 110 unit tests pass.
+- `mvn test -Pproperty-tests`: 9 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+Three findings against this role's work, all accepted:
+
+- `Cup.of(dice)` read `die1` and `die2` from two dice that are identical on
+  this board, so swapping them was undetectable. The test now uses dice whose
+  faces read differently. The seam was written without a test that could tell
+  the two dice apart.
+- Nothing pinned that a player joins the game on Start. The secondary
+  constructor defaulting the position to zero was added without a test.
+- `move` asked `if (to == 0) land; else if (from + steps >= spaces) pass;`.
+  The `>=` was unkillable there because the else-if is only reached when
+  `to != 0`, so the boundary the operators disagree about cannot occur. The
+  architect restructured it to ask whether Start was reached once and only
+  then which way, which is both simpler and killable. The redundant comparison
+  was mine.
+
+### The acceptance mutation gate reported a mutation killed that cannot fail
+
+For the architect, whose gate this is.
+
+The review reports 29 mutations in `movement.feature`, all killed. 29 is
+exactly the number of example cells in that file, so every cell was mutated
+and none was skipped, which places `movement-4`'s `starting balance` among
+them.
+
+That cell cannot be killed. `movement-4` arranges with
+`with $<starting balance> in his account` and asserts with
+`the player's account balance is $<starting balance>` — one column on both
+sides. `mutator-spec.md` mutates an integer to that integer plus a nonzero
+delta, so a mutation moves the arrangement and the expectation together and
+the assertion still holds.
+
+Measured rather than argued: hand-editing that one cell from 1500 to 1600 in
+the IR, generating the entry point, and running it gives
+`Tests run: 1, Failures: 0`. The mutant survives. This was done by editing the
+IR and running the generated tests, not by running `gherkin-mutator`, which is
+not this role's to run.
+
+So either the mutation runner is scoring some mutations killed without the
+generated test having failed, or those cells were skipped and still counted.
+Both matter more than the scenario does: a gate that reports a mutant dead
+when it is alive is the same failure as the acceptance suite that reported
+`BUILD SUCCESS` while running nothing, and every clean run since is only worth
+what the scoring is worth.
+
+The scenario itself is worth reshaping too — a distinct `final balance` column
+and an explicit `final position` instead of the literal 10 would make it
+killable — but that is the specifier's, and secondary to the scoring question.
+
+## 2026-07-27T13:19:37Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T131721Z_000006_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: ad02b22f68
+created_at: 2026-07-27T13:17:21.960177Z
+enqueued_at: 2026-07-27T13:17:22.173229Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T13:19:37.571938Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier ad02b22f68
+```
+
+Action taken: merged specifier commit `ad02b22f68` into `swarmforge-coder`, then
+verified the reshaped `movement-4` scenario against the existing step handlers.
+No production or step-handler change was needed: `the player is at position
+<value>` and `the player's account balance is $<value>` are already regex
+handlers, so the two new columns bind without new code.
+
+## 2026-07-27T15:55:00Z — coder verification of movement-4's new outcome columns
+
+- `mvn test`: 110 unit tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+The point of the reshaping was killability, so that is what was measured rather
+than assumed. With the IR edited in place and the generated class name checked,
+`final balance` 1500 -> 1600 fails on `expected: Balance[amount=Money[amount=
+1600]]`, and `final position` 10 -> 11 fails on `expected: 11`. Both cells are
+now killable; before the reshaping neither outcome had a cell of its own.
+
+### A correction to the surviving-mutant measurement in the previous entry
+
+For the architect, since the acceptance mutation gate was called into question
+partly on the strength of that measurement.
+
+`acceptance-entrypoint-generator.bb` takes the generated class name from the IR
+*file* stem, not from `--feature-path`: an IR written to `mutant.json` generates
+`MutantAcceptanceTest`, whatever feature it holds. So a hand-edited IR saved
+under a new name, then run under the original feature's test class name, runs
+the unmutated class and reports a pass that means nothing. That is a plausible
+shape for the earlier "Tests run: 1, Failures: 0", and it was hit while
+re-measuring today before the class name was checked.
+
+The argument in that entry still holds on its own terms — one column on both
+sides of a scenario moves arrangement and expectation together, so no delta
+applied to it can fail — but the empirical half of it should not be leaned on.
+It is moot for `movement-4` now that the columns are split.
+
+`AcceptanceMutationRunner` derives the entry point class from the same IR stem
+it generates from, so the two agree and the naming does not by itself explain
+the gate's 29-of-29. That question stays open and stays the architect's.
 
 ## 2026-07-27T13:20:49Z — refactorer received handoff from architect
 
