@@ -3939,3 +3939,29 @@ and the other side's 18, with every body byte-identical to the parent it came
 from. The one deliberate exception is the coder's `17:43:10`, truncated back
 to the handoff it actually received; its own account of what it did was lost
 upstream, before this branch ever saw it, and is not recoverable from here.
+
+## 2026-07-27T21:30:00Z — architect handoffs for turn-loop-wiring
+
+To coder and refactorer at priority `00`:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: turn-loop-wiring
+commit: 4e71a4e760
+```
+
+To the specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: turn-loop-wiring
+commit: 4e71a4e760
+```
+
+`Game` is a class rather than a record, and its `rules()`, `players()` and
+`cups()` accessors are gone; no caller had them. Nothing about how a game plays
+changed, so no feature moves.
