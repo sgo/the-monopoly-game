@@ -589,3 +589,26 @@ from 100000 to 50000 fails that scenario too.
 
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer
 and architect.
+
+## 2026-07-27T08:41:10Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T084110Z_000002_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: pipeline-compatible-specs
+commit: eaf16a9eb1
+created_at: 2026-07-27T08:41:10.553187Z
+
+Re-read your role and constitution.
+
+merge_and_process coder eaf16a9eb1
+```
+
+Summary: hands the completed `pipeline-compatible-specs` slice on branch
+`swarmforge-coder` at commit `eaf16a9eb1` to the refactorer.
