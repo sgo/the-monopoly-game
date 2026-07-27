@@ -3844,3 +3844,98 @@ commit: (commit recorded by the handoff draft)
 
 Summary: merged and verified the coder's turn-loop wiring; all refactorer
 quality gates and unit, property, and acceptance verification are green.
+
+## 2026-07-27T21:15:21Z — architect received refactorer handoff
+
+```
+id: 20260727T211511Z_000015_from_refactorer_to_architect
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: turn-loop-wiring
+commit: 135d14ac17
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 135d14ac17
+```
+
+Merged `135d14ac17`: the turn loop, specified and built since the last round.
+`Game.play()` no longer stops at initiative — it takes a turn for every player
+in turn order, each moved by their own rolls, through a new `Game.Cups` seam
+that answers `forPlayer(player)`. `turn-loop.feature` is on the pipeline with
+both scenarios green.
+
+### Reviewed
+
+The seam is the right one. `Cups` lives on `Game` rather than beside `Cup`,
+which is correct: it needs `Player`, and putting it in `components.dice` would
+make the dice know about the players. A shared cup is `player -> cup`, so the
+two older constructors still read as they did, and neither the rules nor
+`Turn` learned anything new — `Turn` still takes the cup for whoever's turn it
+is. Dependency direction is unchanged and still inward.
+
+### `Game` was a record that mutates what it holds
+
+`play()` now moves the players it was given: `Turn.take` writes to
+`player.position()`. A `record` advertises a value — one that can be compared,
+copied, and passed around without consequence — and this one cannot. Two games
+holding the same list would compare equal after one of them had been played.
+The three generated accessors made it worse, not better: `rules()`,
+`players()` and `cups()` had no callers anywhere and published the test seam
+as part of the API.
+
+Made it a class with private final fields, keeping all three constructors and
+dropping the accessors nothing used. The class comment now says what `record`
+had been implying wrongly: a game is something being done, not a value.
+
+### Left alone, deliberately
+
+Nothing is journalled for turns — the journal still holds `Start` and
+`TurnOrder` alone. That is a specification's call rather than mine; inventing
+entries would be inventing behaviour, and `Game`'s own test pins the journal
+at exactly those two.
+
+`World.rollForInitiative()` drives `Initiative` directly while
+`World.playGame()` goes through `Game`, so `initiative.feature` exercises a
+composition no production code performs. Worth watching: as more features play
+whole games, the single-rule harness paths should collapse into `Game`.
+Changing it now would alter what `initiative.feature` drives, which is not
+mine to decide alone.
+
+`with $<starting balance> in pawn "dog"'s account` is a Given that asserts
+rather than arranges, because no rule moves money before the first turn. That
+is honest about the domain rather than papering over it, and the mutation gate
+confirms it bites: `starting_balance: 1500 -> 1502` is killed.
+
+### Verification
+
+- `mvn test`: 120 unit tests pass.
+- `mvn test -Pproperty-tests`: 10 property tests pass.
+- `acceptance/run-acceptance.sh`: 102/102 across nine pipeline features.
+- `mutate4java` on `Game.java`: 5 changed sites, 5 covered, 5 killed, 0
+  survived, 0 uncovered.
+- `dry4java`: 9 candidates, none touching production code — the same
+  arrange-act-assert triples in test files as before, and nothing new from the
+  turn loop.
+- `acceptance/run-acceptance-mutation.sh --level soft`: exit 0.
+  `turn-loop.feature` is new to the gate and scored 11 mutations, 11 killed, 0
+  survived; every other feature skipped against a current manifest.
+
+### The merge dropped an entry again, and spliced two others together
+
+Same hazard as the last round, in a worse shape. `17:46:37` — the refactorer's
+own receipt — is in the merge base and on this branch but absent from
+`135d14ac17`, so it arrived as a deletion. Worse, git had matched the coder's
+`17:43:10` receipt against it on their shared handoff block and grafted the
+refactorer's body onto the coder's header, leaving an entry that says the
+coder merged into `swarmforge-refactorer`.
+
+Rebuilt the file from both parents at entry granularity rather than patching
+around the markers: 107 entries, being 84 from the base plus this branch's 5
+and the other side's 18, with every body byte-identical to the parent it came
+from. The one deliberate exception is the coder's `17:43:10`, truncated back
+to the handoff it actually received; its own account of what it did was lost
+upstream, before this branch ever saw it, and is not recoverable from here.
