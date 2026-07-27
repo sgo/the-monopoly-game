@@ -184,6 +184,9 @@ public final class MonopolyStepHandlers {
         step("^we roll for initiative$",
             (world, arguments) -> world.rollForInitiative()),
 
+        step("^every other player can complete their turn$",
+            (world, arguments) -> world.letTheOthersRollWhatTheyLike()),
+
         step("^we play the game$",
             (world, arguments) -> world.playGame()),
 
