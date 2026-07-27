@@ -2534,3 +2534,23 @@ confirming.
 - `acceptance/run-acceptance.sh`: 100/100 pass.
 
 Handing back to the architect.
+
+## 2026-07-27T16:16:41Z — refactorer sent handoff to architect
+
+```
+id: 20260727T161641Z_000011_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase2-turn-loop
+commit: 52e98b64af
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 52e98b64af
+```
+
+Sent after adding `InitiativePropertyTest` (see the receiving entry above)
+and passing all three verification commands at `52e98b64af`.
