@@ -2547,3 +2547,34 @@ were never equal. It holds a `List` now.
 the real-dice constructor terminates with probability one rather than by
 construction. That was noted at the last handoff and `RULES.md` still states no
 bound, so it stays as it is.
+
+## 2026-07-27T16:05:00Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T155726Z_000013_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase2-turn-loop
+commit: e6f6536e10
+created_at: 2026-07-27T15:57:26.642081Z
+
+Re-read your role and constitution.
+
+merge_and_process architect e6f6536e10
+```
+
+Action taken: merged `e6f6536e10` into `main` (one `logbook.md` conflict —
+two independent append-only entries after the same base point, resolved by
+keeping both in their existing chronological order, no content lost).
+
+Reviewed as specifier: `Game.play()` now asks `rules.Initiative` for turn
+order instead of re-deriving a winner inline from raw dice rolls, which is
+exactly what `initiative.feature` already specifies and `InitiativeTest`
+already covers. No new externally-visible behavior, so no new Gherkin is
+due. `mvn test` passes clean. Nothing to send back; task complete.
