@@ -3966,3 +3966,29 @@ and the other side's 18, with every body byte-identical to the parent it came
 from. The one deliberate exception is the coder's `17:43:10`, truncated back
 to the handoff it actually received; its own account of what it did was lost
 upstream, before this branch ever saw it, and is not recoverable from here.
+
+## 2026-07-27T21:31:47Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T213000Z_000018_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: turn-loop-wiring
+commit: 4e71a4e760
+
+Re-read your role and constitution.
+
+merge_and_process architect 4e71a4e760
+```
+
+Action taken: merged architect commit `4e71a4e760` into `main`, preserving
+the sent and received `turn-loop-wiring` histories while resolving the sole
+append-only `logbook.md` conflict. The completed work keeps the specified
+turn-loop behavior intact, adds the supporting acceptance vocabulary for
+other players' turns, and records its accepted mutation results. Task complete.
