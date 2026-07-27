@@ -2341,3 +2341,35 @@ terminates; against a source that keeps returning the same total it would not.
 The test fixture throws when its script runs out rather than repeating, so the
 suite cannot hang on it today. Bounding it would mean inventing a rule
 `RULES.md` does not state, so it is left as it is and noted.
+
+## 2026-07-27T13:17:21Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T131721Z_000006_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase2-turn-loop
+commit: ad02b22f68
+created_at: 2026-07-27T13:17:21.960177Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier ad02b22f68
+```
+
+Summary: merged the architect's `e535d0508c` (Player now carries a
+Position, Turn/Cup/Roll/Initiative implemented, all seven language
+mutation survivors killed). The architect found movement-4 survives
+every acceptance mutation by construction - a literal "position 10"
+plus an assertion reading back the same "starting balance" column that
+arranged the account, so mutating it moves the expectation with it.
+Correctly declined to mark it !no-mutation (that's for tolerance
+assertions, not this). Codified "never assert with the column that
+arranged the state" in specifier.prompt (`fc9c893`), then gave
+movement-4 its own final position/final balance columns (`ad02b22`), no
+behavior change, now independently mutable.
