@@ -2395,3 +2395,87 @@ comparison collapsed):
 - `acceptance/run-acceptance.sh`: 100/100 pass.
 
 Handing back to the architect.
+
+## 2026-07-27T15:46:02Z — architect received refactorer handoff
+
+```
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: phase2-turn-loop
+commit: 34a7410341
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 34a7410341
+```
+
+Merged `34a7410341` and reviewed it. The move is right: `CupTest` now owns
+every test of `Cup`, `RollTest` only `Roll`'s arithmetic, and the two
+duplicated cases are gone. Nothing to send back.
+
+## 2026-07-27T15:56:00Z — architect review of phase2-turn-loop
+
+Reviewing the merge sent the review outward, to the one place the turn-loop
+work had not reached: `Game`.
+
+### The top level was carrying its own copy of a rule the rules already had
+
+`Game.play()` grouped players by `rules.dice().map(Dice::roll).toList()` and
+logged it, under a `// TODO - there are no tests to assert that the code below
+is correct`. `Game.Journal.Entry.RollForInitiative` then derived a winner from
+that map a second time, by parsing `Dice.Face` symbols back into integers and
+taking the highest.
+
+So the same rule existed three times over: once in `rules.Initiative`, which is
+specified by `initiative.feature` and covered by `InitiativeTest`; once
+inline in `play()`, which settled no ties and produced no order; and once in
+the journal entry, which knew how a roll totals. Only the first was correct.
+
+Two boundaries were wrong as a result. `Game` sits at the top and reached all
+the way down to the concrete `Dice`, past the `Cup` abstraction that exists to
+keep exactly that from happening. And `Dice.Face`'s representation — a symbol
+that happens to spell a number — leaked out of the dice package into the
+journal, which had to know to parse it.
+
+`Game` now asks `Initiative` and records what it answers. The `Dice` import is
+gone; a `Cup` is all it needs.
+
+### A game now says where its rolls come from
+
+`Game` takes the `Cup` as a third component, with the two-argument constructor
+building one from the dice the rules call for. That is the same seam `Turn`
+already has, and it is what makes the top level testable at all: `GameTest`
+plays a scripted game and reads the order back.
+
+`Result` carries that order. It was an empty record, so nothing `play()`
+worked out could be observed, and the journal — the one record of what
+happened — was written to a logger and dropped. `Result` now carries the
+entries as data. Rendering them stays somebody else's job, which is what
+Phase 3 asks for.
+
+`Journal.Entry.Start` held its players in a varargs array. Records compare
+array components by identity, so two `Start` entries listing the same players
+were never equal. It holds a `List` now.
+
+### Verification
+
+- `mvn test`: 113 unit tests pass (108, plus 5 new in `GameTest`).
+- `mvn test -Pproperty-tests`: 9 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+- `mutate4java` on `Game`: 4 sites, 4 killed, 0 survived, 0 uncovered.
+- `dry4java`: no duplication in production code. The nine candidates it
+  reports in tests are arrange-act-assert triples that differ only in their
+  literals, including one across `StationTest` and `UtilityTest`; extracting
+  those would couple two independent test classes to hide the shape a test is
+  supposed to have.
+- `acceptance/run-acceptance-mutation.sh --level soft`: exit 0. No feature
+  changed, so every scenario was skipped against its manifest.
+
+### Left alone, deliberately
+
+`Initiative` re-rolls ties in an unbounded loop, so `GameTest`'s one test of
+the real-dice constructor terminates with probability one rather than by
+construction. That was noted at the last handoff and `RULES.md` still states no
+bound, so it stays as it is.
