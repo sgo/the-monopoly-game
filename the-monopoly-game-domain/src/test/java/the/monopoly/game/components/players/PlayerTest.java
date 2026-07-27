@@ -119,6 +119,17 @@ class PlayerTest {
     assertThat(new Player.Position(7)).isNotEqualTo("7");
   }
 
+  /**
+   * A player is printed whole when something goes wrong, and a position that
+   * did not say which space it was would take the useful part of that message
+   * with it.
+   */
+  @Test
+  void aPositionSaysWhichSpaceItIsWhenPrinted() {
+    assertThat(new Player.Position(7)).hasToString("Position[index=7]");
+    assertThat(playerWith(1500)).asString().contains("Position[index=0]");
+  }
+
   @Test
   void aPawnCarriesItsPositionRatherThanBeingReplaced() {
     Player.Position position = new Player.Position(3);

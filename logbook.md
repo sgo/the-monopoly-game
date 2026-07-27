@@ -4382,3 +4382,115 @@ commit: (commit recorded by the handoff draft)
 
 Summary: reduced the report renderer's CRAP score from 8.0 to 1.0 without
 changing its wording or event order; all refactorer gates and verification pass.
+
+## 2026-07-27T22:32:08Z — architect received refactorer handoff
+
+```
+id: 20260727T223157Z_000017_from_refactorer_to_architect
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase3-journal-report
+commit: db74af9b58
+
+Re-read your role and constitution.
+
+merge_and_process refactorer db74af9b58
+```
+
+Merged `db74af9b58`: Phase 3's journal and report. The journal stopped being
+two summary entries and became a running account — initiative rolls and their
+winner, each turn started, every roll, every move, every salary — and `Report`
+turns that account into lines of English.
+
+### Reviewed
+
+The seam between the two is right, and it is the point of the phase. `Turn`
+reports what it did through `Turn.Events`, whose methods all default to doing
+nothing, so `Turn` never learns that a journal exists; `Game.Journalling`
+adapts one to the other. Nothing in `rules` depends on `Game`, and the wording
+lives outside the domain's decisions entirely. `Journal.Entry` became `sealed`,
+which is the right move for a closed set of things that happened.
+
+`Turn.move` now writes the new position before paying the salary, where it
+used to pay first. Nothing reads position during payment, so the order is free
+— it buys a journal that reads in the order a table would see it.
+
+### Sealing the entries only pays if something has to answer for them all
+
+`Report` dispatched through a `Map<Class<? extends Entry>, Function<Entry,
+String>>`, looking each entry's handler up by its class and casting. That
+throws away exactly what sealing bought: add an eighth kind of entry and the
+map compiles, `LINES.get` returns null, and the report dies at run time on the
+first game that reaches it — or worse, on a game nobody ran yet.
+
+Rewrote it as a switch over the sealed interface. Measured rather than
+asserted: added a `WentToJail` entry and the build fails with "the switch
+expression does not cover all possible input values", pointing at `Report`.
+Under the map it compiled clean. Then removed the entry again.
+
+Complexity did not go up — the seven cases are one line each, where before
+they were seven map entries plus seven casting lambdas plus seven methods.
+
+### `Report` claimed the wording lived in one place, and it did not
+
+`Entry.Start` still carried a hand-written `toString` rendering "Start game
+with players:" and a bulleted list — prose, in the domain, for the one entry
+of seven that had it, left over from when the journal was the report. Removed
+it, along with the `namesOf` helper only it used. The record's own `toString`
+serves the logger and the failure messages, the way it already did for the
+other six.
+
+### The mutation gate had two uncovered sites; one is real, one cannot exist
+
+`Player:70`, `Position.toString`, was genuinely untested. A player is printed
+whole when something fails, and a position that did not say which space it was
+would take the useful part of that message with it — so it is worth having and
+worth pinning. Covered it; the site is now killed.
+
+`Turn:36`, `while (true)`, is reported uncovered and always will be. The
+mutant is `while (false)`, which does not compile — javac rejects the loop
+body as unreachable. No test can kill a mutant that cannot be built, and there
+is nothing here to fix.
+
+### Verification
+
+- `mvn test`: 131 unit tests pass.
+- `mvn test -Pproperty-tests`: 10 property tests pass.
+- `acceptance/run-acceptance.sh`: 108/108 across eleven pipeline features.
+- `mutate4java`: `Game` 5/5 killed, `Report` 1/1, `Turn` 12/12, `Player` 4/4
+  plus the newly covered `toString` site killed. Uncovered is 0 everywhere but
+  `Turn:36` above.
+- `dry4java`: 11 candidates. Nine are the familiar arrange-act-assert triples
+  in test files; two more are new `TurnTest` triples of the same kind. The one
+  production pair is `Game`'s three-field constructor against `Turn`'s — two
+  unrelated classes that both assign their fields, matched at 0.86 on shape.
+  Sharing anything between them would couple `Game` to `Turn`'s fields to save
+  three assignments. Left alone deliberately; recorded so the next run does not
+  reopen it.
+- `acceptance/run-acceptance-mutation.sh --level soft`: exit 0. Both new
+  features scored: `journal.feature` 18 mutations, 18 killed; `report.feature`
+  15 mutations, 15 killed. Everything else skipped against a current manifest.
+
+### Standing hazard, not fixed here
+
+`Player` is a record whose `Position` component is mutable and is mutated all
+through a game. Its `equals` and `hashCode` therefore change as the pawn
+moves, so a `Player` put in a `HashSet` or used as a map key stops being
+findable the moment it takes a turn. Nothing does that today — `Initiative`
+calls `List.indexOf` before anyone has moved, and the one property test that
+builds sets of players never plays — so nothing is broken. It is the same
+mistake `Game` carried until `4e71a4e760`: value semantics over state that
+moves. The fix is to make a player's identity its `ID` alone, and it should
+happen before anything keys on a `Player`.
+
+### The merge
+
+One conflicted region, but the entry-level comparison found more than it. Took
+this branch's `21:15:21` and `21:35:00` — the two entries restored last round —
+and took the other side's `17:43:10`, whose body came back: the coder's own
+account of what it did, which had been grafted away in an earlier merge and
+which this branch had recorded as lost for good. It was not. 122 entries, and
+every other body byte-identical to the parent it came from.
