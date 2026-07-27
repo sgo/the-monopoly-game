@@ -2,9 +2,9 @@
 # Normal acceptance run: parse each feature into JSON IR, generate the entry
 # points, then run the generated tests.
 #
-# Only the features listed below are on the pipeline. The remaining features
-# use step-attached data tables and Dutch keywords, which the APS parser subset
-# does not support; see logbook.md.
+# Only the features listed below are on the pipeline. en/monopoly.feature is
+# the one held back: it parses, but it specifies a whole played-out game, and
+# the turn loop behind it does not exist yet. See logbook.md.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -14,12 +14,13 @@ IR_DIR="$ROOT/build/acceptance/ir"
 GENERATED="$SPECS/target/generated-test-sources/acceptance"
 APS="${APS_HOME:-$ROOT/tmp/aps}"
 
-FEATURE_FILES=(
-  "en/components/streets.feature"
-  "en/components/stations.feature"
-  "en/components/utilities.feature"
-  "en/components/tax.feature"
-)
+# The pipeline features live in one file both scripts read; see
+# pipeline-features.txt.
+PIPELINE_FEATURES=()
+while IFS= read -r feature_line; do
+  PIPELINE_FEATURES+=("$feature_line")
+done < <(grep -vE '^[[:space:]]*(#|$)' "$ROOT/acceptance/pipeline-features.txt")
+FEATURE_FILES=("${PIPELINE_FEATURES[@]}")
 
 if [[ ! -f "$APS/bb.edn" ]]; then
   echo "APS checkout not found at $APS. Set APS_HOME or clone" >&2
