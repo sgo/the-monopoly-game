@@ -37,7 +37,20 @@ class CupTest {
     Cup cup = Cup.of(new Roll(1, 2));
     cup.roll();
 
-    assertThatThrownBy(cup::roll).isInstanceOf(IllegalStateException.class);
+    assertThatThrownBy(cup::roll)
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("no more rolls");
+  }
+
+  @Test
+  void aCupOfDiceRollsEveryDieWithinItsFaces() {
+    Cup cup = Cup.of(Dice.Type.six.create(), Dice.Type.six.create());
+
+    for (int i = 0; i < 100; i++) {
+      Roll roll = cup.roll();
+      assertThat(roll.die1()).isBetween(1, 6);
+      assertThat(roll.die2()).isBetween(1, 6);
+    }
   }
 
   /**
