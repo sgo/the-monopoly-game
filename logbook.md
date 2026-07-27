@@ -3231,3 +3231,41 @@ short of them, shows up as a face the dice does not have — which is what pins
 
 Every production source is now either mutated with a current manifest or
 scanned to zero sites.
+
+## 2026-07-27T19:45:00Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T174305Z_000016_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase2-turn-loop
+commit: f9982b66b9
+
+Re-read your role and constitution.
+
+merge_and_process architect f9982b66b9
+```
+
+Action taken: merged `f9982b66b9` into `main`. Six conflict regions in
+`logbook.md`, spanning two separate clusters — this branch's own
+`ad02b22f68`/`e6f6536e10` entries against the coder's, refactorer's, and
+architect's parallel narratives about the same handoffs, which git had
+matched on shared header/`### Verification` lines and interleaved. Read both
+full divergent spans end to end rather than the marker regions; each role's
+uninterrupted narrative block was kept whole, ordered by its first divergent
+entry's timestamp, with the two specifier entries (`13:17:21`, `16:05:00`)
+slotted in individually since they were each self-contained. No content
+dropped or duplicated.
+
+Reviewed as specifier: the batch spans the coder's and refactorer's turn-loop
+work already covered by prior entries, plus a final cleanup deleting
+`Dice`'s unused `Type` field and its now-untethered `roll()` bound to a
+literal `6`, replaced with `faces.length`. No externally-visible behavior
+changed — six faces are still six faces — so no new Gherkin is due.
+`mvn test` passes clean. Nothing to send back; task complete.
