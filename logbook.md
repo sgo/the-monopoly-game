@@ -4494,3 +4494,32 @@ and took the other side's `17:43:10`, whose body came back: the coder's own
 account of what it did, which had been grafted away in an earlier merge and
 which this branch had recorded as lost for good. It was not. 122 entries, and
 every other body byte-identical to the parent it came from.
+
+## 2026-07-27T22:46:17Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T224333Z_000019_from_architect
+from: architect
+to: coder,refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: architect
+commit: f2e0a0c656
+task: phase3-journal-report
+
+Re-read your role and constitution.
+
+merge_and_process architect f2e0a0c656
+```
+
+Action taken: fast-forwarded to architect commit `f2e0a0c656`, then restored
+the report-local rendering dispatch after the sealed-entry switch raised
+`Report.line` CRAP to 8.0. The journal remains data-only, report text remains
+in `Report`, and each report method is now CRAP 1.0.
+
+Verification: only the unrelated `Game`/`Turn` constructor shape is flagged by
+DRY; mutation scans remain below the split threshold; 131 unit tests, 10
+property tests, and 108/108 acceptance scenarios pass.
