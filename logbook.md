@@ -3107,3 +3107,64 @@ mutations. What is left of Phase 2 is the turn loop itself — `Game.play()` sti
 only settles initiative, and the per-space dispatch every later phase hangs off
 does not exist yet. That is the coder's to write against a specification, not
 mine to invent, and it already has the seam it needs.
+
+## 2026-07-27T17:42:00Z — architect closed the last gap in the mutation gate
+
+No handoff prompted this. With the queue empty I checked which production
+sources had never been through `mutate4java` at all, by looking for the
+manifest footer it writes: seven had none. Six of them scan to zero mutation
+sites — `Board`, `Ownable`, `Station`, `TaxSpace`, `UnownableSpace` and
+`Official` are data and delegation with nothing to mutate. `Dice` was the
+exception, and the one class the gate had never read.
+
+It came back 7 killed, 1 survived, 2 uncovered.
+
+### The survivor was a field nothing read
+
+`Dice` stored a `Type` and offered a `type()` accessor. Nothing in the domain
+or the specs ever called it, so `this.type = type` could be replaced with
+`this.type = null` and every test still passed. The uncovered `type()` was the
+same fact seen from the other side.
+
+Writing a test that asserts a dice remembers its type would have turned the
+gate green while keeping an accessor with no caller. Deleted instead — the
+mutant was pointing at the code, as it was for `Turn`'s redundant comparison
+earlier in this task. `Dice.Type.create()` still holds the faces each type is
+made of; what it no longer does is hand the dice a label nobody asks for.
+
+### And then the six had to go too
+
+`roll()` read `faces[random.get().nextInt(6)]`. That hardcoded `6` was noted at
+`13:35` as latent and left for the coder, on the grounds that only
+`Dice.Type.six` exists so nothing can reach it. Removing `type` changes that
+reasoning: a dice is now nothing but its faces, and a roll that consults a
+number written beside them rather than the faces themselves is incoherent
+regardless of which types exist. It reads `nextInt(faces.length)` now. Every
+dice in the game has six faces, so no behaviour moves.
+
+### The uncovered sites, and what uncovered meant
+
+`faces()` was reported uncovered, but the acceptance suite calls it in two
+places. `mutate4java` measures coverage from the domain module's `mvn test`,
+which never runs the specs module — so UNCOVERED from this tool reads as "no
+unit test reaches this", not "nothing reaches this". Worth remembering the next
+time it reports a site as unreachable.
+
+`DiceTest` now covers both from the domain module. It rolls a two-faced dice
+rather than a six-faced one, so a roll that reaches past the faces, or stops
+short of them, shows up as a face the dice does not have — which is what pins
+`faces.length` in place of the literal.
+
+### Verification
+
+- `mvn test`: 117 unit tests pass (113, plus 4 in `DiceTest`).
+- `mvn test -Pproperty-tests`: 10 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+- `mutate4java` on `Dice`: 8 sites, 8 covered, 8 killed, 0 survived, 0
+  uncovered, where it had been 7 killed, 1 survived, 2 uncovered.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level soft`: exit 0, every scenario
+  skipped against a current manifest.
+
+Every production source is now either mutated with a current manifest or
+scanned to zero sites.
