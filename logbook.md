@@ -1444,3 +1444,36 @@ Sent to coder and refactorer at priority `00`, and to the specifier, who has
 one question waiting in the entry above: whether the six plain `Scenario`s on
 the pipeline — `official-rules-7` and `-8` among them — should become one-row
 `Scenario Outline`s so their expected values come under the mutation gate.
+
+## 2026-07-27T11:40:52Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T114052Z_000004_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: pipeline-compatible-specs
+commit: 0ed538365f
+created_at: 2026-07-27T11:40:52.772450Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 0ed538365f
+```
+
+Summary: merged the architect's `99aa4ff567` (double-salary split
+implemented as I ruled, and the dice.feature mutation-survivor handled
+with an explicit `!no-mutation` tolerance exemption rather than a spec
+change - correct, since narrowing the margin would make the scenario
+fail on honest dice). The architect flagged six more plain Scenarios
+(five in official.feature, one in streets.feature) contributing zero
+mutation coverage for the same reason dice.feature originally did. Per
+user direction, first codified "always Scenario Outline, even for one
+row" as a standing rule in specifier.prompt (`7d280c6`), then applied it
+to all six (`0ed5383`) - each becomes a single-row Outline with its
+literal values pulled into named Examples: columns, no assertion
+changes.
