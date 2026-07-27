@@ -2022,3 +2022,26 @@ distinct from the starting one. Reshaping it is the specifier's to do.
 The behaviour itself is not unverified — `TurnTest` covers three doubles going
 to jail, the third move being taken away, and a pawn jailed after passing Start
 keeping the salary it had already earned.
+
+## 2026-07-27T12:42:08Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T124208Z_000005_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase2-turn-loop
+commit: fbc5f7ca52
+created_at: 2026-07-27T12:42:08.576404Z
+
+Re-read your role and constitution.
+
+merge_and_process coder fbc5f7ca52
+```
+
+Summary: hands the Phase 2 turn loop, movement, and initiative on branch
+`swarmforge-coder` at commit `fbc5f7ca52` to the refactorer.
