@@ -1795,3 +1795,10 @@ and it was not gotten wrong.
   killed, 0 survived, 0 errors, exit 0.
 - `mutate4java`: not re-run; no domain source changed since `1f7a5a6`, where
   it reported 0 survivors and 0 uncovered.
+
+## 2026-07-27T12:05:00Z — architect handoffs for the last plain scenarios
+
+Sent to coder and refactorer at priority `00`, and to the specifier. No
+question is outstanding from this role: the two raised earlier, on where the
+double-salary rule belongs and on the scenarios the mutation gate could not
+reach, are both answered and closed.
