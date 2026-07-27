@@ -513,3 +513,79 @@ directly instead of the nonexistent `swarmtools/notify-agent.sh`, matching
 what every role actually used for this task). Reported the coder's jqwik
 prompt-injection finding to the user, and raised the "ten features are on
 no pipeline" question for a decision before doing any further respecification.
+
+## 2026-07-27T08:21:05Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T082051Z_000002_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: e0c8876bc1
+created_at: 2026-07-27T08:20:51.269968Z
+enqueued_at: 2026-07-27T08:20:52.313652Z
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T08:21:05.449413Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e0c8876bc1
+```
+
+Action taken: merged specifier commit `e0c8876bc1` into `swarmforge-coder`,
+resolving a `logbook.md` conflict by keeping both roles' entries in
+chronological order, then implemented the step vocabulary the reshaped
+specifications need.
+
+## 2026-07-27T08:45:00Z — coder implementation of pipeline-compatible-specs
+
+`official.feature` and `dice.feature` are now on the acceptance pipeline,
+which goes from 31 to 92 passing scenarios. `monopoly.feature` stays off,
+per the specifier's stated intent: it parses, but it specifies a whole
+played-out game and the turn loop does not exist yet.
+
+### Pawns became domain behaviour
+
+The reshaped `official.feature` asserts pawns by name — `pawn "dog" is at
+play`. `Player.Pool` handed out identifiers `"0"` … `"7"`; the names lived
+in `messages*.properties`, read by the Cucumber fixtures the architect
+deleted. Nothing named a pawn any more.
+
+Added `Pawn`, an enum of the eight official pieces, and `Player.Pool` now
+seeds players from it, so a player's identifier is the pawn they play. The
+name a specification writes is spelled with a space (`high hat`) and the
+enum constant with an underscore, so `Pawn.pawnName()` bridges the two.
+
+### Landing on Start is now its own move
+
+Scenario `official-rules-7` says a player *lands on* Start; only `pass`
+existed. Added `Player.land`. It pays the same as `pass` today, because the
+double-salary rule is carried by `StartSpace` rather than by the move, and
+both scenarios pass either way.
+
+Worth a specifier decision rather than a silent choice by me: the rule is
+named `double_salary_when_landing_on_start`, but as modelled the doubling
+also applies to *passing* Start — `PlayerTest.theDoubleSalaryRuleDoublesWhat
+PassingStartPays` pins that. No scenario covers passing Start while the rule
+is active, so nothing says which is intended. If passing should keep paying
+the single salary, the rule belongs on the move rather than on the space.
+
+### Verification
+
+- `mvn test`: 76 unit tests pass, clean tree or dirty.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 92/92 pass, exits 0, leaves nothing behind.
+
+Checked non-vacuous by mutating four different expectations in the IR at
+once — a space's colour group, a space's type, a pawn name, every starting
+balance, and the passing-Start balance. Exactly the twelve corresponding
+scenario executions failed and no others. Mutating the dice fairness count
+from 100000 to 50000 fails that scenario too.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer
+and architect.
