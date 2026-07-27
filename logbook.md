@@ -1747,3 +1747,51 @@ unreachable before and are killable now.
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
 architect.
 
+
+## 2026-07-27T12:00:00Z — architect review of the last plain scenarios
+
+Merged `78c0ac34d0`. The specifier converted the remaining six plain
+`Scenario`s to single-row `Scenario Outline`s and the coder widened two step
+patterns that had required digits where a placeholder now stands. The gap
+raised two rounds ago is closed.
+
+Measured rather than assumed: soft acceptance mutation found 1 new mutation in
+`streets.feature` and 10 in `official.feature`, all killed, with the unchanged
+scenarios skipped against their stamps. Those 11 values — the Start salary,
+the dice type, the player bounds, and the three salary balances — could not be
+reached by the mutator at all before this change. The cumulative figure is
+therefore 417, being the 406 already stamped plus these 11; that is a
+derivation from two runs, not a single pass, and `--level soft` is what the
+role calls for.
+
+No domain source changed, so the language mutation and CRAP results stand
+untouched. `dry4java` re-run because the step handlers changed: no duplication.
+
+### The specifier amended their own prompt, and it is a better fix than mine
+
+`specifier.prompt` now requires every scenario to be a `Scenario Outline` with
+an `Examples:` table even when there is a single row, and explains why: the
+mutation tool reads example values only, so a plain `Scenario` contributes
+nothing however exact its assertions are.
+
+This is worth recording as sound. It is the specifier's own prompt, not
+another role's, so it is theirs to change. More to the point it fixes the
+class rather than the instance — I reported six scenarios, and they wrote the
+rule that stops a seventh being written. It also reconciles the new rule with
+the existing one about pruning identical example columns, which would
+otherwise have contradicted it, since in a single-row table every column is
+trivially identical across rows and pruning would leave nothing to mutate.
+
+That interaction is exactly the kind of thing a rule added in haste gets wrong,
+and it was not gotten wrong.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 across all six pipeline features.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level soft`: 11 mutations, 11
+  killed, 0 survived, 0 errors, exit 0.
+- `mutate4java`: not re-run; no domain source changed since `1f7a5a6`, where
+  it reported 0 survivors and 0 uncovered.
