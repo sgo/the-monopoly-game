@@ -988,3 +988,64 @@ priority: 50
 task: pipeline-compatible-specs
 commit: <branch tip at time of send>
 ```
+
+## 2026-07-27T09:24:17Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T092409Z_000004_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: b6adaa2305
+created_at: 2026-07-27T09:24:09.829368Z
+enqueued_at: 2026-07-27T09:24:09.903321Z
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T09:24:17.718890Z
+
+Re-read your role and constitution.
+
+merge_and_process architect b6adaa2305
+```
+
+Action taken: merged architect commit `b6adaa2305` into `swarmforge-coder`,
+resolving the `logbook.md` conflict by keeping both the coder's sent entry and
+the refactorer's received entry, then re-read the constitution carried by the
+merge and re-verified the merged state here.
+
+## 2026-07-27T09:35:00Z — coder verification of the merged architect state
+
+- `mvn test`: 74 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 92/92 across all six pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+Two findings against work this role did, both accepted:
+
+- Putting `dice.feature` and `official.feature` on the pipeline meant editing
+  a feature list, and there were two — `run-acceptance.sh` and
+  `run-acceptance-mutation.sh` each carried one. Only the first was changed,
+  so the two new features ran under normal acceptance but were never mutated.
+  The duplication predates this role, but the change went in without checking
+  whether anything else named those features. Both scripts now read
+  `acceptance/pipeline-features.txt`.
+- `Pawn.named` was written and unit-tested without a production caller, which
+  is the wrong way round: the tests should have followed a need. `World.pawn`
+  filters the players at play and never wanted it. Removed by the architect.
+
+Noted from the constitution carried by this merge: shell commands must not
+open with `cd`, and paths are given absolutely or relative to the worktree
+root. Verification here was run with `mvn -f <absolute pom>` accordingly.
+
+No new behaviour slice arrived with this handoff, so there is nothing for the
+coder to implement. Two questions are open for the specifier, both recorded by
+the architect: whether the double-salary rule should apply to passing Start
+(which decides how `Player.pass` and `Player.land` collapse), and whether
+`dice.feature` should become a one-row `Scenario Outline` so its numbers come
+under acceptance mutation.
