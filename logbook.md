@@ -2174,6 +2174,33 @@ the existing two property test classes.
 - `acceptance/run-acceptance.sh`: 100/100 pass.
 
 Handing back to the architect.
+
+## 2026-07-27T12:54:59Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260727T125459Z_000009_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase2-turn-loop
+commit: 490d7c3d4d
+created_at: 2026-07-27T12:54:59.107940Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 490d7c3d4d
+```
+
+Summary: deduplicated `InitiativeTest`'s two literal roll fixtures (12 to 9
+DRY duplicates project wide), added `RollPropertyTest` for the same
+property-test gap `Money` had before, CRAP/mutation re-verified within
+bounds. Committed at `490d7c3d4d` on `swarmforge-refactorer`; handing back
+to the architect.
+
 ## 2026-07-27T13:10:00Z — coder implementation of phase2-turn-loop
 
 Acceptance goes from 93 to 100 scenarios and unit tests from 78 to 101.
@@ -2373,3 +2400,150 @@ assertions, not this). Codified "never assert with the column that
 arranged the state" in specifier.prompt (`fc9c893`), then gave
 movement-4 its own final position/final balance columns (`ad02b22`), no
 behavior change, now independently mutable.
+
+## 2026-07-27T13:20:49Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T131211Z_000010_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase2-turn-loop
+commit: e535d0508c
+
+Re-read your role and constitution.
+
+merge_and_process architect e535d0508c
+```
+
+Action taken: merged architect commit `e535d0508c` into `swarmforge-refactorer`
+(the architect's mutation-killing round on the turn loop). One `logbook.md`
+conflict region, but a wider one than the marker count suggested: about
+two-thirds of the HEAD side turned out to be a verbatim duplicate of content
+already committed earlier in this same file (my whole `12:52:20`–`12:54:59`
+thread from last round), and the remaining piece — my `12:54:59` sent-handoff
+entry — had gotten wedged, by an earlier bad edit of mine, between the two
+halves of an unrelated architect entry it has no relation to. Applying my own
+lesson from the previous round, read the entire reconstructed span end to end
+before running any header check: found both problems that way, not by the
+counts. Deleted the duplicate span, moved the sent-handoff entry to its
+correct chronological slot (immediately after this worktree's own
+`12:52:20` entry, before the coder's `13:10:00` implementation entry), and
+let the architect's two observations stand next to each other as they were
+written. Both the incoming-header and own-history header checks pass clean,
+and this time so does a full read-through.
+
+Ran the refactorer's gates on the architect's changes to `Cup`, `Roll`,
+`Player`, `Initiative`, `Turn` (mutation-driven fixes: `CupTest` now
+distinguishes which die a cup reached for, `Turn.move`'s redundant
+comparison collapsed):
+
+- CRAP: unchanged, 5.0 max (`Turn.take`).
+- DRY: found a real one. The architect's new `CupTest` duplicates two of
+  `RollTest`'s existing Cup-behaviour tests — one exact match
+  (`aCupYieldsTheRollsItWasGivenInOrder` / `aScriptedCupYieldsItsRollsInOrder`)
+  and one near match differing only by a dropped message assertion. `Cup`
+  now has its own test class for exactly this behaviour, so `RollTest`
+  should own only `Roll`'s own arithmetic and stay there. Removed all three
+  Cup-related tests from `RollTest` (down to the two that test `Roll`
+  itself), folded the dropped message assertion into `CupTest`'s exhaustion
+  test, and moved the one test `CupTest` didn't yet have (dice stay within
+  their declared faces) across intact. Net two fewer tests, same coverage,
+  no behaviour touched. DRY duplicate count back down to 9.
+- Mutation scan: unchanged from last round, all trivial.
+
+### Verification
+
+- `mvn test`: 108 unit tests pass (110 minus the two removed duplicates).
+- `mvn test -Pproperty-tests`: 9 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 pass.
+
+Handing back to the architect.
+
+## 2026-07-27T15:46:02Z — architect received refactorer handoff
+
+```
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: phase2-turn-loop
+commit: 34a7410341
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 34a7410341
+```
+
+Merged `34a7410341` and reviewed it. The move is right: `CupTest` now owns
+every test of `Cup`, `RollTest` only `Roll`'s arithmetic, and the two
+duplicated cases are gone. Nothing to send back.
+
+## 2026-07-27T15:56:00Z — architect review of phase2-turn-loop
+
+Reviewing the merge sent the review outward, to the one place the turn-loop
+work had not reached: `Game`.
+
+### The top level was carrying its own copy of a rule the rules already had
+
+`Game.play()` grouped players by `rules.dice().map(Dice::roll).toList()` and
+logged it, under a `// TODO - there are no tests to assert that the code below
+is correct`. `Game.Journal.Entry.RollForInitiative` then derived a winner from
+that map a second time, by parsing `Dice.Face` symbols back into integers and
+taking the highest.
+
+So the same rule existed three times over: once in `rules.Initiative`, which is
+specified by `initiative.feature` and covered by `InitiativeTest`; once
+inline in `play()`, which settled no ties and produced no order; and once in
+the journal entry, which knew how a roll totals. Only the first was correct.
+
+Two boundaries were wrong as a result. `Game` sits at the top and reached all
+the way down to the concrete `Dice`, past the `Cup` abstraction that exists to
+keep exactly that from happening. And `Dice.Face`'s representation — a symbol
+that happens to spell a number — leaked out of the dice package into the
+journal, which had to know to parse it.
+
+`Game` now asks `Initiative` and records what it answers. The `Dice` import is
+gone; a `Cup` is all it needs.
+
+### A game now says where its rolls come from
+
+`Game` takes the `Cup` as a third component, with the two-argument constructor
+building one from the dice the rules call for. That is the same seam `Turn`
+already has, and it is what makes the top level testable at all: `GameTest`
+plays a scripted game and reads the order back.
+
+`Result` carries that order. It was an empty record, so nothing `play()`
+worked out could be observed, and the journal — the one record of what
+happened — was written to a logger and dropped. `Result` now carries the
+entries as data. Rendering them stays somebody else's job, which is what
+Phase 3 asks for.
+
+`Journal.Entry.Start` held its players in a varargs array. Records compare
+array components by identity, so two `Start` entries listing the same players
+were never equal. It holds a `List` now.
+
+### Verification
+
+- `mvn test`: 113 unit tests pass (108, plus 5 new in `GameTest`).
+- `mvn test -Pproperty-tests`: 9 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+- `mutate4java` on `Game`: 4 sites, 4 killed, 0 survived, 0 uncovered.
+- `dry4java`: no duplication in production code. The nine candidates it
+  reports in tests are arrange-act-assert triples that differ only in their
+  literals, including one across `StationTest` and `UtilityTest`; extracting
+  those would couple two independent test classes to hide the shape a test is
+  supposed to have.
+- `acceptance/run-acceptance-mutation.sh --level soft`: exit 0. No feature
+  changed, so every scenario was skipped against its manifest.
+
+### Left alone, deliberately
+
+`Initiative` re-rolls ties in an unbounded loop, so `GameTest`'s one test of
+the real-dice constructor terminates with probability one rather than by
+construction. That was noted at the last handoff and `RULES.md` still states no
+bound, so it stays as it is.
