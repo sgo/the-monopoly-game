@@ -174,8 +174,22 @@ public final class MonopolyStepHandlers {
         step("^pawn \"" + NAME + "\" will roll " + VALUE + " for initiative$",
             (world, arguments) -> world.queueInitiativeRoll(arguments.text(1), arguments.number(2))),
 
+        step("^pawn \"" + NAME + "\" will roll " + VALUE + " and " + VALUE + " for their turn$",
+            (world, arguments) -> world.queuePawnRoll(
+                arguments.text(1), new Roll(arguments.number(2), arguments.number(3)))),
+
+        step("^with \\$" + VALUE + " in pawn \"" + NAME + "\"'s account$",
+            (world, arguments) -> world.arrangePawnBalance(arguments.text(2), money(arguments.number(1)))),
+
         step("^we roll for initiative$",
             (world, arguments) -> world.rollForInitiative()),
+
+        step("^we play the game$",
+            (world, arguments) -> world.playGame()),
+
+        then("^pawn \"" + NAME + "\" is at position " + VALUE + "$",
+            (world, arguments) -> assertThat(world.pawn(arguments.text(1)).position().index())
+                .isEqualTo(arguments.number(2))),
 
         step("^pawn \"" + NAME + "\" goes first$",
             (world, arguments) -> assertThat(world.turnOrder().getFirst().id().value())
