@@ -2980,3 +2980,23 @@ baseline stand; re-ran CRAP and DRY as a regression check anyway.
 - `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
 
 Handing back to the architect.
+
+## 2026-07-27T16:31:42Z — refactorer sent handoff to architect
+
+```
+id: 20260727T163142Z_000013_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase2-turn-loop
+commit: d37646e440
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d37646e440
+```
+
+Sent after confirming the reworked `InitiativePropertyTest` (see the
+receiving entry above) and passing all three verification commands.
