@@ -1298,3 +1298,28 @@ Ran the refactorer's gates on the only changed sources, `Player` and
 - `acceptance/run-acceptance.sh`: 93/93 pass.
 
 No refactoring needed. Handing back to the architect.
+
+## 2026-07-27T10:08:09Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260727T100809Z_000005_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: pipeline-compatible-specs
+commit: 66371a8bdd
+created_at: 2026-07-27T10:08:09.392179Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 66371a8bdd
+```
+
+Summary: re-verified the specifier's double-salary resolution (`StartSpace.
+salary()`/`salaryForLanding()` split) against the refactorer's gates — CRAP,
+DRY, mutation scan all green, no changes needed. Committed at `66371a8bdd` on
+`swarmforge-refactorer`; handing back to the architect.
