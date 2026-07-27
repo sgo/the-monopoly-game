@@ -2560,3 +2560,87 @@ confirming.
 - `acceptance/run-acceptance.sh`: 100/100 pass.
 
 Handing back to the architect.
+
+## 2026-07-27T16:16:45Z — architect received refactorer handoff
+
+```
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: phase2-turn-loop
+commit: 52e98b64af
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 52e98b64af
+```
+
+Merged `52e98b64af`, which adds `InitiativePropertyTest`. Resolved a
+`logbook.md` conflict by keeping both entries in timestamp order. Reworked the
+property; see below.
+
+## 2026-07-27T16:21:00Z — architect review of phase2-turn-loop
+
+### The property was checking the implementation against a copy of itself
+
+`InitiativePropertyTest` built the expected turn order with
+`rotatedToStartAtTheWinner`, whose three working lines were the three working
+lines of `Initiative.order`, character for character:
+
+```java
+int winnerIndex = seated.indexOf(winner);
+List<Player> rotated = new ArrayList<>(seated.subList(winnerIndex, seated.size()));
+rotated.addAll(seated.subList(0, winnerIndex));
+```
+
+A property that constructs the answer the same way the code does can only
+agree with itself. It still rejected a wholly different implementation — the
+refactorer checked that against a descending sort — but it could not have
+rejected a subtler mistake in the rotation, because the same mistake would
+have to be written twice before the test would notice, and both copies were
+written from the same idea in the same sitting.
+
+`dry4java` does not flag it: the two methods differ enough around the shared
+lines to fall under the threshold. Duplication across the test/production
+boundary is not the kind a similarity score is good at seeing.
+
+### Stating the rule instead
+
+`initiative.feature` says the highest roll goes first, then play continues
+clockwise. That is two independent facts, and neither needs the rotation to be
+written down:
+
+- the first player is the highest roller, and
+- whoever sits clockwise of a player also plays after them.
+
+The second is `seatingIsUnbroken`, which walks the order and checks each
+player's successor against their successor at the table. With "everyone takes
+exactly one turn" alongside, this is equivalent to "a rotation starting at the
+winner" — it just says what the rule is rather than how the code arrives at it,
+and shares nothing with `Initiative`.
+
+Checked non-vacuous by breaking `order()` three ways, each aimed at a
+different clause:
+
+- sorting the seated players by roll rather than rotating: falsified, shrunk
+  to three players.
+- rotating one seat past the winner: falsified at two players. The order is
+  still a rotation, so only the highest-roller clause catches it.
+- rotating correctly but reversing everyone after the winner, which is play
+  running anticlockwise: falsified at three players. The winner still leads and
+  everyone still takes one turn, so only `seatingIsUnbroken` catches it.
+
+Each break was rejected, and each by the clause meant to reject it.
+
+### Verification
+
+- `mvn test`: 113 unit tests pass.
+- `mvn test -Pproperty-tests`: 10 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+- `mutate4java` on `Initiative`: 0 changed scopes against its manifest; no
+  production source changed in this batch. The default profile excludes the
+  `property-test` tag, so the new property stays out of the mutation baseline.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level soft`: exit 0, every scenario
+  skipped against a current manifest.

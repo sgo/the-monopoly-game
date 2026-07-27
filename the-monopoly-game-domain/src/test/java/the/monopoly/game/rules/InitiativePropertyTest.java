@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import the.monopoly.game.components.players.Player;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -20,37 +19,53 @@ import static java.util.stream.Collectors.toMap;
 /**
  * Initiative.order only ever runs against a handful of hand-picked rolls in
  * the example-based tests. This property sweeps player counts and roll
- * assignments to pin down what those examples only sample: with no tie for
- * the highest roll, the winner leads and everyone else keeps their seating
- * order, and nobody is added, dropped, or duplicated.
+ * assignments to pin down what those examples only sample: with no tie for the
+ * highest roll, the winner leads, play still runs round the table in the
+ * direction the players are sitting, and nobody is added, dropped, or
+ * duplicated.
  */
 @Tag("property-test")
 class InitiativePropertyTest {
   @Test
-  void theWinnerLeadsAndEveryoneElseKeepsTheirSeatingOrder() {
+  void theWinnerLeadsAndPlayContinuesClockwise() {
     PropertyChecker.forAll(distinctRolls(), rolls -> {
       List<Player> seated = Rule.Set.Type.official.create().players().select(rolls.size()).toList();
       Map<Player.ID, Integer> rollById = rollById(seated, rolls);
 
       List<Player> order = new Initiative(player -> rollById.get(player.id())).order(seated);
 
-      return order.size() == seated.size()
-          && new HashSet<>(order).equals(new HashSet<>(seated))
-          && order.equals(rotatedToStartAtTheWinner(seated, rollById));
+      return everyoneTakesOneTurn(order, seated)
+          && order.getFirst().equals(highestRoller(seated, rollById))
+          && seatingIsUnbroken(order, seated);
     });
   }
 
-  private static List<Player> rotatedToStartAtTheWinner(List<Player> seated, Map<Player.ID, Integer> rollById) {
-    Player winner = Collections.max(seated, Comparator.comparingInt(p -> rollById.get(p.id())));
-    int winnerIndex = seated.indexOf(winner);
-    List<Player> rotated = new ArrayList<>(seated.subList(winnerIndex, seated.size()));
-    rotated.addAll(seated.subList(0, winnerIndex));
-    return rotated;
+  private static boolean everyoneTakesOneTurn(List<Player> order, List<Player> seated) {
+    return order.size() == seated.size() && new HashSet<>(order).equals(new HashSet<>(seated));
+  }
+
+  /**
+   * Whoever sits clockwise of a player also plays after them. Stating the rule
+   * this way rather than building the expected list keeps the property from
+   * restating the rotation {@link Initiative#order} performs, which would only
+   * ever agree with itself.
+   */
+  private static boolean seatingIsUnbroken(List<Player> order, List<Player> seated) {
+    return IntStream.range(0, order.size()).allMatch(turn ->
+        after(order, turn).equals(after(seated, seated.indexOf(order.get(turn)))));
+  }
+
+  private static Player after(List<Player> players, int index) {
+    return players.get((index + 1) % players.size());
+  }
+
+  private static Player highestRoller(List<Player> seated, Map<Player.ID, Integer> rollById) {
+    return Collections.max(seated, Comparator.comparingInt(player -> rollById.get(player.id())));
   }
 
   private static Map<Player.ID, Integer> rollById(List<Player> seated, List<Integer> rolls) {
     return IntStream.range(0, seated.size()).boxed()
-        .collect(toMap(i -> seated.get(i).id(), rolls::get));
+        .collect(toMap(index -> seated.get(index).id(), rolls::get));
   }
 
   private static Generator<List<Integer>> distinctRolls() {
