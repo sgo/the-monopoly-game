@@ -112,3 +112,11 @@ Feature: official rules
     And with $1500 in his account
     When the player lands on the street "Start"
     Then the player's account balance is $1900
+
+  # official-rules-8
+  Scenario: players still receive a single salary when passing start with the double salary rule active
+    And with optional double salary when landing on Start rule
+    And a player
+    And with $1500 in his account
+    When the player passes the street "Start"
+    Then the player's account balance is $1700

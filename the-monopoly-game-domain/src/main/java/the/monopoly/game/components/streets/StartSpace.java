@@ -22,8 +22,16 @@ public record StartSpace(Street.Type type, Set<Rule> activatedRules) implements 
     return Street.Kind.start;
   }
 
-  /** What the bank pays a player for passing or landing on Start. */
+  /** What the bank pays a player for passing Start. Passing is never doubled. */
   public Money salary() {
+    return SALARY;
+  }
+
+  /**
+   * What the bank pays a player for landing exactly on Start, which the
+   * optional double-salary rule pays twice over.
+   */
+  public Money salaryForLanding() {
     return doublesSalary() ? SALARY.plus(SALARY) : SALARY;
   }
 
