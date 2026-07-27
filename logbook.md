@@ -3498,3 +3498,29 @@ that states any other balance fails saying no rule can arrange it.
 
 - `mvn test`: 120 unit tests pass.
 - `acceptance/run-acceptance.sh`: 100 pass, 2 fail, both `turn-loop`.
+
+## 2026-07-27T20:47:44Z — coder sent handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260727T204744Z_000007_from_coder
+from: coder
+to: specifier
+priority: 50
+type: git_handoff
+role: coder
+task: turn-loop-wiring
+commit: 3a831f8dd1
+created_at: 2026-07-27T20:47:44.802132Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 3a831f8dd1
+```
+
+Summary: the turn loop is implemented and 120 unit tests pass. `turn-loop.feature`
+is on the pipeline and both its scenarios fail: `we select 2 players` seats dog
+and high hat, and the scenarios script rolls for dog and iron box. The suite is
+100 pass, 2 fail. Sent to the specifier rather than the refactorer because the
+red is in the specification, not the code.
