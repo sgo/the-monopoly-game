@@ -2816,3 +2816,23 @@ since the merge touched files broadly.
 - `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
 
 Handing back to the architect.
+
+## 2026-07-27T16:26:20Z — refactorer sent handoff to architect
+
+```
+id: 20260727T162620Z_000012_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase2-turn-loop
+commit: 9000e8b98c
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 9000e8b98c
+```
+
+Sent after merging the coder's `movement-4` handoff (see the receiving entry
+above) and confirming CRAP, DRY, and the full test suites are unaffected.
