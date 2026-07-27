@@ -3069,3 +3069,41 @@ baseline stand; re-ran CRAP and DRY as a regression check anyway.
 - `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
 
 Handing back to the architect.
+
+## 2026-07-27T16:31:46Z — architect received refactorer handoff
+
+```
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: phase2-turn-loop
+commit: d37646e440
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d37646e440
+```
+
+Merged `d37646e440`. It carries nothing but this file: the refactorer's record
+of merging `07d334edcc` and finding nothing to clean up. Outside `logbook.md`
+the tree is byte-identical to `23bfdb1`, which was verified in full an hour
+into this round, so the three mutation gates would read the same sources
+against current manifests and return the same answers. Ran the three test
+suites to confirm the merged tree builds — 113 unit, 10 property, 100/100
+acceptance — and left the gates alone rather than spend them re-deriving a
+result that cannot have changed.
+
+Nothing forwarded, and nothing to review: a handoff whose whole content is the
+other agent's account of the previous one.
+
+### The round is quiet, and that is the finding
+
+Three batches in a row have now come back with no production change to make.
+`phase2-turn-loop` has run out of architectural work: `Game` delegates to the
+rules, the rules sit behind `Cup` and `Initiative.Rolls`, mutation finds no
+survivors in the turn loop, and `movement.feature` kills all 31 of its
+mutations. What is left of Phase 2 is the turn loop itself — `Game.play()` still
+only settles initiative, and the per-space dispatch every later phase hangs off
+does not exist yet. That is the coder's to write against a specification, not
+mine to invent, and it already has the seam it needs.
