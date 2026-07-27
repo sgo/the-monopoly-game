@@ -1578,3 +1578,26 @@ unreachable before and are killable now.
 
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
 architect.
+
+## 2026-07-27T11:48:46Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T114846Z_000004_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: pipeline-compatible-specs
+commit: 1addc00b74
+created_at: 2026-07-27T11:48:46.785594Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 1addc00b74
+```
+
+Summary: hands the step-handler changes for the last six reshaped scenarios on
+branch `swarmforge-coder` at commit `1addc00b74` to the refactorer.
