@@ -4104,3 +4104,75 @@ merge_and_process specifier 7c89bee79a
 Action taken: merged specifier commit `7c89bee79a` into `swarmforge-coder`,
 resolving the `logbook.md` conflict at entry granularity, then implemented the
 journal and the report.
+
+## 2026-07-28T00:25:00Z — coder implementation of phase3-journal-report
+
+The journal recorded that a game started and who won initiative. It now records
+what each player rolled for initiative, and, for every turn, that it started,
+what was rolled, where the pawn went, and what reaching Start paid. A `Report`
+turns that into text.
+
+### A turn had nothing to say for itself
+
+`Turn` did the rolling, moving and paying, and `Game` held the journal, so the
+events the specification asks for happened where nothing could see them.
+
+`Turn.Events` is what a turn says as it goes: `rolled`, `moved`,
+`collectedSalary`. Every method defaults to doing nothing, so the two-argument
+constructor is a turn nobody is keeping an account of — which is what
+`movement.feature` and `TurnTest` still play. `Game` passes an implementation
+that writes each one down.
+
+The alternative was for `Turn` to return an account of itself, but a turn is a
+sequence — doubles roll again — so it would have returned a list of the same
+events in the end, and only after the fact rather than as they happened.
+
+`Player.pass` and `Player.land` now return the salary they deposited. The turn
+knows a salary was collected and would otherwise have had to work out how much
+by asking the rules a second question they had already answered.
+
+### The salary is reported after the move that earned it
+
+`journal-3` asks for the move before the salary. `move` paid before it moved the
+pawn; it now moves the pawn, says so, and then pays. No behaviour moves with it
+— nothing reads a position while the money is being deposited — and `TurnTest`
+and `GameTest` each pin the order, both of which fail if the two are swapped
+back.
+
+### `TurnOrder` gave way to `InitiativeWon`
+
+The journal recorded a `TurnOrder` entry listing everyone in order. Nothing
+specifies it, and the specification asks instead for who won initiative, which
+is the same fact stated as the moment it happened. Keeping both would have the
+report narrate the same thing twice. The order is still `Result.turnOrder()`,
+and the journal now walks through the turns in order anyway.
+
+### The report is the only place the wording lives
+
+`Report.of(journal)` renders one line per entry by pattern-matching a sealed
+`Entry`. The entries stay data; nothing about how a game reads is in them, and
+`Journal`'s logging is unchanged.
+
+The features' phrasing is the report's phrasing — `dog rolls a total of 5`,
+`dog moves from position 0 to 5` — so the report steps build what they expect
+from the words in the step. A renderer that changed its wording would fail them
+rather than agreeing with itself.
+
+### Acceptance vocabulary
+
+Twenty-one steps of it, one per sentence the two features say, over a small
+`GameAccount` that answers only "where is this?" and says what was there
+instead when it is nowhere. `pawn "X" starts at position N` is the one new
+arrangement step.
+
+### Checked they fail first
+
+The scenarios for turn events fail without the journalling wired through
+`Turn.Events` — journal-2, journal-3, report-2 and report-3 all do, while
+journal-1 and report-1 keep passing because initiative is journalled by `Game`
+itself.
+
+### Verification
+
+- `mvn test`: 130 unit tests pass.
+- `acceptance/run-acceptance.sh`: 108/108 across eleven pipeline features.

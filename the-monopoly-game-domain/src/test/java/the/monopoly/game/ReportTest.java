@@ -1,0 +1,55 @@
+package the.monopoly.game;
+
+import org.junit.jupiter.api.Test;
+import the.monopoly.game.Game.Journal.Entry;
+import the.monopoly.game.components.finance.Money;
+import the.monopoly.game.components.players.Pawn;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class ReportTest {
+  @Test
+  void aReportNamesEveryoneAtTheTableInTheOrderTheySit() {
+    assertThat(report(new Entry.Start(List.of(Pawn.dog.id(), Pawn.high_hat.id()))))
+        .isEqualTo("The game starts with dog, high hat");
+  }
+
+  @Test
+  void aReportTellsWhatEachPlayerRolledForInitiativeAndWhoWon() {
+    assertThat(report(
+        new Entry.InitiativeRoll(Pawn.dog.id(), 10),
+        new Entry.InitiativeWon(Pawn.dog.id())
+    )).isEqualTo("""
+        dog rolls 10 for initiative
+        dog wins initiative""");
+  }
+
+  @Test
+  void aReportTellsATurnAsItWasPlayed() {
+    assertThat(report(
+        new Entry.TurnStarted(Pawn.dog.id()),
+        new Entry.Rolled(Pawn.dog.id(), 5),
+        new Entry.Moved(Pawn.dog.id(), 0, 5)
+    )).isEqualTo("""
+        dog starts a turn
+        dog rolls a total of 5
+        dog moves from position 0 to 5""");
+  }
+
+  @Test
+  void aReportTellsWhatAPawnWasPaidForReachingStart() {
+    assertThat(report(new Entry.SalaryCollected(Pawn.dog.id(), new Money(200))))
+        .isEqualTo("dog collects a salary of $200");
+  }
+
+  @Test
+  void aReportOfAGameNobodyPlayedSaysNothing() {
+    assertThat(report()).isEmpty();
+  }
+
+  private static String report(Entry... journal) {
+    return Report.of(List.of(journal));
+  }
+}

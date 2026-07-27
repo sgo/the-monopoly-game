@@ -1,6 +1,8 @@
 package the.monopoly.game.specs.acceptance;
 
 import the.monopoly.game.Game;
+import the.monopoly.game.Game.Journal.Entry;
+import the.monopoly.game.Report;
 import the.monopoly.game.components.dice.Dice;
 import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Bank.Account.Balance;
@@ -42,6 +44,7 @@ public class World {
   private final Map<String, Deque<Roll>> queuedPawnRolls = new HashMap<>();
   private List<Player> turnOrder;
   private boolean othersRollWhatTheyLike;
+  private List<Entry> journal;
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
@@ -163,9 +166,25 @@ public class World {
   }
 
   public void playGame() {
-    turnOrder = new Game(ruleSet, players(), player -> () -> nextQueuedPawnRoll(player))
-        .play()
-        .turnOrder();
+    Game.Result result = new Game(ruleSet, players(), player -> () -> nextQueuedPawnRoll(player)).play();
+    turnOrder = result.turnOrder();
+    journal = result.journal();
+  }
+
+  public void placePawn(String pawnName, int position) {
+    pawn(pawnName).position().moveTo(position);
+  }
+
+  /** What the game recorded, once it has been played. */
+  public List<Entry> journal() {
+    if (journal == null)
+      throw new AssertionError("No game has been played yet.");
+    return journal;
+  }
+
+  /** The journal told as text, which is the only place the wording is settled. */
+  public String report() {
+    return Report.of(journal());
   }
 
   /**
