@@ -4176,3 +4176,27 @@ itself.
 
 - `mvn test`: 130 unit tests pass.
 - `acceptance/run-acceptance.sh`: 108/108 across eleven pipeline features.
+
+## 2026-07-27T22:20:23Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T222023Z_000009_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase3-journal-report
+commit: 1ef11c9695
+created_at: 2026-07-27T22:20:23.173025Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 1ef11c9695
+```
+
+Summary: the journal records every initiative roll, turn, roll, move and
+salary; `Report` renders it. `journal.feature` and `report.feature` are on the
+pipeline. 130 unit tests and 108 acceptance tests pass.
