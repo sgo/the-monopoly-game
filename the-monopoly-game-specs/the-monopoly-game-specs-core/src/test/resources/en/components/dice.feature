@@ -1,3 +1,8 @@
+# mutation-stamp: sha256=0c1a39d2cbf44cb3766df42e89c80e3b1e3bdcc5cf24c25b813d8a8304cc7fd7
+# acceptance-mutation-manifest-begin
+# {"version":1,"tested_at":"2026-07-27T09:08:52.878221Z","feature_name":"dice","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/components/dice.feature","background_hash":"74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b","implementation_hash":"unknown","scenarios":[]}
+# acceptance-mutation-manifest-end
+
 # language: en
 
 Feature: dice
