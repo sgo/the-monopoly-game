@@ -1044,3 +1044,42 @@ consolidation):
 - `acceptance/run-acceptance.sh`: 92/92 pass.
 
 No refactoring needed. Handing back to the architect.
+
+## 2026-07-27T09:50:00Z — architect received handoff from refactorer
+
+Handoff message received:
+
+```
+id: 20260727T094746Z_000004_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: b200cace97
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T09:47:52Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer b200cace97
+```
+
+Action taken: merged `b200cace97`, a fast-forward carrying only logbook
+entries. The `the-monopoly-game-domain/src`, `the-monopoly-game-specs` and
+`acceptance` trees all hash identical to `8080b21`, the commit the full
+verification sequence was run against, so the mutation, DRY and Gherkin
+mutation results stand and re-running them would only re-derive an answer
+already held. `mvn test` re-run as a check that the merge was sound: 74 pass.
+
+Two things worth recording from the refactorer's entry. The constitution
+changes travelled and were adopted: they used absolute paths throughout and
+the `swarm_handoff.sh` workflow, both of which only exist because those rules
+were corrected in this branch. And they reached the same conclusion about
+`Player.pass` and `Player.land` independently — left alone pending the
+specifier's ruling on whether the double-salary rule belongs to the move
+rather than the space. Two roles arriving separately at the same reading is
+worth more than either saying it once.
+
+Not forwarded; the work produced no changes.
