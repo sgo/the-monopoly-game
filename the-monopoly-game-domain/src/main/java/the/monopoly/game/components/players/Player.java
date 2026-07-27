@@ -8,7 +8,12 @@ import the.monopoly.game.components.streets.StartSpace;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-public record Player(ID id, Bank.Account account) {
+public record Player(ID id, Bank.Account account, Position position) {
+  /** A player joins the game on Start. */
+  public Player(ID id, Bank.Account account) {
+    this(id, account, new Position(0));
+  }
+
   public void pass(StartSpace start) {
     account.deposit(start.salary());
   }
@@ -23,6 +28,42 @@ public record Player(ID id, Bank.Account account) {
 
   public void visit(ColourStreet street) {
     account.credit(street.vacantRent());
+  }
+
+  /**
+   * Where a pawn stands, as an index into the board's spaces. A pawn moves
+   * around one board for the whole game, so the position is carried rather
+   * than replaced, in the same way an account carries its balance.
+   */
+  public static final class Position {
+    private int index;
+
+    public Position(int index) {
+      this.index = index;
+    }
+
+    public int index() {
+      return index;
+    }
+
+    public void moveTo(int index) {
+      this.index = index;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      return o instanceof Position position && index == position.index;
+    }
+
+    @Override
+    public int hashCode() {
+      return Integer.hashCode(index);
+    }
+
+    @Override
+    public String toString() {
+      return "Position[index=" + index + ']';
+    }
   }
 
   public record ID(String value) {

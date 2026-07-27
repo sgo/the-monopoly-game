@@ -1910,3 +1910,115 @@ coder to implement, and no open question is outstanding for this role. The
 `pipeline-compatible-specs` work is complete: every feature on the pipeline
 now has its values under the acceptance mutation gate, except `dice.feature`,
 whose tolerance assertion is exempt by construction and marked `!no-mutation`.
+
+## 2026-07-27T12:27:21Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T122710Z_000005_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: e7f0fc1cbb
+created_at: 2026-07-27T12:27:10.917671Z
+enqueued_at: 2026-07-27T12:27:11.342085Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T12:27:21.391070Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e7f0fc1cbb
+```
+
+Action taken: merged specifier commit `e7f0fc1cbb` into `swarmforge-coder`
+(clean), then implemented Phase 2.
+
+## 2026-07-27T13:10:00Z — coder implementation of phase2-turn-loop
+
+Acceptance goes from 93 to 100 scenarios and unit tests from 78 to 101.
+
+### A pawn now stands somewhere, and a turn moves it
+
+`Player` gained a `Position`, carried rather than replaced, in the same way an
+account carries its `Balance`. A secondary constructor puts a new player on
+Start, so the pool and the acceptance world build players unchanged.
+
+`Turn` enacts one turn: roll, move, roll again while the dice keep matching.
+Movement wraps with `%`, and reaching Start is settled before the pawn is
+placed, because landing exactly on Start and going past it pay differently
+under the optional rule. Three doubles sends the pawn to jail — found by
+looking up `OpBezoek` in the layout rather than hard-coding 10 — and takes the
+third move away, so nothing is collected on the way.
+
+Space effects other than the Start salary are deliberately absent. The
+specifications pin a balance of $1500 after a turn that ends on the income tax
+space, so paying tax now would contradict them; that is Phase 5's.
+
+### Rolls come from a cup
+
+`Roll` is a pair of dice that knows its total and whether it is a double.
+`Cup` is where a roll comes from: `Cup.of(dice)` for real dice, `Cup.of(rolls)`
+for a known sequence. The rules never reach for a die directly, so replaying a
+game is a matter of handing the turn a different cup. This is the seam the
+`the next roll will be X and Y` step drives.
+
+### Initiative
+
+Highest roll goes first; players tied for the highest settle it among
+themselves, as many rounds as it takes; the rest keep their seating order,
+rotated so the winner leads. `Initiative.Rolls` is a per-player seam, so the
+`pawn "X" will roll N for initiative` step binds by pawn rather than by
+position in a queue.
+
+### The runtime now reads step keywords
+
+`the player is at position N` arranges under `Given` and asserts under `Then`
+— the same wording, opposite meaning. Text-only matching cannot tell those
+apart and would have made the assertion silently set the position instead,
+passing whatever the implementation did.
+
+Handlers may now bind to a keyword: `given(...)` and `then(...)` alongside the
+keyword-agnostic `step(...)`, which every existing handler still uses. `And`
+continues whatever preceded it, including across the background into a
+scenario that opens with `And`, so the runtime resolves it to the last real
+keyword before matching.
+
+### Verification
+
+- `mvn test`: 101 unit tests pass, clean tree or dirty.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 pass, exits 0.
+
+Checked non-vacuous by mutating every assertion the examples carry: each
+`final position`, each `final balance`, and both initiative outcomes. Four of
+the five movement executions and both initiative executions fail, and nothing
+else does. The `final position` mutation failing is the one that matters most,
+because it is what proves the `Then` reads the position rather than setting it.
+
+### movement-4 has nothing the mutation gate can kill
+
+For the specifier and the architect, before the mutation gate reports it.
+
+`movement-4` was the one execution that survived every mutation above, and by
+construction rather than by accident. Its two assertions are
+`Then the player is at position 10`, a literal the mutator never touches, and
+`the player's account balance is $<starting balance>`, which expects back the
+same column that arranged it — mutate that column and the arrangement moves
+with the expectation, so it cannot fail. Its remaining columns are the three
+doubles and the starting position, and changing any of them still ends the
+turn in jail with nothing collected.
+
+So `acceptance/run-acceptance-mutation.sh` should be expected to report
+survivors in `movement.feature`. Marking it `!no-mutation` would be the wrong
+fix: that suffix is for tolerance assertions, which are unkillable by
+construction, and this is a specification that could be made killable by
+giving the scenario a `final position` column and a `final balance` column
+distinct from the starting one. Reshaping it is the specifier's to do.
+
+The behaviour itself is not unverified — `TurnTest` covers three doubles going
+to jail, the third move being taken away, and a pawn jailed after passing Start
+keeping the salary it had already earned.

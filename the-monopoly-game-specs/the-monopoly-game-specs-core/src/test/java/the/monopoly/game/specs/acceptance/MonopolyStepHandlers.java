@@ -1,6 +1,7 @@
 package the.monopoly.game.specs.acceptance;
 
 import the.monopoly.game.components.dice.Dice;
+import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.streets.ColourStreet;
@@ -18,6 +19,8 @@ import java.util.regex.Pattern;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static the.monopoly.game.rules.Rule.Type.double_salary_when_landing_on_start;
+import static the.monopoly.game.specs.acceptance.StepHandler.given;
+import static the.monopoly.game.specs.acceptance.StepHandler.then;
 import static the.monopoly.game.specs.acceptance.StepHandler.step;
 
 /**
@@ -154,6 +157,35 @@ public final class MonopolyStepHandlers {
 
         step("^I roll the dice " + VALUE + " times$",
             (world, arguments) -> world.rollDice(arguments.number(1))),
+
+        given("^the player is at position " + VALUE + "$",
+            (world, arguments) -> world.player().position().moveTo(arguments.number(1))),
+
+        then("^the player is at position " + VALUE + "$",
+            (world, arguments) -> assertThat(world.player().position().index())
+                .isEqualTo(arguments.number(1))),
+
+        step("^the next roll will be " + VALUE + " and " + VALUE + "$",
+            (world, arguments) -> world.queueRoll(new Roll(arguments.number(1), arguments.number(2)))),
+
+        step("^the player takes a turn$",
+            (world, arguments) -> world.takeTurn()),
+
+        step("^pawn \"" + NAME + "\" will roll " + VALUE + " for initiative$",
+            (world, arguments) -> world.queueInitiativeRoll(arguments.text(1), arguments.number(2))),
+
+        step("^we roll for initiative$",
+            (world, arguments) -> world.rollForInitiative()),
+
+        step("^pawn \"" + NAME + "\" goes first$",
+            (world, arguments) -> assertThat(world.turnOrder().getFirst().id().value())
+                .isEqualTo(arguments.text(1))),
+
+        step("^pawn \"" + NAME + "\" plays before pawn \"" + NAME + "\"$",
+            (world, arguments) -> {
+              List<String> order = world.turnOrder().stream().map(it -> it.id().value()).toList();
+              assertThat(order).containsSubsequence(arguments.text(1), arguments.text(2));
+            }),
 
         step("^each face was rolled about " + VALUE + " times within a " + VALUE + "% margin$",
             (world, arguments) -> {
