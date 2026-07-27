@@ -2328,3 +2328,87 @@ terminates; against a source that keeps returning the same total it would not.
 The test fixture throws when its script runs out rather than repeating, so the
 suite cannot hang on it today. Bounding it would mean inventing a rule
 `RULES.md` does not state, so it is left as it is and noted.
+
+## 2026-07-27T13:12:17Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T131211Z_000010_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: e535d0508c
+created_at: 2026-07-27T13:12:11.154798Z
+enqueued_at: 2026-07-27T13:12:12.048434Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T13:12:17.815160Z
+
+Re-read your role and constitution.
+
+merge_and_process architect e535d0508c
+```
+
+Action taken: merged architect commit `e535d0508c` into `swarmforge-coder`,
+resolving the `logbook.md` conflict by keeping both the coder's sent entry and
+the architect's review, then re-verified the merged state here.
+
+## 2026-07-27T13:50:00Z — coder verification of the merged architect state
+
+- `mvn test`: 110 unit tests pass.
+- `mvn test -Pproperty-tests`: 9 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+Three findings against this role's work, all accepted:
+
+- `Cup.of(dice)` read `die1` and `die2` from two dice that are identical on
+  this board, so swapping them was undetectable. The test now uses dice whose
+  faces read differently. The seam was written without a test that could tell
+  the two dice apart.
+- Nothing pinned that a player joins the game on Start. The secondary
+  constructor defaulting the position to zero was added without a test.
+- `move` asked `if (to == 0) land; else if (from + steps >= spaces) pass;`.
+  The `>=` was unkillable there because the else-if is only reached when
+  `to != 0`, so the boundary the operators disagree about cannot occur. The
+  architect restructured it to ask whether Start was reached once and only
+  then which way, which is both simpler and killable. The redundant comparison
+  was mine.
+
+### The acceptance mutation gate reported a mutation killed that cannot fail
+
+For the architect, whose gate this is.
+
+The review reports 29 mutations in `movement.feature`, all killed. 29 is
+exactly the number of example cells in that file, so every cell was mutated
+and none was skipped, which places `movement-4`'s `starting balance` among
+them.
+
+That cell cannot be killed. `movement-4` arranges with
+`with $<starting balance> in his account` and asserts with
+`the player's account balance is $<starting balance>` — one column on both
+sides. `mutator-spec.md` mutates an integer to that integer plus a nonzero
+delta, so a mutation moves the arrangement and the expectation together and
+the assertion still holds.
+
+Measured rather than argued: hand-editing that one cell from 1500 to 1600 in
+the IR, generating the entry point, and running it gives
+`Tests run: 1, Failures: 0`. The mutant survives. This was done by editing the
+IR and running the generated tests, not by running `gherkin-mutator`, which is
+not this role's to run.
+
+So either the mutation runner is scoring some mutations killed without the
+generated test having failed, or those cells were skipped and still counted.
+Both matter more than the scenario does: a gate that reports a mutant dead
+when it is alive is the same failure as the acceptance suite that reported
+`BUILD SUCCESS` while running nothing, and every clean run since is only worth
+what the scoring is worth.
+
+The scenario itself is worth reshaping too — a distinct `final balance` column
+and an explicit `final position` instead of the literal 10 would make it
+killable — but that is the specifier's, and secondary to the scoring question.
