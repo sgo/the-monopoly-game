@@ -3424,3 +3424,77 @@ merge_and_process specifier d7eaa20ce5
 Action taken: merged specifier commit `d7eaa20ce5` into `swarmforge-coder`,
 resolving the `logbook.md` conflict as the union of two disjoint appends in
 timestamp order, then implemented the turn-loop wiring.
+
+## 2026-07-27T18:40:00Z — coder implementation of turn-loop-wiring
+
+`Game.play()` settled initiative and stopped. It now plays a turn for each
+player in turn order, and every player is moved by their own rolls.
+
+### Where a player's rolls come from
+
+`Game` held one `Cup` and drew initiative from it, discarding the player
+`Initiative` handed it. Turn-loop-1 asks for something that seam cannot say:
+two pawns, each moved by rolls attributed to them by name.
+
+`Game` now holds `Cups`, which answers `forPlayer(player)`. The existing
+constructors still read as before — real dice, or one scripted cup everyone
+shares — because a shared cup is `player -> cup`. A replayed game hands each
+player the rolls that player is known to have thrown, which is what a feature
+naming pawns is describing.
+
+`Turn` is unchanged: it takes the cup for whoever's turn it is.
+
+Nothing new is journalled. The specification asks for movement, not for an
+account of it, and `aGameAccountsForWhoIsPlayingAndInWhatOrder` still pins the
+journal at exactly the two entries it had.
+
+### Tests
+
+- `everyPlayerTakesATurnMovedByTheirOwnRoll`: three players, three different
+  turn rolls. A loop that moved only the leader, or moved everyone by one roll,
+  or consumed the rolls in seated rather than turn order, lands them elsewhere.
+- `aPlayerWithACupOfTheirOwnRollsThatOneRatherThanTheTable`: each player has
+  their own cup; the positions say each was moved by their own.
+- `landingOnASpaceIsWorthNothingEitherWayYet`: a pawn is walked onto the tax
+  space at position 4 and its balance is unchanged, so an implementation that
+  charged for landing would fail here.
+
+Checked the three fail without the loop before keeping it: all three do, and
+the four older `Game` tests needed turn rolls added to their scripts, since
+`play()` now consumes them.
+
+### The acceptance suite is red on the incoming specification
+
+`turn-loop.feature` is on the pipeline and both its scenarios fail:
+
+```
+The game wanted another roll for "high hat" but none was queued.
+```
+
+`we select 2 players` seats the first two pawns — dog and high hat — and the
+scenarios script rolls for dog and iron box. High hat is at play with no rolls;
+iron box has rolls and is not at play.
+
+Measured rather than argued: with `iron box` read as `high hat` throughout the
+file, both scenarios pass and the suite is 102/102. That edit was made locally
+to test the hypothesis and reverted; the feature is committed exactly as the
+specifier wrote it.
+
+Which way it should be fixed is the specifier's, and the two ways are not
+equivalent: naming a seated pawn is one edit, while `we select 3 players` would
+seat a third player who then takes a turn too and needs rolls of their own, or
+the game runs out of them.
+
+### `with $<starting balance> in pawn "dog"'s account`
+
+The pool opens every pawn's account with the rules' starting capital, $1500,
+which is what turn-loop-2 states. There is no way to arrange a different
+balance — no rule moves money before the first turn — so the step checks that
+the pawn holds what the scenario says rather than depositing it, which would
+have made it $3000 and failed the scenario's own `final balance`. A scenario
+that states any other balance fails saying no rule can arrange it.
+
+### Verification
+
+- `mvn test`: 120 unit tests pass.
+- `acceptance/run-acceptance.sh`: 100 pass, 2 fail, both `turn-loop`.
