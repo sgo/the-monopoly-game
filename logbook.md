@@ -3630,3 +3630,26 @@ unchanged.
 
 - `mvn test`: 120 unit tests pass.
 - `acceptance/run-acceptance.sh`: 102/102 across nine pipeline features.
+
+## 2026-07-27T21:09:28Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T210928Z_000008_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: turn-loop-wiring
+commit: af2a6c9506
+created_at: 2026-07-27T21:09:28.078130Z
+
+Re-read your role and constitution.
+
+merge_and_process coder af2a6c9506
+```
+
+Summary: the turn loop, and the corrected `turn-loop.feature` it is specified
+by. 120 unit tests and 102 acceptance tests pass.
