@@ -1825,3 +1825,55 @@ Sent to coder and refactorer at priority `00`, and to the specifier. No
 question is outstanding from this role: the two raised earlier, on where the
 double-salary rule belongs and on the scenarios the mutation gate could not
 reach, are both answered and closed.
+
+## 2026-07-27T11:58:05Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T115758Z_000008_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: b21adccd94
+created_at: 2026-07-27T11:57:58.266462Z
+enqueued_at: 2026-07-27T11:57:58.964016Z
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T11:58:05.044157Z
+
+Re-read your role and constitution.
+
+merge_and_process architect b21adccd94
+```
+
+Action taken: merged architect commit `b21adccd94` into `swarmforge-coder`,
+resolving the `logbook.md` conflict by keeping both the coder's sent entry and
+the architect's review, then re-verified the merged state here.
+
+## 2026-07-27T12:15:00Z — coder verification of the merged architect state
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 across all six pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+The merge carries only the architect's review and the mutation stamps their
+run wrote into the feature files; no source changed, and the stamps are tool
+written rather than hand edited.
+
+The architect's soft mutation run measured 11 newly reachable values, all
+killed, which matches what this role checked from the other direction before
+handing over: mutating each promoted value in the IR failed exactly the six
+scenarios that carry them. Reaching the same number by two different routes is
+the useful part.
+
+No new behaviour slice arrived with this handoff, so there is nothing for the
+coder to implement, and no open question is outstanding for this role. The
+`pipeline-compatible-specs` work is complete: every feature on the pipeline
+now has its values under the acceptance mutation gate, except `dice.feature`,
+whose tolerance assertion is exempt by construction and marked `!no-mutation`.
