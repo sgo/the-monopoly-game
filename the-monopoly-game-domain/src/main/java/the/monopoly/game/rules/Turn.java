@@ -2,6 +2,7 @@ package the.monopoly.game.rules;
 
 import the.monopoly.game.components.dice.Cup;
 import the.monopoly.game.components.dice.Roll;
+import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.StartSpace;
 import the.monopoly.game.components.streets.Street;
@@ -16,16 +17,25 @@ public class Turn {
 
   private final Rule.Set rules;
   private final Cup cup;
+  private final Events events;
 
-  public Turn(Rule.Set rules, Cup cup) {
+  public Turn(Rule.Set rules, Cup cup, Events events) {
     this.rules = rules;
     this.cup = cup;
+    this.events = events;
+  }
+
+  /** A turn nobody is keeping an account of. */
+  public Turn(Rule.Set rules, Cup cup) {
+    this(rules, cup, new Events() {
+    });
   }
 
   public void take(Player player) {
     int doubles = 0;
     while (true) {
       Roll roll = cup.roll();
+      events.rolled(player, roll);
 
       if (roll.isDouble() && ++doubles > DOUBLES_ALLOWED) {
         sendToJail(player);
@@ -48,12 +58,13 @@ public class Turn {
     int from = player.position().index();
     int to = (from + steps) % spaces;
 
-    if (from + steps >= spaces) {
-      if (to == 0) player.land(start());
-      else player.pass(start());
-    }
-
     player.position().moveTo(to);
+    events.moved(player, from, to);
+
+    if (from + steps >= spaces) {
+      if (to == 0) events.collectedSalary(player, player.land(start()));
+      else events.collectedSalary(player, player.pass(start()));
+    }
   }
 
   /**
@@ -72,6 +83,21 @@ public class Turn {
 
   private StartSpace start() {
     return (StartSpace) rules.create(Street.Type.start);
+  }
+
+  /**
+   * What a turn did, told as it happens, for whoever is keeping an account of
+   * the game. A turn that is not being watched does nothing differently.
+   */
+  public interface Events {
+    default void rolled(Player player, Roll roll) {
+    }
+
+    default void moved(Player player, int from, int to) {
+    }
+
+    default void collectedSalary(Player player, Money salary) {
+    }
   }
 }
 

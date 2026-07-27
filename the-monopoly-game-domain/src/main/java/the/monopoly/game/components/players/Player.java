@@ -14,16 +14,21 @@ public record Player(ID id, Bank.Account account, Position position) {
     this(id, account, new Position(0));
   }
 
-  public void pass(StartSpace start) {
-    account.deposit(start.salary());
+  /** Returns the salary collected, which is what the account was paid. */
+  public Money pass(StartSpace start) {
+    Money salary = start.salary();
+    account.deposit(salary);
+    return salary;
   }
 
   /**
    * Landing exactly on Start is the only move the optional double-salary rule
    * pays twice over; passing Start keeps paying the single salary.
    */
-  public void land(StartSpace start) {
-    account.deposit(start.salaryForLanding());
+  public Money land(StartSpace start) {
+    Money salary = start.salaryForLanding();
+    account.deposit(salary);
+    return salary;
   }
 
   public void visit(ColourStreet street) {

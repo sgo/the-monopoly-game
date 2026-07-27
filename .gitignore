@@ -1,5 +1,6 @@
 .idea
 .claude
+.codex
 .git
 *.iml
 *.swp
