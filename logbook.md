@@ -2941,3 +2941,76 @@ commit: 07d334edcc
 
 Nothing went to the coder or the specifier: this batch changed one property
 test and no production code, so there is no functional commit to review.
+## 2026-07-27T16:26:24Z — architect received refactorer handoff
+
+```
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: phase2-turn-loop
+commit: 9000e8b98c
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 9000e8b98c
+```
+
+Merged `9000e8b98c`, which carries the coder's `movement-4` reshape and the
+specifier's new prompt rule forward. Resolved a `logbook.md` conflict: git had
+matched the two branches on their shared `task:`/`commit:` and `### Verification`
+lines and interleaved the entries through each other, so the region was
+rewritten from both sides' full text rather than from the marker regions,
+keeping each entry whole and the five of them in timestamp order.
+
+## 2026-07-27T16:29:00Z — architect review of phase2-turn-loop
+
+No Java changed. The batch is one scenario and one prompt rule, and the
+scenario is the one the mutation gate could not touch.
+
+### movement-4 can now fail
+
+At `13:30` this logbook recorded that `movement-4` survived every mutation by
+construction: it asserted `position 10` as a literal the mutator never reads,
+and a balance of `$<starting balance>`, the same column that arranged it, so
+mutating that column moved the expectation along with the arrangement. The
+conclusion then was that reshaping it was the specifier's to do.
+
+It has been reshaped. The scenario now carries `final position` and
+`final balance` columns of its own, and the two `Then` steps read those instead
+of a literal and the arrangement. `movement.feature` reports 7 mutations in that
+scenario now where it reported none it could kill, and all 7 die — the whole
+feature is 31 mutations, all killed.
+
+That the position is now a column rather than the literal `10` is the more
+useful half. It is what makes the step read the pawn's position back rather
+than merely agreeing with a number written twice.
+
+`specifier.prompt` gained the general rule behind it: an assertion gets its own
+example column instead of reading back a column that arranged the scenario,
+even when the two values are expected to be equal. That belongs to the
+specifier and arrives here only by merge.
+
+### Verification
+
+- `mvn test`: 113 unit tests pass.
+- `mvn test -Pproperty-tests`: 10 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+- `mutate4java` on `Turn`: 0 changed scopes against its manifest; no production
+  source changed in this batch.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level soft`: exit 0. Only
+  `movement.feature` had moved off its manifest, and its 7 new mutations were
+  all killed.
+
+### Noted, not acted on
+
+`Turn` sends a cheating player to `OpBezoek`, which is the same space a pawn
+lands on when just visiting, so nothing in the model yet distinguishes being in
+jail from standing next to it. `RULES.md` treats them as one space with two
+meanings and Phase 12 owns the difference; there is nothing to separate until
+leaving jail is a rule.
+
+Nothing forwarded: this batch left only manifest changes behind, and the
+functional commit it carried came from the coder and has already reached the
+refactorer.
