@@ -3168,3 +3168,29 @@ short of them, shows up as a face the dice does not have — which is what pins
 
 Every production source is now either mutated with a current manifest or
 scanned to zero sites.
+
+## 2026-07-27T17:43:05Z — architect handoffs for phase2-turn-loop
+
+To coder and refactorer at priority `00`:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: phase2-turn-loop
+commit: f9982b66b9
+```
+
+To the specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: phase2-turn-loop
+commit: f9982b66b9
+```
+
+`Dice` lost its `Type` field and `type()` accessor, so its constructor now
+takes faces alone. `dice.feature` still holds: the six-faced dice the rules
+call for is unchanged, and so is its fairness.
