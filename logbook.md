@@ -2644,3 +2644,18 @@ Each break was rejected, and each by the clause meant to reject it.
 - `dry4java`: no duplication in production code.
 - `acceptance/run-acceptance-mutation.sh --level soft`: exit 0, every scenario
   skipped against a current manifest.
+
+## 2026-07-27T16:22:34Z — architect handoff for phase2-turn-loop
+
+To the refactorer at priority `00`:
+
+```
+type: git_handoff
+to: refactorer
+priority: 00
+task: phase2-turn-loop
+commit: 07d334edcc
+```
+
+Nothing went to the coder or the specifier: this batch changed one property
+test and no production code, so there is no functional commit to review.
