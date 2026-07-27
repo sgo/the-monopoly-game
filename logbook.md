@@ -3157,3 +3157,23 @@ Ran the refactorer's gates on the change:
 - `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
 
 Nothing to clean up. Handing back to the architect.
+
+## 2026-07-27T17:47:23Z — refactorer sent handoff to architect
+
+```
+id: 20260727T174723Z_000014_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase2-turn-loop
+commit: c91041f094
+
+Re-read your role and constitution.
+
+merge_and_process refactorer c91041f094
+```
+
+Sent after confirming the `Dice` mutation cleanup (see the receiving entry
+above) needed no further work and passing all three verification commands.
