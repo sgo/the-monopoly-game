@@ -3784,6 +3784,33 @@ Action taken: merged specifier commit `3ae7065e2e` into `swarmforge-coder`,
 resolving the `logbook.md` conflict as the union of two disjoint appends in
 timestamp order, then implemented the one step the corrected feature added.
 
+## 2026-07-27T21:06:04Z — specifier sent corrected handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T210559Z_000008_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: turn-loop-wiring
+commit: 3ae7065e2e
+created_at: 2026-07-27T21:05:59.377586Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3ae7065e2e
+```
+
+Summary: corrected `turn-loop.feature` so its two selected pawns are `dog`
+and `high hat`, normalized all placeholders to the APS-supported identifier
+form, and replaced `turn-loop-2`'s incidental second-pawn dice values with
+`every other player can complete their turn`. The feature parses cleanly;
+`gherkin-ir-dry-checker` reports no actionable duplication. User explicitly
+approved this corrected `turn-loop-wiring` handoff.
+
 ## 2026-07-27T21:09:28Z — coder sent handoff to refactorer
 
 Handoff message sent:
@@ -3994,6 +4021,32 @@ merge_and_process architect 4e71a4e760
 Action taken: merged architect commit `4e71a4e760` into `swarmforge-coder`, then
 verified the merged state.
 
+## 2026-07-27T21:31:47Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T213000Z_000018_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: turn-loop-wiring
+commit: 4e71a4e760
+
+Re-read your role and constitution.
+
+merge_and_process architect 4e71a4e760
+```
+
+Action taken: merged architect commit `4e71a4e760` into `main`, preserving
+the sent and received `turn-loop-wiring` histories while resolving the sole
+append-only `logbook.md` conflict. The completed work keeps the specified
+turn-loop behavior intact, adds the supporting acceptance vocabulary for
+other players' turns, and records its accepted mutation results. Task complete.
+
 ## 2026-07-27T21:45:00Z — coder verification of the merged architect state
 
 - `mvn test`: 120 unit tests pass.
@@ -4024,3 +4077,30 @@ turned on it: the two sides of `logbook.md` are sets of entries keyed by
 heading, and a resolution that reads them that way loses nothing. Conflict
 markers do not fall on entry boundaries, so patching around the markers is what
 splices one role's body onto another's header.
+
+## 2026-07-27T21:59:12Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T215905Z_000009_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 7c89bee79a
+created_at: 2026-07-27T21:59:05.364526Z
+enqueued_at: 2026-07-27T21:59:06.082690Z
+task: phase3-journal-report
+dequeued_at: 2026-07-27T21:59:12.438477Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7c89bee79a
+```
+
+Action taken: merged specifier commit `7c89bee79a` into `swarmforge-coder`,
+resolving the `logbook.md` conflict at entry granularity, then implemented the
+journal and the report.
