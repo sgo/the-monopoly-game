@@ -2288,3 +2288,20 @@ mutant was pointing at the code.
 Also moved the two new features above the dice exemption comment in
 `pipeline-features.txt`, where they had been appended underneath it and read
 as though they were exempt too.
+
+## 2026-07-27T13:35:00Z — architect handoffs for phase2-turn-loop
+
+Sent to coder and refactorer at priority `00`, and to the specifier. Two
+observations for whoever picks them up, neither of them blocking:
+
+`Dice.roll()` indexes its faces with `random.nextInt(6)` rather than
+`nextInt(faces.length)`. Only `Dice.Type.six` exists, so nothing can reach it
+today, but a dice with any other number of faces would either throw or never
+show its later faces. The specifications now carry the face count as an
+example value, so this is a step nearer being reachable than it was.
+
+`Initiative` re-rolls ties in an unbounded loop. Against real dice that
+terminates; against a source that keeps returning the same total it would not.
+The test fixture throws when its script runs out rather than repeating, so the
+suite cannot hang on it today. Bounding it would mean inventing a rule
+`RULES.md` does not state, so it is left as it is and noted.
