@@ -10,6 +10,7 @@ import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.Street;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -164,6 +165,66 @@ class TurnTest {
     new Turn(jailFirst, Cup.of(new Roll(1, 1), new Roll(2, 2), new Roll(3, 3))).take(player);
 
     assertThat(player.position().index()).isZero();
+  }
+
+  @Test
+  void aTurnReportsWhatWasRolledAndWhereThePawnWent() {
+    Player player = playerAt(5, 1500);
+    Reported reported = new Reported();
+
+    new Turn(ruleSet, Cup.of(new Roll(2, 3)), reported).take(player);
+
+    assertThat(reported.events).containsExactly(
+        "rolled 5",
+        "moved from 5 to 10"
+    );
+  }
+
+  /**
+   * The salary is earned by the move, so it is reported after it, however the
+   * money and the pawn move within the rule.
+   */
+  @Test
+  void aTurnReportsASalaryAfterTheMoveThatEarnedIt() {
+    Player player = playerAt(37, 1500);
+    Reported reported = new Reported();
+
+    new Turn(ruleSet, Cup.of(new Roll(2, 3)), reported).take(player);
+
+    assertThat(reported.events).containsExactly(
+        "rolled 5",
+        "moved from 37 to 2",
+        "collected a salary of 200"
+    );
+  }
+
+  @Test
+  void aTurnThatReportsToNobodyStillPlays() {
+    Player player = playerAt(5, 1500);
+
+    takeTurn(player, new Roll(2, 3));
+
+    assertThat(player.position().index()).isEqualTo(10);
+  }
+
+  /** What a turn said happened, in the order it said it. */
+  private static final class Reported implements Turn.Events {
+    private final List<String> events = new ArrayList<>();
+
+    @Override
+    public void rolled(Player player, Roll roll) {
+      events.add("rolled " + roll.total());
+    }
+
+    @Override
+    public void moved(Player player, int from, int to) {
+      events.add("moved from " + from + " to " + to);
+    }
+
+    @Override
+    public void collectedSalary(Player player, Money salary) {
+      events.add("collected a salary of " + salary.amount());
+    }
   }
 
   private Rule.Set ruleSetOn(Board board) {

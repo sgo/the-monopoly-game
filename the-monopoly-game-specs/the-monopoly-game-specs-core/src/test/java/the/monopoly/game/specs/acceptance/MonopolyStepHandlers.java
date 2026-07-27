@@ -1,9 +1,11 @@
 package the.monopoly.game.specs.acceptance;
 
+import the.monopoly.game.Game.Journal.Entry;
 import the.monopoly.game.components.dice.Dice;
 import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.finance.Money;
+import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.StartSpace;
@@ -19,6 +21,12 @@ import java.util.regex.Pattern;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static the.monopoly.game.rules.Rule.Type.double_salary_when_landing_on_start;
+import static the.monopoly.game.specs.acceptance.GameAccount.Claim;
+import static the.monopoly.game.specs.acceptance.GameAccount.records;
+import static the.monopoly.game.specs.acceptance.GameAccount.recordsInOrder;
+import static the.monopoly.game.specs.acceptance.GameAccount.recordsStartWith;
+import static the.monopoly.game.specs.acceptance.GameAccount.saysInOrder;
+import static the.monopoly.game.specs.acceptance.GameAccount.saysStartWith;
 import static the.monopoly.game.specs.acceptance.StepHandler.given;
 import static the.monopoly.game.specs.acceptance.StepHandler.then;
 import static the.monopoly.game.specs.acceptance.StepHandler.step;
@@ -187,6 +195,9 @@ public final class MonopolyStepHandlers {
         step("^every other player can complete their turn$",
             (world, arguments) -> world.letTheOthersRollWhatTheyLike()),
 
+        given("^pawn \"" + NAME + "\" starts at position " + VALUE + "$",
+            (world, arguments) -> world.placePawn(arguments.text(1), arguments.number(2))),
+
         step("^we play the game$",
             (world, arguments) -> world.playGame()),
 
@@ -204,6 +215,129 @@ public final class MonopolyStepHandlers {
               assertThat(order).containsSubsequence(arguments.text(1), arguments.text(2));
             }),
 
+        then("^the game journal records that the game starts with pawn \"" + NAME
+                + "\" before pawn \"" + NAME + "\"$",
+            (world, arguments) -> recordsStartWith(world, arguments.text(1), arguments.text(2))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" rolls " + VALUE + " for initiative$",
+            (world, arguments) -> records(world, initiativeRoll(arguments.text(1), arguments.number(2)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" wins initiative$",
+            (world, arguments) -> records(world, initiativeWon(arguments.text(1)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" starts a turn$",
+            (world, arguments) -> records(world, turnStarted(arguments.text(1)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" rolls a total of " + VALUE + "$",
+            (world, arguments) -> records(world, rolled(arguments.text(1), arguments.number(2)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " to " + VALUE + "$",
+            (world, arguments) -> records(world,
+                moved(arguments.text(1), arguments.number(2), arguments.number(3)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
+            (world, arguments) -> records(world, salaryCollected(arguments.text(1), arguments.number(2)))),
+
+        then("^the game journal records game start before it records that pawn \"" + NAME
+                + "\" rolls " + VALUE + " for initiative$",
+            (world, arguments) -> recordsInOrder(world,
+                Claim.ofAny(Entry.Start.class),
+                initiativeRoll(arguments.text(1), arguments.number(2)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" rolls " + VALUE
+                + " for initiative before it records that pawn \"" + NAME + "\" rolls " + VALUE
+                + " for initiative$",
+            (world, arguments) -> recordsInOrder(world,
+                initiativeRoll(arguments.text(1), arguments.number(2)),
+                initiativeRoll(arguments.text(3), arguments.number(4)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" rolls " + VALUE
+                + " for initiative before it records that pawn \"" + NAME + "\" wins initiative$",
+            (world, arguments) -> recordsInOrder(world,
+                initiativeRoll(arguments.text(1), arguments.number(2)),
+                initiativeWon(arguments.text(3)))),
+
+        then("^the game journal records that pawn \"" + NAME
+                + "\" wins initiative before starting a turn$",
+            (world, arguments) -> recordsInOrder(world,
+                initiativeWon(arguments.text(1)),
+                Claim.ofAny(Entry.TurnStarted.class))),
+
+        then("^the game journal records that pawn \"" + NAME
+                + "\" starts a turn before it records that pawn \"" + NAME + "\" rolls a total of "
+                + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                turnStarted(arguments.text(1)),
+                rolled(arguments.text(2), arguments.number(3)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" rolls a total of " + VALUE
+                + " before it records that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " to " + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                rolled(arguments.text(1), arguments.number(2)),
+                moved(arguments.text(3), arguments.number(4), arguments.number(5)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " to " + VALUE + " before it records that pawn \"" + NAME + "\" collects a salary of \\$"
+                + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                moved(arguments.text(1), arguments.number(2), arguments.number(3)),
+                salaryCollected(arguments.text(4), arguments.number(5)))),
+
+        then("^the game journal records that pawn \"" + NAME
+                + "\" starts its turn before pawn \"" + NAME + "\"$",
+            (world, arguments) -> recordsInOrder(world,
+                turnStarted(arguments.text(1)), turnStarted(arguments.text(2)))),
+
+        then("^the game report says that the game starts with pawn \"" + NAME
+                + "\" before pawn \"" + NAME + "\"$",
+            (world, arguments) -> saysStartWith(world, arguments.text(1), arguments.text(2))),
+
+        then("^the game report says that the game starts before it says that pawn \"" + NAME
+                + "\" rolls for initiative$",
+            (world, arguments) -> saysInOrder(world,
+                "The game starts with ", arguments.text(1) + " rolls ")),
+
+        then("^the game report says that pawn \"" + NAME + "\" rolls " + VALUE
+                + " for initiative before it says that pawn \"" + NAME + "\" rolls " + VALUE
+                + " for initiative$",
+            (world, arguments) -> saysInOrder(world,
+                rollsForInitiative(arguments.text(1), arguments.number(2)),
+                rollsForInitiative(arguments.text(3), arguments.number(4)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" rolls " + VALUE
+                + " for initiative before it says that pawn \"" + NAME + "\" wins initiative$",
+            (world, arguments) -> saysInOrder(world,
+                rollsForInitiative(arguments.text(1), arguments.number(2)),
+                arguments.text(3) + " wins initiative")),
+
+        then("^the game report says that pawn \"" + NAME
+                + "\" wins initiative before it says that pawn \"" + NAME + "\" starts a turn$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + " wins initiative", arguments.text(2) + " starts a turn")),
+
+        then("^the game report says that pawn \"" + NAME
+                + "\" starts a turn before it says that pawn \"" + NAME + "\" rolls a total of "
+                + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + " starts a turn",
+                rollsATotalOf(arguments.text(2), arguments.number(3)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" rolls a total of " + VALUE
+                + " before it says that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " to " + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                rollsATotalOf(arguments.text(1), arguments.number(2)),
+                movesFromPosition(arguments.text(3), arguments.number(4), arguments.number(5)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " to " + VALUE + " before it says that pawn \"" + NAME + "\" collects a salary of \\$"
+                + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                movesFromPosition(arguments.text(1), arguments.number(2), arguments.number(3)),
+                arguments.text(4) + " collects a salary of $" + arguments.number(5))),
+
         step("^each face was rolled about " + VALUE + " times within a " + VALUE + "% margin$",
             (world, arguments) -> {
               int expected = arguments.number(1);
@@ -212,6 +346,47 @@ public final class MonopolyStepHandlers {
                   .allSatisfy(seen -> assertThat(seen).isCloseTo(expected, within((int) margin)));
             })
     );
+  }
+
+  private static Claim initiativeRoll(String pawnName, int total) {
+    return Claim.of(new Entry.InitiativeRoll(idOf(pawnName), total));
+  }
+
+  private static Claim initiativeWon(String pawnName) {
+    return Claim.of(new Entry.InitiativeWon(idOf(pawnName)));
+  }
+
+  private static Claim turnStarted(String pawnName) {
+    return Claim.of(new Entry.TurnStarted(idOf(pawnName)));
+  }
+
+  private static Claim rolled(String pawnName, int total) {
+    return Claim.of(new Entry.Rolled(idOf(pawnName), total));
+  }
+
+  private static Claim moved(String pawnName, int from, int to) {
+    return Claim.of(new Entry.Moved(idOf(pawnName), from, to));
+  }
+
+  private static Claim salaryCollected(String pawnName, int salary) {
+    return Claim.of(new Entry.SalaryCollected(idOf(pawnName), money(salary)));
+  }
+
+  /** The report reads as the features read, so a claim is words the report must carry. */
+  private static String rollsForInitiative(String pawnName, int total) {
+    return pawnName + " rolls " + total + " for initiative";
+  }
+
+  private static String rollsATotalOf(String pawnName, int total) {
+    return pawnName + " rolls a total of " + total;
+  }
+
+  private static String movesFromPosition(String pawnName, int from, int to) {
+    return pawnName + " moves from position " + from + " to " + to;
+  }
+
+  private static Player.ID idOf(String pawnName) {
+    return new Player.ID(pawnName);
   }
 
   /** A dice is described by how many faces it has, as in "6 faced". */

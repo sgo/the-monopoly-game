@@ -3379,6 +3379,11 @@ Re-read your role and constitution.
 merge_and_process architect f9982b66b9
 ```
 
+Action taken: merged architect commit `f9982b66b9` into `swarmforge-coder`. One
+`logbook.md` conflict, again two disjoint appends: no entry existed on both
+sides with a differing body, so the resolution is the union of the two entry
+sets in timestamp order. Then verified the merged state.
+
 ## 2026-07-27T17:46:37Z — refactorer received handoff from architect
 
 ```
@@ -3752,6 +3757,33 @@ roles' complete append-only log histories while resolving the sole conflict
 in `logbook.md`. Began specifier review of the reported mismatch between the
 two selected pawns and the rolls named by `turn-loop.feature`.
 
+## 2026-07-27T21:06:04Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T210559Z_000008_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 3ae7065e2e
+created_at: 2026-07-27T21:05:59.377586Z
+enqueued_at: 2026-07-27T21:06:00.133900Z
+task: turn-loop-wiring
+dequeued_at: 2026-07-27T21:06:04.314492Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3ae7065e2e
+```
+
+Action taken: merged specifier commit `3ae7065e2e` into `swarmforge-coder`,
+resolving the `logbook.md` conflict as the union of two disjoint appends in
+timestamp order, then implemented the one step the corrected feature added.
+
 ## 2026-07-27T21:06:04Z — specifier sent corrected handoff to coder
 
 Handoff message sent:
@@ -3779,32 +3811,28 @@ form, and replaced `turn-loop-2`'s incidental second-pawn dice values with
 `gherkin-ir-dry-checker` reports no actionable duplication. User explicitly
 approved this corrected `turn-loop-wiring` handoff.
 
-## 2026-07-27T21:06:04Z — coder received handoff from specifier
+## 2026-07-27T21:09:28Z — coder sent handoff to refactorer
 
-Handoff message received:
+Handoff message sent:
 
 ```
-id: 20260727T210559Z_000008_from_specifier
-from: specifier
-to: coder
-recipient: coder
+id: 20260727T210928Z_000008_from_coder
+from: coder
+to: refactorer
 priority: 50
 type: git_handoff
-role: specifier
-commit: 3ae7065e2e
-created_at: 2026-07-27T21:05:59.377586Z
-enqueued_at: 2026-07-27T21:06:00.133900Z
+role: coder
 task: turn-loop-wiring
-dequeued_at: 2026-07-27T21:06:04.314492Z
+commit: af2a6c9506
+created_at: 2026-07-27T21:09:28.078130Z
 
 Re-read your role and constitution.
 
-merge_and_process specifier 3ae7065e2e
+merge_and_process coder af2a6c9506
 ```
 
-Action taken: merged specifier commit `3ae7065e2e` into `swarmforge-coder`,
-resolving the `logbook.md` conflict as the union of two disjoint appends in
-timestamp order, then implemented the one step the corrected feature added.
+Summary: the turn loop, and the corrected `turn-loop.feature` it is specified
+by. 120 unit tests and 102 acceptance tests pass.
 
 ## 2026-07-27T21:20:00Z — coder implementation of the corrected turn-loop feature
 
@@ -3967,6 +3995,58 @@ from. The one deliberate exception is the coder's `17:43:10`, truncated back
 to the handoff it actually received; its own account of what it did was lost
 upstream, before this branch ever saw it, and is not recoverable from here.
 
+## 2026-07-27T21:30:00Z — architect handoffs for turn-loop-wiring
+
+To coder and refactorer at priority `00`:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: turn-loop-wiring
+commit: 4e71a4e760
+```
+
+To the specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: turn-loop-wiring
+commit: 4e71a4e760
+```
+
+`Game` is a class rather than a record, and its `rules()`, `players()` and
+`cups()` accessors are gone; no caller had them. Nothing about how a game plays
+changed, so no feature moves.
+
+## 2026-07-27T21:30:07Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T213000Z_000017_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 4e71a4e760
+created_at: 2026-07-27T21:30:00.613601Z
+enqueued_at: 2026-07-27T21:30:01.487590Z
+task: turn-loop-wiring
+dequeued_at: 2026-07-27T21:30:07.049323Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 4e71a4e760
+```
+
+Action taken: merged architect commit `4e71a4e760` into `swarmforge-coder`, then
+verified the merged state.
+
 ## 2026-07-27T21:31:47Z — specifier received handoff from architect
 
 Handoff message received:
@@ -3992,6 +4072,428 @@ the sent and received `turn-loop-wiring` histories while resolving the sole
 append-only `logbook.md` conflict. The completed work keeps the specified
 turn-loop behavior intact, adds the supporting acceptance vocabulary for
 other players' turns, and records its accepted mutation results. Task complete.
+
+## 2026-07-27T21:34:00Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T213000Z_000017_from_architect
+from: architect
+to: coder,refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: architect
+commit: 4e71a4e760
+created_at: 2026-07-27T21:30:00Z
+task: turn-loop-wiring
+
+Re-read your role and constitution.
+
+merge_and_process architect 4e71a4e760
+```
+
+Action taken: fast-forwarded `swarmforge-refactorer` to architect commit
+`4e71a4e760`, then re-ran the refactorer gates and verification. `Game` is a
+stateful class whose `play()` moves its owned players; CRAP is 1.0, DRY found
+no production duplicates, and `Game.java` has five mutation sites.
+
+Verification: 120 unit tests, 10 property tests, and 102/102 acceptance
+scenarios pass.
+
+## 2026-07-27T21:35:00Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-loop-wiring
+commit: (commit recorded by the handoff draft)
+```
+
+Summary: reviewed architect commit `4e71a4e760`; the stateful `Game` refactor
+passes CRAP, DRY, mutation scan, unit, property, and acceptance verification.
+
+## 2026-07-27T21:34:28Z — architect received refactorer handoff
+
+```
+id: 20260727T213424Z_000016_from_refactorer_to_architect
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: turn-loop-wiring
+commit: e02ff158b9
+
+Re-read your role and constitution.
+
+merge_and_process refactorer e02ff158b9
+```
+
+Merged `e02ff158b9`. It carries only this file — the refactorer's record of
+fast-forwarding to `4e71a4e760` and finding the stateful `Game` clean on CRAP,
+DRY, and the mutation scan. Outside `logbook.md` the tree is byte-identical to
+`4e71a4e760`, verified in full half an hour ago against current manifests, so
+the three gates would read the same sources to the same answer. Ran the three
+suites to confirm the merged tree builds: 120 unit, 10 property, 102/102
+acceptance.
+
+### The hazard turned up in a third shape, and this one forges a byline
+
+The merge auto-applied without a single marker, and quietly cut the last 24
+lines off this branch's own `21:15:21` entry — three verification bullets and
+the whole account of the previous merge. Those lines were not deleted. They
+had been swept into the tail of the refactorer's `21:35:00` sent-handoff entry
+during its merge, so git saw them leave one entry and arrive in another, and
+applied the move.
+
+That is worse than losing them. Left alone, this branch's report of a merge
+hazard would stand under the refactorer's name, saying it had rebuilt a file
+it never touched, alongside gate results it did not run.
+
+Restored `21:15:21` whole from this branch and trimmed `21:35:00` back to what
+the refactorer actually wrote — its handoff and its one-line summary. Also put
+this branch's `21:30:00` handoff entry back before the refactorer's `21:34:00`
+receipt of it, which the merge had reordered. 111 entries, and every body from
+the base and from this branch byte-identical to its source.
+
+Three rounds, three different shapes: a silent deletion, a body grafted onto
+the wrong header, and now a block migrating from one role's entry into
+another's. The common cause is that these merges rewrite whole regions, so
+git's line matching is free to pair any two similar blocks. Nothing short of
+comparing entries against both parents catches it, and comparing headers alone
+would have missed this one entirely — the header set was a perfect union.
+
+Not forwarded: no source changed and no functional commit came in.
+
+## 2026-07-27T21:41:00Z — architect check of the gates with the queue empty
+
+Went looking for anything the turn-loop rounds had left behind, rather than
+waiting on the queue.
+
+### The mutation gate is genuinely complete
+
+Six production sources carry no `mutate4java` manifest: `Official`, `Board`,
+`TaxSpace`, `Ownable`, `UnownableSpace`, `Station`. Scanned all six rather
+than trusting the earlier claim — every one reports 0 mutation sites, so there
+is nothing for a manifest to record. Every other production source has a
+current manifest. That is the same answer as `17:42`, now measured again after
+two rounds of change.
+
+### `en/monopoly.feature` was being held off the pipeline for a reason that
+### had stopped being true
+
+`pipeline-features.txt` said it was absent because "the turn loop behind it
+does not exist yet". The turn loop is what this task built, so the stated
+reason expired the moment it landed.
+
+The feature still belongs off the pipeline — it asks that every one of 1000
+games end in a monopoly, and nothing yet ends a game or moves a deed between
+players; `tasks.md` puts that in Phase 14, with bankruptcy and winning. But a
+stale reason is worse than a blunt one: it is how a scenario stays excluded
+forever, because whoever rechecks it finds an argument that no longer matches
+the code and cannot tell whether anyone has looked since. Rewrote it to say
+what is actually missing and which phase supplies it.
+
+Acceptance still 102/102 after the edit, so the list still reads as intended.
+
+`tasks.md`'s description of `Game.play()` as having no turn loop is also out
+of date, and deliberately left: it sits under "Current state (starting point)",
+which is a snapshot of where the plan began rather than a live account.
+
+Not forwarded: a comment in the pipeline list is not functional work, and no
+role has anything to review in it. It travels with the next merge.
+
+## 2026-07-27T21:45:00Z — coder verification of the merged architect state
+
+- `mvn test`: 120 unit tests pass.
+- `acceptance/run-acceptance.sh`: 102/102 across nine pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+The finding is accepted. `Game` was left a `record` while `play()` was given
+work that moves the players it holds, so it advertised value semantics —
+comparable, copyable, free of consequence — that it stopped having the moment
+the turn loop went in. Two games over the same list would have compared equal
+with one of them already played. The three generated accessors published the
+`Cups` seam as API with no caller. It is a class now, and the seam is only a
+constructor parameter.
+
+### The truncated entry is recoverable, from here
+
+The architect's note says the `Action taken` paragraph of this role's
+`17:43:10` receipt was lost upstream and cannot be recovered. It survived on
+this branch, which never took the bad resolution, and this merge restored it:
+where the incoming side had the entry truncated to the handoff block, the
+resolution kept the longer body, and the entry again records what was done with
+`f9982b66b9`. Every other entry on both sides was carried whole.
+
+Worth stating for the next time, since three of the last four merges here have
+turned on it: the two sides of `logbook.md` are sets of entries keyed by
+heading, and a resolution that reads them that way loses nothing. Conflict
+markers do not fall on entry boundaries, so patching around the markers is what
+splices one role's body onto another's header.
+
+## 2026-07-27T21:59:12Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T215905Z_000009_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 7c89bee79a
+created_at: 2026-07-27T21:59:05.364526Z
+enqueued_at: 2026-07-27T21:59:06.082690Z
+task: phase3-journal-report
+dequeued_at: 2026-07-27T21:59:12.438477Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7c89bee79a
+```
+
+Action taken: merged specifier commit `7c89bee79a` into `swarmforge-coder`,
+resolving the `logbook.md` conflict at entry granularity, then implemented the
+journal and the report.
+
+## 2026-07-28T00:25:00Z — coder implementation of phase3-journal-report
+
+The journal recorded that a game started and who won initiative. It now records
+what each player rolled for initiative, and, for every turn, that it started,
+what was rolled, where the pawn went, and what reaching Start paid. A `Report`
+turns that into text.
+
+### A turn had nothing to say for itself
+
+`Turn` did the rolling, moving and paying, and `Game` held the journal, so the
+events the specification asks for happened where nothing could see them.
+
+`Turn.Events` is what a turn says as it goes: `rolled`, `moved`,
+`collectedSalary`. Every method defaults to doing nothing, so the two-argument
+constructor is a turn nobody is keeping an account of — which is what
+`movement.feature` and `TurnTest` still play. `Game` passes an implementation
+that writes each one down.
+
+The alternative was for `Turn` to return an account of itself, but a turn is a
+sequence — doubles roll again — so it would have returned a list of the same
+events in the end, and only after the fact rather than as they happened.
+
+`Player.pass` and `Player.land` now return the salary they deposited. The turn
+knows a salary was collected and would otherwise have had to work out how much
+by asking the rules a second question they had already answered.
+
+### The salary is reported after the move that earned it
+
+`journal-3` asks for the move before the salary. `move` paid before it moved the
+pawn; it now moves the pawn, says so, and then pays. No behaviour moves with it
+— nothing reads a position while the money is being deposited — and `TurnTest`
+and `GameTest` each pin the order, both of which fail if the two are swapped
+back.
+
+### `TurnOrder` gave way to `InitiativeWon`
+
+The journal recorded a `TurnOrder` entry listing everyone in order. Nothing
+specifies it, and the specification asks instead for who won initiative, which
+is the same fact stated as the moment it happened. Keeping both would have the
+report narrate the same thing twice. The order is still `Result.turnOrder()`,
+and the journal now walks through the turns in order anyway.
+
+### The report is the only place the wording lives
+
+`Report.of(journal)` renders one line per entry by pattern-matching a sealed
+`Entry`. The entries stay data; nothing about how a game reads is in them, and
+`Journal`'s logging is unchanged.
+
+The features' phrasing is the report's phrasing — `dog rolls a total of 5`,
+`dog moves from position 0 to 5` — so the report steps build what they expect
+from the words in the step. A renderer that changed its wording would fail them
+rather than agreeing with itself.
+
+### Acceptance vocabulary
+
+Twenty-one steps of it, one per sentence the two features say, over a small
+`GameAccount` that answers only "where is this?" and says what was there
+instead when it is nowhere. `pawn "X" starts at position N` is the one new
+arrangement step.
+
+### Checked they fail first
+
+The scenarios for turn events fail without the journalling wired through
+`Turn.Events` — journal-2, journal-3, report-2 and report-3 all do, while
+journal-1 and report-1 keep passing because initiative is journalled by `Game`
+itself.
+
+### Verification
+
+- `mvn test`: 130 unit tests pass.
+- `acceptance/run-acceptance.sh`: 108/108 across eleven pipeline features.
+
+## 2026-07-27T22:22:17Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260727T222023Z_000009_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 1ef11c9695
+created_at: 2026-07-27T22:20:23Z
+task: phase3-journal-report
+
+Re-read your role and constitution.
+
+merge_and_process coder 1ef11c9695
+```
+
+Action taken: merged coder commit `1ef11c9695` into `swarmforge-refactorer`.
+`Report.line` exceeded the CRAP ceiling at 8.0, so its sealed-entry switch was
+replaced with a report-local dispatch table and individual renderers, preserving
+all wording and output order while reducing every `Report` method to CRAP 1.0.
+
+Verification: DRY found only two unrelated constructor shapes; mutation scans
+found 5 sites in `Game`, 0 in `Report`, 6 in `Player`, and 13 in `Turn`; 130
+unit tests, 10 property tests, and 108/108 acceptance scenarios pass.
+
+## 2026-07-27T22:31:26Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase3-journal-report
+commit: (commit recorded by the handoff draft)
+```
+
+Summary: reduced the report renderer's CRAP score from 8.0 to 1.0 without
+changing its wording or event order; all refactorer gates and verification pass.
+
+## 2026-07-27T22:32:08Z — architect received refactorer handoff
+
+```
+id: 20260727T223157Z_000017_from_refactorer_to_architect
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase3-journal-report
+commit: db74af9b58
+
+Re-read your role and constitution.
+
+merge_and_process refactorer db74af9b58
+```
+
+Merged `db74af9b58`: Phase 3's journal and report. The journal stopped being
+two summary entries and became a running account — initiative rolls and their
+winner, each turn started, every roll, every move, every salary — and `Report`
+turns that account into lines of English.
+
+### Reviewed
+
+The seam between the two is right, and it is the point of the phase. `Turn`
+reports what it did through `Turn.Events`, whose methods all default to doing
+nothing, so `Turn` never learns that a journal exists; `Game.Journalling`
+adapts one to the other. Nothing in `rules` depends on `Game`, and the wording
+lives outside the domain's decisions entirely. `Journal.Entry` became `sealed`,
+which is the right move for a closed set of things that happened.
+
+`Turn.move` now writes the new position before paying the salary, where it
+used to pay first. Nothing reads position during payment, so the order is free
+— it buys a journal that reads in the order a table would see it.
+
+### Sealing the entries only pays if something has to answer for them all
+
+`Report` dispatched through a `Map<Class<? extends Entry>, Function<Entry,
+String>>`, looking each entry's handler up by its class and casting. That
+throws away exactly what sealing bought: add an eighth kind of entry and the
+map compiles, `LINES.get` returns null, and the report dies at run time on the
+first game that reaches it — or worse, on a game nobody ran yet.
+
+Rewrote it as a switch over the sealed interface. Measured rather than
+asserted: added a `WentToJail` entry and the build fails with "the switch
+expression does not cover all possible input values", pointing at `Report`.
+Under the map it compiled clean. Then removed the entry again.
+
+Complexity did not go up — the seven cases are one line each, where before
+they were seven map entries plus seven casting lambdas plus seven methods.
+
+### `Report` claimed the wording lived in one place, and it did not
+
+`Entry.Start` still carried a hand-written `toString` rendering "Start game
+with players:" and a bulleted list — prose, in the domain, for the one entry
+of seven that had it, left over from when the journal was the report. Removed
+it, along with the `namesOf` helper only it used. The record's own `toString`
+serves the logger and the failure messages, the way it already did for the
+other six.
+
+### The mutation gate had two uncovered sites; one is real, one cannot exist
+
+`Player:70`, `Position.toString`, was genuinely untested. A player is printed
+whole when something fails, and a position that did not say which space it was
+would take the useful part of that message with it — so it is worth having and
+worth pinning. Covered it; the site is now killed.
+
+`Turn:36`, `while (true)`, is reported uncovered and always will be. The
+mutant is `while (false)`, which does not compile — javac rejects the loop
+body as unreachable. No test can kill a mutant that cannot be built, and there
+is nothing here to fix.
+
+### Verification
+
+- `mvn test`: 131 unit tests pass.
+- `mvn test -Pproperty-tests`: 10 property tests pass.
+- `acceptance/run-acceptance.sh`: 108/108 across eleven pipeline features.
+- `mutate4java`: `Game` 5/5 killed, `Report` 1/1, `Turn` 12/12, `Player` 4/4
+  plus the newly covered `toString` site killed. Uncovered is 0 everywhere but
+  `Turn:36` above.
+- `dry4java`: 11 candidates. Nine are the familiar arrange-act-assert triples
+  in test files; two more are new `TurnTest` triples of the same kind. The one
+  production pair is `Game`'s three-field constructor against `Turn`'s — two
+  unrelated classes that both assign their fields, matched at 0.86 on shape.
+  Sharing anything between them would couple `Game` to `Turn`'s fields to save
+  three assignments. Left alone deliberately; recorded so the next run does not
+  reopen it.
+- `acceptance/run-acceptance-mutation.sh --level soft`: exit 0. Both new
+  features scored: `journal.feature` 18 mutations, 18 killed; `report.feature`
+  15 mutations, 15 killed. Everything else skipped against a current manifest.
+
+### Standing hazard, not fixed here
+
+`Player` is a record whose `Position` component is mutable and is mutated all
+through a game. Its `equals` and `hashCode` therefore change as the pawn
+moves, so a `Player` put in a `HashSet` or used as a map key stops being
+findable the moment it takes a turn. Nothing does that today — `Initiative`
+calls `List.indexOf` before anyone has moved, and the one property test that
+builds sets of players never plays — so nothing is broken. It is the same
+mistake `Game` carried until `4e71a4e760`: value semantics over state that
+moves. The fix is to make a player's identity its `ID` alone, and it should
+happen before anything keys on a `Player`.
+
+### The merge
+
+One conflicted region, but the entry-level comparison found more than it. Took
+this branch's `21:15:21` and `21:35:00` — the two entries restored last round —
+and took the other side's `17:43:10`, whose body came back: the coder's own
+account of what it did, which had been grafted away in an earlier merge and
+which this branch had recorded as lost for good. It was not. 122 entries, and
+every other body byte-identical to the parent it came from.
 
 ## 2026-07-27T21:59:09Z — specifier sent handoff to coder
 

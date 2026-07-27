@@ -11,8 +11,10 @@
 # is a tolerance, where a mutation smaller than the tolerance is equivalent by
 # construction and no implementation could ever kill it. Record the reason.
 #
-# en/monopoly.feature is deliberately absent. It parses, but it specifies a
-# whole played-out game and the turn loop behind it does not exist yet.
+# en/monopoly.feature is deliberately absent. It parses, and since turn-loop
+# a game does play every player's turn, but the scenario asks that every game
+# end in a monopoly, and nothing yet ends a game or moves a deed between
+# players. It goes on the pipeline in Phase 14, with bankruptcy and winning.
 
 en/components/streets.feature
 en/components/stations.feature
