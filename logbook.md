@@ -2510,3 +2510,27 @@ It is moot for `movement-4` now that the columns are split.
 `AcceptanceMutationRunner` derives the entry point class from the same IR stem
 it generates from, so the two agree and the naming does not by itself explain
 the gate's 29-of-29. That question stays open and stays the architect's.
+
+## 2026-07-27T15:57:05Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T155705Z_000006_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase2-turn-loop
+commit: 6a03de66b1
+created_at: 2026-07-27T15:57:05.395231Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 6a03de66b1
+```
+
+Summary: `movement-4`'s reshaped scenario, verified against the existing step
+handlers with no production or step-handler change. 110 unit tests and 100
+acceptance tests pass.
