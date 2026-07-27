@@ -14,14 +14,13 @@ IR_DIR="$ROOT/build/acceptance/ir"
 GENERATED="$SPECS/target/generated-test-sources/acceptance"
 APS="${APS_HOME:-$ROOT/tmp/aps}"
 
-FEATURE_FILES=(
-  "en/components/streets.feature"
-  "en/components/stations.feature"
-  "en/components/utilities.feature"
-  "en/components/tax.feature"
-  "en/components/dice.feature"
-  "en/rules/official.feature"
-)
+# The pipeline features live in one file both scripts read; see
+# pipeline-features.txt.
+PIPELINE_FEATURES=()
+while IFS= read -r feature_line; do
+  PIPELINE_FEATURES+=("$feature_line")
+done < <(grep -vE '^[[:space:]]*(#|$)' "$ROOT/acceptance/pipeline-features.txt")
+FEATURE_FILES=("${PIPELINE_FEATURES[@]}")
 
 if [[ ! -f "$APS/bb.edn" ]]; then
   echo "APS checkout not found at $APS. Set APS_HOME or clone" >&2

@@ -870,3 +870,72 @@ user-level `~/.claude/settings.json` rather than a project `.claude/`, because
 project-level file would have had to be maintained four times over and would
 not have covered a worktree made later. The swarm poll is deliberately not on
 the allowlist; it dequeues a handoff, so it is not read-only.
+
+## 2026-07-27T09:15:00Z — architect review of pipeline-compatible-specs
+
+Merged `79d2670423`. `logbook.md` conflicted in four places, and not as simple
+appends: the same handoffs were logged from both the sending and the receiving
+side, interleaved mid-block. Resolved by merging whole entries rather than
+hunks, keeping all 22 in timestamp order.
+
+### The two new features were not being mutated, and that was my fault
+
+`run-acceptance-mutation.sh` carried its own copy of the pipeline feature
+list. The coder put `dice.feature` and `official.feature` on the pipeline by
+editing the list in `run-acceptance.sh`; the copy in the mutation script still
+named four features, so the first soft run reported clean while never touching
+either new feature. Two lists, drifted apart, one of them written by me.
+
+Both scripts now read `acceptance/pipeline-features.txt`. Re-running found 176
+mutations in `official.feature`, all killed — the 40-space board table is
+genuinely checked now, not merely parsed.
+
+The first attempt at the shared reader used `mapfile`, which is bash 4 and
+absent from the bash 3.2 this machine runs; it would have broken both scripts
+on the next use. Replaced with a portable read loop, and both now pass
+`bash -n`.
+
+### `dice.feature` passes acceptance mutation without being checked
+
+It is a plain `Scenario`, so its numbers — six faces, 600000 rolls, a 1%
+margin — are literals in step text rather than example values. The APS mutator
+only mutates example values, so it discovers nothing, reports
+`total=0 killed=0 survived=0 errors=0`, and exits 0. A gate that reports
+success while checking nothing is the same failure the Cucumber path had.
+
+For the specifier, since reshaping a specification is not the architect's to
+do: turning it into a `Scenario Outline` with a one-row `Examples:` table
+would put those four numbers under the gate without changing what the
+specification says.
+
+### `Pawn.named` removed
+
+It had no production caller. `World.pawn` finds a pawn by filtering the
+players actually at play, so nothing needed it, and only its own two tests
+kept it alive — which also gave it coverage it had not earned. It returned
+`null` on a miss, where `SpaceNames.of` and `Vocabulary.constant` both throw
+with a message, so it was inconsistent as well as unused.
+
+### Left alone deliberately
+
+`Player.pass` and `Player.land` have identical bodies. The coder raised the
+question that explains why: the rule is named
+`double_salary_when_landing_on_start`, but as modelled the doubling applies to
+passing Start as well, because the rule is carried by `StartSpace` rather than
+by the move. The duplication is the symptom of that open question, and which
+way to collapse it depends on the answer, so it stays until the specifier
+rules. Collapsing it now would quietly pick one reading.
+
+### Verification
+
+- `mvn test`: 74 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 92/92 across all six pipeline features.
+- `mutate4java` on the changed sources, `Pawn` and `Player`: 0 survivors,
+  0 uncovered.
+- `dry4java`: no duplication in production code. It does not see
+  `pass`/`land`; both bodies are one line, under its four-line floor.
+- `acceptance/run-acceptance-mutation.sh --level soft`: 176 mutations in
+  `official.feature`, 176 killed, 0 survived, 0 errors. The four previously
+  stamped features were skipped as unchanged, and `dice.feature` yielded
+  nothing to mutate for the reason above.

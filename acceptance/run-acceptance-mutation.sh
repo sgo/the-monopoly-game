@@ -17,14 +17,15 @@ if [[ "${1:-}" == "--level" ]]; then
   shift 2
 fi
 
+# The pipeline features live in one file both scripts read; see
+# pipeline-features.txt.
+PIPELINE_FEATURES=()
+while IFS= read -r feature_line; do
+  PIPELINE_FEATURES+=("$feature_line")
+done < <(grep -vE '^[[:space:]]*(#|$)' "$ROOT/acceptance/pipeline-features.txt")
 FEATURE_FILES=("$@")
 if [[ ${#FEATURE_FILES[@]} -eq 0 ]]; then
-  FEATURE_FILES=(
-    "en/components/streets.feature"
-    "en/components/stations.feature"
-    "en/components/utilities.feature"
-    "en/components/tax.feature"
-  )
+  FEATURE_FILES=("${PIPELINE_FEATURES[@]}")
 fi
 
 if [[ ! -f "$APS/bb.edn" ]]; then
