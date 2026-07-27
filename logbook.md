@@ -1835,3 +1835,39 @@ Sent to coder and refactorer at priority `00`, and to the specifier. No
 question is outstanding from this role: the two raised earlier, on where the
 double-salary rule belongs and on the scenarios the mutation gate could not
 reach, are both answered and closed.
+
+## 2026-07-27T12:27:10Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T122710Z_000005_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase2-turn-loop
+commit: e7f0fc1cbb
+created_at: 2026-07-27T12:27:10.917671Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e7f0fc1cbb
+```
+
+Summary: pipeline-compatible-specs closed out clean (architect confirmed
+the class of gap was fixed, not just the six instances). Started a new
+task, phase2-turn-loop, per tasks.md's Phase 2 (turn loop and pawn
+movement). Committed `17feb21` (RULES.md: tied initiative rolls re-roll
+among themselves - a rule gap RULES.md never covered, resolved by user
+decision before writing the tie-break scenario) and `e7f0fc1` (two new
+files: movement.feature - position, wraparound, salary on
+passing/landing via a new "the next roll will be X and Y" deterministic-
+dice test seam, doubles granting another roll, three doubles sending the
+player to jail instead of a third move; initiative.feature - highest
+roll goes first then clockwise, and the new tie-break rule, reusing the
+same per-pawn roll step twice for a re-roll rather than inventing new
+vocabulary). Deliberately scoped out: no separate jail-state flag
+(Phase 12's job), no "rule inactive" landing-vs-passing scenario (both
+pay the same, so it wouldn't catch a pass/land mix-up).
