@@ -3915,50 +3915,6 @@ confirms it bites: `starting_balance: 1500 -> 1502` is killed.
 - `mvn test`: 120 unit tests pass.
 - `mvn test -Pproperty-tests`: 10 property tests pass.
 - `acceptance/run-acceptance.sh`: 102/102 across nine pipeline features.
-
-## 2026-07-27T21:34:00Z — refactorer received handoff from architect
-
-Handoff message received:
-
-```
-id: 20260727T213000Z_000017_from_architect
-from: architect
-to: coder,refactorer
-recipient: refactorer
-priority: 00
-type: git_handoff
-role: architect
-commit: 4e71a4e760
-created_at: 2026-07-27T21:30:00Z
-task: turn-loop-wiring
-
-Re-read your role and constitution.
-
-merge_and_process architect 4e71a4e760
-```
-
-Action taken: fast-forwarded `swarmforge-refactorer` to architect commit
-`4e71a4e760`, then re-ran the refactorer gates and verification. `Game` is a
-stateful class whose `play()` moves its owned players; CRAP is 1.0, DRY found
-no production duplicates, and `Game.java` has five mutation sites.
-
-Verification: 120 unit tests, 10 property tests, and 102/102 acceptance
-scenarios pass.
-
-## 2026-07-27T21:35:00Z — refactorer sent handoff to architect
-
-Handoff message sent:
-
-```
-type: git_handoff
-to: architect
-priority: 50
-task: turn-loop-wiring
-commit: (commit recorded by the handoff draft)
-```
-
-Summary: reviewed architect commit `4e71a4e760`; the stateful `Game` refactor
-passes CRAP, DRY, mutation scan, unit, property, and acceptance verification.
 - `mutate4java` on `Game.java`: 5 changed sites, 5 covered, 5 killed, 0
   survived, 0 uncovered.
 - `dry4java`: 9 candidates, none touching production code — the same
@@ -4009,3 +3965,100 @@ commit: 4e71a4e760
 `Game` is a class rather than a record, and its `rules()`, `players()` and
 `cups()` accessors are gone; no caller had them. Nothing about how a game plays
 changed, so no feature moves.
+
+## 2026-07-27T21:34:00Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T213000Z_000017_from_architect
+from: architect
+to: coder,refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: architect
+commit: 4e71a4e760
+created_at: 2026-07-27T21:30:00Z
+task: turn-loop-wiring
+
+Re-read your role and constitution.
+
+merge_and_process architect 4e71a4e760
+```
+
+Action taken: fast-forwarded `swarmforge-refactorer` to architect commit
+`4e71a4e760`, then re-ran the refactorer gates and verification. `Game` is a
+stateful class whose `play()` moves its owned players; CRAP is 1.0, DRY found
+no production duplicates, and `Game.java` has five mutation sites.
+
+Verification: 120 unit tests, 10 property tests, and 102/102 acceptance
+scenarios pass.
+
+## 2026-07-27T21:35:00Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-loop-wiring
+commit: (commit recorded by the handoff draft)
+```
+
+Summary: reviewed architect commit `4e71a4e760`; the stateful `Game` refactor
+passes CRAP, DRY, mutation scan, unit, property, and acceptance verification.
+
+## 2026-07-27T21:34:28Z — architect received refactorer handoff
+
+```
+id: 20260727T213424Z_000016_from_refactorer_to_architect
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: turn-loop-wiring
+commit: e02ff158b9
+
+Re-read your role and constitution.
+
+merge_and_process refactorer e02ff158b9
+```
+
+Merged `e02ff158b9`. It carries only this file — the refactorer's record of
+fast-forwarding to `4e71a4e760` and finding the stateful `Game` clean on CRAP,
+DRY, and the mutation scan. Outside `logbook.md` the tree is byte-identical to
+`4e71a4e760`, verified in full half an hour ago against current manifests, so
+the three gates would read the same sources to the same answer. Ran the three
+suites to confirm the merged tree builds: 120 unit, 10 property, 102/102
+acceptance.
+
+### The hazard turned up in a third shape, and this one forges a byline
+
+The merge auto-applied without a single marker, and quietly cut the last 24
+lines off this branch's own `21:15:21` entry — three verification bullets and
+the whole account of the previous merge. Those lines were not deleted. They
+had been swept into the tail of the refactorer's `21:35:00` sent-handoff entry
+during its merge, so git saw them leave one entry and arrive in another, and
+applied the move.
+
+That is worse than losing them. Left alone, this branch's report of a merge
+hazard would stand under the refactorer's name, saying it had rebuilt a file
+it never touched, alongside gate results it did not run.
+
+Restored `21:15:21` whole from this branch and trimmed `21:35:00` back to what
+the refactorer actually wrote — its handoff and its one-line summary. Also put
+this branch's `21:30:00` handoff entry back before the refactorer's `21:34:00`
+receipt of it, which the merge had reordered. 111 entries, and every body from
+the base and from this branch byte-identical to its source.
+
+Three rounds, three different shapes: a silent deletion, a body grafted onto
+the wrong header, and now a block migrating from one role's entry into
+another's. The common cause is that these merges rewrite whole regions, so
+git's line matching is free to pair any two similar blocks. Nothing short of
+comparing entries against both parents catches it, and comparing headers alone
+would have missed this one entirely — the header set was a perfect union.
+
+Not forwarded: no source changed and no functional commit came in.
