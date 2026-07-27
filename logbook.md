@@ -3269,3 +3269,36 @@ work already covered by prior entries, plus a final cleanup deleting
 literal `6`, replaced with `faces.length`. No externally-visible behavior
 changed — six faces are still six faces — so no new Gherkin is due.
 `mvn test` passes clean. Nothing to send back; task complete.
+
+## 2026-07-27T18:05:28Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T180528Z_000007_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: turn-loop-wiring
+commit: d7eaa20ce5
+created_at: 2026-07-27T18:05:28.792498Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d7eaa20ce5
+```
+
+Summary: with `phase2-turn-loop`'s supporting rules (`Turn`, `Cup`,
+`Initiative`, movement) built and mutation-clean, the architect flagged that
+`Game.play()` itself still only settles initiative — no turn loop, no
+per-space landing dispatch. That's the last piece of Phase 2 per `tasks.md`,
+and needed a specification before the coder could build it. Added
+`turn-loop.feature` (`d7eaa20ce5`), invented the task name `turn-loop-wiring`
+for it: `turn-loop-1` proves the game moves every player by their own rolls
+(not one player, not a shared roll); `turn-loop-2` pins that landing on a
+space has no economic effect yet, asserted on a real tax space so a premature
+buy/rent/tax implementation would fail it. Ran both through `gherkin-parser`
+and `gherkin-ir-dry-checker`; the only findings were the shared roll-step
+template reused across scenarios, which is intentional, not drift.
