@@ -1,0 +1,17 @@
+# The features on the acceptance pipeline, one path per line, relative to
+# the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources.
+#
+# Both run-acceptance.sh and run-acceptance-mutation.sh read this file. They
+# used to carry a copy of the list each, and the copies drifted: dice.feature
+# and official.feature were put on the pipeline but went unmutated, because
+# only one of the two lists had been updated.
+#
+# en/monopoly.feature is deliberately absent. It parses, but it specifies a
+# whole played-out game and the turn loop behind it does not exist yet.
+
+en/components/streets.feature
+en/components/stations.feature
+en/components/utilities.feature
+en/components/tax.feature
+en/components/dice.feature
+en/rules/official.feature

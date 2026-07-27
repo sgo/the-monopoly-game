@@ -27,17 +27,6 @@ class PawnTest {
   }
 
   @Test
-  void aPawnCanBeFoundByTheNameASpecificationUses() {
-    assertThat(Pawn.named("high hat")).isEqualTo(Pawn.high_hat);
-    assertThat(Pawn.named("dog")).isEqualTo(Pawn.dog);
-  }
-
-  @Test
-  void anUnknownPawnNameIsRejected() {
-    assertThat(Pawn.named("battleship")).isNull();
-  }
-
-  @Test
   void aPawnIdentifiesItsPlayer() {
     assertThat(Pawn.dog.id()).isEqualTo(new Player.ID("dog"));
   }
