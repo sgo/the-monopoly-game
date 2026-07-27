@@ -991,3 +991,56 @@ priority: 50
 task: pipeline-compatible-specs
 commit: <branch tip at time of send>
 ```
+
+## 2026-07-27T09:47:00Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T092409Z_000004_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: pipeline-compatible-specs
+commit: b6adaa2305
+
+Re-read your role and constitution.
+
+merge_and_process architect b6adaa2305
+```
+
+Action taken: merged architect commit `b6adaa2305` into `swarmforge-refactorer`.
+One `logbook.md` conflict region; resolved by keeping the incoming block's
+internal order as-is and appending it after this worktree's own entry, rather
+than trying to re-interleave by timestamp — the architect's own note in that
+block explains they'd already merged whole entries in strict order once, and
+re-splitting a settled block seemed more likely to introduce an error than to
+fix one.
+
+Adopted the new `swarm_handoff.sh`-based workflow rules and the "address
+files by absolute path, never lead a command with `cd`" engineering rule from
+this merge; used absolute paths for every command in this verification pass
+rather than the working-directory `cd` habit used earlier in this worktree's
+own history.
+
+Re-ran the refactorer's gates on the only changed sources, `Pawn` and
+`Player` (the architect's `Pawn.named` removal and pipeline-features.txt
+consolidation):
+
+- CRAP: unchanged, 3.0 max (`OwnedCount.checked`).
+- DRY: no production duplication. Same test-shape duplicates as before,
+  including `PlayerTest`'s `pass`/`land` pairs — the architect independently
+  reached the same conclusion I did last round (left alone pending the
+  specifier's ruling on the double-salary question), which is a useful
+  cross-check.
+- Mutation scan: `Pawn.java` 1 site, `Player.java` 2 sites — trivial.
+
+### Verification
+
+- `mvn test`: 74 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 92/92 pass.
+
+No refactoring needed. Handing back to the architect.
