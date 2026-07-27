@@ -2193,3 +2193,29 @@ the existing two property test classes.
 - `acceptance/run-acceptance.sh`: 100/100 pass.
 
 Handing back to the architect.
+
+## 2026-07-27T12:54:59Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260727T125459Z_000009_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase2-turn-loop
+commit: 490d7c3d4d
+created_at: 2026-07-27T12:54:59.107940Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 490d7c3d4d
+```
+
+Summary: deduplicated `InitiativeTest`'s two literal roll fixtures (12 to 9
+DRY duplicates project wide), added `RollPropertyTest` for the same
+property-test gap `Money` had before, CRAP/mutation re-verified within
+bounds. Committed at `490d7c3d4d` on `swarmforge-refactorer`; handing back
+to the architect.
