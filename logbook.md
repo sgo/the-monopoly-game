@@ -1429,3 +1429,53 @@ Sent to coder and refactorer at priority `00`, and to the specifier, who has
 one question waiting in the entry above: whether the six plain `Scenario`s on
 the pipeline — `official-rules-7` and `-8` among them — should become one-row
 `Scenario Outline`s so their expected values come under the mutation gate.
+
+## 2026-07-27T11:35:01Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T113450Z_000006_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 99aa4ff567
+created_at: 2026-07-27T11:34:50.623052Z
+enqueued_at: 2026-07-27T11:34:51.021824Z
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T11:35:01.385063Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 99aa4ff567
+```
+
+Action taken: merged architect commit `99aa4ff567` into `swarmforge-coder`,
+resolving the `logbook.md` conflict by keeping both the coder's sent entry and
+the refactorer's received entry, then re-verified the merged state here.
+
+## 2026-07-27T11:45:00Z — coder verification of the merged architect state
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 across all six pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+The `!no-mutation` suffix in `pipeline-features.txt` is on `dice.feature`
+alone, which is the right shape for the reason given: its assertion is a
+tolerance, so a mutant inside the tolerance band is equivalent by construction
+and no implementation could kill it. Worth watching that the suffix stays
+restricted to tolerance assertions — on an exact assertion it would hide a
+real hole rather than an unkillable mutant.
+
+No new behaviour slice arrived with this handoff, so there is nothing for the
+coder to implement. The open item is the specifier's: six plain `Scenario`s on
+the pipeline contribute nothing to acceptance mutation, and two of them,
+`official-rules-7` and `official-rules-8`, are the pair encoding the
+double-salary ruling this round implemented. They assert exact amounts, so a
+one-row `Examples:` table would bring them under the gate.
