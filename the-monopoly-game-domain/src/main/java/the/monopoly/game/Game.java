@@ -5,6 +5,7 @@ import the.monopoly.game.components.dice.Cup;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.Rule;
+import the.monopoly.game.rules.Turn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,18 +18,38 @@ import static org.slf4j.LoggerFactory.getLogger;
  * and where their rolls come from. The rules decide what happens; the game only
  * asks them, in order, and narrates the answers.
  */
-public record Game(Rule.Set rules, List<Player> players, Cup cup) {
+public record Game(Rule.Set rules, List<Player> players, Cups cups) {
   /** A game thrown with the dice the rules call for. */
   public Game(Rule.Set rules, List<Player> players) {
     this(rules, players, Cup.of(rules.dice().toList()));
   }
 
+  /** A game played with one cup, passed round the table as turns come and go. */
+  public Game(Rule.Set rules, List<Player> players, Cup cup) {
+    this(rules, players, player -> cup);
+  }
+
   public Result play() {
     var journal = new Journal();
     journal.log(new Journal.Entry.Start(ids(players)));
-    List<Player> turnOrder = new Initiative(player -> cup.roll().total()).order(players);
+    List<Player> turnOrder = new Initiative(this::initiativeRollFor).order(players);
     journal.log(new Journal.Entry.TurnOrder(ids(turnOrder)));
+    turnOrder.forEach(player -> new Turn(rules, cups.forPlayer(player)).take(player));
     return new Result(turnOrder, journal.entries());
+  }
+
+  private int initiativeRollFor(Player player) {
+    return cups.forPlayer(player).roll().total();
+  }
+
+  /**
+   * Where a player's rolls come from. Everyone shares one cup at a real table,
+   * but a game being replayed hands each player the rolls they are known to
+   * have thrown.
+   */
+  @FunctionalInterface
+  public interface Cups {
+    Cup forPlayer(Player player);
   }
 
   private static List<Player.ID> ids(List<Player> players) {

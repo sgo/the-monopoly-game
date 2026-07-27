@@ -1,7 +1,9 @@
 package the.monopoly.game.specs.acceptance;
 
+import the.monopoly.game.Game;
 import the.monopoly.game.components.dice.Dice;
 import the.monopoly.game.components.dice.Roll;
+import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.Street;
@@ -27,6 +29,8 @@ import java.util.Map;
 public class World {
   /** The player a scenario talks about when it says "a player" rather than a pawn. */
   private static final Player.ID UNDER_TEST = new Player.ID("the player");
+  /** What a player rolls when the scenario does not care: no double, so one roll ends the turn. */
+  private static final Roll UNREMARKABLE = new Roll(1, 2);
 
   private Rule.Set ruleSet = Rule.Set.Type.official.create();
   private Street space;
@@ -35,8 +39,9 @@ public class World {
   private Dice dice;
   private Map<Dice.Face, Integer> rolls;
   private final Deque<Roll> queuedRolls = new ArrayDeque<>();
-  private final Map<String, Deque<Integer>> queuedInitiativeRolls = new HashMap<>();
+  private final Map<String, Deque<Roll>> queuedPawnRolls = new HashMap<>();
   private List<Player> turnOrder;
+  private boolean othersRollWhatTheyLike;
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
@@ -140,22 +145,70 @@ public class World {
     return queuedRolls.removeFirst();
   }
 
-  /** Queues what a pawn will roll for initiative, in order. */
+  /**
+   * Queues what a pawn will roll for initiative, in order. Only the total is
+   * specified, so the dice are made to add up to it.
+   */
   public void queueInitiativeRoll(String pawnName, int total) {
-    queuedInitiativeRolls.computeIfAbsent(pawnName, it -> new ArrayDeque<>()).add(total);
+    queuePawnRoll(pawnName, rollTotalling(total));
+  }
+
+  /** Queues what a pawn's next throw of the dice will come up, in order. */
+  public void queuePawnRoll(String pawnName, Roll roll) {
+    queuedPawnRolls.computeIfAbsent(pawnName, it -> new ArrayDeque<>()).add(roll);
   }
 
   public void rollForInitiative() {
-    turnOrder = new Initiative(this::nextQueuedInitiativeRoll).order(players());
+    turnOrder = new Initiative(player -> nextQueuedPawnRoll(player).total()).order(players());
   }
 
-  private int nextQueuedInitiativeRoll(Player player) {
-    Deque<Integer> queued = queuedInitiativeRolls.get(player.id().value());
-    if (queued == null || queued.isEmpty())
+  public void playGame() {
+    turnOrder = new Game(ruleSet, players(), player -> () -> nextQueuedPawnRoll(player))
+        .play()
+        .turnOrder();
+  }
+
+  /**
+   * The rules open every pawn's account with the same starting capital, and no
+   * rule moves money before the first turn, so a scenario can only state the
+   * balance a pawn already has. Stating a different one says the scenario needs
+   * a rule that does not exist yet, which is what the failure says.
+   */
+  public void arrangePawnBalance(String pawnName, Money amount) {
+    Balance balance = pawn(pawnName).account().balance();
+    if (!balance.equals(new Balance(amount)))
       throw new AssertionError(
-          "Initiative wanted another roll for \"" + player.id().value() + "\" but none was queued."
+          "Pawn \"" + pawnName + "\" holds " + balance + ", and no rule can arrange "
+              + new Balance(amount) + " before the game starts."
       );
+  }
+
+  /**
+   * Lets the players a scenario says nothing about roll something unremarkable
+   * when their turn comes, so that a scenario watching one pawn does not have
+   * to script the others.
+   */
+  public void letTheOthersRollWhatTheyLike() {
+    othersRollWhatTheyLike = true;
+  }
+
+  private Roll nextQueuedPawnRoll(Player player) {
+    Deque<Roll> queued = queuedPawnRolls.get(player.id().value());
+    if (queued == null || queued.isEmpty()) {
+      if (othersRollWhatTheyLike) return UNREMARKABLE;
+      throw new AssertionError(
+          "The game wanted another roll for \"" + player.id().value() + "\" but none was queued."
+      );
+    }
     return queued.removeFirst();
+  }
+
+  /** A pair of dice adding up to a total the rules can actually be rolled. */
+  private static Roll rollTotalling(int total) {
+    if (total < 2 || total > 12)
+      throw new AssertionError("Two dice cannot total " + total + ".");
+    int die1 = Math.min(6, total - 1);
+    return new Roll(die1, total - die1);
   }
 
   public List<Player> turnOrder() {
