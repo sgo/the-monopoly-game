@@ -1336,3 +1336,66 @@ Ran the refactorer's gates on the only changed sources, `Player` and
 - `acceptance/run-acceptance.sh`: 93/93 pass.
 
 No refactoring needed. Handing back to the architect.
+
+## 2026-07-27T10:20:00Z — architect review of the double-salary split
+
+Merged `66371a8bdd`. The specifier's ruling resolved the duplication that was
+deliberately left standing last round: `StartSpace.salary()` is what passing
+pays and is never doubled, `salaryForLanding()` is what landing pays and the
+optional rule doubles. `Player.pass` and `Player.land` now make different
+calls, so they are no longer two names for one thing. Leaving the duplication
+alone was the right call — the answer resolved it, rather than a guess having
+to be unpicked.
+
+Corrected the `StartSpace` class comment, which still described the space as
+paying only for passing.
+
+The doubling rule remains safe against a second rule type being added.
+`DOUBLES_SALARY` is a `Rule.Processor<Boolean>` written as `rule -> true`, and
+that reads as though any activated rule would double the salary. It does not:
+adding a second rule type gives `Rule.Processor` a second method, the lambda
+stops being a functional interface, and the compiler refuses it. The visitor
+forces the update rather than allowing a silent misclassification.
+
+### A surviving acceptance mutation, and why it stays
+
+`dice.feature` became a `Scenario Outline`, so its numbers finally reached the
+mutator — and one mutant survived: the expected count moved from 100000 to
+100009 and nothing noticed. That is not a hole in the tests. The scenario
+asserts each face comes up about 100000 times within a 1% margin, which
+accepts anything in a 1000 wide band, so a change of 9 is equivalent by
+construction. No implementation could distinguish it, and narrowing the margin
+enough to kill it would make the scenario fail on honest dice.
+
+A gate that is permanently red is a gate people stop reading, so the exemption
+is explicit rather than left to rot: `pipeline-features.txt` now understands a
+`!no-mutation` suffix, `run-acceptance.sh` strips it and still runs the
+feature, `run-acceptance-mutation.sh` holds it back, and the reason is written
+beside the entry. `dice.feature` is the only feature carrying it, and it must
+stay that way for tolerance assertions only.
+
+### Six scenarios run without their values being checked
+
+For the specifier. The mutator only mutates example values, so a plain
+`Scenario` contributes nothing to it however carefully it is written. Across
+the pipeline there are six: five in `official.feature`, one in
+`streets.feature`. `official.feature`'s 176 mutations all come from its three
+`Scenario Outline`s.
+
+This matters most for `official-rules-7` and `official-rules-8`, the pair that
+encodes the ruling this round was about — that landing pays $1900 and passing
+pays $1700 with the rule active. They run, they pass, and the mutation gate
+cannot see either amount. Unlike the dice case these are exact assertions, so
+a one-row `Examples:` table would bring them under the gate and they would be
+killable. Reshaping a specification is the specifier's to do, not mine.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 across all six pipeline features.
+- `mutate4java` on the changed sources, `StartSpace` and `Player`: 0 survivors,
+  0 uncovered.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level full`: 406 mutations, 406
+  killed, 0 survived, 0 errors, exit 0.

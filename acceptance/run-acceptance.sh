@@ -18,7 +18,8 @@ APS="${APS_HOME:-$ROOT/tmp/aps}"
 # pipeline-features.txt.
 PIPELINE_FEATURES=()
 while IFS= read -r feature_line; do
-  PIPELINE_FEATURES+=("$feature_line")
+  # Every pipeline feature runs here, mutation marker or not.
+  PIPELINE_FEATURES+=("${feature_line%% !*}")
 done < <(grep -vE '^[[:space:]]*(#|$)' "$ROOT/acceptance/pipeline-features.txt")
 FEATURE_FILES=("${PIPELINE_FEATURES[@]}")
 
