@@ -3070,6 +3070,26 @@ baseline stand; re-ran CRAP and DRY as a regression check anyway.
 
 Handing back to the architect.
 
+## 2026-07-27T16:31:42Z — refactorer sent handoff to architect
+
+```
+id: 20260727T163142Z_000013_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase2-turn-loop
+commit: d37646e440
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d37646e440
+```
+
+Sent after confirming the reworked `InitiativePropertyTest` (see the
+receiving entry above) and passing all three verification commands.
+
 ## 2026-07-27T16:31:46Z — architect received refactorer handoff
 
 ```
@@ -3194,3 +3214,61 @@ commit: f9982b66b9
 `Dice` lost its `Type` field and `type()` accessor, so its constructor now
 takes faces alone. `dice.feature` still holds: the six-faced dice the rules
 call for is unchanged, and so is its fairness.
+
+## 2026-07-27T17:46:37Z — refactorer received handoff from architect
+
+```
+id: 20260727T174305Z_000015_from_architect
+from: architect
+to: coder,refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: architect
+commit: f9982b66b9
+created_at: 2026-07-27T17:43:05.684576Z
+enqueued_at: 2026-07-27T17:43:06.539849Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T17:43:10.907456Z
+
+Re-read your role and constitution.
+
+merge_and_process architect f9982b66b9
+```
+
+Action taken: merged architect commit `f9982b66b9` into `swarmforge-refactorer`
+— an unprompted pass closing the last gap in the mutation gate: `Dice` had
+never been through `mutate4java` (7 killed / 1 survived / 2 uncovered). The
+survivor was a `type` field and `type()` accessor nothing calls; deleted
+rather than pinned by a test, since a test would only have greened the gate
+around an accessor with no caller. With `type` gone, `roll()`'s hardcoded `6`
+(noted as latent at `13:35`, left for the coder on the grounds that only
+`Dice.Type.six` existed) became incoherent regardless of which types exist,
+so it now reads `faces.length`. New `DiceTest` covers both from the domain
+module, rolling a two-faced dice so a roll reaching past its faces would show
+up as one it doesn't have.
+
+Only `logbook.md` conflicted, in the same shape as the last two rounds: this
+branch's `16:31:42` sent entry and the architect's `16:31:46` received entry
+covered the same handoff, kept both in send-then-receive order; the
+architect's own subsequent narrative (the quiet-round finding, then the
+unprompted `Dice` cleanup) had no further shared anchor with this branch, so
+it was appended whole after. Read the full spliced region end to end before
+trusting the header check; no duplicate or misplaced content, and this was
+the whole conflict — no third region this time, since the architect's tail
+was already the end of the file on both sides.
+
+Ran the refactorer's gates on the change:
+
+- CRAP: unchanged, 5.0 max (`Turn.take`).
+- DRY: unchanged, 9 candidates, all in test files.
+- Mutation scan (count-only): `Dice.java` now has 8 sites, well under the
+  100-site split threshold.
+
+### Verification
+
+- `mvn test`: 117 unit tests pass (113, plus 4 in `DiceTest`).
+- `mvn test -Pproperty-tests`: 10 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+Nothing to clean up. Handing back to the architect.
