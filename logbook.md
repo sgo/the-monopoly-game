@@ -3272,3 +3272,49 @@ Ran the refactorer's gates on the change:
 - `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
 
 Nothing to clean up. Handing back to the architect.
+
+## 2026-07-27T17:47:29Z — architect received refactorer handoff
+
+```
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: phase2-turn-loop
+commit: c91041f094
+
+Re-read your role and constitution.
+
+merge_and_process refactorer c91041f094
+```
+
+Merged `c91041f094`. It carries only this file — the refactorer's record of
+merging `f9982b66b9` and finding nothing to clean up. Outside `logbook.md` the
+tree is byte-identical to `f9982b66b9`, verified in full an hour ago, so the
+three gates would read the same sources against current manifests. Ran the
+three test suites to confirm the merged tree builds: 117 unit, 10 property,
+100/100 acceptance.
+
+### Three entries had to be restored
+
+The merge dropped `16:22:34`, `16:26:24` and `16:29:00` — the handoff note, the
+receipt, and the whole `movement-4` review — without conflicting on any of
+them. They are present in the merge base and on this branch, and absent from
+`c91041f094`, so git read their absence as a deletion the other side intended
+and applied it silently. Only the tail conflicted, which is why the loss did
+not show up as a marker to resolve.
+
+Restored all three from this branch's own copy and put them back in timestamp
+order, then checked both sides entry by entry: every `##` header present in
+either parent is present in the result, and none is duplicated. 88 entries,
+being the union of this branch's 86 and the other's 84.
+
+Worth stating plainly, because it will recur: a `logbook.md` conflict is not
+the dangerous part of these merges. Git only raises markers where both sides
+edited the same lines. Where one side rewrote a region wholesale — which every
+one of these resolutions does — the other side's untouched entries look like
+deletions, and get applied without a word. Comparing the entry headers of both
+parents against the result is what catches it; reading the marker regions is
+not.
+
+Nothing forwarded: no source changed and no functional commit came in.
