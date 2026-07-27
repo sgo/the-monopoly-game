@@ -2684,32 +2684,6 @@ the real-dice constructor terminates with probability one rather than by
 construction. That was noted at the last handoff and `RULES.md` still states no
 bound, so it stays as it is.
 
-## 2026-07-27T15:57:26Z — architect handoffs for phase2-turn-loop
-
-To coder and refactorer at priority `00`:
-
-```
-type: git_handoff
-to: coder,refactorer
-priority: 00
-task: phase2-turn-loop
-commit: e6f6536e10
-```
-
-To the specifier:
-
-```
-type: git_handoff
-to: specifier
-priority: 50
-task: phase2-turn-loop
-commit: e6f6536e10
-```
-
-`Game.play()` is functional again and now has a cup it can be played to a
-script with, which is the seam Phase 2's turn loop hangs off. What it does with
-that seam is still only initiative.
-
 ## 2026-07-27T15:58:28Z — refactorer received architect handoff
 
 ```
@@ -2941,6 +2915,27 @@ commit: 07d334edcc
 
 Nothing went to the coder or the specifier: this batch changed one property
 test and no production code, so there is no functional commit to review.
+
+## 2026-07-27T16:26:20Z — refactorer sent handoff to architect
+
+```
+id: 20260727T162620Z_000012_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase2-turn-loop
+commit: 9000e8b98c
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 9000e8b98c
+```
+
+Sent after merging the coder's `movement-4` handoff (see the receiving entry
+above) and confirming CRAP, DRY, and the full test suites are unaffected.
+
 ## 2026-07-27T16:26:24Z — architect received refactorer handoff
 
 ```
@@ -3014,3 +3009,63 @@ leaving jail is a rule.
 Nothing forwarded: this batch left only manifest changes behind, and the
 functional commit it carried came from the coder and has already reached the
 refactorer.
+
+## 2026-07-27T16:30:30Z — refactorer received handoff from architect
+
+```
+id: 20260727T162234Z_000014_from_architect
+from: architect
+to: refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: architect
+commit: 07d334edcc
+created_at: 2026-07-27T16:22:34.333593Z
+enqueued_at: 2026-07-27T16:22:34.696592Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T16:26:34.972975Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 07d334edcc
+```
+
+Action taken: merged architect commit `07d334edcc` into `swarmforge-refactorer`.
+The architect reworked `InitiativePropertyTest` (added in this worktree's
+previous round): the expected order had been built with the same three lines
+`Initiative.order` uses, so the property could only ever agree with itself —
+sound self-critique, since the mutation-kill check from that round only ruled
+out one alternative implementation (a full sort) and could not have caught a
+shared subtler bug in both copies of the rotation. The rework states the rule
+`initiative.feature` gives instead — highest roller leads, and whoever sits
+clockwise of a player plays after them — sharing no code with `Initiative`,
+and confirms non-vacuousness against three different broken `order()`s
+(sort instead of rotate, off-by-one rotation, reversed direction), each
+caught by the clause aimed at it.
+
+Only `logbook.md` conflicted; `InitiativePropertyTest.java` and the touched
+feature files (manifest-stamp re-runs, no scenario changes) merged cleanly.
+The conflict was the same shape as the previous round's: both branches had
+kept an uninterrupted narrative from the shared point (this worktree's own
+`52e98b64af` entry) with no further common anchor, so nothing needed
+interleaving beyond chronological order — this branch's `16:16:41` sent
+entry, then the architect's `16:16:45` received-and-review entry that
+directly follows it, then this branch's own `16:21:38` and `16:26:20`
+entries, which happened independently. Read the full spliced region end to
+end before trusting the header check; no duplicate or misplaced content.
+
+No production source changed in this batch, so CRAP and the mutation
+baseline stand; re-ran CRAP and DRY as a regression check anyway.
+
+- CRAP: unchanged, 5.0 max (`Turn.take`).
+- DRY: unchanged, 9 candidates, all in test files.
+
+### Verification
+
+- `mvn test`: 113 unit tests pass.
+- `mvn test -Pproperty-tests`: 10 property tests pass, including the
+  reworked `InitiativePropertyTest`.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+Handing back to the architect.
