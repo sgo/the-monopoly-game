@@ -1828,3 +1828,53 @@ Sent to coder and refactorer at priority `00`, and to the specifier. No
 question is outstanding from this role: the two raised earlier, on where the
 double-salary rule belongs and on the scenarios the mutation gate could not
 reach, are both answered and closed.
+
+## 2026-07-27T12:04:19Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T115758Z_000008_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: pipeline-compatible-specs
+commit: b21adccd94
+
+Re-read your role and constitution.
+
+merge_and_process architect b21adccd94
+```
+
+Action taken: merged architect commit `b21adccd94` into `swarmforge-refactorer`.
+One `logbook.md` conflict region, but with a real problem this time: the
+auto-merged (non-conflicting) part of the file silently dropped the "coder:
+the last six scenarios reach the mutation gate" entry that had been correctly
+placed by the previous round's resolution, while a byte-identical copy of
+that same entry reappeared duplicated inside the new conflict block. Caught
+by the two-way header check (every header in the incoming branch present
+exactly once, and separately every header in this worktree's own pre-merge
+history present exactly once) — the first check alone would have passed with
+the duplicate still in the wrong place. Restored the entry to its correct
+position between "coder received handoff from specifier" and "architect
+received handoff from refactorer", then removed the duplicate from the
+conflict block, keeping only the architect's two genuinely new entries.
+Both header checks pass clean now. Worth carrying forward: check both
+directions, not just the incoming branch, on every future logbook merge.
+
+No domain main source changed in this commit (feature-file comment/example
+tweaks only). Re-ran CRAP and DRY on the domain module as a regression check
+anyway:
+
+- CRAP: unchanged, 3.0 max (`OwnedCount.checked`).
+- DRY: unchanged, same 6 test-shape duplicates, none in production code.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 pass.
+
+No refactoring needed. Handing back to the architect.
