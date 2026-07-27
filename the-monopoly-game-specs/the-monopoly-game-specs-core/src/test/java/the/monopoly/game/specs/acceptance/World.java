@@ -29,6 +29,8 @@ import java.util.Map;
 public class World {
   /** The player a scenario talks about when it says "a player" rather than a pawn. */
   private static final Player.ID UNDER_TEST = new Player.ID("the player");
+  /** What a player rolls when the scenario does not care: no double, so one roll ends the turn. */
+  private static final Roll UNREMARKABLE = new Roll(1, 2);
 
   private Rule.Set ruleSet = Rule.Set.Type.official.create();
   private Street space;
@@ -39,6 +41,7 @@ public class World {
   private final Deque<Roll> queuedRolls = new ArrayDeque<>();
   private final Map<String, Deque<Roll>> queuedPawnRolls = new HashMap<>();
   private List<Player> turnOrder;
+  private boolean othersRollWhatTheyLike;
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
@@ -180,12 +183,23 @@ public class World {
       );
   }
 
+  /**
+   * Lets the players a scenario says nothing about roll something unremarkable
+   * when their turn comes, so that a scenario watching one pawn does not have
+   * to script the others.
+   */
+  public void letTheOthersRollWhatTheyLike() {
+    othersRollWhatTheyLike = true;
+  }
+
   private Roll nextQueuedPawnRoll(Player player) {
     Deque<Roll> queued = queuedPawnRolls.get(player.id().value());
-    if (queued == null || queued.isEmpty())
+    if (queued == null || queued.isEmpty()) {
+      if (othersRollWhatTheyLike) return UNREMARKABLE;
       throw new AssertionError(
           "The game wanted another roll for \"" + player.id().value() + "\" but none was queued."
       );
+    }
     return queued.removeFirst();
   }
 
