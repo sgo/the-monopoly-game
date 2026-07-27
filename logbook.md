@@ -691,3 +691,50 @@ from 100000 to 50000 fails that scenario too.
 
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer
 and architect.
+
+## 2026-07-27T08:48:00Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260727T084110Z_000002_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: pipeline-compatible-specs
+commit: eaf16a9eb1
+
+Re-read your role and constitution.
+
+merge_and_process coder eaf16a9eb1
+```
+
+Action taken: merged coder commit `eaf16a9eb1` into `swarmforge-refactorer`.
+Only `logbook.md` conflicted (three append-only regions); resolved by
+interleaving both threads in chronological order. One resolution error along
+the way — an edit briefly dropped this handoff's own two entries while
+removing what looked like a duplicate — caught by diffing header counts
+against the incoming file before committing, and restored.
+
+Ran the refactorer's gates against `Pawn` and `Player`, the only changed/new
+main sources in this commit:
+
+- CRAP: still 3.0 max (`OwnedCount.checked`), unchanged.
+- DRY: no production duplication. `PlayerTest`'s `pass`/`land` test pairs
+  (`...PaysTheSalaryIntoTheAccount`, `theDoubleSalaryRuleDoublesWhat...Pays`)
+  flag as structural duplicates, but they're deliberately parallel: they pin
+  down that `pass` and `land` currently behave identically, which is exactly
+  the open question the coder raised for the specifier. Collapsing them now
+  would erase that signal before the specifier has answered it, so left as
+  is.
+- Mutation scan: `Pawn.java` 2 sites, `Player.java` 2 sites — trivial.
+
+### Verification
+
+- `mvn test`: 76 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 92/92 pass.
+
+No refactoring needed. Handing back to the architect.
