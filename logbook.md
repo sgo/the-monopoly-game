@@ -1265,6 +1265,7 @@ rather than the space. Two roles arriving separately at the same reading is
 worth more than either saying it once.
 
 Not forwarded; the work produced no changes.
+
 ## 2026-07-27T09:50:00Z — coder received handoff from specifier
 
 Handoff message received:
@@ -1679,6 +1680,7 @@ The open question from the previous entry is still open and still the
 specifier's: six plain `Scenario`s on the pipeline, `official-rules-7` and
 `-8` among them, run without their expected values being reachable by the
 mutation gate.
+
 ## 2026-07-27T11:45:00Z — coder verification of the merged architect state
 
 - `mvn test`: 78 unit tests pass.
@@ -2018,6 +2020,7 @@ real problem. It was not one: the entry concerned is present in both versions,
 their file carries every heading in mine plus two, and the deletions were this
 worktree's timestamp-sorted order being compared against their append order.
 Checked before raising it rather than after.
+
 ## 2026-07-27T12:15:00Z — coder verification of the merged architect state
 
 - `mvn test`: 78 unit tests pass.
@@ -2418,6 +2421,38 @@ Action taken: merged architect commit `e535d0508c` into `swarmforge-coder`,
 resolving the `logbook.md` conflict by keeping both the coder's sent entry and
 the architect's review, then re-verified the merged state here.
 
+## 2026-07-27T13:17:21Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T131721Z_000006_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase2-turn-loop
+commit: ad02b22f68
+created_at: 2026-07-27T13:17:21.960177Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier ad02b22f68
+```
+
+Summary: merged the architect's `e535d0508c` (Player now carries a
+Position, Turn/Cup/Roll/Initiative implemented, all seven language
+mutation survivors killed). The architect found movement-4 survives
+every acceptance mutation by construction - a literal "position 10"
+plus an assertion reading back the same "starting balance" column that
+arranged the account, so mutating it moves the expectation with it.
+Correctly declined to mark it !no-mutation (that's for tolerance
+assertions, not this). Codified "never assert with the column that
+arranged the state" in specifier.prompt (`fc9c893`), then gave
+movement-4 its own final position/final balance columns (`ad02b22`), no
+behavior change, now independently mutable.
+
 ## 2026-07-27T13:50:00Z — coder verification of the merged architect state
 
 - `mvn test`: 110 unit tests pass.
@@ -2684,6 +2719,60 @@ the real-dice constructor terminates with probability one rather than by
 construction. That was noted at the last handoff and `RULES.md` still states no
 bound, so it stays as it is.
 
+## 2026-07-27T15:57:05Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T155705Z_000006_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase2-turn-loop
+commit: 6a03de66b1
+created_at: 2026-07-27T15:57:05.395231Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 6a03de66b1
+```
+
+Summary: `movement-4`'s reshaped scenario, verified against the existing step
+handlers with no production or step-handler change. 110 unit tests and 100
+acceptance tests pass.
+
+## 2026-07-27T15:57:42Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T155726Z_000012_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: e6f6536e10
+created_at: 2026-07-27T15:57:26.565432Z
+enqueued_at: 2026-07-27T15:57:27.520827Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T15:57:42.513306Z
+
+Re-read your role and constitution.
+
+merge_and_process architect e6f6536e10
+```
+
+Action taken: merged architect commit `e6f6536e10` into `swarmforge-coder`.
+One `logbook.md` conflict, both sides appends: rebuilt the tail from the two
+appended blocks in timestamp order rather than side order, so the coder,
+refactorer, and architect entries from this round read as one thread. Nothing
+was dropped; the three entries merged clean before the conflict region are
+still there. Then verified the merged state.
+
 ## 2026-07-27T15:58:28Z — refactorer received architect handoff
 
 ```
@@ -2738,6 +2827,58 @@ confirming.
 - `acceptance/run-acceptance.sh`: 100/100 pass.
 
 Handing back to the architect.
+
+## 2026-07-27T16:05:00Z — coder verification of the merged architect state
+
+- `mvn test`: 113 unit tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+The finding against this role's work is accepted. `Game.play()` grouped players
+by a roll it took from `rules.dice()` directly and never settled a tie, and the
+journal entry worked the winner out a second time by parsing `Dice.Face`
+symbols back into numbers. `rules.Initiative` already had that rule, specified
+and covered. Two of those three copies were mine to not have written: the turn
+loop was built underneath `Game` without `Game` being made to ask for it.
+
+The specifier's split of `movement-4` and the architect's manifest refresh met
+in this merge, so the jail scenario's stored `scenario_hash` no longer matches
+the scenario. The next mutation run will re-test it rather than skip it, which
+is the run that will say whether the two new columns are killed in the gate as
+they are when measured by hand.
+
+## 2026-07-27T16:05:00Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T155726Z_000013_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase2-turn-loop
+commit: e6f6536e10
+created_at: 2026-07-27T15:57:26.642081Z
+
+Re-read your role and constitution.
+
+merge_and_process architect e6f6536e10
+```
+
+Action taken: merged `e6f6536e10` into `main` (one `logbook.md` conflict —
+two independent append-only entries after the same base point, resolved by
+keeping both in their existing chronological order, no content lost).
+
+Reviewed as specifier: `Game.play()` now asks `rules.Initiative` for turn
+order instead of re-deriving a winner inline from raw dice rolls, which is
+exactly what `initiative.feature` already specifies and `InitiativeTest`
+already covers. No new externally-visible behavior, so no new Gherkin is
+due. `mvn test` passes clean. Nothing to send back; task complete.
 
 ## 2026-07-27T16:16:41Z — refactorer sent handoff to architect
 
@@ -3215,6 +3356,29 @@ commit: f9982b66b9
 takes faces alone. `dice.feature` still holds: the six-faced dice the rules
 call for is unchanged, and so is its fairness.
 
+## 2026-07-27T17:43:10Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T174305Z_000015_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: f9982b66b9
+created_at: 2026-07-27T17:43:05.684576Z
+enqueued_at: 2026-07-27T17:43:06.310168Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T17:43:10.644856Z
+
+Re-read your role and constitution.
+
+merge_and_process architect f9982b66b9
+```
+
 ## 2026-07-27T17:46:37Z — refactorer received handoff from architect
 
 ```
@@ -3273,6 +3437,30 @@ Ran the refactorer's gates on the change:
 
 Nothing to clean up. Handing back to the architect.
 
+## 2026-07-27T17:47:23Z — refactorer sent handoff to architect
+
+```
+id: 20260727T174723Z_000014_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase2-turn-loop
+commit: c91041f094
+
+Re-read your role and constitution.
+
+merge_and_process refactorer c91041f094
+```
+
+Sent after confirming the `Dice` mutation cleanup (see the receiving entry
+above) needed no further work and passing all three verification commands.
+Action taken: merged architect commit `f9982b66b9` into `swarmforge-coder`. One
+`logbook.md` conflict, again two disjoint appends: no entry existed on both
+sides with a differing body, so the resolution is the union of the two entry
+sets in timestamp order. Then verified the merged state.
+
 ## 2026-07-27T17:47:29Z — architect received refactorer handoff
 
 ```
@@ -3318,3 +3506,341 @@ parents against the result is what catches it; reading the marker regions is
 not.
 
 Nothing forwarded: no source changed and no functional commit came in.
+
+## 2026-07-27T17:55:00Z — coder verification of the merged architect state
+
+- `mvn test`: 117 unit tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+`Dice.roll()` read `faces[random.get().nextInt(6)]`. That literal was mine, and
+it was left standing at `13:35` on the argument that only `Dice.Type.six`
+exists so nothing can reach past it — an argument about the callers rather than
+about the class. `Dice` now indexes by `faces.length`, and `DiceTest` rolls a
+two-faced dice so a roll that overruns or stops short shows up as a face the
+dice does not have.
+
+### The mutation gate's movement-4 question is answered
+
+At `15:55` this role reported the jail scenario's outcome as unkillable and
+asked how the gate had scored it killed. Since then the specifier split the
+outcome columns and the gate re-read the scenario: `movement.feature`'s
+manifest now records index 3 at 7 mutations, 7 killed, tested at `16:28:53`,
+where it had recorded 5. That is the same count and the same verdict as the
+by-hand measurement at `15:55`, from the tool rather than from an argument.
+Nothing is outstanding on this from here.
+
+## 2026-07-27T18:05:28Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T180528Z_000007_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: turn-loop-wiring
+commit: d7eaa20ce5
+
+Re-read your role and constitution.
+
+merge_and_process specifier d7eaa20ce5
+```
+
+Action taken: merged specifier commit `d7eaa20ce5` into `swarmforge-coder`,
+resolving the `logbook.md` conflict as the union of two disjoint appends in
+timestamp order, then implemented the turn-loop wiring.
+
+## 2026-07-27T18:05:28Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T180528Z_000007_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: turn-loop-wiring
+commit: d7eaa20ce5
+created_at: 2026-07-27T18:05:28.792498Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d7eaa20ce5
+```
+
+Summary: with `phase2-turn-loop`'s supporting rules (`Turn`, `Cup`,
+`Initiative`, movement) built and mutation-clean, the architect flagged that
+`Game.play()` itself still only settles initiative — no turn loop, no
+per-space landing dispatch. That's the last piece of Phase 2 per `tasks.md`,
+and needed a specification before the coder could build it. Added
+`turn-loop.feature` (`d7eaa20ce5`), invented the task name `turn-loop-wiring`
+for it: `turn-loop-1` proves the game moves every player by their own rolls
+(not one player, not a shared roll); `turn-loop-2` pins that landing on a
+space has no economic effect yet, asserted on a real tax space so a premature
+buy/rent/tax implementation would fail it. Ran both through `gherkin-parser`
+and `gherkin-ir-dry-checker`; the only findings were the shared roll-step
+template reused across scenarios, which is intentional, not drift.
+
+## 2026-07-27T18:40:00Z — coder implementation of turn-loop-wiring
+
+`Game.play()` settled initiative and stopped. It now plays a turn for each
+player in turn order, and every player is moved by their own rolls.
+
+### Where a player's rolls come from
+
+`Game` held one `Cup` and drew initiative from it, discarding the player
+`Initiative` handed it. Turn-loop-1 asks for something that seam cannot say:
+two pawns, each moved by rolls attributed to them by name.
+
+`Game` now holds `Cups`, which answers `forPlayer(player)`. The existing
+constructors still read as before — real dice, or one scripted cup everyone
+shares — because a shared cup is `player -> cup`. A replayed game hands each
+player the rolls that player is known to have thrown, which is what a feature
+naming pawns is describing.
+
+`Turn` is unchanged: it takes the cup for whoever's turn it is.
+
+Nothing new is journalled. The specification asks for movement, not for an
+account of it, and `aGameAccountsForWhoIsPlayingAndInWhatOrder` still pins the
+journal at exactly the two entries it had.
+
+### Tests
+
+- `everyPlayerTakesATurnMovedByTheirOwnRoll`: three players, three different
+  turn rolls. A loop that moved only the leader, or moved everyone by one roll,
+  or consumed the rolls in seated rather than turn order, lands them elsewhere.
+- `aPlayerWithACupOfTheirOwnRollsThatOneRatherThanTheTable`: each player has
+  their own cup; the positions say each was moved by their own.
+- `landingOnASpaceIsWorthNothingEitherWayYet`: a pawn is walked onto the tax
+  space at position 4 and its balance is unchanged, so an implementation that
+  charged for landing would fail here.
+
+Checked the three fail without the loop before keeping it: all three do, and
+the four older `Game` tests needed turn rolls added to their scripts, since
+`play()` now consumes them.
+
+### The acceptance suite is red on the incoming specification
+
+`turn-loop.feature` is on the pipeline and both its scenarios fail:
+
+```
+The game wanted another roll for "high hat" but none was queued.
+```
+
+`we select 2 players` seats the first two pawns — dog and high hat — and the
+scenarios script rolls for dog and iron box. High hat is at play with no rolls;
+iron box has rolls and is not at play.
+
+Measured rather than argued: with `iron box` read as `high hat` throughout the
+file, both scenarios pass and the suite is 102/102. That edit was made locally
+to test the hypothesis and reverted; the feature is committed exactly as the
+specifier wrote it.
+
+Which way it should be fixed is the specifier's, and the two ways are not
+equivalent: naming a seated pawn is one edit, while `we select 3 players` would
+seat a third player who then takes a turn too and needs rolls of their own, or
+the game runs out of them.
+
+### `with $<starting balance> in pawn "dog"'s account`
+
+The pool opens every pawn's account with the rules' starting capital, $1500,
+which is what turn-loop-2 states. There is no way to arrange a different
+balance — no rule moves money before the first turn — so the step checks that
+the pawn holds what the scenario says rather than depositing it, which would
+have made it $3000 and failed the scenario's own `final balance`. A scenario
+that states any other balance fails saying no rule can arrange it.
+
+### Verification
+
+- `mvn test`: 120 unit tests pass.
+- `acceptance/run-acceptance.sh`: 100 pass, 2 fail, both `turn-loop`.
+
+## 2026-07-27T19:45:00Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T174305Z_000016_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase2-turn-loop
+commit: f9982b66b9
+
+Re-read your role and constitution.
+
+merge_and_process architect f9982b66b9
+```
+
+Action taken: merged `f9982b66b9` into `main`. Six conflict regions in
+`logbook.md`, spanning two separate clusters — this branch's own
+`ad02b22f68`/`e6f6536e10` entries against the coder's, refactorer's, and
+architect's parallel narratives about the same handoffs, which git had
+matched on shared header/`### Verification` lines and interleaved. Read both
+full divergent spans end to end rather than the marker regions; each role's
+uninterrupted narrative block was kept whole, ordered by its first divergent
+entry's timestamp, with the two specifier entries (`13:17:21`, `16:05:00`)
+slotted in individually since they were each self-contained. No content
+dropped or duplicated.
+
+Reviewed as specifier: the batch spans the coder's and refactorer's turn-loop
+work already covered by prior entries, plus a final cleanup deleting
+`Dice`'s unused `Type` field and its now-untethered `roll()` bound to a
+literal `6`, replaced with `faces.length`. No externally-visible behavior
+changed — six faces are still six faces — so no new Gherkin is due.
+`mvn test` passes clean. Nothing to send back; task complete.
+
+## 2026-07-27T20:47:44Z — coder sent handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260727T204744Z_000007_from_coder
+from: coder
+to: specifier
+priority: 50
+type: git_handoff
+role: coder
+task: turn-loop-wiring
+commit: 3a831f8dd1
+created_at: 2026-07-27T20:47:44.802132Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 3a831f8dd1
+```
+
+Summary: the turn loop is implemented and 120 unit tests pass. `turn-loop.feature`
+is on the pipeline and both its scenarios fail: `we select 2 players` seats dog
+and high hat, and the scenarios script rolls for dog and iron box. The suite is
+100 pass, 2 fail. Sent to the specifier rather than the refactorer because the
+red is in the specification, not the code.
+
+## 2026-07-27T20:52:58Z — specifier received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260727T204744Z_000007_from_coder_to_specifier
+from: coder
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: coder
+task: turn-loop-wiring
+commit: 3a831f8dd1
+
+Re-read your role and constitution.
+
+merge_and_process coder 3a831f8dd1
+```
+
+Action taken: merged coder commit `3a831f8dd1` into `main`, preserving both
+roles' complete append-only log histories while resolving the sole conflict
+in `logbook.md`. Began specifier review of the reported mismatch between the
+two selected pawns and the rolls named by `turn-loop.feature`.
+
+## 2026-07-27T21:06:04Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T210559Z_000008_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 3ae7065e2e
+created_at: 2026-07-27T21:05:59.377586Z
+enqueued_at: 2026-07-27T21:06:00.133900Z
+task: turn-loop-wiring
+dequeued_at: 2026-07-27T21:06:04.314492Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3ae7065e2e
+```
+
+Action taken: merged specifier commit `3ae7065e2e` into `swarmforge-coder`,
+resolving the `logbook.md` conflict as the union of two disjoint appends in
+timestamp order, then implemented the one step the corrected feature added.
+
+## 2026-07-27T21:20:00Z — coder implementation of the corrected turn-loop feature
+
+The pawns the scenarios script are the pawns `we select 2 players` seats now, so
+both scenarios reach the assertions they were written for.
+
+`every other player can complete their turn` is new vocabulary and the only
+thing needing an implementation. A game plays a turn for everyone, so a scenario
+watching one pawn still has to account for the rest; this step says the others
+roll something unremarkable rather than making the scenario carry rolls it does
+not care about. The world serves them a 1 and a 2 — no double, so one roll ends
+the turn — and without the step a player with nothing queued still fails saying
+so, which is what kept the last round's mismatch visible.
+
+No domain change: the turn loop is what it was, and its unit tests are
+unchanged.
+
+### Verification
+
+- `mvn test`: 120 unit tests pass.
+- `acceptance/run-acceptance.sh`: 102/102 across nine pipeline features.
+
+## 2026-07-27T21:13:38Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260727T210928Z_000008_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: af2a6c9506
+created_at: 2026-07-27T21:09:28.078130Z
+enqueued_at: 2026-07-27T21:09:29.013182Z
+task: turn-loop-wiring
+
+Re-read your role and constitution.
+
+merge_and_process coder af2a6c9506
+```
+
+Action taken: merged coder commit `af2a6c9506` into `swarmforge-refactorer`,
+resolved the append-only `logbook.md` merge conflict while retaining both
+role histories, and verified the merged turn-loop wiring.
+
+Verification: CRAP maximum 1.0 for `Game`, no production duplicates from
+DRY analysis, four mutation sites in `Game.java`, `mvn test` 120 passing,
+property tests 10 passing, and acceptance 102/102 passing.
+
+## 2026-07-27T21:14:30Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-loop-wiring
+commit: (commit recorded by the handoff draft)
+```
+
+Summary: merged and verified the coder's turn-loop wiring; all refactorer
+quality gates and unit, property, and acceptance verification are green.
