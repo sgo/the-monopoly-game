@@ -1431,3 +1431,44 @@ Sent to coder and refactorer at priority `00`, and to the specifier, who has
 one question waiting in the entry above: whether the six plain `Scenario`s on
 the pipeline — `official-rules-7` and `-8` among them — should become one-row
 `Scenario Outline`s so their expected values come under the mutation gate.
+
+## 2026-07-27T11:39:51Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T113450Z_000006_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: pipeline-compatible-specs
+commit: 99aa4ff567
+
+Re-read your role and constitution.
+
+merge_and_process architect 99aa4ff567
+```
+
+Action taken: merged architect commit `99aa4ff567` into `swarmforge-refactorer`.
+One `logbook.md` conflict region, a straightforward append after this
+worktree's own last entry; resolved and verified the same way as the previous
+round (every incoming header present exactly once before committing).
+
+Ran the refactorer's gates on the only changed sources, `Player` and
+`StartSpace` (the architect's `StartSpace` comment fix and the
+`!no-mutation` exemption for `dice.feature`'s tolerance-based scenario):
+
+- CRAP: unchanged, 3.0 max (`OwnedCount.checked`).
+- DRY: no production duplication, matching the architect's own report. Same
+  test-shape duplicates as before.
+- Mutation scan: `Player.java` 2 sites, `StartSpace.java` 1 site — trivial.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 pass.
+
+No refactoring needed. Handing back to the architect.
