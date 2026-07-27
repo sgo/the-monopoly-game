@@ -3992,3 +3992,29 @@ the sent and received `turn-loop-wiring` histories while resolving the sole
 append-only `logbook.md` conflict. The completed work keeps the specified
 turn-loop behavior intact, adds the supporting acceptance vocabulary for
 other players' turns, and records its accepted mutation results. Task complete.
+
+## 2026-07-27T21:59:09Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T215905Z_000009_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase3-journal-report
+commit: 7c89bee79a
+created_at: 2026-07-27T21:59:05.364526Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7c89bee79a
+```
+
+Summary: adds separate journal and report features for Phase 3. They require
+the complete chronological sequence from game start through initiative and
+the winner's first turn, plus turn start, roll, movement, and salary events.
+The accepted baseline has 102 existing passing scenarios and six new expected
+unsupported scenarios.
