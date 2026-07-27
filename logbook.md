@@ -2479,3 +2479,29 @@ were never equal. It holds a `List` now.
 the real-dice constructor terminates with probability one rather than by
 construction. That was noted at the last handoff and `RULES.md` still states no
 bound, so it stays as it is.
+
+## 2026-07-27T15:57:26Z — architect handoffs for phase2-turn-loop
+
+To coder and refactorer at priority `00`:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: phase2-turn-loop
+commit: e6f6536e10
+```
+
+To the specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: phase2-turn-loop
+commit: e6f6536e10
+```
+
+`Game.play()` is functional again and now has a cup it can be played to a
+script with, which is the seam Phase 2's turn loop hangs off. What it does with
+that seam is still only initiative.
