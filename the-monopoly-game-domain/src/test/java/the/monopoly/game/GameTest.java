@@ -3,7 +3,9 @@ package the.monopoly.game;
 import org.junit.jupiter.api.Test;
 import the.monopoly.game.components.dice.Cup;
 import the.monopoly.game.components.dice.Roll;
+import the.monopoly.game.Game.Journal.Entry;
 import the.monopoly.game.components.finance.Bank.Account.Balance;
+import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Pawn;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.Street;
@@ -46,12 +48,50 @@ class GameTest {
   }
 
   @Test
-  void aGameAccountsForWhoIsPlayingAndInWhatOrder() {
+  void aGameAccountsForWhoIsPlayingAndWhatEachOfThemRolledForInitiative() {
     Game.Result result = playInitiative(new Roll(2, 2), new Roll(5, 5), new Roll(3, 3));
 
-    assertThat(result.journal()).containsExactly(
-        new Game.Journal.Entry.Start(List.of(Pawn.dog.id(), Pawn.high_hat.id(), Pawn.iron_box.id())),
-        new Game.Journal.Entry.TurnOrder(List.of(Pawn.high_hat.id(), Pawn.iron_box.id(), Pawn.dog.id()))
+    assertThat(result.journal()).startsWith(
+        new Entry.Start(List.of(Pawn.dog.id(), Pawn.high_hat.id(), Pawn.iron_box.id())),
+        new Entry.InitiativeRoll(Pawn.dog.id(), 4),
+        new Entry.InitiativeRoll(Pawn.high_hat.id(), 10),
+        new Entry.InitiativeRoll(Pawn.iron_box.id(), 6),
+        new Entry.InitiativeWon(Pawn.high_hat.id())
+    );
+  }
+
+  @Test
+  void aGameAccountsForEachTurnAsItIsTaken() {
+    Game.Result result = play(
+        new Roll(2, 2), new Roll(5, 5), new Roll(3, 3),
+        new Roll(1, 2), new Roll(2, 4), new Roll(4, 3)
+    );
+
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.TurnStarted(Pawn.high_hat.id()),
+        new Entry.Rolled(Pawn.high_hat.id(), 3),
+        new Entry.Moved(Pawn.high_hat.id(), 0, 3),
+        new Entry.TurnStarted(Pawn.iron_box.id()),
+        new Entry.Rolled(Pawn.iron_box.id(), 6),
+        new Entry.Moved(Pawn.iron_box.id(), 0, 6),
+        new Entry.TurnStarted(Pawn.dog.id()),
+        new Entry.Rolled(Pawn.dog.id(), 7),
+        new Entry.Moved(Pawn.dog.id(), 0, 7)
+    );
+  }
+
+  @Test
+  void aGameAccountsForASalaryAfterTheMoveThatEarnedIt() {
+    players.getFirst().position().moveTo(37);
+
+    Game.Result result = play(
+        new Roll(2, 2), new Roll(5, 5), new Roll(3, 3),
+        new Roll(1, 2), new Roll(2, 4), new Roll(1, 2)
+    );
+
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.Moved(Pawn.dog.id(), 37, 0),
+        new Entry.SalaryCollected(Pawn.dog.id(), new Money(200))
     );
   }
 

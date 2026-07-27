@@ -2,6 +2,8 @@ package the.monopoly.game;
 
 import org.slf4j.Logger;
 import the.monopoly.game.components.dice.Cup;
+import the.monopoly.game.components.dice.Roll;
+import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.Rule;
@@ -46,14 +48,39 @@ public class Game {
   public Result play() {
     var journal = new Journal();
     journal.log(new Journal.Entry.Start(ids(players)));
-    List<Player> turnOrder = new Initiative(this::initiativeRollFor).order(players);
-    journal.log(new Journal.Entry.TurnOrder(ids(turnOrder)));
-    turnOrder.forEach(player -> new Turn(rules, cups.forPlayer(player)).take(player));
+    List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
+    journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
+    turnOrder.forEach(player -> takeTurn(player, journal));
     return new Result(turnOrder, journal.entries());
   }
 
-  private int initiativeRollFor(Player player) {
-    return cups.forPlayer(player).roll().total();
+  private int initiativeRollFor(Player player, Journal journal) {
+    int total = cups.forPlayer(player).roll().total();
+    journal.log(new Journal.Entry.InitiativeRoll(player.id(), total));
+    return total;
+  }
+
+  private void takeTurn(Player player, Journal journal) {
+    journal.log(new Journal.Entry.TurnStarted(player.id()));
+    new Turn(rules, cups.forPlayer(player), new Journalling(journal)).take(player);
+  }
+
+  /** Writes down what a turn says it did, as the game's own account of it. */
+  private record Journalling(Journal journal) implements Turn.Events {
+    @Override
+    public void rolled(Player player, Roll roll) {
+      journal.log(new Journal.Entry.Rolled(player.id(), roll.total()));
+    }
+
+    @Override
+    public void moved(Player player, int from, int to) {
+      journal.log(new Journal.Entry.Moved(player.id(), from, to));
+    }
+
+    @Override
+    public void collectedSalary(Player player, Money salary) {
+      journal.log(new Journal.Entry.SalaryCollected(player.id(), salary));
+    }
   }
 
   /**
@@ -92,7 +119,7 @@ public class Game {
       return List.copyOf(entries);
     }
 
-    public interface Entry {
+    public sealed interface Entry {
       record Start(List<Player.ID> players) implements Entry {
         @Override
         public String toString() {
@@ -103,14 +130,23 @@ public class Game {
         }
       }
 
-      record TurnOrder(List<Player.ID> players) implements Entry {
-        @Override
-        public String toString() {
-          return """
-              Turn order:
-              - %s
-              """.formatted(namesOf(players));
-        }
+      /** What a player threw when the table rolled to see who starts. */
+      record InitiativeRoll(Player.ID player, int total) implements Entry {
+      }
+
+      record InitiativeWon(Player.ID player) implements Entry {
+      }
+
+      record TurnStarted(Player.ID player) implements Entry {
+      }
+
+      record Rolled(Player.ID player, int total) implements Entry {
+      }
+
+      record Moved(Player.ID player, int from, int to) implements Entry {
+      }
+
+      record SalaryCollected(Player.ID player, Money salary) implements Entry {
       }
 
       private static String namesOf(List<Player.ID> players) {
