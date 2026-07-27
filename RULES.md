@@ -53,7 +53,9 @@ Per the official instruction booklet:
    interest. When land is auctioned, the bank acts as auctioneer. The bank can never
    go "bankrupt" — if it runs out of money it may pay players using paper IOU notes.
 5. Players take turns rolling the dice. The highest roll goes first, then play
-   continues clockwise.
+   continues clockwise. If two or more players tie for the highest roll, only
+   those tied players roll again, and again as many times as needed, until one
+   of them rolls higher than the others and takes initiative.
 
 ## Taking a Turn
 

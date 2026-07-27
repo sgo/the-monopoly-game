@@ -1586,6 +1586,39 @@ Summary: re-verified the architect's `StartSpace` comment fix and the
 DRY, mutation scan all green, no changes needed. Committed at `05d7808dff`
 on `swarmforge-refactorer`; handing back to the architect.
 
+## 2026-07-27T11:40:52Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T114052Z_000004_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: pipeline-compatible-specs
+commit: 0ed538365f
+created_at: 2026-07-27T11:40:52.772450Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 0ed538365f
+```
+
+Summary: merged the architect's `99aa4ff567` (double-salary split
+implemented as I ruled, and the dice.feature mutation-survivor handled
+with an explicit `!no-mutation` tolerance exemption rather than a spec
+change - correct, since narrowing the margin would make the scenario
+fail on honest dice). The architect flagged six more plain Scenarios
+(five in official.feature, one in streets.feature) contributing zero
+mutation coverage for the same reason dice.feature originally did. Per
+user direction, first codified "always Scenario Outline, even for one
+row" as a standing rule in specifier.prompt (`7d280c6`), then applied it
+to all six (`0ed5383`) - each becomes a single-row Outline with its
+literal values pulled into named Examples: columns, no assertion
+changes.
+
 ## 2026-07-27T11:40:59Z — coder received handoff from specifier
 
 Handoff message received:
@@ -1612,40 +1645,6 @@ merge_and_process specifier 0ed538365f
 Action taken: merged specifier commit `0ed538365f` into `swarmforge-coder`
 (clean), then taught the step handlers the two shapes the reshaped scenarios
 introduced.
-
-## 2026-07-27T11:55:00Z — coder: the last six scenarios reach the mutation gate
-
-The specifier converted the remaining six plain `Scenario`s to single-row
-`Scenario Outline`s, so their literal values became example values. Running
-acceptance against the merged specs failed exactly two scenarios, both
-reported by the runtime as `Unsupported step` rather than passing quietly:
-
-- `dice 1 is <die 1 type>` — the handler matched `dice ([0-9]+) is ([0-9]+)
-  faced`, which a placeholder cannot satisfy. It now captures the whole
-  description and reads the face count out of `"6 faced"`, so the dice type
-  travels as one example value rather than as a number wedged mid-sentence.
-- `we play with <minimum> to <maximum> players` — the handler required digits
-  where a placeholder now stands. Both bounds use the shared value pattern.
-
-Every other reshaped step already went through that pattern, which accepts a
-literal or a placeholder, so five of the seven changed scenarios needed no
-handler change at all.
-
-### Verification
-
-- `mvn test`: 78 unit tests pass.
-- `mvn test -Pproperty-tests`: 7 property tests pass.
-- `acceptance/run-acceptance.sh`: 93/93 pass, exits 0.
-
-The point of the reshape was to make these values visible to acceptance
-mutation, so that is what was checked rather than only that the suite is
-green. Mutating each newly promoted value in the IR — the Start salary, the
-dice type, the minimum player count, and all three salary balances — fails
-exactly the six corresponding scenarios and nothing else. They were
-unreachable before and are killable now.
-
-Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
-architect.
 
 ## 2026-07-27T11:45:00Z — architect received handoff from refactorer
 
@@ -1702,6 +1701,29 @@ the pipeline contribute nothing to acceptance mutation, and two of them,
 `official-rules-7` and `official-rules-8`, are the pair encoding the
 double-salary ruling this round implemented. They assert exact amounts, so a
 one-row `Examples:` table would bring them under the gate.
+
+## 2026-07-27T11:48:46Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T114846Z_000004_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: pipeline-compatible-specs
+commit: 1addc00b74
+created_at: 2026-07-27T11:48:46.785594Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 1addc00b74
+```
+
+Summary: hands the step-handler changes for the last six reshaped scenarios on
+branch `swarmforge-coder` at commit `1addc00b74` to the refactorer.
 
 ## 2026-07-27T11:52:07Z — refactorer received handoff from coder
 
@@ -1774,6 +1796,67 @@ refactorer's gates on the domain module anyway as a regression check — CRAP,
 DRY unchanged, no changes needed. Committed at `78c0ac34d0` on
 `swarmforge-refactorer`; handing back to the architect.
 
+## 2026-07-27T11:55:00Z — coder: the last six scenarios reach the mutation gate
+
+The specifier converted the remaining six plain `Scenario`s to single-row
+`Scenario Outline`s, so their literal values became example values. Running
+acceptance against the merged specs failed exactly two scenarios, both
+reported by the runtime as `Unsupported step` rather than passing quietly:
+
+- `dice 1 is <die 1 type>` — the handler matched `dice ([0-9]+) is ([0-9]+)
+  faced`, which a placeholder cannot satisfy. It now captures the whole
+  description and reads the face count out of `"6 faced"`, so the dice type
+  travels as one example value rather than as a number wedged mid-sentence.
+- `we play with <minimum> to <maximum> players` — the handler required digits
+  where a placeholder now stands. Both bounds use the shared value pattern.
+
+Every other reshaped step already went through that pattern, which accepts a
+literal or a placeholder, so five of the seven changed scenarios needed no
+handler change at all.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 pass, exits 0.
+
+The point of the reshape was to make these values visible to acceptance
+mutation, so that is what was checked rather than only that the suite is
+green. Mutating each newly promoted value in the IR — the Start salary, the
+dice type, the minimum player count, and all three salary balances — fails
+exactly the six corresponding scenarios and nothing else. They were
+unreachable before and are killable now.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+## 2026-07-27T11:58:05Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T115758Z_000008_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: b21adccd94
+created_at: 2026-07-27T11:57:58.266462Z
+enqueued_at: 2026-07-27T11:57:58.964016Z
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T11:58:05.044157Z
+
+Re-read your role and constitution.
+
+merge_and_process architect b21adccd94
+```
+
+Action taken: merged architect commit `b21adccd94` into `swarmforge-coder`,
+resolving the `logbook.md` conflict by keeping both the coder's sent entry and
+the architect's review, then re-verified the merged state here.
+
 ## 2026-07-27T12:00:00Z — architect review of the last plain scenarios
 
 Merged `78c0ac34d0`. The specifier converted the remaining six plain
@@ -1821,13 +1904,6 @@ and it was not gotten wrong.
   killed, 0 survived, 0 errors, exit 0.
 - `mutate4java`: not re-run; no domain source changed since `1f7a5a6`, where
   it reported 0 survivors and 0 uncovered.
-
-## 2026-07-27T12:05:00Z — architect handoffs for the last plain scenarios
-
-Sent to coder and refactorer at priority `00`, and to the specifier. No
-question is outstanding from this role: the two raised earlier, on where the
-double-salary rule belongs and on the scenarios the mutation gate could not
-reach, are both answered and closed.
 
 ## 2026-07-27T12:04:19Z — refactorer received handoff from architect
 
@@ -1879,6 +1955,38 @@ anyway:
 
 No refactoring needed. Handing back to the architect.
 
+## 2026-07-27T12:04:40Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260727T120440Z_000008_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: pipeline-compatible-specs
+commit: 4efe2d8b10
+created_at: 2026-07-27T12:04:40.836471Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 4efe2d8b10
+```
+
+Summary: caught and fixed a merge-induced content loss in this round's
+logbook resolution (see entry above), then re-verified the domain module's
+CRAP/DRY gates — unchanged, no changes needed. Committed at `4efe2d8b10` on
+`swarmforge-refactorer`; handing back to the architect.
+
+## 2026-07-27T12:05:00Z — architect handoffs for the last plain scenarios
+
+Sent to coder and refactorer at priority `00`, and to the specifier. No
+question is outstanding from this role: the two raised earlier, on where the
+double-salary rule belongs and on the scenarios the mutation gate could not
+reach, are both answered and closed.
+
 ## 2026-07-27T12:10:00Z — architect received handoff from refactorer
 
 Handoff message received:
@@ -1910,3 +2018,209 @@ real problem. It was not one: the entry concerned is present in both versions,
 their file carries every heading in mine plus two, and the deletions were this
 worktree's timestamp-sorted order being compared against their append order.
 Checked before raising it rather than after.
+## 2026-07-27T12:15:00Z — coder verification of the merged architect state
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 across all six pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+The merge carries only the architect's review and the mutation stamps their
+run wrote into the feature files; no source changed, and the stamps are tool
+written rather than hand edited.
+
+The architect's soft mutation run measured 11 newly reachable values, all
+killed, which matches what this role checked from the other direction before
+handing over: mutating each promoted value in the IR failed exactly the six
+scenarios that carry them. Reaching the same number by two different routes is
+the useful part.
+
+No new behaviour slice arrived with this handoff, so there is nothing for the
+coder to implement, and no open question is outstanding for this role. The
+`pipeline-compatible-specs` work is complete: every feature on the pipeline
+now has its values under the acceptance mutation gate, except `dice.feature`,
+whose tolerance assertion is exempt by construction and marked `!no-mutation`.
+
+## 2026-07-27T12:27:21Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T122710Z_000005_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: e7f0fc1cbb
+created_at: 2026-07-27T12:27:10.917671Z
+enqueued_at: 2026-07-27T12:27:11.342085Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T12:27:21.391070Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e7f0fc1cbb
+```
+
+Action taken: merged specifier commit `e7f0fc1cbb` into `swarmforge-coder`
+(clean), then implemented Phase 2.
+
+## 2026-07-27T12:52:20Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260727T124208Z_000005_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase2-turn-loop
+commit: fbc5f7ca52
+
+Re-read your role and constitution.
+
+merge_and_process coder fbc5f7ca52
+```
+
+Action taken: merged coder commit `fbc5f7ca52` into `swarmforge-refactorer`,
+the coder's Phase 2 turn-loop implementation (`Cup`, `Roll`, `Turn`,
+`Initiative`, pawn positions on `Player`). Three `logbook.md` conflict
+regions. The largest one hid a mistake of my own mid-resolution: an edit
+meant to relabel one thread's continuation instead spliced it onto the wrong
+thread's header, producing a dangling sentence ("...into `swarmforge-coder`,
+One `logbook.md` conflict region..."). Caught it on the read-back before
+running the header checks, not by the checks themselves — the checks confirm
+every entry is present once, not that prose reads correctly — so re-read the
+whole reconstructed span this time before trusting the counts. Rebuilt the
+region as two complete, self-contained threads (coder's, then this worktree's
+own) and reran both the incoming-header and own-history header checks; both
+clean.
+
+Ran the refactorer's gates on the changed sources, `Cup`, `Roll`, `Player`,
+`Initiative`, `Turn`:
+
+- CRAP: max is now 5.0 (`Turn.take`, CC=5, 100% coverage), still within
+  bounds. `OwnedCount.checked` (3.0) is no longer the ceiling.
+- DRY: found and fixed a real one this round, distinct in kind from the
+  test-shape duplicates left alone so far. `InitiativeTest` had two literal
+  roll fixtures — the clear-winner map and the tied-pair map — each copied
+  verbatim into three and two `@Test` methods respectively, to assert
+  different things about the *same* initiative run rather than to test
+  different scenarios. Extracted `orderWithAClearWinner()` and
+  `orderWithATie()`; each test now names the fixture it needs instead of
+  restating it. DRY duplicate count for the file dropped from 12 to 9 project
+  wide; `TurnTest`'s flagged pairs are the usual different-scenario-same-shape
+  pattern and stay as they are.
+- Mutation scan: `Cup.java` 5, `Roll.java` 2, `Player.java` 6,
+  `Initiative.java` 4, `Turn.java` 12 sites — all trivial.
+
+### Property tests
+
+`Roll.total()`/`isDouble()` were only example-tested, the same gap `Money`
+had before this role added property tests for it. Added
+`RollPropertyTest`: total is the sum of both dice, and `isDouble` holds
+exactly when the two dice match, both over the full `int` range via jetCheck,
+tagged `property-test` and excluded from normal verification the same way as
+the existing two property test classes.
+
+### Verification
+
+- `mvn test`: 101 unit tests pass (unchanged after the `InitiativeTest`
+  extraction — same tests, same shape, less repeated literal).
+- `mvn test -Pproperty-tests`: 9 property tests pass (7 before this round,
+  plus 2 new).
+- `acceptance/run-acceptance.sh`: 100/100 pass.
+
+Handing back to the architect.
+## 2026-07-27T13:10:00Z — coder implementation of phase2-turn-loop
+
+Acceptance goes from 93 to 100 scenarios and unit tests from 78 to 101.
+
+### A pawn now stands somewhere, and a turn moves it
+
+`Player` gained a `Position`, carried rather than replaced, in the same way an
+account carries its `Balance`. A secondary constructor puts a new player on
+Start, so the pool and the acceptance world build players unchanged.
+
+`Turn` enacts one turn: roll, move, roll again while the dice keep matching.
+Movement wraps with `%`, and reaching Start is settled before the pawn is
+placed, because landing exactly on Start and going past it pay differently
+under the optional rule. Three doubles sends the pawn to jail — found by
+looking up `OpBezoek` in the layout rather than hard-coding 10 — and takes the
+third move away, so nothing is collected on the way.
+
+Space effects other than the Start salary are deliberately absent. The
+specifications pin a balance of $1500 after a turn that ends on the income tax
+space, so paying tax now would contradict them; that is Phase 5's.
+
+### Rolls come from a cup
+
+`Roll` is a pair of dice that knows its total and whether it is a double.
+`Cup` is where a roll comes from: `Cup.of(dice)` for real dice, `Cup.of(rolls)`
+for a known sequence. The rules never reach for a die directly, so replaying a
+game is a matter of handing the turn a different cup. This is the seam the
+`the next roll will be X and Y` step drives.
+
+### Initiative
+
+Highest roll goes first; players tied for the highest settle it among
+themselves, as many rounds as it takes; the rest keep their seating order,
+rotated so the winner leads. `Initiative.Rolls` is a per-player seam, so the
+`pawn "X" will roll N for initiative` step binds by pawn rather than by
+position in a queue.
+
+### The runtime now reads step keywords
+
+`the player is at position N` arranges under `Given` and asserts under `Then`
+— the same wording, opposite meaning. Text-only matching cannot tell those
+apart and would have made the assertion silently set the position instead,
+passing whatever the implementation did.
+
+Handlers may now bind to a keyword: `given(...)` and `then(...)` alongside the
+keyword-agnostic `step(...)`, which every existing handler still uses. `And`
+continues whatever preceded it, including across the background into a
+scenario that opens with `And`, so the runtime resolves it to the last real
+keyword before matching.
+
+### Verification
+
+- `mvn test`: 101 unit tests pass, clean tree or dirty.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 pass, exits 0.
+
+Checked non-vacuous by mutating every assertion the examples carry: each
+`final position`, each `final balance`, and both initiative outcomes. Four of
+the five movement executions and both initiative executions fail, and nothing
+else does. The `final position` mutation failing is the one that matters most,
+because it is what proves the `Then` reads the position rather than setting it.
+
+### movement-4 has nothing the mutation gate can kill
+
+For the specifier and the architect, before the mutation gate reports it.
+
+`movement-4` was the one execution that survived every mutation above, and by
+construction rather than by accident. Its two assertions are
+`Then the player is at position 10`, a literal the mutator never touches, and
+`the player's account balance is $<starting balance>`, which expects back the
+same column that arranged it — mutate that column and the arrangement moves
+with the expectation, so it cannot fail. Its remaining columns are the three
+doubles and the starting position, and changing any of them still ends the
+turn in jail with nothing collected.
+
+So `acceptance/run-acceptance-mutation.sh` should be expected to report
+survivors in `movement.feature`. Marking it `!no-mutation` would be the wrong
+fix: that suffix is for tolerance assertions, which are unkillable by
+construction, and this is a specification that could be made killable by
+giving the scenario a `final position` column and a `final balance` column
+distinct from the starting one. Reshaping it is the specifier's to do.
+
+The behaviour itself is not unverified — `TurnTest` covers three doubles going
+to jail, the third move being taken away, and a pawn jailed after passing Start
+keeping the salary it had already earned.
+
