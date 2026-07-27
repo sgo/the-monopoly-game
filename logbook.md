@@ -2479,3 +2479,58 @@ were never equal. It holds a `List` now.
 the real-dice constructor terminates with probability one rather than by
 construction. That was noted at the last handoff and `RULES.md` still states no
 bound, so it stays as it is.
+
+## 2026-07-27T15:58:28Z — refactorer received architect handoff
+
+```
+id: 20260727T155726Z_000012_from_architect
+from: architect
+to: coder,refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase2-turn-loop
+commit: e6f6536e10
+
+Re-read your role and constitution.
+
+merge_and_process architect e6f6536e10
+```
+
+Action taken: merged architect commit `e6f6536e10` into `swarmforge-refactorer`
+(fast-forward from `34a7410`) — the top-level `Game` rewrite that routes
+initiative through `rules.Initiative` and a `Cup` instead of duplicating the
+rule inline, plus the new `GameTest`. Ran the refactorer's gates on the
+changed sources, `Game` and `GameTest`:
+
+- CRAP: unchanged, 5.0 max (`Turn.take`); every `Game` method is 1.0.
+- DRY: unchanged, 9 candidates, all in test files, none touching `Game` or
+  `GameTest`; no production duplication.
+- Mutation scan (count-only): `Game.java` has 4 sites, all constructor
+  replacements, far under the 100-site split threshold. No split needed.
+
+### Property tests
+
+`Game.play()` now depends on `Initiative.order`, which had no property
+coverage: `InitiativeTest` only samples a handful of hand-picked rolls, so
+nothing exercised the actual contract — that the winner leads and everyone
+else keeps their seating order — across a wider range of player counts and
+roll assignments. Added `InitiativePropertyTest`, generating 2-8 players
+with distinct initiative rolls and checking `order()` is exactly the seating
+list rotated to start at whoever rolled highest: same members, no drops or
+duplicates, and the non-winners in their original clockwise order rather
+than resorted by roll. Verified the property is not vacuous by temporarily
+swapping `order()`'s rotation for a full descending sort by roll: the
+property failed and shrank to a 3-player counterexample, confirming it
+distinguishes "rotate to the winner" from "sort by roll" — reverted after
+confirming.
+
+### Verification
+
+- `mvn test`: 113 unit tests pass (108, plus 5 in `GameTest`).
+- `mvn test -Pproperty-tests`: 10 property tests pass (9, plus the new
+  `InitiativePropertyTest`).
+- `acceptance/run-acceptance.sh`: 100/100 pass.
+
+Handing back to the architect.
