@@ -1,6 +1,6 @@
 # mutation-stamp: sha256=ad20787bd319becef17c907deb4f830fce36e57841e13bc64bc4605f549cbd8c
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-07-27T09:08:50.728433Z","feature_name":"streets","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/components/streets.feature","background_hash":"74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b","implementation_hash":"unknown","scenarios":[{"index":1,"name":"colour street","scenario_hash":"847b71962e86c66d5748b1f0b864cbb6d15fc6dac30e10b7bd6ce71f5d499295","mutation_count":220,"result":{"Total":220,"Killed":220,"Survived":0,"Errors":0},"tested_at":"2026-07-25T23:08:05.934285Z"}]}
+# {"version":1,"tested_at":"2026-07-27T10:30:40.689503Z","feature_name":"streets","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/components/streets.feature","background_hash":"74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b","implementation_hash":"unknown","scenarios":[{"index":1,"name":"colour street","scenario_hash":"847b71962e86c66d5748b1f0b864cbb6d15fc6dac30e10b7bd6ce71f5d499295","mutation_count":220,"result":{"Total":220,"Killed":220,"Survived":0,"Errors":0},"tested_at":"2026-07-27T10:30:40.689503Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en

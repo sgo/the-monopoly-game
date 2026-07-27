@@ -6,6 +6,11 @@
 # and official.feature were put on the pipeline but went unmutated, because
 # only one of the two lists had been updated.
 #
+# A path suffixed with "!no-mutation" is run by run-acceptance.sh but held back
+# from run-acceptance-mutation.sh. Use it only for a scenario whose assertion
+# is a tolerance, where a mutation smaller than the tolerance is equivalent by
+# construction and no implementation could ever kill it. Record the reason.
+#
 # en/monopoly.feature is deliberately absent. It parses, but it specifies a
 # whole played-out game and the turn loop behind it does not exist yet.
 
@@ -13,5 +18,12 @@ en/components/streets.feature
 en/components/stations.feature
 en/components/utilities.feature
 en/components/tax.feature
-en/components/dice.feature
 en/rules/official.feature
+
+# Held back from mutation: the fairness scenario asserts that each face comes
+# up about 100000 times within a 1% margin, so it accepts anything in a 1000
+# wide band. The mutator moves the expected count by 9 and nothing can tell,
+# because the specification itself says that difference does not matter.
+# Narrowing the margin enough to kill that mutant would make the scenario fail
+# on honest dice. The scenario still runs on every acceptance pass.
+en/components/dice.feature !no-mutation

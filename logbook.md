@@ -791,6 +791,29 @@ resolving a `logbook.md` conflict by keeping both roles' entries in
 chronological order, then implemented the step vocabulary the reshaped
 specifications need.
 
+## 2026-07-27T08:41:10Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T084110Z_000002_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: pipeline-compatible-specs
+commit: eaf16a9eb1
+created_at: 2026-07-27T08:41:10.553187Z
+
+Re-read your role and constitution.
+
+merge_and_process coder eaf16a9eb1
+```
+
+Summary: hands the completed `pipeline-compatible-specs` slice on branch
+`swarmforge-coder` at commit `eaf16a9eb1` to the refactorer.
+
 ## 2026-07-27T08:45:00Z — coder implementation of pipeline-compatible-specs
 
 `official.feature` and `dice.feature` are now on the acceptance pipeline,
@@ -885,26 +908,31 @@ main sources in this commit:
 - `acceptance/run-acceptance.sh`: 92/92 pass.
 
 No refactoring needed. Handing back to the architect.
-## 2026-07-27T09:50:00Z — architect: absolute paths instead of `cd`
 
-Added to `engineering.prompt`, on the user's direction, after measuring the
-cost of the habit across the swarm's own transcripts: of 544 shell commands
-run by the four roles, 119 opened with `cd` and 384 were compound. A command
-beginning with `cd` cannot be matched against a permission rule, so every one
-of those asked the user to confirm work that was otherwise unremarkable.
+## 2026-07-27T08:48:18Z — refactorer sent handoff to architect
 
-The correctness cost is the worse of the two. The shell working directory
-persists between commands, so a `cd` changes where every later command runs.
-That happened here: after descending into the streets package to read some
-sources, a later `cat pom.xml` failed with no such file, and the reflex fix
-was another `cd` back to the root, which produced another prompt.
+Handoff message sent:
 
-Also relevant to anyone reading this later: permission rules now live in the
-user-level `~/.claude/settings.json` rather than a project `.claude/`, because
-`.claude/` is gitignored and each role runs from its own directory, so a
-project-level file would have had to be maintained four times over and would
-not have covered a worktree made later. The swarm poll is deliberately not on
-the allowlist; it dequeues a handoff, so it is not read-only.
+```
+id: 20260727T084818Z_000003_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: pipeline-compatible-specs
+commit: 79d2670423
+created_at: 2026-07-27T08:48:18.142738Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 79d2670423
+```
+
+Summary: re-verified the coder's `pipeline-compatible-specs` work (`Pawn`,
+`Player.land`) against the refactorer's gates — CRAP, DRY, mutation scan all
+green, no changes needed. Committed at `79d2670423` on
+`swarmforge-refactorer`; handing back to the architect.
 
 ## 2026-07-27T09:15:00Z — architect review of pipeline-compatible-specs
 
@@ -1001,6 +1029,204 @@ task: pipeline-compatible-specs
 commit: <branch tip at time of send>
 ```
 
+## 2026-07-27T09:24:17Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T092409Z_000004_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: b6adaa2305
+created_at: 2026-07-27T09:24:09.829368Z
+enqueued_at: 2026-07-27T09:24:09.903321Z
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T09:24:17.718890Z
+
+Re-read your role and constitution.
+
+merge_and_process architect b6adaa2305
+```
+
+Action taken: merged architect commit `b6adaa2305` into `swarmforge-coder`,
+resolving the `logbook.md` conflict by keeping both the coder's sent entry and
+the refactorer's received entry, then re-read the constitution carried by the
+merge and re-verified the merged state here.
+
+## 2026-07-27T09:35:00Z — coder verification of the merged architect state
+
+- `mvn test`: 74 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 92/92 across all six pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+Two findings against work this role did, both accepted:
+
+- Putting `dice.feature` and `official.feature` on the pipeline meant editing
+  a feature list, and there were two — `run-acceptance.sh` and
+  `run-acceptance-mutation.sh` each carried one. Only the first was changed,
+  so the two new features ran under normal acceptance but were never mutated.
+  The duplication predates this role, but the change went in without checking
+  whether anything else named those features. Both scripts now read
+  `acceptance/pipeline-features.txt`.
+- `Pawn.named` was written and unit-tested without a production caller, which
+  is the wrong way round: the tests should have followed a need. `World.pawn`
+  filters the players at play and never wanted it. Removed by the architect.
+
+Noted from the constitution carried by this merge: shell commands must not
+open with `cd`, and paths are given absolutely or relative to the worktree
+root. Verification here was run with `mvn -f <absolute pom>` accordingly.
+
+No new behaviour slice arrived with this handoff, so there is nothing for the
+coder to implement. Two questions are open for the specifier, both recorded by
+the architect: whether the double-salary rule should apply to passing Start
+(which decides how `Player.pass` and `Player.land` collapse), and whether
+`dice.feature` should become a one-row `Scenario Outline` so its numbers come
+under acceptance mutation.
+
+## 2026-07-27T09:47:00Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T092409Z_000004_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: pipeline-compatible-specs
+commit: b6adaa2305
+
+Re-read your role and constitution.
+
+merge_and_process architect b6adaa2305
+```
+
+Action taken: merged architect commit `b6adaa2305` into `swarmforge-refactorer`.
+One `logbook.md` conflict region; resolved by keeping the incoming block's
+internal order as-is and appending it after this worktree's own entry, rather
+than trying to re-interleave by timestamp — the architect's own note in that
+block explains they'd already merged whole entries in strict order once, and
+re-splitting a settled block seemed more likely to introduce an error than to
+fix one.
+
+Adopted the new `swarm_handoff.sh`-based workflow rules and the "address
+files by absolute path, never lead a command with `cd`" engineering rule from
+this merge; used absolute paths for every command in this verification pass
+rather than the working-directory `cd` habit used earlier in this worktree's
+own history.
+
+Re-ran the refactorer's gates on the only changed sources, `Pawn` and
+`Player` (the architect's `Pawn.named` removal and pipeline-features.txt
+consolidation):
+
+- CRAP: unchanged, 3.0 max (`OwnedCount.checked`).
+- DRY: no production duplication. Same test-shape duplicates as before,
+  including `PlayerTest`'s `pass`/`land` pairs — the architect independently
+  reached the same conclusion I did last round (left alone pending the
+  specifier's ruling on the double-salary question), which is a useful
+  cross-check.
+- Mutation scan: `Pawn.java` 1 site, `Player.java` 2 sites — trivial.
+
+### Verification
+
+- `mvn test`: 74 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 92/92 pass.
+
+No refactoring needed. Handing back to the architect.
+
+## 2026-07-27T09:47:46Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260727T094746Z_000004_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: pipeline-compatible-specs
+commit: b200cace97
+created_at: 2026-07-27T09:47:46.278098Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer b200cace97
+```
+
+Summary: re-verified the architect's `Pawn.named` removal and shared
+pipeline-features.txt against the refactorer's gates — CRAP, DRY, mutation
+scan all green, no changes needed. Committed at `b200cace97` on
+`swarmforge-refactorer`; handing back to the architect.
+
+## 2026-07-27T09:50:00Z — architect: absolute paths instead of `cd`
+
+Added to `engineering.prompt`, on the user's direction, after measuring the
+cost of the habit across the swarm's own transcripts: of 544 shell commands
+run by the four roles, 119 opened with `cd` and 384 were compound. A command
+beginning with `cd` cannot be matched against a permission rule, so every one
+of those asked the user to confirm work that was otherwise unremarkable.
+
+The correctness cost is the worse of the two. The shell working directory
+persists between commands, so a `cd` changes where every later command runs.
+That happened here: after descending into the streets package to read some
+sources, a later `cat pom.xml` failed with no such file, and the reflex fix
+was another `cd` back to the root, which produced another prompt.
+
+Also relevant to anyone reading this later: permission rules now live in the
+user-level `~/.claude/settings.json` rather than a project `.claude/`, because
+`.claude/` is gitignored and each role runs from its own directory, so a
+project-level file would have had to be maintained four times over and would
+not have covered a worktree made later. The swarm poll is deliberately not on
+the allowlist; it dequeues a handoff, so it is not read-only.
+
+## 2026-07-27T09:50:00Z — architect received handoff from refactorer
+
+Handoff message received:
+
+```
+id: 20260727T094746Z_000004_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: b200cace97
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T09:47:52Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer b200cace97
+```
+
+Action taken: merged `b200cace97`, a fast-forward carrying only logbook
+entries. The `the-monopoly-game-domain/src`, `the-monopoly-game-specs` and
+`acceptance` trees all hash identical to `8080b21`, the commit the full
+verification sequence was run against, so the mutation, DRY and Gherkin
+mutation results stand and re-running them would only re-derive an answer
+already held. `mvn test` re-run as a check that the merge was sound: 74 pass.
+
+Two things worth recording from the refactorer's entry. The constitution
+changes travelled and were adopted: they used absolute paths throughout and
+the `swarm_handoff.sh` workflow, both of which only exist because those rules
+were corrected in this branch. And they reached the same conclusion about
+`Player.pass` and `Player.land` independently — left alone pending the
+specifier's ruling on whether the double-salary rule belongs to the move
+rather than the space. Two roles arriving separately at the same reading is
+worth more than either saying it once.
+
+Not forwarded; the work produced no changes.
 ## 2026-07-27T09:47:14Z — specifier sent handoff to coder
 
 Handoff message sent:
@@ -1038,3 +1264,183 @@ questions the architect raised, both confirmed with the user first:
   `StartSpace` into `Player.land` specifically.
 
 Committed at `3abaace865` on `main`.
+
+## 2026-07-27T09:50:00Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T094714Z_000003_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 3abaace865
+created_at: 2026-07-27T09:47:14.263602Z
+enqueued_at: 2026-07-27T09:47:15.086689Z
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T09:50:00.213601Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3abaace865
+```
+
+Action taken: merged specifier commit `3abaace865` into `swarmforge-coder`
+(clean), then implemented the behaviour change `official-rules-8` requires.
+
+## 2026-07-27T10:05:00Z — coder: passing Start no longer pays double
+
+The specifier settled the question this role raised: only landing exactly on
+Start is ever doubled, so `official-rules-8` pins passing Start at $1700 even
+with the optional rule active.
+
+The doubling was carried by `StartSpace.salary()`, which both moves read, so
+passing Start paid $1900 too. Split it: `salary()` is what passing pays and is
+never doubled, `salaryForLanding()` is what landing pays and the optional rule
+pays twice over. `Player.pass` and `Player.land` now read one each, so the two
+methods that the architect deliberately left duplicated are no longer the same
+call — the duplication is resolved by the answer rather than by picking a side.
+
+`PlayerTest.theDoubleSalaryRuleDoublesWhatPassingStartPays` asserted the old
+reading and is inverted accordingly, and a new `StartSpaceTest` covers the two
+amounts directly.
+
+The specifier also reshaped `dice.feature` into a one-row `Scenario Outline`,
+which needs no handler change: its numbers were already read through the
+`<expected count>` and `<margin>` placeholders, and they are example values
+now, so acceptance mutation can reach them.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 pass, exits 0.
+
+Checked that the new scenario discriminates rather than merely passing: with
+`salary()` put back the way it was, exactly two unit tests fail
+(`theDoubleSalaryRuleLeavesWhatPassingStartPaysAlone` and
+`theOptionalRuleLeavesTheSalaryForPassingStartAlone`) and exactly one
+acceptance scenario fails, `official-rules-8`. Restored afterwards.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+## 2026-07-27T10:07:05Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260727T100228Z_000003_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: pipeline-compatible-specs
+commit: bd54575622
+
+Re-read your role and constitution.
+
+merge_and_process coder bd54575622
+```
+
+Action taken: merged coder commit `bd54575622` into `swarmforge-refactorer`.
+Three `logbook.md` conflict regions, all the same append-only-file pattern as
+previous rounds; resolved by full-entry interleaving in chronological order
+and verified by checking every header line from the incoming file appears
+exactly once in the result before committing.
+
+Ran the refactorer's gates on the only changed sources, `Player` and
+`StartSpace` (the specifier's answer splitting `salary()` from
+`salaryForLanding()`):
+
+- CRAP: unchanged, 3.0 max (`OwnedCount.checked`).
+- DRY: no production duplication. `PlayerTest`'s `pass`/`land` pairs still
+  flag structurally, but they now assert genuinely different amounts for the
+  rule-active case (`$1700` vs `$1900`) — this is no longer an accidental
+  shape collision, it is the test suite pinning down the exact behavioral
+  distinction the specifier just introduced. Collapsing it would erase that
+  distinction, so left alone; this is a stronger case for leaving it than
+  last round, not a weaker one.
+- Mutation scan: `Player.java` 2 sites, `StartSpace.java` 1 site — trivial.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 pass.
+
+No refactoring needed. Handing back to the architect.
+
+## 2026-07-27T10:20:00Z — architect review of the double-salary split
+
+Merged `66371a8bdd`. The specifier's ruling resolved the duplication that was
+deliberately left standing last round: `StartSpace.salary()` is what passing
+pays and is never doubled, `salaryForLanding()` is what landing pays and the
+optional rule doubles. `Player.pass` and `Player.land` now make different
+calls, so they are no longer two names for one thing. Leaving the duplication
+alone was the right call — the answer resolved it, rather than a guess having
+to be unpicked.
+
+Corrected the `StartSpace` class comment, which still described the space as
+paying only for passing.
+
+The doubling rule remains safe against a second rule type being added.
+`DOUBLES_SALARY` is a `Rule.Processor<Boolean>` written as `rule -> true`, and
+that reads as though any activated rule would double the salary. It does not:
+adding a second rule type gives `Rule.Processor` a second method, the lambda
+stops being a functional interface, and the compiler refuses it. The visitor
+forces the update rather than allowing a silent misclassification.
+
+### A surviving acceptance mutation, and why it stays
+
+`dice.feature` became a `Scenario Outline`, so its numbers finally reached the
+mutator — and one mutant survived: the expected count moved from 100000 to
+100009 and nothing noticed. That is not a hole in the tests. The scenario
+asserts each face comes up about 100000 times within a 1% margin, which
+accepts anything in a 1000 wide band, so a change of 9 is equivalent by
+construction. No implementation could distinguish it, and narrowing the margin
+enough to kill it would make the scenario fail on honest dice.
+
+A gate that is permanently red is a gate people stop reading, so the exemption
+is explicit rather than left to rot: `pipeline-features.txt` now understands a
+`!no-mutation` suffix, `run-acceptance.sh` strips it and still runs the
+feature, `run-acceptance-mutation.sh` holds it back, and the reason is written
+beside the entry. `dice.feature` is the only feature carrying it, and it must
+stay that way for tolerance assertions only.
+
+### Six scenarios run without their values being checked
+
+For the specifier. The mutator only mutates example values, so a plain
+`Scenario` contributes nothing to it however carefully it is written. Across
+the pipeline there are six: five in `official.feature`, one in
+`streets.feature`. `official.feature`'s 176 mutations all come from its three
+`Scenario Outline`s.
+
+This matters most for `official-rules-7` and `official-rules-8`, the pair that
+encodes the ruling this round was about — that landing pays $1900 and passing
+pays $1700 with the rule active. They run, they pass, and the mutation gate
+cannot see either amount. Unlike the dice case these are exact assertions, so
+a one-row `Examples:` table would bring them under the gate and they would be
+killable. Reshaping a specification is the specifier's to do, not mine.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 across all six pipeline features.
+- `mutate4java` on the changed sources, `StartSpace` and `Player`: 0 survivors,
+  0 uncovered.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level full`: 406 mutations, 406
+  killed, 0 survived, 0 errors, exit 0.
+
+## 2026-07-27T10:25:00Z — architect handoffs for the double-salary split
+
+Sent to coder and refactorer at priority `00`, and to the specifier, who has
+one question waiting in the entry above: whether the six plain `Scenario`s on
+the pipeline — `official-rules-7` and `-8` among them — should become one-row
+`Scenario Outline`s so their expected values come under the mutation gate.
