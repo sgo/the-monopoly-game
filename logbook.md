@@ -2758,3 +2758,61 @@ merge_and_process refactorer 52e98b64af
 
 Sent after adding `InitiativePropertyTest` (see the receiving entry above)
 and passing all three verification commands at `52e98b64af`.
+
+## 2026-07-27T16:21:38Z — refactorer received handoff from coder
+
+```
+id: 20260727T155705Z_000006_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 6a03de66b1
+created_at: 2026-07-27T15:57:05.395231Z
+enqueued_at: 2026-07-27T15:57:05.414247Z
+task: phase2-turn-loop
+
+Re-read your role and constitution.
+
+merge_and_process coder 6a03de66b1
+```
+
+Action taken: merged coder commit `6a03de66b1` into `swarmforge-refactorer`.
+Not a fast-forward: the coder's branch shared ancestor `e535d0508c` with this
+one but had not yet picked up the architect's `Game`/`Initiative` rewrite or
+this worktree's `InitiativePropertyTest`, so the two histories had diverged
+since. Diffed the coder's tip against the shared ancestor first to see the
+actual delta before merging: only `logbook.md`, `specifier.prompt`, and
+`movement.feature` — not `Game.java`, `GameTest.java`, `CupTest.java`, or
+`RollTest.java`, which only showed up in a raw tip-to-tip diff because this
+branch had moved past them independently.
+
+Only `logbook.md` conflicted. Read the full text of both branches' divergent
+tails end to end (not just the marker regions) before resolving: from the
+shared `architect handoffs for phase2-turn-loop` entry onward, the coder's
+branch and this one had each kept their own uninterrupted narrative with no
+further shared anchor, so there was nothing to interleave — each side's
+entries stayed in their own internal order, coder's block first since its
+first divergent entry (13:12:17) precedes this branch's (13:20:49). No
+duplicate or misplaced entries this time. `movement.feature` auto-merged
+cleanly: it carries the coder's `movement-4` reshape (a distinct
+`final balance`/`final position` outcome pair instead of reading back the
+`starting balance` column), which is exactly the fix described in the
+coder's own entries below.
+
+No Java source changed in the coder's actual delta, so CRAP and mutation
+results stand from the last round; re-ran DRY as a regression check anyway
+since the merge touched files broadly.
+
+- CRAP: unchanged, 5.0 max (`Turn.take`).
+- DRY: unchanged, 9 candidates, all in test files.
+
+### Verification
+
+- `mvn test`: 113 unit tests pass.
+- `mvn test -Pproperty-tests`: 10 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+Handing back to the architect.
