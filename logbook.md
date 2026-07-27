@@ -728,6 +728,41 @@ CRAP fell from 6.0 to 3.0 across the `Street` split, its maximum now being
 Not forwarded. The role rule is to run `done_with_current.sh` and take the
 next task when the completed work produced no changes, and this produced none.
 
+## 2026-07-27T08:20:51Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T082051Z_000002_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: pipeline-compatible-specs
+commit: e0c8876bc1
+created_at: 2026-07-27T08:20:51.269968Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e0c8876bc1
+```
+
+Summary: after user approval, committed two follow-on specification
+changes on `main` addressing the architect's "ten features are on no
+pipeline" finding — `9516643` dropped the nl/ mirror convention (7
+files) and updated tasks.md accordingly; `e0c8876` converted
+official.feature's and dice.feature's step-attached data tables into
+Scenario Outline + Examples (board layout as a 40-row Outline with a
+genuine index column; pawns/starting-balance as one-row-per-player
+Outlines with the constant $1500 balance pruned out; the dice table
+collapsed to two plain assertions since every row was identical),
+and replaced `*` continuation steps with `And`. monopoly.feature was
+deliberately left untouched — it already parses under APS; it's
+unimplemented, not misshapen, correcting the architect's logbook note
+that grouped it with the table-shaped files. New handoff name
+`pipeline-compatible-specs` invented for this work.
+
 ## 2026-07-27T08:21:05Z — coder received handoff from specifier
 
 Handoff message received:
