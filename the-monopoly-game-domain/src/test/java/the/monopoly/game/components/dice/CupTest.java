@@ -2,6 +2,7 @@ package the.monopoly.game.components.dice;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,7 +60,7 @@ class CupTest {
    */
   private static Dice alwaysRolling(int face) {
     Dice.Face[] faces = new Dice.Face[6];
-    java.util.Arrays.fill(faces, new Dice.Face(Integer.toString(face)));
-    return new Dice(Dice.Type.six, faces);
+    Arrays.fill(faces, new Dice.Face(Integer.toString(face)));
+    return new Dice(faces);
   }
 }
