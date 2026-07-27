@@ -1143,6 +1143,44 @@ consolidation):
 
 No refactoring needed. Handing back to the architect.
 
+## 2026-07-27T09:47:14Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T094714Z_000003_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: pipeline-compatible-specs
+commit: 3abaace865
+created_at: 2026-07-27T09:47:14.263602Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3abaace865
+```
+
+Summary: merged the architect's `b6adaa2305` (resolving a three-way
+interleaved logbook.md conflict by reconstructing chronological order
+from both full sides rather than patching hunks), then answered the two
+questions the architect raised, both confirmed with the user first:
+
+- `dice.feature` was mutation-blind (numbers lived in step text, which
+  the APS mutator never touches) — turned into a Scenario Outline with a
+  single-row Examples: table for the two real numbers, without
+  reintroducing the six identical per-face rows removed earlier.
+- The double-salary rule doubled on both landing and passing Start with
+  no scenario to say which was intended. Per the rule's own name and
+  standard Monopoly convention, added official-rules-8 pinning passing
+  Start at $1700 (single) even with the rule active; landing still pays
+  $1900 (official-rules-7). Requires moving the doubling from
+  `StartSpace` into `Player.land` specifically.
+
+Committed at `3abaace865` on `main`.
+
 ## 2026-07-27T09:47:46Z — refactorer sent handoff to architect
 
 Handoff message sent:
@@ -1227,44 +1265,6 @@ rather than the space. Two roles arriving separately at the same reading is
 worth more than either saying it once.
 
 Not forwarded; the work produced no changes.
-## 2026-07-27T09:47:14Z — specifier sent handoff to coder
-
-Handoff message sent:
-
-```
-id: 20260727T094714Z_000003_from_specifier
-from: specifier
-to: coder
-priority: 50
-type: git_handoff
-role: specifier
-task: pipeline-compatible-specs
-commit: 3abaace865
-created_at: 2026-07-27T09:47:14.263602Z
-
-Re-read your role and constitution.
-
-merge_and_process specifier 3abaace865
-```
-
-Summary: merged the architect's `b6adaa2305` (resolving a three-way
-interleaved logbook.md conflict by reconstructing chronological order
-from both full sides rather than patching hunks), then answered the two
-questions the architect raised, both confirmed with the user first:
-
-- `dice.feature` was mutation-blind (numbers lived in step text, which
-  the APS mutator never touches) — turned into a Scenario Outline with a
-  single-row Examples: table for the two real numbers, without
-  reintroducing the six identical per-face rows removed earlier.
-- The double-salary rule doubled on both landing and passing Start with
-  no scenario to say which was intended. Per the rule's own name and
-  standard Monopoly convention, added official-rules-8 pinning passing
-  Start at $1700 (single) even with the rule active; landing still pays
-  $1900 (official-rules-7). Requires moving the doubling from
-  `StartSpace` into `Player.land` specifically.
-
-Committed at `3abaace865` on `main`.
-
 ## 2026-07-27T09:50:00Z — coder received handoff from specifier
 
 Handoff message received:
@@ -1290,6 +1290,29 @@ merge_and_process specifier 3abaace865
 
 Action taken: merged specifier commit `3abaace865` into `swarmforge-coder`
 (clean), then implemented the behaviour change `official-rules-8` requires.
+
+## 2026-07-27T10:02:28Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T100228Z_000003_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: pipeline-compatible-specs
+commit: bd54575622
+created_at: 2026-07-27T10:02:28.629145Z
+
+Re-read your role and constitution.
+
+merge_and_process coder bd54575622
+```
+
+Summary: hands the double-salary correction on branch `swarmforge-coder` at
+commit `bd54575622` to the refactorer.
 
 ## 2026-07-27T10:05:00Z — coder: passing Start no longer pays double
 
@@ -1327,29 +1350,6 @@ acceptance scenario fails, `official-rules-8`. Restored afterwards.
 
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
 architect.
-
-## 2026-07-27T10:02:28Z — coder sent handoff to refactorer
-
-Handoff message sent:
-
-```
-id: 20260727T100228Z_000003_from_coder
-from: coder
-to: refactorer
-priority: 50
-type: git_handoff
-role: coder
-task: pipeline-compatible-specs
-commit: bd54575622
-created_at: 2026-07-27T10:02:28.629145Z
-
-Re-read your role and constitution.
-
-merge_and_process coder bd54575622
-```
-
-Summary: hands the double-salary correction on branch `swarmforge-coder` at
-commit `bd54575622` to the refactorer.
 
 ## 2026-07-27T10:07:05Z — refactorer received handoff from coder
 
@@ -1397,6 +1397,31 @@ Ran the refactorer's gates on the only changed sources, `Player` and
 - `acceptance/run-acceptance.sh`: 93/93 pass.
 
 No refactoring needed. Handing back to the architect.
+
+## 2026-07-27T10:08:09Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260727T100809Z_000005_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: pipeline-compatible-specs
+commit: 66371a8bdd
+created_at: 2026-07-27T10:08:09.392179Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 66371a8bdd
+```
+
+Summary: re-verified the specifier's double-salary resolution (`StartSpace.
+salary()`/`salaryForLanding()` split) against the refactorer's gates — CRAP,
+DRY, mutation scan all green, no changes needed. Committed at `66371a8bdd` on
+`swarmforge-refactorer`; handing back to the architect.
 
 ## 2026-07-27T10:20:00Z — architect review of the double-salary split
 
@@ -1495,28 +1520,71 @@ Action taken: merged architect commit `99aa4ff567` into `swarmforge-coder`,
 resolving the `logbook.md` conflict by keeping both the coder's sent entry and
 the refactorer's received entry, then re-verified the merged state here.
 
-## 2026-07-27T11:45:00Z — coder verification of the merged architect state
+## 2026-07-27T11:39:51Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T113450Z_000006_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: pipeline-compatible-specs
+commit: 99aa4ff567
+
+Re-read your role and constitution.
+
+merge_and_process architect 99aa4ff567
+```
+
+Action taken: merged architect commit `99aa4ff567` into `swarmforge-refactorer`.
+One `logbook.md` conflict region, a straightforward append after this
+worktree's own last entry; resolved and verified the same way as the previous
+round (every incoming header present exactly once before committing).
+
+Ran the refactorer's gates on the only changed sources, `Player` and
+`StartSpace` (the architect's `StartSpace` comment fix and the
+`!no-mutation` exemption for `dice.feature`'s tolerance-based scenario):
+
+- CRAP: unchanged, 3.0 max (`OwnedCount.checked`).
+- DRY: no production duplication, matching the architect's own report. Same
+  test-shape duplicates as before.
+- Mutation scan: `Player.java` 2 sites, `StartSpace.java` 1 site — trivial.
+
+### Verification
 
 - `mvn test`: 78 unit tests pass.
 - `mvn test -Pproperty-tests`: 7 property tests pass.
-- `acceptance/run-acceptance.sh`: 93/93 across all six pipeline features.
+- `acceptance/run-acceptance.sh`: 93/93 pass.
 
-Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
-architect.
+No refactoring needed. Handing back to the architect.
 
-The `!no-mutation` suffix in `pipeline-features.txt` is on `dice.feature`
-alone, which is the right shape for the reason given: its assertion is a
-tolerance, so a mutant inside the tolerance band is equivalent by construction
-and no implementation could kill it. Worth watching that the suffix stays
-restricted to tolerance assertions — on an exact assertion it would hide a
-real hole rather than an unkillable mutant.
+## 2026-07-27T11:40:25Z — refactorer sent handoff to architect
 
-No new behaviour slice arrived with this handoff, so there is nothing for the
-coder to implement. The open item is the specifier's: six plain `Scenario`s on
-the pipeline contribute nothing to acceptance mutation, and two of them,
-`official-rules-7` and `official-rules-8`, are the pair encoding the
-double-salary ruling this round implemented. They assert exact amounts, so a
-one-row `Examples:` table would bring them under the gate.
+Handoff message sent:
+
+```
+id: 20260727T114025Z_000006_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: pipeline-compatible-specs
+commit: 05d7808dff
+created_at: 2026-07-27T11:40:25.471230Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 05d7808dff
+```
+
+Summary: re-verified the architect's `StartSpace` comment fix and the
+`dice.feature` mutation exemption against the refactorer's gates — CRAP,
+DRY, mutation scan all green, no changes needed. Committed at `05d7808dff`
+on `swarmforge-refactorer`; handing back to the architect.
 
 ## 2026-07-27T11:40:59Z — coder received handoff from specifier
 
@@ -1545,6 +1613,106 @@ Action taken: merged specifier commit `0ed538365f` into `swarmforge-coder`
 (clean), then taught the step handlers the two shapes the reshaped scenarios
 introduced.
 
+## 2026-07-27T11:45:00Z — architect received handoff from refactorer
+
+Handoff message received:
+
+```
+id: 20260727T114025Z_000006_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 05d7808dff
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T11:40:32Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 05d7808dff
+```
+
+Action taken: merged `05d7808dff`, a fast-forward carrying only logbook
+entries. The `the-monopoly-game-domain/src`, `the-monopoly-game-specs` and
+`acceptance` trees all hash identical to `1f7a5a6`, the commit the full
+sequence was run against, so the mutation, DRY and Gherkin mutation results
+stand. `mvn test` re-run as a check the merge was sound: 78 pass.
+
+Not forwarded; the work produced no changes.
+
+The open question from the previous entry is still open and still the
+specifier's: six plain `Scenario`s on the pipeline, `official-rules-7` and
+`-8` among them, run without their expected values being reachable by the
+mutation gate.
+## 2026-07-27T11:45:00Z — coder verification of the merged architect state
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 across all six pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+The `!no-mutation` suffix in `pipeline-features.txt` is on `dice.feature`
+alone, which is the right shape for the reason given: its assertion is a
+tolerance, so a mutant inside the tolerance band is equivalent by construction
+and no implementation could kill it. Worth watching that the suffix stays
+restricted to tolerance assertions — on an exact assertion it would hide a
+real hole rather than an unkillable mutant.
+
+No new behaviour slice arrived with this handoff, so there is nothing for the
+coder to implement. The open item is the specifier's: six plain `Scenario`s on
+the pipeline contribute nothing to acceptance mutation, and two of them,
+`official-rules-7` and `official-rules-8`, are the pair encoding the
+double-salary ruling this round implemented. They assert exact amounts, so a
+one-row `Examples:` table would bring them under the gate.
+
+## 2026-07-27T11:52:07Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260727T114846Z_000004_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: pipeline-compatible-specs
+commit: 1addc00b74
+
+Re-read your role and constitution.
+
+merge_and_process coder 1addc00b74
+```
+
+Action taken: merged coder commit `1addc00b74` into `swarmforge-refactorer`.
+Four `logbook.md` conflict regions, the same append-only-file pattern as
+previous rounds, including one region where two threads' verification
+sections shared identical leading bullets before diverging; resolved by
+writing out each thread's full narrative in full rather than trying to
+further diff-merge the fragments, then cross-checked every incoming header
+appears exactly once before committing.
+
+This commit touched no domain main source — only `MonopolyStepHandlers.java`
+in the specs module and feature files, reshaping the last six plain
+`Scenario`s into single-row `Scenario Outline`s so their values reach
+acceptance mutation. Nothing here is in the refactorer's gates' scope, but
+re-ran them on the domain module anyway to confirm no regression:
+
+- CRAP: unchanged, 3.0 max (`OwnedCount.checked`).
+- DRY: unchanged, same 6 test-shape duplicates as before, none in production
+  code.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 pass.
+
+No refactoring needed. Handing back to the architect.
 ## 2026-07-27T11:55:00Z — coder: the last six scenarios reach the mutation gate
 
 The specifier converted the remaining six plain `Scenario`s to single-row
@@ -1579,6 +1747,7 @@ unreachable before and are killable now.
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
 architect.
 
+
 ## 2026-07-27T11:48:46Z — coder sent handoff to refactorer
 
 Handoff message sent:
@@ -1601,3 +1770,58 @@ merge_and_process coder 1addc00b74
 
 Summary: hands the step-handler changes for the last six reshaped scenarios on
 branch `swarmforge-coder` at commit `1addc00b74` to the refactorer.
+
+## 2026-07-27T12:00:00Z — architect review of the last plain scenarios
+
+Merged `78c0ac34d0`. The specifier converted the remaining six plain
+`Scenario`s to single-row `Scenario Outline`s and the coder widened two step
+patterns that had required digits where a placeholder now stands. The gap
+raised two rounds ago is closed.
+
+Measured rather than assumed: soft acceptance mutation found 1 new mutation in
+`streets.feature` and 10 in `official.feature`, all killed, with the unchanged
+scenarios skipped against their stamps. Those 11 values — the Start salary,
+the dice type, the player bounds, and the three salary balances — could not be
+reached by the mutator at all before this change. The cumulative figure is
+therefore 417, being the 406 already stamped plus these 11; that is a
+derivation from two runs, not a single pass, and `--level soft` is what the
+role calls for.
+
+No domain source changed, so the language mutation and CRAP results stand
+untouched. `dry4java` re-run because the step handlers changed: no duplication.
+
+### The specifier amended their own prompt, and it is a better fix than mine
+
+`specifier.prompt` now requires every scenario to be a `Scenario Outline` with
+an `Examples:` table even when there is a single row, and explains why: the
+mutation tool reads example values only, so a plain `Scenario` contributes
+nothing however exact its assertions are.
+
+This is worth recording as sound. It is the specifier's own prompt, not
+another role's, so it is theirs to change. More to the point it fixes the
+class rather than the instance — I reported six scenarios, and they wrote the
+rule that stops a seventh being written. It also reconciles the new rule with
+the existing one about pruning identical example columns, which would
+otherwise have contradicted it, since in a single-row table every column is
+trivially identical across rows and pruning would leave nothing to mutate.
+
+That interaction is exactly the kind of thing a rule added in haste gets wrong,
+and it was not gotten wrong.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 across all six pipeline features.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level soft`: 11 mutations, 11
+  killed, 0 survived, 0 errors, exit 0.
+- `mutate4java`: not re-run; no domain source changed since `1f7a5a6`, where
+  it reported 0 survivors and 0 uncovered.
+
+## 2026-07-27T12:05:00Z — architect handoffs for the last plain scenarios
+
+Sent to coder and refactorer at priority `00`, and to the specifier. No
+question is outstanding from this role: the two raised earlier, on where the
+double-salary rule belongs and on the scenarios the mutation gate could not
+reach, are both answered and closed.
