@@ -1,11 +1,17 @@
 package the.monopoly.game.specs.acceptance;
 
 import the.monopoly.game.components.dice.Dice;
+import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.Rule;
+import the.monopoly.game.rules.Turn;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +34,9 @@ public class World {
   private Player player;
   private Dice dice;
   private Map<Dice.Face, Integer> rolls;
+  private final Deque<Roll> queuedRolls = new ArrayDeque<>();
+  private final Map<String, Deque<Integer>> queuedInitiativeRolls = new HashMap<>();
+  private List<Player> turnOrder;
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
@@ -114,5 +123,50 @@ public class World {
     if (rolls == null)
       throw new AssertionError("The dice has not been rolled yet.");
     return rolls;
+  }
+
+  /** Queues what the next throw of the dice will come up, in order. */
+  public void queueRoll(Roll roll) {
+    queuedRolls.add(roll);
+  }
+
+  public void takeTurn() {
+    new Turn(ruleSet, this::nextQueuedRoll).take(player());
+  }
+
+  private Roll nextQueuedRoll() {
+    if (queuedRolls.isEmpty())
+      throw new AssertionError("The turn wanted another roll but none was queued.");
+    return queuedRolls.removeFirst();
+  }
+
+  /** Queues what a pawn will roll for initiative, in order. */
+  public void queueInitiativeRoll(String pawnName, int total) {
+    queuedInitiativeRolls.computeIfAbsent(pawnName, it -> new ArrayDeque<>()).add(total);
+  }
+
+  public void rollForInitiative() {
+    turnOrder = new Initiative(this::nextQueuedInitiativeRoll).order(players());
+  }
+
+  private int nextQueuedInitiativeRoll(Player player) {
+    Deque<Integer> queued = queuedInitiativeRolls.get(player.id().value());
+    if (queued == null || queued.isEmpty())
+      throw new AssertionError(
+          "Initiative wanted another roll for \"" + player.id().value() + "\" but none was queued."
+      );
+    return queued.removeFirst();
+  }
+
+  public List<Player> turnOrder() {
+    if (turnOrder == null)
+      throw new AssertionError("Initiative has not been rolled for yet.");
+    return turnOrder;
+  }
+
+  private List<Player> players() {
+    if (players == null)
+      throw new AssertionError("No players have been selected yet.");
+    return players;
   }
 }

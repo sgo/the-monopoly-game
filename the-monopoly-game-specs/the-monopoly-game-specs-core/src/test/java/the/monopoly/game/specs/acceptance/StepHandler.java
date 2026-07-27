@@ -11,13 +11,29 @@ import java.util.regex.Pattern;
  * either a literal value or a {@code <placeholder>} naming a column of the
  * current example row.
  */
-public record StepHandler(Pattern pattern, Body body) {
+public record StepHandler(String keyword, Pattern pattern, Body body) {
+  /** A step whose wording says what it does, whichever keyword introduces it. */
   public static StepHandler step(String pattern, Body body) {
-    return new StepHandler(Pattern.compile(pattern), body);
+    return new StepHandler(null, Pattern.compile(pattern), body);
   }
 
-  boolean matches(String text) {
-    return pattern.matcher(text).matches();
+  /**
+   * A step that only arranges. Needed where the same wording arranges under
+   * {@code Given} and asserts under {@code Then}, as "the player is at position
+   * N" does.
+   */
+  public static StepHandler given(String pattern, Body body) {
+    return new StepHandler("Given", Pattern.compile(pattern), body);
+  }
+
+  /** A step that only asserts. The counterpart of {@link #given}. */
+  public static StepHandler then(String pattern, Body body) {
+    return new StepHandler("Then", Pattern.compile(pattern), body);
+  }
+
+  boolean matches(String keyword, String text) {
+    return (this.keyword == null || this.keyword.equals(keyword))
+        && pattern.matcher(text).matches();
   }
 
   void execute(World world, String text, Map<String, String> example) {

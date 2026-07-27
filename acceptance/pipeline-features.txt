@@ -27,3 +27,5 @@ en/rules/official.feature
 # Narrowing the margin enough to kill that mutant would make the scenario fail
 # on honest dice. The scenario still runs on every acceptance pass.
 en/components/dice.feature !no-mutation
+en/rules/movement.feature
+en/rules/initiative.feature
