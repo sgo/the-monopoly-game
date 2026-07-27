@@ -939,3 +939,29 @@ rules. Collapsing it now would quietly pick one reading.
   `official.feature`, 176 killed, 0 survived, 0 errors. The four previously
   stamped features were skipped as unchanged, and `dice.feature` yielded
   nothing to mutate for the reason above.
+
+## 2026-07-27T09:20:00Z — architect handoffs for pipeline-compatible-specs
+
+Sent to coder and refactorer at priority `00`, and to the specifier, who has
+two questions waiting in the entry above: whether the double-salary rule
+belongs to the move rather than to the space, and whether `dice.feature`
+should become a `Scenario Outline` so its numbers come under the mutation
+gate.
+
+Drafts sent:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: pipeline-compatible-specs
+commit: <branch tip at time of send>
+```
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: pipeline-compatible-specs
+commit: <branch tip at time of send>
+```
