@@ -4494,3 +4494,30 @@ and took the other side's `17:43:10`, whose body came back: the coder's own
 account of what it did, which had been grafted away in an earlier merge and
 which this branch had recorded as lost for good. It was not. 122 entries, and
 every other body byte-identical to the parent it came from.
+
+## 2026-07-27T22:43:33Z — architect handoffs for phase3-journal-report
+
+To coder and refactorer at priority `00`:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: phase3-journal-report
+commit: f2e0a0c656
+```
+
+To the specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: phase3-journal-report
+commit: f2e0a0c656
+```
+
+`Report` switches over the sealed `Journal.Entry` instead of looking a handler
+up by class, so an unreported entry is now a compile error. `Entry.Start` lost
+its hand-written `toString`; the record's own serves the log. No line of any
+report changed, so `journal.feature` and `report.feature` stand as written.
