@@ -1399,3 +1399,10 @@ killable. Reshaping a specification is the specifier's to do, not mine.
 - `dry4java`: no duplication in production code.
 - `acceptance/run-acceptance-mutation.sh --level full`: 406 mutations, 406
   killed, 0 survived, 0 errors, exit 0.
+
+## 2026-07-27T10:25:00Z — architect handoffs for the double-salary split
+
+Sent to coder and refactorer at priority `00`, and to the specifier, who has
+one question waiting in the entry above: whether the six plain `Scenario`s on
+the pipeline — `official-rules-7` and `-8` among them — should become one-row
+`Scenario Outline`s so their expected values come under the mutation gate.
