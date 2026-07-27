@@ -6,11 +6,19 @@ import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.StartSpace;
 
 import java.util.Comparator;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public record Player(ID id, Bank.Account account) {
   public void pass(StartSpace start) {
+    account.deposit(start.salary());
+  }
+
+  /**
+   * Landing on Start pays the same salary as passing it. The two are separate
+   * moves because the rules distinguish them, even though nothing yet pays them
+   * differently: the double-salary rule is carried by {@link StartSpace}.
+   */
+  public void land(StartSpace start) {
     account.deposit(start.salary());
   }
 
@@ -36,9 +44,9 @@ public record Player(ID id, Bank.Account account) {
     }
 
     private Stream<Player> stream() {
-      return IntStream.range(0, max)
-          .mapToObj(Integer::toString)
-          .map(ID::new)
+      return Stream.of(Pawn.values())
+          .limit(max)
+          .map(Pawn::id)
           .peek(bank::createAccountFor)
           .peek(id -> bank.accountOf(id).deposit(startingCapital))
           .map(id -> new Player(id, bank.accountOf(id)));

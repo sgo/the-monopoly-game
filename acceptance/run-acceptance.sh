@@ -2,9 +2,9 @@
 # Normal acceptance run: parse each feature into JSON IR, generate the entry
 # points, then run the generated tests.
 #
-# Only the features listed below are on the pipeline. The remaining features
-# use step-attached data tables and Dutch keywords, which the APS parser subset
-# does not support; see logbook.md.
+# Only the features listed below are on the pipeline. en/monopoly.feature is
+# the one held back: it parses, but it specifies a whole played-out game, and
+# the turn loop behind it does not exist yet. See logbook.md.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -19,6 +19,8 @@ FEATURE_FILES=(
   "en/components/stations.feature"
   "en/components/utilities.feature"
   "en/components/tax.feature"
+  "en/components/dice.feature"
+  "en/rules/official.feature"
 )
 
 if [[ ! -f "$APS/bb.edn" ]]; then
