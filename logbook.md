@@ -2287,6 +2287,28 @@ The behaviour itself is not unverified — `TurnTest` covers three doubles going
 to jail, the third move being taken away, and a pawn jailed after passing Start
 keeping the salary it had already earned.
 
+## 2026-07-27T12:42:08Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T124208Z_000005_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase2-turn-loop
+commit: fbc5f7ca52
+created_at: 2026-07-27T12:42:08.576404Z
+
+Re-read your role and constitution.
+
+merge_and_process coder fbc5f7ca52
+```
+
+Summary: hands the Phase 2 turn loop, movement, and initiative on branch
+`swarmforge-coder` at commit `fbc5f7ca52` to the refactorer.
 
 ## 2026-07-27T13:30:00Z — architect review of phase2-turn-loop
 
@@ -2368,6 +2390,152 @@ terminates; against a source that keeps returning the same total it would not.
 The test fixture throws when its script runs out rather than repeating, so the
 suite cannot hang on it today. Bounding it would mean inventing a rule
 `RULES.md` does not state, so it is left as it is and noted.
+
+## 2026-07-27T13:12:17Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T131211Z_000010_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: e535d0508c
+created_at: 2026-07-27T13:12:11.154798Z
+enqueued_at: 2026-07-27T13:12:12.048434Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T13:12:17.815160Z
+
+Re-read your role and constitution.
+
+merge_and_process architect e535d0508c
+```
+
+Action taken: merged architect commit `e535d0508c` into `swarmforge-coder`,
+resolving the `logbook.md` conflict by keeping both the coder's sent entry and
+the architect's review, then re-verified the merged state here.
+
+## 2026-07-27T13:50:00Z — coder verification of the merged architect state
+
+- `mvn test`: 110 unit tests pass.
+- `mvn test -Pproperty-tests`: 9 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+Three findings against this role's work, all accepted:
+
+- `Cup.of(dice)` read `die1` and `die2` from two dice that are identical on
+  this board, so swapping them was undetectable. The test now uses dice whose
+  faces read differently. The seam was written without a test that could tell
+  the two dice apart.
+- Nothing pinned that a player joins the game on Start. The secondary
+  constructor defaulting the position to zero was added without a test.
+- `move` asked `if (to == 0) land; else if (from + steps >= spaces) pass;`.
+  The `>=` was unkillable there because the else-if is only reached when
+  `to != 0`, so the boundary the operators disagree about cannot occur. The
+  architect restructured it to ask whether Start was reached once and only
+  then which way, which is both simpler and killable. The redundant comparison
+  was mine.
+
+### The acceptance mutation gate reported a mutation killed that cannot fail
+
+For the architect, whose gate this is.
+
+The review reports 29 mutations in `movement.feature`, all killed. 29 is
+exactly the number of example cells in that file, so every cell was mutated
+and none was skipped, which places `movement-4`'s `starting balance` among
+them.
+
+That cell cannot be killed. `movement-4` arranges with
+`with $<starting balance> in his account` and asserts with
+`the player's account balance is $<starting balance>` — one column on both
+sides. `mutator-spec.md` mutates an integer to that integer plus a nonzero
+delta, so a mutation moves the arrangement and the expectation together and
+the assertion still holds.
+
+Measured rather than argued: hand-editing that one cell from 1500 to 1600 in
+the IR, generating the entry point, and running it gives
+`Tests run: 1, Failures: 0`. The mutant survives. This was done by editing the
+IR and running the generated tests, not by running `gherkin-mutator`, which is
+not this role's to run.
+
+So either the mutation runner is scoring some mutations killed without the
+generated test having failed, or those cells were skipped and still counted.
+Both matter more than the scenario does: a gate that reports a mutant dead
+when it is alive is the same failure as the acceptance suite that reported
+`BUILD SUCCESS` while running nothing, and every clean run since is only worth
+what the scoring is worth.
+
+The scenario itself is worth reshaping too — a distinct `final balance` column
+and an explicit `final position` instead of the literal 10 would make it
+killable — but that is the specifier's, and secondary to the scoring question.
+
+## 2026-07-27T13:19:37Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T131721Z_000006_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: ad02b22f68
+created_at: 2026-07-27T13:17:21.960177Z
+enqueued_at: 2026-07-27T13:17:22.173229Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T13:19:37.571938Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier ad02b22f68
+```
+
+Action taken: merged specifier commit `ad02b22f68` into `swarmforge-coder`, then
+verified the reshaped `movement-4` scenario against the existing step handlers.
+No production or step-handler change was needed: `the player is at position
+<value>` and `the player's account balance is $<value>` are already regex
+handlers, so the two new columns bind without new code.
+
+## 2026-07-27T15:55:00Z — coder verification of movement-4's new outcome columns
+
+- `mvn test`: 110 unit tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+The point of the reshaping was killability, so that is what was measured rather
+than assumed. With the IR edited in place and the generated class name checked,
+`final balance` 1500 -> 1600 fails on `expected: Balance[amount=Money[amount=
+1600]]`, and `final position` 10 -> 11 fails on `expected: 11`. Both cells are
+now killable; before the reshaping neither outcome had a cell of its own.
+
+### A correction to the surviving-mutant measurement in the previous entry
+
+For the architect, since the acceptance mutation gate was called into question
+partly on the strength of that measurement.
+
+`acceptance-entrypoint-generator.bb` takes the generated class name from the IR
+*file* stem, not from `--feature-path`: an IR written to `mutant.json` generates
+`MutantAcceptanceTest`, whatever feature it holds. So a hand-edited IR saved
+under a new name, then run under the original feature's test class name, runs
+the unmutated class and reports a pass that means nothing. That is a plausible
+shape for the earlier "Tests run: 1, Failures: 0", and it was hit while
+re-measuring today before the class name was checked.
+
+The argument in that entry still holds on its own terms — one column on both
+sides of a scenario moves arrangement and expectation together, so no delta
+applied to it can fail — but the empirical half of it should not be leaned on.
+It is moot for `movement-4` now that the columns are split.
+
+`AcceptanceMutationRunner` derives the entry point class from the same IR stem
+it generates from, so the two agree and the naming does not by itself explain
+the gate's 29-of-29. That question stays open and stays the architect's.
 
 ## 2026-07-27T13:17:21Z — specifier sent handoff to coder
 
@@ -2548,6 +2716,61 @@ the real-dice constructor terminates with probability one rather than by
 construction. That was noted at the last handoff and `RULES.md` still states no
 bound, so it stays as it is.
 
+## 2026-07-27T15:58:28Z — refactorer received architect handoff
+
+```
+id: 20260727T155726Z_000012_from_architect
+from: architect
+to: coder,refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase2-turn-loop
+commit: e6f6536e10
+
+Re-read your role and constitution.
+
+merge_and_process architect e6f6536e10
+```
+
+Action taken: merged architect commit `e6f6536e10` into `swarmforge-refactorer`
+(fast-forward from `34a7410`) — the top-level `Game` rewrite that routes
+initiative through `rules.Initiative` and a `Cup` instead of duplicating the
+rule inline, plus the new `GameTest`. Ran the refactorer's gates on the
+changed sources, `Game` and `GameTest`:
+
+- CRAP: unchanged, 5.0 max (`Turn.take`); every `Game` method is 1.0.
+- DRY: unchanged, 9 candidates, all in test files, none touching `Game` or
+  `GameTest`; no production duplication.
+- Mutation scan (count-only): `Game.java` has 4 sites, all constructor
+  replacements, far under the 100-site split threshold. No split needed.
+
+### Property tests
+
+`Game.play()` now depends on `Initiative.order`, which had no property
+coverage: `InitiativeTest` only samples a handful of hand-picked rolls, so
+nothing exercised the actual contract — that the winner leads and everyone
+else keeps their seating order — across a wider range of player counts and
+roll assignments. Added `InitiativePropertyTest`, generating 2-8 players
+with distinct initiative rolls and checking `order()` is exactly the seating
+list rotated to start at whoever rolled highest: same members, no drops or
+duplicates, and the non-winners in their original clockwise order rather
+than resorted by roll. Verified the property is not vacuous by temporarily
+swapping `order()`'s rotation for a full descending sort by roll: the
+property failed and shrank to a 3-player counterexample, confirming it
+distinguishes "rotate to the winner" from "sort by roll" — reverted after
+confirming.
+
+### Verification
+
+- `mvn test`: 113 unit tests pass (108, plus 5 in `GameTest`).
+- `mvn test -Pproperty-tests`: 10 property tests pass (9, plus the new
+  `InitiativePropertyTest`).
+- `acceptance/run-acceptance.sh`: 100/100 pass.
+
+Handing back to the architect.
+
 ## 2026-07-27T16:05:00Z — specifier received handoff from architect
 
 Handoff message received:
@@ -2578,3 +2801,433 @@ order instead of re-deriving a winner inline from raw dice rolls, which is
 exactly what `initiative.feature` already specifies and `InitiativeTest`
 already covers. No new externally-visible behavior, so no new Gherkin is
 due. `mvn test` passes clean. Nothing to send back; task complete.
+
+## 2026-07-27T16:16:41Z — refactorer sent handoff to architect
+
+```
+id: 20260727T161641Z_000011_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase2-turn-loop
+commit: 52e98b64af
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 52e98b64af
+```
+
+Sent after adding `InitiativePropertyTest` (see the receiving entry above)
+and passing all three verification commands at `52e98b64af`.
+
+## 2026-07-27T16:16:45Z — architect received refactorer handoff
+
+```
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: phase2-turn-loop
+commit: 52e98b64af
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 52e98b64af
+```
+
+Merged `52e98b64af`, which adds `InitiativePropertyTest`. Resolved a
+`logbook.md` conflict by keeping both entries in timestamp order. Reworked the
+property; see below.
+
+## 2026-07-27T16:21:00Z — architect review of phase2-turn-loop
+
+### The property was checking the implementation against a copy of itself
+
+`InitiativePropertyTest` built the expected turn order with
+`rotatedToStartAtTheWinner`, whose three working lines were the three working
+lines of `Initiative.order`, character for character:
+
+```java
+int winnerIndex = seated.indexOf(winner);
+List<Player> rotated = new ArrayList<>(seated.subList(winnerIndex, seated.size()));
+rotated.addAll(seated.subList(0, winnerIndex));
+```
+
+A property that constructs the answer the same way the code does can only
+agree with itself. It still rejected a wholly different implementation — the
+refactorer checked that against a descending sort — but it could not have
+rejected a subtler mistake in the rotation, because the same mistake would
+have to be written twice before the test would notice, and both copies were
+written from the same idea in the same sitting.
+
+`dry4java` does not flag it: the two methods differ enough around the shared
+lines to fall under the threshold. Duplication across the test/production
+boundary is not the kind a similarity score is good at seeing.
+
+### Stating the rule instead
+
+`initiative.feature` says the highest roll goes first, then play continues
+clockwise. That is two independent facts, and neither needs the rotation to be
+written down:
+
+- the first player is the highest roller, and
+- whoever sits clockwise of a player also plays after them.
+
+The second is `seatingIsUnbroken`, which walks the order and checks each
+player's successor against their successor at the table. With "everyone takes
+exactly one turn" alongside, this is equivalent to "a rotation starting at the
+winner" — it just says what the rule is rather than how the code arrives at it,
+and shares nothing with `Initiative`.
+
+Checked non-vacuous by breaking `order()` three ways, each aimed at a
+different clause:
+
+- sorting the seated players by roll rather than rotating: falsified, shrunk
+  to three players.
+- rotating one seat past the winner: falsified at two players. The order is
+  still a rotation, so only the highest-roller clause catches it.
+- rotating correctly but reversing everyone after the winner, which is play
+  running anticlockwise: falsified at three players. The winner still leads and
+  everyone still takes one turn, so only `seatingIsUnbroken` catches it.
+
+Each break was rejected, and each by the clause meant to reject it.
+
+### Verification
+
+- `mvn test`: 113 unit tests pass.
+- `mvn test -Pproperty-tests`: 10 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+- `mutate4java` on `Initiative`: 0 changed scopes against its manifest; no
+  production source changed in this batch. The default profile excludes the
+  `property-test` tag, so the new property stays out of the mutation baseline.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level soft`: exit 0, every scenario
+  skipped against a current manifest.
+
+## 2026-07-27T16:21:38Z — refactorer received handoff from coder
+
+```
+id: 20260727T155705Z_000006_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 6a03de66b1
+created_at: 2026-07-27T15:57:05.395231Z
+enqueued_at: 2026-07-27T15:57:05.414247Z
+task: phase2-turn-loop
+
+Re-read your role and constitution.
+
+merge_and_process coder 6a03de66b1
+```
+
+Action taken: merged coder commit `6a03de66b1` into `swarmforge-refactorer`.
+Not a fast-forward: the coder's branch shared ancestor `e535d0508c` with this
+one but had not yet picked up the architect's `Game`/`Initiative` rewrite or
+this worktree's `InitiativePropertyTest`, so the two histories had diverged
+since. Diffed the coder's tip against the shared ancestor first to see the
+actual delta before merging: only `logbook.md`, `specifier.prompt`, and
+`movement.feature` — not `Game.java`, `GameTest.java`, `CupTest.java`, or
+`RollTest.java`, which only showed up in a raw tip-to-tip diff because this
+branch had moved past them independently.
+
+Only `logbook.md` conflicted. Read the full text of both branches' divergent
+tails end to end (not just the marker regions) before resolving: from the
+shared `architect handoffs for phase2-turn-loop` entry onward, the coder's
+branch and this one had each kept their own uninterrupted narrative with no
+further shared anchor, so there was nothing to interleave — each side's
+entries stayed in their own internal order, coder's block first since its
+first divergent entry (13:12:17) precedes this branch's (13:20:49). No
+duplicate or misplaced entries this time. `movement.feature` auto-merged
+cleanly: it carries the coder's `movement-4` reshape (a distinct
+`final balance`/`final position` outcome pair instead of reading back the
+`starting balance` column), which is exactly the fix described in the
+coder's own entries below.
+
+No Java source changed in the coder's actual delta, so CRAP and mutation
+results stand from the last round; re-ran DRY as a regression check anyway
+since the merge touched files broadly.
+
+- CRAP: unchanged, 5.0 max (`Turn.take`).
+- DRY: unchanged, 9 candidates, all in test files.
+
+### Verification
+
+- `mvn test`: 113 unit tests pass.
+- `mvn test -Pproperty-tests`: 10 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+Handing back to the architect.
+
+## 2026-07-27T16:22:34Z — architect handoff for phase2-turn-loop
+
+To the refactorer at priority `00`:
+
+```
+type: git_handoff
+to: refactorer
+priority: 00
+task: phase2-turn-loop
+commit: 07d334edcc
+```
+
+Nothing went to the coder or the specifier: this batch changed one property
+test and no production code, so there is no functional commit to review.
+
+## 2026-07-27T16:26:20Z — refactorer sent handoff to architect
+
+```
+id: 20260727T162620Z_000012_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase2-turn-loop
+commit: 9000e8b98c
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 9000e8b98c
+```
+
+Sent after merging the coder's `movement-4` handoff (see the receiving entry
+above) and confirming CRAP, DRY, and the full test suites are unaffected.
+
+## 2026-07-27T16:26:24Z — architect received refactorer handoff
+
+```
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: phase2-turn-loop
+commit: 9000e8b98c
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 9000e8b98c
+```
+
+Merged `9000e8b98c`, which carries the coder's `movement-4` reshape and the
+specifier's new prompt rule forward. Resolved a `logbook.md` conflict: git had
+matched the two branches on their shared `task:`/`commit:` and `### Verification`
+lines and interleaved the entries through each other, so the region was
+rewritten from both sides' full text rather than from the marker regions,
+keeping each entry whole and the five of them in timestamp order.
+
+## 2026-07-27T16:29:00Z — architect review of phase2-turn-loop
+
+No Java changed. The batch is one scenario and one prompt rule, and the
+scenario is the one the mutation gate could not touch.
+
+### movement-4 can now fail
+
+At `13:30` this logbook recorded that `movement-4` survived every mutation by
+construction: it asserted `position 10` as a literal the mutator never reads,
+and a balance of `$<starting balance>`, the same column that arranged it, so
+mutating that column moved the expectation along with the arrangement. The
+conclusion then was that reshaping it was the specifier's to do.
+
+It has been reshaped. The scenario now carries `final position` and
+`final balance` columns of its own, and the two `Then` steps read those instead
+of a literal and the arrangement. `movement.feature` reports 7 mutations in that
+scenario now where it reported none it could kill, and all 7 die — the whole
+feature is 31 mutations, all killed.
+
+That the position is now a column rather than the literal `10` is the more
+useful half. It is what makes the step read the pawn's position back rather
+than merely agreeing with a number written twice.
+
+`specifier.prompt` gained the general rule behind it: an assertion gets its own
+example column instead of reading back a column that arranged the scenario,
+even when the two values are expected to be equal. That belongs to the
+specifier and arrives here only by merge.
+
+### Verification
+
+- `mvn test`: 113 unit tests pass.
+- `mvn test -Pproperty-tests`: 10 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+- `mutate4java` on `Turn`: 0 changed scopes against its manifest; no production
+  source changed in this batch.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level soft`: exit 0. Only
+  `movement.feature` had moved off its manifest, and its 7 new mutations were
+  all killed.
+
+### Noted, not acted on
+
+`Turn` sends a cheating player to `OpBezoek`, which is the same space a pawn
+lands on when just visiting, so nothing in the model yet distinguishes being in
+jail from standing next to it. `RULES.md` treats them as one space with two
+meanings and Phase 12 owns the difference; there is nothing to separate until
+leaving jail is a rule.
+
+Nothing forwarded: this batch left only manifest changes behind, and the
+functional commit it carried came from the coder and has already reached the
+refactorer.
+
+## 2026-07-27T16:30:30Z — refactorer received handoff from architect
+
+```
+id: 20260727T162234Z_000014_from_architect
+from: architect
+to: refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: architect
+commit: 07d334edcc
+created_at: 2026-07-27T16:22:34.333593Z
+enqueued_at: 2026-07-27T16:22:34.696592Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T16:26:34.972975Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 07d334edcc
+```
+
+Action taken: merged architect commit `07d334edcc` into `swarmforge-refactorer`.
+The architect reworked `InitiativePropertyTest` (added in this worktree's
+previous round): the expected order had been built with the same three lines
+`Initiative.order` uses, so the property could only ever agree with itself —
+sound self-critique, since the mutation-kill check from that round only ruled
+out one alternative implementation (a full sort) and could not have caught a
+shared subtler bug in both copies of the rotation. The rework states the rule
+`initiative.feature` gives instead — highest roller leads, and whoever sits
+clockwise of a player plays after them — sharing no code with `Initiative`,
+and confirms non-vacuousness against three different broken `order()`s
+(sort instead of rotate, off-by-one rotation, reversed direction), each
+caught by the clause aimed at it.
+
+Only `logbook.md` conflicted; `InitiativePropertyTest.java` and the touched
+feature files (manifest-stamp re-runs, no scenario changes) merged cleanly.
+The conflict was the same shape as the previous round's: both branches had
+kept an uninterrupted narrative from the shared point (this worktree's own
+`52e98b64af` entry) with no further common anchor, so nothing needed
+interleaving beyond chronological order — this branch's `16:16:41` sent
+entry, then the architect's `16:16:45` received-and-review entry that
+directly follows it, then this branch's own `16:21:38` and `16:26:20`
+entries, which happened independently. Read the full spliced region end to
+end before trusting the header check; no duplicate or misplaced content.
+
+No production source changed in this batch, so CRAP and the mutation
+baseline stand; re-ran CRAP and DRY as a regression check anyway.
+
+- CRAP: unchanged, 5.0 max (`Turn.take`).
+- DRY: unchanged, 9 candidates, all in test files.
+
+### Verification
+
+- `mvn test`: 113 unit tests pass.
+- `mvn test -Pproperty-tests`: 10 property tests pass, including the
+  reworked `InitiativePropertyTest`.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+Handing back to the architect.
+
+## 2026-07-27T16:31:46Z — architect received refactorer handoff
+
+```
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: phase2-turn-loop
+commit: d37646e440
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d37646e440
+```
+
+Merged `d37646e440`. It carries nothing but this file: the refactorer's record
+of merging `07d334edcc` and finding nothing to clean up. Outside `logbook.md`
+the tree is byte-identical to `23bfdb1`, which was verified in full an hour
+into this round, so the three mutation gates would read the same sources
+against current manifests and return the same answers. Ran the three test
+suites to confirm the merged tree builds — 113 unit, 10 property, 100/100
+acceptance — and left the gates alone rather than spend them re-deriving a
+result that cannot have changed.
+
+Nothing forwarded, and nothing to review: a handoff whose whole content is the
+other agent's account of the previous one.
+
+### The round is quiet, and that is the finding
+
+Three batches in a row have now come back with no production change to make.
+`phase2-turn-loop` has run out of architectural work: `Game` delegates to the
+rules, the rules sit behind `Cup` and `Initiative.Rolls`, mutation finds no
+survivors in the turn loop, and `movement.feature` kills all 31 of its
+mutations. What is left of Phase 2 is the turn loop itself — `Game.play()` still
+only settles initiative, and the per-space dispatch every later phase hangs off
+does not exist yet. That is the coder's to write against a specification, not
+mine to invent, and it already has the seam it needs.
+
+## 2026-07-27T17:42:00Z — architect closed the last gap in the mutation gate
+
+No handoff prompted this. With the queue empty I checked which production
+sources had never been through `mutate4java` at all, by looking for the
+manifest footer it writes: seven had none. Six of them scan to zero mutation
+sites — `Board`, `Ownable`, `Station`, `TaxSpace`, `UnownableSpace` and
+`Official` are data and delegation with nothing to mutate. `Dice` was the
+exception, and the one class the gate had never read.
+
+It came back 7 killed, 1 survived, 2 uncovered.
+
+### The survivor was a field nothing read
+
+`Dice` stored a `Type` and offered a `type()` accessor. Nothing in the domain
+or the specs ever called it, so `this.type = type` could be replaced with
+`this.type = null` and every test still passed. The uncovered `type()` was the
+same fact seen from the other side.
+
+Writing a test that asserts a dice remembers its type would have turned the
+gate green while keeping an accessor with no caller. Deleted instead — the
+mutant was pointing at the code, as it was for `Turn`'s redundant comparison
+earlier in this task. `Dice.Type.create()` still holds the faces each type is
+made of; what it no longer does is hand the dice a label nobody asks for.
+
+### And then the six had to go too
+
+`roll()` read `faces[random.get().nextInt(6)]`. That hardcoded `6` was noted at
+`13:35` as latent and left for the coder, on the grounds that only
+`Dice.Type.six` exists so nothing can reach it. Removing `type` changes that
+reasoning: a dice is now nothing but its faces, and a roll that consults a
+number written beside them rather than the faces themselves is incoherent
+regardless of which types exist. It reads `nextInt(faces.length)` now. Every
+dice in the game has six faces, so no behaviour moves.
+
+### The uncovered sites, and what uncovered meant
+
+`faces()` was reported uncovered, but the acceptance suite calls it in two
+places. `mutate4java` measures coverage from the domain module's `mvn test`,
+which never runs the specs module — so UNCOVERED from this tool reads as "no
+unit test reaches this", not "nothing reaches this". Worth remembering the next
+time it reports a site as unreachable.
+
+`DiceTest` now covers both from the domain module. It rolls a two-faced dice
+rather than a six-faced one, so a roll that reaches past the faces, or stops
+short of them, shows up as a face the dice does not have — which is what pins
+`faces.length` in place of the literal.
+
+### Verification
+
+- `mvn test`: 117 unit tests pass (113, plus 4 in `DiceTest`).
+- `mvn test -Pproperty-tests`: 10 property tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+- `mutate4java` on `Dice`: 8 sites, 8 covered, 8 killed, 0 survived, 0
+  uncovered, where it had been 7 killed, 1 survived, 2 uncovered.
+- `dry4java`: no duplication in production code.
+- `acceptance/run-acceptance-mutation.sh --level soft`: exit 0, every scenario
+  skipped against a current manifest.
+
+Every production source is now either mutated with a current manifest or
+scanned to zero sites.
