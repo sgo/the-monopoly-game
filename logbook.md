@@ -4062,3 +4062,41 @@ comparing entries against both parents catches it, and comparing headers alone
 would have missed this one entirely — the header set was a perfect union.
 
 Not forwarded: no source changed and no functional commit came in.
+
+## 2026-07-27T21:41:00Z — architect check of the gates with the queue empty
+
+Went looking for anything the turn-loop rounds had left behind, rather than
+waiting on the queue.
+
+### The mutation gate is genuinely complete
+
+Six production sources carry no `mutate4java` manifest: `Official`, `Board`,
+`TaxSpace`, `Ownable`, `UnownableSpace`, `Station`. Scanned all six rather
+than trusting the earlier claim — every one reports 0 mutation sites, so there
+is nothing for a manifest to record. Every other production source has a
+current manifest. That is the same answer as `17:42`, now measured again after
+two rounds of change.
+
+### `en/monopoly.feature` was being held off the pipeline for a reason that
+### had stopped being true
+
+`pipeline-features.txt` said it was absent because "the turn loop behind it
+does not exist yet". The turn loop is what this task built, so the stated
+reason expired the moment it landed.
+
+The feature still belongs off the pipeline — it asks that every one of 1000
+games end in a monopoly, and nothing yet ends a game or moves a deed between
+players; `tasks.md` puts that in Phase 14, with bankruptcy and winning. But a
+stale reason is worse than a blunt one: it is how a scenario stays excluded
+forever, because whoever rechecks it finds an argument that no longer matches
+the code and cannot tell whether anyone has looked since. Rewrote it to say
+what is actually missing and which phase supplies it.
+
+Acceptance still 102/102 after the edit, so the list still reads as intended.
+
+`tasks.md`'s description of `Game.play()` as having no turn loop is also out
+of date, and deliberately left: it sits under "Current state (starting point)",
+which is a snapshot of where the plan began rather than a live account.
+
+Not forwarded: a comment in the pipeline list is not functional work, and no
+role has anything to review in it. It travels with the next merge.
