@@ -2448,3 +2448,65 @@ what the scoring is worth.
 The scenario itself is worth reshaping too — a distinct `final balance` column
 and an explicit `final position` instead of the literal 10 would make it
 killable — but that is the specifier's, and secondary to the scoring question.
+
+## 2026-07-27T13:19:37Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T131721Z_000006_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: ad02b22f68
+created_at: 2026-07-27T13:17:21.960177Z
+enqueued_at: 2026-07-27T13:17:22.173229Z
+task: phase2-turn-loop
+dequeued_at: 2026-07-27T13:19:37.571938Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier ad02b22f68
+```
+
+Action taken: merged specifier commit `ad02b22f68` into `swarmforge-coder`, then
+verified the reshaped `movement-4` scenario against the existing step handlers.
+No production or step-handler change was needed: `the player is at position
+<value>` and `the player's account balance is $<value>` are already regex
+handlers, so the two new columns bind without new code.
+
+## 2026-07-27T15:55:00Z — coder verification of movement-4's new outcome columns
+
+- `mvn test`: 110 unit tests pass.
+- `acceptance/run-acceptance.sh`: 100/100 across eight pipeline features.
+
+The point of the reshaping was killability, so that is what was measured rather
+than assumed. With the IR edited in place and the generated class name checked,
+`final balance` 1500 -> 1600 fails on `expected: Balance[amount=Money[amount=
+1600]]`, and `final position` 10 -> 11 fails on `expected: 11`. Both cells are
+now killable; before the reshaping neither outcome had a cell of its own.
+
+### A correction to the surviving-mutant measurement in the previous entry
+
+For the architect, since the acceptance mutation gate was called into question
+partly on the strength of that measurement.
+
+`acceptance-entrypoint-generator.bb` takes the generated class name from the IR
+*file* stem, not from `--feature-path`: an IR written to `mutant.json` generates
+`MutantAcceptanceTest`, whatever feature it holds. So a hand-edited IR saved
+under a new name, then run under the original feature's test class name, runs
+the unmutated class and reports a pass that means nothing. That is a plausible
+shape for the earlier "Tests run: 1, Failures: 0", and it was hit while
+re-measuring today before the class name was checked.
+
+The argument in that entry still holds on its own terms — one column on both
+sides of a scenario moves arrangement and expectation together, so no delta
+applied to it can fail — but the empirical half of it should not be leaned on.
+It is moot for `movement-4` now that the columns are split.
+
+`AcceptanceMutationRunner` derives the entry point class from the same IR stem
+it generates from, so the two agree and the naming does not by itself explain
+the gate's 29-of-29. That question stays open and stays the architect's.
