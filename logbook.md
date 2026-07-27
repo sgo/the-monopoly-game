@@ -1,8 +1,8 @@
 # Logbook
 
-## 2026-07-25T19:00:15Z — coder received handoff from specifier
+## 2026-07-25T19:00:15Z — specifier sent handoff to coder / coder received it
 
-Handoff message received:
+Handoff message:
 
 ```
 id: 20260725T190015Z_000001_from_specifier
@@ -22,9 +22,17 @@ Re-read your role and constitution.
 merge_and_process specifier 491e6cfa57
 ```
 
-Action taken: merged specifier commit `491e6cfa57` into `swarmforge-coder`
-(fast-forward), then implemented the `full-board-layout` slice against the
-merged Gherkin scenarios.
+Specifier summary: after user approval, committed Phase 1 specification
+changes (commit `491e6cfa57` on `main`) completing the 40-space board
+layout — Gherkin for the remaining 20 streets, both stations, both
+utilities, and the two tax spaces (en + nl), plus the extended 40-row
+gameboard layout scenario in official.feature/officiele.feature. Handoff
+name `full-board-layout` invented for this work; later handoffs about it
+should reference that name.
+
+Coder action taken: merged specifier commit `491e6cfa57` into
+`swarmforge-coder` (fast-forward), then implemented the
+`full-board-layout` slice against the merged Gherkin scenarios.
 
 ## 2026-07-25T19:30:00Z — coder findings for specifier and architect
 
@@ -446,6 +454,90 @@ coverage of the domain, and a reproducible `mvn test`. The specifier also has
 an open question waiting in this logbook — ten feature files are on no
 pipeline, and reshaping them is a specification decision, not mine.
 
+## 2026-07-26T00:00:45Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260726T000045Z_000001_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: acada6cd6b
+created_at: 2026-07-26T00:00:45.522381Z
+enqueued_at: 2026-07-26T00:00:45.694123Z
+task: full-board-layout
+dequeued_at: 2026-07-26T00:00:55.215943Z
+
+Re-read your role and constitution.
+
+merge_and_process architect acada6cd6b
+```
+
+Action taken: merged architect commit `acada6cd6b` into `swarmforge-coder`,
+resolving a `logbook.md` conflict by keeping both the coder's sent entry and
+the refactorer's received entry, then applied coder rules to the merged state.
+
+## 2026-07-26T00:15:00Z — coder verification of the merged architect state
+
+Re-ran the project's verification commands against the merge commit in this
+worktree, to confirm the handed-over state holds here and not only on
+`swarmforge-architect`:
+
+- `mvn test`: 68 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 31/31 pass, exits 0, and leaves no compiled
+  entry points behind.
+- `mvn test` re-run immediately after the acceptance run: 68 again, so the
+  count no longer depends on whether the acceptance script has been run.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+The architect's correction is accepted: spaced example column names such as
+`<vacant rent>` are mutable after all, because the mutator works from example
+keys rather than from the IR `parameters` array. The earlier coder note above
+was wrong on that point; no rename is needed.
+
+No new behavior slice arrived with this handoff, so there is nothing for the
+coder to implement. The outstanding question — ten feature files on no
+pipeline — is the specifier's to answer.
+
+## 2026-07-26T00:18:19Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260726T000110Z_000002_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: acada6cd6b
+created_at: 2026-07-26T00:01:10.851830Z
+enqueued_at: 2026-07-26T00:01:11.139046Z
+task: full-board-layout
+dequeued_at: 2026-07-26T00:18:19.866505Z
+
+Re-read your role and constitution.
+
+merge_and_process architect acada6cd6b
+```
+
+Action taken: merged architect commit `acada6cd6b` into `main` (the
+specifier's assigned branch), resolving a conflict in this file by keeping
+both sides' entries in chronological order. Re-read the corrected
+`workflow.prompt` carried by this merge (it now describes `swarm_handoff.sh`
+directly instead of the nonexistent `swarmtools/notify-agent.sh`, matching
+what every role actually used for this task). Reported the coder's jqwik
+prompt-injection finding to the user, and raised the "ten features are on
+no pipeline" question for a decision before doing any further respecification.
+
 ## 2026-07-26T00:20:45Z — refactorer received handoff from architect
 
 Handoff message received:
@@ -523,3 +615,79 @@ Summary: re-verified the architect's merged `Street` split against the
 refactorer's own gates (CRAP, DRY, mutation scan, property tests) — all
 green, no changes needed. Committed at `78ae535994` on
 `swarmforge-refactorer`; handing back to the architect.
+
+## 2026-07-27T08:21:05Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260727T082051Z_000002_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: e0c8876bc1
+created_at: 2026-07-27T08:20:51.269968Z
+enqueued_at: 2026-07-27T08:20:52.313652Z
+task: pipeline-compatible-specs
+dequeued_at: 2026-07-27T08:21:05.449413Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e0c8876bc1
+```
+
+Action taken: merged specifier commit `e0c8876bc1` into `swarmforge-coder`,
+resolving a `logbook.md` conflict by keeping both roles' entries in
+chronological order, then implemented the step vocabulary the reshaped
+specifications need.
+
+## 2026-07-27T08:45:00Z — coder implementation of pipeline-compatible-specs
+
+`official.feature` and `dice.feature` are now on the acceptance pipeline,
+which goes from 31 to 92 passing scenarios. `monopoly.feature` stays off,
+per the specifier's stated intent: it parses, but it specifies a whole
+played-out game and the turn loop does not exist yet.
+
+### Pawns became domain behaviour
+
+The reshaped `official.feature` asserts pawns by name — `pawn "dog" is at
+play`. `Player.Pool` handed out identifiers `"0"` … `"7"`; the names lived
+in `messages*.properties`, read by the Cucumber fixtures the architect
+deleted. Nothing named a pawn any more.
+
+Added `Pawn`, an enum of the eight official pieces, and `Player.Pool` now
+seeds players from it, so a player's identifier is the pawn they play. The
+name a specification writes is spelled with a space (`high hat`) and the
+enum constant with an underscore, so `Pawn.pawnName()` bridges the two.
+
+### Landing on Start is now its own move
+
+Scenario `official-rules-7` says a player *lands on* Start; only `pass`
+existed. Added `Player.land`. It pays the same as `pass` today, because the
+double-salary rule is carried by `StartSpace` rather than by the move, and
+both scenarios pass either way.
+
+Worth a specifier decision rather than a silent choice by me: the rule is
+named `double_salary_when_landing_on_start`, but as modelled the doubling
+also applies to *passing* Start — `PlayerTest.theDoubleSalaryRuleDoublesWhat
+PassingStartPays` pins that. No scenario covers passing Start while the rule
+is active, so nothing says which is intended. If passing should keep paying
+the single salary, the rule belongs on the move rather than on the space.
+
+### Verification
+
+- `mvn test`: 76 unit tests pass, clean tree or dirty.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 92/92 pass, exits 0, leaves nothing behind.
+
+Checked non-vacuous by mutating four different expectations in the IR at
+once — a space's colour group, a space's type, a pawn name, every starting
+balance, and the passing-Start balance. Exactly the twelve corresponding
+scenario executions failed and no others. Mutating the dice fairness count
+from 100000 to 50000 fails that scenario too.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer
+and architect.

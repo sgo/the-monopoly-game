@@ -57,10 +57,36 @@ class PlayerTest {
 
     assertThat(players).hasSize(3);
     assertThat(players).extracting(Player::id)
-        .containsExactly(new Player.ID("0"), new Player.ID("1"), new Player.ID("2"));
+        .containsExactly(Pawn.dog.id(), Pawn.high_hat.id(), Pawn.iron_box.id());
     assertThat(players).allSatisfy(
         player -> assertThat(player.account().balance()).isEqualTo(Balance.of(1500))
     );
+  }
+
+  @Test
+  void everyPlayerInAFullPoolIsADistinctPawn() {
+    Player.Pool pool = new Player.Pool(2, 8, bank, new Money(1500));
+
+    assertThat(pool.select(8).map(Player::id).distinct().toList()).hasSize(8);
+  }
+
+  @Test
+  void landingOnStartPaysTheSalaryIntoTheAccount() {
+    Player player = playerWith(1500);
+
+    player.land((StartSpace) ruleSet.create(Street.Type.start));
+
+    assertThat(player.account().balance()).isEqualTo(Balance.of(1700));
+  }
+
+  @Test
+  void theDoubleSalaryRuleDoublesWhatLandingOnStartPays() {
+    ruleSet.activate(double_salary_when_landing_on_start);
+    Player player = playerWith(1500);
+
+    player.land((StartSpace) ruleSet.create(Street.Type.start));
+
+    assertThat(player.account().balance()).isEqualTo(Balance.of(1900));
   }
 
   @Test

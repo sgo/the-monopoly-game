@@ -45,7 +45,13 @@ final class SpaceNames {
       Map.entry("Watermaatschappij / Compagnie des Eaux", Watermaatschappij),
 
       Map.entry("Inkomsten Belasting / Impôts sur le revenu", InkomstenBelasting),
-      Map.entry("Extra Belasting / Taxe de Luxe", ExtraBelasting)
+      Map.entry("Extra Belasting / Taxe de Luxe", ExtraBelasting),
+
+      Map.entry("Kans / Chance", Kans),
+      Map.entry("Algemeen Fonds / Caisse de Communauté", AlgemeenFonds),
+      Map.entry("Op Bezoek / Simple Visite", OpBezoek),
+      Map.entry("Gratis Parkeren / Parc Gratuit", GratisParkeren),
+      Map.entry("Naar de Gevangenis / Allez en Prison", NaarDeGevangenis)
   );
 
   private SpaceNames() {

@@ -2,11 +2,13 @@
 
 This is a proposed, step-by-step plan for implementing the game described in
 `RULES.md` on top of the existing `the-monopoly-game-domain` codebase, driven by
-Cucumber specs in `the-monopoly-game-specs`. Each phase is meant to be small enough
-to land as its own set of commits, with its own spec scenarios (English under
-`en/`, mirrored in Dutch under `nl/`, per the existing convention) proving it
-before moving to the next phase. Phases are ordered so that each one only depends
-on mechanics already built in a previous phase.
+Gherkin specs in `the-monopoly-game-specs`, verified by the APS-based acceptance
+pipeline under `acceptance/`. Each phase is meant to be small enough to land as
+its own set of commits, with its own spec scenarios (English under `en/` only —
+the earlier Dutch `nl/` mirror convention was dropped because the acceptance
+pipeline cannot parse localized Gherkin keywords) proving it before moving to
+the next phase. Phases are ordered so that each one only depends on mechanics
+already built in a previous phase.
 
 This plan also folds in the objectives from [`SIMULATOR.md`](SIMULATOR.md): a
 pluggable player strategy, a human-readable journal/report, and a CLI to run
@@ -60,10 +62,10 @@ all 40 spaces from the [board table](RULES.md#the-board) exist.
   `Op Bezoek`/Jail-Just Visiting, `Gratis Parkeren`/Free Parking, `Naar de
   Gevangenis`/Go To Jail.
 - Update `Official.create()`'s board list to the full 40-space layout in order.
-- Extend `official.feature`'s "gameboard layout" scenario (en + nl) to assert
-  all 40 spaces instead of 3, and add one `streets.feature` scenario per new
-  street/station/utility asserting its financial figures (mirroring the
-  existing Rue Grande Dinant / Diestsestraat Leuven scenarios).
+- Extend `official.feature`'s "gameboard layout" scenario to assert all 40
+  spaces instead of 3, and add one scenario per new street/station/utility/tax
+  space asserting its financial figures (mirroring the existing Rue Grande
+  Dinant / Diestsestraat Leuven scenarios).
 
 No turn logic changes here — this phase only makes the board queryable.
 
@@ -474,7 +476,7 @@ can run genuinely complete games rather than partial ones.
   without changing the CLI's shape (per [`SIMULATOR.md`](SIMULATOR.md)'s
   out-of-scope list).
 - Verification: as a console entry point rather than a domain rule, this is
-  better suited to a thin manual/integration check than a Cucumber feature —
+  better suited to a thin manual/integration check than a Gherkin feature —
   run the CLI end-to-end for a couple of player counts and confirm a complete,
   readable report is produced.
 
