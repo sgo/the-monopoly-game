@@ -1251,3 +1251,50 @@ acceptance scenario fails, `official-rules-8`. Restored afterwards.
 
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
 architect.
+
+## 2026-07-27T10:07:05Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260727T100228Z_000003_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: pipeline-compatible-specs
+commit: bd54575622
+
+Re-read your role and constitution.
+
+merge_and_process coder bd54575622
+```
+
+Action taken: merged coder commit `bd54575622` into `swarmforge-refactorer`.
+Three `logbook.md` conflict regions, all the same append-only-file pattern as
+previous rounds; resolved by full-entry interleaving in chronological order
+and verified by checking every header line from the incoming file appears
+exactly once in the result before committing.
+
+Ran the refactorer's gates on the only changed sources, `Player` and
+`StartSpace` (the specifier's answer splitting `salary()` from
+`salaryForLanding()`):
+
+- CRAP: unchanged, 3.0 max (`OwnedCount.checked`).
+- DRY: no production duplication. `PlayerTest`'s `pass`/`land` pairs still
+  flag structurally, but they now assert genuinely different amounts for the
+  rule-active case (`$1700` vs `$1900`) — this is no longer an accidental
+  shape collision, it is the test suite pinning down the exact behavioral
+  distinction the specifier just introduced. Collapsing it would erase that
+  distinction, so left alone; this is a stronger case for leaving it than
+  last round, not a weaker one.
+- Mutation scan: `Player.java` 2 sites, `StartSpace.java` 1 site — trivial.
+
+### Verification
+
+- `mvn test`: 78 unit tests pass.
+- `mvn test -Pproperty-tests`: 7 property tests pass.
+- `acceptance/run-acceptance.sh`: 93/93 pass.
+
+No refactoring needed. Handing back to the architect.
