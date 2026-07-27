@@ -1147,3 +1147,26 @@ acceptance scenario fails, `official-rules-8`. Restored afterwards.
 
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
 architect.
+
+## 2026-07-27T10:02:28Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T100228Z_000003_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: pipeline-compatible-specs
+commit: bd54575622
+created_at: 2026-07-27T10:02:28.629145Z
+
+Re-read your role and constitution.
+
+merge_and_process coder bd54575622
+```
+
+Summary: hands the double-salary correction on branch `swarmforge-coder` at
+commit `bd54575622` to the refactorer.
