@@ -12,6 +12,8 @@ import the.monopoly.game.components.streets.TaxSpace;
 import the.monopoly.game.components.streets.Utility;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
@@ -29,6 +31,7 @@ public final class MonopolyStepHandlers {
   /** Either a literal amount or a {@code <placeholder>} naming an example column. */
   private static final String VALUE = "(<[^<>]+>|-?[0-9,]+)";
   private static final String NAME = "(<[^<>]+>|[^\"]+)";
+  private static final Pattern DICE_DESCRIPTION = Pattern.compile("([0-9]+) faced");
 
   private MonopolyStepHandlers() {
   }
@@ -92,11 +95,11 @@ public final class MonopolyStepHandlers {
         step("^the " + NAME + " rule set$",
             (world, arguments) -> world.selectRuleSet(Vocabulary.ruleSet(arguments.text(1)))),
 
-        step("^dice ([0-9]+) is ([0-9]+) faced$",
+        step("^dice " + VALUE + " is " + NAME + "$",
             (world, arguments) -> assertThat(diceFaceCount(world, arguments.number(1)))
-                .isEqualTo(arguments.number(2))),
+                .isEqualTo(facesOf(arguments.text(2)))),
 
-        step("^we play with ([0-9]+) to ([0-9]+) players$",
+        step("^we play with " + VALUE + " to " + VALUE + " players$",
             (world, arguments) -> {
               assertThat(world.ruleSet().players().min()).isEqualTo(arguments.number(1));
               assertThat(world.ruleSet().players().max()).isEqualTo(arguments.number(2));
@@ -160,6 +163,14 @@ public final class MonopolyStepHandlers {
                   .allSatisfy(seen -> assertThat(seen).isCloseTo(expected, within((int) margin)));
             })
     );
+  }
+
+  /** A dice is described by how many faces it has, as in "6 faced". */
+  private static int facesOf(String description) {
+    Matcher faces = DICE_DESCRIPTION.matcher(description);
+    if (!faces.matches())
+      throw new AssertionError("A dice is described as \"<n> faced\", not \"" + description + "\".");
+    return Integer.parseInt(faces.group(1));
   }
 
   private static long diceFaceCount(World world, int position) {

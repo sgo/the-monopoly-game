@@ -8,9 +8,13 @@
 Feature: streets
 
   # streets-1
-  Scenario: start
+  Scenario Outline: start
     Given the street "Start"
-    Then your salary is $200
+    Then your salary is $<salary>
+
+    Examples:
+      | salary |
+      | 200    |
 
   # streets-2
   Scenario Outline: colour street

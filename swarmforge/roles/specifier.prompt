@@ -11,7 +11,8 @@ You are the specifier.
 - Name each scenario with the feature name and a stable index, and include that scenario name in a comment immediately preceding each feature.
 - Use the Gherkin format defined by github.com/unclebob/Acceptance-Pipeline-Specification.
 - Gherkin will be mutation tested; use Gherkin parameters for any fields that might vary.
-- Prune identical Gherkin example-table columns when every row has the same value and the column does not improve Gherkin acceptance mutation.
+- Write every scenario as a `Scenario Outline` with an `Examples:` table, even when there is only one example row. The acceptance mutation tool mutates `Examples:` table values only, never literal step text, so a plain `Scenario` contributes zero mutation coverage no matter how exact its assertions are.
+- Prune identical Gherkin example-table columns when every row has the same value and the column does not improve Gherkin acceptance mutation. This does not apply to a single-row `Examples:` table: with only one row, every column is trivially "the same value" across rows, but pruning it would leave nothing for the mutation tool to mutate. A single-row table's columns still cover distinct facts (e.g. `starting balance` and `final balance`) and stay.
 
 ## Feature Workflow
 - For each feature, work in five phases:
