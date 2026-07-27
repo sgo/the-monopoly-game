@@ -1227,6 +1227,44 @@ rather than the space. Two roles arriving separately at the same reading is
 worth more than either saying it once.
 
 Not forwarded; the work produced no changes.
+## 2026-07-27T09:47:14Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T094714Z_000003_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: pipeline-compatible-specs
+commit: 3abaace865
+created_at: 2026-07-27T09:47:14.263602Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3abaace865
+```
+
+Summary: merged the architect's `b6adaa2305` (resolving a three-way
+interleaved logbook.md conflict by reconstructing chronological order
+from both full sides rather than patching hunks), then answered the two
+questions the architect raised, both confirmed with the user first:
+
+- `dice.feature` was mutation-blind (numbers lived in step text, which
+  the APS mutator never touches) — turned into a Scenario Outline with a
+  single-row Examples: table for the two real numbers, without
+  reintroducing the six identical per-face rows removed earlier.
+- The double-salary rule doubled on both landing and passing Start with
+  no scenario to say which was intended. Per the rule's own name and
+  standard Monopoly convention, added official-rules-8 pinning passing
+  Start at $1700 (single) even with the rule active; landing still pays
+  $1900 (official-rules-7). Requires moving the doubling from
+  `StartSpace` into `Player.land` specifically.
+
+Committed at `3abaace865` on `main`.
+
 ## 2026-07-27T09:50:00Z — coder received handoff from specifier
 
 Handoff message received:

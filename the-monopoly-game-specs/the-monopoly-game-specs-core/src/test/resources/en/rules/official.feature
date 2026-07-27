@@ -11,13 +11,21 @@ Feature: official rules
     Given the official rule set
 
   # official-rules-1
-  Scenario: the game is played with 2 dice with 6 faces
-    Then dice 1 is 6 faced
-    And dice 2 is 6 faced
+  Scenario Outline: the game is played with 2 dice with 6 faces
+    Then dice 1 is <die 1 type>
+    And dice 2 is <die 2 type>
+
+    Examples:
+      | die 1 type | die 2 type |
+      | 6 faced    | 6 faced    |
 
   # official-rules-2
-  Scenario: the game is played with a minimum of 2 to a maximum of 8 players
-    Then we play with 2 to 8 players
+  Scenario Outline: the game is played with a minimum of 2 to a maximum of 8 players
+    Then we play with <minimum> to <maximum> players
+
+    Examples:
+      | minimum | maximum |
+      | 2       | 8       |
 
   # official-rules-3
   Scenario Outline: board space
@@ -99,24 +107,36 @@ Feature: official rules
       | wheelbarrow |
 
   # official-rules-6
-  Scenario: players receive a salary when passing by start
+  Scenario Outline: players receive a salary when passing by start
     Given a player
-    And with $1500 in his account
+    And with $<starting balance> in his account
     When the player passes the street "Start"
-    Then the player's account balance is $1700
+    Then the player's account balance is $<final balance>
+
+    Examples:
+      | starting balance | final balance |
+      | 1500              | 1700          |
 
   # official-rules-7
-  Scenario: players receive a double salary when landing on start
+  Scenario Outline: players receive a double salary when landing on start
     And with optional double salary when landing on Start rule
     And a player
-    And with $1500 in his account
+    And with $<starting balance> in his account
     When the player lands on the street "Start"
-    Then the player's account balance is $1900
+    Then the player's account balance is $<final balance>
+
+    Examples:
+      | starting balance | final balance |
+      | 1500              | 1900          |
 
   # official-rules-8
-  Scenario: players still receive a single salary when passing start with the double salary rule active
+  Scenario Outline: players still receive a single salary when passing start with the double salary rule active
     And with optional double salary when landing on Start rule
     And a player
-    And with $1500 in his account
+    And with $<starting balance> in his account
     When the player passes the street "Start"
-    Then the player's account balance is $1700
+    Then the player's account balance is $<final balance>
+
+    Examples:
+      | starting balance | final balance |
+      | 1500              | 1700          |
