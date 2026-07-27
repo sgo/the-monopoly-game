@@ -2123,3 +2123,73 @@ Summary: caught and fixed a merge-induced content loss in this round's
 logbook resolution (see entry above), then re-verified the domain module's
 CRAP/DRY gates — unchanged, no changes needed. Committed at `4efe2d8b10` on
 `swarmforge-refactorer`; handing back to the architect.
+
+## 2026-07-27T12:52:20Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260727T124208Z_000005_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase2-turn-loop
+commit: fbc5f7ca52
+
+Re-read your role and constitution.
+
+merge_and_process coder fbc5f7ca52
+```
+
+Action taken: merged coder commit `fbc5f7ca52` into `swarmforge-refactorer`,
+the coder's Phase 2 turn-loop implementation (`Cup`, `Roll`, `Turn`,
+`Initiative`, pawn positions on `Player`). Three `logbook.md` conflict
+regions. The largest one hid a mistake of my own mid-resolution: an edit
+meant to relabel one thread's continuation instead spliced it onto the wrong
+thread's header, producing a dangling sentence ("...into `swarmforge-coder`,
+One `logbook.md` conflict region..."). Caught it on the read-back before
+running the header checks, not by the checks themselves — the checks confirm
+every entry is present once, not that prose reads correctly — so re-read the
+whole reconstructed span this time before trusting the counts. Rebuilt the
+region as two complete, self-contained threads (coder's, then this worktree's
+own) and reran both the incoming-header and own-history header checks; both
+clean.
+
+Ran the refactorer's gates on the changed sources, `Cup`, `Roll`, `Player`,
+`Initiative`, `Turn`:
+
+- CRAP: max is now 5.0 (`Turn.take`, CC=5, 100% coverage), still within
+  bounds. `OwnedCount.checked` (3.0) is no longer the ceiling.
+- DRY: found and fixed a real one this round, distinct in kind from the
+  test-shape duplicates left alone so far. `InitiativeTest` had two literal
+  roll fixtures — the clear-winner map and the tied-pair map — each copied
+  verbatim into three and two `@Test` methods respectively, to assert
+  different things about the *same* initiative run rather than to test
+  different scenarios. Extracted `orderWithAClearWinner()` and
+  `orderWithATie()`; each test now names the fixture it needs instead of
+  restating it. DRY duplicate count for the file dropped from 12 to 9 project
+  wide; `TurnTest`'s flagged pairs are the usual different-scenario-same-shape
+  pattern and stay as they are.
+- Mutation scan: `Cup.java` 5, `Roll.java` 2, `Player.java` 6,
+  `Initiative.java` 4, `Turn.java` 12 sites — all trivial.
+
+### Property tests
+
+`Roll.total()`/`isDouble()` were only example-tested, the same gap `Money`
+had before this role added property tests for it. Added
+`RollPropertyTest`: total is the sum of both dice, and `isDouble` holds
+exactly when the two dice match, both over the full `int` range via jetCheck,
+tagged `property-test` and excluded from normal verification the same way as
+the existing two property test classes.
+
+### Verification
+
+- `mvn test`: 101 unit tests pass (unchanged after the `InitiativeTest`
+  extraction — same tests, same shape, less repeated literal).
+- `mvn test -Pproperty-tests`: 9 property tests pass (7 before this round,
+  plus 2 new).
+- `acceptance/run-acceptance.sh`: 100/100 pass.
+
+Handing back to the architect.
