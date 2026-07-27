@@ -42,17 +42,32 @@ public final class AcceptanceRuntime {
     List<Ir.Step> steps = new ArrayList<>(feature.background());
     steps.addAll(scenario.steps());
 
+    String keyword = null;
     for (Ir.Step step : steps) {
+      keyword = effectiveKeywordOf(step, keyword);
       try {
-        handlerFor(step).execute(world, step.text(), example);
+        handlerFor(step, keyword).execute(world, step.text(), example);
       } catch (AssertionError cause) {
         throw new AssertionError(step.keyword() + " " + step.text() + "\n  " + cause.getMessage(), cause);
       }
     }
   }
 
-  private StepHandler handlerFor(Ir.Step step) {
-    List<StepHandler> matching = handlers.stream().filter(it -> it.matches(step.text())).toList();
+  /**
+   * {@code And} continues whatever came before it, so a step introduced by it
+   * arranges or asserts according to the last real keyword. A scenario may open
+   * with {@code And} when a background preceded it, in which case the keyword
+   * carries across.
+   */
+  private String effectiveKeywordOf(Ir.Step step, String preceding) {
+    if (!step.keyword().equals("And")) return step.keyword();
+    if (preceding == null)
+      throw new AssertionError("Step continues nothing: " + step.keyword() + " " + step.text());
+    return preceding;
+  }
+
+  private StepHandler handlerFor(Ir.Step step, String keyword) {
+    List<StepHandler> matching = handlers.stream().filter(it -> it.matches(keyword, step.text())).toList();
 
     if (matching.isEmpty())
       throw new AssertionError("Unsupported step: " + step.keyword() + " " + step.text());

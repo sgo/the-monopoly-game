@@ -19,6 +19,8 @@ en/components/stations.feature
 en/components/utilities.feature
 en/components/tax.feature
 en/rules/official.feature
+en/rules/movement.feature
+en/rules/initiative.feature
 
 # Held back from mutation: the fairness scenario asserts that each face comes
 # up about 100000 times within a 1% margin, so it accepts anything in a 1000
