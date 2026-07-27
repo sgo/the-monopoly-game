@@ -1,8 +1,8 @@
 # Logbook
 
-## 2026-07-25T19:00:15Z — coder received handoff from specifier
+## 2026-07-25T19:00:15Z — specifier sent handoff to coder / coder received it
 
-Handoff message received:
+Handoff message:
 
 ```
 id: 20260725T190015Z_000001_from_specifier
@@ -22,9 +22,17 @@ Re-read your role and constitution.
 merge_and_process specifier 491e6cfa57
 ```
 
-Action taken: merged specifier commit `491e6cfa57` into `swarmforge-coder`
-(fast-forward), then implemented the `full-board-layout` slice against the
-merged Gherkin scenarios.
+Specifier summary: after user approval, committed Phase 1 specification
+changes (commit `491e6cfa57` on `main`) completing the 40-space board
+layout — Gherkin for the remaining 20 streets, both stations, both
+utilities, and the two tax spaces (en + nl), plus the extended 40-row
+gameboard layout scenario in official.feature/officiele.feature. Handoff
+name `full-board-layout` invented for this work; later handoffs about it
+should reference that name.
+
+Coder action taken: merged specifier commit `491e6cfa57` into
+`swarmforge-coder` (fast-forward), then implemented the
+`full-board-layout` slice against the merged Gherkin scenarios.
 
 ## 2026-07-25T19:30:00Z — coder findings for specifier and architect
 
@@ -76,29 +84,6 @@ left untouched.
 Verification: 49 domain unit tests and 31 generated acceptance tests pass.
 The acceptance tests were checked against a mutated expected value and
 failed as they should, so they are not passing vacuously.
-
-## 2026-07-25T19:30:35Z — coder sent handoff to refactorer
-
-Handoff message sent:
-
-```
-id: 20260725T193035Z_000001_from_coder
-from: coder
-to: refactorer
-priority: 50
-type: git_handoff
-role: coder
-task: full-board-layout
-commit: 31c818a1a2
-created_at: 2026-07-25T19:30:35.387145Z
-
-Re-read your role and constitution.
-
-merge_and_process coder 31c818a1a2
-```
-
-Summary: hands the completed `full-board-layout` slice on branch
-`swarmforge-coder` at commit `31c818a1a2` to the refactorer.
 
 ## 2026-07-25T19:30:35Z — refactorer received handoff from coder
 
@@ -496,3 +481,35 @@ was wrong on that point; no rename is needed.
 No new behavior slice arrived with this handoff, so there is nothing for the
 coder to implement. The outstanding question — ten feature files on no
 pipeline — is the specifier's to answer.
+
+## 2026-07-26T00:18:19Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260726T000110Z_000002_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: acada6cd6b
+created_at: 2026-07-26T00:01:10.851830Z
+enqueued_at: 2026-07-26T00:01:11.139046Z
+task: full-board-layout
+dequeued_at: 2026-07-26T00:18:19.866505Z
+
+Re-read your role and constitution.
+
+merge_and_process architect acada6cd6b
+```
+
+Action taken: merged architect commit `acada6cd6b` into `main` (the
+specifier's assigned branch), resolving a conflict in this file by keeping
+both sides' entries in chronological order. Re-read the corrected
+`workflow.prompt` carried by this merge (it now describes `swarm_handoff.sh`
+directly instead of the nonexistent `swarmtools/notify-agent.sh`, matching
+what every role actually used for this task). Reported the coder's jqwik
+prompt-injection finding to the user, and raised the "ten features are on
+no pipeline" question for a decision before doing any further respecification.
