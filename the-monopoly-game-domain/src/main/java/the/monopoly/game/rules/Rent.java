@@ -7,6 +7,7 @@ import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
+import java.util.Optional;
 
 /** Collects rent when a visitor stops on an owned, unimproved colour street. */
 public class Rent implements Landings {
@@ -48,7 +49,7 @@ public class Rent implements Landings {
     return monopoly ? land.vacantRent().plus(land.vacantRent()) : land.vacantRent();
   }
 
-  private java.util.Optional<Player> playerNamed(Player.ID id) {
+  private Optional<Player> playerNamed(Player.ID id) {
     return players.stream().filter(it -> it.id().equals(id)).findFirst();
   }
 

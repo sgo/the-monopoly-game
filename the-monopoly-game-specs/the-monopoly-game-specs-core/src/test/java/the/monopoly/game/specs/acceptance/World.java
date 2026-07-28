@@ -7,9 +7,11 @@ import the.monopoly.game.components.dice.Dice;
 import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Initiative;
+import the.monopoly.game.rules.Rent;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
@@ -213,8 +215,7 @@ public class World {
   public void givePawnOwnership(String pawnName, Street.Type land) {
     if (deeds == null) deeds = new Deeds();
     Player owner = pawn(pawnName);
-    the.monopoly.game.components.streets.Ownable space =
-        (the.monopoly.game.components.streets.Ownable) ruleSet.create(land);
+    Ownable space = (Ownable) ruleSet.create(land);
     deeds.sell(space, owner, space.price());
     owner.account().deposit(space.price());
   }
@@ -234,7 +235,7 @@ public class World {
   public void pawnDeclinesRent(String pawnName, Street.Type land) {
     pawnStrategies.put(pawnName, new Strategy() {
       @Override
-      public boolean claims(the.monopoly.game.rules.Rent.Claim claim) {
+      public boolean claims(Rent.Claim claim) {
         return false;
       }
     });

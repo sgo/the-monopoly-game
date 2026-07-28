@@ -5,14 +5,15 @@ import the.monopoly.game.components.dice.Cup;
 import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
-import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Rent;
+import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
 
@@ -121,7 +122,7 @@ public class Game {
     }
 
     @Override
-    public void paid(Player tenant, Player owner, the.monopoly.game.components.streets.ColourStreet land, Money rent) {
+    public void paid(Player tenant, Player owner, ColourStreet land, Money rent) {
       journal.log(new Journal.Entry.RentPaid(tenant.id(), owner.id(), land.type(), rent));
     }
   }

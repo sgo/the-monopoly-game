@@ -67,8 +67,9 @@ class RentTest {
   }
 
   private void sell(Street.Type type) {
-    deeds.sell((Ownable) rules.create(type), owner, ((Ownable) rules.create(type)).price());
-    owner.account().deposit(((Ownable) rules.create(type)).price());
+    Ownable land = (Ownable) rules.create(type);
+    deeds.sell(land, owner, land.price());
+    owner.account().deposit(land.price());
   }
 
   private ColourStreet street(Street.Type type) {
