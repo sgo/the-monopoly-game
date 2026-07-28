@@ -6093,3 +6093,21 @@ hotels with turn-time building, improved-street rent, direct house sale and
 hotel exchange mechanics, extended the acceptance vocabulary and pipeline, and
 verified the slice with `181` domain tests plus the full normal acceptance
 pipeline (`141` generated acceptance tests) passing.
+
+## 2026-07-28T13:26:54Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase7-houses-hotels
+commit: 3c123453c9
+```
+
+Summary: implemented phase 7 houses and hotels — turn-time building for the
+initiative winner, improved-street rent, direct house sale and hotel exchange,
+and the acceptance/journal/report coverage for the new slice — with `181`
+domain tests and the full normal acceptance pipeline (`141` generated
+acceptance tests) passing.
