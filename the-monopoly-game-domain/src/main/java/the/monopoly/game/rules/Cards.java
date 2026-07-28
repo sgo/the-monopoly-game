@@ -225,14 +225,16 @@ public final class Cards implements Landings {
   }
 
   private void advanceToNearestStation(Player player) {
-    moveTo(player, nearestStationFrom(player.position().index()), false);
-    Station station = (Station) rules.create(CentraalStation);
+    Street.Type nearestStation = nearestStationFrom(player.position().index());
+    moveTo(player, nearestStation, false);
+    Station station = (Station) rules.create(nearestStation);
     resolveNearestOwnedLand(player, station, station.rentForOwning(1).plus(station.rentForOwning(1)));
   }
 
   private void advanceToNearestUtility(Player player) {
-    moveTo(player, nearestUtilityFrom(player.position().index()), false);
-    Utility utility = (Utility) rules.create(Elektriciteitscentrale);
+    Street.Type nearestUtility = nearestUtilityFrom(player.position().index());
+    moveTo(player, nearestUtility, false);
+    Utility utility = (Utility) rules.create(nearestUtility);
     if (deeds.isUnowned(utility.type())) {
       buyIfAccepted(player, utility);
       return;
@@ -265,19 +267,23 @@ public final class Cards implements Landings {
   }
 
   private void payEveryOtherPlayer(Player player, Money amount) {
-    for (Player other : players) {
-      if (other.id().equals(player.id())) continue;
-      player.account().withdraw(amount);
-      other.account().deposit(amount);
-    }
+    forEveryOtherPlayer(player, other -> transfer(player, other, amount));
   }
 
   private void collectFromEveryOtherPlayer(Player player, Money amount) {
+    forEveryOtherPlayer(player, other -> transfer(other, player, amount));
+  }
+
+  private void forEveryOtherPlayer(Player player, Consumer<Player> action) {
     for (Player other : players) {
       if (other.id().equals(player.id())) continue;
-      other.account().withdraw(amount);
-      player.account().deposit(amount);
+      action.accept(other);
     }
+  }
+
+  private void transfer(Player payer, Player payee, Money amount) {
+    payer.account().withdraw(amount);
+    payee.account().deposit(amount);
   }
 
   private void repair(Player player, Money perHouse, Money perHotel) {
@@ -360,26 +366,26 @@ public final class Cards implements Landings {
 
 /* mutate4java-manifest
 version=1
-moduleHash=59a011814308b8a2376337bb6fea7ce5b5f76aed4b643c2d74ac2f6d771ea706
+moduleHash=4ac83e5a48215dc4ddbcc8cc40f751dc2bd828956ccc2f7309477e67dd93b8a5
 scope.0.id=Y2xhc3M6Q2FyZHMjQ2FyZHM6MzI
 scope.0.kind=class
 scope.0.startLine=32
-scope.0.endLine=359
-scope.0.semanticHash=8e4feee2274b78af5678c171e03df903c3775c0f1ae558c399aac9490b20415c
-scope.1.id=Y2xhc3M6Q2FyZHMuRGVja3MjRGVja3M6MzIy
+scope.0.endLine=365
+scope.0.semanticHash=ecdc8f379197cee80fa506500dee70e9dce87687a675e8866ad0d205b0a9fe8b
+scope.1.id=Y2xhc3M6Q2FyZHMuRGVja3MjRGVja3M6MzI4
 scope.1.kind=class
-scope.1.startLine=322
-scope.1.endLine=338
+scope.1.startLine=328
+scope.1.endLine=344
 scope.1.semanticHash=ef5cf83a0b693680d125f93b5d224de301b13802ad968b301ca7f8c17d28aa03
-scope.2.id=Y2xhc3M6Q2FyZHMuRGVja3MuIzozMjM
+scope.2.id=Y2xhc3M6Q2FyZHMuRGVja3MuIzozMjk
 scope.2.kind=class
-scope.2.startLine=323
-scope.2.endLine=333
+scope.2.startLine=329
+scope.2.endLine=339
 scope.2.semanticHash=2b576fb5dd021afd0922c9494d6778520a99a177e7335c905ad4552867f6acb0
-scope.3.id=Y2xhc3M6Q2FyZHMuRXZlbnRzI0V2ZW50czozNDA
+scope.3.id=Y2xhc3M6Q2FyZHMuRXZlbnRzI0V2ZW50czozNDY
 scope.3.kind=class
-scope.3.startLine=340
-scope.3.endLine=358
+scope.3.startLine=346
+scope.3.endLine=364
 scope.3.semanticHash=20eaac32307cc453cb458a18bc10ed7f39d6ab27f1faa06140b1e7619ec1b63c
 scope.4.id=ZmllbGQ6Q2FyZHMjY2hhbmNlRWZmZWN0czo0MA
 scope.4.kind=field
@@ -426,164 +432,174 @@ scope.12.kind=field
 scope.12.startLine=36
 scope.12.endLine=36
 scope.12.semanticHash=8f90b89a0f4f61ab31d1d05eb010b34195c3e0a9cffef75c49d25c1fcf7e77c8
-scope.13.id=ZmllbGQ6Q2FyZHMuRGVja3MjRU1QVFk6MzIz
+scope.13.id=ZmllbGQ6Q2FyZHMuRGVja3MjRU1QVFk6MzI5
 scope.13.kind=field
-scope.13.startLine=323
-scope.13.endLine=333
+scope.13.startLine=329
+scope.13.endLine=339
 scope.13.semanticHash=7820cd4ba7626263bb22a21f9d65fc8826d029f9ca9bbee46ff774b8136829b2
 scope.14.id=bWV0aG9kOkNhcmRzI2FkdmFuY2VUb05lYXJlc3RTdGF0aW9uKDEpOjIyNw
 scope.14.kind=method
 scope.14.startLine=227
-scope.14.endLine=231
-scope.14.semanticHash=b854ae964d1d25dc98256ac70685a78ac07cceacf90a120e52e04527abe7b64a
-scope.15.id=bWV0aG9kOkNhcmRzI2FkdmFuY2VUb05lYXJlc3RVdGlsaXR5KDEpOjIzMw
+scope.14.endLine=232
+scope.14.semanticHash=9680a9310759657639f715cf979a3a00db593bb91c1cb5f773d1dabb693b1ad0
+scope.15.id=bWV0aG9kOkNhcmRzI2FkdmFuY2VUb05lYXJlc3RVdGlsaXR5KDEpOjIzNA
 scope.15.kind=method
-scope.15.startLine=233
-scope.15.endLine=242
-scope.15.semanticHash=eefb876c98262b0c18fb0944dab71d0ba1010914466fc5d50b8a3131a85f9663
+scope.15.startLine=234
+scope.15.endLine=244
+scope.15.semanticHash=4f7c76fbf9d47269c2dd5a31e5582f84c9d70d14f03fd6ecd2937f1b107026df
 scope.16.id=bWV0aG9kOkNhcmRzI2FwcGx5RWZmZWN0KDMpOjIxMg
 scope.16.kind=method
 scope.16.startLine=212
 scope.16.endLine=215
 scope.16.semanticHash=a85287f1158a29f45f46378c66be706d6334c4a24fe5dcdee0e1c46f64b95279
-scope.17.id=bWV0aG9kOkNhcmRzI2J1eUlmQWNjZXB0ZWQoMik6MjUy
+scope.17.id=bWV0aG9kOkNhcmRzI2J1eUlmQWNjZXB0ZWQoMik6MjU0
 scope.17.kind=method
-scope.17.startLine=252
-scope.17.endLine=256
+scope.17.startLine=254
+scope.17.endLine=258
 scope.17.semanticHash=681cff6cb2a99e43c37acb803c9210c75d4f477d4b6d8d872edf368ab2449ab4
-scope.18.id=bWV0aG9kOkNhcmRzI2NvbGxlY3RGcm9tRXZlcnlPdGhlclBsYXllcigyKToyNzU
+scope.18.id=bWV0aG9kOkNhcmRzI2NvbGxlY3RGcm9tRXZlcnlPdGhlclBsYXllcigyKToyNzM
 scope.18.kind=method
-scope.18.startLine=275
-scope.18.endLine=281
-scope.18.semanticHash=6789eb05050a1fea33398dc287a5d6a58f457202d57f2b29af3e12093972a549
+scope.18.startLine=273
+scope.18.endLine=275
+scope.18.semanticHash=e2e3cabf4b21ae631f1e4b8950b7d933c9d26d62ebd359705c4047dc67ef4855
 scope.19.id=bWV0aG9kOkNhcmRzI2N0b3IoNyk6NDM
 scope.19.kind=method
 scope.19.startLine=43
 scope.19.endLine=182
 scope.19.semanticHash=70c55cbc84372cf2521b60c9291e8450df4c9d9bf2dd9ddc5ce890d901ff1b13
-scope.20.id=bWV0aG9kOkNhcmRzI21vdmVUbygzKToyMTc
+scope.20.id=bWV0aG9kOkNhcmRzI2ZvckV2ZXJ5T3RoZXJQbGF5ZXIoMik6Mjc3
 scope.20.kind=method
-scope.20.startLine=217
-scope.20.endLine=225
-scope.20.semanticHash=aa3c08b2181fc8ed84e3c87d4ba1d71a3ad92f15dddf0329dc7d8586411b8bbb
-scope.21.id=bWV0aG9kOkNhcmRzI25lYXJlc3RTdGF0aW9uRnJvbSgxKToyOTk
+scope.20.startLine=277
+scope.20.endLine=282
+scope.20.semanticHash=c33add1da7ee7440d8cc8050b4ff7516cf27df6e4d0f399962bf5086c948666c
+scope.21.id=bWV0aG9kOkNhcmRzI21vdmVUbygzKToyMTc
 scope.21.kind=method
-scope.21.startLine=299
-scope.21.endLine=304
-scope.21.semanticHash=41ef05423396490061361fb466ef00845ae6267c90dbe0d6ee7073e489e30ce2
-scope.22.id=bWV0aG9kOkNhcmRzI25lYXJlc3RVdGlsaXR5RnJvbSgxKTozMDY
+scope.21.startLine=217
+scope.21.endLine=225
+scope.21.semanticHash=aa3c08b2181fc8ed84e3c87d4ba1d71a3ad92f15dddf0329dc7d8586411b8bbb
+scope.22.id=bWV0aG9kOkNhcmRzI25lYXJlc3RTdGF0aW9uRnJvbSgxKTozMDU
 scope.22.kind=method
-scope.22.startLine=306
-scope.22.endLine=308
-scope.22.semanticHash=1cabe84ca4b4a6c50bb5be30bcd1e7e35e757eacb6217bbcbf816b7aae1f67fb
-scope.23.id=bWV0aG9kOkNhcmRzI3Bhc3Nlc1N0YXJ0KDIpOjMxMA
+scope.22.startLine=305
+scope.22.endLine=310
+scope.22.semanticHash=41ef05423396490061361fb466ef00845ae6267c90dbe0d6ee7073e489e30ce2
+scope.23.id=bWV0aG9kOkNhcmRzI25lYXJlc3RVdGlsaXR5RnJvbSgxKTozMTI
 scope.23.kind=method
-scope.23.startLine=310
-scope.23.endLine=312
-scope.23.semanticHash=06190d79e96c8b7ba59f65e9f47c6f432e31408f4a04d6cd9471568d0c89caa3
-scope.24.id=bWV0aG9kOkNhcmRzI3BheUJhbmsoMik6Mjk0
+scope.23.startLine=312
+scope.23.endLine=314
+scope.23.semanticHash=1cabe84ca4b4a6c50bb5be30bcd1e7e35e757eacb6217bbcbf816b7aae1f67fb
+scope.24.id=bWV0aG9kOkNhcmRzI3Bhc3Nlc1N0YXJ0KDIpOjMxNg
 scope.24.kind=method
-scope.24.startLine=294
-scope.24.endLine=297
-scope.24.semanticHash=1f39aeb2b57754514eeadc674bdc6a6da6af34eed477312be702ee7c46acb1f1
-scope.25.id=bWV0aG9kOkNhcmRzI3BheUV2ZXJ5T3RoZXJQbGF5ZXIoMik6MjY3
+scope.24.startLine=316
+scope.24.endLine=318
+scope.24.semanticHash=06190d79e96c8b7ba59f65e9f47c6f432e31408f4a04d6cd9471568d0c89caa3
+scope.25.id=bWV0aG9kOkNhcmRzI3BheUJhbmsoMik6MzAw
 scope.25.kind=method
-scope.25.startLine=267
-scope.25.endLine=273
-scope.25.semanticHash=c8d525cfa4495ccab219ca7f5e007ec8f39e9d93a2292fa558564181373a789e
-scope.26.id=bWV0aG9kOkNhcmRzI3BheVNwZWNpYWxSZW50KDMpOjI1OA
+scope.25.startLine=300
+scope.25.endLine=303
+scope.25.semanticHash=1f39aeb2b57754514eeadc674bdc6a6da6af34eed477312be702ee7c46acb1f1
+scope.26.id=bWV0aG9kOkNhcmRzI3BheUV2ZXJ5T3RoZXJQbGF5ZXIoMik6MjY5
 scope.26.kind=method
-scope.26.startLine=258
-scope.26.endLine=265
-scope.26.semanticHash=0520e156371c476d179b995694eb74f5ac0c517308f75688b0c3acc85b618838
-scope.27.id=bWV0aG9kOkNhcmRzI3BsYXllck5hbWVkKDEpOjMxNA
+scope.26.startLine=269
+scope.26.endLine=271
+scope.26.semanticHash=c43756e4a4036dd9bba5e6842a1c84247917f86e6606cd234b21a7cbb63eb86a
+scope.27.id=bWV0aG9kOkNhcmRzI3BheVNwZWNpYWxSZW50KDMpOjI2MA
 scope.27.kind=method
-scope.27.startLine=314
-scope.27.endLine=316
-scope.27.semanticHash=fe784ad0d125f4f24c91a494994efaa90a23932b8683b3623632b72cf559a25c
-scope.28.id=bWV0aG9kOkNhcmRzI3JlcGFpcigzKToyODM
+scope.27.startLine=260
+scope.27.endLine=267
+scope.27.semanticHash=0520e156371c476d179b995694eb74f5ac0c517308f75688b0c3acc85b618838
+scope.28.id=bWV0aG9kOkNhcmRzI3BsYXllck5hbWVkKDEpOjMyMA
 scope.28.kind=method
-scope.28.startLine=283
-scope.28.endLine=292
-scope.28.semanticHash=0cd5e8a8469fa89ba6fcaca05a748f6d7cd427161d18f6b11e70dda455733b11
-scope.29.id=bWV0aG9kOkNhcmRzI3Jlc29sdmUoMyk6MTg0
+scope.28.startLine=320
+scope.28.endLine=322
+scope.28.semanticHash=fe784ad0d125f4f24c91a494994efaa90a23932b8683b3623632b72cf559a25c
+scope.29.id=bWV0aG9kOkNhcmRzI3JlcGFpcigzKToyODk
 scope.29.kind=method
-scope.29.startLine=184
-scope.29.endLine=202
-scope.29.semanticHash=78e21146aa1a6e4f5a0be32ae3f372f03c5eb4ced792fb7b2295885e0f308ba2
-scope.30.id=bWV0aG9kOkNhcmRzI3Jlc29sdmVDaGFuY2UoMik6MjA0
+scope.29.startLine=289
+scope.29.endLine=298
+scope.29.semanticHash=0cd5e8a8469fa89ba6fcaca05a748f6d7cd427161d18f6b11e70dda455733b11
+scope.30.id=bWV0aG9kOkNhcmRzI3Jlc29sdmUoMyk6MTg0
 scope.30.kind=method
-scope.30.startLine=204
-scope.30.endLine=206
-scope.30.semanticHash=1988adc70238943bdf1656e6039e31d358cf88f849f29059bff4d2719d4abb57
-scope.31.id=bWV0aG9kOkNhcmRzI3Jlc29sdmVDb21tdW5pdHlDaGVzdCgyKToyMDg
+scope.30.startLine=184
+scope.30.endLine=202
+scope.30.semanticHash=78e21146aa1a6e4f5a0be32ae3f372f03c5eb4ced792fb7b2295885e0f308ba2
+scope.31.id=bWV0aG9kOkNhcmRzI3Jlc29sdmVDaGFuY2UoMik6MjA0
 scope.31.kind=method
-scope.31.startLine=208
-scope.31.endLine=210
-scope.31.semanticHash=9ee220be1a098761911e3f25168726d1285fa94b4db0d8ecf1fdb7245e383158
-scope.32.id=bWV0aG9kOkNhcmRzI3Jlc29sdmVOZWFyZXN0T3duZWRMYW5kKDMpOjI0NA
+scope.31.startLine=204
+scope.31.endLine=206
+scope.31.semanticHash=1988adc70238943bdf1656e6039e31d358cf88f849f29059bff4d2719d4abb57
+scope.32.id=bWV0aG9kOkNhcmRzI3Jlc29sdmVDb21tdW5pdHlDaGVzdCgyKToyMDg
 scope.32.kind=method
-scope.32.startLine=244
-scope.32.endLine=250
-scope.32.semanticHash=b57bccc6249a032fb0172f9e981cc026f58a56e1f750caf66b245abd0efc39a7
-scope.33.id=bWV0aG9kOkNhcmRzI3N0YXJ0KDApOjMxOA
+scope.32.startLine=208
+scope.32.endLine=210
+scope.32.semanticHash=9ee220be1a098761911e3f25168726d1285fa94b4db0d8ecf1fdb7245e383158
+scope.33.id=bWV0aG9kOkNhcmRzI3Jlc29sdmVOZWFyZXN0T3duZWRMYW5kKDMpOjI0Ng
 scope.33.kind=method
-scope.33.startLine=318
-scope.33.endLine=320
-scope.33.semanticHash=0b7b648dc264a3be8475ab9fe4816d765dfd01de5d8fde789cca137a195e3940
-scope.34.id=bWV0aG9kOkNhcmRzLkRlY2tzI2RyYXdDaGFuY2UoMCk6MzM1
+scope.33.startLine=246
+scope.33.endLine=252
+scope.33.semanticHash=b57bccc6249a032fb0172f9e981cc026f58a56e1f750caf66b245abd0efc39a7
+scope.34.id=bWV0aG9kOkNhcmRzI3N0YXJ0KDApOjMyNA
 scope.34.kind=method
-scope.34.startLine=335
-scope.34.endLine=335
-scope.34.semanticHash=a84b4c10cc2fde301018e36d1204857190da2706ae8a907322e7b0e0369b1866
-scope.35.id=bWV0aG9kOkNhcmRzLkRlY2tzI2RyYXdDb21tdW5pdHlDaGVzdCgwKTozMzc
+scope.34.startLine=324
+scope.34.endLine=326
+scope.34.semanticHash=0b7b648dc264a3be8475ab9fe4816d765dfd01de5d8fde789cca137a195e3940
+scope.35.id=bWV0aG9kOkNhcmRzI3RyYW5zZmVyKDMpOjI4NA
 scope.35.kind=method
-scope.35.startLine=337
-scope.35.endLine=337
-scope.35.semanticHash=6c5b3b712f6d4cd48469f646abbf574fa6f5dfd76e2ad10981ec5cf0c95498b9
-scope.36.id=bWV0aG9kOkNhcmRzLkRlY2tzLiNjdG9yKDApOjMyMw
+scope.35.startLine=284
+scope.35.endLine=287
+scope.35.semanticHash=c50901e309edaa4eeb1a6ffaed8edf2e0f3b0fdd1f0d6073092c89db12458a5b
+scope.36.id=bWV0aG9kOkNhcmRzLkRlY2tzI2RyYXdDaGFuY2UoMCk6MzQx
 scope.36.kind=method
-scope.36.startLine=1
-scope.36.endLine=359
-scope.36.semanticHash=20756feace9f025834dd7bf965e50083ccd576366a024106dc85f10684ce6383
-scope.37.id=bWV0aG9kOkNhcmRzLkRlY2tzLiNkcmF3Q2hhbmNlKDApOjMyNA
+scope.36.startLine=341
+scope.36.endLine=341
+scope.36.semanticHash=a84b4c10cc2fde301018e36d1204857190da2706ae8a907322e7b0e0369b1866
+scope.37.id=bWV0aG9kOkNhcmRzLkRlY2tzI2RyYXdDb21tdW5pdHlDaGVzdCgwKTozNDM
 scope.37.kind=method
-scope.37.startLine=324
-scope.37.endLine=327
-scope.37.semanticHash=75f25725ea61196b43460e87d9eb7ac2f3793c53743dc71c8aa48c6b5295c86e
-scope.38.id=bWV0aG9kOkNhcmRzLkRlY2tzLiNkcmF3Q29tbXVuaXR5Q2hlc3QoMCk6MzI5
+scope.37.startLine=343
+scope.37.endLine=343
+scope.37.semanticHash=6c5b3b712f6d4cd48469f646abbf574fa6f5dfd76e2ad10981ec5cf0c95498b9
+scope.38.id=bWV0aG9kOkNhcmRzLkRlY2tzLiNjdG9yKDApOjMyOQ
 scope.38.kind=method
-scope.38.startLine=329
-scope.38.endLine=332
-scope.38.semanticHash=a9b96cb65b99d8a7e227376b20728f740ab1b699cd8ff8e6942ca7a361c4efae
-scope.39.id=bWV0aG9kOkNhcmRzLkV2ZW50cyNib3VnaHQoMyk6MzUz
+scope.38.startLine=1
+scope.38.endLine=365
+scope.38.semanticHash=eef5fe415e3e69b408b9e2f6af86f4be4bb1d20c845def55e5f7d7ed5a552ddd
+scope.39.id=bWV0aG9kOkNhcmRzLkRlY2tzLiNkcmF3Q2hhbmNlKDApOjMzMA
 scope.39.kind=method
-scope.39.startLine=353
-scope.39.endLine=354
-scope.39.semanticHash=fe51180aade1580800fcb97fecb03c63966e127c7bc1fa39f2bef4fb96d1e8f3
-scope.40.id=bWV0aG9kOkNhcmRzLkV2ZW50cyNjb2xsZWN0ZWRTYWxhcnkoMik6MzUw
+scope.39.startLine=330
+scope.39.endLine=333
+scope.39.semanticHash=75f25725ea61196b43460e87d9eb7ac2f3793c53743dc71c8aa48c6b5295c86e
+scope.40.id=bWV0aG9kOkNhcmRzLkRlY2tzLiNkcmF3Q29tbXVuaXR5Q2hlc3QoMCk6MzM1
 scope.40.kind=method
-scope.40.startLine=350
-scope.40.endLine=351
-scope.40.semanticHash=6cd1f36caef5236a7b98bb77c90da39864e729d6d252fdc58b623f587a32a1b6
-scope.41.id=bWV0aG9kOkNhcmRzLkV2ZW50cyNkcmV3Q2hhbmNlQ2FyZCgyKTozNDE
+scope.40.startLine=335
+scope.40.endLine=338
+scope.40.semanticHash=a9b96cb65b99d8a7e227376b20728f740ab1b699cd8ff8e6942ca7a361c4efae
+scope.41.id=bWV0aG9kOkNhcmRzLkV2ZW50cyNib3VnaHQoMyk6MzU5
 scope.41.kind=method
-scope.41.startLine=341
-scope.41.endLine=342
-scope.41.semanticHash=7b0194aa9f23bf63efea81fd631b079753c33870544c4dca20241857204bfc7b
-scope.42.id=bWV0aG9kOkNhcmRzLkV2ZW50cyNkcmV3Q29tbXVuaXR5Q2hlc3RDYXJkKDIpOjM0NA
+scope.41.startLine=359
+scope.41.endLine=360
+scope.41.semanticHash=fe51180aade1580800fcb97fecb03c63966e127c7bc1fa39f2bef4fb96d1e8f3
+scope.42.id=bWV0aG9kOkNhcmRzLkV2ZW50cyNjb2xsZWN0ZWRTYWxhcnkoMik6MzU2
 scope.42.kind=method
-scope.42.startLine=344
-scope.42.endLine=345
-scope.42.semanticHash=9528ca3ad2486c9408cbdb3ef55d179c6130ef07e735e866a35ecf42335536e8
-scope.43.id=bWV0aG9kOkNhcmRzLkV2ZW50cyNwYWlkKDQpOjM1Ng
+scope.42.startLine=356
+scope.42.endLine=357
+scope.42.semanticHash=6cd1f36caef5236a7b98bb77c90da39864e729d6d252fdc58b623f587a32a1b6
+scope.43.id=bWV0aG9kOkNhcmRzLkV2ZW50cyNkcmV3Q2hhbmNlQ2FyZCgyKTozNDc
 scope.43.kind=method
-scope.43.startLine=356
-scope.43.endLine=357
-scope.43.semanticHash=a556c06e7cd612f2e84e1f18f111dee281ba093fb489ff34d85445cfef3df069
-scope.44.id=bWV0aG9kOkNhcmRzLkV2ZW50cyNwYWlkQmFuaygyKTozNDc
+scope.43.startLine=347
+scope.43.endLine=348
+scope.43.semanticHash=7b0194aa9f23bf63efea81fd631b079753c33870544c4dca20241857204bfc7b
+scope.44.id=bWV0aG9kOkNhcmRzLkV2ZW50cyNkcmV3Q29tbXVuaXR5Q2hlc3RDYXJkKDIpOjM1MA
 scope.44.kind=method
-scope.44.startLine=347
-scope.44.endLine=348
-scope.44.semanticHash=eef709f7374719985ca7629b07bc1a836e3c62e85ca90eb3e71b0f0e0eca0eb2
+scope.44.startLine=350
+scope.44.endLine=351
+scope.44.semanticHash=9528ca3ad2486c9408cbdb3ef55d179c6130ef07e735e866a35ecf42335536e8
+scope.45.id=bWV0aG9kOkNhcmRzLkV2ZW50cyNwYWlkKDQpOjM2Mg
+scope.45.kind=method
+scope.45.startLine=362
+scope.45.endLine=363
+scope.45.semanticHash=a556c06e7cd612f2e84e1f18f111dee281ba093fb489ff34d85445cfef3df069
+scope.46.id=bWV0aG9kOkNhcmRzLkV2ZW50cyNwYWlkQmFuaygyKTozNTM
+scope.46.kind=method
+scope.46.startLine=353
+scope.46.endLine=354
+scope.46.semanticHash=eef709f7374719985ca7629b07bc1a836e3c62e85ca90eb3e71b0f0e0eca0eb2
 */

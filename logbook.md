@@ -7807,3 +7807,21 @@ entries for card draws and bank payments. Verification passed with `mvn -B
 -pl the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core
 -Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2
 test` and `acceptance/run-acceptance.sh` (using the same local Maven repo).
+
+## 2026-07-28T22:26:34Z — architect completed phase 10 review follow-up
+
+Action taken: merged refactorer commit `d990a64b1d`, reviewed the Phase 10 chance/community chest implementation, and applied architect follow-up fixes.
+
+Summary: kept card behavior in the domain `Cards` rule, kept event wording in `Report`, and left acceptance wiring in the specs test tree. Fixed nearest station/utility card handling so the deed resolved for buying or special rent is the actual nearest station/utility reached, not always `CentraalStation` or `Elektriciteitscentrale`. Added mutation-killing regressions for nearest station/utility boundaries, no salary on backward card movement, self-owned/mortgaged special-rent suppression, START-to-START salary collection, and retained-card resale preserving card identity. Removed the duplicated player-transfer loop in `Cards`.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 229 tests passed.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2 -Pproperty-tests test` — 17 property tests passed.
+- `./acceptance/run-acceptance.sh` — 207 generated acceptance tests passed.
+- Differential Java mutation, one changed production file at a time with `--max-workers 8 --verbose`: `Cards.java` clean after follow-up (`19/19` killed before DRY refactor, then `11/11` killed after), `Deeds.java` `33/33` killed, `Game.java` `6/6` killed, `Report.java` `1/1` killed.
+- DRY check reviewed; the actionable `Cards` player-transfer duplicate was removed. Remaining findings are existing explicit journal/event/test/acceptance setup or older constructor/test-helper patterns.
+- `./acceptance/run-acceptance-mutation.sh --level soft` — passed; `cards.feature` 87/87 killed, `journal.feature` 1/1 killed, `report.feature` 1/1 killed.
+- `git diff --check` passed.
+
+Routing: this follow-up changes observable card behavior and regression tests, so it must go to coder only with priority 00. No phase-complete specifier sync is sent until the coder/refactorer follow-up loop returns and is accepted.
