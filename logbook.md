@@ -6247,6 +6247,24 @@ merge_and_process refactorer 8d2c1d06ba
 
 Action taken: began architectural review of the named refactorer commit.
 
+## 2026-07-28T20:30:37Z — architect completed phase 9 review follow-up
+
+Action taken: merged refactorer commit `24997ec8ae`, reviewed the Phase 9 land-sale implementation, and applied architect follow-up fixes.
+
+Summary: kept the phase 9 ownership-transfer behavior in the domain layer, preserved report/journal wording behind `Report`, fixed building so a refused build on one mortgaged colour group does not block legal building on another monopoly, added regression coverage for station sales, removed duplicated monopoly filtering in `Building`, and hardened the journal/report land-sale scenarios so action-price and expected-price mutations are independently checked.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 205 tests passed.
+- `mvn -B -Dmaven.repo.local=tmp/m2 -Pproperty test` — 17 property tests passed.
+- `./acceptance/run-acceptance.sh` — 162 generated acceptance tests passed.
+- `./acceptance/run-acceptance-mutation.sh --level soft` — passed; journal/report sale-price mutants killed after adding separate expected-price examples.
+- Java mutation: `Building.java` 8/8 killed, `LandSale.java` 11/11 killed, `Game.java` 5/5 killed, `Report.java` 1/1 killed.
+- DRY check reviewed; remaining findings are existing explicit event-forwarder/test/acceptance setup patterns, not duplicate phase 9 production logic.
+- `git diff --check` passed.
+
+Routing: this follow-up changes observable behavior and tests, so it must go to coder only with priority 00. No specifier phase-complete sync is sent until the coder follow-up loop returns and is accepted.
+
 ## 2026-07-28T11:51:24Z — architect review of redundant follow-up
 
 The refactorer commit contains no source, test, manifest, or configuration
