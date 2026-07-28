@@ -7169,3 +7169,108 @@ once per completed task instead of once per commit, and says not to notify
 the coder again without user approval, which this role already does — so it
 was merged, but the missing audit trail is a real deviation worth the user's
 attention before it's treated as authoritative.
+
+## 2026-07-28T19:18:47Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/50_20260728T191847Z_000017_from_coder_to_refactorer.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase8-mortgaging
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder 70234b9f8f
+```
+
+Action taken: merged `70234b9f8f` into `swarmforge-refactorer` as `f4e5452460`.
+Only `logbook.md` conflicted; every source, test, and feature file auto-merged
+cleanly. The conflict was larger than usual: the coder's branch was carrying
+the specifier's full activity log (phases 3 through 7) that had never reached
+mine, interleaved with my own phase 7 entries and the architect's
+acknowledgement of them. Resolved at entry granularity by strict chronological
+reconstruction rather than picking a side — 11 headers total, none shared with
+a common ancestor for this stretch, ordered by timestamp regardless of which
+side authored them. Header-count arithmetic confirms nothing lost or
+duplicated: 203 (common ancestor) + 2 (mine, new) + 12 (coder's, new) = 217,
+matching the merged file exactly, with `uniq -d` on all headers turning up no
+duplicates.
+
+The mortgaging slice itself: `Deeds` gained `transfer` (title changes hands
+between two players rather than bank-to-player), `mortgage`/`keepMortgaged`/
+`liftMortgage`/`arrangeMortgaged`/`isMortgaged`, backed by a private
+`Mortgage` record computing 10%-rounded-up interest. `Rent.collect` now
+returns early on mortgaged land, and the colour-group monopoly check in
+`colourStreetRent` treats a mortgaged street in the group as breaking the
+monopoly for double-rent purposes. `Building.monopoliesOwnedBy` excludes any
+group with a mortgaged street from development. `Journal.Entry` gained
+`Mortgaged` and `MortgageLifted`, and `Report.line` grew two more cases for
+them (still the one exempt sealed-switch dispatch — CRAP now 15,2, up from
+13,2, tracking the sealed type's growing width). Coverage is already solid:
+new `DeedsTest`, `RentTest`, `GameTest`, and `ReportTest` cases exercise
+mortgaging, transfer-while-mortgaged, rent suppression, monopoly-breaking, and
+the building restriction; `mortgage.feature` and `mortgage-transfer.feature`
+are both wired onto the acceptance pipeline already. I did not extend
+property-test coverage further — the unit tests already sweep the interest
+and value arithmetic, and a mortgage/lift-mortgage cycle over every street
+type would be duplicating what `DeedsPropertyTest`'s existing house/hotel
+sweeps already establish as the right shape for this class, without adding a
+distinct risk the unit tests miss.
+
+Worth flagging, not fixing: mortgaging is wired into `Deeds` and `Report`, but
+not into `Game`'s turn loop or `Strategy` — `World.java`'s acceptance step
+handlers call `deeds.mortgage(...)` directly and hand-construct the journal
+entry, the same way earlier phases exercised new `Deeds` mechanics ahead of
+`Game`/`Strategy` integration. Consistent with how building was staged before
+it, so not treated as a defect, but noted in case the architect intends
+mortgaging to be strategy-driven within a turn in a later phase.
+
+dry4java initially flagged a real duplicate at `Deeds.java:151-154` and
+`:156-159`: the coder's new `mortgage`/`liftMortgage`/etc. needed a
+`verifyOwner` that took `Ownable` rather than the existing `ColourStreet`-typed
+one used by the house/hotel methods, and added a second overload with an
+identical body instead of widening the first. `ColourStreet` already
+implements `Ownable`, so every existing call site resolves to the wider
+overload with no behavior change; removed the narrower one in `dd8bab5911` and
+regenerated its mutate4java manifest. DRY count back to 26, matching the
+established baseline — the remaining candidates are the same accepted
+arrange-act-assert and constructor-shape similarities as every prior round.
+
+Full verification on the final state: 197 unit tests, 17 property tests, and
+154 acceptance tests all pass, up from 141 before this merge — the new
+`mortgage.feature` and `mortgage-transfer.feature` plus a scenario apiece
+added to `journal.feature` and `report.feature`. CRAP clean but for the
+exempt `Report.line`. Mutation scan on every changed file stays well under
+the 100-site threshold (`Deeds` is the largest at 32). Nothing else left to
+do on this state.
+
+## 2026-07-28T19:34:00Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260728T193400Z_000030_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase8-mortgaging
+commit: dd8bab5911
+created_at: 2026-07-28T19:34:00.732058Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer dd8bab5911
+```
+
+Summary: merged the mortgaging slice and consolidated the one duplicate
+`verifyOwner` overload it introduced; unit (197), property (17), and
+acceptance (154, up from 141) verification all pass. Flagged, not fixed:
+mortgaging is not yet wired into `Game`'s turn loop or `Strategy`, only
+exercised directly through `Deeds` and hand-built journal entries in the
+acceptance step handlers — consistent with how building was staged before
+it, so noted rather than treated as a defect.
