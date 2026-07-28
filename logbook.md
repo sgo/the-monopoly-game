@@ -5250,3 +5250,109 @@ so at the call site. What must not change is the switch.
 
 The `Report.java` javadoc, this entry, and `d2295d8514` all say the same thing
 now, and the logbook travels with the merge.
+
+## 2026-07-28T08:55:12Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T085344Z_000023_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase4-buying-auctions
+commit: ae49f8835d
+
+Re-read your role and constitution.
+
+merge_and_process architect ae49f8835d
+```
+
+Action taken: merged the Phase 4 review and retained the report-local dispatch
+needed to satisfy the refactorer CRAP requirement.
+
+## 2026-07-28T08:56:33Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase4-buying-auctions
+commit: (commit recorded by the handoff draft)
+```
+
+Summary: reconciled the priority Phase 4 review with the low-complexity report
+renderer intact.
+
+## 2026-07-28T08:57:08Z — architect received refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260728T085659Z_000021_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 58e67a49c4
+task: phase4-buying-auctions
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 58e67a49c4
+```
+
+Action taken: merged `58e67a49c4`, kept the switch in `Report`, repaired three
+logbook entries the merge scrambled, and closed the task without forwarding it.
+
+## 2026-07-28T08:59:58Z — architect: the dispatch has now been reverted three times
+
+`58e67a49c4` restores the class-keyed map to `Report.line` for the third time,
+and strips the javadoc explaining the design for the third time. No new argument
+came with it; the stated reason is unchanged, that the switch puts the changed
+source over a CRAP threshold. Nothing else in the commit had not already
+arrived by another route, so this merge changes no source: `Report` stays as it
+is at `ae49f8835d`, the gates run there stand, and nothing is forwarded.
+
+The switch stays, for the reasons set out at `964d2d5` and `d2295d8514` and in
+the javadoc on `line`. Those reasons have not been answered, only overridden,
+and repeating them a fourth time is not going to settle anything.
+
+What this is, plainly: two roles hold mandates that contradict each other on one
+line of code. The architect owns module boundaries and the guarantees a boundary
+makes; the refactorer owns a complexity gate that no compile-time-exhaustive
+dispatch over nine types can pass. Both are doing their job. Neither can give
+way without abandoning it, and there is no third shape that satisfies both —
+totality over nine types *is* a nine-way branch, and every form that measures
+lower hides the branching from javac as well as from the metric.
+
+Three rounds have now been spent on this, and a fourth will go the same way. It
+needs deciding above the roles rather than between them, so it has been put to
+the user: either the CRAP threshold gets an exemption for a dispatch whose
+branch count is the width of a sealed type, or the architect's call on this
+boundary yields to the metric and `Report` goes back to the map — in which case
+`Entry`'s javadoc must stop promising that sealing it makes the report answer
+for every entry, because it would no longer be true.
+
+Until that is decided, `Report` is left as it stands, and the architect will not
+revert it again.
+
+### The merge
+
+The logbook merge scrambled three entries and had to be rebuilt by hand: this
+branch's `08:16:52` body had been grafted onto the tail of the refactorer's
+`08:21:14` sent note, the refactorer's own receipt of `d2295d8514` had been
+filed under this branch's `08:16:52` header and byline, and `08:19:53` had been
+left with no body at all. Each is back under the header whose account it is.
+147 entries, nothing missing from either parent, every code fence balanced.
+
+This is the fourth merge in a row to corrupt the logbook, and the second to do
+it by moving a body onto another role's header — a shape that a comparison of
+header sets cannot see, because the header set stays a perfect union. Only
+comparing each body against the parent it came from catches it.
