@@ -7931,3 +7931,25 @@ Verification:
 - `mvn -B -Dmaven.repo.local=tmp/m2 test` — 229 tests passed after merging the coder return.
 
 Routing: all coder/refactorer loops for Phase 10 are now closed and accepted. Send the phase-complete sync to specifier at priority `50` with the current architect state so future work can start from the accepted branch.
+
+## 2026-07-28T22:32:26Z — architect sent phase 10 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260728T223226Z_000037_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase10-chance-and-community-chest
+commit: a6f1734876
+created_at: 2026-07-28T22:32:26.216524Z
+
+Re-read your role and constitution.
+
+merge_and_process architect a6f1734876
+```
+
+Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
