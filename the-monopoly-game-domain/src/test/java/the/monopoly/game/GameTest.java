@@ -148,7 +148,7 @@ class GameTest {
     Game.Result result = playWith(Map.of(Pawn.dog.id(), new AgreeIfAffordable()));
 
     assertThat(result.deeds().ownerOf(Street.Type.DiestsestraatLeuven)).contains(Pawn.dog.id());
-    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1440));
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1448));
   }
 
   @Test

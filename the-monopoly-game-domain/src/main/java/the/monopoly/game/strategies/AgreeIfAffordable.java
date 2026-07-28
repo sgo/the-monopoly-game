@@ -1,6 +1,7 @@
 package the.monopoly.game.strategies;
 
 import the.monopoly.game.components.finance.Money;
+import the.monopoly.game.rules.Rent;
 
 /**
  * Agrees to whatever it has the means to pay for: it buys land it can afford,
@@ -15,6 +16,11 @@ public final class AgreeIfAffordable implements Strategy {
   @Override
   public Money bidFor(Offer offer) {
     return offer.available();
+  }
+
+  @Override
+  public boolean claims(Rent.Claim claim) {
+    return true;
   }
 }
 

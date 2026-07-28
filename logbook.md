@@ -5494,6 +5494,259 @@ parent, every body byte-identical to the parent it came from. Git had placed
 the two new entries mid-file, ahead of entries an hour older than them; they are
 appended in time order instead.
 
+## 2026-07-28T07:29:31Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260728T072931Z_000010_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase4-buying-auctions
+commit: 9baf2dc824
+
+Re-read your role and constitution.
+
+merge_and_process coder 9baf2dc824
+```
+
+Summary: Phase 4's buying and auctions. `Landings` and `LandSale` resolve where
+a pawn stops, `Deeds` holds the titles, `Strategy` and `AgreeIfAffordable` make
+the decisions, and the journal and report account for purchases and auctions.
+165 unit tests and 118 acceptance scenarios pass. The mutate4java manifests on
+`Game`, `Report`, `Bank`, `Money` and `Turn` are stale by line number and were
+not hand-edited.
+
+## 2026-07-28T08:19:37Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T081635Z_000021_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: d2295d8514
+created_at: 2026-07-28T08:16:35.704935Z
+enqueued_at: 2026-07-28T08:16:36.437589Z
+task: phase3-journal-report
+dequeued_at: 2026-07-28T08:16:42.408290Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d2295d8514
+```
+
+Action taken: merged architect commit `d2295d8514` into `swarmforge-coder`,
+resolving the `logbook.md` conflict at entry granularity (136 entries; eight
+ours-only, five theirs-only, no divergent bodies) and the `TurnTest` conflict by
+keeping both sides, then verified the merged state.
+
+## 2026-07-28T08:22:00Z — coder verification of the merged architect state
+
+- `mvn test`: 165 unit tests pass.
+- `acceptance/run-acceptance.sh`: 118/118 across thirteen pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+The architect's review reached this branch after Phase 4 had been built on top
+of the state it reviewed, so the two met in `Report` and in `TurnTest`.
+
+`Report.line` merged cleanly: the exhaustive switch the architect restored now
+carries the two Phase 4 cases, which is what the switch is for — `Entry.Bought`
+and `Entry.AuctionWon` were added to a sealed interface, and the compiler is
+what said where to write their lines. Under the class-keyed map that was
+briefly there, both would have compiled unreported. The javadoc counts "seven
+one-line cases"; there are nine now, and the guidance in it is unaffected.
+
+`TurnTest`'s `aTurnThatReportsToNobodyStillPlays` now builds its own `Turn`
+rather than going through `takeTurn`, which the three Phase 4 arrival tests sit
+above unchanged. The finding behind that change is accepted: written through
+the helper, the test was byte-identical to `aTurnMovesThePawnTheTotalOfBoth-
+Dice` and covered the observer-less constructor only by accident. The same
+reading applies to the constructor Phase 4 added — `Turn(rules, cup, events)`
+now delegates to `Landings.UNEVENTFUL`, and nothing reaches it except the tests
+that spell it out.
+
+The `Report` and `TurnTest` gates the architect ran were measured before Phase
+4 existed. The acceptance mutation stamps on `journal.feature` and
+`report.feature` are stale for the same reason: the specifier added `journal-4`,
+`journal-5`, `report-4` and `report-5` after those stamps were taken. Nothing
+here edits a manifest by hand.
+
+## 2026-07-28T08:55:57Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T085344Z_000023_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: ae49f8835d
+created_at: 2026-07-28T08:53:44.528102Z
+enqueued_at: 2026-07-28T08:53:45.227251Z
+task: phase4-buying-auctions
+dequeued_at: 2026-07-28T08:53:51.616125Z
+
+Re-read your role and constitution.
+
+merge_and_process architect ae49f8835d
+```
+
+Action taken: merged architect commit `ae49f8835d` into `swarmforge-coder`,
+resolving the `logbook.md` conflict at entry granularity (143 entries; three
+ours-only, five theirs-only, three divergent bodies all authored by another
+role and all taken from theirs — two extra blank lines, and the refactorer's
+`22:47:00` note with its placeholder commit filled in), then verified the merged
+state.
+
+## 2026-07-28T08:58:00Z — coder verification of the merged architect state
+
+- `mvn test`: 165 unit tests pass.
+- `acceptance/run-acceptance.sh`: 118/118 across the thirteen features on the
+  pipeline, twelve of which are mutated and `dice` held back.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+Both findings against this role's work are accepted.
+
+`Account.credit` decremented a balance while `deposit` increased one — a
+customer's word for money coming in, next to the bank's word for money going
+out, pointing opposite ways. It predates this task, but Phase 4 is what made it
+carry money: `Deeds.sell` was written here as
+`buyer.account().credit(price)`, which reads as paying the buyer and does the
+reverse. It was read as "the bank credits its ledger" and never questioned,
+because the method already existed and compiled. `withdraw` cannot be read
+backwards, and the sale is the last place to leave a word pointing two ways.
+
+`World.positionOf` was written by copying the shape of `Turn.positionOf` —
+`layout().indexOf(space)` and the same not-found guard — while `Turn` was open
+in front of me. Both were reaching through `Board` into the list it holds and
+each deciding for itself what `-1` means, which is the layout leaking rather
+than two methods happening to look alike. `Board.positionOf` is where it
+belonged from the start, and the harness is better for getting the domain's
+`IllegalStateException` instead of an assertion of its own: a board with no such
+space is a broken board.
+
+The switch in `Report` did the job it was restored for. This merge put two new
+entry kinds against a seven-case switch and the module would not compile until
+both were written, which is the argument from `d2295d8514` paying off on the
+first change after it.
+
+One thing the architect raises is a question for the specifier rather than work
+for this role: `Strategy.bidFor` may return more than the bidder holds and
+`Deeds.sell` debits whatever it is told, so a bid beyond a player's means would
+take them below zero. `AgreeIfAffordable` never bids more than it has and no
+scenario scripts one that does, so nothing is wrong today. What an auction does
+with a bid nobody can pay is not something to invent in the rules.
+
+## 2026-07-28T09:07:53Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T090446Z_000025_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 727fe22ef7
+created_at: 2026-07-28T09:04:46.046621Z
+enqueued_at: 2026-07-28T09:04:46.201083Z
+task: phase4-buying-auctions
+dequeued_at: 2026-07-28T09:04:50.717919Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 727fe22ef7
+```
+
+Action taken: merged architect commit `727fe22ef7` into `swarmforge-coder`,
+resolving the `logbook.md` conflict at entry granularity (155 entries; five
+ours-only, ten theirs-only, one divergent body — an extra blank line in the
+architect's own `08:50:22` review, taken from theirs), then verified the merged
+state.
+
+## 2026-07-28T09:10:00Z — coder verification of the merged CRAP ruling
+
+- `mvn test`: 165 unit tests pass.
+- `acceptance/run-acceptance.sh`: 118/118 across the thirteen features on the
+  pipeline.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+No production behaviour arrived with this handoff. `Report.line` is unchanged
+but for a javadoc line citing the ruling, and `swarmforge/roles/refactorer.-
+prompt` now exempts a switch over a sealed type, exhaustive by compilation, from
+the CRAP threshold.
+
+Nothing here is owed by this role, but the finding behind the ruling is worth
+carrying: the disagreement was structural rather than a difference of judgement.
+The refactorer's prompt read "reduce CRAP to 6 or below" with no exceptions, and
+a switch exhaustive over a nine-member sealed interface measures 9 under full
+coverage, so there was no state it could reach that satisfied both its own rule
+and the architect's. It could not concede. That is worth remembering the next
+time an argument in this swarm repeats itself: check whether the other role is
+allowed to agree before restating the case.
+
+On the merge itself, the architect notes that comparing header sets cannot see a
+body grafted onto another role's header, because the header set stays a perfect
+union either way. The method used here compares each shared entry's body against
+both parents as well as the header set, which is what caught the refactorer's
+`22:47:00` placeholder commit two merges ago. It would still miss a body grafted
+onto a header that appears on only one side, so a spot check of the newest
+entries against their commit stays part of the job.
+
+## 2026-07-28T09:38:56Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/inbox/in_process/50_20260728T093843Z_000011_from_specifier_to_coder.handoff
+FROM: specifier
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase5-street-rent
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process specifier e3a7d1c711
+```
+
+Action taken: merged specifier commit `e3a7d1c711` into `swarmforge-coder`.
+The merge added the accepted street-rent feature and related journal/report
+specifications; implementation review is next.
+
+## 2026-07-28T09:47:14Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase5-street-rent
+commit: 4ff2eb22be
+```
+
+Summary: Street-rent rules, claim decisions, journal/report narration, and the
+acceptance runtime are implemented. Unit and normal acceptance verification pass.
+
 ## 2026-07-28T11:18:00Z — architect received refactorer handoff
 
 Handoff message received:
