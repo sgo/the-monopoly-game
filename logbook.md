@@ -6082,6 +6082,48 @@ merge_and_process architect af47550897
 Action taken: merged architect commit `af47550897`, which fixes bank account
 identity and encapsulation, and began coder verification.
 
+## 2026-07-28T11:46:33Z — architect sent bank invariant handoffs
+
+Handoff message sent to coder and refactorer:
+
+```
+id: 20260728T114620Z_000028_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase5-street-rent
+commit: af47550897
+created_at: 2026-07-28T11:46:20.181943Z
+
+Re-read your role and constitution.
+
+merge_and_process architect af47550897
+```
+
+Handoff message sent to specifier:
+
+```
+id: 20260728T114624Z_000029_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase5-street-rent
+commit: af47550897
+created_at: 2026-07-28T11:46:24.508776Z
+
+Re-read your role and constitution.
+
+merge_and_process architect af47550897
+```
+
+Summary: the stable account-identity correction was sent for implementation
+review and, because it makes account creation explicitly idempotent, for
+specification review.
+
 ## 2026-07-28T11:47:16Z — coder sent handoff to refactorer
 
 Handoff message sent:
@@ -6145,6 +6187,52 @@ commit: 8d2c1d06ba
 Summary: merged the `Bank.Simple` encapsulation fix; refactorer's own CRAP,
 DRY, and mutation-scan gates are unchanged and pass on the merged tree; unit,
 property, and acceptance verification all pass.
+
+## 2026-07-28T11:50:38Z — architect received refactorer follow-up
+
+Handoff message received:
+
+```
+id: 20260728T115002Z_000025_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 8d2c1d06ba
+created_at: 2026-07-28T11:50:02.030065Z
+enqueued_at: 2026-07-28T11:50:02.513431Z
+task: phase5-street-rent
+dequeued_at: 2026-07-28T11:50:30.586792Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 8d2c1d06ba
+```
+
+Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T11:51:24Z — architect review of redundant follow-up
+
+The refactorer commit contains no source, test, manifest, or configuration
+change beyond architect commit `af47550897`; merging it added only accumulated
+handoff journal history. The bank invariant and all four architectural phases
+were already reviewed and verified on that exact source state.
+
+No further handoff is warranted. This follow-up also confirms that sending the
+same functional fix directly from architect to both coder and refactorer
+created duplicate routing: coder is required to forward verified functional
+work to refactorer, while refactorer had already received the architect's
+identical commit.
+
+## 2026-07-28T11:54:13Z — architect routing rule corrected
+
+At the user's direction, the architect handoff rules now make routing
+exclusive. Observable behavior changes go only to coder, which remains
+responsible for forwarding verified work to refactorer. Purely
+behavior-preserving structural changes go only to refactorer. The same commit
+must never be addressed or separately queued to both roles.
 
 ## 2026-07-28T12:07:38Z — coder received handoff from specifier
 
@@ -6244,3 +6332,68 @@ Summary: merged station and utility rent; extended property-test coverage to
 both (previously untested at the unit level) and collapsed the resulting
 sweep duplication into one shared helper; CRAP, DRY, and mutation-scan gates
 pass; unit, property, and acceptance verification all pass.
+
+## 2026-07-28T12:26:34Z — architect received phase 6 handoff
+
+Handoff message received:
+
+```
+id: 20260728T122621Z_000026_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 868bd44dbc
+created_at: 2026-07-28T12:26:21.902225Z
+enqueued_at: 2026-07-28T12:26:22.219004Z
+task: phase6-station-utility-rent
+dequeued_at: 2026-07-28T12:26:28.136886Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 868bd44dbc
+```
+
+Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T12:37:16Z — architect review of phase 6 station and utility rent
+
+The new rent behavior remains in the domain module and introduces no UI,
+framework, persistence, or adapter dependency into the core. Dice context flows
+inward from `Turn` to the landing rules, where utility rent needs it.
+
+One boundary correction was required. `Landings` exposed both a legacy
+two-argument method and a roll-aware overload; the legacy `Rent` path delegated
+with a null roll, making a valid-looking utility landing fail through an
+invalid internal state. Landing resolution now has one roll-aware contract.
+`Game` composes rent and sale rules with one lambda, and every landing rule
+receives the same complete context.
+
+Rent now narrows owned land to the sealed `Ownable` boundary before looking up
+title or asking a strategy. Its exhaustive switch handles colour streets,
+stations, and utilities without a fallback cast, and rent events and decisions
+carry `Ownable` rather than the wider `Street` type.
+
+Mutation analysis exposed that the normal unit suite did not exercise station
+or utility collection even though tagged property and acceptance tests did.
+Focused unit tests now cover owned-count station rent and roll-multiplied
+utility rent. The property generators share their common finance and ownership
+case construction rather than repeating nested generator shapes.
+
+Final verification:
+
+- 172 normal unit tests pass.
+- 13 separately tagged property tests pass.
+- 130 generated acceptance scenarios pass.
+- Differential Java mutation killed all 25 selected mutations across `Game`,
+  `Landings`, `LandSale`, `Rent`, `Turn`, and `Strategy`; no site was uncovered
+  and no mutant survived.
+- DRY analysis fell from 28 candidates to 16 after consolidating the new rent
+  property generators. The remaining production candidates are explicit event
+  handlers or constructor shapes, and the remaining test candidates are
+  independent arrangements and assertions rather than useful shared behavior.
+- Soft Gherkin mutation killed all 11 selected mutations: two journal, one
+  report, four station-rent, and four utility-rent mutations. There were no
+  survivors or infrastructure errors.

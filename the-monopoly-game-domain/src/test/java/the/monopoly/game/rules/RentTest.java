@@ -1,6 +1,7 @@
 package the.monopoly.game.rules;
 
 import org.junit.jupiter.api.Test;
+import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.finance.Money;
@@ -17,6 +18,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RentTest {
+  private static final Roll IRRELEVANT_ROLL = new Roll(1, 1);
+
   private final Rule.Set rules = Rule.Set.Type.official.create();
   private final Deeds deeds = new Deeds();
   private final Map<Player.ID, Strategy> strategies = new HashMap<>();
@@ -29,7 +32,7 @@ class RentTest {
     sell(Street.Type.DiestsestraatLeuven);
     strategies.put(owner.id(), new Claiming());
 
-    rent().resolve(tenant, street(Street.Type.DiestsestraatLeuven));
+    rent().resolve(tenant, street(Street.Type.DiestsestraatLeuven), IRRELEVANT_ROLL);
 
     assertThat(tenant.account().balance()).isEqualTo(Balance.of(1496));
     assertThat(owner.account().balance()).isEqualTo(Balance.of(1504));
@@ -42,7 +45,7 @@ class RentTest {
     sell(Street.Type.DiestsestraatLeuven);
     strategies.put(owner.id(), new Claiming());
 
-    rent().resolve(tenant, street(Street.Type.DiestsestraatLeuven));
+    rent().resolve(tenant, street(Street.Type.DiestsestraatLeuven), IRRELEVANT_ROLL);
 
     assertThat(tenant.account().balance()).isEqualTo(Balance.of(1492));
     assertThat(owner.account().balance()).isEqualTo(Balance.of(1508));
@@ -52,10 +55,36 @@ class RentTest {
   void rentIsNotCollectedWhenTheOwnerDeclinesIt() {
     sell(Street.Type.DiestsestraatLeuven);
 
-    rent().resolve(tenant, street(Street.Type.DiestsestraatLeuven));
+    rent().resolve(tenant, street(Street.Type.DiestsestraatLeuven), IRRELEVANT_ROLL);
 
     assertThat(tenant.account().balance()).isEqualTo(Balance.of(1500));
     assertThat(owner.account().balance()).isEqualTo(Balance.of(1500));
+  }
+
+  @Test
+  void stationRentDependsOnHowManyStationsTheOwnerHolds() {
+    sell(Street.Type.NoordStation);
+    sell(Street.Type.CentraalStation);
+    strategies.put(owner.id(), new Claiming());
+
+    rent().resolve(tenant, rules.create(Street.Type.NoordStation), IRRELEVANT_ROLL);
+
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1450));
+    assertThat(owner.account().balance()).isEqualTo(Balance.of(1550));
+    assertThat(paid.amount).isEqualTo(new Money(50));
+  }
+
+  @Test
+  void utilityRentMultipliesTheLandingRollByTheOwnedCountRate() {
+    sell(Street.Type.Elektriciteitscentrale);
+    sell(Street.Type.Watermaatschappij);
+    strategies.put(owner.id(), new Claiming());
+
+    rent().resolve(tenant, rules.create(Street.Type.Elektriciteitscentrale), new Roll(2, 5));
+
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1430));
+    assertThat(owner.account().balance()).isEqualTo(Balance.of(1570));
+    assertThat(paid.amount).isEqualTo(new Money(70));
   }
 
   private Rent rent() {
@@ -95,7 +124,7 @@ class RentTest {
     private Money amount;
 
     @Override
-    public void paid(Player tenant, Player owner, Street land, Money rent) {
+    public void paid(Player tenant, Player owner, Ownable land, Money rent) {
       amount = rent;
     }
   }

@@ -1,7 +1,7 @@
 package the.monopoly.game.rules;
 
-import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.dice.Roll;
+import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.Street;
 
 /**
@@ -11,32 +11,28 @@ import the.monopoly.game.components.streets.Street;
 @FunctionalInterface
 public interface Landings {
   /** A board where stopping anywhere is worth nothing. */
-  Landings UNEVENTFUL = (player, space) -> {
+  Landings UNEVENTFUL = (player, space, roll) -> {
   };
 
-  void resolve(Player player, Street space);
-
-  default void resolve(Player player, Street space, Roll roll) {
-    resolve(player, space);
-  }
+  void resolve(Player player, Street space, Roll roll);
 }
 
 /* mutate4java-manifest
 version=1
-moduleHash=068d6efdec3106cf9f1463cd80f1f4a5d2bdf1a459efff370fd48b99ca8976bd
-scope.0.id=Y2xhc3M6TGFuZGluZ3MjTGFuZGluZ3M6MTA
+moduleHash=631fcba298819900bbe9e3811087506a0efe03289b20554a2a92a87170f268c7
+scope.0.id=Y2xhc3M6TGFuZGluZ3MjTGFuZGluZ3M6MTE
 scope.0.kind=class
-scope.0.startLine=10
-scope.0.endLine=17
-scope.0.semanticHash=c32d286f7cf0dda0a2317724877331ae20264b65a02bc349d0beb52fe410df0b
-scope.1.id=ZmllbGQ6TGFuZGluZ3MjVU5FVkVOVEZVTDoxMw
+scope.0.startLine=11
+scope.0.endLine=18
+scope.0.semanticHash=23fb19ba2b08217e35903535c5752485fc7d9c3b9bec6935ddc6468e8af9c359
+scope.1.id=ZmllbGQ6TGFuZGluZ3MjVU5FVkVOVEZVTDoxNA
 scope.1.kind=field
-scope.1.startLine=13
-scope.1.endLine=14
-scope.1.semanticHash=74a4a7925157d6fc31d1c44069f43e3acbb81fbda43d23b9415e411d72015f9c
-scope.2.id=bWV0aG9kOkxhbmRpbmdzI3Jlc29sdmUoMik6MTY
+scope.1.startLine=14
+scope.1.endLine=15
+scope.1.semanticHash=ae3aae0a53e9727714965715254844620fcbb3a0a82714f8b226644922a8fb20
+scope.2.id=bWV0aG9kOkxhbmRpbmdzI3Jlc29sdmUoMyk6MTc
 scope.2.kind=method
-scope.2.startLine=16
-scope.2.endLine=16
-scope.2.semanticHash=f89019548848333b09bd9007aec62a12915e72c3ed4f76435ff6733e6e3d67f8
+scope.2.startLine=17
+scope.2.endLine=17
+scope.2.semanticHash=b46fc30be8cf8b2a41b4e7a556dbae8e4a15519feccd62ece6ea6cf2ea920cc3
 */

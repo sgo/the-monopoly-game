@@ -29,6 +29,7 @@ import java.util.List;
  */
 @Tag("property-test")
 class RentPropertyTest {
+  private static final Roll IRRELEVANT_ROLL = new Roll(1, 1);
   private static final Generator<Integer> BALANCES = Generator.integers(0, 5_000);
   private static final Generator<Roll> ROLLS =
       Generator.zipWith(Generator.integers(1, 6), Generator.integers(1, 6), Roll::new);
@@ -46,7 +47,8 @@ class RentPropertyTest {
       else deeds.sell(c.land(), owner, Money.ZERO);
 
       return conservesAndCharges(owner, tenant, c.ownerBalance(), c.tenantBalance(), c.claims(), owedRent(c),
-          () -> rent(rules, deeds, List.of(owner, tenant), c.claims()).resolve(tenant, c.land()));
+          () -> rent(rules, deeds, List.of(owner, tenant), c.claims())
+              .resolve(tenant, c.land(), IRRELEVANT_ROLL));
     });
   }
 
@@ -61,7 +63,8 @@ class RentPropertyTest {
 
       Money owed = c.land().rentForOwning(c.ownedCount());
       return conservesAndCharges(owner, tenant, c.ownerBalance(), c.tenantBalance(), c.claims(), owed,
-          () -> rent(rules, deeds, List.of(owner, tenant), c.claims()).resolve(tenant, c.land()));
+          () -> rent(rules, deeds, List.of(owner, tenant), c.claims())
+              .resolve(tenant, c.land(), IRRELEVANT_ROLL));
     });
   }
 
@@ -140,29 +143,38 @@ class RentPropertyTest {
   private Generator<Case> cases() {
     return colourStreetTypes().flatMap(land ->
         Generator.booleans().flatMap(monopoly ->
-            Generator.booleans().flatMap(claims ->
-                BALANCES.flatMap(ownerBalance ->
-                    BALANCES.map(tenantBalance ->
-                        new Case(land, monopoly, claims, ownerBalance, tenantBalance))))));
+            financialCases().map(finances ->
+                new Case(land, monopoly, finances.claims(), finances.ownerBalance(), finances.tenantBalance()))));
   }
 
   private Generator<StationCase> stationCases() {
-    return stationTypes().flatMap(land ->
-        Generator.integers(1, 4).flatMap(ownedCount ->
-            Generator.booleans().flatMap(claims ->
-                BALANCES.flatMap(ownerBalance ->
-                    BALANCES.map(tenantBalance ->
-                        new StationCase(land, ownedCount, claims, ownerBalance, tenantBalance))))));
+    return ownershipCases(stationTypes(), 4).flatMap(ownership ->
+        financialCases().map(finances ->
+            new StationCase(
+                ownership.land(), ownership.count(),
+                finances.claims(), finances.ownerBalance(), finances.tenantBalance()
+            )));
   }
 
   private Generator<UtilityCase> utilityCases() {
-    return utilityTypes().flatMap(land ->
-        Generator.integers(1, 2).flatMap(ownedCount ->
-            ROLLS.flatMap(roll ->
-                Generator.booleans().flatMap(claims ->
-                    BALANCES.flatMap(ownerBalance ->
-                        BALANCES.map(tenantBalance ->
-                            new UtilityCase(land, ownedCount, roll, claims, ownerBalance, tenantBalance)))))));
+    return ownershipCases(utilityTypes(), 2).flatMap(ownership ->
+        ROLLS.flatMap(roll ->
+            financialCases().map(finances ->
+                new UtilityCase(
+                    ownership.land(), ownership.count(), roll,
+                    finances.claims(), finances.ownerBalance(), finances.tenantBalance()
+                ))));
+  }
+
+  private <T extends Ownable> Generator<Ownership<T>> ownershipCases(Generator<T> land, int maximumCount) {
+    return land.flatMap(it ->
+        Generator.integers(1, maximumCount).map(count -> new Ownership<>(it, count)));
+  }
+
+  private Generator<Finances> financialCases() {
+    return Generator.booleans().flatMap(claims ->
+        BALANCES.flatMap(ownerBalance ->
+            BALANCES.map(tenantBalance -> new Finances(claims, ownerBalance, tenantBalance))));
   }
 
   private Generator<ColourStreet> colourStreetTypes() {
@@ -190,6 +202,12 @@ class RentPropertyTest {
   private record UtilityCase(
       Utility land, int ownedCount, Roll roll, boolean claims, int ownerBalance, int tenantBalance
   ) {
+  }
+
+  private record Finances(boolean claims, int ownerBalance, int tenantBalance) {
+  }
+
+  private record Ownership<T extends Ownable>(T land, int count) {
   }
 
   private record FixedClaim(boolean claims) implements Strategy {
