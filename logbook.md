@@ -4512,7 +4512,7 @@ type: git_handoff
 to: architect
 priority: 50
 task: phase3-journal-report
-commit: (commit recorded by the handoff draft)
+commit: a89aea192c
 ```
 
 Summary: restored the low-complexity report renderer after the architect's
@@ -4623,6 +4623,34 @@ takes a turn. Nothing keys on a `Player` today. It is the same mistake `Game`
 carried until `4e71a4e760`: value semantics over state that moves. A player's
 identity should be its `ID` alone, and that should land before anything keys on
 one.
+
+## 2026-07-28T08:16:35Z — architect handoffs for phase3-journal-report
+
+To coder and refactorer at priority `00`:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: phase3-journal-report
+commit: d2295d8514
+```
+
+To the specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: phase3-journal-report
+commit: d2295d8514
+```
+
+`Report` switches over the sealed `Journal.Entry` again, so an entry with no
+line written for it fails the build rather than the first game that produces
+one. `TurnTest` builds the observer-less `Turn` itself instead of reaching it
+through the helper. No report line and no feature changed.
+
 ## 2026-07-27T21:59:09Z — specifier sent handoff to coder
 
 Handoff message sent:
@@ -4674,6 +4702,7 @@ both append-only histories while resolving the logbook conflict. The completed
 work satisfies the Phase 3 journal/report specifications, including their
 chronological event order; the approved mutation manifests were retained. Task
 complete.
+
 ## 2026-07-28T00:25:00Z — coder implementation of phase3-journal-report
 
 The journal recorded that a game started and who won initiative. It now records
@@ -4916,6 +4945,172 @@ that the report's wording is pinned by the feature rather than by the step.
 The mutate4java manifests on the five changed sources are stale by line number.
 They are not edited by hand.
 
+## 2026-07-28T07:50:41Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260728T072931Z_000010_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase4-buying-auctions
+commit: 9baf2dc824
+
+Re-read your role and constitution.
+
+merge_and_process coder 9baf2dc824
+```
+
+Action taken: merged the Phase 4 implementation, reconciled the append-only
+logbook histories, and retained the report-local dispatch while extending it
+for the new journal entries.
+
+## 2026-07-28T07:52:44Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase4-buying-auctions
+commit: (commit recorded by the handoff draft)
+```
+
+Summary: Phase 4 is structurally reviewed; report rendering remains low
+complexity and all refactorer gates pass.
+
+## 2026-07-28T08:16:52Z — architect received refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260728T075317Z_000019_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 842f9f89e8
+task: phase4-buying-auctions
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 842f9f89e8
+```
+
+Action taken: merged `842f9f89e8`, resolved `Report` and `TurnTest`, moved
+`positionOf` onto `Board`, renamed `Account.credit` to `withdraw`, corrected
+the reason `en/monopoly.feature` is held back, and ran the gates.
+
+## 2026-07-28T08:50:22Z — architect review of phase4-buying-auctions
+
+### The switch earned its keep
+
+This branch merged with three conflicts. The one in `Report` is the interesting
+one: phase four added `Entry.Bought` and `Entry.AuctionWon` against the
+class-keyed map, and this branch had put the exhaustive switch back. Taking the
+switch left it seven cases wide against a nine-case sealed interface, and the
+module would not compile until both were written. That is the whole argument
+from `d2295d8514` playing out on the first change after it: under the map the
+merge would have compiled and two kinds of entry would simply never have been
+reported. The wording of both new lines is the refactorer's, unchanged.
+
+`TurnTest` conflicted only by adjacency — three new arrival tests on one side,
+a javadoc on the other. Both kept.
+
+The logbook merge rewrote one existing entry: the refactorer's `22:47:00`
+handoff note, where the placeholder `(commit recorded by the handoff draft)`
+had been filled in with `a89aea192c`. Theirs taken; it is the same note, more
+accurate. 138 entries, nothing dropped, no other body differing from the parent
+it came from.
+
+### `Landings`, `Strategy`, `Deeds`
+
+The seams are right. `Turn` moves the pawn and hands the space to `Landings`,
+so what a space is worth stays out of the moving of pawns; `Landings.UNEVENTFUL`
+keeps every older turn test honest without a mock. `Strategy` puts the decisions
+behind defaults, so a new question does not rewrite every strategy, and
+`OfPlayers` keeps the table's choices out of the sale. `Deeds` holds title
+against `Street.Type` because the rules rebuild spaces as values each time they
+are asked — that is the correct answer to a real problem, and it is written
+down where the next reader will find it.
+
+Dependency direction holds: `rules` depends on `strategies` through an
+interface, and nothing in `strategies` reaches back into `rules`.
+
+### `Account.credit` decremented a balance
+
+`Account` had `deposit` increasing a balance and `credit` decreasing it — a
+customer's word and the bank's own ledger word side by side, meaning opposite
+directions. It was survivable while `Player.pass` was the only caller. Phase
+four made it load-bearing in `Deeds.sell`, where `buyer.account().credit(price)`
+reads to any ordinary eye as paying the buyer, and the money in a sale is the
+thing most worth getting right. Renamed to `withdraw`, which pairs with
+`deposit` and cannot be read backwards. Five call sites, all compiler-checked.
+
+### `positionOf` had been copied into the acceptance harness
+
+dry4java scored `Turn.positionOf` against `World.positionOf` at 1.00: the same
+`layout().indexOf(space)` and the same not-found guard, once in the rules and
+once in the specification harness. Both were reaching through `Board` into the
+list it holds and deciding for themselves what `-1` means, which is the layout
+leaking rather than a coincidence of shape.
+
+It now lives on `Board`, which is the only object that can answer it. `Turn`
+and `World` both ask. The harness loses its `AssertionError` variant and gets
+the domain's `IllegalStateException`, which is the truer answer: a board with no
+such space is a broken board, not a failed assertion. Two mutation sites, both
+killed.
+
+### `en/monopoly.feature`
+
+Held back with a reason that had gone half stale: it said nothing moves a deed
+between players, and buying-land now moves one from the bank to a player. The
+reason is narrowed to what is actually missing — a game is one round of turns
+rather than rounds played until something ends it, and nothing ends it. Phase 14
+still.
+
+### What the specification does not yet say
+
+`Strategy.bidFor` may return more than the bidder holds, and `Deeds.sell` debits
+whatever it is told without asking whether the buyer can cover it, so a bid
+beyond a player's means would take them below zero. `AgreeIfAffordable` never
+does this and `auctions.feature` does not exercise it, so nothing is wrong
+today. What an auction does with a bid nobody can pay is a question for the
+specification, not something to invent in the rules.
+
+### DRY
+
+Seventeen pairs. The cross-module one is gone. What remains in production is two
+known false-positive shapes: constructors that assign three or four fields
+(`Game`/`Turn`/`LandSale`), and the two one-line journalling overrides in
+`Game.Journalling` that log different entry types. Both are structural echoes of
+things that genuinely differ; sharing either would couple unrelated classes to
+save a line. The rest are arrange-act-assert test pairs, recorded before and
+left alone for the same reason.
+
+### Gates
+
+165 unit tests, 10 property tests, 118 acceptance scenarios across twelve
+pipeline features. mutate4java differential over all twenty-eight domain
+sources: every site killed, and the only uncovered one is `Turn:43`, the
+`while (true)` whose mutant `while (false)` javac rejects as an unreachable
+statement — a mutant that cannot be built cannot be killed. Soft Gherkin
+acceptance mutation exit 0: `buying-land` 14/14, `auctions` 8/8, `journal` 8/8,
+`report` 6/6, everything else skipped as unchanged.
+
+### Still standing
+
+`Player` remains a record whose `Position` is mutated all through a game, so its
+`equals` and `hashCode` move with the pawn. `Deeds` now keeps ownership against
+`Street.Type` and stores `Player.ID` rather than `Player`, which is the right
+instinct and sidesteps the hazard rather than removing it. A player's identity
+should be its `ID` alone, before anything keys on a `Player`.
 ## 2026-07-28T07:29:31Z — coder sent handoff to refactorer
 
 Handoff message sent:
@@ -5002,3 +5197,74 @@ The `Report` and `TurnTest` gates the architect ran were measured before Phase
 `report.feature` are stale for the same reason: the specifier added `journal-4`,
 `journal-5`, `report-4` and `report-5` after those stamps were taken. Nothing
 here edits a manifest by hand.
+
+## 2026-07-28T08:55:57Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T085344Z_000023_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: ae49f8835d
+created_at: 2026-07-28T08:53:44.528102Z
+enqueued_at: 2026-07-28T08:53:45.227251Z
+task: phase4-buying-auctions
+dequeued_at: 2026-07-28T08:53:51.616125Z
+
+Re-read your role and constitution.
+
+merge_and_process architect ae49f8835d
+```
+
+Action taken: merged architect commit `ae49f8835d` into `swarmforge-coder`,
+resolving the `logbook.md` conflict at entry granularity (143 entries; three
+ours-only, five theirs-only, three divergent bodies all authored by another
+role and all taken from theirs — two extra blank lines, and the refactorer's
+`22:47:00` note with its placeholder commit filled in), then verified the merged
+state.
+
+## 2026-07-28T08:58:00Z — coder verification of the merged architect state
+
+- `mvn test`: 165 unit tests pass.
+- `acceptance/run-acceptance.sh`: 118/118 across the thirteen features on the
+  pipeline, twelve of which are mutated and `dice` held back.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+Both findings against this role's work are accepted.
+
+`Account.credit` decremented a balance while `deposit` increased one — a
+customer's word for money coming in, next to the bank's word for money going
+out, pointing opposite ways. It predates this task, but Phase 4 is what made it
+carry money: `Deeds.sell` was written here as
+`buyer.account().credit(price)`, which reads as paying the buyer and does the
+reverse. It was read as "the bank credits its ledger" and never questioned,
+because the method already existed and compiled. `withdraw` cannot be read
+backwards, and the sale is the last place to leave a word pointing two ways.
+
+`World.positionOf` was written by copying the shape of `Turn.positionOf` —
+`layout().indexOf(space)` and the same not-found guard — while `Turn` was open
+in front of me. Both were reaching through `Board` into the list it holds and
+each deciding for itself what `-1` means, which is the layout leaking rather
+than two methods happening to look alike. `Board.positionOf` is where it
+belonged from the start, and the harness is better for getting the domain's
+`IllegalStateException` instead of an assertion of its own: a board with no such
+space is a broken board.
+
+The switch in `Report` did the job it was restored for. This merge put two new
+entry kinds against a seven-case switch and the module would not compile until
+both were written, which is the argument from `d2295d8514` paying off on the
+first change after it.
+
+One thing the architect raises is a question for the specifier rather than work
+for this role: `Strategy.bidFor` may return more than the bidder holds and
+`Deeds.sell` debits whatever it is told, so a bid beyond a player's means would
+take them below zero. `AgreeIfAffordable` never bids more than it has and no
+scenario scripts one that does, so nothing is wrong today. What an auction does
+with a bid nobody can pay is not something to invent in the rules.

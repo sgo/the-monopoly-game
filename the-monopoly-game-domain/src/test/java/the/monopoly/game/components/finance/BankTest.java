@@ -52,7 +52,7 @@ class BankTest {
     Bank.Account account = bank.accountOf(player);
 
     account.deposit(new Money(1500));
-    account.credit(new Money(200));
+    account.withdraw(new Money(200));
 
     assertThat(account.balance()).isEqualTo(Balance.of(1300));
   }
@@ -62,7 +62,7 @@ class BankTest {
     bank.createAccountFor(player);
     Bank.Account account = bank.accountOf(player);
 
-    account.credit(new Money(50));
+    account.withdraw(new Money(50));
 
     assertThat(account.balance()).isEqualTo(Balance.of(-50));
   }

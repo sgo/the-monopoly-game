@@ -195,7 +195,7 @@ public class World {
    * playing rather than by being put there.
    */
   public void landPawnOn(String pawnName, Street.Type space) {
-    int arrival = positionOf(space);
+    int arrival = ruleSet.gameboard().positionOf(space);
     if (arrival < A_SHORT_HOP.total())
       throw new AssertionError(
           "Space " + arrival + " is too close to Start for a pawn to be walked onto it."
@@ -237,12 +237,6 @@ public class World {
     return scripted;
   }
 
-  private int positionOf(Street.Type space) {
-    int at = ruleSet.gameboard().layout().indexOf(space);
-    if (at < 0) throw new AssertionError("This board has no " + space + " space.");
-    return at;
-  }
-
   /** What the game recorded, once it has been played. */
   public List<Entry> journal() {
     if (journal == null)
@@ -269,7 +263,7 @@ public class World {
               + ", and no rule pays anyone before the game starts, so it cannot hold $"
               + amount.amount() + "."
       );
-    pawn(pawnName).account().credit(startingCapital.minus(amount));
+    pawn(pawnName).account().withdraw(startingCapital.minus(amount));
   }
 
   /**
