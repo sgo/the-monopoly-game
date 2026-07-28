@@ -5,20 +5,23 @@ import the.monopoly.game.Game.Journal.Entry;
 import the.monopoly.game.Report;
 import the.monopoly.game.components.dice.Dice;
 import the.monopoly.game.components.dice.Roll;
-import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Turn;
+import the.monopoly.game.strategies.Strategy;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The state shared by the steps of a single scenario execution. Each execution
@@ -31,8 +34,14 @@ import java.util.Map;
 public class World {
   /** The player a scenario talks about when it says "a player" rather than a pawn. */
   private static final Player.ID UNDER_TEST = new Player.ID("the player");
-  /** What a player rolls when the scenario does not care: no double, so one roll ends the turn. */
-  private static final Roll UNREMARKABLE = new Roll(1, 2);
+  /**
+   * What a player rolls when the scenario does not care. No double, so one roll
+   * ends the turn, and it stops on Just Visiting, where nothing at all happens
+   * to a pawn — a roll the scenario says nothing about must not buy anything.
+   */
+  private static final Roll UNREMARKABLE = new Roll(4, 6);
+  /** How far a pawn is walked to put it on a named space: no double, so the turn ends there. */
+  private static final Roll A_SHORT_HOP = new Roll(1, 2);
 
   private Rule.Set ruleSet = Rule.Set.Type.official.create();
   private Street space;
@@ -42,9 +51,11 @@ public class World {
   private Map<Dice.Face, Integer> rolls;
   private final Deque<Roll> queuedRolls = new ArrayDeque<>();
   private final Map<String, Deque<Roll>> queuedPawnRolls = new HashMap<>();
+  private final Map<String, Strategy> pawnStrategies = new HashMap<>();
   private List<Player> turnOrder;
   private boolean othersRollWhatTheyLike;
   private List<Entry> journal;
+  private Deeds deeds;
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
@@ -166,13 +177,64 @@ public class World {
   }
 
   public void playGame() {
-    Game.Result result = new Game(ruleSet, players(), player -> () -> nextQueuedPawnRoll(player)).play();
+    Game.Result result = new Game(
+        ruleSet, players(), player -> () -> nextQueuedPawnRoll(player), this::strategyOf
+    ).play();
     turnOrder = result.turnOrder();
     journal = result.journal();
+    deeds = result.deeds();
   }
 
   public void placePawn(String pawnName, int position) {
     pawn(pawnName).position().moveTo(position);
+  }
+
+  /**
+   * Walks a pawn onto a named space and plays the game out. The pawn is stood a
+   * short hop short of the space and rolls exactly that, so it arrives there by
+   * playing rather than by being put there.
+   */
+  public void landPawnOn(String pawnName, Street.Type space) {
+    int arrival = ruleSet.gameboard().positionOf(space);
+    if (arrival < A_SHORT_HOP.total())
+      throw new AssertionError(
+          "Space " + arrival + " is too close to Start for a pawn to be walked onto it."
+      );
+    placePawn(pawnName, arrival - A_SHORT_HOP.total());
+    queuePawnRoll(pawnName, A_SHORT_HOP);
+    playGame();
+  }
+
+  /** Whether the pawn holds the title to that land once the game has been played. */
+  public boolean pawnOwns(String pawnName, Street.Type land) {
+    if (deeds == null)
+      throw new AssertionError("No game has been played yet.");
+    return deeds.ownerOf(land).filter(it -> it.value().equals(pawnName)).isPresent();
+  }
+
+  public void pawnFollows(String pawnName, Strategy strategy) {
+    pawnStrategies.put(pawnName, strategy);
+  }
+
+  public void pawnDeclines(String pawnName, Street.Type land) {
+    scriptFor(pawnName).declines(land);
+  }
+
+  public void pawnWillBid(String pawnName, Street.Type land, Money amount) {
+    scriptFor(pawnName).bids(land, amount);
+  }
+
+  private Strategy strategyOf(Player player) {
+    return pawnStrategies.getOrDefault(player.id().value(), Strategy.UNDECIDED);
+  }
+
+  private Scripted scriptFor(String pawnName) {
+    Strategy strategy = pawnStrategies.computeIfAbsent(pawnName, it -> new Scripted());
+    if (!(strategy instanceof Scripted scripted))
+      throw new AssertionError(
+          "Pawn \"" + pawnName + "\" already follows a strategy of its own, so it cannot be told what to do."
+      );
+    return scripted;
   }
 
   /** What the game recorded, once it has been played. */
@@ -188,18 +250,20 @@ public class World {
   }
 
   /**
-   * The rules open every pawn's account with the same starting capital, and no
-   * rule moves money before the first turn, so a scenario can only state the
-   * balance a pawn already has. Stating a different one says the scenario needs
-   * a rule that does not exist yet, which is what the failure says.
+   * Leaves a pawn with the money the scenario says it has to spend. The rules
+   * open every account with the same starting capital and no rule pays anyone
+   * before the first roll, so a pawn can be spent down to an amount but never
+   * given more than it was dealt.
    */
   public void arrangePawnBalance(String pawnName, Money amount) {
-    Balance balance = pawn(pawnName).account().balance();
-    if (!balance.equals(new Balance(amount)))
+    Money startingCapital = ruleSet.players().startingCapital();
+    if (amount.exceeds(startingCapital))
       throw new AssertionError(
-          "Pawn \"" + pawnName + "\" holds " + balance + ", and no rule can arrange "
-              + new Balance(amount) + " before the game starts."
+          "Pawn \"" + pawnName + "\" is dealt $" + startingCapital.amount()
+              + ", and no rule pays anyone before the game starts, so it cannot hold $"
+              + amount.amount() + "."
       );
+    pawn(pawnName).account().withdraw(startingCapital.minus(amount));
   }
 
   /**
@@ -240,5 +304,38 @@ public class World {
     if (players == null)
       throw new AssertionError("No players have been selected yet.");
     return players;
+  }
+
+  /**
+   * A pawn told what to do about each piece of land a scenario names, and told
+   * off for being offered anything else: a scenario that scripts a pawn at all
+   * has to say what that pawn does wherever it is asked.
+   */
+  private static final class Scripted implements Strategy {
+    private final Set<Street.Type> declined = new HashSet<>();
+    private final Map<Street.Type, Money> bids = new HashMap<>();
+
+    void declines(Street.Type land) {
+      declined.add(land);
+    }
+
+    void bids(Street.Type land, Money amount) {
+      bids.put(land, amount);
+    }
+
+    @Override
+    public boolean accepts(Offer offer) {
+      if (!declined.contains(offer.land().type()))
+        throw new AssertionError(
+            "This pawn was offered " + offer.land().type()
+                + ", and the scenario never says what it does about that."
+        );
+      return false;
+    }
+
+    @Override
+    public Money bidFor(Offer offer) {
+      return bids.getOrDefault(offer.land().type(), Money.ZERO);
+    }
   }
 }
