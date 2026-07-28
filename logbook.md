@@ -6234,34 +6234,6 @@ responsible for forwarding verified work to refactorer. Purely
 behavior-preserving structural changes go only to refactorer. The same commit
 must never be addressed or separately queued to both roles.
 
-## 2026-07-28T12:07:38Z — specifier sent handoff to coder
-
-Handoff message sent:
-
-```
-id: 20260728T120738Z_000012_from_specifier
-from: specifier
-to: coder
-priority: 50
-type: git_handoff
-role: specifier
-task: phase6-station-utility-rent
-commit: 0540a2acc7
-created_at: 2026-07-28T12:07:38.359252Z
-
-Re-read your role and constitution.
-
-merge_and_process specifier 0540a2acc7
-```
-
-Summary: specified Phase 6 station and utility rent — station rent scaled to
-count owned, utility rent as a multiple (4x/10x) of the dice roll that landed
-there, proven across two different rolls — in new `station-rent.feature` and
-`utility-rent.feature`, with one matching journal/report scenario each for the
-dice-derived utility case. Waiver and the Chance/Community-Chest utility-rent
-sub-case are out of scope, deferred to phase 5's existing generic coverage and
-phase 10 respectively.
-
 ## 2026-07-28T12:07:38Z — coder received handoff from specifier
 
 Handoff message received:
@@ -6426,6 +6398,58 @@ Final verification:
   report, four station-rent, and four utility-rent mutations. There were no
   survivors or infrastructure errors.
 
+## 2026-07-28T12:07:38Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T120738Z_000012_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase6-station-utility-rent
+commit: 0540a2acc7
+created_at: 2026-07-28T12:07:38.359252Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 0540a2acc7
+```
+
+Summary: specified Phase 6 station and utility rent — station rent scaled to
+count owned, utility rent as a multiple (4x/10x) of the dice roll that landed
+there, proven across two different rolls — in new `station-rent.feature` and
+`utility-rent.feature`, with one matching journal/report scenario each for the
+dice-derived utility case. Waiver and the Chance/Community-Chest utility-rent
+sub-case are out of scope, deferred to phase 5's existing generic coverage and
+phase 10 respectively.
+
+## 2026-07-28T12:39:03Z — architect sent phase 6 structural follow-up
+
+Handoff message sent to refactorer:
+
+```
+id: 20260728T123859Z_000030_from_architect
+from: architect
+to: refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase6-station-utility-rent
+commit: d44bfac2eb
+created_at: 2026-07-28T12:38:59.054119Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d44bfac2eb
+```
+
+Summary: the behavior-preserving roll-aware landing boundary correction was
+sent only to refactorer under the exclusive routing rule. No coder or specifier
+handoff was queued.
+
 ## 2026-07-28T12:48:33Z — refactorer received handoff from architect
 
 Handoff message received:
@@ -6486,6 +6510,41 @@ Summary: merged the `Landings` roll-awareness fix and `Ownable` boundary
 narrowing; refactorer's own CRAP, DRY, and mutation-scan gates are unchanged
 or improved and pass on the merged tree; unit, property, and acceptance
 verification all pass.
+
+## 2026-07-28T12:48:46Z — architect received phase 6 structural follow-up
+
+Handoff message received:
+
+```
+id: 20260728T124833Z_000027_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 744312eef7
+created_at: 2026-07-28T12:48:33.340116Z
+enqueued_at: 2026-07-28T12:48:33.343954Z
+task: phase6-station-utility-rent
+dequeued_at: 2026-07-28T12:48:40.426244Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 744312eef7
+```
+
+Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T12:49:13Z — architect accepted phase 6 structural follow-up
+
+The refactorer commit contains no source, test, manifest, configuration, or
+behavioral change beyond architect commit `d44bfac2eb`; merging it added only
+the refactorer's verification and handoff journal history. The four
+architectural phases and all final gates were already completed on that exact
+source state.
+
+No further handoff is warranted. The exclusive routing loop closes here.
 
 ## 2026-07-28T13:26:16Z — coder received handoff from specifier
 
@@ -6630,3 +6689,108 @@ mutation-scan gates pass; unit, property, and acceptance verification all
 pass. Two behavior questions flagged above rather than acted on: whether
 turn-time building is meant to stay restricted to the initiative winner, and
 whether a hotel's price should be its printed rent or its construction cost.
+
+## 2026-07-28T13:57:21Z — architect received phase 7 structural follow-up
+
+Handoff message received:
+
+```
+id: 20260728T135714Z_000028_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 7e999de151
+created_at: 2026-07-28T13:57:14.347881Z
+enqueued_at: 2026-07-28T13:57:15.096299Z
+task: phase7-houses-hotels
+dequeued_at: 2026-07-28T13:57:21.760508Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7e999de151
+```
+
+Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T14:11:02Z — architect completed phase 7 architectural review
+
+The phase 7 houses-and-hotels work keeps the game orchestration in `Game`,
+automatic improvement selection in the new `Building` rule, ownership and
+improvement state in `Deeds`, and report wording outside the journal data.
+The UI/core and dependency boundaries remain inward-facing and testable.
+
+Architectural hardening applied:
+
+- `Building.develop` now uses the same explicit infinite-loop shape already
+  used elsewhere to avoid literal-true mutation noise.
+- `Deeds` now preserves the improvement invariant itself: house counts must
+  stay between zero and the hotel threshold, houses cannot be built past four,
+  a hotel can only replace four houses, a house can only be sold when present,
+  and a hotel can only be exchanged when present.
+- Focused unit tests cover the new illegal-transition guards, one-house rent,
+  default refusal to build, and the previously implicit post-sale hotel flag.
+- Local `DeedsTest` ownership setup was consolidated after DRY reported the
+  repeated invalid-transition arrangements.
+
+Verification:
+
+- Normal Maven tests pass: 189 tests.
+- Property tests pass separately: 17 tagged tests.
+- Normal generated acceptance passes: 141 scenarios.
+- Differential Java mutation is clean one file at a time with `--max-workers 8`
+  and verbose progress: `Building` 7/7 killed, `Deeds` 27/27 killed after
+  adding missing boundary assertions, `Game` 6/6 killed, `Report` 1/1 killed,
+  `Rent` 3/3 killed after adding one-house rent coverage, `Strategy` full pass
+  5/5 killed after covering default build refusal, and `AgreeIfAffordable`
+  full pass 1/1 killed.
+- DRY reports 26 candidates. Remaining candidates are constructor/event-handler
+  symmetry, explicit unit arrangements, or existing cross-test shapes where an
+  abstraction would hide the rule being asserted rather than remove useful
+  duplication.
+- Soft Gherkin mutation passes with no survivors or errors on active phase 7
+  surfaces: building 7/7, journal 2/2, report 2/2, rent 6/6.
+
+This commit changes observable behavior for invalid improvement transitions,
+so under the exclusive routing rule it must be sent only to coder with
+priority 00. The coder owns forwarding verified functional work to refactorer.
+
+## 2026-07-28T14:15:22Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/inbox/in_process/00_20260728T141405Z_000031_from_architect_to_coder.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: phase7-houses-hotels
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect 94515961c6
+```
+
+Action taken: merged architect commit `94515961c6`, which hardens improvement
+invariants in `Deeds`, adds focused regression coverage, and leaves the phase 7
+slice green under coder-owned verification: `189` Maven tests and the full
+normal acceptance pipeline (`134` generated acceptance tests) pass.
+
+## 2026-07-28T14:15:22Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase7-houses-hotels
+commit: 94515961c6
+```
+
+Summary: forwarded the architect-reviewed phase 7 follow-up that hardens
+invalid improvement transitions and adds focused regression coverage; coder
+verification passes on the merged state with `189` Maven tests and the full
+normal acceptance pipeline (`134` generated acceptance tests).

@@ -100,6 +100,17 @@ class RentTest {
   }
 
   @Test
+  void oneHouseChargesItsPrintedRent() {
+    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
+    deeds.arrangeHouses(street, 1);
+    strategies.put(owner.id(), new Claiming());
+
+    rent().resolve(tenant, street, IRRELEVANT_ROLL);
+
+    assertThat(paid.amount).isEqualTo(street.rentForHouses(1));
+  }
+
+  @Test
   void aHotelChargesItsPrintedRent() {
     ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
     deeds.arrangeHotel(street);
