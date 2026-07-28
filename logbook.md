@@ -6652,3 +6652,27 @@ Verification:
 This commit changes observable behavior for invalid improvement transitions,
 so under the exclusive routing rule it must be sent only to coder with
 priority 00. The coder owns forwarding verified functional work to refactorer.
+
+## 2026-07-28T14:14:11Z — architect sent phase 7 functional follow-up
+
+Handoff message sent to coder:
+
+```
+id: 20260728T141405Z_000031_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase7-houses-hotels
+commit: 94515961c6
+created_at: 2026-07-28T14:14:05.239038Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 94515961c6
+```
+
+Summary: the observable invalid-improvement-transition hardening was sent
+only to coder under the exclusive routing rule. No refactorer or specifier
+handoff was queued.
