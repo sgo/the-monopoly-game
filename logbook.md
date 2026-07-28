@@ -6091,3 +6091,32 @@ base entry (`08:16:35Z — specifier received handoff from architect`, commit
 is restored here; a second base entry sharing that header was an empty stub
 with no body and was correctly left out. `mvn test` passes on the merged
 state.
+
+## 2026-07-28T11:46:24Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T114624Z_000029_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: af47550897
+task: phase5-street-rent
+
+Re-read your role and constitution.
+
+merge_and_process architect af47550897
+```
+
+Action taken: merged architect commit `af47550897` into `main` — a follow-up
+fix found while rechecking the refactorer's merge: `Bank.Simple` held accounts
+in a `Set` keyed by a record with a mutable balance, so re-opening an account
+after its balance changed could retain two equal owners and return a stale
+account. `Bank.Simple` now owns a private map keyed by the immutable account
+owner, with a regression test. The `logbook.md` conflict was again resolved at
+entry granularity (166 base entries, 4 new here, 6 new on the architect's
+side, no collisions); `mvn test` passes on the merged state.
