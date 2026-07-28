@@ -7825,3 +7825,25 @@ Verification:
 - `git diff --check` passed.
 
 Routing: this follow-up changes observable card behavior and regression tests, so it must go to coder only with priority 00. No phase-complete specifier sync is sent until the coder/refactorer follow-up loop returns and is accepted.
+
+## 2026-07-28T22:27:44Z — architect sent phase 10 follow-up handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T222739Z_000036_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase10-chance-and-community-chest
+commit: 97bea57d30
+created_at: 2026-07-28T22:27:39.721046Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 97bea57d30
+```
+
+Summary: routed architect follow-up fixes for Phase 10 to coder only at priority 00 because the changes include observable card behavior hardening and regression tests. The specifier phase-complete sync remains pending until this coder/refactorer loop returns and is accepted.
