@@ -28,9 +28,12 @@ en/rules/initiative.feature
 en/rules/turn-loop.feature
 en/rules/buying-land.feature
 en/rules/auctions.feature
+en/rules/building.feature
 en/rules/journal.feature
 en/rules/report.feature
 en/rules/rent.feature
+en/rules/station-rent.feature
+en/rules/utility-rent.feature
 
 # Held back from mutation: the fairness scenario asserts that each face comes
 # up about 100000 times within a 1% margin, so it accepts anything in a 1000

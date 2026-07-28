@@ -274,7 +274,7 @@ class TurnTest {
     private final List<Street.Type> spaces = new ArrayList<>();
 
     @Override
-    public void resolve(Player player, Street space) {
+    public void resolve(Player player, Street space, Roll roll) {
       spaces.add(space.type());
     }
   }

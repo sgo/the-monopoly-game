@@ -1,6 +1,7 @@
 package the.monopoly.game.rules;
 
 import org.junit.jupiter.api.Test;
+import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.finance.Money;
@@ -127,7 +128,7 @@ class LandSaleTest {
 
   private void landOn(Player player, Street.Type space) {
     new LandSale(deeds, List.of(dog, highHat), this::strategyOf, reported)
-        .resolve(player, ruleSet.create(space));
+        .resolve(player, ruleSet.create(space), new Roll(1, 1));
   }
 
   private void plays(Player player, Strategy strategy) {
