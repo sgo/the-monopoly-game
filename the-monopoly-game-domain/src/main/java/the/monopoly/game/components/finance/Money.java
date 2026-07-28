@@ -14,6 +14,16 @@ public record Money(int amount) {
   public Money minus(Money money) {
     return new Money(amount - money.amount);
   }
+
+  /** Whether this amount is enough to pay that one. */
+  public boolean covers(Money price) {
+    return amount >= price.amount;
+  }
+
+  /** Whether this amount is more than that one, as one bid beats another. */
+  public boolean exceeds(Money other) {
+    return amount > other.amount;
+  }
 }
 
 /* mutate4java-manifest

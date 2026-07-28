@@ -4644,3 +4644,98 @@ Action taken: merged specifier commit `56c1532861` into `swarmforge-coder`,
 resolving the `logbook.md` conflict at entry granularity (128 entries; three
 ours-only, two theirs-only, no divergent bodies), then began implementing
 `phase4-buying-auctions`.
+
+## 2026-07-28T07:26:34Z — coder implementation of phase4-buying-auctions
+
+Land nobody owns is now offered to whoever stops on it, and auctioned to the
+table when they turn it down. Players decide through a `Strategy`, the journal
+records what was bought and what an auction fetched, and the report says so.
+
+### A space had nothing to say for itself
+
+`Turn` moved the pawn and paid for reaching Start, and that was all a space
+could ever be worth. `Landings` is what happens where a pawn stops: the turn
+moves the pawn, reports the move, and hands the space over. `Landings.UNEVENTFUL`
+is a board where stopping anywhere is worth nothing, which is what `movement`
+and the single-player `Turn` still play.
+
+The alternative was to give `Turn` the deeds, the table and everyone's
+strategy. That is four collaborators for a class whose job is to roll and move,
+and it would have had to know what an auction is.
+
+### Ownership cannot live on a space
+
+`Rule.Set.create` builds a space afresh every time it is asked, so a `Street` is
+a value and there is nothing on it to mark. `Deeds` keeps the title against the
+space's type for as long as a game lasts, and is what `Game.Result` now carries
+alongside the journal. Selling is one act there — the buyer pays the bank and
+the title moves — so the two cannot drift apart.
+
+### The sale is told what the land fetched
+
+`Deeds.sell` takes the price rather than reading it off the land, because land
+goes for the price on the board when it is bought and for the winning bid when
+it is auctioned. `LandSale` is the rule: offer, and failing that, auction.
+
+The auction is sealed and single-bid — everyone says what the land is worth to
+them and the best bid takes it, paying what they bid. `auctions-1` and
+`auctions-2` fix that: the winner's balance drops by their own bid, not by the
+runner-up's. A bid has to beat the one before it, which makes nothing not a bid
+and settles two equal bids on whoever spoke first, so a game played twice sells
+the land to the same player.
+
+### Strategies are asked, never told
+
+`Strategy` answers `accepts` and `bidFor`, both defaulting to leaving the land
+alone, so a strategy answers only what it has an opinion about and Phase 5 can
+add a decision without rewriting the ones already here. `Strategy.OfPlayers`
+says who plays what, in the same shape as `Game.Cups` — a player is not given a
+strategy, because `Player` is a record and its identity is already doing more
+work than it should.
+
+`AgreeIfAffordable` buys what it can afford and bids everything it has. Bidding
+everything is what "bids up to the most it can afford" says, and it is what
+makes it lose to a higher bid in `buying-land-2`; it also means an agreeable
+player alone in an auction pays its whole balance for a $60 street. That is the
+specification as written, and the specifier owns whether it stays.
+
+### The report spells a space out
+
+`Report` renders `Entry.Bought` and `Entry.AuctionWon`, spelling a space by
+telling its run-together words apart: `DiestsestraatLeuven` reads "Diestsestraat
+Leuven". That agrees with the three names the features use and is pinned by
+`report-4`. A space whose printed name is not its own name spelled out — "Place
+de l'Ange Namur" — will have to be given a name in the domain when a
+specification asks the report for it.
+
+### A roll nobody cares about must not buy anything
+
+The acceptance world rolled 1 and 2 for a player the scenario said nothing
+about, which walked that pawn onto the first street on the board. Now that
+stopping somewhere buys land, an unremarkable roll had to become one that stops
+somewhere unremarkable: 4 and 6, onto Just Visiting, where nothing has ever
+happened.
+
+`with $N in pawn "X"'s account` used to check the balance and refuse to change
+it, because no rule moved money before the first roll. `buying-land-2` needs a
+pawn with $59, so the step now spends a pawn down to the amount it says. It
+still refuses to hand out more than the pawn was dealt, which is the half of it
+no rule can do.
+
+A pawn told to decline or to bid is scripted, and a scripted pawn that is
+offered land the scenario never named fails saying so — otherwise "declines the
+offer for X" would be indistinguishable from saying nothing at all.
+
+### Verification
+
+- `mvn test`: 165 unit tests pass, up from 131.
+- `acceptance/run-acceptance.sh`: 118/118 across thirteen pipeline features,
+  from 108/118 before the work.
+
+Red before green was watched throughout: the new domain tests were written
+first, and the `Game` tests were re-run with the sale unwired to see the three
+of them fail. `report-4` was re-run with "buys" changed to "purchases" to see
+that the report's wording is pinned by the feature rather than by the step.
+
+The mutate4java manifests on the five changed sources are stale by line number.
+They are not edited by hand.

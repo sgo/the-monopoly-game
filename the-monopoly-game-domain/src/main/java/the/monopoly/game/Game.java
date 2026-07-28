@@ -5,9 +5,15 @@ import the.monopoly.game.components.dice.Cup;
 import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.Ownable;
+import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Initiative;
+import the.monopoly.game.rules.LandSale;
+import the.monopoly.game.rules.Landings;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Turn;
+import the.monopoly.game.strategies.Strategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +33,18 @@ public class Game {
   private final Rule.Set rules;
   private final List<Player> players;
   private final Cups cups;
+  private final Strategy.OfPlayers strategies;
 
-  public Game(Rule.Set rules, List<Player> players, Cups cups) {
+  public Game(Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies) {
     this.rules = rules;
     this.players = players;
     this.cups = cups;
+    this.strategies = strategies;
+  }
+
+  /** A game whose players leave every choice they are offered alone. */
+  public Game(Rule.Set rules, List<Player> players, Cups cups) {
+    this(rules, players, cups, Strategy.OfPlayers.NOBODY_DECIDES);
   }
 
   /** A game thrown with the dice the rules call for. */
@@ -46,11 +59,16 @@ public class Game {
 
   public Result play() {
     var journal = new Journal();
+    var deeds = new Deeds();
     journal.log(new Journal.Entry.Start(ids(players)));
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
-    turnOrder.forEach(player -> takeTurn(player, journal));
-    return new Result(turnOrder, journal.entries());
+
+    Journalling journalling = new Journalling(journal);
+    Landings landings = new LandSale(deeds, turnOrder, strategies, journalling);
+    turnOrder.forEach(player -> takeTurn(player, journal, journalling, landings));
+
+    return new Result(turnOrder, journal.entries(), deeds);
   }
 
   private int initiativeRollFor(Player player, Journal journal) {
@@ -59,13 +77,13 @@ public class Game {
     return total;
   }
 
-  private void takeTurn(Player player, Journal journal) {
+  private void takeTurn(Player player, Journal journal, Turn.Events events, Landings landings) {
     journal.log(new Journal.Entry.TurnStarted(player.id()));
-    new Turn(rules, cups.forPlayer(player), new Journalling(journal)).take(player);
+    new Turn(rules, cups.forPlayer(player), events, landings).take(player);
   }
 
-  /** Writes down what a turn says it did, as the game's own account of it. */
-  private record Journalling(Journal journal) implements Turn.Events {
+  /** Writes down what a turn and a sale say they did, as the game's account of it. */
+  private record Journalling(Journal journal) implements Turn.Events, LandSale.Events {
     @Override
     public void rolled(Player player, Roll roll) {
       journal.log(new Journal.Entry.Rolled(player.id(), roll.total()));
@@ -79,6 +97,16 @@ public class Game {
     @Override
     public void collectedSalary(Player player, Money salary) {
       journal.log(new Journal.Entry.SalaryCollected(player.id(), salary));
+    }
+
+    @Override
+    public void bought(Player buyer, Ownable land, Money price) {
+      journal.log(new Journal.Entry.Bought(buyer.id(), land.type(), price));
+    }
+
+    @Override
+    public void wonAtAuction(Player winner, Ownable land, Money price) {
+      journal.log(new Journal.Entry.AuctionWon(winner.id(), land.type(), price));
     }
   }
 
@@ -97,11 +125,11 @@ public class Game {
   }
 
   /**
-   * How the game went: the players in the order they take their turns, and the
-   * account of what happened. The account is data rather than written text, so
-   * that rendering it stays somebody else's job.
+   * How the game went: the players in the order they take their turns, the
+   * account of what happened, and who ended up owning what. The account is data
+   * rather than written text, so that rendering it stays somebody else's job.
    */
-  public record Result(List<Player> turnOrder, List<Journal.Entry> journal) {
+  public record Result(List<Player> turnOrder, List<Journal.Entry> journal, Deeds deeds) {
   }
 
   public static class Journal {
@@ -144,6 +172,14 @@ public class Game {
       }
 
       record SalaryCollected(Player.ID player, Money salary) implements Entry {
+      }
+
+      /** Land bought from the bank at the price on the board. */
+      record Bought(Player.ID player, Street.Type land, Money price) implements Entry {
+      }
+
+      /** Land the table bid for, and what the winner paid for it. */
+      record AuctionWon(Player.ID player, Street.Type land, Money price) implements Entry {
       }
     }
   }

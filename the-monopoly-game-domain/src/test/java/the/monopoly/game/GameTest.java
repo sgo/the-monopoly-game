@@ -11,6 +11,8 @@ import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.components.streets.TaxSpace;
 import the.monopoly.game.rules.Rule;
+import the.monopoly.game.strategies.AgreeIfAffordable;
+import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
 import java.util.Map;
@@ -139,6 +141,69 @@ class GameTest {
     Player dog = players.getFirst();
     assertThat(spaceAt(dog.position().index())).isInstanceOf(TaxSpace.class);
     assertThat(dog.account().balance()).isEqualTo(Balance.of(1500));
+  }
+
+  @Test
+  void aGameSellsUnownedLandToWhoeverStopsOnItAndAgreesToBuyIt() {
+    Game.Result result = playWith(Map.of(Pawn.dog.id(), new AgreeIfAffordable()));
+
+    assertThat(result.deeds().ownerOf(Street.Type.DiestsestraatLeuven)).contains(Pawn.dog.id());
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1440));
+  }
+
+  @Test
+  void aGameAccountsForAPurchaseAfterTheMoveThatReachedIt() {
+    Game.Result result = playWith(Map.of(Pawn.dog.id(), new AgreeIfAffordable()));
+
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.Moved(Pawn.dog.id(), 0, 3),
+        new Entry.Bought(Pawn.dog.id(), Street.Type.DiestsestraatLeuven, new Money(60))
+    );
+  }
+
+  @Test
+  void aGameAccountsForAnAuctionAfterTheMoveThatReachedTheLand() {
+    Game.Result result = playWith(Map.of(Pawn.high_hat.id(), bidding(120)));
+
+    assertThat(result.deeds().ownerOf(Street.Type.DiestsestraatLeuven)).contains(Pawn.high_hat.id());
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.Moved(Pawn.dog.id(), 0, 3),
+        new Entry.AuctionWon(Pawn.high_hat.id(), Street.Type.DiestsestraatLeuven, new Money(120))
+    );
+  }
+
+  @Test
+  void aGameNobodyDecidesAnythingInLeavesTheBoardWithTheBank() {
+    Game.Result result = playWith(Map.of());
+
+    assertThat(result.deeds().isUnowned(Street.Type.DiestsestraatLeuven)).isTrue();
+  }
+
+  /** A player who wants the land at auction but never at the asking price. */
+  private static Strategy bidding(int amount) {
+    return new Strategy() {
+      @Override
+      public Money bidFor(Offer offer) {
+        return new Money(amount);
+      }
+    };
+  }
+
+  /**
+   * Plays a game in which the winner of initiative stops on the first street
+   * anyone can buy, and everyone after them stops on the same street.
+   */
+  private Game.Result playWith(Map<Player.ID, Strategy> strategies) {
+    Map<Player.ID, Cup> cups = Map.of(
+        Pawn.dog.id(), Cup.of(new Roll(5, 5), new Roll(1, 2)),
+        Pawn.high_hat.id(), Cup.of(new Roll(1, 1), new Roll(1, 2)),
+        Pawn.iron_box.id(), Cup.of(new Roll(1, 2), new Roll(1, 2))
+    );
+    return new Game(
+        ruleSet, players,
+        player -> cups.get(player.id()),
+        player -> strategies.getOrDefault(player.id(), Strategy.UNDECIDED)
+    ).play();
   }
 
   private Street spaceAt(int position) {

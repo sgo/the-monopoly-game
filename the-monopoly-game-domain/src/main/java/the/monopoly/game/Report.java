@@ -2,6 +2,7 @@ package the.monopoly.game;
 
 import the.monopoly.game.Game.Journal.Entry;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.Street;
 
 import java.util.List;
 
@@ -36,7 +37,21 @@ public final class Report {
       case Entry.Rolled it -> name(it.player()) + " rolls a total of " + it.total();
       case Entry.Moved it -> name(it.player()) + " moves from position " + it.from() + " to " + it.to();
       case Entry.SalaryCollected it -> name(it.player()) + " collects a salary of $" + it.salary().amount();
+      case Entry.Bought it ->
+          name(it.player()) + " buys " + spaceName(it.land()) + " for $" + it.price().amount();
+      case Entry.AuctionWon it ->
+          name(it.player()) + " wins the auction for " + spaceName(it.land()) + " at $" + it.price().amount();
     };
+  }
+
+  /**
+   * A space is named on the board in words, and in the domain as one name, so
+   * the run-together words are told apart again here. A space whose printed
+   * name is not its own name spelled out will have to be given one when a
+   * specification asks the report for it.
+   */
+  private static String spaceName(Street.Type land) {
+    return land.name().replaceAll("(?<=[a-z])(?=[A-Z])", " ");
   }
 
   private static String names(List<Player.ID> players) {

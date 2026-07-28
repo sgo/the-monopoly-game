@@ -34,4 +34,29 @@ class MoneyTest {
   void nothingIsWorthNothing() {
     assertThat(Money.ZERO.amount()).isZero();
   }
+
+  @Test
+  void anAmountCoversASmallerPrice() {
+    assertThat(new Money(1500).covers(new Money(60))).isTrue();
+  }
+
+  @Test
+  void anAmountCoversAPriceItMatchesExactly() {
+    assertThat(new Money(60).covers(new Money(60))).isTrue();
+  }
+
+  @Test
+  void anAmountDoesNotCoverAPriceBeyondIt() {
+    assertThat(new Money(59).covers(new Money(60))).isFalse();
+  }
+
+  @Test
+  void aLargerAmountExceedsASmallerOne() {
+    assertThat(new Money(120).exceeds(new Money(90))).isTrue();
+  }
+
+  @Test
+  void anEqualAmountDoesNotExceedTheOneItMatches() {
+    assertThat(new Money(120).exceeds(new Money(120))).isFalse();
+  }
 }

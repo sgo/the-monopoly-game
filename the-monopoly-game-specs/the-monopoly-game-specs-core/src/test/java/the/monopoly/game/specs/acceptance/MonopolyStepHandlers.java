@@ -338,6 +338,69 @@ public final class MonopolyStepHandlers {
                 movesFromPosition(arguments.text(1), arguments.number(2), arguments.number(3)),
                 arguments.text(4) + " collects a salary of $" + arguments.number(5))),
 
+        given("^pawn \"" + NAME + "\" follows the \"" + NAME + "\" strategy$",
+            (world, arguments) -> world.pawnFollows(arguments.text(1), Vocabulary.strategy(arguments.text(2)))),
+
+        given("^pawn \"" + NAME + "\" has \\$" + VALUE + " to spend$",
+            (world, arguments) -> world.arrangePawnBalance(arguments.text(1), money(arguments.number(2)))),
+
+        given("^pawn \"" + NAME + "\" declines the offer for \"" + NAME + "\"$",
+            (world, arguments) -> world.pawnDeclines(arguments.text(1), SpaceNames.of(arguments.text(2)))),
+
+        given("^pawn \"" + NAME + "\" will bid \\$" + VALUE + " for \"" + NAME + "\" at auction$",
+            (world, arguments) -> world.pawnWillBid(
+                arguments.text(1), SpaceNames.of(arguments.text(3)), money(arguments.number(2)))),
+
+        step("^pawn \"" + NAME + "\" lands on \"" + NAME + "\"$",
+            (world, arguments) -> world.landPawnOn(arguments.text(1), SpaceNames.of(arguments.text(2)))),
+
+        then("^pawn \"" + NAME + "\" owns \"" + NAME + "\"$",
+            (world, arguments) -> assertThat(world.pawnOwns(arguments.text(1), SpaceNames.of(arguments.text(2))))
+                .as("pawn \"%s\" owns \"%s\"", arguments.text(1), arguments.text(2))
+                .isTrue()),
+
+        then("^pawn \"" + NAME + "\" does not own \"" + NAME + "\"$",
+            (world, arguments) -> assertThat(world.pawnOwns(arguments.text(1), SpaceNames.of(arguments.text(2))))
+                .as("pawn \"%s\" owns \"%s\"", arguments.text(1), arguments.text(2))
+                .isFalse()),
+
+        then("^the game journal records that pawn \"" + NAME + "\" buys \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> records(world,
+                bought(arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" wins the auction for \""
+                + NAME + "\" at \\$" + VALUE + "$",
+            (world, arguments) -> records(world,
+                auctionWon(arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game journal records that pawn \"" + NAME
+                + "\" moves before it records that pawn \"" + NAME + "\" buys \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                moves(arguments.text(1)),
+                bought(arguments.text(2), arguments.text(3), arguments.number(4)))),
+
+        then("^the game journal records that pawn \"" + NAME
+                + "\" moves before it records that pawn \"" + NAME + "\" wins the auction for \""
+                + NAME + "\" at \\$" + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                moves(arguments.text(1)),
+                auctionWon(arguments.text(2), arguments.text(3), arguments.number(4)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" moves before it says that pawn \""
+                + NAME + "\" buys \"" + NAME + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                movesAnywhere(arguments.text(1)),
+                arguments.text(2) + " buys " + arguments.text(3) + " for $" + arguments.number(4))),
+
+        then("^the game report says that pawn \"" + NAME + "\" moves before it says that pawn \""
+                + NAME + "\" wins the auction for \"" + NAME + "\" at \\$" + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                movesAnywhere(arguments.text(1)),
+                arguments.text(2) + " wins the auction for " + arguments.text(3)
+                    + " at $" + arguments.number(4))),
+
         step("^each face was rolled about " + VALUE + " times within a " + VALUE + "% margin$",
             (world, arguments) -> {
               int expected = arguments.number(1);
@@ -372,6 +435,22 @@ public final class MonopolyStepHandlers {
     return Claim.of(new Entry.SalaryCollected(idOf(pawnName), money(salary)));
   }
 
+  private static Claim bought(String pawnName, String spaceName, int price) {
+    return Claim.of(new Entry.Bought(idOf(pawnName), SpaceNames.of(spaceName), money(price)));
+  }
+
+  private static Claim auctionWon(String pawnName, String spaceName, int price) {
+    return Claim.of(new Entry.AuctionWon(idOf(pawnName), SpaceNames.of(spaceName), money(price)));
+  }
+
+  /** A pawn moving anywhere, for a step that says when it moved rather than where to. */
+  private static Claim moves(String pawnName) {
+    return new Claim(
+        entry -> entry instanceof Entry.Moved it && it.player().equals(idOf(pawnName)),
+        "move by " + pawnName
+    );
+  }
+
   /** The report reads as the features read, so a claim is words the report must carry. */
   private static String rollsForInitiative(String pawnName, int total) {
     return pawnName + " rolls " + total + " for initiative";
@@ -383,6 +462,11 @@ public final class MonopolyStepHandlers {
 
   private static String movesFromPosition(String pawnName, int from, int to) {
     return pawnName + " moves from position " + from + " to " + to;
+  }
+
+  /** A pawn moving anywhere, for a step that says when it moved rather than where to. */
+  private static String movesAnywhere(String pawnName) {
+    return pawnName + " moves from position ";
   }
 
   private static Player.ID idOf(String pawnName) {

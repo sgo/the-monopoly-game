@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import the.monopoly.game.Game.Journal.Entry;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Pawn;
+import the.monopoly.game.components.streets.Street;
 
 import java.util.List;
 
@@ -42,6 +43,28 @@ class ReportTest {
   void aReportTellsWhatAPawnWasPaidForReachingStart() {
     assertThat(report(new Entry.SalaryCollected(Pawn.dog.id(), new Money(200))))
         .isEqualTo("dog collects a salary of $200");
+  }
+
+  @Test
+  void aReportTellsWhatAPlayerBoughtAndWhatItCostThem() {
+    assertThat(report(new Entry.Bought(
+        Pawn.dog.id(), Street.Type.DiestsestraatLeuven, new Money(60)
+    ))).isEqualTo("dog buys Diestsestraat Leuven for $60");
+  }
+
+  @Test
+  void aReportTellsWhoWonAnAuctionAndWhatTheyBid() {
+    assertThat(report(new Entry.AuctionWon(
+        Pawn.high_hat.id(), Street.Type.DiestsestraatLeuven, new Money(120)
+    ))).isEqualTo("high hat wins the auction for Diestsestraat Leuven at $120");
+  }
+
+  /** A space is spelled as the board spells it, in words rather than as one. */
+  @Test
+  void aReportSpellsASpaceOfOneWordAsTheOneWordItIs() {
+    assertThat(report(new Entry.Bought(
+        Pawn.dog.id(), Street.Type.Elektriciteitscentrale, new Money(150)
+    ))).isEqualTo("dog buys Elektriciteitscentrale for $150");
   }
 
   @Test
