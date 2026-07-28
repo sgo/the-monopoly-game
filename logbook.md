@@ -7620,3 +7620,51 @@ the audit trail that was otherwise missing. Only one conflict, in
 new on this side (the phase9-land-sale handoff-sent entry), 8 new on the
 architect's side, no header collisions, nothing dropped from base on
 either side. `mvn -q -o test` passes on the merged state (exit 0).
+
+## 2026-07-28T21:30:56Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260728T213056Z_000016_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 62d8a8cf4e
+created_at: 2026-07-28T21:30:56.315339Z
+enqueued_at: 2026-07-28T21:30:56.993863Z
+task: phase10-chance-and-community-chest
+dequeued_at: 2026-07-28T21:31:02.224726Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 62d8a8cf4e
+```
+
+Action taken: merged specifier commit `62d8a8cf4e` into `swarmforge-coder`
+(fast-forward), implemented Phase 10 chance/community chest card handling,
+and verified the result with module tests plus the generated acceptance suite.
+
+## 2026-07-28T21:41:31Z — coder sent handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase10-chance-and-community-chest
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: implemented chance/community chest card resolution for movement,
+salary handling, flat bank payments and receipts, player-to-player card
+payments, nearest station and utility routing, property-repair charges,
+retained/sellable Get Out of Jail Free cards, and matching journal/report
+entries for card draws and bank payments. Verification passed with `mvn -B
+-pl the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core
+-Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2
+test` and `acceptance/run-acceptance.sh` (using the same local Maven repo).

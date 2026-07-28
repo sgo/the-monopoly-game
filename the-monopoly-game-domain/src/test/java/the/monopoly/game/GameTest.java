@@ -12,12 +12,14 @@ import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.components.streets.TaxSpace;
 import the.monopoly.game.rules.Deeds;
+import the.monopoly.game.rules.Cards;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.strategies.AgreeIfAffordable;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -266,6 +268,122 @@ class GameTest {
     assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(0));
   }
 
+  @Test
+  void aChanceCardCanAdvanceAPawnToStartAndPayTheSalary() {
+    Game.Result result = playWithCards(
+        Map.of(),
+        new Deeds(),
+        new Roll(3, 4),
+        "Ga door naar START (Ontvang M200).",
+        null
+    );
+
+    assertThat(players.getFirst().position().index()).isZero();
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1700));
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.ChanceCardDrawn(Pawn.dog.id(), "Ga door naar START (Ontvang M200)."),
+        new Entry.SalaryCollected(Pawn.dog.id(), new Money(200))
+    );
+  }
+
+  @Test
+  void aChanceCardCanMakeItsDrawerPayEveryOtherPlayer() {
+    Game.Result result = playWithCards(
+        Map.of(),
+        new Deeds(),
+        new Roll(3, 4),
+        "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50.",
+        null
+    );
+
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1400));
+    assertThat(players.get(1).account().balance()).isEqualTo(Balance.of(1550));
+    assertThat(players.get(2).account().balance()).isEqualTo(Balance.of(1550));
+    assertThat(result.journal()).contains(new Entry.ChanceCardDrawn(
+        Pawn.dog.id(), "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50."
+    ));
+  }
+
+  @Test
+  void aCommunityChestCardCanBeKeptAndSoldToAnotherPlayer() {
+    players.getFirst().position().moveTo(14);
+
+    Game.Result result = playWithCards(
+        Map.of(),
+        new Deeds(),
+        new Roll(1, 2),
+        null,
+        "Je hebt een puppy gered — en je voelt voldoening! Verlaat de gevangenis zonder betalen. Bewaar deze kaart tot je ze nodig hebt. Je kan de kaart ook ruilen of verkopen."
+    );
+
+    assertThat(result.deeds().holdsGetOutOfJailFreeCard(players.getFirst())).isTrue();
+
+    result.deeds().sellGetOutOfJailFreeCard(players.getFirst(), players.get(1), new Money(50));
+
+    assertThat(result.deeds().holdsGetOutOfJailFreeCard(players.get(1))).isTrue();
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1550));
+    assertThat(players.get(1).account().balance()).isEqualTo(Balance.of(1450));
+  }
+
+  @Test
+  void aChanceCardCanAdvanceToTheNearestStationAndChargeDoubleRent() {
+    Deeds deeds = new Deeds();
+    deeds.sell((the.monopoly.game.components.streets.Station) ruleSet.create(Street.Type.CentraalStation), players.get(1),
+        new Money(200));
+    players.get(1).account().deposit(new Money(200));
+
+    playWithCards(
+        Map.of(Pawn.high_hat.id(), new AgreeIfAffordable()),
+        deeds,
+        new Roll(3, 4),
+        "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.",
+        null
+    );
+
+    assertThat(players.getFirst().position().index()).isEqualTo(15);
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1450));
+    assertThat(players.get(1).account().balance()).isEqualTo(Balance.of(1550));
+  }
+
+  @Test
+  void aChanceCardCanChargeUtilityRentUsingAFreshRoll() {
+    players.getFirst().position().moveTo(4);
+    Deeds deeds = new Deeds();
+    deeds.sell((the.monopoly.game.components.streets.Utility) ruleSet.create(Street.Type.Elektriciteitscentrale), players.get(1), new Money(150));
+    players.get(1).account().deposit(new Money(150));
+
+    play(
+        Map.of(Pawn.high_hat.id(), new AgreeIfAffordable()),
+        deeds,
+        Map.of(
+            Pawn.dog.id(), Cup.of(new Roll(5, 5), new Roll(1, 2), new Roll(3, 4)),
+            Pawn.high_hat.id(), Cup.of(new Roll(1, 1), new Roll(4, 6)),
+            Pawn.iron_box.id(), Cup.of(new Roll(1, 2), new Roll(4, 6))
+        ),
+        chanceDeck("Ga door naar het dichtsbijzijnde nutsbedrijf. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, rol de dobbelsteen en betaal de eigenaar tien keer de gerolde waarde.")
+    );
+
+    assertThat(players.getFirst().position().index()).isEqualTo(12);
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1430));
+    assertThat(players.get(1).account().balance()).isEqualTo(Balance.of(1570));
+  }
+
+  @Test
+  void aChanceCardIsRecordedBeforeItsBankPaymentEffect() {
+    Game.Result result = playWithCards(
+        Map.of(),
+        new Deeds(),
+        new Roll(3, 4),
+        "Boete voor te snel rijden. Betaal M15.",
+        null
+    );
+
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.ChanceCardDrawn(Pawn.dog.id(), "Boete voor te snel rijden. Betaal M15."),
+        new Entry.BankPaid(Pawn.dog.id(), new Money(15))
+    );
+  }
+
   /** A player who wants the land at auction but never at the asking price. */
   private static Strategy bidding(int amount) {
     return new Strategy() {
@@ -308,17 +426,50 @@ class GameTest {
   }
 
   private Game.Result play(Map<Player.ID, Strategy> strategies, Deeds deeds, Roll secondRoll) {
+    return playWithCards(strategies, deeds, secondRoll, null, null);
+  }
+
+  private Game.Result playWithCards(
+      Map<Player.ID, Strategy> strategies, Deeds deeds, Roll secondRoll, String chanceCard, String communityChestCard
+  ) {
     Map<Player.ID, Cup> cups = Map.of(
         Pawn.dog.id(), Cup.of(new Roll(5, 5), secondRoll),
         Pawn.high_hat.id(), Cup.of(new Roll(1, 1), secondRoll),
         Pawn.iron_box.id(), Cup.of(new Roll(1, 2), secondRoll)
     );
+    return play(strategies, deeds, cups, decks(chanceCard, communityChestCard));
+  }
+
+  private Game.Result play(
+      Map<Player.ID, Strategy> strategies, Deeds deeds, Map<Player.ID, Cup> cups, Cards.Decks decks
+  ) {
     return new Game(
         ruleSet, players,
         player -> cups.get(player.id()),
         player -> strategies.getOrDefault(player.id(), Strategy.UNDECIDED),
-        deeds
+        deeds,
+        decks
     ).play();
+  }
+
+  private static Cards.Decks chanceDeck(String chanceCard) {
+    return decks(chanceCard, null);
+  }
+
+  private static Cards.Decks decks(String chanceCard, String communityChestCard) {
+    AtomicReference<String> nextChance = new AtomicReference<>(chanceCard);
+    AtomicReference<String> nextCommunityChest = new AtomicReference<>(communityChestCard);
+    return new Cards.Decks() {
+      @Override
+      public String drawChance() {
+        return nextChance.getAndSet(null);
+      }
+
+      @Override
+      public String drawCommunityChest() {
+        return nextCommunityChest.getAndSet(null);
+      }
+    };
   }
 
   private Deeds monopolyFor(Player.ID owner) {

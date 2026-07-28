@@ -32,6 +32,7 @@ en/rules/building.feature
 en/rules/land-sale.feature
 en/rules/mortgage.feature
 en/rules/mortgage-transfer.feature
+en/rules/cards.feature
 en/rules/journal.feature
 en/rules/report.feature
 en/rules/rent.feature

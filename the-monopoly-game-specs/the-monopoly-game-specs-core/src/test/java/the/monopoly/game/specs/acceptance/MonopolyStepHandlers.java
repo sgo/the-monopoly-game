@@ -187,6 +187,12 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> world.queuePawnRoll(
                 arguments.text(1), new Roll(arguments.number(2), arguments.number(3)))),
 
+        step("^the next chance card will be \"" + NAME + "\"$",
+            (world, arguments) -> world.queueChanceCard(arguments.text(1))),
+
+        step("^the next community chest card will be \"" + NAME + "\"$",
+            (world, arguments) -> world.queueCommunityChestCard(arguments.text(1))),
+
         step("^with \\$" + VALUE + " in pawn \"" + NAME + "\"'s account$",
             (world, arguments) -> world.arrangePawnBalance(arguments.text(2), money(arguments.number(1)))),
 
@@ -352,8 +358,14 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> world.pawnWillBid(
                 arguments.text(1), SpaceNames.of(arguments.text(3)), money(arguments.number(2)))),
 
+        given("^pawn \"" + NAME + "\" will buy \"" + NAME + "\"$",
+            (world, arguments) -> world.pawnWillBuy(arguments.text(1), SpaceNames.of(arguments.text(2)))),
+
         given("^pawn \"" + NAME + "\" owns \"" + NAME + "\"$",
             (world, arguments) -> world.givePawnOwnership(arguments.text(1), SpaceNames.of(arguments.text(2)))),
+
+        given("^pawn \"" + NAME + "\" holds a \"Get Out of Jail Free\" card$",
+            (world, arguments) -> assertThat(world.holdsGetOutOfJailFreeCard(arguments.text(1))).isTrue()),
 
         given("^the street \"" + NAME + "\" has " + VALUE + " house\\(s\\) built$",
             (world, arguments) -> world.arrangeHouses(SpaceNames.of(arguments.text(1)), arguments.number(2))),
@@ -393,6 +405,11 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> world.sellLand(
                 arguments.text(1), SpaceNames.of(arguments.text(2)), arguments.text(3), money(arguments.number(4)))),
 
+        step("^pawn \"" + NAME + "\" sells the \"Get Out of Jail Free\" card to pawn \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> world.sellGetOutOfJailFreeCard(
+                arguments.text(1), arguments.text(2), money(arguments.number(3)))),
+
         then("^pawn \"" + NAME + "\" owns \"" + NAME + "\"$",
             (world, arguments) -> assertThat(world.pawnOwns(arguments.text(1), SpaceNames.of(arguments.text(2))))
                 .as("pawn \"%s\" owns \"%s\"", arguments.text(1), arguments.text(2))
@@ -402,6 +419,9 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> assertThat(world.pawnOwns(arguments.text(1), SpaceNames.of(arguments.text(2))))
                 .as("pawn \"%s\" owns \"%s\"", arguments.text(1), arguments.text(2))
                 .isFalse()),
+
+        then("^pawn \"" + NAME + "\" holds a \"Get Out of Jail Free\" card$",
+            (world, arguments) -> assertThat(world.holdsGetOutOfJailFreeCard(arguments.text(1))).isTrue()),
 
         then("^the street \"" + NAME + "\" has " + VALUE + " house\\(s\\) built$",
             (world, arguments) -> assertThat(world.housesBuiltOn(SpaceNames.of(arguments.text(1))))
@@ -456,6 +476,18 @@ public final class MonopolyStepHandlers {
                 + "\" for \\$" + VALUE + " because a street in the colour group is mortgaged$",
             (world, arguments) -> records(world, buildingRefused(
                 arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" draws the chance card \"" + NAME + "\"$",
+            (world, arguments) -> records(world, chanceCardDrawn(arguments.text(1), arguments.text(2)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" draws the community chest card \"" + NAME + "\"$",
+            (world, arguments) -> records(world, communityChestCardDrawn(arguments.text(1), arguments.text(2)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" draws the chance card \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" pays the bank \\$" + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                chanceCardDrawn(arguments.text(1), arguments.text(2)),
+                bankPaid(arguments.text(3), arguments.number(4)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" moves before it records that pawn \""
                 + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + " rent for \"" + NAME + "\"$",
@@ -541,6 +573,12 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> says(world, buildingRefusedLine(
                 arguments.text(1), arguments.text(2), arguments.number(3)))),
 
+        then("^the game report says that pawn \"" + NAME + "\" draws the chance card \"" + NAME
+                + "\" before it says that pawn \"" + NAME + "\" pays the bank \\$" + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                chanceCardDrawnLine(arguments.text(1), arguments.text(2)),
+                bankPaidLine(arguments.text(3), arguments.number(4)))),
+
         step("^each face was rolled about " + VALUE + " times within a " + VALUE + "% margin$",
             (world, arguments) -> {
               int expected = arguments.number(1);
@@ -618,6 +656,18 @@ public final class MonopolyStepHandlers {
     return Claim.of(new Entry.BuildingRefused(idOf(pawnName), SpaceNames.of(spaceName), money(price)));
   }
 
+  private static Claim chanceCardDrawn(String pawnName, String card) {
+    return Claim.of(new Entry.ChanceCardDrawn(idOf(pawnName), card));
+  }
+
+  private static Claim communityChestCardDrawn(String pawnName, String card) {
+    return Claim.of(new Entry.CommunityChestCardDrawn(idOf(pawnName), card));
+  }
+
+  private static Claim bankPaid(String pawnName, int amount) {
+    return Claim.of(new Entry.BankPaid(idOf(pawnName), money(amount)));
+  }
+
   /** A pawn moving anywhere, for a step that says when it moved rather than where to. */
   private static Claim moves(String pawnName) {
     return new Claim(
@@ -673,6 +723,14 @@ public final class MonopolyStepHandlers {
   private static String buildingRefusedLine(String pawnName, String spaceName, int price) {
     return pawnName + " is refused building a house on " + spaceName
         + " for $" + price + " because a street in the colour group is mortgaged";
+  }
+
+  private static String chanceCardDrawnLine(String pawnName, String card) {
+    return pawnName + " draws the chance card \"" + card + "\"";
+  }
+
+  private static String bankPaidLine(String pawnName, int amount) {
+    return pawnName + " pays the bank $" + amount;
   }
 
   private static Player.ID idOf(String pawnName) {

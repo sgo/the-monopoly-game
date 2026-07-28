@@ -9,6 +9,7 @@ import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Building;
+import the.monopoly.game.rules.Cards;
 import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.LandSale;
@@ -38,17 +39,25 @@ public class Game {
   private final Cups cups;
   private final Strategy.OfPlayers strategies;
   private final Deeds deeds;
+  private final Cards.Decks decks;
 
   public Game(Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies) {
-    this(rules, players, cups, strategies, new Deeds());
+    this(rules, players, cups, strategies, new Deeds(), Cards.Decks.EMPTY);
   }
 
   public Game(Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds) {
+    this(rules, players, cups, strategies, deeds, Cards.Decks.EMPTY);
+  }
+
+  public Game(
+      Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds, Cards.Decks decks
+  ) {
     this.rules = rules;
     this.players = players;
     this.cups = cups;
     this.strategies = strategies;
     this.deeds = deeds;
+    this.decks = decks;
   }
 
   /** A game whose players leave every choice they are offered alone. */
@@ -73,16 +82,10 @@ public class Game {
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
 
     Journalling journalling = new Journalling(journal);
-    Landings rent = new Rent(deeds, rules, turnOrder, strategies, journalling);
-    Landings landSale = new LandSale(deeds, rules, turnOrder, strategies, journalling);
     Building building = new Building(deeds, rules, strategies, journalling);
-    Landings resolvingLandings = (player, space, roll) -> {
-      rent.resolve(player, space, roll);
-      landSale.resolve(player, space, roll);
-    };
     Player builder = turnOrder.getFirst();
     turnOrder.forEach(player -> {
-      takeTurn(player, journal, journalling, resolvingLandings);
+      takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
       if (player.id().equals(builder.id())) building.develop(player);
     });
 
@@ -100,8 +103,20 @@ public class Game {
     new Turn(rules, cups.forPlayer(player), events, landings).take(player);
   }
 
+  private Landings landingsFor(Player player, List<Player> turnOrder, Journalling journalling) {
+    Landings rent = new Rent(deeds, rules, turnOrder, strategies, journalling);
+    Landings landSale = new LandSale(deeds, rules, turnOrder, strategies, journalling);
+    Landings cards = new Cards(deeds, rules, turnOrder, strategies, decks, journalling, cups.forPlayer(player));
+    return (who, space, roll) -> {
+      rent.resolve(who, space, roll);
+      landSale.resolve(who, space, roll);
+      cards.resolve(who, space, roll);
+    };
+  }
+
   /** Writes down what a turn and a sale say they did, as the game's account of it. */
-  private record Journalling(Journal journal) implements Turn.Events, LandSale.Events, Rent.Events, Building.Events {
+  private record Journalling(Journal journal)
+      implements Turn.Events, LandSale.Events, Rent.Events, Building.Events, Cards.Events {
     @Override
     public void rolled(Player player, Roll roll) {
       journal.log(new Journal.Entry.Rolled(player.id(), roll.total()));
@@ -150,6 +165,21 @@ public class Game {
     @Override
     public void refusedBuilding(Player player, ColourStreet street, Money price) {
       journal.log(new Journal.Entry.BuildingRefused(player.id(), street.type(), price));
+    }
+
+    @Override
+    public void drewChanceCard(Player player, String card) {
+      journal.log(new Journal.Entry.ChanceCardDrawn(player.id(), card));
+    }
+
+    @Override
+    public void drewCommunityChestCard(Player player, String card) {
+      journal.log(new Journal.Entry.CommunityChestCardDrawn(player.id(), card));
+    }
+
+    @Override
+    public void paidBank(Player player, Money amount) {
+      journal.log(new Journal.Entry.BankPaid(player.id(), amount));
     }
   }
 
@@ -247,6 +277,15 @@ public class Game {
       }
 
       record BuildingRefused(Player.ID player, Street.Type land, Money price) implements Entry {
+      }
+
+      record ChanceCardDrawn(Player.ID player, String card) implements Entry {
+      }
+
+      record CommunityChestCardDrawn(Player.ID player, String card) implements Entry {
+      }
+
+      record BankPaid(Player.ID player, Money amount) implements Entry {
       }
     }
   }
