@@ -7577,3 +7577,46 @@ merge_and_process refactorer 24997ec8ae
 ```
 
 Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T20:39:50Z — specifier merged handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T203950Z_000035_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: workflow-architect-followup-return-routing
+commit: 2756b260d5
+
+Re-read your role and constitution.
+
+merge_and_process architect 2756b260d5
+```
+
+Action taken: merged architect commit `2756b260d5` into `main`. This
+handoff carried two things: the Phase 9 completion chain (implementation,
+refactor, and hardening for `phase9-land-sale`, already covered by this
+session's own spec work) and, as its own dedicated final commit, a
+constitution/prompt change — `workflow.prompt` and `coder.prompt` — adding
+explicit routing rules for an architect priority-`00` follow-up loop (it
+returns to the architect directly unless the coder/refactorer needs to
+make real changes, in which case it flows through them as normal before
+returning; the specifier phase-complete sync waits until the loop closes).
+
+This is the second undocumented prompt/constitution edit in this project's
+history — like `436724393a` before it, it carried no logbook entry of its
+own explaining why, breaking the established precedent that such changes
+are logged as done at the user's direction. Unlike last time, this was
+surfaced to the user *before* merging, since the entire handoff (not just
+its tail commit) was the prompt change itself. The user confirmed they
+authorized it, so it is merged as authoritative, and this entry serves as
+the audit trail that was otherwise missing. Only one conflict, in
+`logbook.md`, resolved at entry granularity as before: 222 base entries, 1
+new on this side (the phase9-land-sale handoff-sent entry), 8 new on the
+architect's side, no header collisions, nothing dropped from base on
+either side. `mvn -q -o test` passes on the merged state (exit 0).
