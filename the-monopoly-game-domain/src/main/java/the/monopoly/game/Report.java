@@ -26,7 +26,16 @@ public final class Report {
   /**
    * Switching over the sealed {@link Entry} rather than looking a handler up by
    * class is what makes a new kind of entry a compile error here. Told any
-   * other way, one would simply go unreported.
+   * other way — a map keyed by class, a chain of instanceof — an entry nobody
+   * wrote a line for compiles, and goes silently unreported until a game hits
+   * it. That is the guarantee {@link Entry} is sealed for.
+   * <p>
+   * One case per entry is one branch per entry, so complexity counts as high as
+   * the journal is wide. That is the shape of the thing being described, not
+   * complication to be refactored away; a form that measures lower gets there
+   * by hiding the same branching from the compiler as well as the metric. When
+   * the cases outgrow a screen, give each one a named method and leave the
+   * switch itself alone.
    */
   private static String line(Entry entry) {
     return switch (entry) {
@@ -65,31 +74,31 @@ public final class Report {
 
 /* mutate4java-manifest
 version=1
-moduleHash=b71c6f5b882cd2e347a6e6ab2e3980b68c7736cdf4969b5875dd721b780f34d9
+moduleHash=ddfb5e70f9b1c89714f5e8742cbbceb62a6f02fa1d09496584c5db45dd79888b
 scope.0.id=Y2xhc3M6UmVwb3J0I1JlcG9ydDoxNw
 scope.0.kind=class
 scope.0.startLine=17
-scope.0.endLine=49
-scope.0.semanticHash=fb4ca5525a456e9a992f15bfb4e0190626d0a9ede349804f4eed581c86d25348
+scope.0.endLine=58
+scope.0.semanticHash=8061f297e0c1c906d5c2ed9906aa31463cfbdd3c41f6b9ac1f44332a3f6e8640
 scope.1.id=bWV0aG9kOlJlcG9ydCNjdG9yKDApOjE4
 scope.1.kind=method
 scope.1.startLine=18
 scope.1.endLine=19
 scope.1.semanticHash=fa4ab1d8c774b5a49e26e7b36ba0ec25ba0d7069b207d38eb37beccb7d02dc9c
-scope.2.id=bWV0aG9kOlJlcG9ydCNsaW5lKDEpOjMw
+scope.2.id=bWV0aG9kOlJlcG9ydCNsaW5lKDEpOjM5
 scope.2.kind=method
-scope.2.startLine=30
-scope.2.endLine=40
+scope.2.startLine=39
+scope.2.endLine=49
 scope.2.semanticHash=6a5837f79119034af38b21a9f2c8fde1596d803e7aac6130517f06366b07b640
-scope.3.id=bWV0aG9kOlJlcG9ydCNuYW1lKDEpOjQ2
+scope.3.id=bWV0aG9kOlJlcG9ydCNuYW1lKDEpOjU1
 scope.3.kind=method
-scope.3.startLine=46
-scope.3.endLine=48
+scope.3.startLine=55
+scope.3.endLine=57
 scope.3.semanticHash=cd39b08d1576cbc2e9d2ae25bb54b6b608f1219509ee3d03086e8f3ab4c238fa
-scope.4.id=bWV0aG9kOlJlcG9ydCNuYW1lcygxKTo0Mg
+scope.4.id=bWV0aG9kOlJlcG9ydCNuYW1lcygxKTo1MQ
 scope.4.kind=method
-scope.4.startLine=42
-scope.4.endLine=44
+scope.4.startLine=51
+scope.4.endLine=53
 scope.4.semanticHash=7baca973d9baa23bf1205536bbfd229d494b1e2c863e02f6e50c5ce7dcb42959
 scope.5.id=bWV0aG9kOlJlcG9ydCNvZigxKToyMQ
 scope.5.kind=method
