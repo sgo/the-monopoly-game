@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import the.monopoly.game.rules.Rule;
 
+import java.util.function.Function;
+
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -28,18 +30,29 @@ class OwnedCountBoundsPropertyTest {
 
   @Test
   void stationRentIsDefinedOnlyWithinBoardBounds() {
-    PropertyChecker.forAll(Generator.zipWith(stationTypes(), OWNED_COUNTS, Case::new), c -> {
-      Station station = (Station) ruleSet.create(c.type());
-      return isBoundedByOwnedOnBoard(c.owned(), STATIONS_ON_BOARD, () -> station.rentForOwning(c.owned()));
-    });
+    assertOwnedCountBounds(
+        stationTypes(),
+        STATIONS_ON_BOARD,
+        c -> () -> ((Station) ruleSet.create(c.type())).rentForOwning(c.owned())
+    );
   }
 
   @Test
   void utilityRentMultiplierIsDefinedOnlyWithinBoardBounds() {
-    PropertyChecker.forAll(Generator.zipWith(utilityTypes(), OWNED_COUNTS, Case::new), c -> {
-      Utility utility = (Utility) ruleSet.create(c.type());
-      return isBoundedByOwnedOnBoard(c.owned(), UTILITIES_ON_BOARD, () -> utility.rentDiceMultiplierForOwning(c.owned()));
-    });
+    assertOwnedCountBounds(
+        utilityTypes(),
+        UTILITIES_ON_BOARD,
+        c -> () -> ((Utility) ruleSet.create(c.type())).rentDiceMultiplierForOwning(c.owned())
+    );
+  }
+
+  private void assertOwnedCountBounds(
+      Generator<Street.Type> types,
+      int onBoard,
+      Function<Case, ThrowingCallable> callFor
+  ) {
+    PropertyChecker.forAll(Generator.zipWith(types, OWNED_COUNTS, Case::new),
+        c -> isBoundedByOwnedOnBoard(c.owned(), onBoard, callFor.apply(c)));
   }
 
   private boolean isBoundedByOwnedOnBoard(int owned, int onBoard, ThrowingCallable call) {
