@@ -6234,6 +6234,34 @@ responsible for forwarding verified work to refactorer. Purely
 behavior-preserving structural changes go only to refactorer. The same commit
 must never be addressed or separately queued to both roles.
 
+## 2026-07-28T12:07:38Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T120738Z_000012_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase6-station-utility-rent
+commit: 0540a2acc7
+created_at: 2026-07-28T12:07:38.359252Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 0540a2acc7
+```
+
+Summary: specified Phase 6 station and utility rent — station rent scaled to
+count owned, utility rent as a multiple (4x/10x) of the dice roll that landed
+there, proven across two different rolls — in new `station-rent.feature` and
+`utility-rent.feature`, with one matching journal/report scenario each for the
+dice-derived utility case. Waiver and the Chance/Community-Chest utility-rent
+sub-case are out of scope, deferred to phase 5's existing generic coverage and
+phase 10 respectively.
+
 ## 2026-07-28T12:07:38Z — coder received handoff from specifier
 
 Handoff message received:
@@ -6458,3 +6486,43 @@ Summary: merged the `Landings` roll-awareness fix and `Ownable` boundary
 narrowing; refactorer's own CRAP, DRY, and mutation-scan gates are unchanged
 or improved and pass on the merged tree; unit, property, and acceptance
 verification all pass.
+
+## 2026-07-28T13:26:16Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/inbox/in_process/50_20260728T131215Z_000013_from_specifier_to_coder.handoff
+FROM: specifier
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase7-houses-hotels
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process specifier 3e7eb1a658
+```
+
+Action taken: merged specifier commit `3e7eb1a658`, implemented houses and
+hotels with turn-time building, improved-street rent, direct house sale and
+hotel exchange mechanics, extended the acceptance vocabulary and pipeline, and
+verified the slice with `181` domain tests plus the full normal acceptance
+pipeline (`141` generated acceptance tests) passing.
+
+## 2026-07-28T13:26:54Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase7-houses-hotels
+commit: 3c123453c9
+```
+
+Summary: implemented phase 7 houses and hotels — turn-time building for the
+initiative winner, improved-street rent, direct house sale and hotel exchange,
+and the acceptance/journal/report coverage for the new slice — with `181`
+domain tests and the full normal acceptance pipeline (`141` generated
+acceptance tests) passing.

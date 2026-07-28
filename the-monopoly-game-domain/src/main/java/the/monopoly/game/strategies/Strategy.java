@@ -2,6 +2,7 @@ package the.monopoly.game.strategies;
 
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 
 /**
@@ -30,6 +31,11 @@ public interface Strategy {
     return false;
   }
 
+  /** Whether to buy the next house or hotel offered for an owned street. */
+  default boolean builds(BuildOffer offer) {
+    return false;
+  }
+
   /** A visitor, the land they stopped on, and the rent its owner may claim. */
   record RentClaim(Player tenant, Ownable land, Money amount) {
   }
@@ -38,6 +44,13 @@ public interface Strategy {
   record Offer(Ownable land, Money available) {
     public boolean isAffordable() {
       return available.covers(land.price());
+    }
+  }
+
+  /** The improvement a player is being asked to buy for a street they already own. */
+  record BuildOffer(ColourStreet land, Money price, Money available, boolean hotel) {
+    public boolean isAffordable() {
+      return available.covers(price);
     }
   }
 

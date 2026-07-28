@@ -8,8 +8,10 @@ import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Pawn;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.components.streets.TaxSpace;
+import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.strategies.AgreeIfAffordable;
 import the.monopoly.game.strategies.Strategy;
@@ -193,6 +195,35 @@ class GameTest {
     assertThat(result.deeds().isUnowned(Street.Type.DiestsestraatLeuven)).isTrue();
   }
 
+  @Test
+  void anAgreeablePlayerBuildsEvenlyAcrossAFullColourGroupTheyOwn() {
+    Deeds deeds = monopolyFor(Pawn.dog.id());
+    players.getFirst().account().withdraw(new Money(1400));
+
+    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new AgreeIfAffordable()), deeds);
+
+    assertThat(result.deeds().housesBuiltOn(street(Street.Type.RueGrandeDinant))).isEqualTo(1);
+    assertThat(result.deeds().housesBuiltOn(street(Street.Type.DiestsestraatLeuven))).isEqualTo(1);
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(0));
+    assertThat(result.journal()).contains(new Entry.HouseBuilt(
+        Pawn.dog.id(), Street.Type.RueGrandeDinant, new Money(50)
+    ));
+  }
+
+  @Test
+  void anAgreeablePlayerExchangesFourHousesForAHotelOnEveryStreetItCanAfford() {
+    Deeds deeds = monopolyFor(Pawn.dog.id());
+    deeds.arrangeHouses(street(Street.Type.RueGrandeDinant), 4);
+    deeds.arrangeHouses(street(Street.Type.DiestsestraatLeuven), 4);
+    players.getFirst().account().withdraw(new Money(800));
+
+    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new AgreeIfAffordable()), deeds);
+
+    assertThat(result.deeds().hasHotelOn(street(Street.Type.RueGrandeDinant))).isTrue();
+    assertThat(result.deeds().hasHotelOn(street(Street.Type.DiestsestraatLeuven))).isTrue();
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(0));
+  }
+
   /** A player who wants the land at auction but never at the asking price. */
   private static Strategy bidding(int amount) {
     return new Strategy() {
@@ -222,6 +253,10 @@ class GameTest {
    * anyone can buy, and everyone after them stops on the same street.
    */
   private Game.Result playWith(Map<Player.ID, Strategy> strategies) {
+    return playWith(strategies, new Deeds());
+  }
+
+  private Game.Result playWith(Map<Player.ID, Strategy> strategies, Deeds deeds) {
     Map<Player.ID, Cup> cups = Map.of(
         Pawn.dog.id(), Cup.of(new Roll(5, 5), new Roll(1, 2)),
         Pawn.high_hat.id(), Cup.of(new Roll(1, 1), new Roll(1, 2)),
@@ -230,8 +265,39 @@ class GameTest {
     return new Game(
         ruleSet, players,
         player -> cups.get(player.id()),
-        player -> strategies.getOrDefault(player.id(), Strategy.UNDECIDED)
+        player -> strategies.getOrDefault(player.id(), Strategy.UNDECIDED),
+        deeds
     ).play();
+  }
+
+  private Game.Result playWithQuietTurns(Map<Player.ID, Strategy> strategies, Deeds deeds) {
+    Map<Player.ID, Cup> cups = Map.of(
+        Pawn.dog.id(), Cup.of(new Roll(5, 5), new Roll(4, 6)),
+        Pawn.high_hat.id(), Cup.of(new Roll(1, 1), new Roll(4, 6)),
+        Pawn.iron_box.id(), Cup.of(new Roll(1, 2), new Roll(4, 6))
+    );
+    return new Game(
+        ruleSet, players,
+        player -> cups.get(player.id()),
+        player -> strategies.getOrDefault(player.id(), Strategy.UNDECIDED),
+        deeds
+    ).play();
+  }
+
+  private Deeds monopolyFor(Player.ID owner) {
+    Deeds deeds = new Deeds();
+    Player player = players.stream().filter(it -> it.id().equals(owner)).findFirst().orElseThrow();
+    ColourStreet rueGrandeDinant = street(Street.Type.RueGrandeDinant);
+    ColourStreet diestsestraatLeuven = street(Street.Type.DiestsestraatLeuven);
+    deeds.sell(rueGrandeDinant, player, rueGrandeDinant.price());
+    player.account().deposit(rueGrandeDinant.price());
+    deeds.sell(diestsestraatLeuven, player, diestsestraatLeuven.price());
+    player.account().deposit(diestsestraatLeuven.price());
+    return deeds;
+  }
+
+  private ColourStreet street(Street.Type type) {
+    return (ColourStreet) ruleSet.create(type);
   }
 
   private Street spaceAt(int position) {

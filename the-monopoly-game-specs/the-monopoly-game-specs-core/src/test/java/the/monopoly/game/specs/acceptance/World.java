@@ -7,6 +7,7 @@ import the.monopoly.game.components.dice.Dice;
 import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Deeds;
@@ -219,6 +220,26 @@ public class World {
     owner.account().deposit(space.price());
   }
 
+  public void arrangeHouses(Street.Type land, int houses) {
+    if (deeds == null) deeds = new Deeds();
+    deeds.arrangeHouses(colourStreet(land), houses);
+  }
+
+  public void arrangeHotel(Street.Type land) {
+    if (deeds == null) deeds = new Deeds();
+    deeds.arrangeHotel(colourStreet(land));
+  }
+
+  public int housesBuiltOn(Street.Type land) {
+    if (deeds == null) return 0;
+    return deeds.housesBuiltOn(colourStreet(land));
+  }
+
+  public boolean hasHotelOn(Street.Type land) {
+    if (deeds == null) return false;
+    return deeds.hasHotelOn(colourStreet(land));
+  }
+
   public void pawnFollows(String pawnName, Strategy strategy) {
     pawnStrategies.put(pawnName, strategy);
   }
@@ -263,6 +284,21 @@ public class World {
   /** The journal told as text, which is the only place the wording is settled. */
   public String report() {
     return Report.of(journal());
+  }
+
+  public void sellHouse(String pawnName, Street.Type land) {
+    if (deeds == null)
+      throw new AssertionError("No deeds exist yet, so no house can be sold.");
+    Player player = pawn(pawnName);
+    ColourStreet street = colourStreet(land);
+    Money price = deeds.sellHouse(street, player);
+    journal = List.of(new Entry.HouseSold(player.id(), street.type(), price));
+  }
+
+  public void exchangeHotelForHouses(String pawnName, Street.Type land) {
+    if (deeds == null)
+      throw new AssertionError("No deeds exist yet, so no hotel can be exchanged.");
+    deeds.exchangeHotelForHouses(colourStreet(land), pawn(pawnName));
   }
 
   /**
@@ -320,6 +356,13 @@ public class World {
     if (players == null)
       throw new AssertionError("No players have been selected yet.");
     return players;
+  }
+
+  private ColourStreet colourStreet(Street.Type land) {
+    Street space = ruleSet.create(land);
+    if (!(space instanceof ColourStreet street))
+      throw new AssertionError(land + " is not a colour street.");
+    return street;
   }
 
   /**

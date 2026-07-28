@@ -5,6 +5,7 @@ import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 
@@ -46,8 +47,73 @@ class DeedsTest {
     assertThat(deeds.isUnowned(Street.Type.RueGrandeDinant)).isTrue();
   }
 
+  @Test
+  void housesBuiltOnAStreetAreRemembered() {
+    Player owner = playerWith(1500);
+    ColourStreet street = colourStreet(Street.Type.DiestsestraatLeuven);
+    deeds.sell(street, owner, street.price());
+    owner.account().deposit(street.price());
+
+    deeds.buildHouse(street, owner);
+    deeds.buildHouse(street, owner);
+
+    assertThat(deeds.housesBuiltOn(street)).isEqualTo(2);
+    assertThat(deeds.hasHotelOn(street)).isFalse();
+  }
+
+  @Test
+  void aHotelReplacesTheFourHousesOnItsStreet() {
+    Player owner = playerWith(1500);
+    ColourStreet street = colourStreet(Street.Type.DiestsestraatLeuven);
+    deeds.sell(street, owner, street.price());
+    owner.account().deposit(street.price());
+    deeds.arrangeHouses(street, 4);
+
+    deeds.buildHotel(street, owner);
+
+    assertThat(deeds.housesBuiltOn(street)).isZero();
+    assertThat(deeds.hasHotelOn(street)).isTrue();
+  }
+
+  @Test
+  void sellingAHouseBackToTheBankPaysHalfItsConstructionCost() {
+    Player owner = playerWith(1500);
+    ColourStreet street = colourStreet(Street.Type.DiestsestraatLeuven);
+    deeds.sell(street, owner, street.price());
+    owner.account().deposit(street.price());
+    deeds.arrangeHouses(street, 1);
+    owner.account().withdraw(new Money(500));
+
+    Money price = deeds.sellHouse(street, owner);
+
+    assertThat(price).isEqualTo(new Money(25));
+    assertThat(owner.account().balance()).isEqualTo(Balance.of(1025));
+    assertThat(deeds.housesBuiltOn(street)).isZero();
+  }
+
+  @Test
+  void exchangingAHotelBackForHousesPaysHalfTheHotelValue() {
+    Player owner = playerWith(1500);
+    ColourStreet street = colourStreet(Street.Type.DiestsestraatLeuven);
+    deeds.sell(street, owner, street.price());
+    owner.account().deposit(street.price());
+    deeds.arrangeHotel(street);
+    owner.account().withdraw(new Money(500));
+
+    Money price = deeds.exchangeHotelForHouses(street, owner);
+
+    assertThat(price).isEqualTo(new Money(225));
+    assertThat(owner.account().balance()).isEqualTo(Balance.of(1225));
+    assertThat(deeds.housesBuiltOn(street)).isEqualTo(4);
+    assertThat(deeds.hasHotelOn(street)).isFalse();
+  }
+
   private Ownable land(Street.Type type) {
     return (Ownable) ruleSet.create(type);
+  }
+
+  private ColourStreet colourStreet(Street.Type type) {
+    return (ColourStreet) ruleSet.create(type);
   }
 
   private Player playerWith(int balance) {
