@@ -6028,3 +6028,18 @@ merge_and_process specifier 0540a2acc7
 
 Action taken: merged the approved station and utility rent specifications and
 implemented roll-aware landing rent calculation.
+
+## 2026-07-28T12:14:30Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase6-station-utility-rent
+commit: f59f523872
+```
+
+Summary: station and utility rent are implemented with roll-aware landings;
+normal unit and acceptance verification pass.
