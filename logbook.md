@@ -7456,3 +7456,95 @@ Phase 9 scenarios. Verification passed with `mvn -B -pl
 the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core
 -Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2
 test` and `acceptance/run-acceptance.sh` (using the same local Maven repo).
+
+## 2026-07-28T20:13:46Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/50_20260728T201346Z_000018_from_coder_to_refactorer.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase9-land-sale
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder 8f2984fdcc
+```
+
+Action taken: merged `8f2984fdcc` into `swarmforge-refactorer` as `b325ad1`.
+Only `logbook.md` conflicted, again on entry alignment rather than real
+content disagreement: the coder's branch carried 7 entries I didn't have yet
+(the architect's phase 7 completion sync, the specifier's phase 8 mortgaging
+spec, the architect's own accept-and-relay of my phase 8 handoff, the
+specifier's phase 8 merge into `main`, and the specifier→coder→me chain that
+opened phase 9), while my side held the two phase 8 entries I'd already
+logged. All 9 fell into one continuous chronological chain once ordered by
+timestamp — this was one handoff thread split across two branches rather
+than two independent threads. Header-count arithmetic: 217 (common ancestor)
++ 2 (mine, already known) + 7 (coder's, new) = 226, matching the merged file
+exactly, `uniq -d` clean.
+
+The land-sale slice: `LandSale` gained `sell(seller, land, buyer, price)`,
+which refuses the sale via a new `saleIsRefused` check — any street sharing
+the colour group with a house or hotel built blocks it — and otherwise calls
+the new `Deeds.transfer` from Phase 8. `Building.develop` now checks for a
+refused build first (a monopoly with a mortgaged street the player would
+otherwise want to build on) and reports `refusedBuilding` before returning,
+rather than silently skipping it; `monopoliesOwnedBy` dropped the mortgage
+filter it gained in Phase 8 in favour of two named accessors,
+`buildableMonopoliesOwnedBy` and `mortgagedMonopoliesOwnedBy`, so `develop`
+can tell the two cases apart. `Journal.Entry` and `Report.line` gained
+`LandSold`, `LandSaleRefused`, and `BuildingRefused` (still the one exempt
+sealed-switch dispatch — CRAP now 18,1, tracking the sealed type's width).
+Coverage is solid: new `LandSaleTest`, `GameTest`, and `ReportTest` cases
+cover a plain sale, a refused sale, and a refused build; `land-sale.feature`
+is already wired onto the acceptance pipeline.
+
+dry4java flagged the pair `Building.nextBuildFor`/`refusedBuildFor` at
+score 1.00 — identical shape, differing only in which of the two new
+monopoly accessors they queried. Extracted the shared
+`firstOfferedBuild(monopolies, player)` in `24997ec8ae`; DRY count 36 → 35.
+Left `buildableMonopoliesOwnedBy`/`mortgagedMonopoliesOwnedBy` alone despite
+also scoring 1.00 against each other — collapsing a `noneMatch`/`anyMatch`
+pair into a boolean-flag parameter would trade the name that says which
+fact each one asserts for a smaller duplicate count, the same call this
+project has made before (e.g. `DeedsTest`'s illegal-transition tests). The
+rest of the DRY report is the same accepted arrange-act-assert,
+constructor-shape, and one-line-delegate-event similarity as every prior
+round, now including `LandSaleTest`'s `Reported` event recorder picking up
+`sold`/`saleRefused` alongside `bought`/`wonAtAuction`.
+
+Full verification on the final state: 203 unit tests, 17 property tests, and
+acceptance (162, up from 154 — `land-sale.feature`) all pass. CRAP clean but
+for the exempt `Report.line`. Mutation scan on every changed file stays
+well under the 100-site threshold (`LandSale` is the largest of the changed
+files at 11). Nothing else left to do on this state.
+
+## 2026-07-28T20:20:44Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260728T202044Z_000031_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase9-land-sale
+commit: 24997ec8ae
+created_at: 2026-07-28T20:20:44.332661Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 24997ec8ae
+```
+
+Summary: merged the land-sale slice and extracted the one duplicate
+`nextBuildFor`/`refusedBuildFor` shape it introduced in `Building`; unit
+(203), property (17), and acceptance (162, up from 154) verification all
+pass. Left the `buildableMonopoliesOwnedBy`/`mortgagedMonopoliesOwnedBy`
+pair alone on purpose — a boolean-flag collapse would cost more clarity
+than the duplicate count is worth.
