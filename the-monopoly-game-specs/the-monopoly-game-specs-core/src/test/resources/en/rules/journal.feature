@@ -81,3 +81,15 @@ Feature: game journal
     Examples:
       | dog_bid | high_hat_bid | auction_winner | auction_price | expected_auction_price |
       | 90      | 120          | high hat       | 120           | 120                    |
+
+  # journal-6
+  Scenario Outline: the journal records rent paid after the landing movement
+    And pawn "high hat" owns "Diestsestraat Leuven"
+    And pawn "high hat" follows the "Agree if affordable" strategy
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then the game journal records that pawn "dog" pays pawn "high hat" $<rent> rent for "Diestsestraat Leuven"
+    And the game journal records that pawn "dog" moves before it records that pawn "dog" pays pawn "high hat" $<expected_rent> rent for "Diestsestraat Leuven"
+
+    Examples:
+      | rent | expected_rent |
+      | 4    | 4             |
