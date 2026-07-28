@@ -5976,3 +5976,45 @@ Final verification:
   abstraction for this change.
 - Soft Gherkin mutation found no changed scenario surface, retained all prior
   killed results, and reported no survivors or infrastructure errors.
+
+## 2026-07-28T11:46:33Z — architect sent bank invariant handoffs
+
+Handoff message sent to coder and refactorer:
+
+```
+id: 20260728T114620Z_000028_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase5-street-rent
+commit: af47550897
+created_at: 2026-07-28T11:46:20.181943Z
+
+Re-read your role and constitution.
+
+merge_and_process architect af47550897
+```
+
+Handoff message sent to specifier:
+
+```
+id: 20260728T114624Z_000029_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase5-street-rent
+commit: af47550897
+created_at: 2026-07-28T11:46:24.508776Z
+
+Re-read your role and constitution.
+
+merge_and_process architect af47550897
+```
+
+Summary: the stable account-identity correction was sent for implementation
+review and, because it makes account creation explicitly idempotent, for
+specification review.
