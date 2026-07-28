@@ -198,11 +198,16 @@ class TurnTest {
     );
   }
 
+  /**
+   * Spelled out rather than taken through {@link #takeTurn}, because the
+   * constructor without an observer is the whole point here. Reached only
+   * through the helper, this would keep passing if the helper stopped using it.
+   */
   @Test
   void aTurnThatReportsToNobodyStillPlays() {
     Player player = playerAt(5, 1500);
 
-    takeTurn(player, new Roll(2, 3));
+    new Turn(ruleSet, Cup.of(new Roll(2, 3))).take(player);
 
     assertThat(player.position().index()).isEqualTo(10);
   }

@@ -4565,3 +4565,109 @@ commit: (commit recorded by the handoff draft)
 
 Summary: restored the low-complexity report renderer after the architect's
 sealed-entry refactor; all refactorer gates and verification pass.
+
+## 2026-07-28T06:17:04Z — architect received refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260727T224958Z_000018_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: a89aea192c
+created_at: 2026-07-27T22:49:58.709588Z
+enqueued_at: 2026-07-27T22:49:59.700934Z
+task: phase3-journal-report
+dequeued_at: 2026-07-28T06:17:04.854796Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer a89aea192c
+```
+
+Action taken: merged `a89aea192c`, restored the exhaustive switch in `Report`,
+made `TurnTest` reach the observer-less `Turn` constructor on its own, and ran
+the gates.
+
+## 2026-07-28T08:20:00Z — architect review of phase3-journal-report
+
+### The report dispatch, settled
+
+`b9f931addf` replaced the exhaustive switch in `Report.line` with a
+`Map<Class<? extends Entry>, Function<Entry, String>>`, to bring that method's
+CRAP from 8.0 to 1.0. The switch is back. The reason is not preference:
+
+Adding an eighth record to the sealed `Entry` and compiling proves it, and both
+directions were run on this tree before deciding. Under the map, the module
+compiles clean — the new entry is simply never reported, and the first game
+that produces one gets a `NullPointerException` out of `LINES.get(...)`. Under
+the switch, the same edit fails the build with "the switch expression does not
+cover all possible input values" at `Report.java:40`.
+
+`Entry`'s own javadoc says sealing it "is what makes it answer for every entry
+there is". Class-keyed dispatch leaves that sentence in the source while taking
+away the thing that made it true, so the delivered state promised a guarantee
+it no longer had.
+
+On the metric itself: one case per entry is one branch per entry. The map has
+exactly the same seven branches — it moves them into a field initialiser, where
+neither CRAP nor the compiler counts them. Nothing was simplified; the count
+was relocated, and the compiler's exhaustiveness check went with it. CRAP 8.0
+here is complexity 8 under full coverage, comfortably inside any usual
+threshold of 30, and it is the width of the journal rather than tangled control
+flow. There is no shape that keeps compile-time totality over seven types and
+also measures below it, because the totality *is* the seven-way branch; the
+only structures that score lower do so by hiding the branching from javac too.
+
+The javadoc on `line` now says all of this at the call site, including what to
+do when the cases outgrow a screen: give each one a named method and leave the
+switch itself alone. The rendering methods `b9f931addf` introduced are the
+right destination for that day; they are not needed while seven one-line cases
+still read as a single table.
+
+### `aTurnThatReportsToNobodyStillPlays`
+
+The test went through the `takeTurn` helper, which uses the two-argument `Turn`
+constructor — so its body was byte-identical to
+`aTurnMovesThePawnTheTotalOfBothDice`, and the constructor it exists to cover
+was reached only by accident. It now builds the `Turn` itself. Had the helper
+ever moved to the three-argument form, the observer-less path would have lost
+its only cover without a single test going red.
+
+### DRY
+
+Eleven pairs, scoped to `the-monopoly-game-domain` and
+`the-monopoly-game-specs`. One in production: `Game.java:31-35` against
+`Turn.java:22-26` at 0.86, the documented false positive — two unrelated
+three-field constructors, and sharing anything would couple `Game` to `Turn`'s
+fields to save three assignments.
+
+The other ten are all in test sources, and all are pairs of arrange-act-assert
+tests that share a shape and assert different things: `movingWithoutReaching-
+StartPaysNothing` against `passingStartPaysTheSalary`, and so on. Tests are
+structurally uniform on purpose, and a structural detector will always find
+them. Collapsing them into parameterised tests would put unrelated behaviours
+behind one data table and make a failure say less about what broke. Left as
+they are, recorded here so the next run does not reopen them.
+
+### Gates
+
+131 unit tests, 10 property tests, 108/108 acceptance across eleven pipeline
+features. mutate4java differential over all twenty-three domain sources: zero
+uncovered sites anywhere, and the one changed site in `Report` killed. Soft
+Gherkin acceptance mutation exit 0, every feature skipped as unchanged — no
+report line moved, so `journal.feature` and `report.feature` stand as written.
+
+### Still standing
+
+`Player` is a record whose `Position` component is mutable and is mutated all
+through a game, so its `equals` and `hashCode` change as the pawn moves and a
+`Player` in a `HashSet` or used as a map key stops being findable the moment it
+takes a turn. Nothing keys on a `Player` today. It is the same mistake `Game`
+carried until `4e71a4e760`: value semantics over state that moves. A player's
+identity should be its `ID` alone, and that should land before anything keys on
+one.
