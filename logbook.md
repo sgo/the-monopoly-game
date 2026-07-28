@@ -6142,3 +6142,11 @@ same functional fix directly from architect to both coder and refactorer
 created duplicate routing: coder is required to forward verified functional
 work to refactorer, while refactorer had already received the architect's
 identical commit.
+
+## 2026-07-28T11:54:13Z — architect routing rule corrected
+
+At the user's direction, the architect handoff rules now make routing
+exclusive. Observable behavior changes go only to coder, which remains
+responsible for forwarding verified work to refactorer. Purely
+behavior-preserving structural changes go only to refactorer. The same commit
+must never be addressed or separately queued to both roles.
