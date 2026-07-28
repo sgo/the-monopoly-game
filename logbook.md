@@ -6247,6 +6247,46 @@ merge_and_process refactorer 8d2c1d06ba
 
 Action taken: began architectural review of the named refactorer commit.
 
+## 2026-07-28T20:30:37Z — architect completed phase 9 review follow-up
+
+Action taken: merged refactorer commit `24997ec8ae`, reviewed the Phase 9 land-sale implementation, and applied architect follow-up fixes.
+
+Summary: kept the phase 9 ownership-transfer behavior in the domain layer, preserved report/journal wording behind `Report`, fixed building so a refused build on one mortgaged colour group does not block legal building on another monopoly, added regression coverage for station sales, removed duplicated monopoly filtering in `Building`, and hardened the journal/report land-sale scenarios so action-price and expected-price mutations are independently checked.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 205 tests passed.
+- `mvn -B -Dmaven.repo.local=tmp/m2 -Pproperty test` — 17 property tests passed.
+- `./acceptance/run-acceptance.sh` — 162 generated acceptance tests passed.
+- `./acceptance/run-acceptance-mutation.sh --level soft` — passed; journal/report sale-price mutants killed after adding separate expected-price examples.
+- Java mutation: `Building.java` 8/8 killed, `LandSale.java` 11/11 killed, `Game.java` 5/5 killed, `Report.java` 1/1 killed.
+- DRY check reviewed; remaining findings are existing explicit event-forwarder/test/acceptance setup patterns, not duplicate phase 9 production logic.
+- `git diff --check` passed.
+
+Routing: this follow-up changes observable behavior and tests, so it must go to coder only with priority 00. No specifier phase-complete sync is sent until the coder follow-up loop returns and is accepted.
+
+## 2026-07-28T20:31:33Z — architect sent phase 9 follow-up handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T203125Z_000034_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase9-land-sale
+commit: 5ff2344bad
+created_at: 2026-07-28T20:31:25.390343Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 5ff2344bad
+```
+
+Summary: routed architect follow-up fixes for Phase 9 to coder only at priority 00 because the changes include observable behavior hardening and regression tests. The specifier phase-complete sync remains pending until this coder loop returns and is accepted.
+
 ## 2026-07-28T11:51:24Z — architect review of redundant follow-up
 
 The refactorer commit contains no source, test, manifest, or configuration
@@ -7409,6 +7449,69 @@ entry), 7 new on the architect's side, no header collisions, nothing
 dropped from base on either side this time. `mvn -q -o test` passes on
 the merged state (exit 0). No unexplained prompt-file edits this round.
 
+## 2026-07-28T19:41:57Z — architect sent phase 8 completion sync
+
+Handoff message sent to specifier:
+
+```
+id: 20260728T194148Z_000033_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase8-mortgaging
+commit: a79e5f2931
+created_at: 2026-07-28T19:41:48.546597Z
+
+Re-read your role and constitution.
+
+merge_and_process architect a79e5f2931
+```
+
+Summary: sent the phase-complete sync handoff so the specifier can merge the
+completed architect branch state before future specification work.
+
+## 2026-07-28T20:05:04Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T200504Z_000015_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase9-land-sale
+commit: 3a34a43b46
+created_at: 2026-07-28T20:05:04.183815Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3a34a43b46
+```
+
+Summary: specified Phase 9 selling land between players — unimproved
+land sold at any agreed price, and the group-lock rule (a full colour
+group with even one house built anywhere in it blocks selling any
+street from that group until the houses are sold back to the bank),
+new `land-sale.feature`. Modelled as a direct action per tasks.md's own
+scope note, since no strategy proposes trades yet; strategy-initiated
+trading stays future work per `SIMULATOR.md`. A user question during
+review distinguished "accepting a trade if affordable" (in scope) from
+"deciding on its own to trade to raise funds" (out of scope, same
+category as SIMULATOR.md's parked "selective buying, trading" future
+work) — resolved in favor of the documented scope.
+
+Also closes a player-communication gap the user caught in review: a
+refused sale left no journal/report trace beyond an unchanged balance,
+so a human player had no way to know why nothing happened. Added
+`journal-13`/`report-13` narrating a refused sale with its reason and
+attempted price, and retroactively `journal-14`/`report-14` for the
+same gap in Phase 8's already-merged mortgage build-block scenario,
+echoing the house's construction cost instead of a bare refusal.
+
 ## 2026-07-28T20:05:04Z — coder received handoff from specifier
 
 Handoff message received:
@@ -7548,3 +7651,112 @@ Summary: merged the land-sale slice and extracted the one duplicate
 pass. Left the `buildableMonopoliesOwnedBy`/`mortgagedMonopoliesOwnedBy`
 pair alone on purpose — a boolean-flag collapse would cost more clarity
 than the duplicate count is worth.
+
+## 2026-07-28T20:21:08Z — architect received phase 9 refactorer handoff
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/architect/.swarmforge/handoffs/inbox/in_process/batch_20260728T202052Z_000001/50_20260728T202044Z_000031_from_refactorer_to_architect.handoff
+FROM: refactorer
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase9-land-sale
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process refactorer 24997ec8ae
+```
+
+Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T20:39:50Z — specifier merged handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T203950Z_000035_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: workflow-architect-followup-return-routing
+commit: 2756b260d5
+
+Re-read your role and constitution.
+
+merge_and_process architect 2756b260d5
+```
+
+Action taken: merged architect commit `2756b260d5` into `main`. This
+handoff carried two things: the Phase 9 completion chain (implementation,
+refactor, and hardening for `phase9-land-sale`, already covered by this
+session's own spec work) and, as its own dedicated final commit, a
+constitution/prompt change — `workflow.prompt` and `coder.prompt` — adding
+explicit routing rules for an architect priority-`00` follow-up loop (it
+returns to the architect directly unless the coder/refactorer needs to
+make real changes, in which case it flows through them as normal before
+returning; the specifier phase-complete sync waits until the loop closes).
+
+This is the second undocumented prompt/constitution edit in this project's
+history — like `436724393a` before it, it carried no logbook entry of its
+own explaining why, breaking the established precedent that such changes
+are logged as done at the user's direction. Unlike last time, this was
+surfaced to the user *before* merging, since the entire handoff (not just
+its tail commit) was the prompt change itself. The user confirmed they
+authorized it, so it is merged as authoritative, and this entry serves as
+the audit trail that was otherwise missing. Only one conflict, in
+`logbook.md`, resolved at entry granularity as before: 222 base entries, 1
+new on this side (the phase9-land-sale handoff-sent entry), 8 new on the
+architect's side, no header collisions, nothing dropped from base on
+either side. `mvn -q -o test` passes on the merged state (exit 0).
+
+## 2026-07-28T21:30:56Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260728T213056Z_000016_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 62d8a8cf4e
+created_at: 2026-07-28T21:30:56.315339Z
+enqueued_at: 2026-07-28T21:30:56.993863Z
+task: phase10-chance-and-community-chest
+dequeued_at: 2026-07-28T21:31:02.224726Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 62d8a8cf4e
+```
+
+Action taken: merged specifier commit `62d8a8cf4e` into `swarmforge-coder`
+(fast-forward), implemented Phase 10 chance/community chest card handling,
+and verified the result with module tests plus the generated acceptance suite.
+
+## 2026-07-28T21:41:31Z — coder sent handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase10-chance-and-community-chest
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: implemented chance/community chest card resolution for movement,
+salary handling, flat bank payments and receipts, player-to-player card
+payments, nearest station and utility routing, property-repair charges,
+retained/sellable Get Out of Jail Free cards, and matching journal/report
+entries for card draws and bank payments. Verification passed with `mvn -B
+-pl the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core
+-Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2
+test` and `acceptance/run-acceptance.sh` (using the same local Maven repo).

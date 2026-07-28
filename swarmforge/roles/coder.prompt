@@ -26,4 +26,5 @@ You are the coder.
 - Do not run Gherkin acceptance mutation.
 
 ## Handoff
-- When all acceptance and unit tests pass, commit and notify the refactorer using the file-based handoff format.
+- When all acceptance and unit tests pass for a specifier-originated behavior slice, commit and notify the refactorer using the file-based handoff format.
+- When processing an architect-originated priority `00` follow-up, merge, review, and verify it under coder rules. If no further coder-owned implementation changes are needed, commit the handoff log and hand the verified state back to the architect instead of forwarding it to the refactorer or specifier. If coder-owned implementation changes are needed, make and verify them, then hand the result to the refactorer as normal.

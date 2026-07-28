@@ -141,6 +141,20 @@ class LandSaleTest {
   }
 
   @Test
+  void aStationCanBeSoldBetweenPlayersAtAnAgreedPrice() {
+    Ownable station = land(Street.Type.NoordStation);
+    deeds.sell(station, dog, station.price());
+    dog.account().deposit(station.price());
+
+    sale().sell(dog, station, highHat, new Money(90));
+
+    assertThat(deeds.ownerOf(Street.Type.NoordStation)).contains(highHat.id());
+    assertThat(dog.account().balance()).isEqualTo(Balance.of(1590));
+    assertThat(highHat.account().balance()).isEqualTo(Balance.of(1410));
+    assertThat(reported.events).containsExactly("dog sold NoordStation to high hat for 90");
+  }
+
+  @Test
   void aStreetInAColourGroupWithAnyHouseBuiltCannotBeSold() {
     deeds.sell(land(Street.Type.RueGrandeDinant), dog, new Money(60));
     dog.account().deposit(new Money(60));
