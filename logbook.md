@@ -4546,3 +4546,32 @@ both append-only histories while resolving the logbook conflict. The completed
 work satisfies the Phase 3 journal/report specifications, including their
 chronological event order; the approved mutation manifests were retained. Task
 complete.
+
+## 2026-07-28T06:39:02Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T063902Z_000010_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase4-buying-auctions
+commit: 56c1532861
+created_at: 2026-07-28T06:39:02.505073Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 56c1532861
+```
+
+Summary: Phase 4 adds business-level buying and auction specifications. Landing
+on a named property is deliberately an abstract acceptance action: the glue is
+responsible for reaching that space. The scenarios cover face-value purchases
+of streets, stations, and utilities; declining when unaffordable; highest-bid
+and declining-player auction wins; and journal/report chronology requiring
+movement before the purchase or auction outcome. The parser and IR dry-checker
+pass. The regular acceptance baseline is intentionally red with 10 new
+unsupported Phase 4 scenarios; the previous 108 scenarios pass.
