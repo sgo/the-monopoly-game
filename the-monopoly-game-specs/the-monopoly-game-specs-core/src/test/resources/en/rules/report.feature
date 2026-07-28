@@ -94,3 +94,27 @@ Feature: game report
     Examples:
       | rent |
       | 20   |
+
+  # report-8
+  Scenario Outline: the report narrates a house built during a player's turn
+    And pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "Diestsestraat Leuven"
+    And pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" has $100 to spend
+    When we play the game
+    Then the game report says that pawn "dog" builds a house on "Rue Grande Dinant" for $<cost>
+
+    Examples:
+      | cost |
+      | 50   |
+
+  # report-9
+  Scenario Outline: the report narrates a house sold back to the bank
+    And pawn "dog" owns "Diestsestraat Leuven"
+    And the street "Diestsestraat Leuven" has 1 house(s) built
+    When pawn "dog" sells a house on "Diestsestraat Leuven" back to the bank
+    Then the game report says that pawn "dog" sells a house on "Diestsestraat Leuven" for $<price>
+
+    Examples:
+      | price |
+      | 25    |

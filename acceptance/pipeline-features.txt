@@ -28,6 +28,7 @@ en/rules/initiative.feature
 en/rules/turn-loop.feature
 en/rules/buying-land.feature
 en/rules/auctions.feature
+en/rules/building.feature
 en/rules/journal.feature
 en/rules/report.feature
 en/rules/rent.feature

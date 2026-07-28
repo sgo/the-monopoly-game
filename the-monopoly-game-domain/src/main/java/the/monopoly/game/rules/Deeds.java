@@ -2,6 +2,7 @@ package the.monopoly.game.rules;
 
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 
@@ -17,6 +18,7 @@ import java.util.Optional;
  */
 public class Deeds {
   private final Map<Street.Type, Player.ID> owners = new HashMap<>();
+  private final Map<Street.Type, Improvement> improvements = new HashMap<>();
 
   public boolean isUnowned(Street.Type land) {
     return !owners.containsKey(land);
@@ -35,6 +37,91 @@ public class Deeds {
   public void sell(Ownable land, Player buyer, Money price) {
     buyer.account().withdraw(price);
     owners.put(land.type(), buyer.id());
+  }
+
+  public int housesBuiltOn(ColourStreet land) {
+    return improvementOn(land).houses();
+  }
+
+  public boolean hasHotelOn(ColourStreet land) {
+    return improvementOn(land).hotel();
+  }
+
+  public void arrangeHouses(ColourStreet land, int houses) {
+    improvements.put(land.type(), Improvement.withHouses(houses));
+  }
+
+  public void arrangeHotel(ColourStreet land) {
+    improvements.put(land.type(), Improvement.withHotel());
+  }
+
+  public void buildHouse(ColourStreet land, Player owner) {
+    verifyOwner(land, owner);
+    owner.account().withdraw(land.houseConstructionCost());
+    improvements.put(land.type(), improvementOn(land).withAnotherHouse());
+  }
+
+  public void buildHotel(ColourStreet land, Player owner) {
+    verifyOwner(land, owner);
+    owner.account().withdraw(hotelValueOf(land));
+    improvements.put(land.type(), Improvement.withHotel());
+  }
+
+  public Money sellHouse(ColourStreet land, Player owner) {
+    verifyOwner(land, owner);
+    return refund(land, owner, improvementOn(land).withOneLessHouse(), land.houseConstructionCost());
+  }
+
+  public Money exchangeHotelForHouses(ColourStreet land, Player owner) {
+    verifyOwner(land, owner);
+    return refund(
+        land, owner,
+        Improvement.withHouses(land.hotelConstructionRequiresNumberOfHouses()), hotelValueOf(land)
+    );
+  }
+
+  private Money refund(ColourStreet land, Player owner, Improvement newImprovement, Money fullPrice) {
+    improvements.put(land.type(), newImprovement);
+    Money price = half(fullPrice);
+    owner.account().deposit(price);
+    return price;
+  }
+
+  private Improvement improvementOn(ColourStreet land) {
+    return improvements.getOrDefault(land.type(), Improvement.UNIMPROVED);
+  }
+
+  private void verifyOwner(ColourStreet land, Player owner) {
+    if (ownerOf(land.type()).filter(owner.id()::equals).isEmpty())
+      throw new IllegalStateException(owner.id().value() + " does not own " + land.type() + ".");
+  }
+
+  private static Money hotelValueOf(ColourStreet land) {
+    return land.rentForOneHotel();
+  }
+
+  private static Money half(Money price) {
+    return new Money(price.amount() / 2);
+  }
+
+  private record Improvement(int houses, boolean hotel) {
+    private static final Improvement UNIMPROVED = new Improvement(0, false);
+
+    private static Improvement withHouses(int houses) {
+      return new Improvement(houses, false);
+    }
+
+    private static Improvement withHotel() {
+      return new Improvement(0, true);
+    }
+
+    private Improvement withAnotherHouse() {
+      return new Improvement(houses + 1, false);
+    }
+
+    private Improvement withOneLessHouse() {
+      return new Improvement(houses - 1, false);
+    }
   }
 }
 

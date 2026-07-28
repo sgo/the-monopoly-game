@@ -59,6 +59,20 @@ class ReportTest {
     ))).isEqualTo("high hat wins the auction for Diestsestraat Leuven at $120");
   }
 
+  @Test
+  void aReportTellsWhenAPlayerBuildsAHouse() {
+    assertThat(report(new Entry.HouseBuilt(
+        Pawn.dog.id(), Street.Type.RueGrandeDinant, new Money(50)
+    ))).isEqualTo("dog builds a house on Rue Grande Dinant for $50");
+  }
+
+  @Test
+  void aReportTellsWhenAPlayerSellsAHouseBackToTheBank() {
+    assertThat(report(new Entry.HouseSold(
+        Pawn.dog.id(), Street.Type.DiestsestraatLeuven, new Money(25)
+    ))).isEqualTo("dog sells a house on Diestsestraat Leuven for $25");
+  }
+
   /** A space is spelled as the board spells it, in words rather than as one. */
   @Test
   void aReportSpellsASpaceOfOneWordAsTheOneWordItIs() {

@@ -6398,6 +6398,34 @@ Final verification:
   report, four station-rent, and four utility-rent mutations. There were no
   survivors or infrastructure errors.
 
+## 2026-07-28T12:07:38Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T120738Z_000012_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase6-station-utility-rent
+commit: 0540a2acc7
+created_at: 2026-07-28T12:07:38.359252Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 0540a2acc7
+```
+
+Summary: specified Phase 6 station and utility rent — station rent scaled to
+count owned, utility rent as a multiple (4x/10x) of the dice roll that landed
+there, proven across two different rolls — in new `station-rent.feature` and
+`utility-rent.feature`, with one matching journal/report scenario each for the
+dice-derived utility case. Waiver and the Chance/Community-Chest utility-rent
+sub-case are out of scope, deferred to phase 5's existing generic coverage and
+phase 10 respectively.
+
 ## 2026-07-28T12:39:03Z — architect sent phase 6 structural follow-up
 
 Handoff message sent to refactorer:
@@ -6421,6 +6449,67 @@ merge_and_process architect d44bfac2eb
 Summary: the behavior-preserving roll-aware landing boundary correction was
 sent only to refactorer under the exclusive routing rule. No coder or specifier
 handoff was queued.
+
+## 2026-07-28T12:48:33Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/00_20260728T123859Z_000030_from_architect_to_refactorer.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: phase6-station-utility-rent
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect d44bfac2eb
+```
+
+Action taken: merged `d44bfac2eb` into `swarmforge-refactorer`. The merge
+conflicted only in `logbook.md`, resolved the same way as the prior five:
+ordering both sides' entries chronologically. Header counts confirm nothing
+lost: 181 (common ancestor) + 2 (mine, new) + 6 (architect's, new) = 189,
+matching the merged file.
+
+This is the same encapsulation-defect pattern as the `Bank.Simple` fix two
+tasks ago, this time in `Landings`: the legacy two-argument `resolve` and its
+null-roll delegation are gone, and the interface's single abstract method is
+now the roll-aware one, so a utility landing can no longer reach a null roll
+through a valid-looking call. `Rent` narrows to the sealed `Ownable` boundary
+with an exhaustive switch over colour streets, stations, and utilities, and
+`RentClaim`/`Events.paid` carry `Ownable` rather than the wider `Street`.
+`RentTest` now has direct unit coverage for station and utility rent, closing
+the coverage gap noted in the last handoff, and the property generators share
+one `Finances`/`Ownership` construction instead of three separate nested
+`flatMap` chains — the DRY reduction I judged not worth chasing on my own
+pass, done anyway once it was this cheap.
+
+Re-ran the refactorer's own gates against the merged state: CRAP is clean
+across every changed file (`rentFor` full coverage at 4.0, `owned` now 100%
+covered where it was 0% before); DRY is down to 16, matching the architect's
+own figure; mutation scan on every changed file (`Rent` 5, `Landings` 1,
+`LandSale` 5, `Turn` 10, `Strategy` 4, `Game` 6, `RentTest` 4,
+`RentPropertyTest` 18) stays well under the 100-site split threshold. Unit,
+property, and normal acceptance verification all pass. Nothing left to do on
+this state.
+
+## 2026-07-28T12:48:33Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase6-station-utility-rent
+commit: 744312eef7
+```
+
+Summary: merged the `Landings` roll-awareness fix and `Ownable` boundary
+narrowing; refactorer's own CRAP, DRY, and mutation-scan gates are unchanged
+or improved and pass on the merged tree; unit, property, and acceptance
+verification all pass.
 
 ## 2026-07-28T12:48:46Z — architect received phase 6 structural follow-up
 
@@ -6456,6 +6545,46 @@ architectural phases and all final gates were already completed on that exact
 source state.
 
 No further handoff is warranted. The exclusive routing loop closes here.
+
+## 2026-07-28T13:26:16Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/inbox/in_process/50_20260728T131215Z_000013_from_specifier_to_coder.handoff
+FROM: specifier
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase7-houses-hotels
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process specifier 3e7eb1a658
+```
+
+Action taken: merged specifier commit `3e7eb1a658`, implemented houses and
+hotels with turn-time building, improved-street rent, direct house sale and
+hotel exchange mechanics, extended the acceptance vocabulary and pipeline, and
+verified the slice with `181` domain tests plus the full normal acceptance
+pipeline (`141` generated acceptance tests) passing.
+
+## 2026-07-28T13:26:54Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase7-houses-hotels
+commit: 3c123453c9
+```
+
+Summary: implemented phase 7 houses and hotels — turn-time building for the
+initiative winner, improved-street rent, direct house sale and hotel exchange,
+and the acceptance/journal/report coverage for the new slice — with `181`
+domain tests and the full normal acceptance pipeline (`141` generated
+acceptance tests) passing.
 
 ## 2026-07-28T13:57:21Z — architect received phase 7 structural follow-up
 

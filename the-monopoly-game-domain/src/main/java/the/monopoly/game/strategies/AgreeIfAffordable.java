@@ -21,6 +21,11 @@ public final class AgreeIfAffordable implements Strategy {
   public boolean claims(RentClaim claim) {
     return true;
   }
+
+  @Override
+  public boolean builds(BuildOffer offer) {
+    return offer.isAffordable();
+  }
 }
 
 /* mutate4java-manifest

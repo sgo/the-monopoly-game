@@ -54,6 +54,9 @@ public class Rent implements Landings {
   }
 
   private Money colourStreetRent(Player owner, ColourStreet street) {
+    if (deeds.hasHotelOn(street)) return street.rentForOneHotel();
+    int houses = deeds.housesBuiltOn(street);
+    if (houses > 0) return street.rentForHouses(houses);
     boolean monopoly = rules.streets()
         .filter(ColourStreet.class::isInstance)
         .map(ColourStreet.class::cast)
