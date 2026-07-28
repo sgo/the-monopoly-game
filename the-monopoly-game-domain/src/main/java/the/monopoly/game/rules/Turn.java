@@ -49,7 +49,7 @@ public class Turn {
         return;
       }
 
-      move(player, roll.total());
+      move(player, roll);
 
       if (!roll.isDouble()) return;
     }
@@ -60,7 +60,8 @@ public class Turn {
    * Landing exactly on Start is not the same as going past it, because the
    * optional rule pays double for one and not the other.
    */
-  private void move(Player player, int steps) {
+  private void move(Player player, Roll roll) {
+    int steps = roll.total();
     int spaces = rules.gameboard().size();
     int from = player.position().index();
     int to = (from + steps) % spaces;
@@ -73,7 +74,7 @@ public class Turn {
       else events.collectedSalary(player, player.pass(start()));
     }
 
-    landings.resolve(player, spaceAt(to));
+    landings.resolve(player, spaceAt(to), roll);
   }
 
   private Street spaceAt(int position) {

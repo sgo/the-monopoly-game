@@ -2,7 +2,7 @@ package the.monopoly.game.strategies;
 
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
-import the.monopoly.game.components.streets.ColourStreet;
+import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.components.streets.Ownable;
 
 /**
@@ -32,7 +32,7 @@ public interface Strategy {
   }
 
   /** A visitor, the land they stopped on, and the rent its owner may claim. */
-  record RentClaim(Player tenant, ColourStreet land, Money amount) {
+  record RentClaim(Player tenant, Street land, Money amount) {
   }
 
   /** The land a player is being asked about, and what they have to spend on it. */
