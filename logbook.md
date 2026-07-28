@@ -5878,3 +5878,55 @@ Final verification:
 - Soft Gherkin mutation killed all 13 selected mutations: two journal, one
   report, and ten rent mutations. There were no survivors or infrastructure
   errors.
+
+## 2026-07-28T11:40:43Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T113503Z_000026_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase5-street-rent
+commit: 4c3fc826fc
+
+Re-read your role and constitution.
+
+merge_and_process architect 4c3fc826fc
+```
+
+Action taken: merged `4c3fc826fc` into `swarmforge-refactorer`. The merge
+conflicted only in `logbook.md`, where both sides had appended past the same
+point in the history; resolved by ordering the four entries chronologically
+(mine at 09:56 and 11:17, the architect's at 11:18 and 11:34) rather than
+picking one side, keeping every body under its own header. Header counts
+confirm nothing was lost: 163 (mine) + 166 (architect's) − 161 (common
+ancestor) = 168, matching the merged file exactly.
+
+Re-ran the refactorer's own gates against the merged state: CRAP is unchanged
+from the last check — clean but for the exempt sealed dispatch on
+`Report.line`, still 11,3; DRY still reports the same 15 candidates, nothing
+new; mutation scan on every file the architect touched (`Game`, `Rent`,
+`Strategy`, `AgreeIfAffordable`, `GameTest`) stays well under the 100-site
+split threshold, from 1 to 21 sites. Unit, property, and normal acceptance
+verification all pass on the merged tree.
+
+## 2026-07-28T11:40:43Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase5-street-rent
+commit: 7f2102ac5a
+```
+
+Summary: merged the architect's `RentClaim` boundary fix and rent-before-sale
+ordering correction; refactorer's own CRAP, DRY, and mutation-scan gates are
+unchanged and pass on the merged tree; unit, property, and acceptance
+verification all pass.
