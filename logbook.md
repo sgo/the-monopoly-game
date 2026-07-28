@@ -7303,3 +7303,43 @@ base entries, 1 new on this side (the phase8-mortgaging handoff-sent
 entry), 7 new on the architect's side, no header collisions, nothing
 dropped from base on either side this time. `mvn -q -o test` passes on
 the merged state (exit 0). No unexplained prompt-file edits this round.
+
+## 2026-07-28T20:05:04Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T200504Z_000015_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase9-land-sale
+commit: 3a34a43b46
+created_at: 2026-07-28T20:05:04.183815Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3a34a43b46
+```
+
+Summary: specified Phase 9 selling land between players — unimproved
+land sold at any agreed price, and the group-lock rule (a full colour
+group with even one house built anywhere in it blocks selling any
+street from that group until the houses are sold back to the bank),
+new `land-sale.feature`. Modelled as a direct action per tasks.md's own
+scope note, since no strategy proposes trades yet; strategy-initiated
+trading stays future work per `SIMULATOR.md`. A user question during
+review distinguished "accepting a trade if affordable" (in scope) from
+"deciding on its own to trade to raise funds" (out of scope, same
+category as SIMULATOR.md's parked "selective buying, trading" future
+work) — resolved in favor of the documented scope.
+
+Also closes a player-communication gap the user caught in review: a
+refused sale left no journal/report trace beyond an unchanged balance,
+so a human player had no way to know why nothing happened. Added
+`journal-13`/`report-13` narrating a refused sale with its reason and
+attempted price, and retroactively `journal-14`/`report-14` for the
+same gap in Phase 8's already-merged mortgage build-block scenario,
+echoing the house's construction cost instead of a bare refusal.
