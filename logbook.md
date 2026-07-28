@@ -6268,6 +6268,71 @@ commit: f59f523872
 Summary: station and utility rent are implemented with roll-aware landings;
 normal unit and acceptance verification pass.
 
+## 2026-07-28T12:26:21Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/50_20260728T121458Z_000014_from_coder_to_refactorer.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase6-station-utility-rent
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder 3b173f7f5e
+```
+
+Action taken: merged `3b173f7f5e` into `swarmforge-refactorer`. The merge
+conflicted only in `logbook.md`, resolved the same way as the prior three:
+ordering both sides' entries chronologically. Header counts confirm nothing
+lost: 173 (common ancestor) + 6 (mine, new) + 2 (coder's, new) = 181, matching
+the merged file.
+
+`Rent.rentFor` now dispatches on `Station` and `Utility` as well as
+`ColourStreet`, but only the colour-street path had property coverage, and the
+station/utility paths had none at all in the domain module's own unit-test
+run — CRAP showed `owned()` at 0% and `rentFor` at 62.3% coverage, because
+station and utility rent were exercised only through the new Gherkin
+acceptance features (`station-rent.feature`, `utility-rent.feature`), which
+this module's coverage tooling cannot see. Added two more property sweeps to
+`RentPropertyTest`, over every station and utility, every valid owned count,
+and a wide range of dice rolls, checking conservation and the exact amount
+owed for each. The three sweeps' conservation-and-charge check was itself
+identical apart from the setup; extracted into one shared helper. `dry4java`
+still reports 26 candidates, unchanged by that extraction: what it flags now
+is entirely the three generators' nested `flatMap` chains, each combining a
+different number of independent generators into a different record type —
+the same kind of generator-plumbing and arrange-act-assert similarity already
+judged not worth chasing elsewhere in this file and in `MoneyPropertyTest`.
+Also fixed `Rent`'s class javadoc, stale since rent moved beyond colour
+streets.
+
+CRAP stays clean but for the exempt sealed dispatch on `Report.line`; the
+`rentFor`/`owned` figures the coverage tool reports are for the unit-test
+profile only, by design — property tests run in a separate profile and are
+verified there, not through CRAP. Mutation scan on every changed file stays
+well under the 100-site split threshold. Unit (170), property (13), and normal
+acceptance (130) verification all pass.
+
+## 2026-07-28T12:26:21Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase6-station-utility-rent
+commit: 868bd44dbc
+```
+
+Summary: merged station and utility rent; extended property-test coverage to
+both (previously untested at the unit level) and collapsed the resulting
+sweep duplication into one shared helper; CRAP, DRY, and mutation-scan gates
+pass; unit, property, and acceptance verification all pass.
+
 ## 2026-07-28T12:26:34Z — architect received phase 6 handoff
 
 Handoff message received:
