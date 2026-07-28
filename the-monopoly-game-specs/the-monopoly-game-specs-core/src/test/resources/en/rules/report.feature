@@ -48,3 +48,25 @@ Feature: game report
     Examples:
       | dog_start_position | dog_die_1 | dog_die_2 | expected_dog_start_position | dog_final_position | dog_salary |
       | 37                 | 1         | 2         | 37                          | 0                  | 200        |
+
+  # report-4
+  Scenario Outline: the report narrates an unowned-land purchase after the landing movement
+    And pawn "dog" follows the "Agree if affordable" strategy
+    When pawn "dog" lands on "<property>"
+    Then the game report says that pawn "dog" moves before it says that pawn "dog" buys "<property>" for $<purchase_price>
+
+    Examples:
+      | property            | purchase_price |
+      | Diestsestraat Leuven | 60             |
+
+  # report-5
+  Scenario Outline: the report narrates an auction outcome after the landing movement
+    And pawn "dog" declines the offer for "Diestsestraat Leuven"
+    And pawn "dog" will bid $<dog_bid> for "Diestsestraat Leuven" at auction
+    And pawn "high hat" will bid $<high_hat_bid> for "Diestsestraat Leuven" at auction
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then the game report says that pawn "dog" moves before it says that pawn "<auction_winner>" wins the auction for "Diestsestraat Leuven" at $<auction_price>
+
+    Examples:
+      | dog_bid | high_hat_bid | auction_winner | auction_price |
+      | 90      | 120          | high hat       | 120           |
