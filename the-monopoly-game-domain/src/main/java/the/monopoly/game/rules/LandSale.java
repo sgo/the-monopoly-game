@@ -3,6 +3,7 @@ package the.monopoly.game.rules;
 import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.strategies.Strategy;
@@ -16,12 +17,14 @@ import java.util.List;
  */
 public class LandSale implements Landings {
   private final Deeds deeds;
+  private final Rule.Set rules;
   private final List<Player> table;
   private final Strategy.OfPlayers strategies;
   private final Events events;
 
-  public LandSale(Deeds deeds, List<Player> table, Strategy.OfPlayers strategies, Events events) {
+  public LandSale(Deeds deeds, Rule.Set rules, List<Player> table, Strategy.OfPlayers strategies, Events events) {
     this.deeds = deeds;
+    this.rules = rules;
     this.table = table;
     this.strategies = strategies;
     this.events = events;
@@ -64,11 +67,35 @@ public class LandSale implements Landings {
     return new Strategy.Offer(land, player.account().balance().amount());
   }
 
+  public void sell(Player seller, Ownable land, Player buyer, Money price) {
+    if (saleIsRefused(land)) {
+      events.saleRefused(seller, land, buyer, price);
+      return;
+    }
+    deeds.transfer(land, seller, buyer, price);
+    events.sold(seller, land, buyer, price);
+  }
+
+  private boolean saleIsRefused(Ownable land) {
+    if (!(land instanceof ColourStreet street)) return false;
+    return rules.streets()
+        .filter(ColourStreet.class::isInstance)
+        .map(ColourStreet.class::cast)
+        .filter(it -> it.colourGroup() == street.colourGroup())
+        .anyMatch(it -> deeds.housesBuiltOn(it) > 0 || deeds.hasHotelOn(it));
+  }
+
   /** What a sale did, for whoever is keeping an account of the game. */
   public interface Events {
     void bought(Player buyer, Ownable land, Money price);
 
     void wonAtAuction(Player winner, Ownable land, Money price);
+
+    default void sold(Player seller, Ownable land, Player buyer, Money price) {
+    }
+
+    default void saleRefused(Player seller, Ownable land, Player buyer, Money price) {
+    }
   }
 }
 

@@ -29,6 +29,7 @@ en/rules/turn-loop.feature
 en/rules/buying-land.feature
 en/rules/auctions.feature
 en/rules/building.feature
+en/rules/land-sale.feature
 en/rules/mortgage.feature
 en/rules/mortgage-transfer.feature
 en/rules/journal.feature

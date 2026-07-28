@@ -7303,3 +7303,51 @@ base entries, 1 new on this side (the phase8-mortgaging handoff-sent
 entry), 7 new on the architect's side, no header collisions, nothing
 dropped from base on either side this time. `mvn -q -o test` passes on
 the merged state (exit 0). No unexplained prompt-file edits this round.
+
+## 2026-07-28T20:05:04Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260728T200504Z_000015_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 3a34a43b46
+created_at: 2026-07-28T20:05:04.183815Z
+enqueued_at: 2026-07-28T20:05:04.652035Z
+task: phase9-land-sale
+dequeued_at: 2026-07-28T20:05:10.090198Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3a34a43b46
+```
+
+Action taken: merged specifier commit `3a34a43b46` into `swarmforge-coder`
+(fast-forward), implemented Phase 9 land sale, and verified the result with
+module tests plus the generated acceptance suite.
+
+## 2026-07-28T20:12:54Z — coder sent handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase9-land-sale
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: implemented peer-to-peer land sale with ownership transfer and
+balance updates for agreed price, refusal when any street in the colour
+group has houses or a hotel, matching journal/report entries for sale and
+sale refusal, and the targeted building-refusal reporting needed by the new
+Phase 9 scenarios. Verification passed with `mvn -B -pl
+the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core
+-Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2
+test` and `acceptance/run-acceptance.sh` (using the same local Maven repo).

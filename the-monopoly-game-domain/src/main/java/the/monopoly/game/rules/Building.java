@@ -8,6 +8,7 @@ import the.monopoly.game.strategies.Strategy;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
 /**
@@ -28,27 +29,38 @@ public class Building {
   }
 
   public void develop(Player player) {
+    Optional<Build> refused = refusedBuildFor(player);
+    if (refused.isPresent()) {
+      Build build = refused.get();
+      events.refusedBuilding(player, build.street, build.price);
+      return;
+    }
     for (;;) {
-      Optional<Build> build = nextBuildFor(player)
-          .filter(it -> strategies.forPlayer(player).builds(it.offer(player)));
+      Optional<Build> build = nextBuildFor(player);
       if (build.isEmpty()) return;
       build.get().apply(deeds, player, events);
     }
   }
 
   private Optional<Build> nextBuildFor(Player player) {
-    return monopoliesOwnedBy(player).stream()
-        .map(this::nextBuildFor)
-        .flatMap(Optional::stream)
+    return buildableMonopoliesOwnedBy(player).stream()
+        .flatMap(this::candidateBuildsFor)
+        .filter(it -> strategies.forPlayer(player).builds(it.offer(player)))
         .findFirst();
   }
 
-  private Optional<Build> nextBuildFor(List<ColourStreet> group) {
+  private Optional<Build> refusedBuildFor(Player player) {
+    return mortgagedMonopoliesOwnedBy(player).stream()
+        .flatMap(this::candidateBuildsFor)
+        .filter(it -> strategies.forPlayer(player).builds(it.offer(player)))
+        .findFirst();
+  }
+
+  private Stream<Build> candidateBuildsFor(List<ColourStreet> group) {
     int lowestLevel = group.stream().mapToInt(this::levelOf).min().orElse(Integer.MAX_VALUE);
     return group.stream()
         .filter(it -> levelOf(it) == lowestLevel)
-        .map(this::buildFor)
-        .findFirst();
+        .map(this::buildFor);
   }
 
   private int levelOf(ColourStreet street) {
@@ -61,6 +73,18 @@ public class Building {
         : new Build(street, street.houseConstructionCost(), false);
   }
 
+  private List<List<ColourStreet>> buildableMonopoliesOwnedBy(Player player) {
+    return monopoliesOwnedBy(player).stream()
+        .filter(group -> group.stream().noneMatch(deeds::isMortgaged))
+        .toList();
+  }
+
+  private List<List<ColourStreet>> mortgagedMonopoliesOwnedBy(Player player) {
+    return monopoliesOwnedBy(player).stream()
+        .filter(group -> group.stream().anyMatch(deeds::isMortgaged))
+        .toList();
+  }
+
   private List<List<ColourStreet>> monopoliesOwnedBy(Player player) {
     return rules.streets()
         .filter(ColourStreet.class::isInstance)
@@ -71,7 +95,6 @@ public class Building {
         ))
         .values().stream()
         .filter(group -> group.stream().allMatch(it -> deeds.ownerOf(it.type()).filter(player.id()::equals).isPresent()))
-        .filter(group -> group.stream().noneMatch(deeds::isMortgaged))
         .sorted(Comparator.comparing(group -> rules.gameboard().positionOf(group.getFirst().type())))
         .toList();
   }
@@ -92,6 +115,9 @@ public class Building {
 
   public interface Events {
     default void builtHouse(Player player, ColourStreet street, Money price) {
+    }
+
+    default void refusedBuilding(Player player, ColourStreet street, Money price) {
     }
   }
 }

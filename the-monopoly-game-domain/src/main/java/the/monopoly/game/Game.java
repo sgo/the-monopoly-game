@@ -74,7 +74,7 @@ public class Game {
 
     Journalling journalling = new Journalling(journal);
     Landings rent = new Rent(deeds, rules, turnOrder, strategies, journalling);
-    Landings landSale = new LandSale(deeds, turnOrder, strategies, journalling);
+    Landings landSale = new LandSale(deeds, rules, turnOrder, strategies, journalling);
     Building building = new Building(deeds, rules, strategies, journalling);
     Landings resolvingLandings = (player, space, roll) -> {
       rent.resolve(player, space, roll);
@@ -135,6 +135,21 @@ public class Game {
     @Override
     public void builtHouse(Player player, ColourStreet street, Money price) {
       journal.log(new Journal.Entry.HouseBuilt(player.id(), street.type(), price));
+    }
+
+    @Override
+    public void sold(Player seller, Ownable land, Player buyer, Money price) {
+      journal.log(new Journal.Entry.LandSold(seller.id(), land.type(), buyer.id(), price));
+    }
+
+    @Override
+    public void saleRefused(Player seller, Ownable land, Player buyer, Money price) {
+      journal.log(new Journal.Entry.LandSaleRefused(seller.id(), land.type(), buyer.id(), price));
+    }
+
+    @Override
+    public void refusedBuilding(Player player, ColourStreet street, Money price) {
+      journal.log(new Journal.Entry.BuildingRefused(player.id(), street.type(), price));
     }
   }
 
@@ -223,6 +238,15 @@ public class Game {
       }
 
       record MortgageLifted(Player.ID player, Street.Type land, Money total, Money interest) implements Entry {
+      }
+
+      record LandSold(Player.ID seller, Street.Type land, Player.ID buyer, Money price) implements Entry {
+      }
+
+      record LandSaleRefused(Player.ID seller, Street.Type land, Player.ID buyer, Money price) implements Entry {
+      }
+
+      record BuildingRefused(Player.ID player, Street.Type land, Money price) implements Entry {
       }
     }
   }
