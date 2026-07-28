@@ -237,6 +237,35 @@ class GameTest {
     assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(100));
   }
 
+  @Test
+  void aGameRecordsWhenBuildingIsRefusedBecauseAStreetInTheColourGroupIsMortgaged() {
+    Deeds deeds = monopolyFor(Pawn.dog.id());
+    deeds.arrangeMortgaged((ColourStreet) ruleSet.create(Street.Type.RueGrandeDinant));
+    players.getFirst().account().withdraw(new Money(1400));
+
+    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new AgreeIfAffordable()), deeds);
+
+    assertThat(result.journal()).contains(new Entry.BuildingRefused(
+        Pawn.dog.id(), Street.Type.RueGrandeDinant, new Money(50)
+    ));
+  }
+
+  @Test
+  void aMortgagedColourGroupDoesNotBlockBuildingOnAnotherColourGroup() {
+    Deeds deeds = monopolyFor(Pawn.dog.id());
+    giveMonopolyTo(deeds, Pawn.dog.id(), Street.Type.MeirAntwerpen, Street.Type.NieuwstraatBrussel);
+    deeds.arrangeMortgaged((ColourStreet) ruleSet.create(Street.Type.RueGrandeDinant));
+    players.getFirst().account().withdraw(new Money(1100));
+
+    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new AgreeIfAffordable()), deeds);
+
+    assertThat(result.deeds().housesBuiltOn(street(Street.Type.RueGrandeDinant))).isZero();
+    assertThat(result.deeds().housesBuiltOn(street(Street.Type.DiestsestraatLeuven))).isZero();
+    assertThat(result.deeds().housesBuiltOn(street(Street.Type.MeirAntwerpen))).isEqualTo(1);
+    assertThat(result.deeds().housesBuiltOn(street(Street.Type.NieuwstraatBrussel))).isEqualTo(1);
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(0));
+  }
+
   /** A player who wants the land at auction but never at the asking price. */
   private static Strategy bidding(int amount) {
     return new Strategy() {
@@ -294,14 +323,19 @@ class GameTest {
 
   private Deeds monopolyFor(Player.ID owner) {
     Deeds deeds = new Deeds();
-    Player player = players.stream().filter(it -> it.id().equals(owner)).findFirst().orElseThrow();
-    ColourStreet rueGrandeDinant = street(Street.Type.RueGrandeDinant);
-    ColourStreet diestsestraatLeuven = street(Street.Type.DiestsestraatLeuven);
-    deeds.sell(rueGrandeDinant, player, rueGrandeDinant.price());
-    player.account().deposit(rueGrandeDinant.price());
-    deeds.sell(diestsestraatLeuven, player, diestsestraatLeuven.price());
-    player.account().deposit(diestsestraatLeuven.price());
+    giveMonopolyTo(deeds, owner, Street.Type.RueGrandeDinant, Street.Type.DiestsestraatLeuven);
     return deeds;
+  }
+
+  private void giveMonopolyTo(Deeds deeds, Player.ID owner, Street.Type first, Street.Type second) {
+    Player player = players.stream().filter(it -> it.id().equals(owner)).findFirst().orElseThrow();
+    giveStreetTo(deeds, player, street(first));
+    giveStreetTo(deeds, player, street(second));
+  }
+
+  private void giveStreetTo(Deeds deeds, Player player, ColourStreet street) {
+    deeds.sell(street, player, street.price());
+    player.account().deposit(street.price());
   }
 
   private ColourStreet street(Street.Type type) {

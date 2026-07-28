@@ -19,6 +19,12 @@
 - Do not tell the receiving role how to do its job, repeat your process, or ask it to continue sender-owned responsibilities.
 - After receiving a handoff, merge the commit named in the handoff into your assigned branch before applying your own role rules. The commit identifies the state on its own; no branch name is needed and none is sent.
 - When receiving a handoff, ignore sender process narrative and decide next actions only from your own role prompt, the constitution, and the current project state.
+- When the architect sends a priority `00` follow-up to the coder or refactorer, it is an architect review loop, not a new specifier-originated implementation phase.
+  - The receiving role must merge, review, and verify under its own role rules.
+  - If no further role-owned changes are needed, hand the verified state back to the architect using the same task name instead of forwarding it to the specifier or the next normal pipeline role.
+  - If the coder needs implementation changes for an architect follow-up, the coder may make and verify them, then hand the result to the refactorer as normal; after the refactorer completes, the result returns to the architect.
+  - If the refactorer needs structural changes for an architect follow-up, the refactorer may make and verify them, then hand the result back to the architect.
+  - The architect alone sends the phase-complete specifier sync after all coder/refactorer follow-up loops for the task are closed and accepted.
 - If one or more messages arrive while you are busy:
   - Save each complete message as its own file in a local untracked `pending-messages/` directory in your assigned worktree.
   - Name queued message files with this format: `PP-YYYYMMDD-HHMMSS-source.txt`, where `PP` is the two-digit priority.
