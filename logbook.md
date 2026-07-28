@@ -4671,3 +4671,30 @@ takes a turn. Nothing keys on a `Player` today. It is the same mistake `Game`
 carried until `4e71a4e760`: value semantics over state that moves. A player's
 identity should be its `ID` alone, and that should land before anything keys on
 one.
+
+## 2026-07-28T08:16:35Z — architect handoffs for phase3-journal-report
+
+To coder and refactorer at priority `00`:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: phase3-journal-report
+commit: d2295d8514
+```
+
+To the specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: phase3-journal-report
+commit: d2295d8514
+```
+
+`Report` switches over the sealed `Journal.Entry` again, so an entry with no
+line written for it fails the build rather than the first game that produces
+one. `TurnTest` builds the observer-less `Turn` itself instead of reaching it
+through the helper. No report line and no feature changed.
