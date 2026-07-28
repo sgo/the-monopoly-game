@@ -70,3 +70,14 @@ Feature: game report
     Examples:
       | dog_bid | high_hat_bid | auction_winner | auction_price |
       | 90      | 120          | high hat       | 120           |
+
+  # report-6
+  Scenario Outline: the report narrates rent paid after the landing movement
+    And pawn "high hat" owns "Diestsestraat Leuven"
+    And pawn "high hat" follows the "Agree if affordable" strategy
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then the game report says that pawn "dog" moves before it says that pawn "dog" pays pawn "high hat" $<rent> rent for "Diestsestraat Leuven"
+
+    Examples:
+      | rent |
+      | 4    |
