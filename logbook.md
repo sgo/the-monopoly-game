@@ -6794,3 +6794,64 @@ Summary: forwarded the architect-reviewed phase 7 follow-up that hardens
 invalid improvement transitions and adds focused regression coverage; coder
 verification passes on the merged state with `189` Maven tests and the full
 normal acceptance pipeline (`134` generated acceptance tests).
+
+## 2026-07-28T14:28:27Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/50_20260728T141556Z_000016_from_coder_to_refactorer.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase7-houses-hotels
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder 2481338dfe
+```
+
+Action taken: merged `2481338dfe` into `swarmforge-refactorer`. Only
+`logbook.md` conflicted this time; every source file auto-merged cleanly.
+Neither of the two questions from the last handoff was touched here — this
+commit is a separate, independent hardening pass the architect ran (mutation
+testing surfaced that invalid improvement transitions had no guard):
+`Deeds.buildHouse`/`buildHotel`/`sellHouse`/`exchangeHotelForHouses` now throw
+`IllegalStateException` on an out-of-sequence call, `arrangeHouses` validates
+its bound, and `Building.develop`'s `while (true)` became the project's usual
+`for (;;)`. Both flagged questions — the single permanent builder, and
+whether a hotel's price should be its printed rent or its construction cost
+— remain open. Logbook conflict resolved the same way as the prior seven,
+interleaving two independent handoff threads (mine for phases 5–7, the
+coder's own phase 6/7 specifier and architect-routing history it had recorded
+separately) into one chronological order. Header counts confirm nothing
+lost: 194 (common ancestor) + 2 (mine, new) + 7 (coder's, new) = 203, matching
+the merged file.
+
+My own gates against the merged state: CRAP clean but for the exempt sealed
+dispatch on `Report.line` (13,2, unchanged); DRY at 26, matching the
+architect's own figure — what it flags is the same arrange-act-assert and
+constructor-shape similarity already judged not worth chasing, now including
+`DeedsTest`'s four illegal-transition tests, which the architect's own commit
+message gives the same reasoning for leaving alone: collapsing them would
+hide which rule each one asserts. Mutation scan on every changed file stays
+well under the 100-site split threshold. Unit (189), property (17), and
+normal acceptance (141) verification all pass. Nothing left to do on this
+state.
+
+## 2026-07-28T14:28:27Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase7-houses-hotels
+commit: ae13bf8911
+```
+
+Summary: merged the invalid-transition hardening pass; refactorer's own CRAP,
+DRY, and mutation-scan gates are unchanged and pass on the merged tree; unit,
+property, and acceptance verification all pass. The two behavior questions
+from the last handoff are still open.
