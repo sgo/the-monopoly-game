@@ -6653,6 +6653,110 @@ This commit changes observable behavior for invalid improvement transitions,
 so under the exclusive routing rule it must be sent only to coder with
 priority 00. The coder owns forwarding verified functional work to refactorer.
 
+## 2026-07-28T13:57:14Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/50_20260728T132729Z_000015_from_coder_to_refactorer.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase7-houses-hotels
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder e04da40dee
+```
+
+Action taken: merged `e04da40dee` into `swarmforge-refactorer`. This one had
+real conflicts, not just `logbook.md`: the coder's branch forked from before
+the architect's roll-awareness fix landed in the last handoff, so `Game`,
+`Rent`, and `RentTest` had each been changed on both sides. Kept the
+roll-aware, `Ownable`-narrowed dispatch shape and folded the coder's
+house/hotel logic into it — `Rent.rentFor`'s exhaustive switch keeps its three
+cases, and the hotel/house rent tiers went inside `colourStreetRent` rather
+than back into a re-opened `instanceof` chain. `RentTest` kept both sides'
+new tests (station/utility from the last merge, house/hotel from this one),
+updated to the 3-arg `resolve`. `Strategy.BuildOffer` had lost its `Street`
+import in the same refactor that removed it from `RentClaim`; retyped the
+field to `ColourStreet`, which is what `Building` always passes and is more
+precise than the vanished `Street` anyway. Logbook conflicts resolved the same
+way as the prior six. Header counts confirm nothing lost: 175 (common
+ancestor) + 16 (mine, new) + 3 (coder's, new) = 194, matching the merged file.
+
+Two DRY duplications were real, not the usual arrange-act-assert noise:
+`Deeds.sellHouse`/`exchangeHotelForHouses` shared a verify-set-refund shape,
+collapsed into one `refund` helper; `GameTest.playWith`/`playWithQuietTurns`
+were identical but for one `Roll`, collapsed into one `play` helper. DRY went
+25 → 23 from those two. `Building`'s constructor duplicate against
+`LandSale`'s and `Turn`'s is the same constructor-shape pattern already judged
+not worth chasing.
+
+`Building`/`Deeds` had full unit coverage already (100% on every method) but
+none at the property level — the same gap as station/utility rent two tasks
+ago, just closed sooner this time. Added `DeedsPropertyTest` sweeping every
+colour street, every valid starting house count, and a wide range of starting
+balances for `buildHouse`, `buildHotel`, `sellHouse`, and
+`exchangeHotelForHouses` — `DeedsTest` only exercised each on one street.
+Sweeping the four hotel-related cases over just the 22 street values (or 22 ×
+4 house counts) without an unconstrained dimension made jetCheck fail with
+"cannot generate enough sufficiently different values" — its default 100
+iterations need more combined cardinality than a small fixed domain gives.
+Added a starting-balance dimension, matching this file's own convention and
+`RentPropertyTest`'s, which fixed it and adds a real check that the charge/
+refund arithmetic holds regardless of the owner's balance.
+
+Two things surfaced worth a decision above the refactorer, not touched here
+since either would be a behavior change:
+
+- `Game.play()` only ever calls `building.develop(player)` for
+  `turnOrder.getFirst()` — the coder's own handoff called this "turn-time
+  building for the initiative winner", so it's deliberate for this phase, not
+  an oversight. Worth flagging anyway: as written, whoever wins initiative is
+  the table's permanent sole builder for the rest of the game, even in turns
+  where another player owns the monopoly being developed. If that is meant to
+  open up to every player developing after their own turn in a later phase,
+  it is not yet tracked anywhere obvious.
+- `Deeds.hotelValueOf(land)` returns `land.rentForOneHotel()` — the rent
+  charged once a hotel stands, not `land.hotelConstructionCost()`, which is
+  what `buildHouse` uses for a house and is the same figure the board prints
+  for construction. The acceptance numbers are self-consistent with this
+  choice (`building-2` prices two hotels at `250 + 450 = 700`, matching
+  `rentForOneHotel` on Rue Grande Dinant and Diestsestraat Leuven exactly,
+  where `hotelConstructionCost` would have priced both at `50` each), so
+  either it is a deliberate house rule for this simulator, or the specifier's
+  own example numbers were built on the same mix-up the implementation
+  matches. Flagging the arithmetic rather than guessing which, since either
+  answer changes the accepted acceptance criteria, not just the code.
+
+Verification: CRAP is clean but for the exempt sealed dispatch on
+`Report.line` (now 13,2 with the two new journal entry kinds); DRY at 24;
+mutation scan on every changed file stays well under the 100-site split
+threshold. Unit (172), property (17), and normal acceptance (141)
+verification all pass.
+
+## 2026-07-28T13:57:14Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase7-houses-hotels
+commit: 7e999de151
+```
+
+Summary: merged houses and hotels, resolving real conflicts with the prior
+roll-awareness fix rather than just the logbook; deduplicated the two real
+production/test duplications this introduced; added `DeedsPropertyTest` to
+close the same unit-vs-property coverage gap as two tasks ago. CRAP, DRY, and
+mutation-scan gates pass; unit, property, and acceptance verification all
+pass. Two behavior questions flagged above rather than acted on: whether
+turn-time building is meant to stay restricted to the initiative winner, and
+whether a hotel's price should be its printed rent or its construction cost.
+
 ## 2026-07-28T14:14:11Z — architect sent phase 7 functional follow-up
 
 Handoff message sent to coder:
@@ -6676,6 +6780,44 @@ merge_and_process architect 94515961c6
 Summary: the observable invalid-improvement-transition hardening was sent
 only to coder under the exclusive routing rule. No refactorer or specifier
 handoff was queued.
+
+## 2026-07-28T14:15:22Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/inbox/in_process/00_20260728T141405Z_000031_from_architect_to_coder.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: phase7-houses-hotels
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect 94515961c6
+```
+
+Action taken: merged architect commit `94515961c6`, which hardens improvement
+invariants in `Deeds`, adds focused regression coverage, and leaves the phase 7
+slice green under coder-owned verification: `189` Maven tests and the full
+normal acceptance pipeline (`134` generated acceptance tests) pass.
+
+## 2026-07-28T14:15:22Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase7-houses-hotels
+commit: 94515961c6
+```
+
+Summary: forwarded the architect-reviewed phase 7 follow-up that hardens
+invalid improvement transitions and adds focused regression coverage; coder
+verification passes on the merged state with `189` Maven tests and the full
+normal acceptance pipeline (`134` generated acceptance tests).
 
 ## 2026-07-28T14:28:39Z — architect received phase 7 refactorer follow-up
 
