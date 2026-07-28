@@ -5621,3 +5621,18 @@ merge_and_process specifier e3a7d1c711
 Action taken: merged specifier commit `e3a7d1c711` into `swarmforge-coder`.
 The merge added the accepted street-rent feature and related journal/report
 specifications; implementation review is next.
+
+## 2026-07-28T09:47:14Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase5-street-rent
+commit: 4ff2eb22be
+```
+
+Summary: Street-rent rules, claim decisions, journal/report narration, and the
+acceptance runtime are implemented. Unit and normal acceptance verification pass.
