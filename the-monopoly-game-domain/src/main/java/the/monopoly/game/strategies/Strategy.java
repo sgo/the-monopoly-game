@@ -3,6 +3,7 @@ package the.monopoly.game.strategies;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.Ownable;
+import the.monopoly.game.rules.Rent;
 
 /**
  * How a player decides. The game asks a strategy wherever a player has a
@@ -23,6 +24,11 @@ public interface Strategy {
   /** What to bid for the land at auction. Nothing is not a bid. */
   default Money bidFor(Offer offer) {
     return Money.ZERO;
+  }
+
+  /** Whether to collect the rent owed by a visitor to land this player owns. */
+  default boolean claims(Rent.Claim claim) {
+    return false;
   }
 
   /** The land a player is being asked about, and what they have to spend on it. */

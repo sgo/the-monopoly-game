@@ -5601,3 +5601,23 @@ both parents as well as the header set, which is what caught the refactorer's
 `22:47:00` placeholder commit two merges ago. It would still miss a body grafted
 onto a header that appears on only one side, so a spot check of the newest
 entries against their commit stays part of the job.
+
+## 2026-07-28T09:38:56Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/inbox/in_process/50_20260728T093843Z_000011_from_specifier_to_coder.handoff
+FROM: specifier
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase5-street-rent
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process specifier e3a7d1c711
+```
+
+Action taken: merged specifier commit `e3a7d1c711` into `swarmforge-coder`.
+The merge added the accepted street-rent feature and related journal/report
+specifications; implementation review is next.

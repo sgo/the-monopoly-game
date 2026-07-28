@@ -12,6 +12,7 @@ import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
 import the.monopoly.game.rules.Rule;
+import the.monopoly.game.rules.Rent;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
 
@@ -34,12 +35,18 @@ public class Game {
   private final List<Player> players;
   private final Cups cups;
   private final Strategy.OfPlayers strategies;
+  private final Deeds deeds;
 
   public Game(Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies) {
+    this(rules, players, cups, strategies, new Deeds());
+  }
+
+  public Game(Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds) {
     this.rules = rules;
     this.players = players;
     this.cups = cups;
     this.strategies = strategies;
+    this.deeds = deeds;
   }
 
   /** A game whose players leave every choice they are offered alone. */
@@ -59,14 +66,18 @@ public class Game {
 
   public Result play() {
     var journal = new Journal();
-    var deeds = new Deeds();
     journal.log(new Journal.Entry.Start(ids(players)));
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
 
     Journalling journalling = new Journalling(journal);
     Landings landings = new LandSale(deeds, turnOrder, strategies, journalling);
-    turnOrder.forEach(player -> takeTurn(player, journal, journalling, landings));
+    Landings rent = new Rent(deeds, rules, turnOrder, strategies, journalling);
+    Landings resolvingLandings = (player, space) -> {
+      landings.resolve(player, space);
+      rent.resolve(player, space);
+    };
+    turnOrder.forEach(player -> takeTurn(player, journal, journalling, resolvingLandings));
 
     return new Result(turnOrder, journal.entries(), deeds);
   }
@@ -83,7 +94,7 @@ public class Game {
   }
 
   /** Writes down what a turn and a sale say they did, as the game's account of it. */
-  private record Journalling(Journal journal) implements Turn.Events, LandSale.Events {
+  private record Journalling(Journal journal) implements Turn.Events, LandSale.Events, Rent.Events {
     @Override
     public void rolled(Player player, Roll roll) {
       journal.log(new Journal.Entry.Rolled(player.id(), roll.total()));
@@ -107,6 +118,11 @@ public class Game {
     @Override
     public void wonAtAuction(Player winner, Ownable land, Money price) {
       journal.log(new Journal.Entry.AuctionWon(winner.id(), land.type(), price));
+    }
+
+    @Override
+    public void paid(Player tenant, Player owner, the.monopoly.game.components.streets.ColourStreet land, Money rent) {
+      journal.log(new Journal.Entry.RentPaid(tenant.id(), owner.id(), land.type(), rent));
     }
   }
 
@@ -180,6 +196,9 @@ public class Game {
 
       /** Land the table bid for, and what the winner paid for it. */
       record AuctionWon(Player.ID player, Street.Type land, Money price) implements Entry {
+      }
+
+      record RentPaid(Player.ID tenant, Player.ID owner, Street.Type land, Money rent) implements Entry {
       }
     }
   }
