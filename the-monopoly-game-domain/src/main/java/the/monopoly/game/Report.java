@@ -58,6 +58,11 @@ public final class Report {
           name(it.player()) + " builds a house on " + spaceName(it.land()) + " for $" + it.price().amount();
       case Entry.HouseSold it ->
           name(it.player()) + " sells a house on " + spaceName(it.land()) + " for $" + it.price().amount();
+      case Entry.Mortgaged it ->
+          name(it.player()) + " mortgages " + spaceName(it.land()) + " for $" + it.value().amount();
+      case Entry.MortgageLifted it ->
+          name(it.player()) + " lifts the mortgage on " + spaceName(it.land()) + " for $"
+              + it.total().amount() + " including $" + it.interest().amount() + " interest";
     };
   }
 

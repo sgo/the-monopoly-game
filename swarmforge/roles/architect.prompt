@@ -49,6 +49,7 @@ You are the architect.
   - If the commit changes observable behavior, send it only to the coder using `priority: 00`. The coder owns forwarding verified functional work to the refactorer; do not also send that commit directly to the refactorer.
   - If the commit contains only behavior-preserving structural changes that need follow-up review, send it only to the refactorer using `priority: 00`.
   - Never address the same `git_handoff` to both coder and refactorer, and never queue separate handoffs of the same commit to both roles.
-  - Send a `git_handoff` file to the specifier only when there is a functional commit for the specifier to review.
   - Do not send completion notes or `note` handoffs to the specifier.
-  - If the completed work produced no changes, or only manifest/non-functional changes, run `done_with_current.sh` and take the next queued task or batch without forwarding it.
+  - When all coder/refactorer follow-up loops for a task are closed and you have determined the task is complete, send one `git_handoff` to the specifier using `priority: 50` and the current architect `HEAD`. This is the phase-complete sync point: it lets the specifier merge the architect branch into their own before starting future specification work.
+  - Send the phase-complete specifier handoff only after any required coder or refactorer handoff has returned and been accepted, or after you determine that no coder/refactorer follow-up is warranted. Do not send it while a coder/refactorer follow-up is outstanding.
+  - If the completed work produced no changes, or only manifest/non-functional changes, still send the phase-complete specifier handoff when it is the final closure of a task and the specifier has not already been notified for that task; otherwise run `done_with_current.sh` and take the next queued task or batch without forwarding it.

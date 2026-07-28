@@ -50,6 +50,47 @@ class DeedsTest {
   }
 
   @Test
+  void mortgagingLandPaysItsMortgageValueAndMarksItMortgaged() {
+    Ownership ownership = ownedStreet();
+
+    Money price = deeds.mortgage(ownership.street(), ownership.owner());
+
+    assertThat(price).isEqualTo(new Money(30));
+    assertThat(ownership.owner().account().balance()).isEqualTo(Balance.of(1530));
+    assertThat(deeds.isMortgaged(ownership.street())).isTrue();
+  }
+
+  @Test
+  void liftingAMortgageCostsTheValuePlusTenPercentInterest() {
+    Ownership ownership = ownedStreet();
+    deeds.arrangeMortgaged(ownership.street());
+    ownership.owner().account().withdraw(new Money(1400));
+
+    Deeds.MortgageCost cost = deeds.liftMortgage(ownership.street(), ownership.owner());
+
+    assertThat(cost.total()).isEqualTo(new Money(33));
+    assertThat(cost.interest()).isEqualTo(new Money(3));
+    assertThat(ownership.owner().account().balance()).isEqualTo(Balance.of(67));
+    assertThat(deeds.isMortgaged(ownership.street())).isFalse();
+  }
+
+  @Test
+  void keepingTransferredLandMortgagedCostsOnlyTheInterest() {
+    Ownership seller = ownedStreet();
+    deeds.arrangeMortgaged(seller.street());
+    Player buyer = playerWith("new buyer", 1500);
+
+    deeds.transfer(seller.street(), seller.owner(), buyer, new Money(50));
+    Money interest = deeds.keepMortgaged(seller.street(), buyer);
+
+    assertThat(seller.owner().account().balance()).isEqualTo(Balance.of(1550));
+    assertThat(buyer.account().balance()).isEqualTo(Balance.of(1447));
+    assertThat(interest).isEqualTo(new Money(3));
+    assertThat(deeds.ownerOf(seller.street().type())).contains(buyer.id());
+    assertThat(deeds.isMortgaged(seller.street())).isTrue();
+  }
+
+  @Test
   void housesBuiltOnAStreetAreRemembered() {
     Ownership ownership = ownedStreet();
 
@@ -154,8 +195,12 @@ class DeedsTest {
   }
 
   private Player playerWith(int balance) {
+    return playerWith("buyer", balance);
+  }
+
+  private Player playerWith(String name, int balance) {
     Bank bank = ruleSet.bank();
-    Player.ID id = new Player.ID("buyer");
+    Player.ID id = new Player.ID(name);
     bank.createAccountFor(id);
     Player player = new Player(id, bank.accountOf(id));
     player.account().deposit(new Money(balance));

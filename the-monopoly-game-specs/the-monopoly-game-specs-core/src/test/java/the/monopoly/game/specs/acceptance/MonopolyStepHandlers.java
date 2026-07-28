@@ -361,8 +361,15 @@ public final class MonopolyStepHandlers {
         given("^the street \"" + NAME + "\" has a hotel built$",
             (world, arguments) -> world.arrangeHotel(SpaceNames.of(arguments.text(1)))),
 
+        given("^the land \"" + NAME + "\" is mortgaged$",
+            (world, arguments) -> world.arrangeMortgaged(SpaceNames.of(arguments.text(1)))),
+
         given("^pawn \"" + NAME + "\" declines to claim rent for \"" + NAME + "\"$",
             (world, arguments) -> world.pawnDeclinesRent(arguments.text(1), SpaceNames.of(arguments.text(2)))),
+
+        given("^pawn \"" + NAME + "\" will build a house on \"" + NAME + "\"$",
+            (world, arguments) -> world.pawnWillBuildHouseOn(
+                arguments.text(1), SpaceNames.of(arguments.text(2)))),
 
         step("^pawn \"" + NAME + "\" lands on \"" + NAME + "\"$",
             (world, arguments) -> world.landPawnOn(arguments.text(1), SpaceNames.of(arguments.text(2)))),
@@ -372,6 +379,19 @@ public final class MonopolyStepHandlers {
 
         step("^pawn \"" + NAME + "\" exchanges the hotel on \"" + NAME + "\" for houses$",
             (world, arguments) -> world.exchangeHotelForHouses(arguments.text(1), SpaceNames.of(arguments.text(2)))),
+
+        step("^pawn \"" + NAME + "\" mortgages \"" + NAME + "\"$",
+            (world, arguments) -> world.mortgage(arguments.text(1), SpaceNames.of(arguments.text(2)))),
+
+        step("^pawn \"" + NAME + "\" lifts the mortgage on \"" + NAME + "\"$",
+            (world, arguments) -> world.liftMortgage(arguments.text(1), SpaceNames.of(arguments.text(2)))),
+
+        step("^pawn \"" + NAME + "\" keeps \"" + NAME + "\" mortgaged, paying the interest$",
+            (world, arguments) -> world.keepMortgaged(arguments.text(1), SpaceNames.of(arguments.text(2)))),
+
+        step("^pawn \"" + NAME + "\" sells \"" + NAME + "\" to pawn \"" + NAME + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> world.sellLand(
+                arguments.text(1), SpaceNames.of(arguments.text(2)), arguments.text(3), money(arguments.number(4)))),
 
         then("^pawn \"" + NAME + "\" owns \"" + NAME + "\"$",
             (world, arguments) -> assertThat(world.pawnOwns(arguments.text(1), SpaceNames.of(arguments.text(2))))
@@ -390,6 +410,12 @@ public final class MonopolyStepHandlers {
         then("^the street \"" + NAME + "\" has a hotel built$",
             (world, arguments) -> assertThat(world.hasHotelOn(SpaceNames.of(arguments.text(1)))).isTrue()),
 
+        then("^the land \"" + NAME + "\" is mortgaged$",
+            (world, arguments) -> assertThat(world.isMortgaged(SpaceNames.of(arguments.text(1)))).isTrue()),
+
+        then("^the land \"" + NAME + "\" is not mortgaged$",
+            (world, arguments) -> assertThat(world.isMortgaged(SpaceNames.of(arguments.text(1)))).isFalse()),
+
         then("^the game journal records that pawn \"" + NAME + "\" pays pawn \"" + NAME
                 + "\" \\$" + VALUE + " rent for \"" + NAME + "\"$",
             (world, arguments) -> records(world, rentPaid(
@@ -404,6 +430,16 @@ public final class MonopolyStepHandlers {
                 + "\" for \\$" + VALUE + "$",
             (world, arguments) -> records(world, houseSold(
                 arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" mortgages \"" + NAME + "\" for \\$"
+                + VALUE + "$",
+            (world, arguments) -> records(world, mortgaged(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" lifts the mortgage on \"" + NAME
+                + "\" for \\$" + VALUE + " including \\$" + VALUE + " interest$",
+            (world, arguments) -> records(world, mortgageLifted(
+                arguments.text(1), arguments.text(2), arguments.number(3), arguments.number(4)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" moves before it records that pawn \""
                 + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + " rent for \"" + NAME + "\"$",
@@ -463,6 +499,16 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> says(world, soldAHouse(
                 arguments.text(1), arguments.text(2), arguments.number(3)))),
 
+        then("^the game report says that pawn \"" + NAME + "\" mortgages \"" + NAME + "\" for \\$"
+                + VALUE + "$",
+            (world, arguments) -> says(world, mortgagedLine(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" lifts the mortgage on \"" + NAME
+                + "\" for \\$" + VALUE + " including \\$" + VALUE + " interest$",
+            (world, arguments) -> says(world, mortgageLiftedLine(
+                arguments.text(1), arguments.text(2), arguments.number(3), arguments.number(4)))),
+
         step("^each face was rolled about " + VALUE + " times within a " + VALUE + "% margin$",
             (world, arguments) -> {
               int expected = arguments.number(1);
@@ -517,6 +563,15 @@ public final class MonopolyStepHandlers {
     return Claim.of(new Entry.HouseSold(idOf(pawnName), SpaceNames.of(spaceName), money(price)));
   }
 
+  private static Claim mortgaged(String pawnName, String spaceName, int value) {
+    return Claim.of(new Entry.Mortgaged(idOf(pawnName), SpaceNames.of(spaceName), money(value)));
+  }
+
+  private static Claim mortgageLifted(String pawnName, String spaceName, int total, int interest) {
+    return Claim.of(new Entry.MortgageLifted(
+        idOf(pawnName), SpaceNames.of(spaceName), money(total), money(interest)));
+  }
+
   /** A pawn moving anywhere, for a step that says when it moved rather than where to. */
   private static Claim moves(String pawnName) {
     return new Claim(
@@ -549,6 +604,15 @@ public final class MonopolyStepHandlers {
 
   private static String builtAHouse(String pawnName, String spaceName, int price) {
     return pawnName + " builds a house on " + spaceName + " for $" + price;
+  }
+
+  private static String mortgagedLine(String pawnName, String spaceName, int value) {
+    return pawnName + " mortgages " + spaceName + " for $" + value;
+  }
+
+  private static String mortgageLiftedLine(String pawnName, String spaceName, int total, int interest) {
+    return pawnName + " lifts the mortgage on " + spaceName + " for $" + total
+        + " including $" + interest + " interest";
   }
 
   private static Player.ID idOf(String pawnName) {

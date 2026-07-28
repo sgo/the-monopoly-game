@@ -71,6 +71,7 @@ public class Building {
         ))
         .values().stream()
         .filter(group -> group.stream().allMatch(it -> deeds.ownerOf(it.type()).filter(player.id()::equals).isPresent()))
+        .filter(group -> group.stream().noneMatch(deeds::isMortgaged))
         .sorted(Comparator.comparing(group -> rules.gameboard().positionOf(group.getFirst().type())))
         .toList();
   }
