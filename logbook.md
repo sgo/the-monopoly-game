@@ -7847,3 +7847,28 @@ merge_and_process architect 97bea57d30
 ```
 
 Summary: routed architect follow-up fixes for Phase 10 to coder only at priority 00 because the changes include observable card behavior hardening and regression tests. The specifier phase-complete sync remains pending until this coder/refactorer loop returns and is accepted.
+
+## 2026-07-28T22:29:55Z — architect received phase 10 coder return handoff
+
+Handoff message received:
+
+```
+id: 20260728T222938Z_000020_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: 7c17ecbddd
+created_at: 2026-07-28T22:29:38.623713Z
+enqueued_at: 2026-07-28T22:29:39.402635Z
+task: phase10-chance-and-community-chest
+dequeued_at: 2026-07-28T22:29:44.594284Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 7c17ecbddd
+```
+
+Action taken: began architectural review of the returned coder verification handoff for the architect-originated Phase 10 follow-up.
