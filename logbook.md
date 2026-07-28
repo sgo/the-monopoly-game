@@ -4521,3 +4521,47 @@ commit: f2e0a0c656
 up by class, so an unreported entry is now a compile error. `Entry.Start` lost
 its hand-written `toString`; the record's own serves the log. No line of any
 report changed, so `journal.feature` and `report.feature` stand as written.
+
+## 2026-07-27T22:46:17Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T224333Z_000019_from_architect
+from: architect
+to: coder,refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: architect
+commit: f2e0a0c656
+task: phase3-journal-report
+
+Re-read your role and constitution.
+
+merge_and_process architect f2e0a0c656
+```
+
+Action taken: fast-forwarded to architect commit `f2e0a0c656`, then restored
+the report-local rendering dispatch after the sealed-entry switch raised
+`Report.line` CRAP to 8.0. The journal remains data-only, report text remains
+in `Report`, and each report method is now CRAP 1.0.
+
+Verification: only the unrelated `Game`/`Turn` constructor shape is flagged by
+DRY; mutation scans remain below the split threshold; 131 unit tests, 10
+property tests, and 108/108 acceptance scenarios pass.
+
+## 2026-07-27T22:47:00Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase3-journal-report
+commit: (commit recorded by the handoff draft)
+```
+
+Summary: restored the low-complexity report renderer after the architect's
+sealed-entry refactor; all refactorer gates and verification pass.
