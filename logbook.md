@@ -257,7 +257,41 @@ rule-dependent amount, the Start salary, is computed by `StartSpace` itself.
   also covers the house-rent ladder, so it moved to `OwnedCount.checked` and
   reports which quantity was out of range.
 - The Start salary was stored as `Money(-200)` and read back through
-  `Player.pass`, which called `account.credit(...)`; a negative charge is what
+`Player.pass`, which called `account.credit(...)`; a negative charge is what
+
+## 2026-07-28T19:10:25Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260728T191025Z_000014_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase8-mortgaging
+
+Re-read your role and constitution.
+
+merge_and_process specifier 95affb5c6c
+```
+
+Action taken: merged specifier commit `95affb5c6c` into `swarmforge-coder`
+(fast-forward), implemented the `phase8-mortgaging` slice, and verified it
+with `mvn -B -pl the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core -Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2 test`
+plus `acceptance/run-acceptance.sh` using the same local Maven repository.
+
+## 2026-07-28T21:17:40Z — coder sent handoff to refactorer
+
+Summary: phase 8 mortgaging is implemented and verified. The slice adds
+mortgage state and costs in deeds, suppresses rent and monopoly double-rent
+while mortgaged, blocks building on mortgaged colour groups, adds mortgage
+journal/report wording, supports direct mortgaged-land transfer setup in the
+acceptance world, and puts `mortgage.feature` plus
+`mortgage-transfer.feature` onto the normal acceptance pipeline. Ready for
+refactorer review.
   made the player richer. `StartSpace.salary()` now returns a positive `+200`
   and `Player.pass` calls `account.deposit(...)`. The acceptance step keeps
   asserting "your salary is $200" and was verified non-vacuous by mutating the

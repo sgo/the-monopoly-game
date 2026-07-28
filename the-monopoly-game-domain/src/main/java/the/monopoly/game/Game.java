@@ -218,6 +218,12 @@ public class Game {
 
       record HouseSold(Player.ID player, Street.Type land, Money price) implements Entry {
       }
+
+      record Mortgaged(Player.ID player, Street.Type land, Money value) implements Entry {
+      }
+
+      record MortgageLifted(Player.ID player, Street.Type land, Money total, Money interest) implements Entry {
+      }
     }
   }
 }

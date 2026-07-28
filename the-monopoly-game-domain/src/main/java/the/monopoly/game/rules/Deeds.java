@@ -19,6 +19,7 @@ import java.util.Optional;
 public class Deeds {
   private final Map<Street.Type, Player.ID> owners = new HashMap<>();
   private final Map<Street.Type, Improvement> improvements = new HashMap<>();
+  private final Map<Street.Type, Mortgage> mortgages = new HashMap<>();
 
   public boolean isUnowned(Street.Type land) {
     return !owners.containsKey(land);
@@ -37,6 +38,44 @@ public class Deeds {
   public void sell(Ownable land, Player buyer, Money price) {
     buyer.account().withdraw(price);
     owners.put(land.type(), buyer.id());
+  }
+
+  public void transfer(Ownable land, Player seller, Player buyer, Money price) {
+    verifyOwner(land, seller);
+    seller.account().deposit(price);
+    buyer.account().withdraw(price);
+    owners.put(land.type(), buyer.id());
+  }
+
+  public boolean isMortgaged(Ownable land) {
+    return mortgages.containsKey(land.type());
+  }
+
+  public void arrangeMortgaged(Ownable land) {
+    mortgages.put(land.type(), Mortgage.on(land));
+  }
+
+  public Money mortgage(Ownable land, Player owner) {
+    verifyOwner(land, owner);
+    Mortgage mortgage = Mortgage.on(land);
+    mortgages.put(land.type(), mortgage);
+    owner.account().deposit(mortgage.value());
+    return mortgage.value();
+  }
+
+  public Money keepMortgaged(Ownable land, Player owner) {
+    verifyOwner(land, owner);
+    Mortgage mortgage = mortgageOn(land);
+    owner.account().withdraw(mortgage.interest());
+    return mortgage.interest();
+  }
+
+  public MortgageCost liftMortgage(Ownable land, Player owner) {
+    verifyOwner(land, owner);
+    Mortgage mortgage = mortgageOn(land);
+    owner.account().withdraw(mortgage.totalToLift());
+    mortgages.remove(land.type());
+    return new MortgageCost(mortgage.totalToLift(), mortgage.interest());
   }
 
   public int housesBuiltOn(ColourStreet land) {
@@ -114,6 +153,18 @@ public class Deeds {
       throw new IllegalStateException(owner.id().value() + " does not own " + land.type() + ".");
   }
 
+  private void verifyOwner(Ownable land, Player owner) {
+    if (ownerOf(land.type()).filter(owner.id()::equals).isEmpty())
+      throw new IllegalStateException(owner.id().value() + " does not own " + land.type() + ".");
+  }
+
+  private Mortgage mortgageOn(Ownable land) {
+    Mortgage mortgage = mortgages.get(land.type());
+    if (mortgage == null)
+      throw new IllegalStateException(land.type() + " is not mortgaged.");
+    return mortgage;
+  }
+
   private static int validatedHouses(ColourStreet land, int houses) {
     if (houses < 0 || houses > land.hotelConstructionRequiresNumberOfHouses())
       throw new IllegalArgumentException(
@@ -148,6 +199,17 @@ public class Deeds {
     private Improvement withOneLessHouse() {
       return new Improvement(houses - 1, false);
     }
+  }
+
+  private record Mortgage(Money value, Money interest, Money totalToLift) {
+    private static Mortgage on(Ownable land) {
+      Money value = land.landMortgageValue();
+      Money interest = new Money((value.amount() + 9) / 10);
+      return new Mortgage(value, interest, value.plus(interest));
+    }
+  }
+
+  public record MortgageCost(Money total, Money interest) {
   }
 }
 

@@ -230,6 +230,11 @@ public class World {
     deeds.arrangeHotel(colourStreet(land));
   }
 
+  public void arrangeMortgaged(Street.Type land) {
+    if (deeds == null) deeds = new Deeds();
+    deeds.arrangeMortgaged(ownable(land));
+  }
+
   public int housesBuiltOn(Street.Type land) {
     if (deeds == null) return 0;
     return deeds.housesBuiltOn(colourStreet(land));
@@ -238,6 +243,10 @@ public class World {
   public boolean hasHotelOn(Street.Type land) {
     if (deeds == null) return false;
     return deeds.hasHotelOn(colourStreet(land));
+  }
+
+  public boolean isMortgaged(Street.Type land) {
+    return deeds != null && deeds.isMortgaged(ownable(land));
   }
 
   public void pawnFollows(String pawnName, Strategy strategy) {
@@ -250,6 +259,39 @@ public class World {
 
   public void pawnWillBid(String pawnName, Street.Type land, Money amount) {
     scriptFor(pawnName).bids(land, amount);
+  }
+
+  public void pawnWillBuildHouseOn(String pawnName, Street.Type land) {
+    Strategy strategy = pawnStrategies.get(pawnName);
+    if (strategy == null) {
+      scriptFor(pawnName).builds(land);
+      return;
+    }
+    if (strategy instanceof Scripted scripted) {
+      scripted.builds(land);
+      return;
+    }
+    pawnStrategies.put(pawnName, new Strategy() {
+      @Override
+      public boolean accepts(Offer offer) {
+        return strategy.accepts(offer);
+      }
+
+      @Override
+      public Money bidFor(Offer offer) {
+        return strategy.bidFor(offer);
+      }
+
+      @Override
+      public boolean claims(RentClaim claim) {
+        return strategy.claims(claim);
+      }
+
+      @Override
+      public boolean builds(BuildOffer offer) {
+        return offer.land().type() == land || strategy.builds(offer);
+      }
+    });
   }
 
   public void pawnDeclinesRent(String pawnName, Street.Type land) {
@@ -299,6 +341,35 @@ public class World {
     if (deeds == null)
       throw new AssertionError("No deeds exist yet, so no hotel can be exchanged.");
     deeds.exchangeHotelForHouses(colourStreet(land), pawn(pawnName));
+  }
+
+  public void mortgage(String pawnName, Street.Type land) {
+    if (deeds == null)
+      throw new AssertionError("No deeds exist yet, so no land can be mortgaged.");
+    Player player = pawn(pawnName);
+    Ownable ownable = ownable(land);
+    Money value = deeds.mortgage(ownable, player);
+    journal = List.of(new Entry.Mortgaged(player.id(), land, value));
+  }
+
+  public void liftMortgage(String pawnName, Street.Type land) {
+    if (deeds == null)
+      throw new AssertionError("No deeds exist yet, so no mortgage can be lifted.");
+    Player player = pawn(pawnName);
+    Deeds.MortgageCost cost = deeds.liftMortgage(ownable(land), player);
+    journal = List.of(new Entry.MortgageLifted(player.id(), land, cost.total(), cost.interest()));
+  }
+
+  public void keepMortgaged(String pawnName, Street.Type land) {
+    if (deeds == null)
+      throw new AssertionError("No deeds exist yet, so no mortgage can be kept.");
+    deeds.keepMortgaged(ownable(land), pawn(pawnName));
+  }
+
+  public void sellLand(String sellerName, Street.Type land, String buyerName, Money price) {
+    if (deeds == null)
+      throw new AssertionError("No deeds exist yet, so no land can be sold.");
+    deeds.transfer(ownable(land), pawn(sellerName), pawn(buyerName), price);
   }
 
   /**
@@ -365,6 +436,13 @@ public class World {
     return street;
   }
 
+  private Ownable ownable(Street.Type land) {
+    Street space = ruleSet.create(land);
+    if (!(space instanceof Ownable ownable))
+      throw new AssertionError(land + " is not ownable land.");
+    return ownable;
+  }
+
   /**
    * A pawn told what to do about each piece of land a scenario names, and told
    * off for being offered anything else: a scenario that scripts a pawn at all
@@ -373,6 +451,7 @@ public class World {
   private static final class Scripted implements Strategy {
     private final Set<Street.Type> declined = new HashSet<>();
     private final Map<Street.Type, Money> bids = new HashMap<>();
+    private final Set<Street.Type> builds = new HashSet<>();
 
     void declines(Street.Type land) {
       declined.add(land);
@@ -380,6 +459,10 @@ public class World {
 
     void bids(Street.Type land, Money amount) {
       bids.put(land, amount);
+    }
+
+    void builds(Street.Type land) {
+      builds.add(land);
     }
 
     @Override
@@ -395,6 +478,11 @@ public class World {
     @Override
     public Money bidFor(Offer offer) {
       return bids.getOrDefault(offer.land().type(), Money.ZERO);
+    }
+
+    @Override
+    public boolean builds(BuildOffer offer) {
+      return builds.contains(offer.land().type());
     }
   }
 }
