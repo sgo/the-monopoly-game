@@ -28,10 +28,8 @@ class RentPropertyTest {
   @Test
   void resolvingRentConservesTotalMoneyAndMovesExactlyTheAmountOwed() {
     PropertyChecker.forAll(cases(), c -> {
-      // A fresh rule set and bank per iteration: Bank.Simple accumulates
-      // accounts in a Set keyed by owner name and balance, so reusing one
-      // bank across iterations can hand back a stale account left over from
-      // an earlier case with the same player name.
+      // A fresh rule set and bank keep generated cases independent: balances
+      // and ownership from one case must not become another case's setup.
       Rule.Set rules = Rule.Set.Type.official.create();
       Deeds deeds = new Deeds();
       Player owner = playerWith(rules, "owner");

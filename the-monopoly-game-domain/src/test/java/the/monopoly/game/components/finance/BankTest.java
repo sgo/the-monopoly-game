@@ -4,13 +4,11 @@ import org.junit.jupiter.api.Test;
 import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.players.Player;
 
-import java.util.HashSet;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class BankTest {
-  private final Bank bank = new Bank.Simple(new HashSet<>());
+  private final Bank bank = new Bank.Simple();
   private final Player.ID player = new Player.ID("0");
 
   @Test
@@ -37,6 +35,18 @@ class BankTest {
 
     assertThat(bank.accountOf(player).balance()).isEqualTo(Balance.of(1500));
     assertThat(bank.accountOf(other).balance()).isEqualTo(Balance.of(0));
+  }
+
+  @Test
+  void openingAnExistingAccountKeepsTheOneAlreadyOwnedByThatPlayer() {
+    bank.createAccountFor(player);
+    Bank.Account original = bank.accountOf(player);
+    original.deposit(new Money(1500));
+
+    bank.createAccountFor(player);
+
+    assertThat(bank.accounts()).containsExactly(original);
+    assertThat(bank.accountOf(player)).isSameAs(original);
   }
 
   @Test

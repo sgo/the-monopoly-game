@@ -5898,6 +5898,47 @@ merge_and_process architect 4c3fc826fc
 Action taken: merged architect commit `4c3fc826fc` into `swarmforge-coder` and
 began normal unit and acceptance verification of the corrected rent boundaries.
 
+## 2026-07-28T11:35:25Z — architect sent phase 5 review handoffs
+
+Handoff message sent to coder and refactorer:
+
+```
+id: 20260728T113503Z_000026_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase5-street-rent
+commit: 4c3fc826fc
+created_at: 2026-07-28T11:35:03.078697Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 4c3fc826fc
+```
+
+Handoff message sent to specifier:
+
+```
+id: 20260728T113507Z_000027_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase5-street-rent
+commit: 4c3fc826fc
+created_at: 2026-07-28T11:35:07.032885Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 4c3fc826fc
+```
+
+Summary: the functional rent-order correction and decision-boundary cleanup
+were sent for role-appropriate review.
+
 ## 2026-07-28T11:36:00Z — coder sent handoff to refactorer
 
 Handoff message sent:
@@ -5964,3 +6005,60 @@ Summary: merged the architect's `RentClaim` boundary fix and rent-before-sale
 ordering correction; refactorer's own CRAP, DRY, and mutation-scan gates are
 unchanged and pass on the merged tree; unit, property, and acceptance
 verification all pass.
+
+## 2026-07-28T11:40:55Z — architect received refactorer follow-up
+
+Handoff message received:
+
+```
+id: 20260728T114043Z_000024_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 7f2102ac5a
+created_at: 2026-07-28T11:40:43.047166Z
+enqueued_at: 2026-07-28T11:40:43.275981Z
+task: phase5-street-rent
+dequeued_at: 2026-07-28T11:40:47.908389Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7f2102ac5a
+```
+
+Action taken: began review of the refactorer's merged architect state.
+
+## 2026-07-28T11:45:23Z — architect review of refactorer follow-up
+
+The refactorer follow-up contained the already reviewed architect source state
+and its review journal. Rechecking the four architectural phases found no new
+UI/core or dependency-direction issue, but did confirm an encapsulation defect
+in `Bank.Simple`: its caller-supplied `Set<Account>` used a record containing a
+mutable balance as a hash key. Once that balance changed, opening an account
+again for the same player could retain two equal owners and make `accountOf`
+return an arbitrary, stale account.
+
+`Bank.Simple` now owns a private map keyed by the immutable account owner.
+Account creation is idempotent, lookup is deterministic, and callers no longer
+provide or retain the bank's storage representation. A regression test opens
+the same account after a deposit and verifies that the original account and
+balance are preserved. Construction sites and the property-test explanation
+were updated to match the encapsulated representation.
+
+Final verification:
+
+- 170 normal unit tests pass.
+- 11 separately tagged property tests pass.
+- 124 generated acceptance scenarios pass.
+- Differential Java mutation killed all 10 selected `Bank` mutations; no site
+  was uncovered and no mutant survived. `Official` had no mutation sites after
+  its constructor-only change.
+- DRY analysis reported 15 established small candidates. The production
+  candidates are explicit event handlers or constructor shapes, and the rest
+  are independent test arrangements and assertions; none is a useful shared
+  abstraction for this change.
+- Soft Gherkin mutation found no changed scenario surface, retained all prior
+  killed results, and reported no survivors or infrastructure errors.
