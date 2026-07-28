@@ -12,6 +12,7 @@ import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Initiative;
+import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
@@ -289,7 +290,7 @@ public class World {
 
       @Override
       public boolean builds(BuildOffer offer) {
-        return offer.land().type() == land || strategy.builds(offer);
+        return offer.land().type() == land;
       }
     });
   }
@@ -369,7 +370,26 @@ public class World {
   public void sellLand(String sellerName, Street.Type land, String buyerName, Money price) {
     if (deeds == null)
       throw new AssertionError("No deeds exist yet, so no land can be sold.");
-    deeds.transfer(ownable(land), pawn(sellerName), pawn(buyerName), price);
+    LandSale sale = new LandSale(deeds, ruleSet, players(), this::strategyOf, new LandSale.Events() {
+      @Override
+      public void bought(Player buyer, Ownable land, Money price) {
+      }
+
+      @Override
+      public void wonAtAuction(Player winner, Ownable land, Money price) {
+      }
+
+      @Override
+      public void sold(Player seller, Ownable soldLand, Player buyer, Money soldPrice) {
+        journal = List.of(new Entry.LandSold(seller.id(), soldLand.type(), buyer.id(), soldPrice));
+      }
+
+      @Override
+      public void saleRefused(Player seller, Ownable soldLand, Player buyer, Money soldPrice) {
+        journal = List.of(new Entry.LandSaleRefused(seller.id(), soldLand.type(), buyer.id(), soldPrice));
+      }
+    });
+    sale.sell(pawn(sellerName), ownable(land), pawn(buyerName), price);
   }
 
   /**

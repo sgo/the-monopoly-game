@@ -87,6 +87,27 @@ class ReportTest {
     ))).isEqualTo("dog lifts the mortgage on Diestsestraat Leuven for $33 including $3 interest");
   }
 
+  @Test
+  void aReportTellsWhenLandIsSoldBetweenPlayers() {
+    assertThat(report(new Entry.LandSold(
+        Pawn.dog.id(), Street.Type.DiestsestraatLeuven, Pawn.high_hat.id(), new Money(90)
+    ))).isEqualTo("dog sells Diestsestraat Leuven to high hat for $90");
+  }
+
+  @Test
+  void aReportTellsWhenLandSaleIsRefusedBecauseTheColourGroupHasHousesBuilt() {
+    assertThat(report(new Entry.LandSaleRefused(
+        Pawn.dog.id(), Street.Type.DiestsestraatLeuven, Pawn.high_hat.id(), new Money(90)
+    ))).isEqualTo("dog is refused selling Diestsestraat Leuven to high hat for $90 because the colour group has houses built");
+  }
+
+  @Test
+  void aReportTellsWhenBuildingIsRefusedBecauseAStreetInTheColourGroupIsMortgaged() {
+    assertThat(report(new Entry.BuildingRefused(
+        Pawn.dog.id(), Street.Type.DiestsestraatLeuven, new Money(50)
+    ))).isEqualTo("dog is refused building a house on Diestsestraat Leuven for $50 because a street in the colour group is mortgaged");
+  }
+
   /** A space is spelled as the board spells it, in words rather than as one. */
   @Test
   void aReportSpellsASpaceOfOneWordAsTheOneWordItIs() {

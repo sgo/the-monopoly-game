@@ -63,6 +63,15 @@ public final class Report {
       case Entry.MortgageLifted it ->
           name(it.player()) + " lifts the mortgage on " + spaceName(it.land()) + " for $"
               + it.total().amount() + " including $" + it.interest().amount() + " interest";
+      case Entry.LandSold it ->
+          name(it.seller()) + " sells " + spaceName(it.land()) + " to " + name(it.buyer())
+              + " for $" + it.price().amount();
+      case Entry.LandSaleRefused it ->
+          name(it.seller()) + " is refused selling " + spaceName(it.land()) + " to " + name(it.buyer())
+              + " for $" + it.price().amount() + " because the colour group has houses built";
+      case Entry.BuildingRefused it ->
+          name(it.player()) + " is refused building a house on " + spaceName(it.land())
+              + " for $" + it.price().amount() + " because a street in the colour group is mortgaged";
     };
   }
 

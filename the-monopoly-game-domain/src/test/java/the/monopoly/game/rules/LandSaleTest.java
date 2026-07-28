@@ -6,6 +6,7 @@ import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.strategies.AgreeIfAffordable;
@@ -126,9 +127,42 @@ class LandSaleTest {
     assertThat(reported.events).isEmpty();
   }
 
+  @Test
+  void unimprovedLandCanBeSoldBetweenPlayersAtAnAgreedPrice() {
+    deeds.sell(land(LAND), dog, PRICE);
+    dog.account().deposit(PRICE);
+
+    sale().sell(dog, land(LAND), highHat, new Money(90));
+
+    assertThat(deeds.ownerOf(LAND)).contains(highHat.id());
+    assertThat(dog.account().balance()).isEqualTo(Balance.of(1590));
+    assertThat(highHat.account().balance()).isEqualTo(Balance.of(1410));
+    assertThat(reported.events).containsExactly("dog sold DiestsestraatLeuven to high hat for 90");
+  }
+
+  @Test
+  void aStreetInAColourGroupWithAnyHouseBuiltCannotBeSold() {
+    deeds.sell(land(Street.Type.RueGrandeDinant), dog, new Money(60));
+    dog.account().deposit(new Money(60));
+    deeds.sell(land(LAND), dog, PRICE);
+    dog.account().deposit(PRICE);
+    deeds.arrangeHouses((ColourStreet) ruleSet.create(Street.Type.RueGrandeDinant), 1);
+
+    sale().sell(dog, land(LAND), highHat, new Money(90));
+
+    assertThat(deeds.ownerOf(LAND)).contains(dog.id());
+    assertThat(dog.account().balance()).isEqualTo(Balance.of(1500));
+    assertThat(highHat.account().balance()).isEqualTo(Balance.of(1500));
+    assertThat(reported.events).containsExactly("dog refused DiestsestraatLeuven to high hat for 90");
+  }
+
   private void landOn(Player player, Street.Type space) {
-    new LandSale(deeds, List.of(dog, highHat), this::strategyOf, reported)
+    new LandSale(deeds, ruleSet, List.of(dog, highHat), this::strategyOf, reported)
         .resolve(player, ruleSet.create(space), new Roll(1, 1));
+  }
+
+  private LandSale sale() {
+    return new LandSale(deeds, ruleSet, List.of(dog, highHat), this::strategyOf, reported);
   }
 
   private void plays(Player player, Strategy strategy) {
@@ -174,6 +208,16 @@ class LandSaleTest {
     @Override
     public void wonAtAuction(Player winner, Ownable land, Money price) {
       events.add(winner.id().value() + " won " + land.type() + " at " + price.amount());
+    }
+
+    @Override
+    public void sold(Player seller, Ownable land, Player buyer, Money price) {
+      events.add(seller.id().value() + " sold " + land.type() + " to " + buyer.id().value() + " for " + price.amount());
+    }
+
+    @Override
+    public void saleRefused(Player seller, Ownable land, Player buyer, Money price) {
+      events.add(seller.id().value() + " refused " + land.type() + " to " + buyer.id().value() + " for " + price.amount());
     }
   }
 }

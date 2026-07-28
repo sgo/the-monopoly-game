@@ -441,6 +441,22 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> records(world, mortgageLifted(
                 arguments.text(1), arguments.text(2), arguments.number(3), arguments.number(4)))),
 
+        then("^the game journal records that pawn \"" + NAME + "\" sells \"" + NAME + "\" to pawn \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> records(world, landSold(
+                arguments.text(1), arguments.text(2), arguments.text(3), arguments.number(4)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" is refused selling \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \\$" + VALUE
+                + " because the colour group has houses built$",
+            (world, arguments) -> records(world, landSaleRefused(
+                arguments.text(1), arguments.text(2), arguments.text(3), arguments.number(4)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" is refused building a house on \"" + NAME
+                + "\" for \\$" + VALUE + " because a street in the colour group is mortgaged$",
+            (world, arguments) -> records(world, buildingRefused(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+
         then("^the game journal records that pawn \"" + NAME + "\" moves before it records that pawn \""
                 + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + " rent for \"" + NAME + "\"$",
             (world, arguments) -> recordsInOrder(world, moves(arguments.text(1)), rentPaid(
@@ -509,6 +525,22 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> says(world, mortgageLiftedLine(
                 arguments.text(1), arguments.text(2), arguments.number(3), arguments.number(4)))),
 
+        then("^the game report says that pawn \"" + NAME + "\" sells \"" + NAME + "\" to pawn \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> says(world, landSoldLine(
+                arguments.text(1), arguments.text(2), arguments.text(3), arguments.number(4)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" is refused selling \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \\$" + VALUE
+                + " because the colour group has houses built$",
+            (world, arguments) -> says(world, landSaleRefusedLine(
+                arguments.text(1), arguments.text(2), arguments.text(3), arguments.number(4)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" is refused building a house on \"" + NAME
+                + "\" for \\$" + VALUE + " because a street in the colour group is mortgaged$",
+            (world, arguments) -> says(world, buildingRefusedLine(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+
         step("^each face was rolled about " + VALUE + " times within a " + VALUE + "% margin$",
             (world, arguments) -> {
               int expected = arguments.number(1);
@@ -572,6 +604,20 @@ public final class MonopolyStepHandlers {
         idOf(pawnName), SpaceNames.of(spaceName), money(total), money(interest)));
   }
 
+  private static Claim landSold(String seller, String spaceName, String buyer, int price) {
+    return Claim.of(new Entry.LandSold(
+        idOf(seller), SpaceNames.of(spaceName), idOf(buyer), money(price)));
+  }
+
+  private static Claim landSaleRefused(String seller, String spaceName, String buyer, int price) {
+    return Claim.of(new Entry.LandSaleRefused(
+        idOf(seller), SpaceNames.of(spaceName), idOf(buyer), money(price)));
+  }
+
+  private static Claim buildingRefused(String pawnName, String spaceName, int price) {
+    return Claim.of(new Entry.BuildingRefused(idOf(pawnName), SpaceNames.of(spaceName), money(price)));
+  }
+
   /** A pawn moving anywhere, for a step that says when it moved rather than where to. */
   private static Claim moves(String pawnName) {
     return new Claim(
@@ -613,6 +659,20 @@ public final class MonopolyStepHandlers {
   private static String mortgageLiftedLine(String pawnName, String spaceName, int total, int interest) {
     return pawnName + " lifts the mortgage on " + spaceName + " for $" + total
         + " including $" + interest + " interest";
+  }
+
+  private static String landSoldLine(String seller, String spaceName, String buyer, int price) {
+    return seller + " sells " + spaceName + " to " + buyer + " for $" + price;
+  }
+
+  private static String landSaleRefusedLine(String seller, String spaceName, String buyer, int price) {
+    return seller + " is refused selling " + spaceName + " to " + buyer
+        + " for $" + price + " because the colour group has houses built";
+  }
+
+  private static String buildingRefusedLine(String pawnName, String spaceName, int price) {
+    return pawnName + " is refused building a house on " + spaceName
+        + " for $" + price + " because a street in the colour group is mortgaged";
   }
 
   private static Player.ID idOf(String pawnName) {
