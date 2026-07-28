@@ -6397,3 +6397,64 @@ Final verification:
 - Soft Gherkin mutation killed all 11 selected mutations: two journal, one
   report, four station-rent, and four utility-rent mutations. There were no
   survivors or infrastructure errors.
+
+## 2026-07-28T12:48:33Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/00_20260728T123859Z_000030_from_architect_to_refactorer.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: phase6-station-utility-rent
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect d44bfac2eb
+```
+
+Action taken: merged `d44bfac2eb` into `swarmforge-refactorer`. The merge
+conflicted only in `logbook.md`, resolved the same way as the prior five:
+ordering both sides' entries chronologically. Header counts confirm nothing
+lost: 181 (common ancestor) + 2 (mine, new) + 6 (architect's, new) = 189,
+matching the merged file.
+
+This is the same encapsulation-defect pattern as the `Bank.Simple` fix two
+tasks ago, this time in `Landings`: the legacy two-argument `resolve` and its
+null-roll delegation are gone, and the interface's single abstract method is
+now the roll-aware one, so a utility landing can no longer reach a null roll
+through a valid-looking call. `Rent` narrows to the sealed `Ownable` boundary
+with an exhaustive switch over colour streets, stations, and utilities, and
+`RentClaim`/`Events.paid` carry `Ownable` rather than the wider `Street`.
+`RentTest` now has direct unit coverage for station and utility rent, closing
+the coverage gap noted in the last handoff, and the property generators share
+one `Finances`/`Ownership` construction instead of three separate nested
+`flatMap` chains — the DRY reduction I judged not worth chasing on my own
+pass, done anyway once it was this cheap.
+
+Re-ran the refactorer's own gates against the merged state: CRAP is clean
+across every changed file (`rentFor` full coverage at 4.0, `owned` now 100%
+covered where it was 0% before); DRY is down to 16, matching the architect's
+own figure; mutation scan on every changed file (`Rent` 5, `Landings` 1,
+`LandSale` 5, `Turn` 10, `Strategy` 4, `Game` 6, `RentTest` 4,
+`RentPropertyTest` 18) stays well under the 100-site split threshold. Unit,
+property, and normal acceptance verification all pass. Nothing left to do on
+this state.
+
+## 2026-07-28T12:48:33Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase6-station-utility-rent
+commit: 744312eef7
+```
+
+Summary: merged the `Landings` roll-awareness fix and `Ownable` boundary
+narrowing; refactorer's own CRAP, DRY, and mutation-scan gates are unchanged
+or improved and pass on the merged tree; unit, property, and acceptance
+verification all pass.
