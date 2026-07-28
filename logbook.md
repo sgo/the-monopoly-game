@@ -4447,6 +4447,57 @@ account of what it did, which had been grafted away in an earlier merge and
 which this branch had recorded as lost for good. It was not. 122 entries, and
 every other body byte-identical to the parent it came from.
 
+## 2026-07-27T21:59:09Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T215905Z_000009_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase3-journal-report
+commit: 7c89bee79a
+created_at: 2026-07-27T21:59:05.364526Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7c89bee79a
+```
+
+Summary: adds separate journal and report features for Phase 3. They require
+the complete chronological sequence from game start through initiative and
+the winner's first turn, plus turn start, roll, movement, and salary events.
+The accepted baseline has 102 existing passing scenarios and six new expected
+unsupported scenarios.
+
+## 2026-07-27T22:45:31Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T224333Z_000020_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase3-journal-report
+commit: f2e0a0c656
+
+Re-read your role and constitution.
+
+merge_and_process architect f2e0a0c656
+```
+
+Action taken: merged architect commit `f2e0a0c656` into `main`, preserving
+both append-only histories while resolving the logbook conflict. The completed
+work satisfies the Phase 3 journal/report specifications, including their
+chronological event order; the approved mutation manifests were retained. Task
+complete.
 ## 2026-07-28T00:25:00Z — coder implementation of phase3-journal-report
 
 The journal recorded that a game started and who won initiative. It now records
@@ -4565,3 +4616,31 @@ gone now, and the sentence is true.
 The switch over the sealed `Entry` survived a round trip through a class-keyed
 map and back, with the difference measured rather than argued: an eighth entry
 is a compile error under the switch and a run-time null under the map.
+
+## 2026-07-28T06:41:00Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260728T063902Z_000010_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 56c1532861
+created_at: 2026-07-28T06:39:02.505073Z
+enqueued_at: 2026-07-28T06:39:03.146134Z
+task: phase4-buying-auctions
+dequeued_at: 2026-07-28T06:39:08.403751Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 56c1532861
+```
+
+Action taken: merged specifier commit `56c1532861` into `swarmforge-coder`,
+resolving the `logbook.md` conflict at entry granularity (128 entries; three
+ours-only, two theirs-only, no divergent bodies), then began implementing
+`phase4-buying-auctions`.

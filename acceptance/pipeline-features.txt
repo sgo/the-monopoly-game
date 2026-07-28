@@ -24,6 +24,8 @@ en/rules/official.feature
 en/rules/movement.feature
 en/rules/initiative.feature
 en/rules/turn-loop.feature
+en/rules/buying-land.feature
+en/rules/auctions.feature
 en/rules/journal.feature
 en/rules/report.feature
 

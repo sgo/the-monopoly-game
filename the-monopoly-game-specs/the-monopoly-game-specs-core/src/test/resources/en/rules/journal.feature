@@ -57,3 +57,27 @@ Feature: game journal
     Examples:
       | dog_start_position | dog_die_1 | dog_die_2 | expected_dog_start_position | dog_final_position | expected_dog_final_position | dog_salary | expected_dog_salary |
       | 37                 | 1         | 2         | 37                          | 0                  | 0                           | 200        | 200                 |
+
+  # journal-4
+  Scenario Outline: the journal records an unowned-land purchase after the landing movement
+    And pawn "dog" follows the "Agree if affordable" strategy
+    When pawn "dog" lands on "<property>"
+    Then the game journal records that pawn "dog" buys "<property>" for $<purchase_price>
+    And the game journal records that pawn "dog" moves before it records that pawn "dog" buys "<property>" for $<expected_purchase_price>
+
+    Examples:
+      | property            | purchase_price | expected_purchase_price |
+      | Diestsestraat Leuven | 60             | 60                      |
+
+  # journal-5
+  Scenario Outline: the journal records the winner and price of an auction after the landing movement
+    And pawn "dog" declines the offer for "Diestsestraat Leuven"
+    And pawn "dog" will bid $<dog_bid> for "Diestsestraat Leuven" at auction
+    And pawn "high hat" will bid $<high_hat_bid> for "Diestsestraat Leuven" at auction
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then the game journal records that pawn "<auction_winner>" wins the auction for "Diestsestraat Leuven" at $<auction_price>
+    And the game journal records that pawn "dog" moves before it records that pawn "<auction_winner>" wins the auction for "Diestsestraat Leuven" at $<expected_auction_price>
+
+    Examples:
+      | dog_bid | high_hat_bid | auction_winner | auction_price | expected_auction_price |
+      | 90      | 120          | high hat       | 120           | 120                    |
