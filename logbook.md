@@ -5192,3 +5192,30 @@ merge_and_process architect ae49f8835d
 Action taken: merged architect commit `ae49f8835d` into `main`, preserving the
 Phase 4 purchase, auction, journal, and report implementation and its review.
 The completion reports 118 acceptance scenarios passing.
+
+## 2026-07-28T09:38:43Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T093843Z_000011_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase5-street-rent
+commit: e3a7d1c711
+created_at: 2026-07-28T09:38:43.751883Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e3a7d1c711
+```
+
+Summary: specified Phase 5 street rent — base rent on unimproved,
+non-monopoly streets, monopoly double rent while unimproved, and a
+strategy-delegated claim/waiver decision — in a new `rent.feature`, with
+matching journal/report scenarios. Mortgage-suppressed rent and
+insufficient-funds handling are explicitly out of scope pending Phases 8
+and 14.
