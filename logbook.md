@@ -5810,3 +5810,44 @@ Final verification:
 - Soft Gherkin mutation killed all 13 selected mutations: two journal, one
   report, and ten rent mutations. There were no survivors or infrastructure
   errors.
+
+## 2026-07-28T11:35:25Z — architect sent phase 5 review handoffs
+
+Handoff message sent to coder and refactorer:
+
+```
+id: 20260728T113503Z_000026_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase5-street-rent
+commit: 4c3fc826fc
+created_at: 2026-07-28T11:35:03.078697Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 4c3fc826fc
+```
+
+Handoff message sent to specifier:
+
+```
+id: 20260728T113507Z_000027_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase5-street-rent
+commit: 4c3fc826fc
+created_at: 2026-07-28T11:35:07.032885Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 4c3fc826fc
+```
+
+Summary: the functional rent-order correction and decision-boundary cleanup
+were sent for role-appropriate review.
