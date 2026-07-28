@@ -10,6 +10,7 @@ SPECS="$ROOT/the-monopoly-game-specs/the-monopoly-game-specs-core"
 FEATURES="$SPECS/src/test/resources"
 WORK="$ROOT/build/acceptance-mutation"
 APS="${APS_HOME:-$ROOT/tmp/aps}"
+MAVEN_REPO_LOCAL="${MAVEN_REPO_LOCAL:-$ROOT/tmp/m2}"
 
 LEVEL="soft"
 if [[ "${1:-}" == "--level" ]]; then
@@ -41,8 +42,10 @@ mkdir -p "$WORK"
 # The runner adapter hosts JUnit itself, so it needs the module's test
 # classpath and its compiled classes. Build both once, not once per mutation.
 echo "preparing test classpath"
-(cd "$ROOT" && mvn -B -q -pl the-monopoly-game-specs/the-monopoly-game-specs-core -am -DskipTests test-compile)
-(cd "$ROOT" && mvn -B -q -pl the-monopoly-game-specs/the-monopoly-game-specs-core \
+(cd "$ROOT" && mvn -B -q -Dmaven.repo.local="$MAVEN_REPO_LOCAL" \
+  -pl the-monopoly-game-specs/the-monopoly-game-specs-core -am -DskipTests install)
+(cd "$ROOT" && mvn -B -q -Dmaven.repo.local="$MAVEN_REPO_LOCAL" \
+  -pl the-monopoly-game-specs/the-monopoly-game-specs-core \
   dependency:build-classpath -Dmdep.outputFile="$WORK/classpath.txt")
 
 CP="$SPECS/target/test-classes:$SPECS/target/classes:$(cat "$WORK/classpath.txt")"

@@ -5771,3 +5771,42 @@ merge_and_process refactorer a35ef2d417
 ```
 
 Action taken: began architectural review of the named commit.
+
+## 2026-07-28T11:34:09Z — architect review of phase 5 street rent
+
+The rent rule stays in the testable domain module and communicates outward only
+through its event interface and journal data. No UI, filesystem, framework, or
+acceptance-runtime concern entered the core.
+
+Two structural corrections were required:
+
+- `Strategy` imported `Rent` for the owner's claim decision while `Rent`
+  imported `Strategy`. The decision value is now `Strategy.RentClaim`, removing
+  that package dependency cycle and leaving rent dependent on the stable player
+  decision boundary.
+- `Game` resolved a sale before rent. An auction could therefore create an
+  owner during a landing and immediately charge the landing player rent on land
+  that was unowned when they arrived. Rent now observes the title first and a
+  game-level regression test fixes that boundary in place.
+
+The acceptance mutation adapter also had two environmental leaks. Its separate
+classpath-resolution invocation could not see a merely compiled reactor
+dependency in a fresh project-local Maven repository, and game logging wrote to
+the worker's protocol stdout. The scripts now own `tmp/m2`, install the prepared
+reactor artifacts before resolving the classpath, and capture test stdout inside
+the JSON response while leaving protocol stdout clean.
+
+Final verification:
+
+- 169 normal unit tests pass.
+- 11 separately tagged property tests pass.
+- 124 generated acceptance scenarios pass.
+- Differential Java mutation killed all 16 selected mutations across `Game`,
+  `Rent`, `Strategy`, `AgreeIfAffordable`, and `Report`; no site was uncovered
+  and no mutant survived.
+- DRY analysis reported 15 small candidates. The production candidates are
+  explicit event handlers or constructor shapes, and the rest are independent
+  test arrangements and assertions; none is a useful shared abstraction.
+- Soft Gherkin mutation killed all 13 selected mutations: two journal, one
+  report, and ten rent mutations. There were no survivors or infrastructure
+  errors.

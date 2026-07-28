@@ -11,7 +11,6 @@ import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Initiative;
-import the.monopoly.game.rules.Rent;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
@@ -235,7 +234,7 @@ public class World {
   public void pawnDeclinesRent(String pawnName, Street.Type land) {
     pawnStrategies.put(pawnName, new Strategy() {
       @Override
-      public boolean claims(Rent.Claim claim) {
+      public boolean claims(RentClaim claim) {
         return false;
       }
     });

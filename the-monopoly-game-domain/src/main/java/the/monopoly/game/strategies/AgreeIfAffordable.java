@@ -1,7 +1,6 @@
 package the.monopoly.game.strategies;
 
 import the.monopoly.game.components.finance.Money;
-import the.monopoly.game.rules.Rent;
 
 /**
  * Agrees to whatever it has the means to pay for: it buys land it can afford,
@@ -19,19 +18,19 @@ public final class AgreeIfAffordable implements Strategy {
   }
 
   @Override
-  public boolean claims(Rent.Claim claim) {
+  public boolean claims(RentClaim claim) {
     return true;
   }
 }
 
 /* mutate4java-manifest
 version=1
-moduleHash=aea5f218c4cf8b38fa2ba0936f5270cdc51d7fbe3b5534ea9532dc5451660a41
+moduleHash=5c1eacccdb408671da781f3880a84718e32005dce94915985916f9d61db65713
 scope.0.id=Y2xhc3M6QWdyZWVJZkFmZm9yZGFibGUjQWdyZWVJZkFmZm9yZGFibGU6OQ
 scope.0.kind=class
 scope.0.startLine=9
-scope.0.endLine=19
-scope.0.semanticHash=59f1a533c271f9e800d500c8632fc3fea59f7446e74d2a2318bcd8b16b1b4810
+scope.0.endLine=24
+scope.0.semanticHash=f1ec0bbea62b0fffe9be346dca1fd519f78ffe43a9f3f850516357e57c016c15
 scope.1.id=bWV0aG9kOkFncmVlSWZBZmZvcmRhYmxlI2FjY2VwdHMoMSk6MTA
 scope.1.kind=method
 scope.1.startLine=10
@@ -42,9 +41,14 @@ scope.2.kind=method
 scope.2.startLine=15
 scope.2.endLine=18
 scope.2.semanticHash=05cf56723033ae6cd91dfe0c0ea7f4a4fc24266e132d960f7c7f715e3ed573d7
-scope.3.id=bWV0aG9kOkFncmVlSWZBZmZvcmRhYmxlI2N0b3IoMCk6OQ
+scope.3.id=bWV0aG9kOkFncmVlSWZBZmZvcmRhYmxlI2NsYWltcygxKToyMA
 scope.3.kind=method
-scope.3.startLine=1
-scope.3.endLine=19
-scope.3.semanticHash=45d3cdaa87d8ff4ac5bc65b90aac8eede3943be713fd1be9cdf58264fce0cc17
+scope.3.startLine=20
+scope.3.endLine=23
+scope.3.semanticHash=507d9cac6317e7a85e3b057aed54560aaf53551ff97de821929348d3149eed56
+scope.4.id=bWV0aG9kOkFncmVlSWZBZmZvcmRhYmxlI2N0b3IoMCk6OQ
+scope.4.kind=method
+scope.4.startLine=1
+scope.4.endLine=24
+scope.4.semanticHash=d0ee43df319d9b6fd4902f4906ee594862424bb58d31baacce2f469b9fef0f33
 */

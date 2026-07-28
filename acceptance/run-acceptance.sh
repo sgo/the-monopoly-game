@@ -13,6 +13,7 @@ FEATURES="$SPECS/src/test/resources"
 IR_DIR="$ROOT/build/acceptance/ir"
 GENERATED="$SPECS/target/generated-test-sources/acceptance"
 APS="${APS_HOME:-$ROOT/tmp/aps}"
+MAVEN_REPO_LOCAL="${MAVEN_REPO_LOCAL:-$ROOT/tmp/m2}"
 
 # The pipeline features live in one file both scripts read; see
 # pipeline-features.txt.
@@ -51,7 +52,8 @@ compiled="$SPECS/target/test-classes/the/monopoly/game/specs/acceptance/generate
 trap 'rm -rf "$compiled"' EXIT
 
 status=0
-mvn -B -Pacceptance -pl the-monopoly-game-specs/the-monopoly-game-specs-core -am \
+mvn -B -Dmaven.repo.local="$MAVEN_REPO_LOCAL" \
+  -Pacceptance -pl the-monopoly-game-specs/the-monopoly-game-specs-core -am \
   -Dtest='*AcceptanceTest' -Dsurefire.failIfNoSpecifiedTests=false test || status=$?
 
 exit $status

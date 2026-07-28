@@ -103,7 +103,7 @@ class RentPropertyTest {
 
   private record FixedClaim(boolean claims) implements Strategy {
     @Override
-    public boolean claims(Rent.Claim claim) {
+    public boolean claims(RentClaim claim) {
       return claims;
     }
   }
