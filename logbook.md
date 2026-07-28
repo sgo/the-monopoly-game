@@ -6652,3 +6652,41 @@ Verification:
 This commit changes observable behavior for invalid improvement transitions,
 so under the exclusive routing rule it must be sent only to coder with
 priority 00. The coder owns forwarding verified functional work to refactorer.
+
+## 2026-07-28T14:15:22Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/inbox/in_process/00_20260728T141405Z_000031_from_architect_to_coder.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: phase7-houses-hotels
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect 94515961c6
+```
+
+Action taken: merged architect commit `94515961c6`, which hardens improvement
+invariants in `Deeds`, adds focused regression coverage, and leaves the phase 7
+slice green under coder-owned verification: `189` Maven tests and the full
+normal acceptance pipeline (`134` generated acceptance tests) pass.
+
+## 2026-07-28T14:15:22Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase7-houses-hotels
+commit: 94515961c6
+```
+
+Summary: forwarded the architect-reviewed phase 7 follow-up that hardens
+invalid improvement transitions and adds focused regression coverage; coder
+verification passes on the merged state with `189` Maven tests and the full
+normal acceptance pipeline (`134` generated acceptance tests).
