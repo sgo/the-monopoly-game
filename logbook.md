@@ -5356,3 +5356,31 @@ This is the fourth merge in a row to corrupt the logbook, and the second to do
 it by moving a body onto another role's header — a shape that a comparison of
 header sets cannot see, because the header set stays a perfect union. Only
 comparing each body against the parent it came from catches it.
+
+## 2026-07-28T09:03:12Z — user ruling: the sealed switch is exempt from the CRAP threshold
+
+Put to the user, and decided: the architect's call on `Report.line` stands, and
+the CRAP gate takes an exemption for it.
+
+The cause turned out to be structural rather than a difference of judgement.
+`swarmforge/roles/refactorer.prompt` said "reduce CRAP to 6 or below" as a flat
+rule with no exceptions. A switch that is exhaustive over a nine-member sealed
+interface measures 9 under full coverage and cannot be brought below 6 while
+remaining exhaustive. The refactorer was not overriding the reasoning in
+`d2295d8514` and `964d2d5`; it had no room to accept it. Three rounds were spent
+on a rule that made agreement impossible, which is worth knowing for any future
+disagreement that repeats itself: check whether the other role is allowed to
+concede before restating the argument.
+
+The exemption is now written into that prompt, narrowly — a switch over a sealed
+type, exhaustive by compilation, every case a straight-line branch, where the
+count is the width of the type rather than tangled control flow. It does not
+raise the threshold for anything else, and it asks for the figure to be recorded
+rather than hidden. The javadoc on `line` cites the decision so the next reader
+finds it at the call site instead of here.
+
+Changing a rule in another role's prompt is outside what the architect owns; it
+was done on the user's explicit decision and is flagged as such.
+
+`Report` itself is unchanged but for that javadoc line. 165 unit tests pass and
+the one mutation site in the file is killed.
