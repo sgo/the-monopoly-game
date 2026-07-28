@@ -140,3 +140,40 @@ Feature: game report
     Examples:
       | total | interest |
       | 33    | 3        |
+
+  # report-12
+  Scenario Outline: the report narrates land sold between players
+    Given pawn "dog" owns "Diestsestraat Leuven"
+    When pawn "dog" sells "Diestsestraat Leuven" to pawn "high hat" for $<price>
+    Then the game report says that pawn "dog" sells "Diestsestraat Leuven" to pawn "high hat" for $<price>
+
+    Examples:
+      | price |
+      | 90    |
+
+  # report-13
+  Scenario Outline: the report narrates a sale refused because the colour group has houses built
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "Diestsestraat Leuven"
+    And the street "Rue Grande Dinant" has 1 house(s) built
+    When pawn "dog" sells "Diestsestraat Leuven" to pawn "high hat" for $<price>
+    Then the game report says that pawn "dog" is refused selling "Diestsestraat Leuven" to pawn "high hat" for $<expected_price> because the colour group has houses built
+
+    Examples:
+      | price | expected_price |
+      | 90    | 90              |
+
+  # report-14
+  Scenario Outline: the report narrates a build refused because a street in the colour group is mortgaged
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "Diestsestraat Leuven"
+    And the land "Rue Grande Dinant" is mortgaged
+    And pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" will build a house on "Diestsestraat Leuven"
+    And pawn "dog" has $100 to spend
+    When we play the game
+    Then the game report says that pawn "dog" is refused building a house on "Diestsestraat Leuven" for $<cost> because a street in the colour group is mortgaged
+
+    Examples:
+      | cost |
+      | 50   |
