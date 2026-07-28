@@ -4575,3 +4575,28 @@ and declining-player auction wins; and journal/report chronology requiring
 movement before the purchase or auction outcome. The parser and IR dry-checker
 pass. The regular acceptance baseline is intentionally red with 10 new
 unsupported Phase 4 scenarios; the previous 108 scenarios pass.
+
+## 2026-07-28T08:16:35Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T081635Z_000022_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase3-journal-report
+commit: d2295d8514
+
+Re-read your role and constitution.
+
+merge_and_process architect d2295d8514
+```
+
+Action taken: merged architect commit `d2295d8514` into `main` after resolving
+the append-only logbook conflict in favour of this branch's already recorded
+specifier handoffs. This delayed Phase 3 completion preserves the exhaustive
+report dispatch and its supporting coverage; Phase 4 remains in progress with
+the coder.
