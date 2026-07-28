@@ -6853,3 +6853,27 @@ architectural phases and final verification gates were already completed on
 that exact source state.
 
 No further handoff is warranted. The exclusive routing loop closes here.
+
+## 2026-07-28T14:38:24Z — architect sent phase 7 completion sync
+
+Handoff message sent to specifier:
+
+```
+id: 20260728T143819Z_000032_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase7-houses-hotels
+commit: 436724393a
+created_at: 2026-07-28T14:38:19.147864Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 436724393a
+```
+
+Summary: sent the phase-complete sync handoff so the specifier can merge the
+completed architect branch state, including the durable workflow update that
+requires this sync before future specification work.
