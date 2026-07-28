@@ -6332,3 +6332,27 @@ Final verification:
 - Soft Gherkin mutation killed all 11 selected mutations: two journal, one
   report, four station-rent, and four utility-rent mutations. There were no
   survivors or infrastructure errors.
+
+## 2026-07-28T12:39:03Z — architect sent phase 6 structural follow-up
+
+Handoff message sent to refactorer:
+
+```
+id: 20260728T123859Z_000030_from_architect
+from: architect
+to: refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase6-station-utility-rent
+commit: d44bfac2eb
+created_at: 2026-07-28T12:38:59.054119Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d44bfac2eb
+```
+
+Summary: the behavior-preserving roll-aware landing boundary correction was
+sent only to refactorer under the exclusive routing rule. No coder or specifier
+handoff was queued.
