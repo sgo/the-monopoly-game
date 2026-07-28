@@ -20,6 +20,7 @@ public class Deeds {
   private final Map<Street.Type, Player.ID> owners = new HashMap<>();
   private final Map<Street.Type, Improvement> improvements = new HashMap<>();
   private final Map<Street.Type, Mortgage> mortgages = new HashMap<>();
+  private final Map<RetainedCard, Player.ID> retainedCards = new HashMap<>();
 
   public boolean isUnowned(Street.Type land) {
     return !owners.containsKey(land);
@@ -45,6 +46,25 @@ public class Deeds {
     seller.account().deposit(price);
     buyer.account().withdraw(price);
     owners.put(land.type(), buyer.id());
+  }
+
+  public void hold(RetainedCard card, Player owner) {
+    retainedCards.put(card, owner.id());
+  }
+
+  public boolean holdsGetOutOfJailFreeCard(Player owner) {
+    return retainedCards.containsValue(owner.id());
+  }
+
+  public void sellGetOutOfJailFreeCard(Player seller, Player buyer, Money price) {
+    RetainedCard card = retainedCards.entrySet().stream()
+        .filter(it -> it.getValue().equals(seller.id()))
+        .map(Map.Entry::getKey)
+        .findFirst()
+        .orElseThrow(() -> new IllegalStateException(seller.id().value() + " holds no Get Out of Jail Free card."));
+    seller.account().deposit(price);
+    buyer.account().withdraw(price);
+    retainedCards.put(card, buyer.id());
   }
 
   public boolean isMortgaged(Ownable land) {
@@ -205,6 +225,11 @@ public class Deeds {
   }
 
   public record MortgageCost(Money total, Money interest) {
+  }
+
+  public enum RetainedCard {
+    CHANCE_GET_OUT_OF_JAIL_FREE,
+    COMMUNITY_CHEST_GET_OUT_OF_JAIL_FREE
   }
 }
 

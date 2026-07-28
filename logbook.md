@@ -7519,6 +7519,46 @@ merge_and_process architect a79e5f2931
 Summary: sent the phase-complete sync handoff so the specifier can merge the
 completed architect branch state before future specification work.
 
+## 2026-07-28T20:05:04Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T200504Z_000015_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase9-land-sale
+commit: 3a34a43b46
+created_at: 2026-07-28T20:05:04.183815Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3a34a43b46
+```
+
+Summary: specified Phase 9 selling land between players — unimproved
+land sold at any agreed price, and the group-lock rule (a full colour
+group with even one house built anywhere in it blocks selling any
+street from that group until the houses are sold back to the bank),
+new `land-sale.feature`. Modelled as a direct action per tasks.md's own
+scope note, since no strategy proposes trades yet; strategy-initiated
+trading stays future work per `SIMULATOR.md`. A user question during
+review distinguished "accepting a trade if affordable" (in scope) from
+"deciding on its own to trade to raise funds" (out of scope, same
+category as SIMULATOR.md's parked "selective buying, trading" future
+work) — resolved in favor of the documented scope.
+
+Also closes a player-communication gap the user caught in review: a
+refused sale left no journal/report trace beyond an unchanged balance,
+so a human player had no way to know why nothing happened. Added
+`journal-13`/`report-13` narrating a refused sale with its reason and
+attempted price, and retroactively `journal-14`/`report-14` for the
+same gap in Phase 8's already-merged mortgage build-block scenario,
+echoing the house's construction cost instead of a bare refusal.
+
 ## 2026-07-28T20:05:04Z — coder received handoff from specifier
 
 Handoff message received:
@@ -7567,6 +7607,98 @@ the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core
 -Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2
 test` and `acceptance/run-acceptance.sh` (using the same local Maven repo).
 
+## 2026-07-28T20:13:46Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/50_20260728T201346Z_000018_from_coder_to_refactorer.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase9-land-sale
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder 8f2984fdcc
+```
+
+Action taken: merged `8f2984fdcc` into `swarmforge-refactorer` as `b325ad1`.
+Only `logbook.md` conflicted, again on entry alignment rather than real
+content disagreement: the coder's branch carried 7 entries I didn't have yet
+(the architect's phase 7 completion sync, the specifier's phase 8 mortgaging
+spec, the architect's own accept-and-relay of my phase 8 handoff, the
+specifier's phase 8 merge into `main`, and the specifier→coder→me chain that
+opened phase 9), while my side held the two phase 8 entries I'd already
+logged. All 9 fell into one continuous chronological chain once ordered by
+timestamp — this was one handoff thread split across two branches rather
+than two independent threads. Header-count arithmetic: 217 (common ancestor)
++ 2 (mine, already known) + 7 (coder's, new) = 226, matching the merged file
+exactly, `uniq -d` clean.
+
+The land-sale slice: `LandSale` gained `sell(seller, land, buyer, price)`,
+which refuses the sale via a new `saleIsRefused` check — any street sharing
+the colour group with a house or hotel built blocks it — and otherwise calls
+the new `Deeds.transfer` from Phase 8. `Building.develop` now checks for a
+refused build first (a monopoly with a mortgaged street the player would
+otherwise want to build on) and reports `refusedBuilding` before returning,
+rather than silently skipping it; `monopoliesOwnedBy` dropped the mortgage
+filter it gained in Phase 8 in favour of two named accessors,
+`buildableMonopoliesOwnedBy` and `mortgagedMonopoliesOwnedBy`, so `develop`
+can tell the two cases apart. `Journal.Entry` and `Report.line` gained
+`LandSold`, `LandSaleRefused`, and `BuildingRefused` (still the one exempt
+sealed-switch dispatch — CRAP now 18,1, tracking the sealed type's width).
+Coverage is solid: new `LandSaleTest`, `GameTest`, and `ReportTest` cases
+cover a plain sale, a refused sale, and a refused build; `land-sale.feature`
+is already wired onto the acceptance pipeline.
+
+dry4java flagged the pair `Building.nextBuildFor`/`refusedBuildFor` at
+score 1.00 — identical shape, differing only in which of the two new
+monopoly accessors they queried. Extracted the shared
+`firstOfferedBuild(monopolies, player)` in `24997ec8ae`; DRY count 36 → 35.
+Left `buildableMonopoliesOwnedBy`/`mortgagedMonopoliesOwnedBy` alone despite
+also scoring 1.00 against each other — collapsing a `noneMatch`/`anyMatch`
+pair into a boolean-flag parameter would trade the name that says which
+fact each one asserts for a smaller duplicate count, the same call this
+project has made before (e.g. `DeedsTest`'s illegal-transition tests). The
+rest of the DRY report is the same accepted arrange-act-assert,
+constructor-shape, and one-line-delegate-event similarity as every prior
+round, now including `LandSaleTest`'s `Reported` event recorder picking up
+`sold`/`saleRefused` alongside `bought`/`wonAtAuction`.
+
+Full verification on the final state: 203 unit tests, 17 property tests, and
+acceptance (162, up from 154 — `land-sale.feature`) all pass. CRAP clean but
+for the exempt `Report.line`. Mutation scan on every changed file stays
+well under the 100-site threshold (`LandSale` is the largest of the changed
+files at 11). Nothing else left to do on this state.
+
+## 2026-07-28T20:20:44Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260728T202044Z_000031_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase9-land-sale
+commit: 24997ec8ae
+created_at: 2026-07-28T20:20:44.332661Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 24997ec8ae
+```
+
+Summary: merged the land-sale slice and extracted the one duplicate
+`nextBuildFor`/`refusedBuildFor` shape it introduced in `Building`; unit
+(203), property (17), and acceptance (162, up from 154) verification all
+pass. Left the `buildableMonopoliesOwnedBy`/`mortgagedMonopoliesOwnedBy`
+pair alone on purpose — a boolean-flag collapse would cost more clarity
+than the duplicate count is worth.
+
 ## 2026-07-28T20:21:08Z — architect received phase 9 refactorer handoff
 
 Handoff message received:
@@ -7584,3 +7716,94 @@ merge_and_process refactorer 24997ec8ae
 ```
 
 Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T20:39:50Z — specifier merged handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T203950Z_000035_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: workflow-architect-followup-return-routing
+commit: 2756b260d5
+
+Re-read your role and constitution.
+
+merge_and_process architect 2756b260d5
+```
+
+Action taken: merged architect commit `2756b260d5` into `main`. This
+handoff carried two things: the Phase 9 completion chain (implementation,
+refactor, and hardening for `phase9-land-sale`, already covered by this
+session's own spec work) and, as its own dedicated final commit, a
+constitution/prompt change — `workflow.prompt` and `coder.prompt` — adding
+explicit routing rules for an architect priority-`00` follow-up loop (it
+returns to the architect directly unless the coder/refactorer needs to
+make real changes, in which case it flows through them as normal before
+returning; the specifier phase-complete sync waits until the loop closes).
+
+This is the second undocumented prompt/constitution edit in this project's
+history — like `436724393a` before it, it carried no logbook entry of its
+own explaining why, breaking the established precedent that such changes
+are logged as done at the user's direction. Unlike last time, this was
+surfaced to the user *before* merging, since the entire handoff (not just
+its tail commit) was the prompt change itself. The user confirmed they
+authorized it, so it is merged as authoritative, and this entry serves as
+the audit trail that was otherwise missing. Only one conflict, in
+`logbook.md`, resolved at entry granularity as before: 222 base entries, 1
+new on this side (the phase9-land-sale handoff-sent entry), 8 new on the
+architect's side, no header collisions, nothing dropped from base on
+either side. `mvn -q -o test` passes on the merged state (exit 0).
+
+## 2026-07-28T21:30:56Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260728T213056Z_000016_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 62d8a8cf4e
+created_at: 2026-07-28T21:30:56.315339Z
+enqueued_at: 2026-07-28T21:30:56.993863Z
+task: phase10-chance-and-community-chest
+dequeued_at: 2026-07-28T21:31:02.224726Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 62d8a8cf4e
+```
+
+Action taken: merged specifier commit `62d8a8cf4e` into `swarmforge-coder`
+(fast-forward), implemented Phase 10 chance/community chest card handling,
+and verified the result with module tests plus the generated acceptance suite.
+
+## 2026-07-28T21:41:31Z — coder sent handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase10-chance-and-community-chest
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: implemented chance/community chest card resolution for movement,
+salary handling, flat bank payments and receipts, player-to-player card
+payments, nearest station and utility routing, property-repair charges,
+retained/sellable Get Out of Jail Free cards, and matching journal/report
+entries for card draws and bank payments. Verification passed with `mvn -B
+-pl the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core
+-Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2
+test` and `acceptance/run-acceptance.sh` (using the same local Maven repo).

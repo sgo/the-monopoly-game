@@ -72,6 +72,12 @@ public final class Report {
       case Entry.BuildingRefused it ->
           name(it.player()) + " is refused building a house on " + spaceName(it.land())
               + " for $" + it.price().amount() + " because a street in the colour group is mortgaged";
+      case Entry.ChanceCardDrawn it ->
+          name(it.player()) + " draws the chance card \"" + it.card() + "\"";
+      case Entry.CommunityChestCardDrawn it ->
+          name(it.player()) + " draws the community chest card \"" + it.card() + "\"";
+      case Entry.BankPaid it ->
+          name(it.player()) + " pays the bank $" + it.amount().amount();
     };
   }
 
