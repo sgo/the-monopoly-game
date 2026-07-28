@@ -5891,3 +5891,37 @@ strategy-delegated claim/waiver decision — in a new `rent.feature`, with
 matching journal/report scenarios. Mortgage-suppressed rent and
 insufficient-funds handling are explicitly out of scope pending Phases 8
 and 14.
+
+## 2026-07-28T11:35:25Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T113507Z_000027_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 4c3fc826fc
+created_at: 2026-07-28T11:35:07.032885Z
+enqueued_at: 2026-07-28T11:35:07.458353Z
+task: phase5-street-rent
+dequeued_at: 2026-07-28T11:35:25.643139Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 4c3fc826fc
+```
+
+Action taken: merged architect commit `4c3fc826fc` into `main`, completing
+Phase 5 street rent. The `logbook.md` conflict was resolved at entry
+granularity rather than by the raw line-based diff, which misaligned several
+near-identical headers: 143 entries in the merge base, 2 new here, 166 new on
+the architect's side, no header collisions between the two new sets, and one
+base entry (`08:16:35Z — specifier received handoff from architect`, commit
+`d2295d8514`) that the architect's lineage had dropped in an earlier merge and
+is restored here; a second base entry sharing that header was an empty stub
+with no body and was correctly left out. `mvn test` passes on the merged
+state.
