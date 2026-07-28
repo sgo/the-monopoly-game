@@ -69,16 +69,20 @@ public class Deeds {
 
   public Money sellHouse(ColourStreet land, Player owner) {
     verifyOwner(land, owner);
-    improvements.put(land.type(), improvementOn(land).withOneLessHouse());
-    Money price = half(land.houseConstructionCost());
-    owner.account().deposit(price);
-    return price;
+    return refund(land, owner, improvementOn(land).withOneLessHouse(), land.houseConstructionCost());
   }
 
   public Money exchangeHotelForHouses(ColourStreet land, Player owner) {
     verifyOwner(land, owner);
-    improvements.put(land.type(), Improvement.withHouses(land.hotelConstructionRequiresNumberOfHouses()));
-    Money price = half(hotelValueOf(land));
+    return refund(
+        land, owner,
+        Improvement.withHouses(land.hotelConstructionRequiresNumberOfHouses()), hotelValueOf(land)
+    );
+  }
+
+  private Money refund(ColourStreet land, Player owner, Improvement newImprovement, Money fullPrice) {
+    improvements.put(land.type(), newImprovement);
+    Money price = half(fullPrice);
     owner.account().deposit(price);
     return price;
   }

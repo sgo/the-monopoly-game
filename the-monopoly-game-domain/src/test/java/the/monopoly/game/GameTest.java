@@ -257,24 +257,19 @@ class GameTest {
   }
 
   private Game.Result playWith(Map<Player.ID, Strategy> strategies, Deeds deeds) {
-    Map<Player.ID, Cup> cups = Map.of(
-        Pawn.dog.id(), Cup.of(new Roll(5, 5), new Roll(1, 2)),
-        Pawn.high_hat.id(), Cup.of(new Roll(1, 1), new Roll(1, 2)),
-        Pawn.iron_box.id(), Cup.of(new Roll(1, 2), new Roll(1, 2))
-    );
-    return new Game(
-        ruleSet, players,
-        player -> cups.get(player.id()),
-        player -> strategies.getOrDefault(player.id(), Strategy.UNDECIDED),
-        deeds
-    ).play();
+    return play(strategies, deeds, new Roll(1, 2));
   }
 
+  /** Plays a game where every turn after the first ends without landing anywhere notable. */
   private Game.Result playWithQuietTurns(Map<Player.ID, Strategy> strategies, Deeds deeds) {
+    return play(strategies, deeds, new Roll(4, 6));
+  }
+
+  private Game.Result play(Map<Player.ID, Strategy> strategies, Deeds deeds, Roll secondRoll) {
     Map<Player.ID, Cup> cups = Map.of(
-        Pawn.dog.id(), Cup.of(new Roll(5, 5), new Roll(4, 6)),
-        Pawn.high_hat.id(), Cup.of(new Roll(1, 1), new Roll(4, 6)),
-        Pawn.iron_box.id(), Cup.of(new Roll(1, 2), new Roll(4, 6))
+        Pawn.dog.id(), Cup.of(new Roll(5, 5), secondRoll),
+        Pawn.high_hat.id(), Cup.of(new Roll(1, 1), secondRoll),
+        Pawn.iron_box.id(), Cup.of(new Roll(1, 2), secondRoll)
     );
     return new Game(
         ruleSet, players,
