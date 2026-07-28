@@ -1,6 +1,6 @@
-# mutation-stamp: sha256=a77ddee2347ebd38360286b0118bc80d98a48eaee1fa5d84e0844e2127129e64
+# mutation-stamp: sha256=92f1ff68635cbbee6c1525e1fcf24fec0ff466d84f5882c94e975730babfdd80
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-07-28T14:09:54.324075Z","feature_name":"game journal","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/journal.feature","background_hash":"f9cad8a167d25a58781606f42a70845a9afe8a18f1f63bed35985499ab19f099","implementation_hash":"unknown","scenarios":[{"index":7,"name":"the journal records a house built during a player's turn","scenario_hash":"ceb5d071e206bc72ef81059394eb2e8199d6f76679de5060b62d00ec16e68ad0","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-07-28T14:09:54.324075Z"},{"index":8,"name":"the journal records a house sold back to the bank","scenario_hash":"c08e1685f14b09566c50668ecd475023568227c04af9b0fcb54d4ab6a81935d9","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-07-28T14:09:54.324075Z"},{"index":6,"name":"the journal records rent paid for a utility as a multiple of the dice roll that landed there","scenario_hash":"ca1fd8201ea675765ee92abce5ef2bdd514a5257870faa7cb9968e2d37be4356","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-07-28T12:36:50.054698Z"},{"index":5,"name":"the journal records rent paid after the landing movement","scenario_hash":"c2cf4254e9e76077b2a4dff701220ac02aa2e19a7d0af4ef6ee58f0e8a0dcfe4","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-07-28T11:33:01.147036Z"},{"index":3,"name":"the journal records an unowned-land purchase after the landing movement","scenario_hash":"15d1f69e7a3dc9eb97006158d68f1c7f0f9f7d1eb8165d374b52f0fe8866d199","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-07-28T08:44:12.510519Z"},{"index":4,"name":"the journal records the winner and price of an auction after the landing movement","scenario_hash":"2270f449276e8c4a76dc3ee65d642dc84efc8720a2d57fa3db479f393387ebc5","mutation_count":5,"result":{"Total":5,"Killed":5,"Survived":0,"Errors":0},"tested_at":"2026-07-28T08:44:12.510519Z"},{"index":0,"name":"the journal records game start and initiative","scenario_hash":"2e7a8628431ead85b28e68eb7a6c1c79223c5d8a7b37315aa3a204b4d770f730","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-07-27T22:41:58.808126Z"},{"index":1,"name":"the journal records a pawn's turn, roll, and movement","scenario_hash":"ad3d80456f9a3b97c1c7360e238a458631268970ed3bea120c604ea02a9e7d4c","mutation_count":7,"result":{"Total":7,"Killed":7,"Survived":0,"Errors":0},"tested_at":"2026-07-27T22:41:58.808126Z"},{"index":2,"name":"the journal records a salary collected while passing start","scenario_hash":"bcbcd3a0276fd3869af9dd620b9b0338936d719291a5f3b44434ef49ab84986d","mutation_count":8,"result":{"Total":8,"Killed":8,"Survived":0,"Errors":0},"tested_at":"2026-07-27T22:41:58.808126Z"}]}
+# {"version":1,"tested_at":"2026-07-28T19:39:29.960820Z","feature_name":"game journal","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/journal.feature","background_hash":"f9cad8a167d25a58781606f42a70845a9afe8a18f1f63bed35985499ab19f099","implementation_hash":"unknown","scenarios":[{"index":9,"name":"the journal records land being mortgaged","scenario_hash":"6f9feeaf37794c9f44050361cebab29cd7e116c809f58e778839d8d8f53d17d9","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-07-28T19:39:29.960820Z"},{"index":10,"name":"the journal records a mortgage being lifted, including interest paid","scenario_hash":"37fddc6c1e943a6c64d33185599391f2203cfc9f0740ed851abb2acf77b82888","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-07-28T19:39:29.960820Z"},{"index":7,"name":"the journal records a house built during a player's turn","scenario_hash":"ceb5d071e206bc72ef81059394eb2e8199d6f76679de5060b62d00ec16e68ad0","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-07-28T14:09:54.324075Z"},{"index":8,"name":"the journal records a house sold back to the bank","scenario_hash":"c08e1685f14b09566c50668ecd475023568227c04af9b0fcb54d4ab6a81935d9","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-07-28T14:09:54.324075Z"},{"index":6,"name":"the journal records rent paid for a utility as a multiple of the dice roll that landed there","scenario_hash":"ca1fd8201ea675765ee92abce5ef2bdd514a5257870faa7cb9968e2d37be4356","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-07-28T12:36:50.054698Z"},{"index":5,"name":"the journal records rent paid after the landing movement","scenario_hash":"c2cf4254e9e76077b2a4dff701220ac02aa2e19a7d0af4ef6ee58f0e8a0dcfe4","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-07-28T11:33:01.147036Z"},{"index":3,"name":"the journal records an unowned-land purchase after the landing movement","scenario_hash":"15d1f69e7a3dc9eb97006158d68f1c7f0f9f7d1eb8165d374b52f0fe8866d199","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-07-28T08:44:12.510519Z"},{"index":4,"name":"the journal records the winner and price of an auction after the landing movement","scenario_hash":"2270f449276e8c4a76dc3ee65d642dc84efc8720a2d57fa3db479f393387ebc5","mutation_count":5,"result":{"Total":5,"Killed":5,"Survived":0,"Errors":0},"tested_at":"2026-07-28T08:44:12.510519Z"},{"index":0,"name":"the journal records game start and initiative","scenario_hash":"2e7a8628431ead85b28e68eb7a6c1c79223c5d8a7b37315aa3a204b4d770f730","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-07-27T22:41:58.808126Z"},{"index":1,"name":"the journal records a pawn's turn, roll, and movement","scenario_hash":"ad3d80456f9a3b97c1c7360e238a458631268970ed3bea120c604ea02a9e7d4c","mutation_count":7,"result":{"Total":7,"Killed":7,"Survived":0,"Errors":0},"tested_at":"2026-07-27T22:41:58.808126Z"},{"index":2,"name":"the journal records a salary collected while passing start","scenario_hash":"bcbcd3a0276fd3869af9dd620b9b0338936d719291a5f3b44434ef49ab84986d","mutation_count":8,"result":{"Total":8,"Killed":8,"Survived":0,"Errors":0},"tested_at":"2026-07-27T22:41:58.808126Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -153,3 +153,40 @@ Feature: game journal
     Examples:
       | total | interest |
       | 33    | 3        |
+
+  # journal-12
+  Scenario Outline: the journal records land sold between players
+    Given pawn "dog" owns "Diestsestraat Leuven"
+    When pawn "dog" sells "Diestsestraat Leuven" to pawn "high hat" for $<price>
+    Then the game journal records that pawn "dog" sells "Diestsestraat Leuven" to pawn "high hat" for $<price>
+
+    Examples:
+      | price |
+      | 90    |
+
+  # journal-13
+  Scenario Outline: the journal records a sale refused because the colour group has houses built
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "Diestsestraat Leuven"
+    And the street "Rue Grande Dinant" has 1 house(s) built
+    When pawn "dog" sells "Diestsestraat Leuven" to pawn "high hat" for $<price>
+    Then the game journal records that pawn "dog" is refused selling "Diestsestraat Leuven" to pawn "high hat" for $<expected_price> because the colour group has houses built
+
+    Examples:
+      | price | expected_price |
+      | 90    | 90              |
+
+  # journal-14
+  Scenario Outline: the journal records a build refused because a street in the colour group is mortgaged
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "Diestsestraat Leuven"
+    And the land "Rue Grande Dinant" is mortgaged
+    And pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" will build a house on "Diestsestraat Leuven"
+    And pawn "dog" has $100 to spend
+    When we play the game
+    Then the game journal records that pawn "dog" is refused building a house on "Diestsestraat Leuven" for $<cost> because a street in the colour group is mortgaged
+
+    Examples:
+      | cost |
+      | 50   |

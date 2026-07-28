@@ -7170,6 +7170,70 @@ the coder again without user approval, which this role already does — so it
 was merged, but the missing audit trail is a real deviation worth the user's
 attention before it's treated as authoritative.
 
+## 2026-07-28T14:38:24Z — architect sent phase 7 completion sync
+
+Handoff message sent to specifier:
+
+```
+id: 20260728T143819Z_000032_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase7-houses-hotels
+commit: 436724393a
+created_at: 2026-07-28T14:38:19.147864Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 436724393a
+```
+
+Summary: sent the phase-complete sync handoff so the specifier can merge the
+completed architect branch state, including the durable workflow update that
+requires this sync before future specification work.
+
+## 2026-07-28T19:10:25Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T191025Z_000014_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase8-mortgaging
+commit: 95affb5c6c
+created_at: 2026-07-28T19:10:25.226421Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 95affb5c6c
+```
+
+Summary: specified Phase 8 mortgaging — mortgage/lift-mortgage for a
+street, station, or utility at the official mortgage value plus 10%
+interest (new `mortgage.feature`), rent suppression on mortgaged land
+including the loss of a monopoly's double-rent bonus while any street
+in the group is mortgaged, and the building block while a mortgage is
+outstanding in the group; plus selling mortgaged land to another player
+under both buyer choices — pay off immediately, or keep it mortgaged
+and pay only the interest — in new `mortgage-transfer.feature`.
+Matching journal/report entries for mortgage and lift-mortgage events,
+including interest paid. Mortgaging is modelled as a direct player
+action rather than gated on a real insolvency/shortfall event, since no
+such mechanism exists before Phase 14 Bankruptcy; the mortgaged-transfer
+mechanic is scoped narrowly to mortgaged land only, ahead of Phase 9's
+general peer-to-peer trading. User review caught that the build-block
+scenario implied an attempted build only through the "Agree if
+affordable" strategy's known behavior; added an explicit
+`pawn "dog" will build a house on "..."` decision-override step (mirroring
+the existing `will bid`/`declines` overrides) so the scenario's intent
+holds regardless of which strategy is assigned.
+
 ## 2026-07-28T19:18:47Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -7274,3 +7338,121 @@ mortgaging is not yet wired into `Game`'s turn loop or `Strategy`, only
 exercised directly through `Deeds` and hand-built journal entries in the
 acceptance step handlers — consistent with how building was staged before
 it, so noted rather than treated as a defect.
+
+## 2026-07-28T19:34:26Z — architect received phase 8 refactorer handoff
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/architect/.swarmforge/handoffs/inbox/in_process/batch_20260728T193406Z_000001/50_20260728T193400Z_000030_from_refactorer_to_architect.handoff
+FROM: refactorer
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase8-mortgaging
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process refactorer dd8bab5911
+```
+
+Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T19:39:49Z — architect accepted phase 8 refactorer handoff
+
+The phase 8 mortgaging implementation keeps mortgage state inside `Deeds`,
+leaves rent/building rules dependent on the core rule model rather than on
+test or delivery code, and keeps the new acceptance support under the specs
+test tree. No structural source change was warranted; DRY candidates were
+existing constructor/test-helper shape or explicit scenario-step code where
+extraction would reduce clarity.
+
+Verification passed: normal Maven tests (`197`), property tests (`17`), normal
+generated acceptance (`154`), Java mutation on changed production files
+(`Rent` 7/7 killed, `Report` 1/1 killed, `Game`/`Building`/`Deeds` with no
+differential mutations pending), DRY review with no actionable duplication,
+and soft Gherkin mutation (`mortgage` 14/14, `mortgage-transfer` 8/8,
+`journal` 3/3, `report` 3/3; no survivors).
+
+Only tool-owned mutation and Gherkin manifest updates were produced by this
+architect pass. No coder or refactorer follow-up is warranted.
+
+## 2026-07-28T19:39:49Z — specifier merged handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T194148Z_000033_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: a79e5f2931
+task: phase8-mortgaging
+
+Re-read your role and constitution.
+
+merge_and_process architect a79e5f2931
+```
+
+Action taken: merged architect commit `a79e5f2931` into `main`. This closes
+out Phase 8 (mortgaging) — mortgage/lift-mortgage at value plus 10%
+interest, rent suppression (including the lost double-rent bonus on a
+mortgaged monopoly), the building block while a mortgage is outstanding,
+and the mortgaged-transfer buyer choices. Soft Gherkin mutation on the
+new/changed files: `mortgage` 14/14, `mortgage-transfer` 8/8, `journal`
+3/3, `report` 3/3, no survivors, per the architect's own report. Only one
+conflict, in `logbook.md`, resolved at entry granularity as before: 213
+base entries, 1 new on this side (the phase8-mortgaging handoff-sent
+entry), 7 new on the architect's side, no header collisions, nothing
+dropped from base on either side this time. `mvn -q -o test` passes on
+the merged state (exit 0). No unexplained prompt-file edits this round.
+
+## 2026-07-28T20:05:04Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260728T200504Z_000015_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 3a34a43b46
+created_at: 2026-07-28T20:05:04.183815Z
+enqueued_at: 2026-07-28T20:05:04.652035Z
+task: phase9-land-sale
+dequeued_at: 2026-07-28T20:05:10.090198Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3a34a43b46
+```
+
+Action taken: merged specifier commit `3a34a43b46` into `swarmforge-coder`
+(fast-forward), implemented Phase 9 land sale, and verified the result with
+module tests plus the generated acceptance suite.
+
+## 2026-07-28T20:12:54Z — coder sent handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase9-land-sale
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: implemented peer-to-peer land sale with ownership transfer and
+balance updates for agreed price, refusal when any street in the colour
+group has houses or a hotel, matching journal/report entries for sale and
+sale refusal, and the targeted building-refusal reporting needed by the new
+Phase 9 scenarios. Verification passed with `mvn -B -pl
+the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core
+-Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2
+test` and `acceptance/run-acceptance.sh` (using the same local Maven repo).

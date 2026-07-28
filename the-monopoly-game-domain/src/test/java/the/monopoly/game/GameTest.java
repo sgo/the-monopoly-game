@@ -237,6 +237,19 @@ class GameTest {
     assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(100));
   }
 
+  @Test
+  void aGameRecordsWhenBuildingIsRefusedBecauseAStreetInTheColourGroupIsMortgaged() {
+    Deeds deeds = monopolyFor(Pawn.dog.id());
+    deeds.arrangeMortgaged((ColourStreet) ruleSet.create(Street.Type.RueGrandeDinant));
+    players.getFirst().account().withdraw(new Money(1400));
+
+    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new AgreeIfAffordable()), deeds);
+
+    assertThat(result.journal()).contains(new Entry.BuildingRefused(
+        Pawn.dog.id(), Street.Type.RueGrandeDinant, new Money(50)
+    ));
+  }
+
   /** A player who wants the land at auction but never at the asking price. */
   private static Strategy bidding(int amount) {
     return new Strategy() {
