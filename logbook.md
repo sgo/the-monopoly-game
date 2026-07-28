@@ -7760,3 +7760,134 @@ entries for card draws and bank payments. Verification passed with `mvn -B
 -pl the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core
 -Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2
 test` and `acceptance/run-acceptance.sh` (using the same local Maven repo).
+
+## 2026-07-28T21:42:19Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/50_20260728T214219Z_000019_from_coder_to_refactorer.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase10-chance-and-community-chest
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder f79d6ebfdc
+```
+
+Action taken: merged `f79d6ebfdc` into `swarmforge-refactorer` as `d82297a`.
+Only `logbook.md` conflicted, on the now-familiar entry-alignment pattern:
+the coder's branch carried 4 new entries I didn't have (the architect's
+receipt of my phase 9 handoff, the specifier's merge that closed phase 9 and
+carried a second undocumented-but-user-confirmed prompt edit — this one
+adding explicit return routing for the architect's priority-`00` follow-up
+loop — and the specifier→coder chain opening phase 10), against my own two
+already-logged phase 9 entries. All 6 fell into one chronological chain.
+Header-count arithmetic: 226 (common ancestor) + 2 (mine, already known) + 8
+(coder's, new — 4 in the conflict region, 4 auto-merged elsewhere in the
+file without conflict) = 236, matching the merged file exactly, `uniq -d`
+clean.
+
+The card slice: new `Cards` class implements `Landings` for Chance and
+Community Chest, dispatching on the literal Dutch card text via two switch
+statements (15 chance cases, 16 community chest cases) covering movement
+(with/without passing-Start salary), flat bank payments and receipts,
+player-to-player collections, nearest-station and nearest-utility routing
+(buy-if-unowned or pay-double/roll-and-pay-tenfold if owned), a
+per-house/per-hotel repair charge, and retained Get Out of Jail Free cards
+(`Deeds` gained `hold`/`holdsGetOutOfJailFreeCard`/`sellGetOutOfJailFreeCard`
+backed by a new `RetainedCard` enum). `Journal`/`Report` gained
+`ChanceCardDrawn`, `CommunityChestCardDrawn`, and `BankPaid`. Production
+`Game` still defaults to `Cards.Decks.EMPTY` (always draws nothing) — the
+same staging pattern as mortgaging in Phase 8 and land sale in Phase 9,
+where a mechanic's domain plumbing lands before it's wired into the turn
+loop's live deck source. Not treated as a defect. Also noticed in passing:
+the architect's own review of the Phase 9 handoff replaced my
+`buildableMonopoliesOwnedBy`/`mortgagedMonopoliesOwnedBy` bodies with a
+shared `monopoliesOwnedBy(player, Predicate)` helper — the two named
+accessors I'd deliberately kept separate are still there and still what
+callers see; only the body duplication I'd left alone is gone. Better
+outcome than my own choice, not a conflict with it.
+
+CRAP was not clean this time, and not eligible for the sealed-switch
+exemption: `resolveChance` measured CRAP 100,4 (CC 17, 33,9% covered) and
+`resolveCommunityChest` measured 247,4 (CC 18, 10,9% covered) — both far
+past the tool's own 8.0 gate and this role's 6.0 target. The exemption in
+`refactorer.prompt` is narrowly for "a switch over a sealed type that is
+exhaustive by compilation"; a `String` switch carries no compiler-checked
+exhaustiveness, so unlike `Report.line` this could not simply be recorded
+and left alone — it needed an actual fix. Replaced both switches with a
+`Map<String, Consumer<Player>>` built once per `Cards` instance (one per
+deck), collapsing `resolveChance`/`resolveCommunityChest` to a single map
+lookup each. Every card string was extracted from the original switch by a
+small script reading the source directly, rather than retyped by hand — a
+single mistyped character in a 31-entry table of Dutch sentences would
+silently turn a card into a no-op with no compiler or test signal, which is
+exactly the failure mode this dispatch shape already has once live (an
+unmatched string falls through to a no-op default). Full unit, property,
+and acceptance verification confirmed identical behavior before and after
+the swap — same 219 assertions' worth of cards exercised, same journal
+entries, same balances.
+
+That swap didn't fully close CRAP: `repair` (CC 6, 0% covered → CRAP 42,0),
+`collectFromEveryOtherPlayer` (CC 3, 0% → CRAP 12,0), and
+`nearestStationFrom` (CC 4, 29,4% → CRAP 9,6) were flagged for the same
+reason `Deeds` and `Rent` were in earlier phases: real logic the acceptance
+suite exercises but that `crap4java` can't see, since it only reads the
+unit-test JaCoCo run. Added five `GameTest` cases: a repair charge across a
+houses-owned and a hotel-owned street, a repair no-op when nothing is
+improved, a community-chest collection from every other player, and two
+more `nearestStationFrom` branches (Buurtspoorwegen and NoordStation,
+reached by landing exactly on the Chance space at board positions 22 and 36
+respectively — the fourth branch, ZuidStation, has no Chance space in its
+range on the official board and isn't reachable through `Cards`' only entry
+point). `repair` now measures 100% covered at CRAP 6,0 (satisfies "6 or
+below"); the other two dropped well clear of the threshold too.
+
+dry4java then caught a duplicate I introduced myself:
+`resolveChance`/`resolveCommunityChest` were now identical two-line bodies
+differing only in which map they read. Extracted `applyEffect(effects, card,
+player)`, the same shape as `firstOfferedBuild` in Phase 9 — DRY count 35.
+Left `payEveryOtherPlayer`/`collectFromEveryOtherPlayer` alone despite also
+being near-identical (opposite withdraw/deposit direction): collapsing them
+to a boolean-flag parameter would cost the same clarity the project has
+declined to trade away before.
+
+Full verification on the final state: 219 unit tests, 17 property tests,
+and 207 acceptance tests (up from 162 — `cards.feature`) all pass. CRAP
+clean but for the exempt `Report.line` (now 21,1, three more `Journal.Entry`
+variants). Mutation scan on every changed file stays well under the
+100-site threshold (`Cards` is the largest of the changed files at 34).
+Nothing else left to do on this state.
+
+## 2026-07-28T22:14:40Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260728T221440Z_000032_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase10-chance-and-community-chest
+commit: d990a64b1d
+created_at: 2026-07-28T22:14:40.127984Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d990a64b1d
+```
+
+Summary: merged the card-handling slice and replaced its two String-switch
+dispatches (CRAP 100,4 and 247,4 — the sealed-switch exemption does not
+cover a non-exhaustive String switch) with a table-driven
+`Map<String, Consumer<Player>>` lookup, verified string-for-string against
+the original switch by script rather than retyped by hand. Added targeted
+`GameTest` coverage for three more CRAP-flagged methods the acceptance
+suite already exercised but unit coverage didn't. Extracted one duplicate
+my own fix introduced. Unit (219), property (17), and acceptance (207, up
+from 162) verification all pass.
