@@ -7073,3 +7073,43 @@ once per completed task instead of once per commit, and says not to notify
 the coder again without user approval, which this role already does — so it
 was merged, but the missing audit trail is a real deviation worth the user's
 attention before it's treated as authoritative.
+
+## 2026-07-28T19:10:25Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T191025Z_000014_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase8-mortgaging
+commit: 95affb5c6c
+created_at: 2026-07-28T19:10:25.226421Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 95affb5c6c
+```
+
+Summary: specified Phase 8 mortgaging — mortgage/lift-mortgage for a
+street, station, or utility at the official mortgage value plus 10%
+interest (new `mortgage.feature`), rent suppression on mortgaged land
+including the loss of a monopoly's double-rent bonus while any street
+in the group is mortgaged, and the building block while a mortgage is
+outstanding in the group; plus selling mortgaged land to another player
+under both buyer choices — pay off immediately, or keep it mortgaged
+and pay only the interest — in new `mortgage-transfer.feature`.
+Matching journal/report entries for mortgage and lift-mortgage events,
+including interest paid. Mortgaging is modelled as a direct player
+action rather than gated on a real insolvency/shortfall event, since no
+such mechanism exists before Phase 14 Bankruptcy; the mortgaged-transfer
+mechanic is scoped narrowly to mortgaged land only, ahead of Phase 9's
+general peer-to-peer trading. User review caught that the build-block
+scenario implied an attempted build only through the "Agree if
+affordable" strategy's known behavior; added an explicit
+`pawn "dog" will build a house on "..."` decision-override step (mirroring
+the existing `will bid`/`declines` overrides) so the scenario's intent
+holds regardless of which strategy is assigned.
