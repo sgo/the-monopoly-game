@@ -4821,3 +4821,26 @@ commit: (commit recorded by the handoff draft)
 
 Summary: Phase 4 is structurally reviewed; report rendering remains low
 complexity and all refactorer gates pass.
+
+## 2026-07-28T08:19:53Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T081635Z_000021_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase3-journal-report
+commit: d2295d8514
+
+Re-read your role and constitution.
+
+merge_and_process architect d2295d8514
+```
+
+Action taken: merged the architect review with Phase 4, retaining the direct
+observer-less-turn test and the report-local dispatch required to keep the
+changed source within the CRAP threshold.
