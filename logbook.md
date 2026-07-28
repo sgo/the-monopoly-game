@@ -5384,3 +5384,22 @@ was done on the user's explicit decision and is flagged as such.
 
 `Report` itself is unchanged but for that javadoc line. 165 unit tests pass and
 the one mutation site in the file is killed.
+
+## 2026-07-28T09:04:46Z — architect handoff for the CRAP exemption
+
+To coder and refactorer at priority `00`:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: phase4-buying-auctions
+commit: 727fe22ef7
+```
+
+The CRAP rule in `swarmforge/roles/refactorer.prompt` now exempts a switch over
+a sealed type that is exhaustive by compilation. Merging this is what puts the
+amended rule in the refactorer's worktree. No production behaviour changed; the
+only source edit is the javadoc on `Report.line` citing the decision.
+
+Not sent to the specifier: nothing functional changed.
