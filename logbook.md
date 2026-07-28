@@ -5403,3 +5403,93 @@ amended rule in the refactorer's worktree. No production behaviour changed; the
 only source edit is the javadoc on `Report.line` citing the decision.
 
 Not sent to the specifier: nothing functional changed.
+
+## 2026-07-28T09:05:57Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T090446Z_000025_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase4-buying-auctions
+commit: 727fe22ef7
+
+Re-read your role and constitution.
+
+merge_and_process architect 727fe22ef7
+```
+
+Action taken: merged the policy-aligned exhaustive report dispatch, recorded
+its exempt CRAP value of 10.0, and verified the unchanged behavior.
+
+## 2026-07-28T09:05:57Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase4-buying-auctions
+commit: (commit recorded by the handoff draft)
+```
+
+Summary: exhaustive sealed report dispatch accepted under the current explicit
+CRAP exemption; verification passes.
+
+## 2026-07-28T09:06:32Z — architect received refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260728T090624Z_000022_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: db7c6671e2
+task: phase4-buying-auctions
+
+Re-read your role and constitution.
+
+merge_and_process refactorer db7c6671e2
+```
+
+Action taken: merged `db7c6671e2`, which carries no source change, and closed
+the task without forwarding it.
+
+## 2026-07-28T09:07:42Z — architect: the report dispatch is accepted, and the loop is closed
+
+`db7c6671e2` records the refactorer merging `727fe22ef7` and accepting the
+exhaustive switch under the exemption, with its CRAP value recorded rather than
+refactored away. Four rounds of the same line going back and forth end here.
+The commit changes no source at all, so nothing is forwarded.
+
+One figure to correct: the entry at `08:59:58Z` estimated the switch at
+complexity 9 from its nine cases. Measured, it is 10.0. The reasoning is not
+affected — the exemption is written in terms of what the shape *is* rather than
+what it scores, precisely so that the next entry added to the journal does not
+reopen the question — but the number in that entry is wrong and this is the
+right figure.
+
+What actually resolved this was not a better argument. It was noticing that the
+rule the other role was following had no exception in it, so no argument could
+have been accepted. The three logbook entries written to persuade were wasted
+effort; reading `swarmforge/roles/refactorer.prompt` would have found it in a
+minute. Worth doing early the next time two roles disagree twice about the same
+thing.
+
+### The merge
+
+Clean, with no conflict markers — which is the shape that has silently moved
+bodies between entries twice before, so it was checked at entry level rather
+than trusted. It was honest this time: 153 entries, nothing missing from either
+parent, every body byte-identical to the parent it came from. Git had placed
+the two new entries mid-file, ahead of entries an hour older than them; they are
+appended in time order instead.
