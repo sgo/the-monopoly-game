@@ -2,6 +2,8 @@ package the.monopoly.game.strategies;
 
 import org.junit.jupiter.api.Test;
 import the.monopoly.game.components.finance.Money;
+import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 
@@ -42,9 +44,16 @@ class AgreeIfAffordableTest {
   @Test
   void aStrategyThatAnswersNothingBuysNothingAndBidsNothing() {
     Strategy indifferent = Strategy.UNDECIDED;
+    ColourStreet street = (ColourStreet) LAND;
 
     assertThat(indifferent.accepts(offerWith(new Money(1500)))).isFalse();
     assertThat(indifferent.bidFor(offerWith(new Money(1500)))).isEqualTo(Money.ZERO);
+    assertThat(indifferent.claims(new Strategy.RentClaim(
+        new Player(new Player.ID("tenant"), null), LAND, new Money(4)
+    ))).isFalse();
+    assertThat(indifferent.builds(new Strategy.BuildOffer(
+        street, street.houseConstructionCost(), new Money(1500), false
+    ))).isFalse();
   }
 
   private static Strategy.Offer offerWith(Money available) {

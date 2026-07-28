@@ -6610,3 +6610,45 @@ merge_and_process refactorer 7e999de151
 ```
 
 Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T14:11:02Z — architect completed phase 7 architectural review
+
+The phase 7 houses-and-hotels work keeps the game orchestration in `Game`,
+automatic improvement selection in the new `Building` rule, ownership and
+improvement state in `Deeds`, and report wording outside the journal data.
+The UI/core and dependency boundaries remain inward-facing and testable.
+
+Architectural hardening applied:
+
+- `Building.develop` now uses the same explicit infinite-loop shape already
+  used elsewhere to avoid literal-true mutation noise.
+- `Deeds` now preserves the improvement invariant itself: house counts must
+  stay between zero and the hotel threshold, houses cannot be built past four,
+  a hotel can only replace four houses, a house can only be sold when present,
+  and a hotel can only be exchanged when present.
+- Focused unit tests cover the new illegal-transition guards, one-house rent,
+  default refusal to build, and the previously implicit post-sale hotel flag.
+- Local `DeedsTest` ownership setup was consolidated after DRY reported the
+  repeated invalid-transition arrangements.
+
+Verification:
+
+- Normal Maven tests pass: 189 tests.
+- Property tests pass separately: 17 tagged tests.
+- Normal generated acceptance passes: 141 scenarios.
+- Differential Java mutation is clean one file at a time with `--max-workers 8`
+  and verbose progress: `Building` 7/7 killed, `Deeds` 27/27 killed after
+  adding missing boundary assertions, `Game` 6/6 killed, `Report` 1/1 killed,
+  `Rent` 3/3 killed after adding one-house rent coverage, `Strategy` full pass
+  5/5 killed after covering default build refusal, and `AgreeIfAffordable`
+  full pass 1/1 killed.
+- DRY reports 26 candidates. Remaining candidates are constructor/event-handler
+  symmetry, explicit unit arrangements, or existing cross-test shapes where an
+  abstraction would hide the rule being asserted rather than remove useful
+  duplication.
+- Soft Gherkin mutation passes with no survivors or errors on active phase 7
+  surfaces: building 7/7, journal 2/2, report 2/2, rent 6/6.
+
+This commit changes observable behavior for invalid improvement transitions,
+so under the exclusive routing rule it must be sent only to coder with
+priority 00. The coder owns forwarding verified functional work to refactorer.

@@ -10,6 +10,8 @@ import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 
 class DeedsTest {
   private final Rule.Set ruleSet = Rule.Set.Type.official.create();
@@ -49,63 +51,98 @@ class DeedsTest {
 
   @Test
   void housesBuiltOnAStreetAreRemembered() {
-    Player owner = playerWith(1500);
-    ColourStreet street = colourStreet(Street.Type.DiestsestraatLeuven);
-    deeds.sell(street, owner, street.price());
-    owner.account().deposit(street.price());
+    Ownership ownership = ownedStreet();
 
-    deeds.buildHouse(street, owner);
-    deeds.buildHouse(street, owner);
+    deeds.buildHouse(ownership.street(), ownership.owner());
+    deeds.buildHouse(ownership.street(), ownership.owner());
 
-    assertThat(deeds.housesBuiltOn(street)).isEqualTo(2);
-    assertThat(deeds.hasHotelOn(street)).isFalse();
+    assertThat(deeds.housesBuiltOn(ownership.street())).isEqualTo(2);
+    assertThat(deeds.hasHotelOn(ownership.street())).isFalse();
   }
 
   @Test
   void aHotelReplacesTheFourHousesOnItsStreet() {
-    Player owner = playerWith(1500);
-    ColourStreet street = colourStreet(Street.Type.DiestsestraatLeuven);
-    deeds.sell(street, owner, street.price());
-    owner.account().deposit(street.price());
-    deeds.arrangeHouses(street, 4);
+    Ownership ownership = ownedStreet();
+    deeds.arrangeHouses(ownership.street(), 4);
 
-    deeds.buildHotel(street, owner);
+    deeds.buildHotel(ownership.street(), ownership.owner());
 
-    assertThat(deeds.housesBuiltOn(street)).isZero();
-    assertThat(deeds.hasHotelOn(street)).isTrue();
+    assertThat(deeds.housesBuiltOn(ownership.street())).isZero();
+    assertThat(deeds.hasHotelOn(ownership.street())).isTrue();
   }
 
   @Test
   void sellingAHouseBackToTheBankPaysHalfItsConstructionCost() {
-    Player owner = playerWith(1500);
-    ColourStreet street = colourStreet(Street.Type.DiestsestraatLeuven);
-    deeds.sell(street, owner, street.price());
-    owner.account().deposit(street.price());
-    deeds.arrangeHouses(street, 1);
-    owner.account().withdraw(new Money(500));
+    Ownership ownership = ownedStreet();
+    deeds.arrangeHouses(ownership.street(), 1);
+    ownership.owner().account().withdraw(new Money(500));
 
-    Money price = deeds.sellHouse(street, owner);
+    Money price = deeds.sellHouse(ownership.street(), ownership.owner());
 
     assertThat(price).isEqualTo(new Money(25));
-    assertThat(owner.account().balance()).isEqualTo(Balance.of(1025));
-    assertThat(deeds.housesBuiltOn(street)).isZero();
+    assertThat(ownership.owner().account().balance()).isEqualTo(Balance.of(1025));
+    assertThat(deeds.housesBuiltOn(ownership.street())).isZero();
+    assertThat(deeds.hasHotelOn(ownership.street())).isFalse();
   }
 
   @Test
   void exchangingAHotelBackForHousesPaysHalfTheHotelValue() {
-    Player owner = playerWith(1500);
-    ColourStreet street = colourStreet(Street.Type.DiestsestraatLeuven);
-    deeds.sell(street, owner, street.price());
-    owner.account().deposit(street.price());
-    deeds.arrangeHotel(street);
-    owner.account().withdraw(new Money(500));
+    Ownership ownership = ownedStreet();
+    deeds.arrangeHotel(ownership.street());
+    ownership.owner().account().withdraw(new Money(500));
 
-    Money price = deeds.exchangeHotelForHouses(street, owner);
+    Money price = deeds.exchangeHotelForHouses(ownership.street(), ownership.owner());
 
     assertThat(price).isEqualTo(new Money(225));
-    assertThat(owner.account().balance()).isEqualTo(Balance.of(1225));
+    assertThat(ownership.owner().account().balance()).isEqualTo(Balance.of(1225));
+    assertThat(deeds.housesBuiltOn(ownership.street())).isEqualTo(4);
+    assertThat(deeds.hasHotelOn(ownership.street())).isFalse();
+  }
+
+  @Test
+  void aStreetCannotBeArrangedWithAnImpossibleNumberOfHouses() {
+    ColourStreet street = colourStreet(Street.Type.DiestsestraatLeuven);
+
+    deeds.arrangeHouses(street, 0);
+    assertThat(deeds.housesBuiltOn(street)).isZero();
+    deeds.arrangeHouses(street, 4);
     assertThat(deeds.housesBuiltOn(street)).isEqualTo(4);
-    assertThat(deeds.hasHotelOn(street)).isFalse();
+
+    assertThatThrownBy(() -> deeds.arrangeHouses(street, -1))
+        .isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> deeds.arrangeHouses(street, 5))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
+  void aStreetCannotBeBuiltPastFourHouses() {
+    Ownership ownership = ownedStreet();
+    deeds.arrangeHouses(ownership.street(), 4);
+
+    assertIllegalState(() -> deeds.buildHouse(ownership.street(), ownership.owner()));
+  }
+
+  @Test
+  void aHotelCanOnlyReplaceFourHouses() {
+    Ownership ownership = ownedStreet();
+    deeds.arrangeHouses(ownership.street(), 3);
+
+    assertIllegalState(() -> deeds.buildHotel(ownership.street(), ownership.owner()));
+  }
+
+  @Test
+  void aHouseCanOnlyBeSoldWhenOneExists() {
+    Ownership ownership = ownedStreet();
+
+    assertIllegalState(() -> deeds.sellHouse(ownership.street(), ownership.owner()));
+  }
+
+  @Test
+  void aHotelCanOnlyBeExchangedWhenOneExists() {
+    Ownership ownership = ownedStreet();
+    deeds.arrangeHouses(ownership.street(), 4);
+
+    assertIllegalState(() -> deeds.exchangeHotelForHouses(ownership.street(), ownership.owner()));
   }
 
   private Ownable land(Street.Type type) {
@@ -123,5 +160,25 @@ class DeedsTest {
     Player player = new Player(id, bank.accountOf(id));
     player.account().deposit(new Money(balance));
     return player;
+  }
+
+  private Ownership ownedStreet() {
+    Player owner = playerWith(1500);
+    ColourStreet street = colourStreet(Street.Type.DiestsestraatLeuven);
+    deeds.sell(street, owner, street.price());
+    owner.account().deposit(street.price());
+    return new Ownership(owner, street);
+  }
+
+  private static void assertIllegalState(Action action) {
+    assertThat(catchThrowable(action::run)).isInstanceOf(IllegalStateException.class);
+  }
+
+  @FunctionalInterface
+  private interface Action {
+    void run();
+  }
+
+  private record Ownership(Player owner, ColourStreet street) {
   }
 }
