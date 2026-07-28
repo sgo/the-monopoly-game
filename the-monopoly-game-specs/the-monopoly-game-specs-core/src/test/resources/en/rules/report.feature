@@ -177,3 +177,13 @@ Feature: game report
     Examples:
       | cost |
       | 50   |
+
+  # report-15
+  Scenario Outline: the report narrates a card drawn before the effect it resolves
+    Given the next chance card will be "Boete voor te snel rijden. Betaal M15."
+    When pawn "dog" lands on "Kans / Chance"
+    Then the game report says that pawn "dog" draws the chance card "Boete voor te snel rijden. Betaal M15." before it says that pawn "dog" pays the bank $<amount>
+
+    Examples:
+      | amount |
+      | 15     |

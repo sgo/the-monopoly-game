@@ -190,3 +190,13 @@ Feature: game journal
     Examples:
       | cost |
       | 50   |
+
+  # journal-15
+  Scenario Outline: the journal records a card drawn before the effect it resolves
+    Given the next chance card will be "Boete voor te snel rijden. Betaal M15."
+    When pawn "dog" lands on "Kans / Chance"
+    Then the game journal records that pawn "dog" draws the chance card "Boete voor te snel rijden. Betaal M15." before it records that pawn "dog" pays the bank $<amount>
+
+    Examples:
+      | amount |
+      | 15     |
