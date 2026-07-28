@@ -5673,3 +5673,71 @@ commit: 4ff2eb22be
 
 Summary: Street-rent rules, claim decisions, journal/report narration, and the
 acceptance runtime are implemented. Unit and normal acceptance verification pass.
+
+## 2026-07-28T09:56:16Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260728T095017Z_000011_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase5-street-rent
+commit: c86b540765
+
+Re-read your role and constitution.
+
+merge_and_process coder c86b540765
+```
+
+Action taken: merged `c86b540765` into `swarmforge-refactorer`. Before merging,
+committed a pending local dedup of `OwnedCountBoundsPropertyTest`'s two
+property tests into one shared helper, already sitting uncommitted in the
+worktree and untouched by the incoming commit. The merge itself touched no
+file the local commit had touched, and the merged `logbook.md` came through as
+a clean append with no interleaving: header counts across both parents and
+their common ancestor add up exactly (150 + 2 + 9 = 161), and the tail reads
+as one role's entries followed by the other's, each body under its own
+header.
+
+## 2026-07-28T11:17:46Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase5-street-rent
+commit: a35ef2d417
+```
+
+Summary: `Game`, `Rent`, and `World` had reached for `ColourStreet`, `Optional`,
+`Ownable`, and `Rent.Claim` fully qualified inline instead of importing them;
+now imported. `RentTest.sell` cast `rules.create(type)` three times in one
+method; now cast once into a local. Added `RentPropertyTest`, sweeping every
+colour street, monopoly and non-monopoly ownership, a claiming and a declining
+owner, and a wide range of starting balances, checking conservation of total
+money and the exact amount owed together — `RentTest` only sampled two streets
+with the owner always claiming. CRAP is clean but for the exempt sealed
+dispatch on `Report.line`, now 11,3 with the new `RentPaid` case; DRY turned up
+nothing worth changing beyond what already existed; mutation scan stays well
+under the 100-site split threshold on every changed or new file. Unit,
+property, and normal acceptance verification all pass.
+
+While writing the property test, an unrelated hazard turned up in
+`Bank.Simple`: `createAccountFor` adds to a `Set<Account>`, keyed by a record
+whose `Balance` field is mutable, rather than replacing any existing entry for
+the same player name. A property test that shares one `Rule.Set` across
+iterations and reuses a player name will accumulate several accounts under
+that name, and `accountOf`'s `findAny()` can then hand back a stale one from
+an earlier iteration instead of the fresh one just created — caught here by a
+conservation check that failed on an all-zero case with balances that weren't
+zero. Worked around locally by creating a fresh `Rule.Set` per iteration
+rather than reusing one across the whole property check; not fixed at the
+source; flagged for whoever owns `Bank` next, since anything else that reuses
+one bank across repeated same-named account creation would hit the same
+thing.
