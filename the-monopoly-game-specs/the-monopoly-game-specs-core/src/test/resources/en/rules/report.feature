@@ -81,3 +81,16 @@ Feature: game report
     Examples:
       | rent |
       | 4    |
+
+  # report-7
+  Scenario Outline: the report narrates rent paid for a utility as a multiple of the dice roll that landed there
+    And pawn "dog" starts at position 7
+    And pawn "dog" will roll 1 and 4 for their turn
+    And pawn "high hat" owns "Elektriciteitscentrale"
+    And pawn "high hat" follows the "Agree if affordable" strategy
+    When we play the game
+    Then the game report says that pawn "dog" moves before it says that pawn "dog" pays pawn "high hat" $<rent> rent for "Elektriciteitscentrale"
+
+    Examples:
+      | rent |
+      | 20   |
