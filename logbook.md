@@ -7620,3 +7620,45 @@ the audit trail that was otherwise missing. Only one conflict, in
 new on this side (the phase9-land-sale handoff-sent entry), 8 new on the
 architect's side, no header collisions, nothing dropped from base on
 either side. `mvn -q -o test` passes on the merged state (exit 0).
+
+## 2026-07-28T21:30:56Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T213056Z_000016_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase10-chance-and-community-chest
+commit: 62d8a8cf4e
+created_at: 2026-07-28T21:30:56.315339Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 62d8a8cf4e
+```
+
+Summary: specified Phase 10 chance and community chest cards — new
+`cards.feature` covering move-and-salary, pay/receive-bank, pay/receive-
+every-other-player, go-to-jail, draw/retain/sell a "Get Out of Jail
+Free" card, nearest-station and nearest-utility advances, and the
+renovation (per house/hotel) card, plus two exhaustive per-deck outlines
+that double as the journal's card-drawn record; matching journal/report
+additions for a card's effect being recorded after its draw. Dropped
+the "move-without-salary" (go back 3 spaces) scenario after review
+established it couldn't demonstrate anything distinct from ordinary
+movement math on this board's actual Chance-space positions. "Used"
+(leaving jail) stays out of scope until Phase 12 exists; the nearest-
+station's mandatory double rent bypasses the owner's usual strategy
+claim, since the card instructs payment rather than offering a claim.
+
+User review caught three real gaps before handoff: the pay/collect-
+every-player scenarios only had one other player to pay, indistinguishable
+from a single fixed payment — now use 3 players; the nearest-station
+purchase relied on inferring intent from the "Agree if affordable"
+strategy name rather than an explicit buy declaration — added one; and
+the renovation card scenario never exercised the hotel rate, only
+houses — now combines a hotel and a house to prove both sum correctly.
