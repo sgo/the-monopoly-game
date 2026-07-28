@@ -118,3 +118,25 @@ Feature: game report
     Examples:
       | price |
       | 25    |
+
+  # report-10
+  Scenario Outline: the report narrates land being mortgaged
+    Given pawn "dog" owns "Diestsestraat Leuven"
+    When pawn "dog" mortgages "Diestsestraat Leuven"
+    Then the game report says that pawn "dog" mortgages "Diestsestraat Leuven" for $<value>
+
+    Examples:
+      | value |
+      | 30    |
+
+  # report-11
+  Scenario Outline: the report narrates a mortgage being lifted, including interest paid
+    Given pawn "dog" owns "Diestsestraat Leuven"
+    And the land "Diestsestraat Leuven" is mortgaged
+    And pawn "dog" has $100 to spend
+    When pawn "dog" lifts the mortgage on "Diestsestraat Leuven"
+    Then the game report says that pawn "dog" lifts the mortgage on "Diestsestraat Leuven" for $<total> including $<interest> interest
+
+    Examples:
+      | total | interest |
+      | 33    | 3        |
