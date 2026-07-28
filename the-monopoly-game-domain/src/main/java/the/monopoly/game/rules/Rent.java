@@ -12,7 +12,7 @@ import the.monopoly.game.strategies.Strategy;
 import java.util.List;
 import java.util.Optional;
 
-/** Collects rent when a visitor stops on an owned, unimproved colour street. */
+/** Collects rent when a visitor stops on land somebody else owns. */
 public class Rent implements Landings {
   private final Deeds deeds;
   private final Rule.Set rules;
