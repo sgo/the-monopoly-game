@@ -6010,6 +6010,34 @@ commit: 16a687b
 
 Summary: Architect-reviewed bank identity correction is merged; 170 unit tests pass.
 
+## 2026-07-28T12:07:38Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T120738Z_000012_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase6-station-utility-rent
+commit: 0540a2acc7
+created_at: 2026-07-28T12:07:38.359252Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 0540a2acc7
+```
+
+Summary: specified Phase 6 station and utility rent — station rent scaled to
+count owned, utility rent as a multiple (4x/10x) of the dice roll that landed
+there, proven across two different rolls — in new `station-rent.feature` and
+`utility-rent.feature`, with one matching journal/report scenario each for the
+dice-derived utility case. Waiver and the Chance/Community-Chest utility-rent
+sub-case are out of scope, deferred to phase 5's existing generic coverage and
+phase 10 respectively.
+
 ## 2026-07-28T12:07:38Z — coder received handoff from specifier
 
 Handoff message received:
