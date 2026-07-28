@@ -32,7 +32,7 @@ public record Player(ID id, Bank.Account account, Position position) {
   }
 
   public void visit(ColourStreet street) {
-    account.credit(street.vacantRent());
+    account.withdraw(street.vacantRent());
   }
 
   /**
@@ -101,12 +101,12 @@ public record Player(ID id, Bank.Account account, Position position) {
 
 /* mutate4java-manifest
 version=1
-moduleHash=94fae03f348ea1996b07da3fab71b7f9c7d235386414aee9cc25aa92446116d9
+moduleHash=73673ff6a04db01c39897e043d40f4cc243c83c204e9d43dda64a9f3218fadf2
 scope.0.id=Y2xhc3M6UGxheWVyI1BsYXllcjoxMQ
 scope.0.kind=class
 scope.0.startLine=11
 scope.0.endLine=100
-scope.0.semanticHash=f145ac64ef549e061e8b3d1ddc1ebdc87de8f71cadb5f3bcf8b7666d10fc7312
+scope.0.semanticHash=2f8f4f8cb8d1877521c7f45f101b2109e2c84a2390ad5e10e601eab8dd536cbc
 scope.1.id=Y2xhc3M6UGxheWVyLklEI0lEOjc0
 scope.1.kind=class
 scope.1.startLine=74
@@ -181,7 +181,7 @@ scope.15.id=bWV0aG9kOlBsYXllciNjdG9yKDMpOjEx
 scope.15.kind=method
 scope.15.startLine=1
 scope.15.endLine=100
-scope.15.semanticHash=ce195894d6b1d349c3fdec1126433346df632b0c373c54387cc388cf093e7871
+scope.15.semanticHash=1dab0d683df3843026a16591ccf96d5e820185230b4b7d1fa9c84787903a10fd
 scope.16.id=bWV0aG9kOlBsYXllciNsYW5kKDEpOjI4
 scope.16.kind=method
 scope.16.startLine=28
@@ -196,17 +196,17 @@ scope.18.id=bWV0aG9kOlBsYXllciN2aXNpdCgxKTozNA
 scope.18.kind=method
 scope.18.startLine=34
 scope.18.endLine=36
-scope.18.semanticHash=03cc14e23d867feacd6fcfcd3be5f2735a382fc31d6c8597996dd14c8f58aa79
+scope.18.semanticHash=c3391457e2ee48c043f07639cc03fb209fbdf8ffb534b7d164f1f516258589f1
 scope.19.id=bWV0aG9kOlBsYXllci5JRCNjdG9yKDEpOjc0
 scope.19.kind=method
 scope.19.startLine=1
 scope.19.endLine=100
-scope.19.semanticHash=ce195894d6b1d349c3fdec1126433346df632b0c373c54387cc388cf093e7871
+scope.19.semanticHash=1dab0d683df3843026a16591ccf96d5e820185230b4b7d1fa9c84787903a10fd
 scope.20.id=bWV0aG9kOlBsYXllci5JRC5Db21wYXJhdG9ycyNjdG9yKDApOjc1
 scope.20.kind=method
 scope.20.startLine=1
 scope.20.endLine=100
-scope.20.semanticHash=ce195894d6b1d349c3fdec1126433346df632b0c373c54387cc388cf093e7871
+scope.20.semanticHash=1dab0d683df3843026a16591ccf96d5e820185230b4b7d1fa9c84787903a10fd
 scope.21.id=bWV0aG9kOlBsYXllci5JRC5Db21wYXJhdG9ycyNuYXR1cmFsKDApOjc2
 scope.21.kind=method
 scope.21.startLine=76
@@ -221,7 +221,7 @@ scope.23.id=bWV0aG9kOlBsYXllci5Qb29sI2N0b3IoNCk6ODY
 scope.23.kind=method
 scope.23.startLine=1
 scope.23.endLine=100
-scope.23.semanticHash=ce195894d6b1d349c3fdec1126433346df632b0c373c54387cc388cf093e7871
+scope.23.semanticHash=1dab0d683df3843026a16591ccf96d5e820185230b4b7d1fa9c84787903a10fd
 scope.24.id=bWV0aG9kOlBsYXllci5Qb29sI3NlbGVjdCgxKTo4Nw
 scope.24.kind=method
 scope.24.startLine=87

@@ -2,6 +2,8 @@ package the.monopoly.game.specs.acceptance;
 
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Rule;
+import the.monopoly.game.strategies.AgreeIfAffordable;
+import the.monopoly.game.strategies.Strategy;
 
 /**
  * Turns the words a feature uses into the domain's own names. Features spell
@@ -22,6 +24,14 @@ final class Vocabulary {
 
   static Rule.Set.Type ruleSet(String name) {
     return constant(Rule.Set.Type.class, name, "rule set");
+  }
+
+  /** A strategy by the name the features call it, which is the name it is published under. */
+  static Strategy strategy(String name) {
+    return switch (name) {
+      case "Agree if affordable" -> new AgreeIfAffordable();
+      default -> throw new AssertionError("Unknown strategy \"" + name + "\".");
+    };
   }
 
   private static <T extends Enum<T>> T constant(Class<T> type, String name, String description) {

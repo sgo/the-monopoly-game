@@ -4522,6 +4522,34 @@ The accepted baseline has 102 existing passing scenarios and six new expected
 unsupported scenarios.
 
 ## 2026-07-27T22:45:31Z — specifier received handoff from architect
+## 2026-07-27T22:43:33Z — architect handoffs for phase3-journal-report
+
+To coder and refactorer at priority `00`:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: phase3-journal-report
+commit: f2e0a0c656
+```
+
+To the specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: phase3-journal-report
+commit: f2e0a0c656
+```
+
+`Report` switches over the sealed `Journal.Entry` instead of looking a handler
+up by class, so an unreported entry is now a compile error. `Entry.Start` lost
+its hand-written `toString`; the record's own serves the log. No line of any
+report changed, so `journal.feature` and `report.feature` stand as written.
+
+## 2026-07-27T22:46:17Z — refactorer received handoff from architect
 
 Handoff message received:
 
@@ -4535,6 +4563,15 @@ type: git_handoff
 role: architect
 task: phase3-journal-report
 commit: f2e0a0c656
+id: 20260727T224333Z_000019_from_architect
+from: architect
+to: coder,refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: architect
+commit: f2e0a0c656
+task: phase3-journal-report
 
 Re-read your role and constitution.
 
@@ -4546,6 +4583,10 @@ both append-only histories while resolving the logbook conflict. The completed
 work satisfies the Phase 3 journal/report specifications, including their
 chronological event order; the approved mutation manifests were retained. Task
 complete.
+Action taken: fast-forwarded to architect commit `f2e0a0c656`, then restored
+the report-local rendering dispatch after the sealed-entry switch raised
+`Report.line` CRAP to 8.0. The journal remains data-only, report text remains
+in `Report`, and each report method is now CRAP 1.0.
 
 ## 2026-07-28T06:39:02Z — specifier sent handoff to coder
 
@@ -4565,6 +4606,8 @@ created_at: 2026-07-28T06:39:02.505073Z
 Re-read your role and constitution.
 
 merge_and_process specifier 56c1532861
+task: phase3-journal-report
+commit: a89aea192c
 ```
 
 Summary: Phase 4 adds business-level buying and auction specifications. Landing
@@ -4600,3 +4643,552 @@ the append-only logbook conflict in favour of this branch's already recorded
 specifier handoffs. This delayed Phase 3 completion preserves the exhaustive
 report dispatch and its supporting coverage; Phase 4 remains in progress with
 the coder.
+Action taken: merged `a89aea192c`, restored the exhaustive switch in `Report`,
+made `TurnTest` reach the observer-less `Turn` constructor on its own, and ran
+the gates.
+
+## 2026-07-28T08:20:00Z — architect review of phase3-journal-report
+
+### The report dispatch, settled
+
+`b9f931addf` replaced the exhaustive switch in `Report.line` with a
+`Map<Class<? extends Entry>, Function<Entry, String>>`, to bring that method's
+CRAP from 8.0 to 1.0. The switch is back. The reason is not preference:
+
+Adding an eighth record to the sealed `Entry` and compiling proves it, and both
+directions were run on this tree before deciding. Under the map, the module
+compiles clean — the new entry is simply never reported, and the first game
+that produces one gets a `NullPointerException` out of `LINES.get(...)`. Under
+the switch, the same edit fails the build with "the switch expression does not
+cover all possible input values" at `Report.java:40`.
+
+`Entry`'s own javadoc says sealing it "is what makes it answer for every entry
+there is". Class-keyed dispatch leaves that sentence in the source while taking
+away the thing that made it true, so the delivered state promised a guarantee
+it no longer had.
+
+On the metric itself: one case per entry is one branch per entry. The map has
+exactly the same seven branches — it moves them into a field initialiser, where
+neither CRAP nor the compiler counts them. Nothing was simplified; the count
+was relocated, and the compiler's exhaustiveness check went with it. CRAP 8.0
+here is complexity 8 under full coverage, comfortably inside any usual
+threshold of 30, and it is the width of the journal rather than tangled control
+flow. There is no shape that keeps compile-time totality over seven types and
+also measures below it, because the totality *is* the seven-way branch; the
+only structures that score lower do so by hiding the branching from javac too.
+
+The javadoc on `line` now says all of this at the call site, including what to
+do when the cases outgrow a screen: give each one a named method and leave the
+switch itself alone. The rendering methods `b9f931addf` introduced are the
+right destination for that day; they are not needed while seven one-line cases
+still read as a single table.
+
+### `aTurnThatReportsToNobodyStillPlays`
+
+The test went through the `takeTurn` helper, which uses the two-argument `Turn`
+constructor — so its body was byte-identical to
+`aTurnMovesThePawnTheTotalOfBothDice`, and the constructor it exists to cover
+was reached only by accident. It now builds the `Turn` itself. Had the helper
+ever moved to the three-argument form, the observer-less path would have lost
+its only cover without a single test going red.
+
+### DRY
+
+Eleven pairs, scoped to `the-monopoly-game-domain` and
+`the-monopoly-game-specs`. One in production: `Game.java:31-35` against
+`Turn.java:22-26` at 0.86, the documented false positive — two unrelated
+three-field constructors, and sharing anything would couple `Game` to `Turn`'s
+fields to save three assignments.
+
+The other ten are all in test sources, and all are pairs of arrange-act-assert
+tests that share a shape and assert different things: `movingWithoutReaching-
+StartPaysNothing` against `passingStartPaysTheSalary`, and so on. Tests are
+structurally uniform on purpose, and a structural detector will always find
+them. Collapsing them into parameterised tests would put unrelated behaviours
+behind one data table and make a failure say less about what broke. Left as
+they are, recorded here so the next run does not reopen them.
+
+### Gates
+
+131 unit tests, 10 property tests, 108/108 acceptance across eleven pipeline
+features. mutate4java differential over all twenty-three domain sources: zero
+uncovered sites anywhere, and the one changed site in `Report` killed. Soft
+Gherkin acceptance mutation exit 0, every feature skipped as unchanged — no
+report line moved, so `journal.feature` and `report.feature` stand as written.
+
+### Still standing
+
+`Player` is a record whose `Position` component is mutable and is mutated all
+through a game, so its `equals` and `hashCode` change as the pawn moves and a
+`Player` in a `HashSet` or used as a map key stops being findable the moment it
+takes a turn. Nothing keys on a `Player` today. It is the same mistake `Game`
+carried until `4e71a4e760`: value semantics over state that moves. A player's
+identity should be its `ID` alone, and that should land before anything keys on
+one.
+
+## 2026-07-28T08:16:35Z — architect handoffs for phase3-journal-report
+
+To coder and refactorer at priority `00`:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: phase3-journal-report
+commit: d2295d8514
+```
+
+To the specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: phase3-journal-report
+commit: d2295d8514
+```
+
+`Report` switches over the sealed `Journal.Entry` again, so an entry with no
+line written for it fails the build rather than the first game that produces
+one. `TurnTest` builds the observer-less `Turn` itself instead of reaching it
+through the helper. No report line and no feature changed.
+
+## 2026-07-27T22:20:23Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260727T222023Z_000009_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase3-journal-report
+commit: 1ef11c9695
+created_at: 2026-07-27T22:20:23.173025Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 1ef11c9695
+```
+
+Summary: the journal records every initiative roll, turn, roll, move and
+salary; `Report` renders it. `journal.feature` and `report.feature` are on the
+pipeline. 130 unit tests and 108 acceptance tests pass.
+
+## 2026-07-27T21:59:09Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260727T215905Z_000009_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase3-journal-report
+commit: 7c89bee79a
+created_at: 2026-07-27T21:59:05.364526Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7c89bee79a
+```
+
+Summary: adds separate journal and report features for Phase 3. They require
+the complete chronological sequence from game start through initiative and
+the winner's first turn, plus turn start, roll, movement, and salary events.
+The accepted baseline has 102 existing passing scenarios and six new expected
+unsupported scenarios.
+
+## 2026-07-27T22:45:31Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T224333Z_000020_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase3-journal-report
+commit: f2e0a0c656
+
+Re-read your role and constitution.
+
+merge_and_process architect f2e0a0c656
+```
+
+Action taken: merged architect commit `f2e0a0c656` into `main`, preserving
+both append-only histories while resolving the logbook conflict. The completed
+work satisfies the Phase 3 journal/report specifications, including their
+chronological event order; the approved mutation manifests were retained. Task
+complete.
+
+## 2026-07-27T22:43:40Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260727T224333Z_000019_from_architect
+from: architect
+to: coder,refactorer
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: f2e0a0c656
+created_at: 2026-07-27T22:43:33.334786Z
+enqueued_at: 2026-07-27T22:43:34.317995Z
+task: phase3-journal-report
+dequeued_at: 2026-07-27T22:43:40.891375Z
+
+Re-read your role and constitution.
+
+merge_and_process architect f2e0a0c656
+```
+
+Action taken: merged architect commit `f2e0a0c656` into `swarmforge-coder`,
+resolving the `logbook.md` conflict at entry granularity, then verified the
+merged state.
+
+## 2026-07-28T00:55:00Z — coder verification of the merged architect state
+
+- `mvn test`: 131 unit tests pass.
+- `acceptance/run-acceptance.sh`: 108/108 across eleven pipeline features.
+
+Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
+architect.
+
+The finding against this role's work is accepted. `Report` was written here to
+be the only place a game's wording lives, and `Entry.Start` was carrying a
+hand-written `toString` rendering "Start game with players:" and a bulleted
+list the whole time — prose in the domain, on one entry of seven. It predates
+this task, but the claim made in the last entry was checked against the code
+written for it rather than against the file, and the file said otherwise. It is
+gone now, and the sentence is true.
+
+The switch over the sealed `Entry` survived a round trip through a class-keyed
+map and back, with the difference measured rather than argued: an eighth entry
+is a compile error under the switch and a run-time null under the map.
+
+## 2026-07-28T06:41:00Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260728T063902Z_000010_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 56c1532861
+created_at: 2026-07-28T06:39:02.505073Z
+enqueued_at: 2026-07-28T06:39:03.146134Z
+task: phase4-buying-auctions
+dequeued_at: 2026-07-28T06:39:08.403751Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 56c1532861
+```
+
+Action taken: merged specifier commit `56c1532861` into `swarmforge-coder`,
+resolving the `logbook.md` conflict at entry granularity (128 entries; three
+ours-only, two theirs-only, no divergent bodies), then began implementing
+`phase4-buying-auctions`.
+
+## 2026-07-28T07:26:34Z — coder implementation of phase4-buying-auctions
+
+Land nobody owns is now offered to whoever stops on it, and auctioned to the
+table when they turn it down. Players decide through a `Strategy`, the journal
+records what was bought and what an auction fetched, and the report says so.
+
+### A space had nothing to say for itself
+
+`Turn` moved the pawn and paid for reaching Start, and that was all a space
+could ever be worth. `Landings` is what happens where a pawn stops: the turn
+moves the pawn, reports the move, and hands the space over. `Landings.UNEVENTFUL`
+is a board where stopping anywhere is worth nothing, which is what `movement`
+and the single-player `Turn` still play.
+
+The alternative was to give `Turn` the deeds, the table and everyone's
+strategy. That is four collaborators for a class whose job is to roll and move,
+and it would have had to know what an auction is.
+
+### Ownership cannot live on a space
+
+`Rule.Set.create` builds a space afresh every time it is asked, so a `Street` is
+a value and there is nothing on it to mark. `Deeds` keeps the title against the
+space's type for as long as a game lasts, and is what `Game.Result` now carries
+alongside the journal. Selling is one act there — the buyer pays the bank and
+the title moves — so the two cannot drift apart.
+
+### The sale is told what the land fetched
+
+`Deeds.sell` takes the price rather than reading it off the land, because land
+goes for the price on the board when it is bought and for the winning bid when
+it is auctioned. `LandSale` is the rule: offer, and failing that, auction.
+
+The auction is sealed and single-bid — everyone says what the land is worth to
+them and the best bid takes it, paying what they bid. `auctions-1` and
+`auctions-2` fix that: the winner's balance drops by their own bid, not by the
+runner-up's. A bid has to beat the one before it, which makes nothing not a bid
+and settles two equal bids on whoever spoke first, so a game played twice sells
+the land to the same player.
+
+### Strategies are asked, never told
+
+`Strategy` answers `accepts` and `bidFor`, both defaulting to leaving the land
+alone, so a strategy answers only what it has an opinion about and Phase 5 can
+add a decision without rewriting the ones already here. `Strategy.OfPlayers`
+says who plays what, in the same shape as `Game.Cups` — a player is not given a
+strategy, because `Player` is a record and its identity is already doing more
+work than it should.
+
+`AgreeIfAffordable` buys what it can afford and bids everything it has. Bidding
+everything is what "bids up to the most it can afford" says, and it is what
+makes it lose to a higher bid in `buying-land-2`; it also means an agreeable
+player alone in an auction pays its whole balance for a $60 street. That is the
+specification as written, and the specifier owns whether it stays.
+
+### The report spells a space out
+
+`Report` renders `Entry.Bought` and `Entry.AuctionWon`, spelling a space by
+telling its run-together words apart: `DiestsestraatLeuven` reads "Diestsestraat
+Leuven". That agrees with the three names the features use and is pinned by
+`report-4`. A space whose printed name is not its own name spelled out — "Place
+de l'Ange Namur" — will have to be given a name in the domain when a
+specification asks the report for it.
+
+### A roll nobody cares about must not buy anything
+
+The acceptance world rolled 1 and 2 for a player the scenario said nothing
+about, which walked that pawn onto the first street on the board. Now that
+stopping somewhere buys land, an unremarkable roll had to become one that stops
+somewhere unremarkable: 4 and 6, onto Just Visiting, where nothing has ever
+happened.
+
+`with $N in pawn "X"'s account` used to check the balance and refuse to change
+it, because no rule moved money before the first roll. `buying-land-2` needs a
+pawn with $59, so the step now spends a pawn down to the amount it says. It
+still refuses to hand out more than the pawn was dealt, which is the half of it
+no rule can do.
+
+A pawn told to decline or to bid is scripted, and a scripted pawn that is
+offered land the scenario never named fails saying so — otherwise "declines the
+offer for X" would be indistinguishable from saying nothing at all.
+
+### Verification
+
+- `mvn test`: 165 unit tests pass, up from 131.
+- `acceptance/run-acceptance.sh`: 118/118 across thirteen pipeline features,
+  from 108/118 before the work.
+
+Red before green was watched throughout: the new domain tests were written
+first, and the `Game` tests were re-run with the sale unwired to see the three
+of them fail. `report-4` was re-run with "buys" changed to "purchases" to see
+that the report's wording is pinned by the feature rather than by the step.
+
+The mutate4java manifests on the five changed sources are stale by line number.
+They are not edited by hand.
+
+## 2026-07-28T07:50:41Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260728T072931Z_000010_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase4-buying-auctions
+commit: 9baf2dc824
+
+Re-read your role and constitution.
+
+merge_and_process coder 9baf2dc824
+```
+
+Action taken: merged the Phase 4 implementation, reconciled the append-only
+logbook histories, and retained the report-local dispatch while extending it
+for the new journal entries.
+
+## 2026-07-28T07:52:44Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase4-buying-auctions
+commit: (commit recorded by the handoff draft)
+```
+
+Summary: Phase 4 is structurally reviewed; report rendering remains low
+complexity and all refactorer gates pass.
+
+## 2026-07-28T08:16:52Z — architect received refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260728T075317Z_000019_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 842f9f89e8
+task: phase4-buying-auctions
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 842f9f89e8
+```
+
+Action taken: merged `842f9f89e8`, resolved `Report` and `TurnTest`, moved
+`positionOf` onto `Board`, renamed `Account.credit` to `withdraw`, corrected
+the reason `en/monopoly.feature` is held back, and ran the gates.
+
+## 2026-07-28T08:50:22Z — architect review of phase4-buying-auctions
+
+### The switch earned its keep
+
+This branch merged with three conflicts. The one in `Report` is the interesting
+one: phase four added `Entry.Bought` and `Entry.AuctionWon` against the
+class-keyed map, and this branch had put the exhaustive switch back. Taking the
+switch left it seven cases wide against a nine-case sealed interface, and the
+module would not compile until both were written. That is the whole argument
+from `d2295d8514` playing out on the first change after it: under the map the
+merge would have compiled and two kinds of entry would simply never have been
+reported. The wording of both new lines is the refactorer's, unchanged.
+
+`TurnTest` conflicted only by adjacency — three new arrival tests on one side,
+a javadoc on the other. Both kept.
+
+The logbook merge rewrote one existing entry: the refactorer's `22:47:00`
+handoff note, where the placeholder `(commit recorded by the handoff draft)`
+had been filled in with `a89aea192c`. Theirs taken; it is the same note, more
+accurate. 138 entries, nothing dropped, no other body differing from the parent
+it came from.
+
+### `Landings`, `Strategy`, `Deeds`
+
+The seams are right. `Turn` moves the pawn and hands the space to `Landings`,
+so what a space is worth stays out of the moving of pawns; `Landings.UNEVENTFUL`
+keeps every older turn test honest without a mock. `Strategy` puts the decisions
+behind defaults, so a new question does not rewrite every strategy, and
+`OfPlayers` keeps the table's choices out of the sale. `Deeds` holds title
+against `Street.Type` because the rules rebuild spaces as values each time they
+are asked — that is the correct answer to a real problem, and it is written
+down where the next reader will find it.
+
+Dependency direction holds: `rules` depends on `strategies` through an
+interface, and nothing in `strategies` reaches back into `rules`.
+
+### `Account.credit` decremented a balance
+
+`Account` had `deposit` increasing a balance and `credit` decreasing it — a
+customer's word and the bank's own ledger word side by side, meaning opposite
+directions. It was survivable while `Player.pass` was the only caller. Phase
+four made it load-bearing in `Deeds.sell`, where `buyer.account().credit(price)`
+reads to any ordinary eye as paying the buyer, and the money in a sale is the
+thing most worth getting right. Renamed to `withdraw`, which pairs with
+`deposit` and cannot be read backwards. Five call sites, all compiler-checked.
+
+### `positionOf` had been copied into the acceptance harness
+
+dry4java scored `Turn.positionOf` against `World.positionOf` at 1.00: the same
+`layout().indexOf(space)` and the same not-found guard, once in the rules and
+once in the specification harness. Both were reaching through `Board` into the
+list it holds and deciding for themselves what `-1` means, which is the layout
+leaking rather than a coincidence of shape.
+
+It now lives on `Board`, which is the only object that can answer it. `Turn`
+and `World` both ask. The harness loses its `AssertionError` variant and gets
+the domain's `IllegalStateException`, which is the truer answer: a board with no
+such space is a broken board, not a failed assertion. Two mutation sites, both
+killed.
+
+### `en/monopoly.feature`
+
+Held back with a reason that had gone half stale: it said nothing moves a deed
+between players, and buying-land now moves one from the bank to a player. The
+reason is narrowed to what is actually missing — a game is one round of turns
+rather than rounds played until something ends it, and nothing ends it. Phase 14
+still.
+
+### What the specification does not yet say
+
+`Strategy.bidFor` may return more than the bidder holds, and `Deeds.sell` debits
+whatever it is told without asking whether the buyer can cover it, so a bid
+beyond a player's means would take them below zero. `AgreeIfAffordable` never
+does this and `auctions.feature` does not exercise it, so nothing is wrong
+today. What an auction does with a bid nobody can pay is a question for the
+specification, not something to invent in the rules.
+
+### DRY
+
+Seventeen pairs. The cross-module one is gone. What remains in production is two
+known false-positive shapes: constructors that assign three or four fields
+(`Game`/`Turn`/`LandSale`), and the two one-line journalling overrides in
+`Game.Journalling` that log different entry types. Both are structural echoes of
+things that genuinely differ; sharing either would couple unrelated classes to
+save a line. The rest are arrange-act-assert test pairs, recorded before and
+left alone for the same reason.
+
+### Gates
+
+165 unit tests, 10 property tests, 118 acceptance scenarios across twelve
+pipeline features. mutate4java differential over all twenty-eight domain
+sources: every site killed, and the only uncovered one is `Turn:43`, the
+`while (true)` whose mutant `while (false)` javac rejects as an unreachable
+statement — a mutant that cannot be built cannot be killed. Soft Gherkin
+acceptance mutation exit 0: `buying-land` 14/14, `auctions` 8/8, `journal` 8/8,
+`report` 6/6, everything else skipped as unchanged.
+
+### Still standing
+
+`Player` remains a record whose `Position` is mutated all through a game, so its
+`equals` and `hashCode` move with the pawn. `Deeds` now keeps ownership against
+`Street.Type` and stores `Player.ID` rather than `Player`, which is the right
+instinct and sidesteps the hazard rather than removing it. A player's identity
+should be its `ID` alone, before anything keys on a `Player`.
+
+## 2026-07-28T08:53:57Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T085344Z_000024_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: ae49f8835d
+created_at: 2026-07-28T08:53:44.595876Z
+enqueued_at: 2026-07-28T08:53:45.686786Z
+task: phase4-buying-auctions
+dequeued_at: 2026-07-28T08:53:57.814186Z
+
+Re-read your role and constitution.
+
+merge_and_process architect ae49f8835d
+```
+
+Action taken: merged architect commit `ae49f8835d` into `main`, preserving the
+Phase 4 purchase, auction, journal, and report implementation and its review.
+The completion reports 118 acceptance scenarios passing.
