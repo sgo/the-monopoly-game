@@ -6877,3 +6877,21 @@ merge_and_process architect 436724393a
 Summary: sent the phase-complete sync handoff so the specifier can merge the
 completed architect branch state, including the durable workflow update that
 requires this sync before future specification work.
+
+## 2026-07-28T19:34:26Z — architect received phase 8 refactorer handoff
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/architect/.swarmforge/handoffs/inbox/in_process/batch_20260728T193406Z_000001/50_20260728T193400Z_000030_from_refactorer_to_architect.handoff
+FROM: refactorer
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase8-mortgaging
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process refactorer dd8bab5911
+```
+
+Action taken: began architectural review of the named refactorer commit.
