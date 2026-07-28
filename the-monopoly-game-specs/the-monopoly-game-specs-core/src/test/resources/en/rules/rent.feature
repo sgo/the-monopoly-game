@@ -53,3 +53,43 @@ Feature: street rent
     Examples:
       | expected_tenant_final_balance | expected_owner_final_balance |
       | 1500                          | 1500                         |
+
+  # rent-4
+  Scenario Outline: rent scales with the number of houses built on the street
+    Given pawn "high hat" owns "Diestsestraat Leuven"
+    And the street "Diestsestraat Leuven" has 2 house(s) built
+    And pawn "high hat" follows the "Agree if affordable" strategy
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
+    And pawn "high hat"'s account balance is $<expected_owner_final_balance>
+
+    Examples:
+      | expected_tenant_final_balance | expected_owner_final_balance |
+      | 1440                          | 1560                         |
+
+  # rent-5
+  Scenario Outline: a hotel charges the hotel rent printed on the title deed
+    Given pawn "high hat" owns "Diestsestraat Leuven"
+    And the street "Diestsestraat Leuven" has a hotel built
+    And pawn "high hat" follows the "Agree if affordable" strategy
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
+    And pawn "high hat"'s account balance is $<expected_owner_final_balance>
+
+    Examples:
+      | expected_tenant_final_balance | expected_owner_final_balance |
+      | 1050                          | 1950                         |
+
+  # rent-6
+  Scenario Outline: an unimproved street in a partially built-up monopoly still charges double rent
+    Given pawn "high hat" owns "Rue Grande Dinant"
+    And pawn "high hat" owns "Diestsestraat Leuven"
+    And the street "Rue Grande Dinant" has 2 house(s) built
+    And pawn "high hat" follows the "Agree if affordable" strategy
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
+    And pawn "high hat"'s account balance is $<expected_owner_final_balance>
+
+    Examples:
+      | expected_tenant_final_balance | expected_owner_final_balance |
+      | 1492                          | 1508                         |
