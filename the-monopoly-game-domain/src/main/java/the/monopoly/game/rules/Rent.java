@@ -37,6 +37,7 @@ public class Rent implements Landings {
 
   private void collect(Player owner, Player tenant, Ownable land, Roll roll) {
     if (owner.id().equals(tenant.id())) return;
+    if (deeds.isMortgaged(land)) return;
     Money rent = rentFor(owner, land, roll);
     if (!strategies.forPlayer(owner).claims(new Strategy.RentClaim(tenant, land, rent))) return;
     tenant.account().withdraw(rent);
@@ -61,7 +62,7 @@ public class Rent implements Landings {
         .filter(ColourStreet.class::isInstance)
         .map(ColourStreet.class::cast)
         .filter(it -> it.colourGroup() == street.colourGroup())
-        .allMatch(it -> deeds.ownerOf(it.type()).filter(owner.id()::equals).isPresent());
+        .allMatch(it -> deeds.ownerOf(it.type()).filter(owner.id()::equals).isPresent() && !deeds.isMortgaged(it));
     return monopoly ? street.vacantRent().plus(street.vacantRent()) : street.vacantRent();
   }
 

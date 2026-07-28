@@ -123,6 +123,31 @@ class RentTest {
   }
 
   @Test
+  void mortgagedLandCollectsNoRent() {
+    sell(Street.Type.DiestsestraatLeuven);
+    deeds.arrangeMortgaged(street(Street.Type.DiestsestraatLeuven));
+    strategies.put(owner.id(), new Claiming());
+
+    rent().resolve(tenant, street(Street.Type.DiestsestraatLeuven), IRRELEVANT_ROLL);
+
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1500));
+    assertThat(owner.account().balance()).isEqualTo(Balance.of(1500));
+  }
+
+  @Test
+  void aMortgagedStreetInAColourGroupStopsDoubleRentOnTheOtherStreetToo() {
+    sell(Street.Type.RueGrandeDinant);
+    sell(Street.Type.DiestsestraatLeuven);
+    deeds.arrangeMortgaged((Ownable) rules.create(Street.Type.RueGrandeDinant));
+    strategies.put(owner.id(), new Claiming());
+
+    rent().resolve(tenant, street(Street.Type.DiestsestraatLeuven), IRRELEVANT_ROLL);
+
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1496));
+    assertThat(owner.account().balance()).isEqualTo(Balance.of(1504));
+  }
+
+  @Test
   void anUnimprovedStreetInAPartiallyBuiltMonopolyStillChargesDoubleRent() {
     sell(Street.Type.RueGrandeDinant);
     ColourStreet street = sell(Street.Type.DiestsestraatLeuven);

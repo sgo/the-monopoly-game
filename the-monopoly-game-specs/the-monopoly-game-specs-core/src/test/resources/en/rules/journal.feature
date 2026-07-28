@@ -131,3 +131,25 @@ Feature: game journal
     Examples:
       | price |
       | 25    |
+
+  # journal-10
+  Scenario Outline: the journal records land being mortgaged
+    Given pawn "dog" owns "Diestsestraat Leuven"
+    When pawn "dog" mortgages "Diestsestraat Leuven"
+    Then the game journal records that pawn "dog" mortgages "Diestsestraat Leuven" for $<value>
+
+    Examples:
+      | value |
+      | 30    |
+
+  # journal-11
+  Scenario Outline: the journal records a mortgage being lifted, including interest paid
+    Given pawn "dog" owns "Diestsestraat Leuven"
+    And the land "Diestsestraat Leuven" is mortgaged
+    And pawn "dog" has $100 to spend
+    When pawn "dog" lifts the mortgage on "Diestsestraat Leuven"
+    Then the game journal records that pawn "dog" lifts the mortgage on "Diestsestraat Leuven" for $<total> including $<interest> interest
+
+    Examples:
+      | total | interest |
+      | 33    | 3        |

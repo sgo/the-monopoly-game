@@ -257,7 +257,41 @@ rule-dependent amount, the Start salary, is computed by `StartSpace` itself.
   also covers the house-rent ladder, so it moved to `OwnedCount.checked` and
   reports which quantity was out of range.
 - The Start salary was stored as `Money(-200)` and read back through
-  `Player.pass`, which called `account.credit(...)`; a negative charge is what
+`Player.pass`, which called `account.credit(...)`; a negative charge is what
+
+## 2026-07-28T19:10:25Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260728T191025Z_000014_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase8-mortgaging
+
+Re-read your role and constitution.
+
+merge_and_process specifier 95affb5c6c
+```
+
+Action taken: merged specifier commit `95affb5c6c` into `swarmforge-coder`
+(fast-forward), implemented the `phase8-mortgaging` slice, and verified it
+with `mvn -B -pl the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core -Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2 test`
+plus `acceptance/run-acceptance.sh` using the same local Maven repository.
+
+## 2026-07-28T21:17:40Z — coder sent handoff to refactorer
+
+Summary: phase 8 mortgaging is implemented and verified. The slice adds
+mortgage state and costs in deeds, suppresses rent and monopoly double-rent
+while mortgaged, blocks building on mortgaged colour groups, adds mortgage
+journal/report wording, supports direct mortgaged-land transfer setup in the
+acceptance world, and puts `mortgage.feature` plus
+`mortgage-transfer.feature` onto the normal acceptance pipeline. Ready for
+refactorer review.
   made the player richer. `StartSpace.salary()` now returns a positive `+200`
   and `Player.pass` calls `account.deposit(...)`. The acceptance step keeps
   asserting "your salary is $200" and was verified non-vacuous by mutating the
@@ -6819,6 +6853,245 @@ invalid improvement transitions and adds focused regression coverage; coder
 verification passes on the merged state with `189` Maven tests and the full
 normal acceptance pipeline (`134` generated acceptance tests).
 
+## 2026-07-28T08:16:35Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T081635Z_000022_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase3-journal-report
+commit: d2295d8514
+
+Re-read your role and constitution.
+
+merge_and_process architect d2295d8514
+```
+
+Action taken: merged architect commit `d2295d8514` into `main` after resolving
+the append-only logbook conflict in favour of this branch's already recorded
+specifier handoffs. This delayed Phase 3 completion preserves the exhaustive
+report dispatch and its supporting coverage; Phase 4 remains in progress with
+the coder.
+Action taken: merged `a89aea192c`, restored the exhaustive switch in `Report`,
+made `TurnTest` reach the observer-less `Turn` constructor on its own, and ran
+the gates.
+
+## 2026-07-28T08:53:57Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T085344Z_000024_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: ae49f8835d
+created_at: 2026-07-28T08:53:44.595876Z
+enqueued_at: 2026-07-28T08:53:45.686786Z
+task: phase4-buying-auctions
+dequeued_at: 2026-07-28T08:53:57.814186Z
+
+Re-read your role and constitution.
+
+merge_and_process architect ae49f8835d
+```
+
+Action taken: merged architect commit `ae49f8835d` into `main`, preserving the
+Phase 4 purchase, auction, journal, and report implementation and its review.
+The completion reports 118 acceptance scenarios passing.
+
+## 2026-07-28T09:38:43Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T093843Z_000011_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase5-street-rent
+commit: e3a7d1c711
+created_at: 2026-07-28T09:38:43.751883Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e3a7d1c711
+```
+
+Summary: specified Phase 5 street rent — base rent on unimproved,
+non-monopoly streets, monopoly double rent while unimproved, and a
+strategy-delegated claim/waiver decision — in a new `rent.feature`, with
+matching journal/report scenarios. Mortgage-suppressed rent and
+insufficient-funds handling are explicitly out of scope pending Phases 8
+and 14.
+
+## 2026-07-28T11:35:25Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T113507Z_000027_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 4c3fc826fc
+created_at: 2026-07-28T11:35:07.032885Z
+enqueued_at: 2026-07-28T11:35:07.458353Z
+task: phase5-street-rent
+dequeued_at: 2026-07-28T11:35:25.643139Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 4c3fc826fc
+```
+
+Action taken: merged architect commit `4c3fc826fc` into `main`, completing
+Phase 5 street rent. The `logbook.md` conflict was resolved at entry
+granularity rather than by the raw line-based diff, which misaligned several
+near-identical headers: 143 entries in the merge base, 2 new here, 166 new on
+the architect's side, no header collisions between the two new sets, and one
+base entry (`08:16:35Z — specifier received handoff from architect`, commit
+`d2295d8514`) that the architect's lineage had dropped in an earlier merge and
+is restored here; a second base entry sharing that header was an empty stub
+with no body and was correctly left out. `mvn test` passes on the merged
+state.
+
+## 2026-07-28T11:46:24Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T114624Z_000029_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: af47550897
+task: phase5-street-rent
+
+Re-read your role and constitution.
+
+merge_and_process architect af47550897
+```
+
+Action taken: merged architect commit `af47550897` into `main` — a follow-up
+fix found while rechecking the refactorer's merge: `Bank.Simple` held accounts
+in a `Set` keyed by a record with a mutable balance, so re-opening an account
+after its balance changed could retain two equal owners and return a stale
+account. `Bank.Simple` now owns a private map keyed by the immutable account
+owner, with a regression test. The `logbook.md` conflict was again resolved at
+entry granularity (166 base entries, 4 new here, 6 new on the architect's
+side, no collisions); `mvn test` passes on the merged state.
+
+## 2026-07-28T13:12:15Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T131215Z_000013_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase7-houses-hotels
+commit: 3e7eb1a658
+created_at: 2026-07-28T13:12:15.288838Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3e7eb1a658
+```
+
+Summary: specified Phase 7 houses and hotels — even build across a colour
+group when affordable, hotel construction from four houses, selling a house
+back at half price, and hotel-to-houses exchange, all in new
+`building.feature` — plus the house/hotel rent tiers and the
+partial-monopoly-still-double-rent scenario that Phase 5 deferred into
+`rent.feature`, with one matching journal/report scenario each for building
+and selling. Bank shortage of houses/hotels and building while mortgaged stay
+out of scope, deferred as a substantial sub-feature and pending Phase 8
+respectively. A DRY-checker pass caught a real `placeholder-variant`
+(`<houses>` vs `<remaining_houses>` naming the same fact) that was normalized
+before handoff, and a review question caught a scenario arranging an
+untested second street, which was trimmed.
+
+## 2026-07-28T14:28:27Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/50_20260728T141556Z_000016_from_coder_to_refactorer.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase7-houses-hotels
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder 2481338dfe
+```
+
+Action taken: merged `2481338dfe` into `swarmforge-refactorer`. Only
+`logbook.md` conflicted this time; every source file auto-merged cleanly.
+Neither of the two questions from the last handoff was touched here — this
+commit is a separate, independent hardening pass the architect ran (mutation
+testing surfaced that invalid improvement transitions had no guard):
+`Deeds.buildHouse`/`buildHotel`/`sellHouse`/`exchangeHotelForHouses` now throw
+`IllegalStateException` on an out-of-sequence call, `arrangeHouses` validates
+its bound, and `Building.develop`'s `while (true)` became the project's usual
+`for (;;)`. Both flagged questions — the single permanent builder, and
+whether a hotel's price should be its printed rent or its construction cost
+— remain open. Logbook conflict resolved the same way as the prior seven,
+interleaving two independent handoff threads (mine for phases 5–7, the
+coder's own phase 6/7 specifier and architect-routing history it had recorded
+separately) into one chronological order. Header counts confirm nothing
+lost: 194 (common ancestor) + 2 (mine, new) + 7 (coder's, new) = 203, matching
+the merged file.
+
+My own gates against the merged state: CRAP clean but for the exempt sealed
+dispatch on `Report.line` (13,2, unchanged); DRY at 26, matching the
+architect's own figure — what it flags is the same arrange-act-assert and
+constructor-shape similarity already judged not worth chasing, now including
+`DeedsTest`'s four illegal-transition tests, which the architect's own commit
+message gives the same reasoning for leaving alone: collapsing them would
+hide which rule each one asserts. Mutation scan on every changed file stays
+well under the 100-site split threshold. Unit (189), property (17), and
+normal acceptance (141) verification all pass. Nothing left to do on this
+state.
+
+## 2026-07-28T14:28:27Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase7-houses-hotels
+commit: ae13bf8911
+```
+
+Summary: merged the invalid-transition hardening pass; refactorer's own CRAP,
+DRY, and mutation-scan gates are unchanged and pass on the merged tree; unit,
+property, and acceptance verification all pass. The two behavior questions
+from the last handoff are still open.
+
 ## 2026-07-28T14:28:39Z — architect received phase 7 refactorer follow-up
 
 Handoff message received:
@@ -6853,6 +7126,49 @@ architectural phases and final verification gates were already completed on
 that exact source state.
 
 No further handoff is warranted. The exclusive routing loop closes here.
+
+## 2026-07-28T14:38:19Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T143819Z_000032_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 436724393a
+task: phase7-houses-hotels
+
+Re-read your role and constitution.
+
+merge_and_process architect 436724393a
+```
+
+Action taken: merged architect commit `436724393a` into `main`. This one
+handoff closed out both phase 6 (station/utility rent) and phase 7
+(houses and hotels) — 189 unit tests and 134 generated acceptance scenarios
+pass on the merged state, per the coder's own verification. The `logbook.md`
+conflict was again resolved at entry granularity: 177 base entries, 1 new
+here, 36 new on the architect's side, one collision (identical content,
+just a trailing-whitespace difference against the merge base); 6 entries
+present in the merge base had been dropped somewhere in the architect's own
+internal merge chain — one of them the architect's own `11:45:23Z` review
+entry, not mine — and are restored here except where the architect's side
+already carried an equivalent copy.
+
+Flagged separately to the user: this commit's last change
+(`436724393a`, "Add phase complete specifier sync") edits both
+`architect.prompt` and `specifier.prompt` with no logbook entry explaining
+why, unlike every other prompt change in this project's history, which was
+explicitly logged as done at the user's direction. The content itself is
+consistent with current behavior — it batches the specifier notification to
+once per completed task instead of once per commit, and says not to notify
+the coder again without user approval, which this role already does — so it
+was merged, but the missing audit trail is a real deviation worth the user's
+attention before it's treated as authoritative.
 
 ## 2026-07-28T14:38:24Z — architect sent phase 7 completion sync
 
