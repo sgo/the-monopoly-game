@@ -6148,3 +6148,36 @@ there, proven across two different rolls — in new `station-rent.feature` and
 dice-derived utility case. Waiver and the Chance/Community-Chest utility-rent
 sub-case are out of scope, deferred to phase 5's existing generic coverage and
 phase 10 respectively.
+
+## 2026-07-28T13:12:15Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T131215Z_000013_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase7-houses-hotels
+commit: 3e7eb1a658
+created_at: 2026-07-28T13:12:15.288838Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3e7eb1a658
+```
+
+Summary: specified Phase 7 houses and hotels — even build across a colour
+group when affordable, hotel construction from four houses, selling a house
+back at half price, and hotel-to-houses exchange, all in new
+`building.feature` — plus the house/hotel rent tiers and the
+partial-monopoly-still-double-rent scenario that Phase 5 deferred into
+`rent.feature`, with one matching journal/report scenario each for building
+and selling. Bank shortage of houses/hotels and building while mortgaged stay
+out of scope, deferred as a substantial sub-feature and pending Phase 8
+respectively. A DRY-checker pass caught a real `placeholder-variant`
+(`<houses>` vs `<remaining_houses>` naming the same fact) that was normalized
+before handoff, and a review question caught a scenario arranging an
+untested second street, which was trimmed.
