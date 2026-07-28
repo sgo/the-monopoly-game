@@ -6265,6 +6265,28 @@ Verification:
 
 Routing: this follow-up changes observable behavior and tests, so it must go to coder only with priority 00. No specifier phase-complete sync is sent until the coder follow-up loop returns and is accepted.
 
+## 2026-07-28T20:31:33Z — architect sent phase 9 follow-up handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T203125Z_000034_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase9-land-sale
+commit: 5ff2344bad
+created_at: 2026-07-28T20:31:25.390343Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 5ff2344bad
+```
+
+Summary: routed architect follow-up fixes for Phase 9 to coder only at priority 00 because the changes include observable behavior hardening and regression tests. The specifier phase-complete sync remains pending until this coder loop returns and is accepted.
+
 ## 2026-07-28T11:51:24Z — architect review of redundant follow-up
 
 The refactorer commit contains no source, test, manifest, or configuration
