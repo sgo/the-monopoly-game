@@ -86,7 +86,7 @@ class RentTest {
 
   private static final class Claiming implements Strategy {
     @Override
-    public boolean claims(Rent.Claim claim) {
+    public boolean claims(RentClaim claim) {
       return true;
     }
   }
