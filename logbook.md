@@ -5112,6 +5112,43 @@ acceptance mutation exit 0: `buying-land` 14/14, `auctions` 8/8, `journal` 8/8,
 instinct and sidesteps the hazard rather than removing it. A player's identity
 should be its `ID` alone, before anything keys on a `Player`.
 
+## 2026-07-28T09:05:57Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T090446Z_000025_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase4-buying-auctions
+commit: 727fe22ef7
+
+Re-read your role and constitution.
+
+merge_and_process architect 727fe22ef7
+```
+
+Action taken: merged the policy-aligned exhaustive report dispatch, recorded
+its exempt CRAP value of 10.0, and verified the unchanged behavior.
+
+## 2026-07-28T09:05:57Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase4-buying-auctions
+commit: (commit recorded by the handoff draft)
+```
+
+Summary: exhaustive sealed report dispatch accepted under the current explicit
+CRAP exemption; verification passes.
+
 ## 2026-07-28T08:53:44Z — architect handoffs for phase4-buying-auctions
 
 To coder and refactorer at priority `00`:
