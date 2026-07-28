@@ -257,7 +257,41 @@ rule-dependent amount, the Start salary, is computed by `StartSpace` itself.
   also covers the house-rent ladder, so it moved to `OwnedCount.checked` and
   reports which quantity was out of range.
 - The Start salary was stored as `Money(-200)` and read back through
-  `Player.pass`, which called `account.credit(...)`; a negative charge is what
+`Player.pass`, which called `account.credit(...)`; a negative charge is what
+
+## 2026-07-28T19:10:25Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260728T191025Z_000014_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase8-mortgaging
+
+Re-read your role and constitution.
+
+merge_and_process specifier 95affb5c6c
+```
+
+Action taken: merged specifier commit `95affb5c6c` into `swarmforge-coder`
+(fast-forward), implemented the `phase8-mortgaging` slice, and verified it
+with `mvn -B -pl the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core -Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2 test`
+plus `acceptance/run-acceptance.sh` using the same local Maven repository.
+
+## 2026-07-28T21:17:40Z — coder sent handoff to refactorer
+
+Summary: phase 8 mortgaging is implemented and verified. The slice adds
+mortgage state and costs in deeds, suppresses rent and monopoly double-rent
+while mortgaged, blocks building on mortgaged colour groups, adds mortgage
+journal/report wording, supports direct mortgaged-land transfer setup in the
+acceptance world, and puts `mortgage.feature` plus
+`mortgage-transfer.feature` onto the normal acceptance pipeline. Ready for
+refactorer review.
   made the player richer. `StartSpace.salary()` now returns a positive `+200`
   and `Player.pass` calls `account.deposit(...)`. The acceptance step keeps
   asserting "your salary is $200" and was verified non-vacuous by mutating the
@@ -6819,40 +6853,6 @@ invalid improvement transitions and adds focused regression coverage; coder
 verification passes on the merged state with `189` Maven tests and the full
 normal acceptance pipeline (`134` generated acceptance tests).
 
-## 2026-07-28T14:28:39Z — architect received phase 7 refactorer follow-up
-
-Handoff message received:
-
-```
-id: 20260728T142827Z_000029_from_refactorer
-from: refactorer
-to: architect
-recipient: architect
-priority: 50
-type: git_handoff
-role: refactorer
-commit: ae13bf8911
-created_at: 2026-07-28T14:28:27.951145Z
-enqueued_at: 2026-07-28T14:28:28.764400Z
-task: phase7-houses-hotels
-dequeued_at: 2026-07-28T14:28:39.266225Z
-
-Re-read your role and constitution.
-
-merge_and_process refactorer ae13bf8911
-```
-
-Action taken: began architectural review of the named refactorer commit.
-
-## 2026-07-28T14:30:03Z — architect accepted phase 7 refactorer follow-up
-
-The refactorer return commit `ae13bf8911` contains no source, test, manifest,
-configuration, or behavior change beyond architect commit `94515961c6`;
-outside `logbook.md`, `git diff 94515961c6 ae13bf8911` is empty. The
-architectural phases and final verification gates were already completed on
-that exact source state.
-
-No further handoff is warranted. The exclusive routing loop closes here.
 ## 2026-07-28T08:16:35Z — specifier received handoff from architect
 
 Handoff message received:
@@ -7031,6 +7031,102 @@ respectively. A DRY-checker pass caught a real `placeholder-variant`
 before handoff, and a review question caught a scenario arranging an
 untested second street, which was trimmed.
 
+## 2026-07-28T14:28:27Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/50_20260728T141556Z_000016_from_coder_to_refactorer.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase7-houses-hotels
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder 2481338dfe
+```
+
+Action taken: merged `2481338dfe` into `swarmforge-refactorer`. Only
+`logbook.md` conflicted this time; every source file auto-merged cleanly.
+Neither of the two questions from the last handoff was touched here — this
+commit is a separate, independent hardening pass the architect ran (mutation
+testing surfaced that invalid improvement transitions had no guard):
+`Deeds.buildHouse`/`buildHotel`/`sellHouse`/`exchangeHotelForHouses` now throw
+`IllegalStateException` on an out-of-sequence call, `arrangeHouses` validates
+its bound, and `Building.develop`'s `while (true)` became the project's usual
+`for (;;)`. Both flagged questions — the single permanent builder, and
+whether a hotel's price should be its printed rent or its construction cost
+— remain open. Logbook conflict resolved the same way as the prior seven,
+interleaving two independent handoff threads (mine for phases 5–7, the
+coder's own phase 6/7 specifier and architect-routing history it had recorded
+separately) into one chronological order. Header counts confirm nothing
+lost: 194 (common ancestor) + 2 (mine, new) + 7 (coder's, new) = 203, matching
+the merged file.
+
+My own gates against the merged state: CRAP clean but for the exempt sealed
+dispatch on `Report.line` (13,2, unchanged); DRY at 26, matching the
+architect's own figure — what it flags is the same arrange-act-assert and
+constructor-shape similarity already judged not worth chasing, now including
+`DeedsTest`'s four illegal-transition tests, which the architect's own commit
+message gives the same reasoning for leaving alone: collapsing them would
+hide which rule each one asserts. Mutation scan on every changed file stays
+well under the 100-site split threshold. Unit (189), property (17), and
+normal acceptance (141) verification all pass. Nothing left to do on this
+state.
+
+## 2026-07-28T14:28:27Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase7-houses-hotels
+commit: ae13bf8911
+```
+
+Summary: merged the invalid-transition hardening pass; refactorer's own CRAP,
+DRY, and mutation-scan gates are unchanged and pass on the merged tree; unit,
+property, and acceptance verification all pass. The two behavior questions
+from the last handoff are still open.
+
+## 2026-07-28T14:28:39Z — architect received phase 7 refactorer follow-up
+
+Handoff message received:
+
+```
+id: 20260728T142827Z_000029_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: ae13bf8911
+created_at: 2026-07-28T14:28:27.951145Z
+enqueued_at: 2026-07-28T14:28:28.764400Z
+task: phase7-houses-hotels
+dequeued_at: 2026-07-28T14:28:39.266225Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer ae13bf8911
+```
+
+Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T14:30:03Z — architect accepted phase 7 refactorer follow-up
+
+The refactorer return commit `ae13bf8911` contains no source, test, manifest,
+configuration, or behavior change beyond architect commit `94515961c6`;
+outside `logbook.md`, `git diff 94515961c6 ae13bf8911` is empty. The
+architectural phases and final verification gates were already completed on
+that exact source state.
+
+No further handoff is warranted. The exclusive routing loop closes here.
+
 ## 2026-07-28T14:38:19Z — specifier received handoff from architect
 
 Handoff message received:
@@ -7074,6 +7170,30 @@ the coder again without user approval, which this role already does — so it
 was merged, but the missing audit trail is a real deviation worth the user's
 attention before it's treated as authoritative.
 
+## 2026-07-28T14:38:24Z — architect sent phase 7 completion sync
+
+Handoff message sent to specifier:
+
+```
+id: 20260728T143819Z_000032_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase7-houses-hotels
+commit: 436724393a
+created_at: 2026-07-28T14:38:19.147864Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 436724393a
+```
+
+Summary: sent the phase-complete sync handoff so the specifier can merge the
+completed architect branch state, including the durable workflow update that
+requires this sync before future specification work.
+
 ## 2026-07-28T19:10:25Z — specifier sent handoff to coder
 
 Handoff message sent:
@@ -7113,3 +7233,40 @@ affordable" strategy's known behavior; added an explicit
 `pawn "dog" will build a house on "..."` decision-override step (mirroring
 the existing `will bid`/`declines` overrides) so the scenario's intent
 holds regardless of which strategy is assigned.
+
+## 2026-07-28T19:34:26Z — architect received phase 8 refactorer handoff
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/architect/.swarmforge/handoffs/inbox/in_process/batch_20260728T193406Z_000001/50_20260728T193400Z_000030_from_refactorer_to_architect.handoff
+FROM: refactorer
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase8-mortgaging
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process refactorer dd8bab5911
+```
+
+Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T19:39:49Z — architect accepted phase 8 refactorer handoff
+
+The phase 8 mortgaging implementation keeps mortgage state inside `Deeds`,
+leaves rent/building rules dependent on the core rule model rather than on
+test or delivery code, and keeps the new acceptance support under the specs
+test tree. No structural source change was warranted; DRY candidates were
+existing constructor/test-helper shape or explicit scenario-step code where
+extraction would reduce clarity.
+
+Verification passed: normal Maven tests (`197`), property tests (`17`), normal
+generated acceptance (`154`), Java mutation on changed production files
+(`Rent` 7/7 killed, `Report` 1/1 killed, `Game`/`Building`/`Deeds` with no
+differential mutations pending), DRY review with no actionable duplication,
+and soft Gherkin mutation (`mortgage` 14/14, `mortgage-transfer` 8/8,
+`journal` 3/3, `report` 3/3; no survivors).
+
+Only tool-owned mutation and Gherkin manifest updates were produced by this
+architect pass. No coder or refactorer follow-up is warranted.
