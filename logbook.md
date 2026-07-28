@@ -5944,3 +5944,35 @@ merge_and_process refactorer 7f2102ac5a
 ```
 
 Action taken: began review of the refactorer's merged architect state.
+
+## 2026-07-28T11:45:23Z — architect review of refactorer follow-up
+
+The refactorer follow-up contained the already reviewed architect source state
+and its review journal. Rechecking the four architectural phases found no new
+UI/core or dependency-direction issue, but did confirm an encapsulation defect
+in `Bank.Simple`: its caller-supplied `Set<Account>` used a record containing a
+mutable balance as a hash key. Once that balance changed, opening an account
+again for the same player could retain two equal owners and make `accountOf`
+return an arbitrary, stale account.
+
+`Bank.Simple` now owns a private map keyed by the immutable account owner.
+Account creation is idempotent, lookup is deterministic, and callers no longer
+provide or retain the bank's storage representation. A regression test opens
+the same account after a deposit and verifies that the original account and
+balance are preserved. Construction sites and the property-test explanation
+were updated to match the encapsulated representation.
+
+Final verification:
+
+- 170 normal unit tests pass.
+- 11 separately tagged property tests pass.
+- 124 generated acceptance scenarios pass.
+- Differential Java mutation killed all 10 selected `Bank` mutations; no site
+  was uncovered and no mutant survived. `Official` had no mutation sites after
+  its constructor-only change.
+- DRY analysis reported 15 established small candidates. The production
+  candidates are explicit event handlers or constructor shapes, and the rest
+  are independent test arrangements and assertions; none is a useful shared
+  abstraction for this change.
+- Soft Gherkin mutation found no changed scenario surface, retained all prior
+  killed results, and reported no survivors or infrastructure errors.
