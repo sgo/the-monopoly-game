@@ -7211,3 +7211,22 @@ merge_and_process refactorer dd8bab5911
 ```
 
 Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T19:39:49Z — architect accepted phase 8 refactorer handoff
+
+The phase 8 mortgaging implementation keeps mortgage state inside `Deeds`,
+leaves rent/building rules dependent on the core rule model rather than on
+test or delivery code, and keeps the new acceptance support under the specs
+test tree. No structural source change was warranted; DRY candidates were
+existing constructor/test-helper shape or explicit scenario-step code where
+extraction would reduce clarity.
+
+Verification passed: normal Maven tests (`197`), property tests (`17`), normal
+generated acceptance (`154`), Java mutation on changed production files
+(`Rent` 7/7 killed, `Report` 1/1 killed, `Game`/`Building`/`Deeds` with no
+differential mutations pending), DRY review with no actionable duplication,
+and soft Gherkin mutation (`mortgage` 14/14, `mortgage-transfer` 8/8,
+`journal` 3/3, `report` 3/3; no survivors).
+
+Only tool-owned mutation and Gherkin manifest updates were produced by this
+architect pass. No coder or refactorer follow-up is warranted.
