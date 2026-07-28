@@ -3,7 +3,10 @@ package the.monopoly.game.rules;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
+import the.monopoly.game.components.streets.Station;
 import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.components.streets.Utility;
+import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
@@ -27,26 +30,40 @@ public class Rent implements Landings {
 
   @Override
   public void resolve(Player tenant, Street space) {
-    if (!(space instanceof ColourStreet land)) return;
-    deeds.ownerOf(land.type()).flatMap(this::playerNamed).ifPresent(owner -> collect(owner, tenant, land));
+    resolve(tenant, space, null);
   }
 
-  private void collect(Player owner, Player tenant, ColourStreet land) {
+  @Override
+  public void resolve(Player tenant, Street space, Roll roll) {
+    deeds.ownerOf(space.type()).flatMap(this::playerNamed).ifPresent(owner -> collect(owner, tenant, space, roll));
+  }
+
+  private void collect(Player owner, Player tenant, Street land, Roll roll) {
     if (owner.id().equals(tenant.id())) return;
-    Money rent = rentFor(owner, land);
+    Money rent = rentFor(owner, land, roll);
     if (!strategies.forPlayer(owner).claims(new Strategy.RentClaim(tenant, land, rent))) return;
     tenant.account().withdraw(rent);
     owner.account().deposit(rent);
     events.paid(tenant, owner, land, rent);
   }
 
-  private Money rentFor(Player owner, ColourStreet land) {
+  private Money rentFor(Player owner, Street land, Roll roll) {
+    if (land instanceof Station station)
+      return station.rentForOwning(owned(owner, Station.class));
+    if (land instanceof Utility utility)
+      return new Money(utility.rentDiceMultiplierForOwning(owned(owner, Utility.class)) * roll.total());
+    ColourStreet street = (ColourStreet) land;
     boolean monopoly = rules.streets()
         .filter(ColourStreet.class::isInstance)
         .map(ColourStreet.class::cast)
-        .filter(it -> it.colourGroup() == land.colourGroup())
+        .filter(it -> it.colourGroup() == street.colourGroup())
         .allMatch(it -> deeds.ownerOf(it.type()).filter(owner.id()::equals).isPresent());
-    return monopoly ? land.vacantRent().plus(land.vacantRent()) : land.vacantRent();
+    return monopoly ? street.vacantRent().plus(street.vacantRent()) : street.vacantRent();
+  }
+
+  private int owned(Player owner, Class<? extends Street> kind) {
+    return (int) rules.streets().filter(kind::isInstance)
+        .filter(it -> deeds.ownerOf(it.type()).filter(owner.id()::equals).isPresent()).count();
   }
 
   private Optional<Player> playerNamed(Player.ID id) {
@@ -55,7 +72,7 @@ public class Rent implements Landings {
 
   /** What the payment did, for whoever records the game. */
   public interface Events {
-    void paid(Player tenant, Player owner, ColourStreet land, Money rent);
+    void paid(Player tenant, Player owner, Street land, Money rent);
   }
 }
 

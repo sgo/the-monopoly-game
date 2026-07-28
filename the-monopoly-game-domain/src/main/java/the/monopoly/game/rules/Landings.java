@@ -1,6 +1,7 @@
 package the.monopoly.game.rules;
 
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.streets.Street;
 
 /**
@@ -14,6 +15,10 @@ public interface Landings {
   };
 
   void resolve(Player player, Street space);
+
+  default void resolve(Player player, Street space, Roll roll) {
+    resolve(player, space);
+  }
 }
 
 /* mutate4java-manifest

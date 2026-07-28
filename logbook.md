@@ -6145,3 +6145,37 @@ commit: 8d2c1d06ba
 Summary: merged the `Bank.Simple` encapsulation fix; refactorer's own CRAP,
 DRY, and mutation-scan gates are unchanged and pass on the merged tree; unit,
 property, and acceptance verification all pass.
+
+## 2026-07-28T12:07:38Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/inbox/in_process/50_20260728T120738Z_000012_from_specifier_to_coder.handoff
+FROM: specifier
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase6-station-utility-rent
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process specifier 0540a2acc7
+```
+
+Action taken: merged the approved station and utility rent specifications and
+implemented roll-aware landing rent calculation.
+
+## 2026-07-28T12:14:30Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase6-station-utility-rent
+commit: f59f523872
+```
+
+Summary: station and utility rent are implemented with roll-aware landings;
+normal unit and acceptance verification pass.
