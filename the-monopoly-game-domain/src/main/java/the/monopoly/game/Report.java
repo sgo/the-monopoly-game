@@ -2,6 +2,7 @@ package the.monopoly.game;
 
 import the.monopoly.game.Game.Journal.Entry;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.Street;
 
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,9 @@ public final class Report {
       Entry.TurnStarted.class, entry -> turnStarted((Entry.TurnStarted) entry),
       Entry.Rolled.class, entry -> rolled((Entry.Rolled) entry),
       Entry.Moved.class, entry -> moved((Entry.Moved) entry),
-      Entry.SalaryCollected.class, entry -> salaryCollected((Entry.SalaryCollected) entry)
+      Entry.SalaryCollected.class, entry -> salaryCollected((Entry.SalaryCollected) entry),
+      Entry.Bought.class, entry -> bought((Entry.Bought) entry),
+      Entry.AuctionWon.class, entry -> auctionWon((Entry.AuctionWon) entry)
   );
 
   private Report() {
@@ -64,6 +67,24 @@ public final class Report {
 
   private static String salaryCollected(Entry.SalaryCollected entry) {
     return name(entry.player()) + " collects a salary of $" + entry.salary().amount();
+  }
+
+  private static String bought(Entry.Bought entry) {
+    return name(entry.player()) + " buys " + spaceName(entry.land()) + " for $" + entry.price().amount();
+  }
+
+  private static String auctionWon(Entry.AuctionWon entry) {
+    return name(entry.player()) + " wins the auction for " + spaceName(entry.land()) + " at $" + entry.price().amount();
+  }
+
+  /**
+   * A space is named on the board in words, and in the domain as one name, so
+   * the run-together words are told apart again here. A space whose printed
+   * name is not its own name spelled out will have to be given one when a
+   * specification asks the report for it.
+   */
+  private static String spaceName(Street.Type land) {
+    return land.name().replaceAll("(?<=[a-z])(?=[A-Z])", " ");
   }
 
   private static String names(List<Player.ID> players) {

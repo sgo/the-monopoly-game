@@ -4,6 +4,7 @@ import the.monopoly.game.components.streets.Street;
 
 import java.util.Map;
 
+import static java.util.stream.Collectors.toMap;
 import static the.monopoly.game.components.streets.Street.Type.*;
 
 /**
@@ -54,13 +55,25 @@ final class SpaceNames {
       Map.entry("Naar de Gevangenis / Allez en Prison", NaarDeGevangenis)
   );
 
+  /**
+   * The same spaces under the first of the names they are printed with, so a
+   * feature can say "Noord Station" where the board says "Noord Station / Gare
+   * du Nord".
+   */
+  private static final Map<String, Street.Type> BY_FIRST_NAME = BY_NAME.entrySet().stream()
+      .collect(toMap(it -> firstOf(it.getKey()), Map.Entry::getValue));
+
   private SpaceNames() {
   }
 
   static Street.Type of(String name) {
-    Street.Type type = BY_NAME.get(name);
+    Street.Type type = BY_NAME.getOrDefault(name, BY_FIRST_NAME.get(name));
     if (type == null)
       throw new AssertionError("Unknown board space \"" + name + "\".");
     return type;
+  }
+
+  private static String firstOf(String name) {
+    return name.split(" / ")[0];
   }
 }

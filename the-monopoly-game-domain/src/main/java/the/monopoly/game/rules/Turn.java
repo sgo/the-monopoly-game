@@ -18,11 +18,18 @@ public class Turn {
   private final Rule.Set rules;
   private final Cup cup;
   private final Events events;
+  private final Landings landings;
 
-  public Turn(Rule.Set rules, Cup cup, Events events) {
+  public Turn(Rule.Set rules, Cup cup, Events events, Landings landings) {
     this.rules = rules;
     this.cup = cup;
     this.events = events;
+    this.landings = landings;
+  }
+
+  /** A turn played where stopping on a space is worth nothing. */
+  public Turn(Rule.Set rules, Cup cup, Events events) {
+    this(rules, cup, events, Landings.UNEVENTFUL);
   }
 
   /** A turn nobody is keeping an account of. */
@@ -65,6 +72,12 @@ public class Turn {
       if (to == 0) events.collectedSalary(player, player.land(start()));
       else events.collectedSalary(player, player.pass(start()));
     }
+
+    landings.resolve(player, spaceAt(to));
+  }
+
+  private Street spaceAt(int position) {
+    return rules.create(rules.gameboard().layout().get(position));
   }
 
   /**

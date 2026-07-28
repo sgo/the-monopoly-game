@@ -198,6 +198,43 @@ class TurnTest {
     );
   }
 
+  /** Whatever a space is worth is the rules' business, so the turn hands it over. */
+  @Test
+  void aTurnHandsOverTheSpaceThePawnStoppedOn() {
+    Player player = playerAt(0, 1500);
+    Arrivals arrivals = new Arrivals();
+
+    new Turn(ruleSet, Cup.of(new Roll(1, 2)), new Turn.Events() {
+    }, arrivals).take(player);
+
+    assertThat(arrivals.spaces).containsExactly(Street.Type.DiestsestraatLeuven);
+  }
+
+  @Test
+  void rollingDoublesHandsOverEverySpaceThePawnStoppedOn() {
+    Player player = playerAt(0, 1500);
+    Arrivals arrivals = new Arrivals();
+
+    new Turn(ruleSet, Cup.of(new Roll(1, 1), new Roll(1, 2)), new Turn.Events() {
+    }, arrivals).take(player);
+
+    assertThat(arrivals.spaces)
+        .containsExactly(Street.Type.AlgemeenFonds, Street.Type.NoordStation);
+  }
+
+  /** The third double takes the move away, so there is nowhere to arrive at. */
+  @Test
+  void aPawnSentToJailForCheatingArrivesNowhere() {
+    Player player = playerAt(0, 1500);
+    Arrivals arrivals = new Arrivals();
+
+    new Turn(ruleSet, Cup.of(new Roll(2, 2), new Roll(5, 5), new Roll(1, 1)), new Turn.Events() {
+    }, arrivals).take(player);
+
+    assertThat(arrivals.spaces)
+        .containsExactly(Street.Type.InkomstenBelasting, Street.Type.PlaceVerteVerviers);
+  }
+
   @Test
   void aTurnThatReportsToNobodyStillPlays() {
     Player player = playerAt(5, 1500);
@@ -224,6 +261,16 @@ class TurnTest {
     @Override
     public void collectedSalary(Player player, Money salary) {
       events.add("collected a salary of " + salary.amount());
+    }
+  }
+
+  /** Where a turn said the pawn arrived, in the order it arrived there. */
+  private static final class Arrivals implements Landings {
+    private final List<Street.Type> spaces = new ArrayList<>();
+
+    @Override
+    public void resolve(Player player, Street space) {
+      spaces.add(space.type());
     }
   }
 

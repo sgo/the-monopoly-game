@@ -36,6 +36,11 @@ public interface Bank {
         return new Balance(new Money(amount));
       }
 
+      /** What is in the account, for whoever has to decide what it can pay for. */
+      public Money amount() {
+        return amount;
+      }
+
       public void incrementWith(Money amount) {
         this.amount = this.amount.plus(amount);
       }
