@@ -68,6 +68,14 @@ public final class Report {
     return name(entry.player()) + " collects a salary of $" + entry.salary().amount();
   }
 
+  private static String bought(Entry.Bought entry) {
+    return name(entry.player()) + " buys " + spaceName(entry.land()) + " for $" + entry.price().amount();
+  }
+
+  private static String auctionWon(Entry.AuctionWon entry) {
+    return name(entry.player()) + " wins the auction for " + spaceName(entry.land()) + " at $" + entry.price().amount();
+  }
+
   /**
    * A space is named on the board in words, and in the domain as one name, so
    * the run-together words are told apart again here. A space whose printed
