@@ -148,7 +148,7 @@ class GameTest {
     Game.Result result = playWith(Map.of(Pawn.dog.id(), new AgreeIfAffordable()));
 
     assertThat(result.deeds().ownerOf(Street.Type.DiestsestraatLeuven)).contains(Pawn.dog.id());
-    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1440));
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1448));
   }
 
   @Test
@@ -173,6 +173,20 @@ class GameTest {
   }
 
   @Test
+  void auctioningUnownedLandDoesNotMakeTheLandingPlayerPayRent() {
+    Game.Result result = playWith(Map.of(Pawn.high_hat.id(), biddingAndClaiming(120)));
+
+    assertThat(result.journal()).doesNotContain(
+        new Entry.RentPaid(
+            Pawn.dog.id(),
+            Pawn.high_hat.id(),
+            Street.Type.DiestsestraatLeuven,
+            new Money(4)
+        )
+    );
+  }
+
+  @Test
   void aGameNobodyDecidesAnythingInLeavesTheBoardWithTheBank() {
     Game.Result result = playWith(Map.of());
 
@@ -185,6 +199,20 @@ class GameTest {
       @Override
       public Money bidFor(Offer offer) {
         return new Money(amount);
+      }
+    };
+  }
+
+  private static Strategy biddingAndClaiming(int amount) {
+    return new Strategy() {
+      @Override
+      public Money bidFor(Offer offer) {
+        return new Money(amount);
+      }
+
+      @Override
+      public boolean claims(RentClaim claim) {
+        return true;
       }
     };
   }

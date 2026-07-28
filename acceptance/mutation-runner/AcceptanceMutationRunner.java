@@ -7,8 +7,9 @@ import org.junit.platform.launcher.listeners.TestExecutionSummary;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.PrintStream;
 import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -72,7 +73,10 @@ public final class AcceptanceMutationRunner {
     String id = job.getOrDefault("id", "");
     long started = System.nanoTime();
     Path work = null;
+    PrintStream protocol = System.out;
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
     try {
+      System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
       work = Files.createTempDirectory("acceptance-mutation-");
       Path sources = work.resolve("src");
       Path classes = Files.createDirectories(work.resolve("classes"));
@@ -82,12 +86,16 @@ public final class AcceptanceMutationRunner {
       TestExecutionSummary summary = execute(classes, entryPointClass(job.get("feature_json")));
 
       if (summary.getTestsFoundCount() == 0)
-        return response(id, "infrastructure_error", "no tests were discovered", "", started);
-      return response(id, summary.getTotalFailureCount() > 0 ? "test_failure" : "test_success", "", "", started);
+        return response(id, "infrastructure_error", output.toString(StandardCharsets.UTF_8),
+            "no tests were discovered", started);
+      return response(id, summary.getTotalFailureCount() > 0 ? "test_failure" : "test_success",
+          output.toString(StandardCharsets.UTF_8), "", started);
     } catch (Exception cause) {
       System.err.println("job " + id + " failed: " + cause);
-      return response(id, "infrastructure_error", "", String.valueOf(cause.getMessage()), started);
+      return response(id, "infrastructure_error", output.toString(StandardCharsets.UTF_8),
+          String.valueOf(cause.getMessage()), started);
     } finally {
+      System.setOut(protocol);
       deleteTree(work);
     }
   }

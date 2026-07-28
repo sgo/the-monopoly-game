@@ -34,9 +34,11 @@ public final class Report {
    * One case per entry is one branch per entry, so complexity counts as high as
    * the journal is wide. That is the shape of the thing being described, not
    * complication to be refactored away; a form that measures lower gets there
-   * by hiding the same branching from the compiler as well as the metric. When
-   * the cases outgrow a screen, give each one a named method and leave the
-   * switch itself alone.
+   * by hiding the same branching from the compiler as well as the metric. This
+   * switch is exempt from the CRAP threshold by decision of 2026-07-28, after
+   * three rounds of it being replaced by a map and put back. When the cases
+   * outgrow a screen, give each one a named method and leave the switch itself
+   * alone.
    */
   private static String line(Entry entry) {
     return switch (entry) {
@@ -50,6 +52,8 @@ public final class Report {
       case Entry.Bought it -> name(it.player()) + " buys " + spaceName(it.land()) + " for $" + it.price().amount();
       case Entry.AuctionWon it ->
           name(it.player()) + " wins the auction for " + spaceName(it.land()) + " at $" + it.price().amount();
+      case Entry.RentPaid it -> name(it.tenant()) + " pays " + name(it.owner()) + " $"
+          + it.rent().amount() + " rent for " + spaceName(it.land());
     };
   }
 
@@ -74,40 +78,40 @@ public final class Report {
 
 /* mutate4java-manifest
 version=1
-moduleHash=bd2d142aaa0ddd848415988e83db9497855468fae040f94950c45689810d0ad9
+moduleHash=42f8121ce3bc816a6b0095af33f4170b7c72c690a7fedce6f0084188dcebfe88
 scope.0.id=Y2xhc3M6UmVwb3J0I1JlcG9ydDoxOA
 scope.0.kind=class
 scope.0.startLine=18
-scope.0.endLine=73
-scope.0.semanticHash=655c29996be96996e971c9770f09ad4257e45524563432a2e787584612a8cb2c
+scope.0.endLine=77
+scope.0.semanticHash=101ba3f46a620356d3cede7004732a7b3349e3ba845e542af7ff2bd79bbd0b74
 scope.1.id=bWV0aG9kOlJlcG9ydCNjdG9yKDApOjE5
 scope.1.kind=method
 scope.1.startLine=19
 scope.1.endLine=20
 scope.1.semanticHash=fa4ab1d8c774b5a49e26e7b36ba0ec25ba0d7069b207d38eb37beccb7d02dc9c
-scope.2.id=bWV0aG9kOlJlcG9ydCNsaW5lKDEpOjQx
+scope.2.id=bWV0aG9kOlJlcG9ydCNsaW5lKDEpOjQz
 scope.2.kind=method
-scope.2.startLine=41
-scope.2.endLine=54
-scope.2.semanticHash=a88fbaba922aeeed1d50410a2db255de8519cf4e27dd0f2d8eba413152310297
-scope.3.id=bWV0aG9kOlJlcG9ydCNuYW1lKDEpOjcw
+scope.2.startLine=43
+scope.2.endLine=58
+scope.2.semanticHash=8cdb0d140b81bad07efdba850e859d83100ea22e012797f1196bf65764dfd6fb
+scope.3.id=bWV0aG9kOlJlcG9ydCNuYW1lKDEpOjc0
 scope.3.kind=method
-scope.3.startLine=70
-scope.3.endLine=72
+scope.3.startLine=74
+scope.3.endLine=76
 scope.3.semanticHash=cd39b08d1576cbc2e9d2ae25bb54b6b608f1219509ee3d03086e8f3ab4c238fa
-scope.4.id=bWV0aG9kOlJlcG9ydCNuYW1lcygxKTo2Ng
+scope.4.id=bWV0aG9kOlJlcG9ydCNuYW1lcygxKTo3MA
 scope.4.kind=method
-scope.4.startLine=66
-scope.4.endLine=68
+scope.4.startLine=70
+scope.4.endLine=72
 scope.4.semanticHash=7baca973d9baa23bf1205536bbfd229d494b1e2c863e02f6e50c5ce7dcb42959
 scope.5.id=bWV0aG9kOlJlcG9ydCNvZigxKToyMg
 scope.5.kind=method
 scope.5.startLine=22
 scope.5.endLine=24
 scope.5.semanticHash=3bddf559e6362200e39e3d2024808e23da1e3da3deb262e8b89f1402e9edd25e
-scope.6.id=bWV0aG9kOlJlcG9ydCNzcGFjZU5hbWUoMSk6NjI
+scope.6.id=bWV0aG9kOlJlcG9ydCNzcGFjZU5hbWUoMSk6NjY
 scope.6.kind=method
-scope.6.startLine=62
-scope.6.endLine=64
+scope.6.startLine=66
+scope.6.endLine=68
 scope.6.semanticHash=56eb8b748063de6798efd6f1a96d5a30f07cf019c0478f7f004006d2fe61eaf8
 */

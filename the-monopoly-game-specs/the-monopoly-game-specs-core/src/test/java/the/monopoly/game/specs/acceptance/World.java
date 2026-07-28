@@ -7,6 +7,7 @@ import the.monopoly.game.components.dice.Dice;
 import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Initiative;
@@ -178,7 +179,8 @@ public class World {
 
   public void playGame() {
     Game.Result result = new Game(
-        ruleSet, players(), player -> () -> nextQueuedPawnRoll(player), this::strategyOf
+        ruleSet, players(), player -> () -> nextQueuedPawnRoll(player), this::strategyOf,
+        deeds == null ? deeds = new Deeds() : deeds
     ).play();
     turnOrder = result.turnOrder();
     journal = result.journal();
@@ -196,10 +198,6 @@ public class World {
    */
   public void landPawnOn(String pawnName, Street.Type space) {
     int arrival = ruleSet.gameboard().positionOf(space);
-    if (arrival < A_SHORT_HOP.total())
-      throw new AssertionError(
-          "Space " + arrival + " is too close to Start for a pawn to be walked onto it."
-      );
     placePawn(pawnName, arrival - A_SHORT_HOP.total());
     queuePawnRoll(pawnName, A_SHORT_HOP);
     playGame();
@@ -212,6 +210,15 @@ public class World {
     return deeds.ownerOf(land).filter(it -> it.value().equals(pawnName)).isPresent();
   }
 
+  /** Gives a pawn a title without changing the scenario's stated starting money. */
+  public void givePawnOwnership(String pawnName, Street.Type land) {
+    if (deeds == null) deeds = new Deeds();
+    Player owner = pawn(pawnName);
+    Ownable space = (Ownable) ruleSet.create(land);
+    deeds.sell(space, owner, space.price());
+    owner.account().deposit(space.price());
+  }
+
   public void pawnFollows(String pawnName, Strategy strategy) {
     pawnStrategies.put(pawnName, strategy);
   }
@@ -222,6 +229,15 @@ public class World {
 
   public void pawnWillBid(String pawnName, Street.Type land, Money amount) {
     scriptFor(pawnName).bids(land, amount);
+  }
+
+  public void pawnDeclinesRent(String pawnName, Street.Type land) {
+    pawnStrategies.put(pawnName, new Strategy() {
+      @Override
+      public boolean claims(RentClaim claim) {
+        return false;
+      }
+    });
   }
 
   private Strategy strategyOf(Player player) {
