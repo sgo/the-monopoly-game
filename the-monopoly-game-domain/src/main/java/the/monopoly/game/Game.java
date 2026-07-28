@@ -74,9 +74,15 @@ public class Game {
     Journalling journalling = new Journalling(journal);
     Landings rent = new Rent(deeds, rules, turnOrder, strategies, journalling);
     Landings landSale = new LandSale(deeds, turnOrder, strategies, journalling);
-    Landings resolvingLandings = (player, space) -> {
-      rent.resolve(player, space);
-      landSale.resolve(player, space);
+    Landings resolvingLandings = new Landings() {
+      @Override public void resolve(Player player, Street space) {
+        rent.resolve(player, space);
+        landSale.resolve(player, space);
+      }
+      @Override public void resolve(Player player, Street space, Roll roll) {
+        rent.resolve(player, space, roll);
+        landSale.resolve(player, space, roll);
+      }
     };
     turnOrder.forEach(player -> takeTurn(player, journal, journalling, resolvingLandings));
 
@@ -122,7 +128,7 @@ public class Game {
     }
 
     @Override
-    public void paid(Player tenant, Player owner, ColourStreet land, Money rent) {
+    public void paid(Player tenant, Player owner, Street land, Money rent) {
       journal.log(new Journal.Entry.RentPaid(tenant.id(), owner.id(), land.type(), rent));
     }
   }

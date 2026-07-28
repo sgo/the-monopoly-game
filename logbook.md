@@ -6063,6 +6063,25 @@ Final verification:
 - Soft Gherkin mutation found no changed scenario surface, retained all prior
   killed results, and reported no survivors or infrastructure errors.
 
+## 2026-07-28T11:46:20Z — coder received handoff from architect
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/inbox/in_process/00_20260728T114620Z_000028_from_architect_to_coder_refactorer.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: phase5-street-rent
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect af47550897
+```
+
+Action taken: merged architect commit `af47550897`, which fixes bank account
+identity and encapsulation, and began coder verification.
+
 ## 2026-07-28T11:46:33Z — architect sent bank invariant handoffs
 
 Handoff message sent to coder and refactorer:
@@ -6104,6 +6123,70 @@ merge_and_process architect af47550897
 Summary: the stable account-identity correction was sent for implementation
 review and, because it makes account creation explicitly idempotent, for
 specification review.
+
+## 2026-07-28T11:47:16Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase5-street-rent
+commit: 16a687b
+```
+
+Summary: Architect-reviewed bank identity correction is merged; 170 unit tests pass.
+
+## 2026-07-28T11:50:02Z — refactorer received handoff from architect
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/00_20260728T114620Z_000028_from_architect_to_coder_refactorer.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: phase5-street-rent
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect af47550897
+```
+
+Action taken: merged `af47550897` into `swarmforge-refactorer`. The merge
+conflicted only in `logbook.md`, past the same point in the history as the
+previous merge; resolved the same way, by ordering all seven entries
+chronologically rather than picking a side. Header counts confirm nothing was
+lost: 172 (mine) + 4 (mine, new) + 3 (architect's, new) over a common ancestor
+of 168 gives 175, matching the merged file.
+
+This merge fixes the `Bank.Simple` encapsulation defect flagged in the
+`11:17:46Z` handoff: it now owns a private map keyed by the immutable account
+owner instead of a caller-supplied `Set<Account>` keyed by a record with a
+mutable balance field, so repeated `createAccountFor` calls for one player are
+idempotent and `accountOf` is deterministic rather than an arbitrary match.
+Re-ran the refactorer's own gates against the merged state: CRAP unchanged;
+DRY still the same 15 candidates; mutation scan on `Bank` (10 sites),
+`Official` (0, constructor-only change), and `BankTest` (3) all well under the
+100-site split threshold. Unit, property, and normal acceptance verification
+all pass.
+
+## 2026-07-28T11:50:02Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase5-street-rent
+commit: 8d2c1d06ba
+```
+
+Summary: merged the `Bank.Simple` encapsulation fix; refactorer's own CRAP,
+DRY, and mutation-scan gates are unchanged and pass on the merged tree; unit,
+property, and acceptance verification all pass.
 
 ## 2026-07-28T11:50:38Z — architect received refactorer follow-up
 
@@ -6150,6 +6233,40 @@ exclusive. Observable behavior changes go only to coder, which remains
 responsible for forwarding verified work to refactorer. Purely
 behavior-preserving structural changes go only to refactorer. The same commit
 must never be addressed or separately queued to both roles.
+
+## 2026-07-28T12:07:38Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/inbox/in_process/50_20260728T120738Z_000012_from_specifier_to_coder.handoff
+FROM: specifier
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase6-station-utility-rent
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process specifier 0540a2acc7
+```
+
+Action taken: merged the approved station and utility rent specifications and
+implemented roll-aware landing rent calculation.
+
+## 2026-07-28T12:14:30Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase6-station-utility-rent
+commit: f59f523872
+```
+
+Summary: station and utility rent are implemented with roll-aware landings;
+normal unit and acceptance verification pass.
 
 ## 2026-07-28T12:26:34Z — architect received phase 6 handoff
 

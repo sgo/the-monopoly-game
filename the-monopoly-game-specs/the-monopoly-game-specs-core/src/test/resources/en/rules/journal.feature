@@ -93,3 +93,17 @@ Feature: game journal
     Examples:
       | rent | expected_rent |
       | 4    | 4             |
+
+  # journal-7
+  Scenario Outline: the journal records rent paid for a utility as a multiple of the dice roll that landed there
+    And pawn "dog" starts at position 7
+    And pawn "dog" will roll 1 and 4 for their turn
+    And pawn "high hat" owns "Elektriciteitscentrale"
+    And pawn "high hat" follows the "Agree if affordable" strategy
+    When we play the game
+    Then the game journal records that pawn "dog" pays pawn "high hat" $<rent> rent for "Elektriciteitscentrale"
+    And the game journal records that pawn "dog" moves before it records that pawn "dog" pays pawn "high hat" $<expected_rent> rent for "Elektriciteitscentrale"
+
+    Examples:
+      | rent | expected_rent |
+      | 20   | 20            |

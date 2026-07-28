@@ -95,7 +95,7 @@ class RentTest {
     private Money amount;
 
     @Override
-    public void paid(Player tenant, Player owner, ColourStreet land, Money rent) {
+    public void paid(Player tenant, Player owner, Street land, Money rent) {
       amount = rent;
     }
   }
