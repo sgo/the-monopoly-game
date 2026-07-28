@@ -384,6 +384,80 @@ class GameTest {
     );
   }
 
+  @Test
+  void aChanceCardChargesRepairCostsForEveryHouseAndHotelOwned() {
+    Deeds deeds = new Deeds();
+    Player dog = players.getFirst();
+    ColourStreet withHouses = street(Street.Type.RueGrandeDinant);
+    ColourStreet withHotel = street(Street.Type.DiestsestraatLeuven);
+    giveStreetTo(deeds, dog, withHouses);
+    giveStreetTo(deeds, dog, withHotel);
+    deeds.arrangeHouses(withHouses, 2);
+    deeds.arrangeHotel(withHotel);
+
+    Game.Result result = playWithCards(
+        Map.of(), deeds, new Roll(3, 4),
+        "Renoveer al je eigendommen. Je betaald M25 voor ek huis. en M100 voor elk hotel.",
+        null
+    );
+
+    assertThat(result.journal()).contains(new Entry.BankPaid(Pawn.dog.id(), new Money(150)));
+  }
+
+  @Test
+  void aChanceCardRepairCostsNothingWhenNoImprovedPropertyIsOwned() {
+    Game.Result result = playWithCards(
+        Map.of(), new Deeds(), new Roll(3, 4),
+        "Renoveer al je eigendommen. Je betaald M25 voor ek huis. en M100 voor elk hotel.",
+        null
+    );
+
+    assertThat(result.journal()).filteredOn(Entry.BankPaid.class::isInstance).isEmpty();
+  }
+
+  @Test
+  void aCommunityChestCardCanMakeItsDrawerCollectFromEveryOtherPlayer() {
+    players.getFirst().position().moveTo(14);
+
+    playWithCards(
+        Map.of(), new Deeds(), new Roll(1, 2),
+        null,
+        "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler."
+    );
+
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1520));
+    assertThat(players.get(1).account().balance()).isEqualTo(Balance.of(1490));
+    assertThat(players.get(2).account().balance()).isEqualTo(Balance.of(1490));
+  }
+
+  @Test
+  void aChanceCardAdvancesToBuurtspoorwegenWhenItIsTheNearestStation() {
+    players.getFirst().position().moveTo(15);
+
+    playWithCards(
+        Map.of(), new Deeds(), new Roll(3, 4),
+        "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.",
+        null
+    );
+
+    assertThat(players.getFirst().position().index())
+        .isEqualTo(ruleSet.gameboard().positionOf(Street.Type.Buurtspoorwegen));
+  }
+
+  @Test
+  void aChanceCardAdvancesToNoordStationWhenItIsTheNearestStation() {
+    players.getFirst().position().moveTo(29);
+
+    playWithCards(
+        Map.of(), new Deeds(), new Roll(3, 4),
+        "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.",
+        null
+    );
+
+    assertThat(players.getFirst().position().index())
+        .isEqualTo(ruleSet.gameboard().positionOf(Street.Type.NoordStation));
+  }
+
   /** A player who wants the land at auction but never at the asking price. */
   private static Strategy bidding(int amount) {
     return new Strategy() {
