@@ -6292,3 +6292,43 @@ merge_and_process refactorer 868bd44dbc
 ```
 
 Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T12:37:16Z — architect review of phase 6 station and utility rent
+
+The new rent behavior remains in the domain module and introduces no UI,
+framework, persistence, or adapter dependency into the core. Dice context flows
+inward from `Turn` to the landing rules, where utility rent needs it.
+
+One boundary correction was required. `Landings` exposed both a legacy
+two-argument method and a roll-aware overload; the legacy `Rent` path delegated
+with a null roll, making a valid-looking utility landing fail through an
+invalid internal state. Landing resolution now has one roll-aware contract.
+`Game` composes rent and sale rules with one lambda, and every landing rule
+receives the same complete context.
+
+Rent now narrows owned land to the sealed `Ownable` boundary before looking up
+title or asking a strategy. Its exhaustive switch handles colour streets,
+stations, and utilities without a fallback cast, and rent events and decisions
+carry `Ownable` rather than the wider `Street` type.
+
+Mutation analysis exposed that the normal unit suite did not exercise station
+or utility collection even though tagged property and acceptance tests did.
+Focused unit tests now cover owned-count station rent and roll-multiplied
+utility rent. The property generators share their common finance and ownership
+case construction rather than repeating nested generator shapes.
+
+Final verification:
+
+- 172 normal unit tests pass.
+- 13 separately tagged property tests pass.
+- 130 generated acceptance scenarios pass.
+- Differential Java mutation killed all 25 selected mutations across `Game`,
+  `Landings`, `LandSale`, `Rent`, `Turn`, and `Strategy`; no site was uncovered
+  and no mutant survived.
+- DRY analysis fell from 28 candidates to 16 after consolidating the new rent
+  property generators. The remaining production candidates are explicit event
+  handlers or constructor shapes, and the remaining test candidates are
+  independent arrangements and assertions rather than useful shared behavior.
+- Soft Gherkin mutation killed all 11 selected mutations: two journal, one
+  report, four station-rent, and four utility-rent mutations. There were no
+  survivors or infrastructure errors.

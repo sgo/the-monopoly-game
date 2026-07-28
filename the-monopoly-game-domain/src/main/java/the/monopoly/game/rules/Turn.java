@@ -40,7 +40,7 @@ public class Turn {
 
   public void take(Player player) {
     int doubles = 0;
-    while (true) {
+    for (;;) {
       Roll roll = cup.roll();
       events.rolled(player, roll);
 
@@ -111,21 +111,21 @@ public class Turn {
 
 /* mutate4java-manifest
 version=1
-moduleHash=b23140a4f58bb2beb57ca069540d975bf6867f0fc2957b1941e2ba665a230cea
+moduleHash=198b9093d280987552d99f5bf418d155c7a853a5eb9d3a3e94bc71d19fa8e187
 scope.0.id=Y2xhc3M6VHVybiNUdXJuOjE0
 scope.0.kind=class
 scope.0.startLine=14
-scope.0.endLine=109
-scope.0.semanticHash=69b67f57e1d5a0c701d2eaceaee8f1d106d844c8027a794e9cfa8cc7461df77a
+scope.0.endLine=110
+scope.0.semanticHash=0e97a3ceb02377f4b4ef66cb6eac169647ea1e10a2b04662891e51a59828c137
 scope.1.id=Y2xhc3M6VHVybi4jOjM3
 scope.1.kind=class
 scope.1.startLine=37
 scope.1.endLine=38
 scope.1.semanticHash=9265619237dc049c9efd5c01a5c74a7e99db1a67aa7ef3e2e396e54563e1bc57
-scope.2.id=Y2xhc3M6VHVybi5FdmVudHMjRXZlbnRzOjk5
+scope.2.id=Y2xhc3M6VHVybi5FdmVudHMjRXZlbnRzOjEwMA
 scope.2.kind=class
-scope.2.startLine=99
-scope.2.endLine=108
+scope.2.startLine=100
+scope.2.endLine=109
 scope.2.semanticHash=3b9b76331994f1b8000bd5ae3d4d1cd0c79771b1941d566b820f6a14cb8d24ec
 scope.3.id=ZmllbGQ6VHVybiNET1VCTEVTX0FMTE9XRUQ6MTY
 scope.3.kind=field
@@ -170,46 +170,46 @@ scope.10.semanticHash=022bb488dd3bd0a584b990ac8e4a5998372c0380cf834c395134a88ce6
 scope.11.id=bWV0aG9kOlR1cm4jbW92ZSgyKTo2Mw
 scope.11.kind=method
 scope.11.startLine=63
-scope.11.endLine=77
-scope.11.semanticHash=4d1dd33ce05fb4ef77008de83aa42a684e497b460f1e0c71e3bdb3dd8c226824
-scope.12.id=bWV0aG9kOlR1cm4jc2VuZFRvSmFpbCgxKTo4Nw
+scope.11.endLine=78
+scope.11.semanticHash=fb6c30f76d5af9542659edb22eacb827f65595f27de06448008da20febddbcf3
+scope.12.id=bWV0aG9kOlR1cm4jc2VuZFRvSmFpbCgxKTo4OA
 scope.12.kind=method
-scope.12.startLine=87
-scope.12.endLine=89
+scope.12.startLine=88
+scope.12.endLine=90
 scope.12.semanticHash=4ba38fd0a7d71766911e04202b79cc0fcc7f22ec217e679b11c6eb5a71f96598
-scope.13.id=bWV0aG9kOlR1cm4jc3BhY2VBdCgxKTo3OQ
+scope.13.id=bWV0aG9kOlR1cm4jc3BhY2VBdCgxKTo4MA
 scope.13.kind=method
-scope.13.startLine=79
-scope.13.endLine=81
+scope.13.startLine=80
+scope.13.endLine=82
 scope.13.semanticHash=3cf1682b5d12e12710c2220fe7a9b80855f69e8cb475fb7e7b6715a1407f7a5b
-scope.14.id=bWV0aG9kOlR1cm4jc3RhcnQoMCk6OTE
+scope.14.id=bWV0aG9kOlR1cm4jc3RhcnQoMCk6OTI
 scope.14.kind=method
-scope.14.startLine=91
-scope.14.endLine=93
+scope.14.startLine=92
+scope.14.endLine=94
 scope.14.semanticHash=afb3b0a57fbbaa1251328756f79d64399df7945610a5fc68fb8115e48ef2233e
 scope.15.id=bWV0aG9kOlR1cm4jdGFrZSgxKTo0MQ
 scope.15.kind=method
 scope.15.startLine=41
 scope.15.endLine=56
-scope.15.semanticHash=e95168b705564850a28e8ae9c083bef5ea82d7662874bd560bd5b9bf04742d39
+scope.15.semanticHash=cb3bd42acc798ee40c4f220101122cca8b557377115d43cec0728a0c85b07076
 scope.16.id=bWV0aG9kOlR1cm4uI2N0b3IoMCk6Mzc
 scope.16.kind=method
 scope.16.startLine=1
-scope.16.endLine=109
-scope.16.semanticHash=44798f91205982bc042d4ed7bfc37a0a65f0c4d1cd8784b71117685d6d5e079e
-scope.17.id=bWV0aG9kOlR1cm4uRXZlbnRzI2NvbGxlY3RlZFNhbGFyeSgyKToxMDY
+scope.16.endLine=110
+scope.16.semanticHash=b6a539b45ed6f7758257233ef2208a099232f6b9e89f1d9fe402c7df93b9d350
+scope.17.id=bWV0aG9kOlR1cm4uRXZlbnRzI2NvbGxlY3RlZFNhbGFyeSgyKToxMDc
 scope.17.kind=method
-scope.17.startLine=106
-scope.17.endLine=107
+scope.17.startLine=107
+scope.17.endLine=108
 scope.17.semanticHash=6cd1f36caef5236a7b98bb77c90da39864e729d6d252fdc58b623f587a32a1b6
-scope.18.id=bWV0aG9kOlR1cm4uRXZlbnRzI21vdmVkKDMpOjEwMw
+scope.18.id=bWV0aG9kOlR1cm4uRXZlbnRzI21vdmVkKDMpOjEwNA
 scope.18.kind=method
-scope.18.startLine=103
-scope.18.endLine=104
+scope.18.startLine=104
+scope.18.endLine=105
 scope.18.semanticHash=bf8ac6aae9c2fb39caa0da86e8d10d9a39d0fd199deb60d2ed3d2dd4326881f4
-scope.19.id=bWV0aG9kOlR1cm4uRXZlbnRzI3JvbGxlZCgyKToxMDA
+scope.19.id=bWV0aG9kOlR1cm4uRXZlbnRzI3JvbGxlZCgyKToxMDE
 scope.19.kind=method
-scope.19.startLine=100
-scope.19.endLine=101
+scope.19.startLine=101
+scope.19.endLine=102
 scope.19.semanticHash=d337b62683e09a112c3bba9b808a8165b26be5a0102e64fcddc9210746e7975c
 */
