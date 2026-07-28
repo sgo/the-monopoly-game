@@ -5111,3 +5111,31 @@ acceptance mutation exit 0: `buying-land` 14/14, `auctions` 8/8, `journal` 8/8,
 `Street.Type` and stores `Player.ID` rather than `Player`, which is the right
 instinct and sidesteps the hazard rather than removing it. A player's identity
 should be its `ID` alone, before anything keys on a `Player`.
+
+## 2026-07-28T08:53:44Z — architect handoffs for phase4-buying-auctions
+
+To coder and refactorer at priority `00`:
+
+```
+type: git_handoff
+to: coder,refactorer
+priority: 00
+task: phase4-buying-auctions
+commit: ae49f8835d
+```
+
+To the specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: phase4-buying-auctions
+commit: ae49f8835d
+```
+
+Buying and auctions merged. `Report` covers the two new entries through the
+sealed switch. `Board` answers where a space sits, so the rules and the
+acceptance harness no longer each search the layout. `Account.credit` is now
+`withdraw`. No feature changed, and `en/monopoly.feature` stays off the pipeline
+with its reason narrowed to a missing ending.
