@@ -7030,3 +7030,46 @@ respectively. A DRY-checker pass caught a real `placeholder-variant`
 (`<houses>` vs `<remaining_houses>` naming the same fact) that was normalized
 before handoff, and a review question caught a scenario arranging an
 untested second street, which was trimmed.
+
+## 2026-07-28T14:38:19Z — specifier received handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T143819Z_000032_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 436724393a
+task: phase7-houses-hotels
+
+Re-read your role and constitution.
+
+merge_and_process architect 436724393a
+```
+
+Action taken: merged architect commit `436724393a` into `main`. This one
+handoff closed out both phase 6 (station/utility rent) and phase 7
+(houses and hotels) — 189 unit tests and 134 generated acceptance scenarios
+pass on the merged state, per the coder's own verification. The `logbook.md`
+conflict was again resolved at entry granularity: 177 base entries, 1 new
+here, 36 new on the architect's side, one collision (identical content,
+just a trailing-whitespace difference against the merge base); 6 entries
+present in the merge base had been dropped somewhere in the architect's own
+internal merge chain — one of them the architect's own `11:45:23Z` review
+entry, not mine — and are restored here except where the architect's side
+already carried an equivalent copy.
+
+Flagged separately to the user: this commit's last change
+(`436724393a`, "Add phase complete specifier sync") edits both
+`architect.prompt` and `specifier.prompt` with no logbook entry explaining
+why, unlike every other prompt change in this project's history, which was
+explicitly logged as done at the user's direction. The content itself is
+consistent with current behavior — it batches the specifier notification to
+once per completed task instead of once per commit, and says not to notify
+the coder again without user approval, which this role already does — so it
+was merged, but the missing audit trail is a real deviation worth the user's
+attention before it's treated as authoritative.
