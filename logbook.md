@@ -7270,3 +7270,36 @@ and soft Gherkin mutation (`mortgage` 14/14, `mortgage-transfer` 8/8,
 
 Only tool-owned mutation and Gherkin manifest updates were produced by this
 architect pass. No coder or refactorer follow-up is warranted.
+
+## 2026-07-28T19:39:49Z — specifier merged handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T194148Z_000033_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: a79e5f2931
+task: phase8-mortgaging
+
+Re-read your role and constitution.
+
+merge_and_process architect a79e5f2931
+```
+
+Action taken: merged architect commit `a79e5f2931` into `main`. This closes
+out Phase 8 (mortgaging) — mortgage/lift-mortgage at value plus 10%
+interest, rent suppression (including the lost double-rent bonus on a
+mortgaged monopoly), the building block while a mortgage is outstanding,
+and the mortgaged-transfer buyer choices. Soft Gherkin mutation on the
+new/changed files: `mortgage` 14/14, `mortgage-transfer` 8/8, `journal`
+3/3, `report` 3/3, no survivors, per the architect's own report. Only one
+conflict, in `logbook.md`, resolved at entry granularity as before: 213
+base entries, 1 new on this side (the phase8-mortgaging handoff-sent
+entry), 7 new on the architect's side, no header collisions, nothing
+dropped from base on either side this time. `mvn -q -o test` passes on
+the merged state (exit 0). No unexplained prompt-file edits this round.
