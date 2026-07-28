@@ -5747,6 +5747,74 @@ commit: 4ff2eb22be
 Summary: Street-rent rules, claim decisions, journal/report narration, and the
 acceptance runtime are implemented. Unit and normal acceptance verification pass.
 
+## 2026-07-28T09:56:16Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260728T095017Z_000011_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase5-street-rent
+commit: c86b540765
+
+Re-read your role and constitution.
+
+merge_and_process coder c86b540765
+```
+
+Action taken: merged `c86b540765` into `swarmforge-refactorer`. Before merging,
+committed a pending local dedup of `OwnedCountBoundsPropertyTest`'s two
+property tests into one shared helper, already sitting uncommitted in the
+worktree and untouched by the incoming commit. The merge itself touched no
+file the local commit had touched, and the merged `logbook.md` came through as
+a clean append with no interleaving: header counts across both parents and
+their common ancestor add up exactly (150 + 2 + 9 = 161), and the tail reads
+as one role's entries followed by the other's, each body under its own
+header.
+
+## 2026-07-28T11:17:46Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: phase5-street-rent
+commit: a35ef2d417
+```
+
+Summary: `Game`, `Rent`, and `World` had reached for `ColourStreet`, `Optional`,
+`Ownable`, and `Rent.Claim` fully qualified inline instead of importing them;
+now imported. `RentTest.sell` cast `rules.create(type)` three times in one
+method; now cast once into a local. Added `RentPropertyTest`, sweeping every
+colour street, monopoly and non-monopoly ownership, a claiming and a declining
+owner, and a wide range of starting balances, checking conservation of total
+money and the exact amount owed together — `RentTest` only sampled two streets
+with the owner always claiming. CRAP is clean but for the exempt sealed
+dispatch on `Report.line`, now 11,3 with the new `RentPaid` case; DRY turned up
+nothing worth changing beyond what already existed; mutation scan stays well
+under the 100-site split threshold on every changed or new file. Unit,
+property, and normal acceptance verification all pass.
+
+While writing the property test, an unrelated hazard turned up in
+`Bank.Simple`: `createAccountFor` adds to a `Set<Account>`, keyed by a record
+whose `Balance` field is mutable, rather than replacing any existing entry for
+the same player name. A property test that shares one `Rule.Set` across
+iterations and reuses a player name will accumulate several accounts under
+that name, and `accountOf`'s `findAny()` can then hand back a stale one from
+an earlier iteration instead of the fresh one just created — caught here by a
+conservation check that failed on an all-zero case with balances that weren't
+zero. Worked around locally by creating a fresh `Rule.Set` per iteration
+rather than reusing one across the whole property check; not fixed at the
+source; flagged for whoever owns `Bank` next, since anything else that reuses
+one bank across repeated same-named account creation would hit the same
+thing.
+
 ## 2026-07-28T11:18:00Z — architect received refactorer handoff
 
 Handoff message received:
@@ -5811,36 +5879,100 @@ Final verification:
   report, and ten rent mutations. There were no survivors or infrastructure
   errors.
 
-## 2026-07-28T11:35:19Z — coder received handoff from architect
+## 2026-07-28T11:35:25Z — architect sent phase 5 review handoffs
 
-Handoff message received:
+Handoff message sent to coder and refactorer:
 
 ```
-TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/inbox/in_process/00_20260728T113503Z_000026_from_architect_to_coder_refactorer.handoff
-FROM: architect
-TYPE: git_handoff
-PRIORITY: 00
-TASK_NAME: phase5-street-rent
-PAYLOAD:
+id: 20260728T113503Z_000026_from_architect
+from: architect
+to: coder,refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase5-street-rent
+commit: 4c3fc826fc
+created_at: 2026-07-28T11:35:03.078697Z
+
 Re-read your role and constitution.
 
 merge_and_process architect 4c3fc826fc
 ```
 
-Action taken: merged architect commit `4c3fc826fc` into `swarmforge-coder` and
-began normal unit and acceptance verification of the corrected rent boundaries.
-
-## 2026-07-28T11:36:00Z — coder sent handoff to refactorer
-
-Handoff message sent:
+Handoff message sent to specifier:
 
 ```
-type: git_handoff
-to: refactorer
+id: 20260728T113507Z_000027_from_architect
+from: architect
+to: specifier
 priority: 50
+type: git_handoff
+role: architect
 task: phase5-street-rent
 commit: 4c3fc826fc
+created_at: 2026-07-28T11:35:07.032885Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 4c3fc826fc
 ```
 
-Summary: Architect-reviewed rent boundaries are merged and verified; no further
-coder implementation is required.
+Summary: the functional rent-order correction and decision-boundary cleanup
+were sent for role-appropriate review.
+
+## 2026-07-28T11:40:55Z — architect received refactorer follow-up
+
+Handoff message received:
+
+```
+id: 20260728T114043Z_000024_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 7f2102ac5a
+created_at: 2026-07-28T11:40:43.047166Z
+enqueued_at: 2026-07-28T11:40:43.275981Z
+task: phase5-street-rent
+dequeued_at: 2026-07-28T11:40:47.908389Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7f2102ac5a
+```
+
+Action taken: began review of the refactorer's merged architect state.
+
+## 2026-07-28T11:45:23Z — architect review of refactorer follow-up
+
+The refactorer follow-up contained the already reviewed architect source state
+and its review journal. Rechecking the four architectural phases found no new
+UI/core or dependency-direction issue, but did confirm an encapsulation defect
+in `Bank.Simple`: its caller-supplied `Set<Account>` used a record containing a
+mutable balance as a hash key. Once that balance changed, opening an account
+again for the same player could retain two equal owners and make `accountOf`
+return an arbitrary, stale account.
+
+`Bank.Simple` now owns a private map keyed by the immutable account owner.
+Account creation is idempotent, lookup is deterministic, and callers no longer
+provide or retain the bank's storage representation. A regression test opens
+the same account after a deposit and verifies that the original account and
+balance are preserved. Construction sites and the property-test explanation
+were updated to match the encapsulated representation.
+
+Final verification:
+
+- 170 normal unit tests pass.
+- 11 separately tagged property tests pass.
+- 124 generated acceptance scenarios pass.
+- Differential Java mutation killed all 10 selected `Bank` mutations; no site
+  was uncovered and no mutant survived. `Official` had no mutation sites after
+  its constructor-only change.
+- DRY analysis reported 15 established small candidates. The production
+  candidates are explicit event handlers or constructor shapes, and the rest
+  are independent test arrangements and assertions; none is a useful shared
+  abstraction for this change.
+- Soft Gherkin mutation found no changed scenario surface, retained all prior
+  killed results, and reported no survivors or infrastructure errors.

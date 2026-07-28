@@ -10,7 +10,6 @@ import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Rule;
 
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,7 +18,7 @@ import static the.monopoly.game.rules.Rule.Type.double_salary_when_landing_on_st
 
 class PlayerTest {
   private final Rule.Set ruleSet = Rule.Set.Type.official.create();
-  private final Bank bank = new Bank.Simple(new HashSet<>());
+  private final Bank bank = new Bank.Simple();
 
   @Test
   void passingStartPaysTheSalaryIntoTheAccount() {
