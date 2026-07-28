@@ -7848,6 +7848,53 @@ merge_and_process architect 97bea57d30
 
 Summary: routed architect follow-up fixes for Phase 10 to coder only at priority 00 because the changes include observable card behavior hardening and regression tests. The specifier phase-complete sync remains pending until this coder/refactorer loop returns and is accepted.
 
+## 2026-07-28T22:27:39Z — coder received architect follow-up for phase 10
+
+Handoff message received:
+
+```
+id: 20260728T222739Z_000036_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 97bea57d30
+created_at: 2026-07-28T22:27:39.721046Z
+enqueued_at: 2026-07-28T22:27:40.157865Z
+task: phase10-chance-and-community-chest
+dequeued_at: 2026-07-28T22:27:44.956888Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 97bea57d30
+```
+
+Action taken: merged architect commit `97bea57d30` into `swarmforge-coder`
+(fast-forward), re-ran coder verification, and found no further coder-owned
+implementation changes were needed.
+
+## 2026-07-28T22:28:59Z — coder returned verified phase 10 follow-up to architect
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: phase10-chance-and-community-chest
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: verified the architect follow-up on the coder branch without adding
+new implementation changes. Coder checks passed with `mvn -B -pl
+the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core
+-Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2
+test` and `acceptance/run-acceptance.sh` (using the same local Maven repo), so
+the same task returns directly to architect under the priority-`00` review-loop
+workflow.
+
 ## 2026-07-28T22:29:55Z — architect received phase 10 coder return handoff
 
 Handoff message received:
