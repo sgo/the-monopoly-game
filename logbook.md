@@ -4739,3 +4739,29 @@ that the report's wording is pinned by the feature rather than by the step.
 
 The mutate4java manifests on the five changed sources are stale by line number.
 They are not edited by hand.
+
+## 2026-07-28T07:29:31Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260728T072931Z_000010_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: phase4-buying-auctions
+commit: 9baf2dc824
+
+Re-read your role and constitution.
+
+merge_and_process coder 9baf2dc824
+```
+
+Summary: Phase 4's buying and auctions. `Landings` and `LandSale` resolve where
+a pawn stops, `Deeds` holds the titles, `Strategy` and `AgreeIfAffordable` make
+the decisions, and the journal and report account for purchases and auctions.
+165 unit tests and 118 acceptance scenarios pass. The mutate4java manifests on
+`Game`, `Report`, `Bank`, `Money` and `Turn` are stale by line number and were
+not hand-edited.
