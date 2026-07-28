@@ -6247,6 +6247,28 @@ merge_and_process refactorer 8d2c1d06ba
 
 Action taken: began architectural review of the named refactorer commit.
 
+## 2026-07-28T20:39:54Z — architect sent workflow routing clarification to specifier
+
+Handoff message sent:
+
+```
+id: 20260728T203950Z_000035_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: workflow-architect-followup-return-routing
+commit: 2756b260d5
+created_at: 2026-07-28T20:39:50.176594Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 2756b260d5
+```
+
+Summary: sent the durable workflow clarification so the specifier can merge the architect branch state. The change makes architect-originated priority `00` follow-ups return to architect after coder/refactorer verification when no further role-owned work is needed.
+
 ## 2026-07-28T20:30:37Z — architect completed phase 9 review follow-up
 
 Action taken: merged refactorer commit `24997ec8ae`, reviewed the Phase 9 land-sale implementation, and applied architect follow-up fixes.
