@@ -25,6 +25,7 @@ import static the.monopoly.game.specs.acceptance.GameAccount.Claim;
 import static the.monopoly.game.specs.acceptance.GameAccount.records;
 import static the.monopoly.game.specs.acceptance.GameAccount.recordsInOrder;
 import static the.monopoly.game.specs.acceptance.GameAccount.recordsStartWith;
+import static the.monopoly.game.specs.acceptance.GameAccount.says;
 import static the.monopoly.game.specs.acceptance.GameAccount.saysInOrder;
 import static the.monopoly.game.specs.acceptance.GameAccount.saysStartWith;
 import static the.monopoly.game.specs.acceptance.StepHandler.given;
@@ -354,11 +355,23 @@ public final class MonopolyStepHandlers {
         given("^pawn \"" + NAME + "\" owns \"" + NAME + "\"$",
             (world, arguments) -> world.givePawnOwnership(arguments.text(1), SpaceNames.of(arguments.text(2)))),
 
+        given("^the street \"" + NAME + "\" has " + VALUE + " house\\(s\\) built$",
+            (world, arguments) -> world.arrangeHouses(SpaceNames.of(arguments.text(1)), arguments.number(2))),
+
+        given("^the street \"" + NAME + "\" has a hotel built$",
+            (world, arguments) -> world.arrangeHotel(SpaceNames.of(arguments.text(1)))),
+
         given("^pawn \"" + NAME + "\" declines to claim rent for \"" + NAME + "\"$",
             (world, arguments) -> world.pawnDeclinesRent(arguments.text(1), SpaceNames.of(arguments.text(2)))),
 
         step("^pawn \"" + NAME + "\" lands on \"" + NAME + "\"$",
             (world, arguments) -> world.landPawnOn(arguments.text(1), SpaceNames.of(arguments.text(2)))),
+
+        step("^pawn \"" + NAME + "\" sells a house on \"" + NAME + "\" back to the bank$",
+            (world, arguments) -> world.sellHouse(arguments.text(1), SpaceNames.of(arguments.text(2)))),
+
+        step("^pawn \"" + NAME + "\" exchanges the hotel on \"" + NAME + "\" for houses$",
+            (world, arguments) -> world.exchangeHotelForHouses(arguments.text(1), SpaceNames.of(arguments.text(2)))),
 
         then("^pawn \"" + NAME + "\" owns \"" + NAME + "\"$",
             (world, arguments) -> assertThat(world.pawnOwns(arguments.text(1), SpaceNames.of(arguments.text(2))))
@@ -370,10 +383,27 @@ public final class MonopolyStepHandlers {
                 .as("pawn \"%s\" owns \"%s\"", arguments.text(1), arguments.text(2))
                 .isFalse()),
 
+        then("^the street \"" + NAME + "\" has " + VALUE + " house\\(s\\) built$",
+            (world, arguments) -> assertThat(world.housesBuiltOn(SpaceNames.of(arguments.text(1))))
+                .isEqualTo(arguments.number(2))),
+
+        then("^the street \"" + NAME + "\" has a hotel built$",
+            (world, arguments) -> assertThat(world.hasHotelOn(SpaceNames.of(arguments.text(1)))).isTrue()),
+
         then("^the game journal records that pawn \"" + NAME + "\" pays pawn \"" + NAME
                 + "\" \\$" + VALUE + " rent for \"" + NAME + "\"$",
             (world, arguments) -> records(world, rentPaid(
                 arguments.text(1), arguments.text(2), arguments.text(4), arguments.number(3)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" builds a house on \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> records(world, houseBuilt(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" sells a house on \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> records(world, houseSold(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" moves before it records that pawn \""
                 + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + " rent for \"" + NAME + "\"$",
@@ -423,6 +453,16 @@ public final class MonopolyStepHandlers {
                 arguments.text(2) + " pays " + arguments.text(3) + " $" + arguments.number(4)
                     + " rent for " + arguments.text(5))),
 
+        then("^the game report says that pawn \"" + NAME + "\" builds a house on \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> says(world, builtAHouse(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" sells a house on \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> says(world, soldAHouse(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+
         step("^each face was rolled about " + VALUE + " times within a " + VALUE + "% margin$",
             (world, arguments) -> {
               int expected = arguments.number(1);
@@ -469,6 +509,14 @@ public final class MonopolyStepHandlers {
     return Claim.of(new Entry.RentPaid(idOf(tenant), idOf(owner), SpaceNames.of(spaceName), money(rent)));
   }
 
+  private static Claim houseBuilt(String pawnName, String spaceName, int price) {
+    return Claim.of(new Entry.HouseBuilt(idOf(pawnName), SpaceNames.of(spaceName), money(price)));
+  }
+
+  private static Claim houseSold(String pawnName, String spaceName, int price) {
+    return Claim.of(new Entry.HouseSold(idOf(pawnName), SpaceNames.of(spaceName), money(price)));
+  }
+
   /** A pawn moving anywhere, for a step that says when it moved rather than where to. */
   private static Claim moves(String pawnName) {
     return new Claim(
@@ -493,6 +541,14 @@ public final class MonopolyStepHandlers {
   /** A pawn moving anywhere, for a step that says when it moved rather than where to. */
   private static String movesAnywhere(String pawnName) {
     return pawnName + " moves from position ";
+  }
+
+  private static String soldAHouse(String pawnName, String spaceName, int price) {
+    return pawnName + " sells a house on " + spaceName + " for $" + price;
+  }
+
+  private static String builtAHouse(String pawnName, String spaceName, int price) {
+    return pawnName + " builds a house on " + spaceName + " for $" + price;
   }
 
   private static Player.ID idOf(String pawnName) {

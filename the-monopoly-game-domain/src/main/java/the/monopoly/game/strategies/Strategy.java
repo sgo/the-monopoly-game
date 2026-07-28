@@ -31,6 +31,11 @@ public interface Strategy {
     return false;
   }
 
+  /** Whether to buy the next house or hotel offered for an owned street. */
+  default boolean builds(BuildOffer offer) {
+    return false;
+  }
+
   /** A visitor, the land they stopped on, and the rent its owner may claim. */
   record RentClaim(Player tenant, Street land, Money amount) {
   }
@@ -39,6 +44,13 @@ public interface Strategy {
   record Offer(Ownable land, Money available) {
     public boolean isAffordable() {
       return available.covers(land.price());
+    }
+  }
+
+  /** The improvement a player is being asked to buy for a street they already own. */
+  record BuildOffer(Street land, Money price, Money available, boolean hotel) {
+    public boolean isAffordable() {
+      return available.covers(price);
     }
   }
 

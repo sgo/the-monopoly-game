@@ -58,6 +58,43 @@ class RentTest {
     assertThat(owner.account().balance()).isEqualTo(Balance.of(1500));
   }
 
+  @Test
+  void housesChargeTheirPrintedRent() {
+    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
+    deeds.arrangeHouses(street, 2);
+    strategies.put(owner.id(), new Claiming());
+
+    rent().resolve(tenant, street);
+
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1440));
+    assertThat(owner.account().balance()).isEqualTo(Balance.of(1560));
+  }
+
+  @Test
+  void aHotelChargesItsPrintedRent() {
+    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
+    deeds.arrangeHotel(street);
+    strategies.put(owner.id(), new Claiming());
+
+    rent().resolve(tenant, street);
+
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1050));
+    assertThat(owner.account().balance()).isEqualTo(Balance.of(1950));
+  }
+
+  @Test
+  void anUnimprovedStreetInAPartiallyBuiltMonopolyStillChargesDoubleRent() {
+    sell(Street.Type.RueGrandeDinant);
+    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
+    deeds.arrangeHouses((ColourStreet) rules.create(Street.Type.RueGrandeDinant), 2);
+    strategies.put(owner.id(), new Claiming());
+
+    rent().resolve(tenant, street);
+
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1492));
+    assertThat(owner.account().balance()).isEqualTo(Balance.of(1508));
+  }
+
   private Rent rent() {
     return new Rent(deeds, rules, List.of(tenant, owner), this::strategyFor, paid);
   }
@@ -66,10 +103,11 @@ class RentTest {
     return strategies.getOrDefault(player.id(), Strategy.UNDECIDED);
   }
 
-  private void sell(Street.Type type) {
+  private ColourStreet sell(Street.Type type) {
     Ownable land = (Ownable) rules.create(type);
     deeds.sell(land, owner, land.price());
     owner.account().deposit(land.price());
+    return land instanceof ColourStreet street ? street : null;
   }
 
   private ColourStreet street(Street.Type type) {

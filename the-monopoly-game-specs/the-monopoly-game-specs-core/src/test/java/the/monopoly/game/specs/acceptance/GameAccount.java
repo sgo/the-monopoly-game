@@ -67,6 +67,10 @@ final class GameAccount {
       );
   }
 
+  static void says(World world, String phrase) {
+    saidAt(world.report(), phrase);
+  }
+
   /** Whether the line naming everyone at the table names these two in this order. */
   static void saysStartWith(World world, String firstPawn, String secondPawn) {
     String start = world.report().lines()

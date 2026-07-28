@@ -53,6 +53,9 @@ public class Rent implements Landings {
     if (land instanceof Utility utility)
       return new Money(utility.rentDiceMultiplierForOwning(owned(owner, Utility.class)) * roll.total());
     ColourStreet street = (ColourStreet) land;
+    if (deeds.hasHotelOn(street)) return street.rentForOneHotel();
+    int houses = deeds.housesBuiltOn(street);
+    if (houses > 0) return street.rentForHouses(houses);
     boolean monopoly = rules.streets()
         .filter(ColourStreet.class::isInstance)
         .map(ColourStreet.class::cast)

@@ -6071,3 +6071,25 @@ commit: f59f523872
 
 Summary: station and utility rent are implemented with roll-aware landings;
 normal unit and acceptance verification pass.
+
+## 2026-07-28T13:26:16Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/inbox/in_process/50_20260728T131215Z_000013_from_specifier_to_coder.handoff
+FROM: specifier
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase7-houses-hotels
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process specifier 3e7eb1a658
+```
+
+Action taken: merged specifier commit `3e7eb1a658`, implemented houses and
+hotels with turn-time building, improved-street rent, direct house sale and
+hotel exchange mechanics, extended the acceptance vocabulary and pipeline, and
+verified the slice with `181` domain tests plus the full normal acceptance
+pipeline (`141` generated acceptance tests) passing.

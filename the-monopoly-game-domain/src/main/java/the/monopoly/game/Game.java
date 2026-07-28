@@ -9,6 +9,7 @@ import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Deeds;
+import the.monopoly.game.rules.Building;
 import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
@@ -74,6 +75,7 @@ public class Game {
     Journalling journalling = new Journalling(journal);
     Landings rent = new Rent(deeds, rules, turnOrder, strategies, journalling);
     Landings landSale = new LandSale(deeds, turnOrder, strategies, journalling);
+    Building building = new Building(deeds, rules, strategies, journalling);
     Landings resolvingLandings = new Landings() {
       @Override public void resolve(Player player, Street space) {
         rent.resolve(player, space);
@@ -84,7 +86,11 @@ public class Game {
         landSale.resolve(player, space, roll);
       }
     };
-    turnOrder.forEach(player -> takeTurn(player, journal, journalling, resolvingLandings));
+    Player builder = turnOrder.getFirst();
+    turnOrder.forEach(player -> {
+      takeTurn(player, journal, journalling, resolvingLandings);
+      if (player.id().equals(builder.id())) building.develop(player);
+    });
 
     return new Result(turnOrder, journal.entries(), deeds);
   }
@@ -101,7 +107,7 @@ public class Game {
   }
 
   /** Writes down what a turn and a sale say they did, as the game's account of it. */
-  private record Journalling(Journal journal) implements Turn.Events, LandSale.Events, Rent.Events {
+  private record Journalling(Journal journal) implements Turn.Events, LandSale.Events, Rent.Events, Building.Events {
     @Override
     public void rolled(Player player, Roll roll) {
       journal.log(new Journal.Entry.Rolled(player.id(), roll.total()));
@@ -130,6 +136,11 @@ public class Game {
     @Override
     public void paid(Player tenant, Player owner, Street land, Money rent) {
       journal.log(new Journal.Entry.RentPaid(tenant.id(), owner.id(), land.type(), rent));
+    }
+
+    @Override
+    public void builtHouse(Player player, ColourStreet street, Money price) {
+      journal.log(new Journal.Entry.HouseBuilt(player.id(), street.type(), price));
     }
   }
 
@@ -206,6 +217,12 @@ public class Game {
       }
 
       record RentPaid(Player.ID tenant, Player.ID owner, Street.Type land, Money rent) implements Entry {
+      }
+
+      record HouseBuilt(Player.ID player, Street.Type land, Money price) implements Entry {
+      }
+
+      record HouseSold(Player.ID player, Street.Type land, Money price) implements Entry {
       }
     }
   }
