@@ -38,9 +38,9 @@ Feature: Monopoly command line interface
     Given the simulator is configured for <players> players
     When I run the simulator
     Then the simulator exits unsuccessfully
-    And the output explains that the number of players must be between 2 and 8
+    And the output explains that the number of players must be between 2 and 8 and received <reported players> players
 
     Examples:
-      | players |
-      | 1       |
-      | 9       |
+      | players | reported players |
+      | 1       | 1                |
+      | 9       | 9                |

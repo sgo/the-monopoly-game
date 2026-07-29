@@ -10336,14 +10336,13 @@ Handoff message received:
 id: 20260729T130425Z_000025_from_specifier
 from: specifier
 to: architect
-recipient: architect
 priority: 00
 type: git_handoff
 role: specifier
+task: phase15-cli
 commit: 85c9e76959
 created_at: 2026-07-29T13:04:25.792106Z
 enqueued_at: 2026-07-29T13:04:26.457382Z
-task: phase15-cli
 dequeued_at: 2026-07-29T13:04:30.884512Z
 
 Re-read your role and constitution.
@@ -10623,6 +10622,10 @@ merge_and_process architect 1495026905
 
 Action taken: sent the invalid-count boundary mutation finding to specifier
 for the required Gherkin-content decision.
+
+Specifier decision: accepted the invalid-boundary mutation finding and
+revised the feature so the reported invalid count is an independent example
+column.
 
 ## 2026-07-29T13:42:27Z — architect processed queued handoff notification
 
