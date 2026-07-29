@@ -10753,6 +10753,18 @@ Action taken: sent the core-owned normal-setup implementation to coder; it
 returns through refactorer. Completion policy remains pending user/specifier
 direction.
 
+## 2026-07-29T16:09:30Z — user set Phase 15 CLI completion policy
+
+User direction: the CLI does not need prompt completion. It must use real
+random dice, start from the normal standard configuration, and let each
+selected strategy play normally until bankruptcies leave one player. No
+pre-arranged balances, positions, assets, dice trace, turn cap, or synthetic
+winner is permitted.
+
+Action taken: route this authoritative policy to specifier for acceptance
+criteria and coder for implementation alignment. The existing normal-setup
+loop remains open.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
