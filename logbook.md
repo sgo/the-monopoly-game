@@ -8762,6 +8762,31 @@ unadvanceable only for the already-recorded Gherkin examples whose starting
 balances are mutation-equivalent; send that content finding to specifier at
 priority `00`.
 
+## 2026-07-29T12:19:33Z — architect sent phase 14 Gherkin finding to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T121925Z_000045_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: 5bbf369b66
+created_at: 2026-07-29T12:19:25.775127Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 5bbf369b66
+```
+
+Summary: routed the two mutation-equivalent starting-balance examples in the
+bankruptcy card-return scenarios to specifier, under the Gherkin-content
+workflow rule. Do not advance Phase 14 until this priority-`00` specifier loop
+returns and is accepted.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
