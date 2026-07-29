@@ -10468,6 +10468,20 @@ merge_and_process architect 22da133076
 Action taken: sent the normal-initial-state correction to coder; it returns
 through refactorer for architectural acceptance.
 
+## 2026-07-29T15:54:30Z — architect found Phase 15 CLI setup-specification gap
+
+The €5 debit and pre-owned-hotel fixture show that the current CLI scenarios
+assert an eventual report but do not sufficiently constrain the game they
+start. The phase needs acceptance criteria for normal standard setup: players
+on START with official cash, and bank ownership of deeds, houses, and hotels
+until normal play transfers them. It also needs a clear, user-approved policy
+for a complete CLI simulation to terminate without pre-arranging player
+balances, positions, or assets.
+
+Action taken: route the specification gap to specifier at priority 00. The
+specifier may need user direction to settle the intended completion policy;
+the current coder correction remains open.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
