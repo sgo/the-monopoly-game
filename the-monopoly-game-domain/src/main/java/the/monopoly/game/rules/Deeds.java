@@ -56,6 +56,11 @@ public class Deeds {
     return retainedCards.containsValue(owner.id());
   }
 
+  /** Uses one retained card held by the player, returning whether one was available. */
+  public boolean releaseGetOutOfJailFreeCard(Player owner) {
+    return retainedCards.entrySet().removeIf(it -> it.getValue().equals(owner.id()));
+  }
+
   public void sellGetOutOfJailFreeCard(Player seller, Player buyer, Money price) {
     RetainedCard card = retainedCards.entrySet().stream()
         .filter(it -> it.getValue().equals(seller.id()))

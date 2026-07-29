@@ -12,7 +12,9 @@ import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Initiative;
+import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
+import the.monopoly.game.rules.Landings;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
@@ -61,9 +63,11 @@ public class World {
   private boolean othersRollWhatTheyLike;
   private List<Entry> journal;
   private Deeds deeds;
+  private Jail jail = new Jail(ruleSet);
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
+    jail = new Jail(ruleSet);
   }
 
   public Rule.Set ruleSet() {
@@ -161,7 +165,9 @@ public class World {
   }
 
   public void takeTurn() {
-    new Turn(ruleSet, this::nextQueuedRoll).take(player());
+    if (deeds == null) deeds = new Deeds();
+    new Turn(ruleSet, this::nextQueuedRoll, new Turn.Events() {
+    }, Landings.UNEVENTFUL, jail, Strategy.UNDECIDED, deeds).take(player());
   }
 
   private Roll nextQueuedRoll() {
@@ -201,7 +207,8 @@ public class World {
           public String drawCommunityChest() {
             return queuedCommunityChestCards.pollFirst();
           }
-        }
+        },
+        jail
     ).play();
     turnOrder = result.turnOrder();
     journal = result.journal();
@@ -210,6 +217,61 @@ public class World {
 
   public void placePawn(String pawnName, int position) {
     pawn(pawnName).position().moveTo(position);
+  }
+
+  public void startPawnInJail(String pawnName) {
+    jail.imprison(pawn(pawnName));
+  }
+
+  public boolean isInJail(String pawnName) {
+    return jail.holds(pawn(pawnName));
+  }
+
+  public void givePawnGetOutOfJailFreeCard(String pawnName) {
+    if (deeds == null) deeds = new Deeds();
+    deeds.hold(Deeds.RetainedCard.CHANCE_GET_OUT_OF_JAIL_FREE, pawn(pawnName));
+  }
+
+  public void pawnWillUseGetOutOfJailFreeCard(String pawnName) {
+    jail.useCard(pawn(pawnName));
+  }
+
+  public void startPlayerInJail() {
+    jail.imprison(player());
+  }
+
+  public boolean playerIsInJail() {
+    return jail.holds(player());
+  }
+
+  public void pawnWillClaimRent(String pawnName) {
+    Strategy strategy = pawnStrategies.getOrDefault(pawnName, Strategy.UNDECIDED);
+    pawnStrategies.put(pawnName, new Strategy() {
+      @Override
+      public boolean accepts(Offer offer) {
+        return strategy.accepts(offer);
+      }
+
+      @Override
+      public Money bidFor(Offer offer) {
+        return strategy.bidFor(offer);
+      }
+
+      @Override
+      public boolean claims(RentClaim claim) {
+        return true;
+      }
+
+      @Override
+      public boolean builds(BuildOffer offer) {
+        return strategy.builds(offer);
+      }
+
+      @Override
+      public boolean pays(JailFine fine) {
+        return strategy.pays(fine);
+      }
+    });
   }
 
   /**

@@ -8146,6 +8146,49 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T08:56:28Z — coder received phase 12 jail handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260729T085628Z_000018_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase12-jail
+commit: d4409e59e4
+created_at: 2026-07-29T08:56:28Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d4409e59e4
+```
+
+Action taken: merged the accepted Phase 12 jail specification and implemented
+jail entry, jail state, and the specified exit paths.
+
+## 2026-07-29T09:04:03Z — coder prepared phase 12 jail handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase12-jail
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: Go To Jail now sends and marks a pawn as imprisoned; Just Visiting
+does not. A jailed player may leave by an affordable $50 fine, an explicitly
+used Get Out of Jail Free card, doubles, or the compulsory fine after three
+failed doubles attempts. Jail entry and paid-fine exit are journalled and
+reported. Unit verification passed with 236 tests; normal generated acceptance
+verification passed with 217 tests.
+
 ## 2026-07-29T06:24:46Z — specifier sent handoff to coder
 
 Handoff message sent:
