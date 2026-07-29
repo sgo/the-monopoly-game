@@ -10491,3 +10491,24 @@ the logbook conflict while preserving all prior entries. Unit tests pass
 (252), CRAP remains within threshold except the documented `Report.line`
 exemption, but the full acceptance run still does not terminate promptly in
 the 8-player complete-game scenario; architect handoff remains withheld.
+
+## 2026-07-29T13:25:02Z — refactorer routed remaining acceptance defect
+
+Handoff message sent:
+
+```
+id: 20260729T132502Z_000040_from_refactorer
+from: refactorer
+to: coder
+priority: 00
+type: note
+message: d8db fix still leaves 8-player acceptance run nonterminating
+created_at: 2026-07-29T13:25:02.220786Z
+
+Re-read your role and constitution.
+
+d8db fix still leaves 8-player acceptance run nonterminating
+```
+
+Action taken: returned the unresolved acceptance termination defect to coder;
+no architect handoff was sent.
