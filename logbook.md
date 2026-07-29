@@ -11022,3 +11022,15 @@ merge_and_process coder 460573dc41
 Action taken: merged the standalone CLI executable entry point and verified
 five CLI tests pass. The documented `-h`/`--h` behavior is covered; no new
 DRY duplication was introduced.
+
+## 2026-07-29T14:15:46Z — architect found Phase 15 CLI strategy-selection defect
+
+Architectural review found that `Simulator.execute` accepts only zero or one
+argument (the player count) and always supplies `AgreeIfAffordable` for every
+player. Phase 15 requires a strategy selection for each player, defaulting to
+Agree if affordable, with registry/lookup plumbing that can support future
+strategies without changing the CLI shape.
+
+Action taken: route this remaining observable CLI contract gap to coder at
+priority 00. The executable entry point, help output, stdout report, and
+invalid-input exit path are already in place.
