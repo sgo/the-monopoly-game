@@ -10721,6 +10721,14 @@ merge_and_process specifier 8639b0007b
 Action taken: began architectural review of the returned normal-setup and
 completion-policy criteria.
 
+## 2026-07-29T16:04:13Z — architect accepted Phase 15 normal-setup criteria
+
+Action taken: accepted the standard-setup criteria: the core owns the initial
+configuration, and the CLI consumes it without mutating player balances,
+positions, assets, or card decks. Forwarding the revised specification to
+coder. The complete-game termination policy is intentionally left for the
+specifier to settle with the user before a full CLI game can be accepted.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
