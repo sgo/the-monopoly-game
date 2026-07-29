@@ -10233,3 +10233,26 @@ that distinguishes a genuine terminal game result from a fabricated winner.
 Action taken: route this Gherkin-content defect to specifier at priority `00`.
 This runs alongside the already-open coder correction; Phase 15 remains open
 until both review loops return and are accepted.
+
+## 2026-07-29T13:01:13Z — architect sent Phase 15 Gherkin correction to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T130109Z_000048_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 2eae6cbf21
+created_at: 2026-07-29T13:01:09.390840Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 2eae6cbf21
+```
+
+Action taken: sent the observable-completion criterion gap to specifier for a
+Phase 15 scenario revision. No implementation prescription was included.
