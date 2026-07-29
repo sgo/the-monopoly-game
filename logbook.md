@@ -8146,6 +8146,58 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T12:03:58Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T120038Z_000026_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: a3226167e4
+created_at: 2026-07-29T12:00:38.403960Z
+enqueued_at: 2026-07-29T12:00:38.666827Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T12:00:44.511252Z
+
+Re-read your role and constitution.
+
+merge_and_process coder a3226167e4
+```
+
+Action taken: merged coder commit `a3226167e4`, added focused unit coverage
+for bankruptcy asset liquidation, auctions, creditor transfers, and mortgage
+settlement, then re-ran CRAP, DRY, mutation-site, unit, property, and
+acceptance verification. All non-exempt CRAP is at or below 6; changed
+production files remain below the mutation split threshold.
+
+## 2026-07-29T11:17:00Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260729T111656Z_000036_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase13-free-parking
+commit: 27fb5af98b
+created_at: 2026-07-29T11:16:56.042026Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 27fb5af98b
+```
+
+Summary: handed the verified Phase 13 free-parking state to the architect
+at commit `27fb5af98b`; no structural cleanup was required.
+
 ## 2026-07-29T11:16:26Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -8561,6 +8613,155 @@ Routing: no architect correction or coder/refactorer follow-up is warranted.
 All Phase 13 loops are closed; send the phase-complete sync to specifier at
 priority `50`.
 
+## 2026-07-29T11:20:09Z — architect sent phase 13 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T112000Z_000043_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase13-free-parking
+commit: 97630aba9b
+created_at: 2026-07-29T11:20:00.806525Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 97630aba9b
+```
+
+Summary: sent the Phase 13 completion sync after accepting the explicit Free
+Parking no-op specification, its shared movement journal/report coverage, and
+the clean unit, property, Java-mutation, DRY, acceptance, and soft-Gherkin
+mutation gates.
+
+## 2026-07-29T12:04:30Z — architect received phase 14 refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260729T120421Z_000037_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 4ab31d3d7c
+created_at: 2026-07-29T12:04:21.501846Z
+enqueued_at: 2026-07-29T12:04:22.324909Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T12:04:26.511490Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 4ab31d3d7c
+```
+
+Action taken: began architectural review of the Phase 14 bankruptcy-and-winning
+refactorer handoff.
+
+## 2026-07-29T12:14:24Z — architect completed phase 14 bankruptcy review
+
+Action taken: merged refactorer commit `4ab31d3d7c` and reviewed `Bankruptcy`
+as the focused boundary between a charged landing debt and the resulting asset
+liquidation or elimination. Corrected two observable rule gaps: liquidation
+now exchanges a hotel and sells as many houses as needed before mortgaging,
+and a player-bankruptcy transfers retained Get Out of Jail Free cards to the
+creditor instead of discarding them. Bank bankruptcy still returns retained
+cards to their decks. Added regressions for multi-house liquidation,
+hotel liquidation, and creditor card inheritance.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 249 tests passed.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+  -Pproperty-tests test` — 17 property tests passed.
+- `mutate4java` (differential, eight-worker limit) was run for
+  `Bankruptcy.java`, `Deeds.java`, `Game.java`, and `Report.java`; the
+  Bankruptcy and Deeds manifests were refreshed after the strengthened
+  liquidation and retained-card regressions.
+- `dry4java` — only the established journal-event adapters, rule constructor
+  shapes (`Bankruptcy`/`LandSale`/`Rent`), and existing `Game`/`Turn`
+  constructor shape remain; no actionable duplication.
+- `./acceptance/run-acceptance.sh` — 242 generated acceptance tests passed.
+- Soft Gherkin mutation for `en/rules/bankruptcy.feature` — 3/5 killed with
+  two equivalent surviving starting-balance mutations in bank-bankruptcy card
+  return scenarios; the runner refreshed its partial manifest.
+- `git diff --check` — passed.
+
+Routing: the liquidation and card-transfer corrections change observable
+behaviour, so send the priority-`00` architect follow-up to coder. The two
+surviving Gherkin examples are a specifier-owned content defect; route that
+priority-`00` follow-up to specifier after the coder review loop returns.
+
+## 2026-07-29T12:15:56Z — architect sent phase 14 follow-up to coder
+
+Handoff message sent:
+
+```
+id: 20260729T121544Z_000044_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: 8141a9c0ba
+created_at: 2026-07-29T12:15:44.210095Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 8141a9c0ba
+```
+
+Summary: sent the observable bankruptcy hardening for full asset liquidation
+and creditor inheritance of retained jail-release cards. Coder must validate
+and return this priority-`00` architect review loop before the pending
+bankruptcy Gherkin-example finding is routed to specifier.
+
+## 2026-07-29T12:17:46Z — architect received phase 14 coder follow-up
+
+Handoff message received:
+
+```
+id: 20260729T121736Z_000027_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: 88749b96bb
+created_at: 2026-07-29T12:17:36.122737Z
+enqueued_at: 2026-07-29T12:17:36.513843Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T12:17:42.176831Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 88749b96bb
+```
+
+Action taken: began review of the coder's priority-`00` return for the Phase
+14 bankruptcy correction.
+
+## 2026-07-29T12:19:01Z — architect accepted phase 14 coder verification
+
+Action taken: merged coder commit `88749b96bb`. The coder confirmed the
+hotel/house liquidation and retained-card transfer corrections require no
+further implementation change; focused domain verification passed 249 tests
+and the normal generated acceptance pipeline passed 242 tests. Re-ran
+`git diff --check` on the merged state; it passed cleanly.
+
+Routing: the coder priority-`00` loop is closed. The phase remains
+unadvanceable only for the already-recorded Gherkin examples whose starting
+balances are mutation-equivalent; send that content finding to specifier at
+priority `00`.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -8816,6 +9017,95 @@ merge_and_process architect a6f1734876
 ```
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
+
+## 2026-07-29T12:17:09Z — coder received phase 14 bankruptcy architect follow-up
+
+Handoff message received:
+
+```
+id: 20260729T121544Z_000044_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 8141a9c0ba
+created_at: 2026-07-29T12:15:44.210095Z
+enqueued_at: 2026-07-29T12:15:44.901517Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T12:15:49.749229Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 8141a9c0ba
+```
+
+Action taken: fast-forward merged and reviewed the architect's bankruptcy
+hardening. Its hotel/house liquidation and retained-card transfer protections
+need no further coder changes. Focused domain tests (249) and the normal
+generated acceptance pipeline (242 tests) pass.
+
+## 2026-07-29T12:17:09Z — coder prepared phase 14 bankruptcy verification return to architect
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: phase14-bankruptcy-and-winning
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: architect hardening is verified; the priority-00 review loop returns
+directly to architect without further coder implementation.
+
+## 2026-07-29T12:00:07Z — coder received phase 14 bankruptcy and winning handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260729T114852Z_000022_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 55c969a94a
+created_at: 2026-07-29T11:48:52.237278Z
+enqueued_at: 2026-07-29T11:48:52.419060Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T11:48:57.567290Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 55c969a94a
+```
+
+Action taken: merged the Phase 14 specification and implemented bankruptcy
+resolution. Debts now liquidate houses and mortgages before bankruptcy; remaining
+assets transfer to a creditor or return to the bank for auction, inherited
+mortgages settle according to strategy, retained jail cards are surrendered,
+and bankruptcy/winner journal and report entries are recorded. Registered the
+bankruptcy and monopoly features in the normal acceptance pipeline. Domain tests
+(241) and generated acceptance tests (242) pass.
+
+## 2026-07-29T12:00:07Z — coder prepared phase 14 bankruptcy and winning handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase14-bankruptcy-and-winning
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: bankruptcy, creditor or bank asset disposition, winner reporting, and
+the registered phase-14 acceptance features are ready for structural review.
 
 ## 2026-07-29T11:14:19Z — coder received phase 13 free parking handoff from specifier
 

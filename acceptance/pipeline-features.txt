@@ -11,12 +11,8 @@
 # is a tolerance, where a mutation smaller than the tolerance is equivalent by
 # construction and no implementation could ever kill it. Record the reason.
 #
-# en/monopoly.feature is deliberately absent. It parses, a game plays every
-# player's turn, and since buying-land a deed can now pass from the bank to a
-# player. What the scenario asks for is still missing on two counts: a game is
-# one round of turns rather than rounds played until something ends it, and
-# nothing ends it — there is no bankruptcy and no winning. It goes on the
-# pipeline in Phase 14, with both.
+# en/monopoly.feature runs from Phase 14 onward, once bankruptcy and winning
+# give a game a terminal condition.
 
 en/components/streets.feature
 en/components/stations.feature
@@ -27,6 +23,7 @@ en/rules/movement.feature
 en/rules/initiative.feature
 en/rules/jail.feature
 en/rules/free-parking.feature
+en/rules/bankruptcy.feature
 en/rules/tax.feature
 en/rules/turn-loop.feature
 en/rules/buying-land.feature
@@ -41,6 +38,7 @@ en/rules/report.feature
 en/rules/rent.feature
 en/rules/station-rent.feature
 en/rules/utility-rent.feature
+en/monopoly.feature
 
 # Held back from mutation: the fairness scenario asserts that each face comes
 # up about 100000 times within a 1% margin, so it accepts anything in a 1000
