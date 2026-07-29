@@ -26,6 +26,7 @@ en/rules/official.feature
 en/rules/movement.feature
 en/rules/initiative.feature
 en/rules/jail.feature
+en/rules/free-parking.feature
 en/rules/tax.feature
 en/rules/turn-loop.feature
 en/rules/buying-land.feature

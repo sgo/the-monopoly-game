@@ -8146,6 +8146,34 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T11:16:26Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T111451Z_000025_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: ca9bab22ee
+created_at: 2026-07-29T11:14:51.887241Z
+enqueued_at: 2026-07-29T11:14:52.716971Z
+task: phase13-free-parking
+dequeued_at: 2026-07-29T11:14:58.725171Z
+
+Re-read your role and constitution.
+
+merge_and_process coder ca9bab22ee
+```
+
+Action taken: merged coder commit `ca9bab22ee`, re-read the updated workflow
+article, and ran CRAP, DRY, mutation-site, unit, property, and acceptance
+verification. No refactoring was needed; all non-exempt CRAP remains within
+the threshold and no changed production source exceeded the mutation limit.
+
 ## 2026-07-29T07:35:18Z — architect sent phase 11 completion handoff to specifier
 
 Handoff message sent:
@@ -8758,6 +8786,50 @@ merge_and_process architect a6f1734876
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
 
+## 2026-07-29T11:14:19Z — coder received phase 13 free parking handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260729T111139Z_000021_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: fbde16eb55
+created_at: 2026-07-29T11:11:39.215675Z
+enqueued_at: 2026-07-29T11:11:39.549176Z
+task: phase13-free-parking
+dequeued_at: 2026-07-29T11:11:46.845042Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier fbde16eb55
+```
+
+Action taken: merged the Phase 13 Free Parking specification. Registered its
+feature in the normal acceptance pipeline, added focused game coverage that the
+landing changes only position, and added the direct report-movement assertion
+needed by its report scenario. Domain tests (241) and generated acceptance
+tests (228) pass.
+
+## 2026-07-29T11:14:19Z — coder prepared phase 13 free parking handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase13-free-parking
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: the uneventful Free Parking landing is covered in the game and normal
+acceptance pipeline, with movement narration available as a direct assertion.
+
 ## 2026-07-29T10:09:48Z — coder received phase 12 jail follow-up from specifier
 
 Handoff message received:
@@ -9266,6 +9338,35 @@ Re-read your role and constitution.
 merge_and_process architect 5dfbd58acd
 ```
 
+Action taken: merged coder commit `95ea8a1d7c`, re-ran CRAP, DRY, mutation
+site scans, unit tests, property tests, and acceptance tests. No further
+structural changes were needed; CRAP remains within the threshold except
+for the documented `Report.line` exemption, and changed source files stay
+below the mutation split limit.
+
+## 2026-07-29T10:14:58Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260729T101454Z_000035_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase12-jail
+commit: 2c973562b8
+created_at: 2026-07-29T10:14:54.320297Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 2c973562b8
+```
+
+Summary: handed the verified Phase 12 follow-up state to the architect at
+commit `2c973562b8`; no additional refactoring was required after the
+coder's follow-up.
 Action taken: merged architect commit `5dfbd58acd` into `main` - the first
 use of the new architect-to-specifier Gherkin-routing rule. One conflict, in
 `logbook.md`; resolved at entry granularity as established, with one mistake
@@ -9311,3 +9412,34 @@ edits with no new step text, so no coder work is needed.
 
 Per the new workflow rule, handing this back to the architect now so it
 can resume and close the loop.
+
+## 2026-07-29T10:33:19Z — specifier received phase-complete handoff from architect
+
+Handoff message received:
+
+```
+id: 20260729T103257Z_000042_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 06011df87c
+
+Re-read your role and constitution.
+
+merge_and_process architect 06011df87c
+```
+
+Action taken: fast-forward merged architect commit `06011df87c` into
+`main`, no conflicts. This closes the architect-to-specifier Gherkin
+routing loop on its first real use: the architect accepted the
+specifier's fix (dropping jail-4/jail-6's under-mutated die columns),
+re-ran soft Gherkin mutation, and confirmed both scenarios now show
+0 survivors in the refreshed manifest. `phase12-jail` is now fully
+closed.
+
+Verification: `mvn -q -o test` passes on the merged state (exit 0).
+
+Per role rules, will now ask the user for the next feature to add.

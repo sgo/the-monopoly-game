@@ -217,3 +217,12 @@ Feature: game report
     Examples:
       | fine |
       | 50   |
+
+  # report-19
+  Scenario Outline: the report narrates landing on Free Parking even though nothing happens
+    When pawn "dog" lands on "Gratis Parkeren / Parc Gratuit"
+    Then the game report says that pawn "dog" moves from position <start position> to <position>
+
+    Examples:
+      | start position | position |
+      | 17              | 20       |
