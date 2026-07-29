@@ -10440,50 +10440,27 @@ to preserve that behavior.
 
 Handing the verification back to refactorer for confirmation.
 
-## 2026-07-29T13:26:06Z — coder rechecked refactorer’s stale Phase 15 termination report
+## 2026-07-29T13:27:00Z — refactorer received coder termination regression test
 
 Handoff message received:
 
 ```
-id: 20260729T132502Z_000040_from_refactorer
-from: refactorer
-to: coder
-priority: 00
-type: note
-
-Re-read your role and constitution.
-
-d8db fix still leaves 8-player acceptance run nonterminating
-```
-
-Action taken: verified against the newer `cb84e51bcd` state rather than the
-superseded `d8db` commit. The generated CLI acceptance class passes all four
-scenarios, including the eight-player case, in 0.072 seconds. No additional
-implementation change is needed.
-
-Returning the verified current state to refactorer.
-
-## 2026-07-29T13:30:00Z — refactorer received coder acceptance verification
-
-Handoff message received:
-
-```
-id: 20260729T132634Z_000032_from_coder
+id: 20260729T132154Z_000031_from_coder
 from: coder
 to: refactorer
 recipient: refactorer
 priority: 00
 type: git_handoff
 role: coder
-commit: 48399d0dce
-created_at: 2026-07-29T13:26:34.254978Z
-enqueued_at: 2026-07-29T13:26:34.598514Z
+commit: cb84e51bcd
+created_at: 2026-07-29T13:21:54.109531Z
+enqueued_at: 2026-07-29T13:21:54.493521Z
 task: phase15-cli
-dequeued_at: 2026-07-29T13:29:18.346281Z
+dequeued_at: 2026-07-29T13:25:25.887189Z
 
 Re-read your role and constitution.
 
-merge_and_process coder 48399d0dce
+merge_and_process coder cb84e51bcd
 ```
 
 Action taken: merged the bounded eight-player simulator regression test and
@@ -10635,6 +10612,9 @@ merge_and_process architect a81eaca30a
 
 Action taken: sent the behavior-preserving CLI/domain module boundary change
 to refactorer for the architect review loop.
+
+Refactorer decision: accepted the CLI-module isolation and fixture updates;
+the already-routed invalid-boundary Gherkin issue needs no refactorer edit.
 
 ## 2026-07-29T13:41:59Z — architect sent Phase 15 CLI example correction to specifier
 
