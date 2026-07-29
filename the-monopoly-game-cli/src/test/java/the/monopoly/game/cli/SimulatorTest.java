@@ -66,12 +66,9 @@ class SimulatorTest {
 
   @Test
   void startsPlayersWithTheOfficialCapital() {
-    Rule.Set rules = Rule.Set.Type.official.create();
-    List<Player> players = rules.players().select(2).toList();
+    Simulator.Result result = Simulator.run(2, Simulator.strategiesFor(2, List.of()));
 
-    Simulator.terminalGameSetup(rules, players);
-
-    assertThat(players).extracting(player -> player.account().balance().amount().amount()).containsOnly(1500);
+    assertThat(result.startingBalances()).extracting(balance -> balance.amount()).containsOnly(1500);
   }
 
   @Test
