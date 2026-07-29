@@ -10197,3 +10197,27 @@ player rather than an actually completed game.
 Action taken: route this observable defect to coder at priority `00` for
 implementation and focused verification. No phase-complete handoff is sent
 while that review loop is outstanding.
+
+## 2026-07-29T12:58:33Z — architect sent Phase 15 completion correction to coder
+
+Handoff message sent:
+
+```
+id: 20260729T125826Z_000047_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: d4daa26893
+created_at: 2026-07-29T12:58:26.864170Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d4daa26893
+```
+
+Action taken: sent the simulator-completion correction through the required
+coder review loop. The coder must return the verified state to architect, or
+forward it to refactorer if implementation changes require that normal review.
