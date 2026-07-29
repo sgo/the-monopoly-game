@@ -10328,6 +10328,29 @@ the CLI implementation.
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
 
+## 2026-07-29T14:42:20Z — specifier returned Phase 15 starting-capital revision
+
+Handoff message sent:
+
+```
+id: 20260729T144211Z_000029_from_specifier
+from: specifier
+to: architect
+priority: 00
+type: git_handoff
+role: specifier
+task: phase15-cli
+commit: c7a0dde7dc
+created_at: 2026-07-29T14:42:11.171871Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier c7a0dde7dc
+```
+
+Summary: returned the revised CLI acceptance criterion requiring every player
+to begin with the official $1500 before the first turn.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
