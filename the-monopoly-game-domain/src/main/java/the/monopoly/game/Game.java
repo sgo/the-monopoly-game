@@ -107,16 +107,26 @@ public class Game {
     jail.observe(journalling);
     Building building = new Building(deeds, rules, strategies, journalling);
     Player builder = turnOrder.getFirst();
-    do {
-      for (Player player : turnOrder) {
-        if (deeds.isBankrupt(player)) continue;
-        takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
-        if (player.id().equals(builder.id()) && !deeds.isBankrupt(player)) building.develop(player);
-        if (remainingPlayers().size() <= 1) break;
-      }
-    } while (untilComplete && remainingPlayers().size() > 1);
+    playTurns(turnOrder, builder, journal, journalling, building, untilComplete);
 
     return new Result(turnOrder, journal.entries(), deeds, winner());
+  }
+
+  private void playTurns(List<Player> turnOrder, Player builder, Journal journal,
+                         Journalling journalling, Building building, boolean untilComplete) {
+    do {
+      for (Player player : turnOrder) {
+        if (playTurn(player, builder, turnOrder, journal, journalling, building)) break;
+      }
+    } while (untilComplete && remainingPlayers().size() > 1);
+  }
+
+  private boolean playTurn(Player player, Player builder, List<Player> turnOrder, Journal journal,
+                           Journalling journalling, Building building) {
+    if (deeds.isBankrupt(player)) return false;
+    takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
+    if (player.id().equals(builder.id()) && !deeds.isBankrupt(player)) building.develop(player);
+    return remainingPlayers().size() <= 1;
   }
 
   private List<Player> remainingPlayers() {
