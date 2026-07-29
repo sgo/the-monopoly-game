@@ -45,6 +45,19 @@ class JailTest {
   }
 
   @Test
+  void threeFailedDoubleAttemptsChargeTheFineAndReleaseThePawn() {
+    dog.account().withdraw(new Money(1460));
+    jail.imprison(dog);
+
+    assertThat(jail.leavesOn(new Roll(1, 2), dog)).isFalse();
+    assertThat(jail.leavesOn(new Roll(2, 3), dog)).isFalse();
+    assertThat(jail.leavesOn(new Roll(3, 4), dog)).isTrue();
+
+    assertThat(dog.account().balance()).isEqualTo(Balance.of(-10));
+    assertThat(jail.holds(dog)).isFalse();
+  }
+
+  @Test
   void anExplicitlyUsedRetainedCardFreesThePawnWithoutAFine() {
     Deeds deeds = new Deeds();
     deeds.hold(Deeds.RetainedCard.CHANCE_GET_OUT_OF_JAIL_FREE, dog);

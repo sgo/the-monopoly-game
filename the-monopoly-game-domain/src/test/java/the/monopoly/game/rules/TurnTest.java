@@ -9,6 +9,7 @@ import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.strategies.Strategy;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -106,6 +107,19 @@ class TurnTest {
     takeTurn(player, new Roll(3, 3), new Roll(2, 4), new Roll(1, 1));
 
     assertThat(player.position().index()).isEqualTo(12);
+  }
+
+  @Test
+  void anUnaffordablePrisonerTriesDoublesBeforeMoving() {
+    Player player = playerAt(10, 40);
+    Jail jail = new Jail(ruleSet);
+    jail.imprison(player);
+
+    new Turn(ruleSet, Cup.of(new Roll(1, 2)), new Turn.Events() {
+    }, Landings.UNEVENTFUL, jail, Strategy.UNDECIDED, new Deeds()).take(player);
+
+    assertThat(player.position().index()).isEqualTo(JAIL);
+    assertThat(jail.holds(player)).isTrue();
   }
 
   @Test

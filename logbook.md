@@ -8146,6 +8146,36 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T09:13:49Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T090451Z_000022_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 61f7ecd378
+created_at: 2026-07-29T09:04:51.253333Z
+enqueued_at: 2026-07-29T09:04:51.293468Z
+task: phase12-jail
+dequeued_at: 2026-07-29T09:04:59.645260Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 61f7ecd378
+```
+
+Action taken: merged coder commit `61f7ecd378`, extracted the jail-attempt
+branch in `Turn`, added targeted coverage for failed jail double attempts and
+the unaffordable-prisoner turn path, and verified unit, property, and
+acceptance suites. CRAP is at or below 6 for all non-exempt production
+methods; `Report.line` remains the documented exhaustive sealed-switch
+exception. Mutation-site counts remain below 100 per changed source file.
+
 ## 2026-07-29T08:56:28Z — coder received phase 12 jail handoff from specifier
 
 Handoff message received:

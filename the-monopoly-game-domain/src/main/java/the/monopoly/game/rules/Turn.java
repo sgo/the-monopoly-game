@@ -54,9 +54,7 @@ public class Turn {
 
   public void take(Player player) {
     if (!jail.mayTakeTurn(player, strategy, deeds)) {
-      Roll roll = cup.roll();
-      events.rolled(player, roll);
-      if (jail.leavesOn(roll, player)) move(player, roll);
+      takeFromJail(player);
       return;
     }
 
@@ -74,6 +72,12 @@ public class Turn {
 
       if (!roll.isDouble()) return;
     }
+  }
+
+  private void takeFromJail(Player player) {
+    Roll roll = cup.roll();
+    events.rolled(player, roll);
+    if (jail.leavesOn(roll, player)) move(player, roll);
   }
 
   /**
