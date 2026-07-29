@@ -10541,6 +10541,31 @@ Verification: targeted soft mutation for `specs-cli:en/cli.feature` killed
 feature manifest. The specifier loop is closed. Await the outstanding
 refactorer boundary-review loop before Phase 15 completion.
 
+## 2026-07-29T13:46:13Z — architect received Phase 15 CLI boundary review from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T134405Z_000043_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 8d58bc58f0
+created_at: 2026-07-29T13:44:05.571304Z
+enqueued_at: 2026-07-29T13:44:05.843593Z
+task: phase15-cli
+dequeued_at: 2026-07-29T13:46:04.299115Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 8d58bc58f0
+```
+
+Action taken: began final architectural review of the Phase 15 CLI boundary.
+
 ## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
 
 Handoff message received:
