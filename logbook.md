@@ -10433,6 +10433,18 @@ merge_and_process coder 5653a571b7
 Action taken: merged the official-capital terminal fixture and regression
 coverage; focused CLI verification remains green.
 
+## 2026-07-29T15:52:01Z — architect found Phase 15 initial-state defect
+
+Architectural review found that the replacement terminal fixture gives the
+first player a hotel on Nieuwstraat Brussel and moves the other players to
+position 36 before play. Although it restores €1500 after the purchase, this
+still contradicts the standard setup: all pawns begin on START and the bank
+retains title deeds and hotels until a player buys them. It is another
+production shortcut for forcing a rapid terminal game, not valid CLI setup.
+
+Action taken: route the remaining observable setup defect to coder at
+priority 00. The starting-capital Gherkin criterion remains accepted.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
