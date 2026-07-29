@@ -8418,3 +8418,71 @@ collisions, fences balanced (412, even) after resolution.
 Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
+
+## 2026-07-29T08:56:28Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260729T085628Z_000018_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase12-jail
+commit: d4409e59e4
+created_at: 2026-07-29T08:56:28.476461Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d4409e59e4
+```
+
+Summary: specified Phase 12 jail — new `jail.feature` covering entry via
+landing on Go To Jail (previously a gap: only the 3-doubles rule and a
+Chance card could jail a pawn), just-visiting as a no-op, the "Agree if
+affordable" jail-exit hook (pays the fine and moves the same turn when
+affordable, else attempts doubles), using a held Get Out of Jail Free
+card to leave without paying, and rent still being collected normally
+while jailed. Extended `movement.feature` (movement-5/6) with the
+matching multi-turn exit mechanics in the existing single-player
+vocabulary: doubles release and move the pawn with the turn ending (no
+bonus roll), and three failed attempts force the fine before moving on
+that third turn. Added journal-17/report-17 (entry cause) and
+journal-18/report-18 (exit method).
+
+During review the user flagged that jail-6 attached "Agree if
+affordable" to the jailed owner purely to unlock the rent claim,
+which read as if it were about the jail-exit decision when it wasn't,
+and also forced a contrived low-balance workaround so the owner's own
+later turn that round wouldn't confound the balance assertion. This
+led to a larger design change at the user's direction: the existing
+(test-only) `Scripted` class in `World.java` (previously created
+lazily only when a pawn got an override like "will buy"/"will build")
+becomes the implicit default strategy for every pawn, extended with
+"will claim rent for X" and "will use the Get Out of Jail Free card to
+leave jail" (untold default: attempt doubles). "Agree if affordable"
+is now reserved for scenarios that actually test that algorithm's own
+behavior.
+
+At the user's explicit direction this was applied retroactively, not
+just to the new jail work: retrofitted rent.feature (5 scenarios),
+mortgage.feature (2), utility-rent.feature (2), and station-rent.feature
+(2) to use "will claim rent for X" instead of "Agree if affordable".
+Also dropped "Agree if affordable" entirely from mortgage-5 and
+cards-9, where it was already redundant alongside their own explicit
+"will build"/"will buy" overrides. `building.feature` and
+`buying-land.feature` were left untouched, since those scenarios are
+directly testing the "Agree if affordable" algorithm itself, not using
+it as an incidental enabler.
+
+Implementation note left for the coder: "declines to claim rent for X"
+currently bypasses `Scripted` via its own one-off anonymous `Strategy`;
+worth reconciling so it routes through `Scripted` for consistency,
+though the Gherkin wording itself doesn't need to change.
+
+Verification: all touched feature files re-parsed and passed the
+`ir-dry-checker` with only the established baseline "possible-synonym"
+noise (no new duplicate findings); `mvn -q -o test` passes unaffected
+(feature-file-only changes, no compiled Java touched).
