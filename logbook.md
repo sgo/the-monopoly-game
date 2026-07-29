@@ -11035,6 +11035,54 @@ Action taken: route this remaining observable CLI contract gap to coder at
 priority 00. The executable entry point, help output, stdout report, and
 invalid-input exit path are already in place.
 
+## 2026-07-29T14:16:19Z — architect sent Phase 15 CLI strategy-selection handoff
+
+Handoff message sent:
+
+```
+id: 20260729T141619Z_000055_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: ca8b1b2144
+created_at: 2026-07-29T14:16:19.376348Z
+
+Re-read your role and constitution.
+
+merge_and_process architect ca8b1b2144
+```
+
+Action taken: sent the remaining strategy-selection and lookup work to coder.
+
+## 2026-07-29T14:21:02Z — architect received Phase 15 strategy-selection return from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T142049Z_000046_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 427c4e33ee
+created_at: 2026-07-29T14:20:49.967808Z
+enqueued_at: 2026-07-29T14:20:50.061692Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:20:53.583236Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 427c4e33ee
+```
+
+Action taken: began architectural review of the refactorer-returned
+strategy-selection implementation.
+
 ## 2026-07-29T14:17:59Z — coder received architect strategy-selection follow-up
 
 Handoff message received:
@@ -11090,6 +11138,7 @@ merge_and_process coder 093668a142
 Action taken: merged named strategy registry and per-player selection support;
 default and unknown-strategy paths are covered by focused tests.
 
+<<<<<<< HEAD
 ## 2026-07-29T14:20:49Z — refactorer returned strategy-selection review
 
 Handoff message sent:
@@ -11113,3 +11162,17 @@ merge_and_process refactorer 427c4e33ee
 Action taken: returned strategy registry and per-player CLI selection after
 seven focused CLI tests, DRY review, and the coder-reported 246 acceptance
 scenarios passed.
+=======
+## 2026-07-29T14:25:46Z — architect hardened Phase 15 CLI adapter verification
+
+Action taken: accepted the registry at the CLI boundary, where it preserves
+domain dependency direction. Added process-boundary verification for invalid
+input exit status, plus focused tests for default mappings and incomplete
+strategy lists. The 53 CLI source mutations were killed after hardening;
+DRY reported no CLI duplication; targeted soft Gherkin mutation completed
+without survivors. Existing DRY findings remain confined to unchanged domain
+code.
+
+Handing the behavior-preserving adapter-test hardening to refactorer for
+review.
+>>>>>>> bd3d62e157
