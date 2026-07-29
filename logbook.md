@@ -8337,3 +8337,25 @@ Verification:
 - `git diff --check` — passed.
 
 Routing: the acceptance-pipeline registration and mutation manifests are non-functional verification infrastructure; no coder or refactorer follow-up is warranted. All Phase 11 loops are closed, so send the phase-complete sync to specifier at priority `50`.
+
+## 2026-07-29T07:35:18Z — architect sent phase 11 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T073514Z_000038_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase11-taxes
+commit: d9f082b1bc
+created_at: 2026-07-29T07:35:14.212114Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d9f082b1bc
+```
+
+Summary: sent the Phase 11 completion sync after accepting the tax-rule architecture and registering the tax specification in the normal and mutation acceptance pipeline. The sync points specifier at architect commit `d9f082b1bc`.
