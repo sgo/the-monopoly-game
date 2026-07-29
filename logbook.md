@@ -11223,3 +11223,11 @@ merge_and_process refactorer 427c4e33ee
 Action taken: returned strategy registry and per-player CLI selection after
 seven focused CLI tests, DRY review, and the coder-reported 246 acceptance
 scenarios passed.
+
+## 2026-07-29T14:28:19Z — architect accepted Phase 15 CLI completion
+
+Action taken: accepted the final refactorer return. The CLI remains an adapter
+module depending inward on the domain; its strategy registry is local to that
+boundary, and its process behavior is verified separately from domain logic.
+All coder and refactorer follow-up loops for `phase15-cli` are closed. Routing
+the completed phase to specifier for branch synchronization.
