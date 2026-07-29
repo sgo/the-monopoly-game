@@ -10582,6 +10582,14 @@ merge_and_process refactorer 6598335d45
 Action taken: began architectural review of the refactorer-returned
 initial-state correction while the specification loop remains outstanding.
 
+## 2026-07-29T15:55:53Z — architect rejected Phase 15 initial-state closure
+
+Review found that the return snapshots the €1500 balances for the new
+assertion but retains the pre-owned hotel and player repositioning fixture.
+That does not restore normal standard setup. The already-sent priority-00
+coder correction remains outstanding, as does the specifier's broader setup
+criteria; no phase-complete handoff is warranted.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
