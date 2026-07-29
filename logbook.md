@@ -10562,3 +10562,26 @@ Action taken: merged architect commit `1495026905`, preserving the
 architect's Phase 15 review chain. Accepted the invalid-boundary mutation
 finding and revised the CLI feature so the expected reported invalid count
 is an independent example column.
+
+## 2026-07-29T13:44:00Z — specifier returned Phase 15 boundary revision to architect
+
+Handoff message sent:
+
+```
+id: 20260729T134321Z_000026_from_specifier
+from: specifier
+to: architect
+priority: 00
+type: git_handoff
+role: specifier
+task: phase15-cli
+commit: bdcd920ce4
+created_at: 2026-07-29T13:43:21.622583Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier bdcd920ce4
+```
+
+Summary: returned the revised invalid-player-boundary specification after
+separating the arranged count from the asserted reported count.
