@@ -11082,3 +11082,58 @@ merge_and_process refactorer 427c4e33ee
 
 Action taken: began architectural review of the refactorer-returned
 strategy-selection implementation.
+
+## 2026-07-29T14:17:59Z — coder received architect strategy-selection follow-up
+
+Handoff message received:
+
+```
+id: 20260729T141619Z_000055_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: ca8b1b2144
+
+Re-read your role and constitution.
+
+merge_and_process architect ca8b1b2144
+```
+
+Action taken: merged `ca8b1b2144`; added a named strategy registry and
+per-player command-line selection. Omitted selections default to
+`agree-if-affordable`; supplied selections are validated one-for-one against
+the player count, with clear errors for unknown strategies.
+
+Verification: CLI reactor tests pass (257); generated acceptance passes
+(246 scenarios).
+
+Handing implementation to refactorer for review.
+
+## 2026-07-29T14:20:11Z — refactorer received coder strategy-selection follow-up
+
+Handoff message received:
+
+```
+id: 20260729T141826Z_000035_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 093668a142
+created_at: 2026-07-29T14:18:26.313823Z
+enqueued_at: 2026-07-29T14:18:26.903745Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:18:30.726397Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 093668a142
+```
+
+Action taken: merged named strategy registry and per-player selection support;
+default and unknown-strategy paths are covered by focused tests.

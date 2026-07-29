@@ -5,6 +5,7 @@ import the.monopoly.game.Report;
 import the.monopoly.game.components.dice.Cup;
 import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Money;
+import the.monopoly.game.components.players.Pawn;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.strategies.AgreeIfAffordable;
@@ -13,6 +14,7 @@ import the.monopoly.game.strategies.Strategy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /** Thin command boundary for running a configured Monopoly simulation. */
 public final class Simulator {
@@ -21,6 +23,9 @@ public final class Simulator {
       new Roll(1, 5), new Roll(1, 6), new Roll(2, 6), new Roll(3, 6)
   );
   private static final Roll BANKRUPTING_ROLL = new Roll(1, 3);
+  private static final Map<String, Supplier<Strategy>> STRATEGIES = Map.of(
+      "agree-if-affordable", AgreeIfAffordable::new
+  );
 
   private Simulator() {
   }
@@ -35,17 +40,39 @@ public final class Simulator {
   /** Parses the command line without performing process termination. */
   public static Result execute(String... arguments) {
     if (arguments.length == 1 && (arguments[0].equals("-h") || arguments[0].equals("--h")))
-      return new Result(0, "Usage: simulator [number of players]");
-    if (arguments.length > 1)
-      return new Result(1, "Usage: simulator [number of players]");
+      return new Result(0, usage());
 
     try {
       int playerCount = arguments.length == 0 ? 2 : Integer.parseInt(arguments[0]);
-      return run(playerCount, player -> new AgreeIfAffordable());
+      List<String> strategyNames = List.of(arguments).subList(Math.min(1, arguments.length), arguments.length);
+      if (!strategyNames.isEmpty() && strategyNames.size() != playerCount)
+        return new Result(1, "Supply one strategy for each player. " + usage());
+      return run(playerCount, strategiesFor(playerCount, strategyNames));
     } catch (NumberFormatException cause) {
       String received = arguments.length == 0 ? "" : arguments[0];
       return new Result(1, "The number of players must be between 2 and 8; received " + received + " players.");
+    } catch (IllegalArgumentException cause) {
+      return new Result(1, cause.getMessage() + " " + usage());
     }
+  }
+
+  private static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames) {
+    List<String> names = strategyNames.isEmpty()
+        ? java.util.Collections.nCopies(playerCount, "agree-if-affordable")
+        : strategyNames;
+    Map<Player.ID, Strategy> selections = new HashMap<>();
+    for (int index = 0; index < playerCount; index++) {
+      String name = names.get(index);
+      Supplier<Strategy> strategy = STRATEGIES.get(name);
+      if (strategy == null) throw new IllegalArgumentException("Unknown strategy: " + name + ".");
+      selections.put(Pawn.values()[index].id(), strategy.get());
+    }
+    return player -> selections.get(player.id());
+  }
+
+  private static String usage() {
+    return "Usage: simulator [number of players] [strategy for each player]"
+        + System.lineSeparator() + "Available strategies: " + String.join(", ", STRATEGIES.keySet());
   }
 
   public static Result run(int playerCount, Strategy.OfPlayers strategies) {

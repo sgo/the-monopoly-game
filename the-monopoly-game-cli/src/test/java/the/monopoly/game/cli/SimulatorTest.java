@@ -34,6 +34,22 @@ class SimulatorTest {
   }
 
   @Test
+  void acceptsOneNamedStrategyForEachPlayer() {
+    Simulator.Result result = Simulator.execute("2", "agree-if-affordable", "agree-if-affordable");
+
+    assertThat(result.succeeded()).isTrue();
+    assertThat(result.output()).contains("wins the game");
+  }
+
+  @Test
+  void rejectsUnknownStrategies() {
+    Simulator.Result result = Simulator.execute("2", "careful", "careful");
+
+    assertThat(result.succeeded()).isFalse();
+    assertThat(result.output()).contains("Unknown strategy: careful.");
+  }
+
+  @Test
   void producesAReadableReportAndWinnerForAnOfficialGame() {
     Simulator.Result result = Simulator.run(2, Strategy.OfPlayers.NOBODY_DECIDES);
 
