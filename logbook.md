@@ -10363,3 +10363,27 @@ previous one-round false winner without prescribing the implementation.
 The new acceptance step needs a handler and the game loop must now produce
 the required terminal sequence. Route the accepted revision to the coder's
 open priority-`00` correction loop. Phase 15 remains open pending that loop.
+
+## 2026-07-29T13:06:06Z — architect sent accepted Phase 15 revision to coder
+
+Handoff message sent:
+
+```
+id: 20260729T130601Z_000049_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 73fda5f617
+created_at: 2026-07-29T13:06:01.494376Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 73fda5f617
+```
+
+Action taken: sent the accepted Gherkin revision to the same open coder
+correction loop, so implementation and binding verification use the current
+specification.
