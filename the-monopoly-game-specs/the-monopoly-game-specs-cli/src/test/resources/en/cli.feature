@@ -46,3 +46,20 @@ Feature: Monopoly command line interface
       | players | reported players |
       | 1       | 1                |
       | 9       | 9                |
+
+  # cli-4
+  Scenario Outline: the CLI applies the standard game setup before play
+    Given the simulator is configured for <players> players without strategy choices
+    When I run the simulator
+    Then the simulator uses the standard game setup
+    And every simulated player starts at position <starting position>
+    And every simulated player starts with $<starting balance>
+    And no simulated player owns any street
+    And no simulated player has any house or hotel
+    And all Chance cards are available in the Chance deck
+    And all Community Chest cards are available in the Community Chest deck
+    And no simulated player holds a Get Out of Jail Free card
+
+    Examples:
+      | players | starting position | starting balance |
+      | 2       | 0                 | 1500             |
