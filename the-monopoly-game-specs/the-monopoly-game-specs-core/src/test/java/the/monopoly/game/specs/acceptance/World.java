@@ -236,6 +236,10 @@ public class World {
     jail.useCard(pawn(pawnName));
   }
 
+  public void pawnWillPayJailFine(String pawnName) {
+    scriptFor(pawnName).paysJailFine();
+  }
+
   public void startPlayerInJail() {
     jail.imprison(player());
   }
@@ -606,6 +610,7 @@ public class World {
     private final Set<Street.Type> bought = new HashSet<>();
     private final Map<Street.Type, Money> bids = new HashMap<>();
     private final Set<Street.Type> builds = new HashSet<>();
+    private boolean paysJailFine;
 
     void declines(Street.Type land) {
       declined.add(land);
@@ -621,6 +626,10 @@ public class World {
 
     void builds(Street.Type land) {
       builds.add(land);
+    }
+
+    void paysJailFine() {
+      paysJailFine = true;
     }
 
     @Override
@@ -642,6 +651,11 @@ public class World {
     @Override
     public boolean builds(BuildOffer offer) {
       return builds.contains(offer.land().type());
+    }
+
+    @Override
+    public boolean pays(JailFine fine) {
+      return paysJailFine;
     }
   }
 }

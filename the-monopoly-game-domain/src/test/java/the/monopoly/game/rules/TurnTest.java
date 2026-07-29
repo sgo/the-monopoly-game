@@ -125,10 +125,15 @@ class TurnTest {
   @Test
   void rollingDoublesThreeTimesInARowSendsThePawnStraightToJail() {
     Player player = playerAt(0, 1500);
+    Jail jail = new Jail(ruleSet);
 
-    takeTurn(player, new Roll(2, 2), new Roll(5, 5), new Roll(1, 1));
+    new Turn(
+        ruleSet, Cup.of(new Roll(2, 2), new Roll(5, 5), new Roll(1, 1)), new Turn.Events() {
+        }, Landings.UNEVENTFUL, jail, Strategy.UNDECIDED, new Deeds()
+    ).take(player);
 
     assertThat(player.position().index()).isEqualTo(JAIL);
+    assertThat(jail.holds(player)).isTrue();
   }
 
   @Test

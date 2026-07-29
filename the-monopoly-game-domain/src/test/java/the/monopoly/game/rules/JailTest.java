@@ -26,10 +26,34 @@ class JailTest {
   }
 
   @Test
+  void anObserverRecordsWhyThePawnWasSentToJail() {
+    Reported reported = new Reported();
+    jail.observe(reported);
+
+    jail.resolve(dog, rules.create(Street.Type.NaarDeGevangenis), new Roll(1, 2));
+
+    assertThat(reported.cause).isEqualTo(Street.Type.NaarDeGevangenis);
+  }
+
+  @Test
   void anAffordableFineFreesThePawn() {
     jail.imprison(dog);
 
     assertThat(jail.mayTakeTurn(dog, new AgreeIfAffordable(), new Deeds())).isTrue();
+    assertThat(dog.account().balance()).isEqualTo(Balance.of(1450));
+    assertThat(jail.holds(dog)).isFalse();
+  }
+
+  @Test
+  void anExplicitChoiceToPayTheFineFreesThePawn() {
+    jail.imprison(dog);
+
+    assertThat(jail.mayTakeTurn(dog, new Strategy() {
+      @Override
+      public boolean pays(JailFine fine) {
+        return true;
+      }
+    }, new Deeds())).isTrue();
     assertThat(dog.account().balance()).isEqualTo(Balance.of(1450));
     assertThat(jail.holds(dog)).isFalse();
   }
@@ -76,5 +100,14 @@ class JailTest {
     Player player = new Player(id, bank.accountOf(id));
     player.account().deposit(new Money(balance));
     return player;
+  }
+
+  private static final class Reported implements Jail.Events {
+    private Street.Type cause;
+
+    @Override
+    public void sentToJail(Player player, Street.Type cause) {
+      this.cause = cause;
+    }
   }
 }
