@@ -8502,6 +8502,88 @@ the previously accepted Phase 12 results remain applicable. The specifier
 already owns and has received the phase state, so do not send a duplicate
 phase-complete handoff. All Phase 12 review loops are closed.
 
+## 2026-07-29T10:33:04Z — architect sent final phase 12 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T103257Z_000042_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 06011df87c
+created_at: 2026-07-29T10:32:57.737508Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 06011df87c
+```
+
+Summary: sent the final Phase 12 completion sync after accepting the
+specifier's Gherkin correction and its clean 5/5 soft mutation result. This
+ensures the specifier receives the architect's final acceptance and manifest
+state, rather than only its earlier outbound revision.
+
+## 2026-07-29T11:17:09Z — architect received phase 13 refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260729T111656Z_000036_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 27fb5af98b
+created_at: 2026-07-29T11:16:56.042026Z
+enqueued_at: 2026-07-29T11:16:57.082939Z
+task: phase13-free-parking
+dequeued_at: 2026-07-29T11:17:02.050785Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 27fb5af98b
+```
+
+Action taken: began architectural review of the Phase 13 free-parking
+refactorer handoff.
+
+## 2026-07-29T11:19:23Z — architect accepted phase 13 free parking
+
+Action taken: merged refactorer commit `27fb5af98b` and accepted the Free
+Parking rule as an explicit specification of the existing `UnownableSpace`
+no-op path. It introduces no special-case production dependency: `Game` keeps
+movement and its journal event in the shared turn pipeline, while Free Parking
+adds neither a financial effect nor a new domain rule object. The report
+assertion is a narrow acceptance adapter over that existing movement event.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 241 tests passed.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+  -Pproperty-tests test` — 17 property tests passed.
+- `mutate4java` (differential, six selected sites, eight-worker limit) for
+  `Game.java` — 6/6 killed. The first runner invocation could not use its
+  relative local Maven repository from the module directory; the rerun used
+  the absolute local repository and passed.
+- `dry4java` — only the established `Game` journal-adapter repetitions, the
+  existing `LandSale`/`Rent` construction shape, and `Game`/`Turn`
+  constructor shape remain; no actionable duplication.
+- `./acceptance/run-acceptance.sh` — 228 generated acceptance tests passed,
+  including `en/rules/free-parking.feature`.
+- Soft Gherkin mutation for `en/rules/free-parking.feature` — 2/2 killed,
+  zero survivors and zero errors; runner manifests refreshed.
+- `git diff --check` — passed.
+
+Routing: no architect correction or coder/refactorer follow-up is warranted.
+All Phase 13 loops are closed; send the phase-complete sync to specifier at
+priority `50`.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -8757,6 +8839,52 @@ merge_and_process architect a6f1734876
 ```
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
+
+## 2026-07-29T12:00:07Z — coder received phase 14 bankruptcy and winning handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260729T114852Z_000022_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 55c969a94a
+created_at: 2026-07-29T11:48:52.237278Z
+enqueued_at: 2026-07-29T11:48:52.419060Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T11:48:57.567290Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 55c969a94a
+```
+
+Action taken: merged the Phase 14 specification and implemented bankruptcy
+resolution. Debts now liquidate houses and mortgages before bankruptcy; remaining
+assets transfer to a creditor or return to the bank for auction, inherited
+mortgages settle according to strategy, retained jail cards are surrendered,
+and bankruptcy/winner journal and report entries are recorded. Registered the
+bankruptcy and monopoly features in the normal acceptance pipeline. Domain tests
+(241) and generated acceptance tests (242) pass.
+
+## 2026-07-29T12:00:07Z — coder prepared phase 14 bankruptcy and winning handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase14-bankruptcy-and-winning
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: bankruptcy, creditor or bank asset disposition, winner reporting, and
+the registered phase-14 acceptance features are ready for structural review.
 
 ## 2026-07-29T11:14:19Z — coder received phase 13 free parking handoff from specifier
 
@@ -9413,5 +9541,81 @@ re-ran soft Gherkin mutation, and confirmed both scenarios now show
 closed.
 
 Verification: `mvn -q -o test` passes on the merged state (exit 0).
+
+Per role rules, will now ask the user for the next feature to add.
+
+## 2026-07-29T11:11:39Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260729T111139Z_000021_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase13-free-parking
+commit: fbde16eb55
+created_at: 2026-07-29T11:11:39.215675Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier fbde16eb55
+```
+
+Summary: specified Phase 13 Free Parking — new `free-parking.feature`
+covering the no-penalty/no-reward landing, guarding against the common
+house-rule jackpot expectation. Added journal-19/report-19 confirming
+the turn's "moved" event is still recorded even though nothing else
+happens, so the report never has a silent gap. Verified journal-19
+already passes against the current implementation, since `journal` has
+a standalone "records that pawn X moves from position A to B" step;
+`report` only has combinator variants of that step ("...moves...
+before it says... collects a salary"), so report-19 needs the coder to
+add the equivalent standalone step - confirmed via a temporary local
+pipeline registration (not committed; that stays the architect's
+territory) followed by `./acceptance/run-acceptance.sh`, which showed
+exactly one failure ("Unsupported step") at report-19 and none at
+journal-19.
+
+## 2026-07-29T11:22:47Z — specifier received phase-complete handoff from architect
+
+Handoff message received:
+
+```
+id: 20260729T112000Z_000043_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase13-free-parking
+commit: 97630aba9b
+
+Re-read your role and constitution.
+
+merge_and_process architect 97630aba9b
+```
+
+Action taken: merged architect commit `97630aba9b` into `main`, closing out
+the `phase13-free-parking` task. Clean merge (only `logbook.md` auto-merged,
+no conflicts). This brought in the coder's implementation (the missing
+standalone "the game report says that pawn X moves from position A to B"
+step, mirroring the journal equivalent already present) and the refactorer's
+pass; the architect found no correction or follow-up warranted.
+
+`Game.java` showed a large diff by line count (1132 lines) at first glance,
+worth double-checking given how small this phase is - but a direct diff of
+everything before the `mutate4java-manifest` comment block showed the actual
+code identical to the specifier's own pre-handoff commit. The entire diff is
+manifest bookkeeping (line numbers, hashes) regenerated by the mutation
+tooling; Free Parking needed zero changes to `Game.java`'s logic, consistent
+with it already being a no-op path through the existing `UnownableSpace`/
+movement pipeline.
+
+Verification: `./acceptance/run-acceptance.sh` passes (228/228), including
+`report-19` (previously failing with "Unsupported step" before the coder
+added the missing standalone step).
 
 Per role rules, will now ask the user for the next feature to add.

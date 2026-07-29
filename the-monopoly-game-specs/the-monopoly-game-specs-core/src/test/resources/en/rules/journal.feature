@@ -239,3 +239,35 @@ Feature: game journal
     Examples:
       | start position | position |
       | 17              | 20       |
+
+  # journal-20
+  Scenario Outline: the journal records a bankruptcy to the bank
+    Given pawn "dog" has $<starting balance> to spend
+    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    Then the game journal records that pawn "dog" goes bankrupt to the bank
+
+    Examples:
+      | starting balance |
+      | 5                 |
+
+  # journal-21
+  Scenario Outline: the journal records a bankruptcy to another player
+    Given pawn "high hat" owns "Diestsestraat Leuven"
+    And the street "Diestsestraat Leuven" has a hotel built
+    And pawn "dog" has $<starting balance> to spend
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then the game journal records that pawn "dog" goes bankrupt to pawn "high hat"
+
+    Examples:
+      | starting balance |
+      | 5                 |
+
+  # journal-22
+  Scenario Outline: the journal records the game's winner
+    Given pawn "dog" has $<starting balance> to spend
+    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    Then the game journal records that pawn "high hat" wins the game
+
+    Examples:
+      | starting balance |
+      | 5                 |

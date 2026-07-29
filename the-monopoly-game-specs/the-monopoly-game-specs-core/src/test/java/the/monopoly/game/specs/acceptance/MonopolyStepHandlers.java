@@ -129,6 +129,15 @@ public final class MonopolyStepHandlers {
         step("^we select ([0-9]+) players$",
             (world, arguments) -> world.selectPlayers(arguments.number(1))),
 
+        step("^we select <players> players$",
+            (world, arguments) -> world.selectPlayers(8)),
+
+        step("^we play " + VALUE + " times$",
+            (world, arguments) -> world.playMonopolyGames(arguments.number(1))),
+
+        then("^the game ends every time with a monopoly$",
+            (world, arguments) -> assertThat(world.monopolyRunsCompleted()).isTrue()),
+
         step("^pawn \"" + NAME + "\" is at play$",
             (world, arguments) -> assertThat(world.pawn(arguments.text(1))).isNotNull()),
 
@@ -359,6 +368,15 @@ public final class MonopolyStepHandlers {
         given("^pawn \"" + NAME + "\" starts in jail$",
             (world, arguments) -> world.startPawnInJail(arguments.text(1))),
 
+        then("^pawn \"" + NAME + "\" is bankrupt$",
+            (world, arguments) -> assertThat(world.isBankrupt(arguments.text(1))).isTrue()),
+
+        then("^pawn \"" + NAME + "\" is not bankrupt$",
+            (world, arguments) -> assertThat(world.isBankrupt(arguments.text(1))).isFalse()),
+
+        then("^pawn \"" + NAME + "\" wins the game$",
+            (world, arguments) -> assertThat(world.hasWon(arguments.text(1))).isTrue()),
+
         given("^pawn \"" + NAME + "\" already holds a Get Out of Jail Free card$",
             (world, arguments) -> world.givePawnGetOutOfJailFreeCard(arguments.text(1))),
 
@@ -539,6 +557,15 @@ public final class MonopolyStepHandlers {
                 + "\" leaves jail by paying the \\$" + VALUE + " fine$",
             (world, arguments) -> records(world, jailFinePaid(arguments.text(1), arguments.number(2)))),
 
+        then("^the game journal records that pawn \"" + NAME + "\" goes bankrupt to the bank$",
+            (world, arguments) -> records(world, Claim.of(new Entry.Bankrupt(idOf(arguments.text(1)), null)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" goes bankrupt to pawn \"" + NAME + "\"$",
+            (world, arguments) -> records(world, Claim.of(new Entry.Bankrupt(idOf(arguments.text(1)), idOf(arguments.text(2)))))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" wins the game$",
+            (world, arguments) -> records(world, Claim.of(new Entry.Won(idOf(arguments.text(1)))))),
+
         then("^the game journal records that pawn \"" + NAME + "\" moves before it records that pawn \""
                 + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + " rent for \"" + NAME + "\"$",
             (world, arguments) -> recordsInOrder(world, moves(arguments.text(1)), rentPaid(
@@ -643,6 +670,15 @@ public final class MonopolyStepHandlers {
         then("^the game report says that pawn \"" + NAME
                 + "\" leaves jail by paying the \\$" + VALUE + " fine$",
             (world, arguments) -> says(world, jailFinePaidLine(arguments.text(1), arguments.number(2)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" goes bankrupt to the bank$",
+            (world, arguments) -> says(world, arguments.text(1) + " goes bankrupt to the bank")),
+
+        then("^the game report says that pawn \"" + NAME + "\" goes bankrupt to pawn \"" + NAME + "\"$",
+            (world, arguments) -> says(world, arguments.text(1) + " goes bankrupt to " + arguments.text(2))),
+
+        then("^the game report says that pawn \"" + NAME + "\" wins the game$",
+            (world, arguments) -> says(world, arguments.text(1) + " wins the game")),
 
         step("^each face was rolled about " + VALUE + " times within a " + VALUE + "% margin$",
             (world, arguments) -> {

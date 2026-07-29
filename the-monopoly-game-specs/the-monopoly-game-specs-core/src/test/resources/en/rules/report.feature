@@ -226,3 +226,35 @@ Feature: game report
     Examples:
       | start position | position |
       | 17              | 20       |
+
+  # report-20
+  Scenario Outline: the report narrates a bankruptcy to the bank
+    Given pawn "dog" has $<starting balance> to spend
+    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    Then the game report says that pawn "dog" goes bankrupt to the bank
+
+    Examples:
+      | starting balance |
+      | 5                 |
+
+  # report-21
+  Scenario Outline: the report narrates a bankruptcy to another player
+    Given pawn "high hat" owns "Diestsestraat Leuven"
+    And the street "Diestsestraat Leuven" has a hotel built
+    And pawn "dog" has $<starting balance> to spend
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then the game report says that pawn "dog" goes bankrupt to pawn "high hat"
+
+    Examples:
+      | starting balance |
+      | 5                 |
+
+  # report-22
+  Scenario Outline: the report narrates the game's winner
+    Given pawn "dog" has $<starting balance> to spend
+    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    Then the game report says that pawn "high hat" wins the game
+
+    Examples:
+      | starting balance |
+      | 5                 |
