@@ -10901,6 +10901,31 @@ Action taken: accepted the refactorer-returned core acceptance handlers for
 the standard setup. No CLI runtime behavior changed in this return; the coder
 loop for real random dice and normal bankruptcy remains outstanding.
 
+## 2026-07-29T18:30:12Z — architect received Phase 15 natural-completion specification return
+
+Handoff message received:
+
+```
+id: 20260729T182907Z_000032_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: de36f0eb2a
+created_at: 2026-07-29T18:29:07.034011Z
+enqueued_at: 2026-07-29T18:29:07.780248Z
+task: phase15-cli
+dequeued_at: 2026-07-29T18:30:12.656724Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier de36f0eb2a
+```
+
+Action taken: began review of the user-approved natural completion criteria.
+
 ## 2026-07-29T18:28:58Z — architect queued incoming-handoff notification
 
 Queued message received while processing the active return:
