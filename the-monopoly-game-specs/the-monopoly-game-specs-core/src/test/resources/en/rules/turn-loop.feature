@@ -1,6 +1,6 @@
 # mutation-stamp: sha256=a5605a8efb0ebb0350648575b089fd417da58e65fc56d494e99f167f6b4ac5df
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-07-28T20:29:53.372249Z","feature_name":"turn-loop","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/turn-loop.feature","background_hash":"d393cd2ad76babc786d9464e9f2cbd2d33b5de531a11eda2744728a563e5e9ca","implementation_hash":"unknown","scenarios":[{"index":0,"name":"the game plays a turn for every player, each moved by their own rolls","scenario_hash":"0cdbea2858bb3e65391cd19b3616ab85588a36a90c2c3489ba082263ca7e2190","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-07-27T21:28:13.690899Z"},{"index":1,"name":"landing on a space produces no economic effect yet","scenario_hash":"ff34146caf82c71e384cf2dbed54c76264999d6edf070e546f0497655976eb38","mutation_count":5,"result":{"Total":5,"Killed":5,"Survived":0,"Errors":0},"tested_at":"2026-07-27T21:28:13.690899Z"}]}
+# {"version":1,"tested_at":"2026-07-28T22:26:05.064043Z","feature_name":"turn-loop","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/turn-loop.feature","background_hash":"d393cd2ad76babc786d9464e9f2cbd2d33b5de531a11eda2744728a563e5e9ca","implementation_hash":"unknown","scenarios":[{"index":0,"name":"the game plays a turn for every player, each moved by their own rolls","scenario_hash":"0cdbea2858bb3e65391cd19b3616ab85588a36a90c2c3489ba082263ca7e2190","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-07-27T21:28:13.690899Z"},{"index":1,"name":"landing on a space produces no economic effect yet","scenario_hash":"ff34146caf82c71e384cf2dbed54c76264999d6edf070e546f0497655976eb38","mutation_count":5,"result":{"Total":5,"Killed":5,"Survived":0,"Errors":0},"tested_at":"2026-07-27T21:28:13.690899Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -26,7 +26,7 @@ Feature: turn-loop
       | 2         | 3         | 5                  | 6              | 5              | 11                      |
 
   # turn-loop-2
-  Scenario Outline: landing on a space produces no economic effect yet
+  Scenario Outline: landing on Income Tax charges its fixed amount
     And with $<starting_balance> in pawn "dog"'s account
     And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
     And every other player can complete their turn
@@ -36,4 +36,4 @@ Feature: turn-loop
 
     Examples:
       | starting_balance | dog_die_1 | dog_die_2 | dog_final_position | final_balance |
-      | 1500             | 1         | 3         | 4                  | 1500          |
+      | 1500             | 1         | 3         | 4                  | 1300          |

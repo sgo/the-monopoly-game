@@ -6247,6 +6247,53 @@ merge_and_process refactorer 8d2c1d06ba
 
 Action taken: began architectural review of the named refactorer commit.
 
+## 2026-07-28T22:14:58Z — architect received phase 10 refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260728T221440Z_000032_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: d990a64b1d
+created_at: 2026-07-28T22:14:40.127984Z
+enqueued_at: 2026-07-28T22:14:40.757204Z
+task: phase10-chance-and-community-chest
+dequeued_at: 2026-07-28T22:14:48.065326Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d990a64b1d
+```
+
+Action taken: began architectural review of the named refactorer commit.
+
+## 2026-07-28T20:39:54Z — architect sent workflow routing clarification to specifier
+
+Handoff message sent:
+
+```
+id: 20260728T203950Z_000035_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: workflow-architect-followup-return-routing
+commit: 2756b260d5
+created_at: 2026-07-28T20:39:50.176594Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 2756b260d5
+```
+
+Summary: sent the durable workflow clarification so the specifier can merge the architect branch state. The change makes architect-originated priority `00` follow-ups return to architect after coder/refactorer verification when no further role-owned work is needed.
+
 ## 2026-07-28T20:30:37Z — architect completed phase 9 review follow-up
 
 Action taken: merged refactorer commit `24997ec8ae`, reviewed the Phase 9 land-sale implementation, and applied architect follow-up fixes.
@@ -7713,6 +7760,48 @@ new on this side (the phase9-land-sale handoff-sent entry), 8 new on the
 architect's side, no header collisions, nothing dropped from base on
 either side. `mvn -q -o test` passes on the merged state (exit 0).
 
+## 2026-07-28T21:30:56Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T213056Z_000016_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase10-chance-and-community-chest
+commit: 62d8a8cf4e
+created_at: 2026-07-28T21:30:56.315339Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 62d8a8cf4e
+```
+
+Summary: specified Phase 10 chance and community chest cards — new
+`cards.feature` covering move-and-salary, pay/receive-bank, pay/receive-
+every-other-player, go-to-jail, draw/retain/sell a "Get Out of Jail
+Free" card, nearest-station and nearest-utility advances, and the
+renovation (per house/hotel) card, plus two exhaustive per-deck outlines
+that double as the journal's card-drawn record; matching journal/report
+additions for a card's effect being recorded after its draw. Dropped
+the "move-without-salary" (go back 3 spaces) scenario after review
+established it couldn't demonstrate anything distinct from ordinary
+movement math on this board's actual Chance-space positions. "Used"
+(leaving jail) stays out of scope until Phase 12 exists; the nearest-
+station's mandatory double rent bypasses the owner's usual strategy
+claim, since the card instructs payment rather than offering a claim.
+
+User review caught three real gaps before handoff: the pay/collect-
+every-player scenarios only had one other player to pay, indistinguishable
+from a single fixed payment — now use 3 players; the nearest-station
+purchase relied on inferring intent from the "Agree if affordable"
+strategy name rather than an explicit buy declaration — added one; and
+the renovation card scenario never exercised the hotel rate, only
+houses — now combines a hotel and a house to prove both sum correctly.
+
 ## 2026-07-28T21:30:56Z — coder received handoff from specifier
 
 Handoff message received:
@@ -7891,3 +7980,211 @@ the original switch by script rather than retyped by hand. Added targeted
 suite already exercised but unit coverage didn't. Extracted one duplicate
 my own fix introduced. Unit (219), property (17), and acceptance (207, up
 from 162) verification all pass.
+
+## 2026-07-28T22:26:34Z — architect completed phase 10 review follow-up
+
+Action taken: merged refactorer commit `d990a64b1d`, reviewed the Phase 10 chance/community chest implementation, and applied architect follow-up fixes.
+
+Summary: kept card behavior in the domain `Cards` rule, kept event wording in `Report`, and left acceptance wiring in the specs test tree. Fixed nearest station/utility card handling so the deed resolved for buying or special rent is the actual nearest station/utility reached, not always `CentraalStation` or `Elektriciteitscentrale`. Added mutation-killing regressions for nearest station/utility boundaries, no salary on backward card movement, self-owned/mortgaged special-rent suppression, START-to-START salary collection, and retained-card resale preserving card identity. Removed the duplicated player-transfer loop in `Cards`.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 229 tests passed.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2 -Pproperty-tests test` — 17 property tests passed.
+- `./acceptance/run-acceptance.sh` — 207 generated acceptance tests passed.
+- Differential Java mutation, one changed production file at a time with `--max-workers 8 --verbose`: `Cards.java` clean after follow-up (`19/19` killed before DRY refactor, then `11/11` killed after), `Deeds.java` `33/33` killed, `Game.java` `6/6` killed, `Report.java` `1/1` killed.
+- DRY check reviewed; the actionable `Cards` player-transfer duplicate was removed. Remaining findings are existing explicit journal/event/test/acceptance setup or older constructor/test-helper patterns.
+- `./acceptance/run-acceptance-mutation.sh --level soft` — passed; `cards.feature` 87/87 killed, `journal.feature` 1/1 killed, `report.feature` 1/1 killed.
+- `git diff --check` passed.
+
+Routing: this follow-up changes observable card behavior and regression tests, so it must go to coder only with priority 00. No phase-complete specifier sync is sent until the coder/refactorer follow-up loop returns and is accepted.
+
+## 2026-07-28T22:27:44Z — architect sent phase 10 follow-up handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260728T222739Z_000036_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase10-chance-and-community-chest
+commit: 97bea57d30
+created_at: 2026-07-28T22:27:39.721046Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 97bea57d30
+```
+
+Summary: routed architect follow-up fixes for Phase 10 to coder only at priority 00 because the changes include observable card behavior hardening and regression tests. The specifier phase-complete sync remains pending until this coder/refactorer loop returns and is accepted.
+
+## 2026-07-28T22:27:39Z — coder received architect follow-up for phase 10
+
+Handoff message received:
+
+```
+id: 20260728T222739Z_000036_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 97bea57d30
+created_at: 2026-07-28T22:27:39.721046Z
+enqueued_at: 2026-07-28T22:27:40.157865Z
+task: phase10-chance-and-community-chest
+dequeued_at: 2026-07-28T22:27:44.956888Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 97bea57d30
+```
+
+Action taken: merged architect commit `97bea57d30` into `swarmforge-coder`
+(fast-forward), re-ran coder verification, and found no further coder-owned
+implementation changes were needed.
+
+## 2026-07-28T22:28:59Z — coder returned verified phase 10 follow-up to architect
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: phase10-chance-and-community-chest
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: verified the architect follow-up on the coder branch without adding
+new implementation changes. Coder checks passed with `mvn -B -pl
+the-monopoly-game-domain,the-monopoly-game-specs/the-monopoly-game-specs-core
+-Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2
+test` and `acceptance/run-acceptance.sh` (using the same local Maven repo), so
+the same task returns directly to architect under the priority-`00` review-loop
+workflow.
+
+## 2026-07-28T22:29:55Z — architect received phase 10 coder return handoff
+
+Handoff message received:
+
+```
+id: 20260728T222938Z_000020_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: 7c17ecbddd
+created_at: 2026-07-28T22:29:38.623713Z
+enqueued_at: 2026-07-28T22:29:39.402635Z
+task: phase10-chance-and-community-chest
+dequeued_at: 2026-07-28T22:29:44.594284Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 7c17ecbddd
+```
+
+Action taken: began architectural review of the returned coder verification handoff for the architect-originated Phase 10 follow-up.
+
+## 2026-07-28T22:31:53Z — architect accepted phase 10 coder return
+
+Action taken: merged coder commit `7c17ecbddd` and resolved the logbook-only merge conflict by preserving the architect sent handoff, coder receipt, coder return, and architect receipt entries.
+
+Summary: coder returned the architect-originated priority-`00` follow-up after verification with no additional source or test changes. The merge changed only `logbook.md` relative to the accepted architect follow-up, so no further coder or refactorer loop is warranted.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 229 tests passed after merging the coder return.
+
+Routing: all coder/refactorer loops for Phase 10 are now closed and accepted. Send the phase-complete sync to specifier at priority `50` with the current architect state so future work can start from the accepted branch.
+
+## 2026-07-29T01:37:35Z — specifier received phase-complete handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T223226Z_000037_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: a6f1734876
+created_at: 2026-07-28T22:32:26.216524Z
+enqueued_at: 2026-07-28T22:32:26.471156Z
+task: phase10-chance-and-community-chest
+
+Re-read your role and constitution.
+
+merge_and_process architect a6f1734876
+```
+
+Action taken: merged architect commit `a6f1734876` into `main`, closing out
+the `phase10-chance-and-community-chest` task. This brought in the full
+coder implementation, the refactorer's table-driven `Cards` dispatch
+DRY-up, and the architect's priority-`00` follow-up (correct nearest-
+station/utility deed resolution, additional mutation-killing regressions,
+removal of a duplicated player-transfer loop) plus its accepted coder
+return. One conflict, in `logbook.md`, resolved at entry granularity as
+established: kept the specifier's own "sent handoff" entry alongside the
+coder's parallel "received handoff" entry for the same handoff (each with
+its own complete quoted message, since the coder's copy carries additional
+`recipient`/`enqueued_at`/`dequeued_at` fields the specifier's outbound
+draft never had), then preserved the full unmodified coder→refactorer→
+architect follow-up chain verbatim. No entries dropped, no header
+collisions, fences balanced (394, even) after resolution.
+
+Verification: `mvn -q -o test` passes on the merged state (exit 0).
+
+Per role rules, will now ask the user for the next feature to add.
+
+## 2026-07-29T06:24:46Z — coder received phase 11 taxes handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260729T062446Z_000017_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase11-taxes
+commit: 7f2d9d2d36
+created_at: 2026-07-29T06:24:46Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7f2d9d2d36
+```
+
+Action taken: merged the accepted Phase 11 taxes specification and implemented
+the tax landing rule.
+
+## 2026-07-29T06:28:48Z — coder prepared phase 11 taxes handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase11-taxes
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: landing on Income Tax or Luxury Tax now withdraws the fixed tax from
+the player and records the existing bank-payment journal entry after movement.
+Added focused rule and game tests, acceptance ordering handlers, and updated
+the earlier turn-loop scenario that intentionally lands on Income Tax. Unit
+verification passed with 232 tests; the normal generated acceptance pipeline
+passed with 209 tests.

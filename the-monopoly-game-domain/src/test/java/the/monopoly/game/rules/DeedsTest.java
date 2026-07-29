@@ -186,6 +186,24 @@ class DeedsTest {
     assertIllegalState(() -> deeds.exchangeHotelForHouses(ownership.street(), ownership.owner()));
   }
 
+  @Test
+  void aSoldGetOutOfJailFreeCardCanBeSoldOnAgain() {
+    Player firstOwner = playerWith("first owner", 1500);
+    Player secondOwner = playerWith("second owner", 1500);
+    Player thirdOwner = playerWith("third owner", 1500);
+    deeds.hold(Deeds.RetainedCard.CHANCE_GET_OUT_OF_JAIL_FREE, firstOwner);
+
+    deeds.sellGetOutOfJailFreeCard(firstOwner, secondOwner, new Money(50));
+    deeds.sellGetOutOfJailFreeCard(secondOwner, thirdOwner, new Money(60));
+
+    assertThat(deeds.holdsGetOutOfJailFreeCard(firstOwner)).isFalse();
+    assertThat(deeds.holdsGetOutOfJailFreeCard(secondOwner)).isFalse();
+    assertThat(deeds.holdsGetOutOfJailFreeCard(thirdOwner)).isTrue();
+    assertThat(firstOwner.account().balance()).isEqualTo(Balance.of(1550));
+    assertThat(secondOwner.account().balance()).isEqualTo(Balance.of(1510));
+    assertThat(thirdOwner.account().balance()).isEqualTo(Balance.of(1440));
+  }
+
   private Ownable land(Street.Type type) {
     return (Ownable) ruleSet.create(type);
   }

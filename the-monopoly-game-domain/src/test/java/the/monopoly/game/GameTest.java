@@ -9,6 +9,7 @@ import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Pawn;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
+import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.components.streets.TaxSpace;
 import the.monopoly.game.rules.Deeds;
@@ -17,6 +18,7 @@ import the.monopoly.game.rules.Rule;
 import the.monopoly.game.strategies.AgreeIfAffordable;
 import the.monopoly.game.strategies.Strategy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -136,15 +138,19 @@ class GameTest {
   }
 
   @Test
-  void landingOnASpaceIsWorthNothingEitherWayYet() {
-    play(
+  void landingOnIncomeTaxChargesTheFixedTax() {
+    Game.Result result = play(
         new Roll(2, 2), new Roll(5, 5), new Roll(3, 3),
         new Roll(1, 2), new Roll(2, 4), new Roll(1, 3)
     );
 
     Player dog = players.getFirst();
     assertThat(spaceAt(dog.position().index())).isInstanceOf(TaxSpace.class);
-    assertThat(dog.account().balance()).isEqualTo(Balance.of(1500));
+    assertThat(dog.account().balance()).isEqualTo(Balance.of(1300));
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.Moved(Pawn.dog.id(), 0, 4),
+        new Entry.BankPaid(Pawn.dog.id(), new Money(200))
+    );
   }
 
   @Test
@@ -445,6 +451,45 @@ class GameTest {
   }
 
   @Test
+  void aChanceCardCanBuyBuurtspoorwegenWhenItIsTheNearestStation() {
+    players.getFirst().position().moveTo(15);
+    Deeds deeds = new Deeds();
+
+    playWithCards(
+        Map.of(Pawn.dog.id(), new AgreeIfAffordable()), deeds, new Roll(3, 4),
+        "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.",
+        null
+    );
+
+    assertThat(deeds.ownerOf(Street.Type.Buurtspoorwegen)).contains(Pawn.dog.id());
+    assertThat(deeds.ownerOf(Street.Type.CentraalStation)).isEmpty();
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1300));
+  }
+
+  @Test
+  void aChanceCardNearestStationBoundariesChooseTheNextStation() {
+    assertNearestStationFrom(15, Street.Type.Buurtspoorwegen);
+    assertNearestStationFrom(25, Street.Type.ZuidStation);
+    assertNearestStationFrom(35, Street.Type.NoordStation);
+  }
+
+  @Test
+  void aChanceCardAdvancingBackwardToNoordStationDoesNotCollectSalary() {
+    players.getFirst().position().moveTo(36);
+
+    resolveChanceCardAt(
+        36, new Deeds(), Map.of(),
+        "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.",
+        new Cards.Events() {
+        }
+    );
+
+    assertThat(players.getFirst().position().index())
+        .isEqualTo(ruleSet.gameboard().positionOf(Street.Type.NoordStation));
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1500));
+  }
+
+  @Test
   void aChanceCardAdvancesToNoordStationWhenItIsTheNearestStation() {
     players.getFirst().position().moveTo(29);
 
@@ -456,6 +501,128 @@ class GameTest {
 
     assertThat(players.getFirst().position().index())
         .isEqualTo(ruleSet.gameboard().positionOf(Street.Type.NoordStation));
+  }
+
+  @Test
+  void aChanceCardChargesWatermaatschappijRentWhenItIsTheNearestUtility() {
+    players.getFirst().position().moveTo(15);
+    Deeds deeds = new Deeds();
+    deeds.sell(
+        (the.monopoly.game.components.streets.Utility) ruleSet.create(Street.Type.Watermaatschappij),
+        players.get(1),
+        new Money(150)
+    );
+    players.get(1).account().deposit(new Money(150));
+
+    play(
+        Map.of(Pawn.high_hat.id(), new AgreeIfAffordable()),
+        deeds,
+        Map.of(
+            Pawn.dog.id(), Cup.of(new Roll(5, 5), new Roll(3, 4), new Roll(3, 4)),
+            Pawn.high_hat.id(), Cup.of(new Roll(1, 1), new Roll(4, 6)),
+            Pawn.iron_box.id(), Cup.of(new Roll(1, 2), new Roll(4, 6))
+        ),
+        chanceDeck("Ga door naar het dichtsbijzijnde nutsbedrijf. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, rol de dobbelsteen en betaal de eigenaar tien keer de gerolde waarde.")
+    );
+
+    assertThat(players.getFirst().position().index())
+        .isEqualTo(ruleSet.gameboard().positionOf(Street.Type.Watermaatschappij));
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1430));
+    assertThat(players.get(1).account().balance()).isEqualTo(Balance.of(1570));
+  }
+
+  @Test
+  void aChanceCardNearestUtilityBoundariesChooseTheNextUtility() {
+    assertNearestUtilityFrom(12, Street.Type.Watermaatschappij);
+    assertNearestUtilityFrom(28, Street.Type.Elektriciteitscentrale);
+  }
+
+  @Test
+  void aChanceCardAdvancingBackwardToElektriciteitscentraleDoesNotCollectSalary() {
+    players.getFirst().position().moveTo(36);
+    Deeds deeds = new Deeds();
+    deeds.sell(
+        (the.monopoly.game.components.streets.Utility) ruleSet.create(Street.Type.Elektriciteitscentrale),
+        players.get(1),
+        new Money(150)
+    );
+    players.get(1).account().deposit(new Money(150));
+
+    resolveChanceCardAt(
+        36, deeds, Map.of(),
+        "Ga door naar het dichtsbijzijnde nutsbedrijf. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, rol de dobbelsteen en betaal de eigenaar tien keer de gerolde waarde.",
+        new Cards.Events() {
+        },
+        new Roll(3, 4)
+    );
+
+    assertThat(players.getFirst().position().index())
+        .isEqualTo(ruleSet.gameboard().positionOf(Street.Type.Elektriciteitscentrale));
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1430));
+    assertThat(players.get(1).account().balance()).isEqualTo(Balance.of(1570));
+  }
+
+  @Test
+  void aChanceCardAdvancingFromStartToStartCollectsSalary() {
+    List<Entry> journal = new ArrayList<>();
+
+    resolveChanceCardAt(
+        0, new Deeds(), Map.of(),
+        "Ga door naar START (Ontvang M200).",
+        new Cards.Events() {
+          @Override
+          public void collectedSalary(Player player, Money salary) {
+            journal.add(new Entry.SalaryCollected(player.id(), salary));
+          }
+        }
+    );
+
+    assertThat(players.getFirst().position().index()).isZero();
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1700));
+    assertThat(journal).containsExactly(new Entry.SalaryCollected(Pawn.dog.id(), new Money(200)));
+  }
+
+  @Test
+  void aChanceCardDoesNotChargeSpecialRentWhenTheNearestStationIsOwnedByTheDrawer() {
+    Player dog = players.getFirst();
+    dog.position().moveTo(15);
+    Deeds deeds = new Deeds();
+    deeds.sell(
+        (the.monopoly.game.components.streets.Station) ruleSet.create(Street.Type.Buurtspoorwegen),
+        dog,
+        new Money(200)
+    );
+    dog.account().deposit(new Money(200));
+    List<Entry> journal = new ArrayList<>();
+
+    resolveChanceCardAt(
+        15, deeds, Map.of(),
+        "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.",
+        rentJournal(journal)
+    );
+
+    assertThat(dog.account().balance()).isEqualTo(Balance.of(1500));
+    assertThat(journal).filteredOn(Entry.RentPaid.class::isInstance).isEmpty();
+  }
+
+  @Test
+  void aChanceCardDoesNotChargeSpecialRentWhenTheNearestStationIsMortgaged() {
+    players.getFirst().position().moveTo(15);
+    Deeds deeds = new Deeds();
+    var station = (the.monopoly.game.components.streets.Station) ruleSet.create(Street.Type.Buurtspoorwegen);
+    deeds.sell(station, players.get(1), new Money(200));
+    players.get(1).account().deposit(new Money(200));
+    deeds.arrangeMortgaged(station);
+
+    resolveChanceCardAt(
+        15, deeds, Map.of(),
+        "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.",
+        new Cards.Events() {
+        }
+    );
+
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1500));
+    assertThat(players.get(1).account().balance()).isEqualTo(Balance.of(1500));
   }
 
   /** A player who wants the land at auction but never at the asking price. */
@@ -528,6 +695,58 @@ class GameTest {
 
   private static Cards.Decks chanceDeck(String chanceCard) {
     return decks(chanceCard, null);
+  }
+
+  private void assertNearestStationFrom(int position, Street.Type expectedStation) {
+    players.getFirst().position().moveTo(position);
+
+    resolveChanceCardAt(
+        position, new Deeds(), Map.of(),
+        "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.",
+        new Cards.Events() {
+        }
+    );
+
+    assertThat(players.getFirst().position().index()).isEqualTo(ruleSet.gameboard().positionOf(expectedStation));
+  }
+
+  private void assertNearestUtilityFrom(int position, Street.Type expectedUtility) {
+    players.getFirst().position().moveTo(position);
+
+    resolveChanceCardAt(
+        position, new Deeds(), Map.of(Pawn.dog.id(), new AgreeIfAffordable()),
+        "Ga door naar het dichtsbijzijnde nutsbedrijf. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, rol de dobbelsteen en betaal de eigenaar tien keer de gerolde waarde.",
+        new Cards.Events() {
+        }
+    );
+
+    assertThat(players.getFirst().position().index()).isEqualTo(ruleSet.gameboard().positionOf(expectedUtility));
+  }
+
+  private void resolveChanceCardAt(
+      int position, Deeds deeds, Map<Player.ID, Strategy> strategies, String chanceCard, Cards.Events events,
+      Roll... extraRolls
+  ) {
+    Player dog = players.getFirst();
+    dog.position().moveTo(position);
+    new Cards(
+        deeds,
+        ruleSet,
+        players,
+        player -> strategies.getOrDefault(player.id(), Strategy.UNDECIDED),
+        chanceDeck(chanceCard),
+        events,
+        Cup.of(extraRolls)
+    ).resolve(dog, ruleSet.create(Street.Type.Kans), new Roll(1, 1));
+  }
+
+  private static Cards.Events rentJournal(List<Entry> journal) {
+    return new Cards.Events() {
+      @Override
+      public void paid(Player tenant, Player owner, Ownable land, Money rent) {
+        journal.add(new Entry.RentPaid(tenant.id(), owner.id(), land.type(), rent));
+      }
+    };
   }
 
   private static Cards.Decks decks(String chanceCard, String communityChestCard) {
