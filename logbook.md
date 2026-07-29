@@ -8146,6 +8146,61 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T12:53:15Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T125034Z_000028_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 76ee254a97
+created_at: 2026-07-29T12:50:34.109935Z
+enqueued_at: 2026-07-29T12:50:34.145696Z
+task: phase15-cli
+dequeued_at: 2026-07-29T12:50:41.535934Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 76ee254a97
+```
+
+Action taken: merged coder commit `76ee254a97` cleanly. Extracted
+`Bankruptcy.sellImprovementsIfNeeded` to keep non-exempt CRAP within the
+role threshold, then re-ran CRAP/DRY and mutation scans. Non-exempt CRAP is
+at most 6; `Report.line` remains the documented exhaustive sealed-switch
+exception. Changed production files have mutation counts below the split
+threshold. Unit, property, and acceptance verification passed.
+
+## 2026-07-29T12:49:59Z — coder received Phase 15 CLI specification
+
+Handoff message received:
+
+```
+id: 20260729T124550Z_000024_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: e60240e986
+task: phase15-cli
+```
+
+Action taken: fast-forward merged `e60240e986`; implemented the command
+simulation boundary, CLI acceptance bindings for default and
+Agree-if-affordable strategies, validation of the official two-to-eight
+player range, and focused simulator tests.
+
+Verification: `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+test` passed (251 tests); `acceptance/run-acceptance.sh` passed (246 tests).
+
+Handing implementation to refactorer for the required review.
+
 ## 2026-07-29T12:03:58Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -8174,6 +8229,30 @@ for bankruptcy asset liquidation, auctions, creditor transfers, and mortgage
 settlement, then re-ran CRAP, DRY, mutation-site, unit, property, and
 acceptance verification. All non-exempt CRAP is at or below 6; changed
 production files remain below the mutation split threshold.
+
+## 2026-07-29T12:04:30Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260729T120421Z_000037_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase14-bankruptcy-and-winning
+commit: 4ab31d3d7c
+created_at: 2026-07-29T12:04:21.501846Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 4ab31d3d7c
+```
+
+Summary: handed the verified Phase 14 bankruptcy-and-winning state to the
+architect at commit `4ab31d3d7c`, including focused bankruptcy coverage
+added to satisfy the CRAP threshold.
 
 ## 2026-07-29T11:17:00Z — refactorer sent handoff to architect
 
@@ -10047,6 +10126,40 @@ edit with no new step text, so no coder work is needed.
 
 Per the workflow rule, handing this back to the architect now so it
 can resume and close the loop.
+
+## 2026-07-29T12:24:47Z — specifier received phase-complete handoff from architect
+
+Handoff message received:
+
+```
+id: 20260729T122418Z_000046_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: d066219aac
+
+Re-read your role and constitution.
+
+merge_and_process architect d066219aac
+```
+
+Action taken: fast-forward merged architect commit `d066219aac` into
+`main`, no conflicts. This closes the architect-to-specifier Gherkin
+routing loop for Phase 14: the architect accepted the specifier's fix
+(hardcoding bankruptcy-3/4's under-mutated starting balances,
+parameterizing the triggering space in bankruptcy-4 instead), re-ran
+soft Gherkin mutation, and confirmed both scenarios now show 0
+survivors in the refreshed manifest. `phase14-bankruptcy-and-winning`
+is now fully closed - the rules engine is complete end-to-end, with a
+real game loop, both bankruptcy paths, and winner detection all in
+place for the first time.
+
+Verification: `mvn -q -o test` passes on the merged state (exit 0).
+
+Per role rules, will now ask the user for the next feature to add.
 
 ## 2026-07-29T12:56:08Z — architect received Phase 15 CLI handoff from refactorer
 

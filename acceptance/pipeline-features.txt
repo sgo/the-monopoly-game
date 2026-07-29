@@ -1,5 +1,7 @@
-# The features on the acceptance pipeline, one path per line, relative to
-# the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources.
+# The features on the acceptance pipeline, one path per line. Core-spec
+# features are relative to the-monopoly-game-specs-core test resources;
+# module-owned features use <module>:<path>, relative to that module's test
+# resources.
 #
 # Both run-acceptance.sh and run-acceptance-mutation.sh read this file. They
 # used to carry a copy of the list each, and the copies drifted: dice.feature
@@ -39,6 +41,7 @@ en/rules/rent.feature
 en/rules/station-rent.feature
 en/rules/utility-rent.feature
 en/monopoly.feature
+specs-cli:en/cli.feature
 
 # Held back from mutation: the fairness scenario asserts that each face comes
 # up about 100000 times within a 1% margin, so it accepts anything in a 1000

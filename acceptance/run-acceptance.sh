@@ -16,7 +16,8 @@ APS="${APS_HOME:-$ROOT/tmp/aps}"
 MAVEN_REPO_LOCAL="${MAVEN_REPO_LOCAL:-$ROOT/tmp/m2}"
 
 # The pipeline features live in one file both scripts read; see
-# pipeline-features.txt.
+# pipeline-features.txt. A module-qualified entry is resolved from that
+# module's test resources.
 PIPELINE_FEATURES=()
 while IFS= read -r feature_line; do
   # Every pipeline feature runs here, mutation marker or not.
@@ -34,9 +35,19 @@ rm -rf "$IR_DIR" "$GENERATED"
 mkdir -p "$IR_DIR"
 
 for feature in "${FEATURE_FILES[@]}"; do
-  ir="$IR_DIR/$(echo "$feature" | tr '/' '-' | sed 's/\.feature$//').json"
+  module="${feature%%:*}"
+  feature_path="${feature#*:}"
+  if [[ "$module" == "$feature" ]]; then
+    module_root="$SPECS"
+  elif [[ "$module" == specs-* ]]; then
+    module_root="$ROOT/the-monopoly-game-specs/the-monopoly-game-$module"
+  else
+    module_root="$ROOT/the-monopoly-game-$module"
+  fi
+  feature_file="$module_root/src/test/resources/$feature_path"
+  ir="$IR_DIR/$(echo "$feature" | tr '/:' '-' | sed 's/\.feature$//').json"
   echo "parsing $feature"
-  (cd "$APS" && bb gherkin-parser "$FEATURES/$feature" "$ir")
+  (cd "$APS" && bb gherkin-parser "$feature_file" "$ir")
   echo "generating entry point for $feature"
   "$ROOT/acceptance/acceptance-entrypoint-generator.bb" --feature-path "$feature" "$ir" "$GENERATED"
 done
