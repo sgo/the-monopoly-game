@@ -8,6 +8,7 @@ Feature: Monopoly command line interface
     When I run the simulator
     Then the simulator exits successfully
     And the output contains a human-readable game report
+    And the report contains a bankruptcy before the game's winner
     And the report contains the game's winner
 
     Examples:
@@ -21,6 +22,7 @@ Feature: Monopoly command line interface
     When I run the simulator
     Then the simulator exits successfully
     And the output contains a human-readable game report
+    And the report contains a bankruptcy before the game's winner
     And the report contains the game's winner
 
     Examples:
