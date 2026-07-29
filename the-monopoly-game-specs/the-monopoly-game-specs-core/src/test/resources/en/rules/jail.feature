@@ -51,14 +51,18 @@ Feature: jail
       | 20              | 1450          |
 
   # jail-4
-  Scenario: a strategy that cannot afford the fine attempts to roll doubles instead
+  Scenario Outline: a strategy that cannot afford the fine attempts to roll doubles instead
     Given pawn "dog" starts in jail
     And pawn "dog" follows the "Agree if affordable" strategy
-    And pawn "dog" has $40 to spend
-    And pawn "dog" will roll 3 and 3 for their turn
+    And pawn "dog" has $<starting balance> to spend
+    And pawn "dog" will roll <die> and <die> for their turn
     When we play the game
-    Then pawn "dog" is at position 16
-    And pawn "dog"'s account balance is $0
+    Then pawn "dog" is at position <final position>
+    And pawn "dog"'s account balance is $<final balance>
+
+    Examples:
+      | starting balance | die | final position | final balance |
+      | 40                | 5   | 20              | 40            |
 
   # jail-5
   Scenario Outline: a player already holding a Get Out of Jail Free card uses it to leave jail without paying
