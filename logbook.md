@@ -9291,3 +9291,38 @@ closed.
 Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
+
+## 2026-07-29T11:11:39Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260729T111139Z_000021_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase13-free-parking
+commit: fbde16eb55
+created_at: 2026-07-29T11:11:39.215675Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier fbde16eb55
+```
+
+Summary: specified Phase 13 Free Parking — new `free-parking.feature`
+covering the no-penalty/no-reward landing, guarding against the common
+house-rule jackpot expectation. Added journal-19/report-19 confirming
+the turn's "moved" event is still recorded even though nothing else
+happens, so the report never has a silent gap. Verified journal-19
+already passes against the current implementation, since `journal` has
+a standalone "records that pawn X moves from position A to B" step;
+`report` only has combinator variants of that step ("...moves...
+before it says... collects a salary"), so report-19 needs the coder to
+add the equivalent standalone step - confirmed via a temporary local
+pipeline registration (not committed; that stays the architect's
+territory) followed by `./acceptance/run-acceptance.sh`, which showed
+exactly one failure ("Unsupported step") at report-19 and none at
+journal-19.
