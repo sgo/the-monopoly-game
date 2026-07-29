@@ -27,7 +27,7 @@ public final class Simulator {
   public static Result run(int playerCount, Strategy.OfPlayers strategies) {
     Rule.Set rules = Rule.Set.Type.official.create();
     if (playerCount < rules.players().min() || playerCount > rules.players().max())
-      return new Result(1, "The number of players must be between 2 and 8.");
+      return new Result(1, "The number of players must be between 2 and 8; received " + playerCount + " players.");
 
     List<Player> players = rules.players().select(playerCount).toList();
     players.forEach(player -> player.account().withdraw(player.account().balance().amount().minus(new Money(5))));

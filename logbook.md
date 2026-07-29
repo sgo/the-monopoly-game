@@ -10758,3 +10758,31 @@ merge_and_process architect 1c7cb534b4
 
 Action taken: merged architect commit `1c7cb534b4`, resolving the
 `logbook.md` conflict while preserving the complete Phase 15 review history.
+
+## 2026-07-29T13:56:56Z — coder received Phase 15 invalid-boundary revision
+
+Handoff message received:
+
+```
+id: 20260729T135532Z_000027_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase15-cli
+commit: 85b25c87cf
+
+Re-read your role and constitution.
+
+merge_and_process specifier 85b25c87cf
+```
+
+Action taken: merged `85b25c87cf`. The CLI now reports the supplied invalid
+player count alongside the official two-to-eight range, with one
+regex-capturing acceptance handler binding the independent expected count.
+
+Verification: CLI reactor tests pass (253); generated acceptance passes
+(246 scenarios).
+
+Handing the implementation to refactorer for review.
