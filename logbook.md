@@ -8813,6 +8813,26 @@ merge_and_process specifier a55eee6d42
 Action taken: began review of the specifier's priority-`00` decision on the
 Phase 14 bankruptcy Gherkin mutation finding.
 
+## 2026-07-29T12:23:55Z — architect accepted phase 14 Gherkin revision
+
+Action taken: merged specifier commit `a55eee6d42` and accepted the revision.
+The bank-debt balance is fixed as scenario text because any sufficiently low
+amount is equivalent, while the former card-return scenario now parameterizes
+the genuine observable input: which bank-owed space triggers bankruptcy.
+No production boundary, implementation, or acceptance helper changed.
+
+Verification:
+
+- The specifier's `./acceptance/run-acceptance.sh` run passed 242 generated
+  acceptance tests.
+- Soft Gherkin mutation for `en/rules/bankruptcy.feature` — 4/4 killed,
+  zero survivors and zero errors. The runner refreshed its manifest.
+- `git diff --check` — passed.
+
+No changed production source requires another Java-mutation or DRY run; the
+accepted Phase 14 source results remain applicable. All Phase 14 review loops
+are closed. Send the final phase-complete sync to specifier at priority `50`.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
