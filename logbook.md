@@ -11089,3 +11089,27 @@ merge_and_process coder 093668a142
 
 Action taken: merged named strategy registry and per-player selection support;
 default and unknown-strategy paths are covered by focused tests.
+
+## 2026-07-29T14:20:49Z — refactorer returned strategy-selection review
+
+Handoff message sent:
+
+```
+id: 20260729T142049Z_000046_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase15-cli
+commit: 427c4e33ee
+created_at: 2026-07-29T14:20:49.967808Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 427c4e33ee
+```
+
+Action taken: returned strategy registry and per-player CLI selection after
+seven focused CLI tests, DRY review, and the coder-reported 246 acceptance
+scenarios passed.
