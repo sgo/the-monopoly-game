@@ -465,20 +465,23 @@ can run genuinely complete games rather than partial ones.
 
 - Build a new module (e.g. `the-monopoly-game-cli`) alongside
   `the-monopoly-game-domain` and `the-monopoly-game-specs`.
+- Deliver a standalone executable process with a command-line entry point,
+  rather than only a programmatic simulator API.
 - Accepts the number of players (2–8, per [Setup](RULES.md#setup)) and, per
   player, a strategy selection — defaulting to "Agree if affordable" when not
   specified.
-- Runs one game via the domain module's `Game`, then prints the rendered game
-  report (Phase 3's renderer) to the console.
+- Accepts command-line arguments, runs one game via the domain module's `Game`,
+  and prints the rendered game report (Phase 3's renderer) to stdout.
+- Provides a `-h`/`--h` flag explaining how to use the CLI.
+- Returns a nonzero exit code for invalid input.
 - Since "Agree if affordable" is the only strategy for now, strategy selection
   is effectively a pass-through, but the plumbing (a strategy registry/lookup
   by name) should already accommodate more strategies being added later
   without changing the CLI's shape (per [`SIMULATOR.md`](SIMULATOR.md)'s
   out-of-scope list).
-- Verification: as a console entry point rather than a domain rule, this is
-  better suited to a thin manual/integration check than a Gherkin feature —
-  run the CLI end-to-end for a couple of player counts and confirm a complete,
-  readable report is produced.
+- Verification: invoke the standalone executable end-to-end for a couple of
+  player counts, the help flag, and invalid input; confirm complete readable
+  reports, usage guidance, stdout output, and nonzero failure status.
 
 ### BDD/TDD Process (mandatory):
 

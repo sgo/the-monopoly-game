@@ -162,9 +162,10 @@ public final class MonopolyStepHandlers {
         then("^the report contains the game's winner$",
             (world, arguments) -> assertThat(world.simulatorResult().output()).contains("wins the game")),
 
-        then("^the output explains that the number of players must be between 2 and 8$",
+        then("^the output explains that the number of players must be between 2 and 8 and received (.+) players$",
             (world, arguments) -> assertThat(world.simulatorResult().output())
-                .contains("number of players must be between 2 and 8")),
+                .contains("number of players must be between 2 and 8")
+                .contains("received " + arguments.number(1) + " players")),
 
         step("^we play " + VALUE + " times$",
             (world, arguments) -> world.playMonopolyGames(arguments.number(1))),
