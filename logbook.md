@@ -8833,6 +8833,31 @@ No changed production source requires another Java-mutation or DRY run; the
 accepted Phase 14 source results remain applicable. All Phase 14 review loops
 are closed. Send the final phase-complete sync to specifier at priority `50`.
 
+## 2026-07-29T12:24:26Z — architect sent phase 14 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T122418Z_000046_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: d066219aac
+created_at: 2026-07-29T12:24:18.207795Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d066219aac
+```
+
+Action taken: sent the final Phase 14 sync after accepting the coder-verified
+bankruptcy rule hardening and the specifier's Gherkin correction. The final
+acceptance commit is `d066219aac`; soft bankruptcy Gherkin mutation is 4/4
+killed with zero survivors.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
