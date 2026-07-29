@@ -38,7 +38,33 @@ Feature: jail
       | 10       | 1500              |
 
   # jail-3
-  Scenario Outline: a strategy that can afford the fine pays it immediately and moves the same turn
+  Scenario Outline: paying the fine leaves jail and moves the same turn
+    Given pawn "dog" starts in jail
+    And pawn "dog" will pay the fine to leave jail
+    And pawn "dog" will roll 4 and 6 for their turn
+    When we play the game
+    Then pawn "dog" is at position <final position>
+    And pawn "dog"'s account balance is $<final balance>
+
+    Examples:
+      | final position | final balance |
+      | 20              | 1450          |
+
+  # jail-4
+  Scenario Outline: a jailed player who has not chosen to pay the fine attempts to roll doubles instead
+    Given pawn "dog" starts in jail
+    And pawn "dog" will roll <die 1> and <die 2> for their turn
+    When we play the game
+    Then pawn "dog" is at position <position>
+    And pawn "dog"'s account balance is $<final balance>
+    And pawn "dog" is in jail
+
+    Examples:
+      | die 1 | die 2 | position | final balance |
+      | 4     | 6     | 10       | 1500          |
+
+  # jail-5
+  Scenario Outline: "Agree if affordable" pays the fine immediately when it can afford to
     Given pawn "dog" starts in jail
     And pawn "dog" follows the "Agree if affordable" strategy
     And pawn "dog" will roll 4 and 6 for their turn
@@ -50,17 +76,22 @@ Feature: jail
       | final position | final balance |
       | 20              | 1450          |
 
-  # jail-4
-  Scenario: a strategy that cannot afford the fine attempts to roll doubles instead
+  # jail-6
+  Scenario Outline: "Agree if affordable" does not pay the fine when it cannot afford to, and stays jailed
     Given pawn "dog" starts in jail
     And pawn "dog" follows the "Agree if affordable" strategy
-    And pawn "dog" has $40 to spend
-    And pawn "dog" will roll 3 and 3 for their turn
+    And pawn "dog" has $<starting balance> to spend
+    And pawn "dog" will roll <die 1> and <die 2> for their turn
     When we play the game
-    Then pawn "dog" is at position 16
-    And pawn "dog"'s account balance is $0
+    Then pawn "dog" is at position <position>
+    And pawn "dog"'s account balance is $<final balance>
+    And pawn "dog" is in jail
 
-  # jail-5
+    Examples:
+      | starting balance | die 1 | die 2 | position | final balance |
+      | 40                | 4     | 6     | 10       | 40            |
+
+  # jail-7
   Scenario Outline: a player already holding a Get Out of Jail Free card uses it to leave jail without paying
     Given pawn "dog" starts in jail
     And pawn "dog" already holds a Get Out of Jail Free card
@@ -75,7 +106,7 @@ Feature: jail
       | final position | final balance |
       | 20              | 1500          |
 
-  # jail-6
+  # jail-8
   Scenario Outline: a jailed player still collects rent from a street they own
     Given pawn "high hat" owns "Diestsestraat Leuven"
     And pawn "high hat" starts in jail

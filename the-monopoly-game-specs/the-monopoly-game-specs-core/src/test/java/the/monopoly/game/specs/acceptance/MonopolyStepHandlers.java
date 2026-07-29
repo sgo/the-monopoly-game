@@ -401,6 +401,9 @@ public final class MonopolyStepHandlers {
         step("^pawn \"" + NAME + "\" will use the Get Out of Jail Free card to leave jail$",
             (world, arguments) -> world.pawnWillUseGetOutOfJailFreeCard(arguments.text(1))),
 
+        step("^pawn \"" + NAME + "\" will pay the fine to leave jail$",
+            (world, arguments) -> world.pawnWillPayJailFine(arguments.text(1))),
+
         step("^pawn \"" + NAME + "\" sells a house on \"" + NAME + "\" back to the bank$",
             (world, arguments) -> world.sellHouse(arguments.text(1), SpaceNames.of(arguments.text(2)))),
 
