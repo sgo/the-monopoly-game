@@ -10672,6 +10672,10 @@ merge_and_process architect 0ae1fe2dc3
 
 Action taken: sent the outstanding executable CLI implementation to coder.
 
+Coder implementation: added the standalone `main` boundary, `-h`/`--h` usage,
+optional player-count parsing, and nonzero invalid-input process status while
+keeping parsing testable without process termination.
+
 ## 2026-07-29T14:14:01Z — architect received Phase 15 executable CLI return from refactorer
 
 Handoff message received:
@@ -10967,3 +10971,54 @@ merge_and_process coder ef66b4c033
 Action taken: merged the invalid-player-count reporting fix and preserved the
 architect/specifier review history. The coder reports 253 CLI reactor tests
 and 246 acceptance scenarios passing.
+
+## 2026-07-29T13:59:25Z — refactorer returned invalid-count review
+
+Handoff message sent:
+
+```
+id: 20260729T135925Z_000044_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase15-cli
+commit: 7e82624c22
+created_at: 2026-07-29T13:59:25.116720Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7e82624c22
+```
+
+Action taken: returned the reviewed invalid-count reporting fix after 3 CLI
+tests, 17 property tests, and 246 acceptance tests passed; DRY found no new
+duplication. The Gherkin boundary mutation issue remains with specifier.
+
+## 2026-07-29T14:12:02Z — refactorer received coder CLI executable follow-up
+
+Handoff message received:
+
+```
+id: 20260729T141115Z_000034_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 460573dc41
+created_at: 2026-07-29T14:11:15.021788Z
+enqueued_at: 2026-07-29T14:11:15.032469Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:11:22.864636Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 460573dc41
+```
+
+Action taken: merged the standalone CLI executable entry point and verified
+five CLI tests pass. The documented `-h`/`--h` behavior is covered; no new
+DRY duplication was introduced.
