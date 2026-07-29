@@ -10384,6 +10384,55 @@ merge_and_process refactorer b7064ba9bc
 Action taken: began architectural review of the refactorer-returned
 starting-capital remediation.
 
+## 2026-07-29T15:47:57Z — coder received starting-capital correction
+
+Handoff message received:
+
+```
+id: 20260729T143946Z_000059_from_architect_to_coder
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 07c95bf1e9
+```
+
+Action taken: merged the architect handoff, removed the simulator's artificial
+pre-game debit, and replaced it with a deterministic terminal fixture that
+preserves every selected player's official €1500 balance. Added regression
+coverage for that balance and for prompt eight-player completion.
+
+Verification: `SimulatorTest` passed (11 tests). The focused CLI acceptance
+report remains green.
+
+## 2026-07-29T16:30:00Z — refactorer received coder starting-capital fix
+
+Handoff message received:
+
+```
+id: 20260729T154852Z_000036_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 5653a571b7
+created_at: 2026-07-29T15:48:52.616967Z
+enqueued_at: 2026-07-29T15:48:53.547354Z
+task: phase15-cli
+dequeued_at: 2026-07-29T15:48:59.651634Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 5653a571b7
+```
+
+Action taken: merged the official-capital terminal fixture and regression
+coverage; focused CLI verification remains green.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
