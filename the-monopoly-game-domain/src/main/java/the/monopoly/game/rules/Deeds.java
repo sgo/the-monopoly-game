@@ -7,6 +7,8 @@ import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -21,6 +23,7 @@ public class Deeds {
   private final Map<Street.Type, Improvement> improvements = new HashMap<>();
   private final Map<Street.Type, Mortgage> mortgages = new HashMap<>();
   private final Map<RetainedCard, Player.ID> retainedCards = new HashMap<>();
+  private final java.util.Set<Player.ID> bankrupt = new java.util.HashSet<>();
 
   public boolean isUnowned(Street.Type land) {
     return !owners.containsKey(land);
@@ -29,6 +32,33 @@ public class Deeds {
   /** Who holds the title to this land, if anyone does. */
   public Optional<Player.ID> ownerOf(Street.Type land) {
     return Optional.ofNullable(owners.get(land));
+  }
+
+  public boolean isBankrupt(Player player) {
+    return bankrupt.contains(player.id());
+  }
+
+  public void bankrupt(Player player) {
+    bankrupt.add(player.id());
+    retainedCards.entrySet().removeIf(it -> it.getValue().equals(player.id()));
+  }
+
+  public List<Street.Type> landOwnedBy(Player player) {
+    return owners.entrySet().stream()
+        .filter(it -> it.getValue().equals(player.id()))
+        .map(Map.Entry::getKey)
+        .toList();
+  }
+
+  public void transferWithoutPayment(Ownable land, Player from, Player to) {
+    verifyOwner(land, from);
+    owners.put(land.type(), to.id());
+  }
+
+  public void returnToBank(Ownable land, Player owner) {
+    verifyOwner(land, owner);
+    owners.remove(land.type());
+    improvements.remove(land.type());
   }
 
   /**

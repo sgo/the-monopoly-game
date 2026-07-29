@@ -9,6 +9,7 @@ import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Building;
+import the.monopoly.game.rules.Bankruptcy;
 import the.monopoly.game.rules.Cards;
 import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Initiative;
@@ -120,18 +121,24 @@ public class Game {
     Landings landSale = new LandSale(deeds, rules, turnOrder, strategies, journalling);
     Landings cards = new Cards(deeds, rules, turnOrder, strategies, decks, journalling, cups.forPlayer(player), jail);
     Landings taxes = new Taxes(journalling);
+    Bankruptcy bankruptcy = new Bankruptcy(deeds, rules, turnOrder, strategies, journalling);
     return (who, space, roll) -> {
       rent.resolve(who, space, roll);
       landSale.resolve(who, space, roll);
       cards.resolve(who, space, roll);
       taxes.resolve(who, space, roll);
       jail.resolve(who, space, roll);
+      Player creditor = space instanceof Ownable land
+          ? deeds.ownerOf(land.type()).filter(id -> !id.equals(who.id()))
+              .flatMap(id -> turnOrder.stream().filter(it -> it.id().equals(id)).findFirst()).orElse(null)
+          : null;
+      bankruptcy.resolve(who, creditor);
     };
   }
 
   /** Writes down what a turn and a sale say they did, as the game's account of it. */
   private record Journalling(Journal journal)
-      implements Turn.Events, LandSale.Events, Rent.Events, Building.Events, Cards.Events, Taxes.Events, Jail.Events {
+      implements Turn.Events, LandSale.Events, Rent.Events, Building.Events, Cards.Events, Taxes.Events, Jail.Events, Bankruptcy.Events {
     @Override
     public void rolled(Player player, Roll roll) {
       journal.log(new Journal.Entry.Rolled(player.id(), roll.total()));
@@ -205,6 +212,16 @@ public class Game {
     @Override
     public void leftJailByPaying(Player player, Money fine) {
       journal.log(new Journal.Entry.JailFinePaid(player.id(), fine));
+    }
+
+    @Override
+    public void bankrupt(Player debtor, Player creditor) {
+      journal.log(new Journal.Entry.Bankrupt(debtor.id(), creditor == null ? null : creditor.id()));
+    }
+
+    @Override
+    public void won(Player player) {
+      journal.log(new Journal.Entry.Won(player.id()));
     }
   }
 
@@ -317,6 +334,12 @@ public class Game {
       }
 
       record JailFinePaid(Player.ID player, Money fine) implements Entry {
+      }
+
+      record Bankrupt(Player.ID player, Player.ID creditor) implements Entry {
+      }
+
+      record Won(Player.ID player) implements Entry {
       }
     }
   }

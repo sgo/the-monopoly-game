@@ -8817,6 +8817,52 @@ merge_and_process architect a6f1734876
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
 
+## 2026-07-29T12:00:07Z — coder received phase 14 bankruptcy and winning handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260729T114852Z_000022_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 55c969a94a
+created_at: 2026-07-29T11:48:52.237278Z
+enqueued_at: 2026-07-29T11:48:52.419060Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T11:48:57.567290Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 55c969a94a
+```
+
+Action taken: merged the Phase 14 specification and implemented bankruptcy
+resolution. Debts now liquidate houses and mortgages before bankruptcy; remaining
+assets transfer to a creditor or return to the bank for auction, inherited
+mortgages settle according to strategy, retained jail cards are surrendered,
+and bankruptcy/winner journal and report entries are recorded. Registered the
+bankruptcy and monopoly features in the normal acceptance pipeline. Domain tests
+(241) and generated acceptance tests (242) pass.
+
+## 2026-07-29T12:00:07Z — coder prepared phase 14 bankruptcy and winning handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase14-bankruptcy-and-winning
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: bankruptcy, creditor or bank asset disposition, winner reporting, and
+the registered phase-14 acceptance features are ready for structural review.
+
 ## 2026-07-29T11:14:19Z — coder received phase 13 free parking handoff from specifier
 
 Handoff message received:
