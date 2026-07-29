@@ -8256,6 +8256,32 @@ and regression hardening. Coder must validate and return this priority-`00`
 architect review loop to architect before Phase 12 can be synced to
 specifier.
 
+## 2026-07-29T09:34:41Z — architect received phase 12 coder follow-up
+
+Handoff message received:
+
+```
+id: 20260729T093431Z_000023_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: ae778bd6b8
+created_at: 2026-07-29T09:34:31.735940Z
+enqueued_at: 2026-07-29T09:34:31.780121Z
+task: phase12-jail
+dequeued_at: 2026-07-29T09:34:36.391619Z
+
+Re-read your role and constitution.
+
+merge_and_process coder ae778bd6b8
+```
+
+Action taken: began review of the coder's priority-`00` return for the Phase
+12 jail correction.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
