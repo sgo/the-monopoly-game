@@ -69,3 +69,7 @@ The game result report and journal should have a human-readable format.
   (defaulting to "Agree if affordable");
 - runs one game
 - prints the rendered game report to console
+- starts from the normal standard game configuration
+- uses real random dice and lets the game continue until bankruptcies leave
+  one player; it must not use pre-arranged state, a turn limit, or a synthetic
+  winner

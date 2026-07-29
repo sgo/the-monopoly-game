@@ -10353,6 +10353,16 @@ starting configuration and CLI assertions for starting cash and position,
 ownership and improvements, inventory, and complete Chance and Community
 Chest decks.
 
+## 2026-07-29T16:10:18Z — specifier processed Phase 15 completion-policy handoff
+
+Action taken: merged architect commit `00ac6d5436`. Added CLI acceptance
+criteria and simulator requirements stating that games use real random dice,
+start from standard setup, continue until bankruptcies leave one player, and
+do not use pre-arranged state, a turn limit, or a synthetic winner.
+
+Verification: the updated CLI feature parses successfully and
+`gherkin-ir-dry-checker` reports only reviewed possible-synonym findings.
+
 ## 2026-07-29T14:42:20Z — specifier returned Phase 15 starting-capital revision
 ## 2026-07-29T15:55:04Z — refactorer received coder starting-balance acceptance fix
 

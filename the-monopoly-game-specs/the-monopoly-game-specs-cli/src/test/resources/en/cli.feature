@@ -63,3 +63,16 @@ Feature: Monopoly command line interface
     Examples:
       | players | starting position | starting balance |
       | 2       | 0                 | 1500             |
+
+  # cli-5
+  Scenario Outline: the CLI plays a real game to its natural terminal state
+    Given the simulator is configured for <players> players without strategy choices
+    When I run the simulator
+    Then the simulator uses real random dice
+    And the game continues until all but one player are bankrupt
+    And the simulator does not impose a turn limit
+    And the report contains no synthetic winner
+
+    Examples:
+      | players |
+      | 2       |
