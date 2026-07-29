@@ -176,10 +176,6 @@ public class World {
     return simulatorResult;
   }
 
-  public List<Money> simulatorStartingBalances() {
-    return simulatorResult().startingBalances();
-  }
-
   public Player pawn(String pawnName) {
     if (players == null)
       throw new AssertionError("No players have been selected yet.");
