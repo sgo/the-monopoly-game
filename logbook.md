@@ -11320,3 +11320,26 @@ merge_and_process coder 5653a571b7
 Action taken: merged the official-capital terminal fixture and regression
 coverage; focused CLI verification remains green while the broader acceptance
 loop limitation is recorded above.
+
+## 2026-07-29T15:50:38Z — refactorer returned starting-capital review
+
+Handoff message sent:
+
+```
+id: 20260729T155038Z_000048_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase15-cli
+commit: b7064ba9bc
+created_at: 2026-07-29T15:50:38.260004Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer b7064ba9bc
+```
+
+Action taken: returned the official-capital simulator fix after 11 focused
+CLI tests, DRY review, and mutation scan (56 sites, below the split threshold).
