@@ -8403,6 +8403,32 @@ jail no-payment scenario to specifier, as required for Gherkin-content
 defects. Phase 12 is not advanceable again until that priority-`00`
 specifier loop returns and is accepted.
 
+## 2026-07-29T10:30:55Z — architect received phase 12 Gherkin review return
+
+Handoff message received:
+
+```
+id: 20260729T103044Z_000020_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 7e250ab97f
+created_at: 2026-07-29T10:30:44.399750Z
+enqueued_at: 2026-07-29T10:30:44.411981Z
+task: phase12-jail
+dequeued_at: 2026-07-29T10:30:51.580462Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7e250ab97f
+```
+
+Action taken: began review of the specifier's priority-`00` decision on the
+Phase 12 Gherkin mutation finding.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
