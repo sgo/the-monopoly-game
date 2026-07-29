@@ -10988,6 +10988,13 @@ merge_and_process refactorer 2767438f28
 
 Action taken: began review of the refactorer return.
 
+## 2026-07-29T18:31:53Z — architect accepted Phase 15 real-dice completion
+
+Action taken: accepted the removal of fixture setup and deterministic dice.
+The CLI now creates official dice cups for normal play and completes only by
+the game's ordinary bankruptcy rule. Focused CLI reactor verification passed.
+All coder/refactorer loops are closed; route the completed phase to specifier.
+
 ## 2026-07-29T18:28:58Z — architect queued incoming-handoff notification
 
 Queued message received while processing the active return:
