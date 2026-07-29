@@ -46,7 +46,7 @@ Feature: bankruptcy
   # bankruptcy-3
   Scenario Outline: a player who cannot cover a debt to the bank forfeits everything, and the bank auctions the land
     Given pawn "dog" owns "Diestsestraat Leuven"
-    And pawn "dog" has $<starting balance> to spend
+    And pawn "dog" has $5 to spend
     And pawn "high hat" will bid $<bid> for "Diestsestraat Leuven" at auction
     When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
     Then pawn "dog" is bankrupt
@@ -58,21 +58,21 @@ Feature: bankruptcy
     And pawn "high hat" wins the game
 
     Examples:
-      | starting balance | bid | debtor final balance | owner final balance |
-      | 5                 | 10  | 0                     | 1487                 |
+      | bid | debtor final balance | owner final balance |
+      | 10  | 0                     | 1487                 |
 
   # bankruptcy-4
   Scenario Outline: a Get Out of Jail Free card returns to the bottom of its deck when its holder goes bankrupt to the bank
     Given pawn "dog" already holds a Get Out of Jail Free card
-    And pawn "dog" has $<starting balance> to spend
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    And pawn "dog" has $5 to spend
+    When pawn "dog" lands on "<space>"
     Then pawn "dog" is bankrupt
     And pawn "dog" no longer holds a Get Out of Jail Free card
     And pawn "high hat" wins the game
 
     Examples:
-      | starting balance |
-      | 5                 |
+      | space                                       |
+      | Inkomsten Belasting / Impôts sur le revenu |
 
   # bankruptcy-5
   Scenario Outline: a player who cannot cover a debt to another player forfeits their remaining money and mortgaged property to the creditor
