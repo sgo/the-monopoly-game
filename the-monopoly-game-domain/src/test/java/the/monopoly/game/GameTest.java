@@ -138,15 +138,19 @@ class GameTest {
   }
 
   @Test
-  void landingOnASpaceIsWorthNothingEitherWayYet() {
-    play(
+  void landingOnIncomeTaxChargesTheFixedTax() {
+    Game.Result result = play(
         new Roll(2, 2), new Roll(5, 5), new Roll(3, 3),
         new Roll(1, 2), new Roll(2, 4), new Roll(1, 3)
     );
 
     Player dog = players.getFirst();
     assertThat(spaceAt(dog.position().index())).isInstanceOf(TaxSpace.class);
-    assertThat(dog.account().balance()).isEqualTo(Balance.of(1500));
+    assertThat(dog.account().balance()).isEqualTo(Balance.of(1300));
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.Moved(Pawn.dog.id(), 0, 4),
+        new Entry.BankPaid(Pawn.dog.id(), new Money(200))
+    );
   }
 
   @Test

@@ -26,7 +26,7 @@ Feature: turn-loop
       | 2         | 3         | 5                  | 6              | 5              | 11                      |
 
   # turn-loop-2
-  Scenario Outline: landing on a space produces no economic effect yet
+  Scenario Outline: landing on Income Tax charges its fixed amount
     And with $<starting_balance> in pawn "dog"'s account
     And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
     And every other player can complete their turn
@@ -36,4 +36,4 @@ Feature: turn-loop
 
     Examples:
       | starting_balance | dog_die_1 | dog_die_2 | dog_final_position | final_balance |
-      | 1500             | 1         | 3         | 4                  | 1500          |
+      | 1500             | 1         | 3         | 4                  | 1300          |

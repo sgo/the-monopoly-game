@@ -8014,3 +8014,46 @@ collisions, fences balanced (394, even) after resolution.
 Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
+
+## 2026-07-29T06:24:46Z — coder received phase 11 taxes handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260729T062446Z_000017_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase11-taxes
+commit: 7f2d9d2d36
+created_at: 2026-07-29T06:24:46Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7f2d9d2d36
+```
+
+Action taken: merged the accepted Phase 11 taxes specification and implemented
+the tax landing rule.
+
+## 2026-07-29T06:28:48Z — coder prepared phase 11 taxes handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase11-taxes
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: landing on Income Tax or Luxury Tax now withdraws the fixed tax from
+the player and records the existing bank-payment journal entry after movement.
+Added focused rule and game tests, acceptance ordering handlers, and updated
+the earlier turn-loop scenario that intentionally lands on Income Tax. Unit
+verification passed with 232 tests; the normal generated acceptance pipeline
+passed with 209 tests.
