@@ -10445,6 +10445,29 @@ production shortcut for forcing a rapid terminal game, not valid CLI setup.
 Action taken: route the remaining observable setup defect to coder at
 priority 00. The starting-capital Gherkin criterion remains accepted.
 
+## 2026-07-29T15:52:22Z — architect sent Phase 15 initial-state correction to coder
+
+Handoff message sent:
+
+```
+id: 20260729T155222Z_000061_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 22da133076
+created_at: 2026-07-29T15:52:22.457583Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 22da133076
+```
+
+Action taken: sent the normal-initial-state correction to coder; it returns
+through refactorer for architectural acceptance.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
