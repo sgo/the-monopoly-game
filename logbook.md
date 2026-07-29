@@ -8146,6 +8146,36 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T13:11:19Z — coder received architect Phase 15 completion follow-up
+
+Handoff message received:
+
+```
+id: 20260729T125826Z_000047_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: d4daa26893
+
+Re-read your role and constitution.
+
+merge_and_process architect d4daa26893
+```
+
+Action taken: merged `d4daa26893` and corrected the completion defect. A
+complete game now continues through turns until one non-bankrupt player
+remains, exposes that player on `Game.Result`, and stops immediately when
+the final bankruptcy settles. The simulator now reports that actual winner
+rather than the initiative leader.
+
+Verification: domain tests pass (252); generated acceptance tests pass,
+including all four CLI scenarios.
+
+The implementation changed, so it is being sent through refactorer review.
+
 ## 2026-07-29T12:53:15Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -8934,6 +8964,31 @@ Verification:
 No changed production source requires another Java-mutation or DRY run; the
 accepted Phase 14 source results remain applicable. All Phase 14 review loops
 are closed. Send the final phase-complete sync to specifier at priority `50`.
+
+## 2026-07-29T12:24:26Z — architect sent phase 14 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T122418Z_000046_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: d066219aac
+created_at: 2026-07-29T12:24:18.207795Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d066219aac
+```
+
+Action taken: sent the final Phase 14 sync after accepting the coder-verified
+bankruptcy rule hardening and the specifier's Gherkin correction. The final
+acceptance commit is `d066219aac`; soft bankruptcy Gherkin mutation is 4/4
+killed with zero survivors.
 
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
@@ -10158,3 +10213,40 @@ place for the first time.
 Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
+
+## 2026-07-29T12:56:08Z — architect received Phase 15 CLI handoff from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T125551Z_000038_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: f2817b1489
+created_at: 2026-07-29T12:55:51.534366Z
+enqueued_at: 2026-07-29T12:55:51.623101Z
+task: phase15-cli
+dequeued_at: 2026-07-29T12:55:56.065617Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer f2817b1489
+```
+
+Action taken: began architectural review of the Phase 15 CLI state.
+
+## 2026-07-29T12:58:08Z — architect found a Phase 15 simulator completion defect
+
+Review finding: `Simulator.run` calls `Game.play`, but `Game.play` performs
+only one round. `Simulator` then reports the first player in initiative order
+as the winner, without checking for bankruptcy or a `Won` journal entry. The
+Phase 15 complete-game scenarios therefore pass against an arbitrary first
+player rather than an actually completed game.
+
+Action taken: route this observable defect to coder at priority `00` for
+implementation and focused verification. No phase-complete handoff is sent
+while that review loop is outstanding.
