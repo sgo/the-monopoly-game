@@ -10279,3 +10279,24 @@ lower-complexity helpers, reviewed DRY findings, and ran unit/property checks.
 Acceptance generation completed but the full run was stopped after hanging
 in the long-running complete-game scenario; this remains under review before
 handoff.
+
+## 2026-07-29T13:20:34Z — refactorer routed Phase 15 acceptance defect to coder
+
+Handoff message sent:
+
+```
+id: 20260729T132034Z_000039_from_refactorer
+from: refactorer
+to: coder
+priority: 00
+type: note
+message: 8-player complete-game acceptance run does not terminate promptly
+created_at: 2026-07-29T13:20:34.091323Z
+
+Re-read your role and constitution.
+
+8-player complete-game acceptance run does not terminate promptly
+```
+
+Action taken: routed the unresolved long-running complete-game simulation to
+the coder and withheld architect handoff pending a terminating acceptance run.
