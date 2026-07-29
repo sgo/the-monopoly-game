@@ -10895,6 +10895,23 @@ merge_and_process refactorer 3025ffe4b3
 
 Action taken: began review of the returned real-game completion alignment.
 
+## 2026-07-29T18:28:58Z — architect accepted Phase 15 standard-setup acceptance support
+
+Action taken: accepted the refactorer-returned core acceptance handlers for
+the standard setup. No CLI runtime behavior changed in this return; the coder
+loop for real random dice and normal bankruptcy remains outstanding.
+
+## 2026-07-29T18:28:58Z — architect queued incoming-handoff notification
+
+Queued message received while processing the active return:
+
+```
+You have new handoff mail. If idle, run ready_for_next.sh.
+```
+
+Action taken: deferred the notification until the active batch record was
+committed; it is now next for processing.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
