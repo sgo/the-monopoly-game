@@ -149,6 +149,10 @@ public final class MonopolyStepHandlers {
         then("^the simulator exits unsuccessfully$",
             (world, arguments) -> assertThat(world.simulatorResult().succeeded()).isFalse()),
 
+        then("^every player starts with \\$" + VALUE + " before the first turn$",
+            (world, arguments) -> assertThat(world.simulatorStartingBalances())
+                .containsOnly(money(arguments.number(1)))),
+
         then("^the output contains a human-readable game report$",
             (world, arguments) -> assertThat(world.simulatorResult().output()).contains("The game starts")),
 

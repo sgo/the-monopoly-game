@@ -10328,6 +10328,56 @@ the CLI implementation.
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
 
+## 2026-07-29T15:55:04Z — refactorer received coder starting-balance acceptance fix
+
+Handoff message received:
+
+```
+id: 20260729T155356Z_000037_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 0748405346
+created_at: 2026-07-29T15:53:56.732311Z
+enqueued_at: 2026-07-29T15:53:56.787262Z
+task: phase15-cli
+dequeued_at: 2026-07-29T15:54:04.317802Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 0748405346
+```
+
+Action taken: merged the observable starting-balance acceptance assertion and
+verified 11 focused CLI tests; the broader generated acceptance limitation is
+recorded in the preceding coder review entry.
+
+## 2026-07-29T15:48:52Z — coder received specification synchronization
+
+Handoff message received:
+
+```
+id: 20260729T144359Z_000060_from_architect_to_coder
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 53e9a1f8dc
+```
+
+Action taken: merged the architect synchronization, including the independent
+CLI starting-balance acceptance criterion. Resolving the shared logbook record
+before verifying the merged acceptance criterion.
+
+Verification: regenerated the CLI acceptance entry point and passed its four
+scenarios, including the new starting-balance assertion. `SimulatorTest` also
+passed all 11 tests.
+
 ## 2026-07-29T14:42:23Z — architect accepted Phase 15 starting-capital criterion
 
 Action taken: accepted the new CLI-level $1500 pre-turn assertion. Forwarding
