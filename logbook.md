@@ -7973,3 +7973,44 @@ Verification:
 - `mvn -B -Dmaven.repo.local=tmp/m2 test` — 229 tests passed after merging the coder return.
 
 Routing: all coder/refactorer loops for Phase 10 are now closed and accepted. Send the phase-complete sync to specifier at priority `50` with the current architect state so future work can start from the accepted branch.
+
+## 2026-07-29T01:37:35Z — specifier received phase-complete handoff from architect
+
+Handoff message received:
+
+```
+id: 20260728T223226Z_000037_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: a6f1734876
+created_at: 2026-07-28T22:32:26.216524Z
+enqueued_at: 2026-07-28T22:32:26.471156Z
+task: phase10-chance-and-community-chest
+
+Re-read your role and constitution.
+
+merge_and_process architect a6f1734876
+```
+
+Action taken: merged architect commit `a6f1734876` into `main`, closing out
+the `phase10-chance-and-community-chest` task. This brought in the full
+coder implementation, the refactorer's table-driven `Cards` dispatch
+DRY-up, and the architect's priority-`00` follow-up (correct nearest-
+station/utility deed resolution, additional mutation-killing regressions,
+removal of a duplicated player-transfer loop) plus its accepted coder
+return. One conflict, in `logbook.md`, resolved at entry granularity as
+established: kept the specifier's own "sent handoff" entry alongside the
+coder's parallel "received handoff" entry for the same handoff (each with
+its own complete quoted message, since the coder's copy carries additional
+`recipient`/`enqueued_at`/`dequeued_at` fields the specifier's outbound
+draft never had), then preserved the full unmodified coder→refactorer→
+architect follow-up chain verbatim. No entries dropped, no header
+collisions, fences balanced (394, even) after resolution.
+
+Verification: `mvn -q -o test` passes on the merged state (exit 0).
+
+Per role rules, will now ask the user for the next feature to add.
