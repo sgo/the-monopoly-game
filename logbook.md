@@ -8787,6 +8787,32 @@ bankruptcy card-return scenarios to specifier, under the Gherkin-content
 workflow rule. Do not advance Phase 14 until this priority-`00` specifier loop
 returns and is accepted.
 
+## 2026-07-29T12:23:14Z — architect received phase 14 Gherkin review return
+
+Handoff message received:
+
+```
+id: 20260729T122303Z_000023_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: a55eee6d42
+created_at: 2026-07-29T12:23:03.242026Z
+enqueued_at: 2026-07-29T12:23:03.591803Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T12:23:09.924729Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier a55eee6d42
+```
+
+Action taken: began review of the specifier's priority-`00` decision on the
+Phase 14 bankruptcy Gherkin mutation finding.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
