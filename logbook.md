@@ -8371,3 +8371,50 @@ Verification:
 - `git diff --check` — passed.
 
 Routing: the acceptance-pipeline registration and mutation manifests are non-functional verification infrastructure; no coder or refactorer follow-up is warranted. All Phase 11 loops are closed, so send the phase-complete sync to specifier at priority `50`.
+
+## 2026-07-29T07:37:54Z — specifier received phase-complete handoff from architect
+
+Handoff message received:
+
+```
+id: 20260729T073514Z_000038_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase11-taxes
+commit: d9f082b1bc
+
+Re-read your role and constitution.
+
+merge_and_process architect d9f082b1bc
+```
+
+Action taken: merged architect commit `d9f082b1bc` into `main`, closing out
+the `phase11-taxes` task. This brought in the coder's `Taxes` rule
+(implementing `Landings` for `TaxSpace`, withdrawing the printed amount and
+reporting `paidBank`), the architect's own priority-`00` follow-up carried
+in the same chain fixing a latent `advanceToNearestStation`/
+`advanceToNearestUtility` bug from Phase 10's table-driven `Cards` rewrite
+(both branches of the original switch shared the bug, so it survived the
+DRY-up unnoticed) and collapsing `payEveryOtherPlayer`/
+`collectFromEveryOtherPlayer` into a shared `forEveryOtherPlayer`/
+`transfer` pair, and the architect's own correction registering
+`en/rules/tax.feature` in `acceptance/pipeline-features.txt` — the
+specifier had created the feature file but never wired it into the
+acceptance/mutation pipeline, so neither exercised it until the architect
+caught the gap this phase.
+
+One conflict, in `logbook.md`, resolved at entry granularity as
+established: kept the specifier's own "sent handoff" entry alongside the
+coder's parallel "received handoff" entry for the same handoff (each with
+its own complete quoted message; the coder's copy carries an added
+`recipient` field and a slightly different `created_at` rendering, kept
+as each side actually recorded it), then preserved the full unmodified
+coder→refactorer→architect chain verbatim. No entries dropped, no header
+collisions, fences balanced (412, even) after resolution.
+
+Verification: `mvn -q -o test` passes on the merged state (exit 0).
+
+Per role rules, will now ask the user for the next feature to add.
