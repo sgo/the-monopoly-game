@@ -8899,3 +8899,50 @@ the jail-exit event itself, not which strategy caused it.
 The new "will pay the fine to leave jail" step has no glue code yet -
 this is the one piece of this handoff that needs real coder work; the
 rest is confirmed already passing.
+
+## 2026-07-29T10:13:15Z — specifier amended workflow.prompt (user-authorized)
+
+Action taken: committed `577c071`, adding a rule to
+`swarmforge/constitution/articles/workflow.prompt` at the user's
+explicit request, following their review of the phase12-jail merge.
+
+Context: during Phase 12's review, the architect found a real defect
+in jail-4 (escaping jail via doubles lands on unowned property, and
+"Agree if affordable" always bids its entire available balance at
+auction, an established mechanic - so it wins its own uncontested
+auction and zeroes its balance; not a bug, but an unaccounted-for
+confound in the specifier's original scenario design). The architect's
+fix edited `jail.feature` directly: flattening the `Scenario Outline`
+to a plain `Scenario` and hardcoding the confounded values. This
+silently dropped the scenario out of mutation coverage (the
+acceptance-mutation tool only mutates `Examples:` table values, never
+literal step text) and would have gone unnoticed had the user not
+caught it during their own review of the phase-complete merge summary.
+
+The gap: the architect's own verification sequence already includes
+running soft Gherkin acceptance mutation, so it will keep surfacing
+genuine specification defects - but neither `workflow.prompt` nor
+`architect.prompt` drew a line between the architect's own territory
+(pipeline registration, mutation-manifest housekeeping - e.g. adding a
+feature file to `acceptance/pipeline-features.txt`, done correctly and
+without incident in both Phase 11 and Phase 12) and the specifier's
+exclusive ownership of "acceptance criteria and examples" per
+`specifier.prompt`.
+
+Change: added a new `workflow.prompt` rule (after the existing
+architect/coder/refactorer priority-`00` review-loop block): when the
+architect's review finds a defect in Gherkin scenario *content*, it
+must send a priority-`00` follow-up to the specifier describing the
+finding rather than editing the feature file directly, and treat the
+task as not advanceable until that loop returns - mirroring exactly
+how the architect already waits for coder/refactorer follow-ups to
+close. Also widened the existing "use priority `00` for architect
+handoffs to coder or refactorer" note to include specifier.
+
+This is the third prompt/constitution edit in this project's history.
+Unlike the first two (each an architect-originated change discovered
+after the fact, requiring the specifier to ask about authorization
+before or after merging), this one originated from the user directly
+instructing the specifier to make it, so there is no separate
+authorization question to raise - this entry itself is the audit
+trail.
