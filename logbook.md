@@ -9550,3 +9550,60 @@ Verification: `./acceptance/run-acceptance.sh` passes (228/228), including
 added the missing standalone step).
 
 Per role rules, will now ask the user for the next feature to add.
+
+## 2026-07-29T11:48:52Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260729T114852Z_000022_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase14-bankruptcy-and-winning
+commit: 55c969a94a
+created_at: 2026-07-29T11:48:52.237278Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 55c969a94a
+```
+
+Summary: specified Phase 14 bankruptcy and winning - by far the largest
+spec this session. New `bankruptcy.feature` (7 scenarios) covers: a
+debt exceeding cash first triggers automatic liquidation (mortgage
+property, sell houses, stopping once the shortfall is covered) before
+bankruptcy is even considered; bank-debt bankruptcy (forfeit
+everything, bank auctions the now-mortgaged land, Get Out of Jail Free
+cards return to the bottom of their deck); player-debt bankruptcy (the
+creditor receives the debtor's remaining cash and mortgaged property
+directly); and a new creditor mortgage-choice strategy hook ("Agree if
+affordable" pays off an inherited mortgage when affordable, keeps it
+paying only the mandatory 10% interest when not). Fixed
+`monopoly.feature`'s pre-existing `Scenario` -> `Scenario Outline`
+violation (it predates that convention). Added journal-20/21/22 and
+report-20/21/22 for bankruptcy-to-bank, bankruptcy-to-player, and the
+game's winner.
+
+Two assumptions flagged explicitly to the user, both confirmed as
+acceptable: houses sold before mortgaging during liquidation, in
+board-position order when there's a choice among streets (no RULES.md
+text pins this down); and the mortgage-choice hook applies uniformly
+whether a mortgaged property is acquired via direct creditor-
+inheritance (RULES.md's explicit case) or via winning an auction for
+bank-forfeited land (RULES.md is silent there).
+
+During review the user caught that bankruptcy-6/7's titles didn't
+name "Agree if affordable" explicitly, reading as generic mechanic
+scenarios rather than algorithm-specific ones - the same issue already
+fixed for jail-5/6 earlier this session, which I should have applied
+here from the start. Retitled both to name the strategy directly.
+
+This is the point where the rules engine needs a real game loop for
+the first time - Game.play() currently plays exactly one round, ever,
+and Game.Result needs to carry a winner. None of this can be verified
+against the current implementation; it is entirely new production
+work, consistent with this phase's role of completing the rules engine
+end-to-end before the CLI (Phase 15).
