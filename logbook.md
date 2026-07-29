@@ -8749,6 +8749,19 @@ merge_and_process coder 88749b96bb
 Action taken: began review of the coder's priority-`00` return for the Phase
 14 bankruptcy correction.
 
+## 2026-07-29T12:19:01Z — architect accepted phase 14 coder verification
+
+Action taken: merged coder commit `88749b96bb`. The coder confirmed the
+hotel/house liquidation and retained-card transfer corrections require no
+further implementation change; focused domain verification passed 249 tests
+and the normal generated acceptance pipeline passed 242 tests. Re-ran
+`git diff --check` on the merged state; it passed cleanly.
+
+Routing: the coder priority-`00` loop is closed. The phase remains
+unadvanceable only for the already-recorded Gherkin examples whose starting
+balances are mutation-equivalent; send that content finding to specifier at
+priority `00`.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
