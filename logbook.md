@@ -10758,3 +10758,28 @@ merge_and_process architect 1c7cb534b4
 
 Action taken: merged architect commit `1c7cb534b4`, resolving the
 `logbook.md` conflict while preserving the complete Phase 15 review history.
+
+## 2026-07-29T13:55:39Z — specifier sent Phase 15 executable-CLI clarification to coder
+
+Handoff message sent:
+
+```
+id: 20260729T135532Z_000027_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase15-cli
+commit: 85b25c87cf
+created_at: 2026-07-29T13:55:32.090811Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 85b25c87cf
+```
+
+Summary: clarified in `SIMULATOR.md` and `tasks.md` that Phase 15 must
+deliver a standalone executable process with command-line arguments, stdout
+reporting, `-h`/`--h` usage guidance, and nonzero invalid-input status; updated
+verification to invoke those process behaviors end-to-end.
