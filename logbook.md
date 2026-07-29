@@ -10358,6 +10358,32 @@ merge_and_process architect 53e9a1f8dc
 Action taken: supplied coder the accepted Gherkin revision for the existing
 starting-capital remediation loop.
 
+## 2026-07-29T15:50:50Z — architect received Phase 15 starting-capital return from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T155038Z_000048_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: b7064ba9bc
+created_at: 2026-07-29T15:50:38.260004Z
+enqueued_at: 2026-07-29T15:50:38.679576Z
+task: phase15-cli
+dequeued_at: 2026-07-29T15:50:44.258939Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer b7064ba9bc
+```
+
+Action taken: began architectural review of the refactorer-returned
+starting-capital remediation.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
