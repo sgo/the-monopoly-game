@@ -11268,3 +11268,49 @@ specifier owns an acceptance criterion that a simulated player begins with
 the official capital and is not artificially debited before the first turn.
 The coder returns through refactorer; architect will accept both loops before
 closing the reopened phase.
+
+## 2026-07-29T14:39:45Z — architect sent Phase 15 starting-capital specification follow-up
+
+Handoff message sent:
+
+```
+id: 20260729T143945Z_000058_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 07c95bf1e9
+created_at: 2026-07-29T14:39:45.905924Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 07c95bf1e9
+```
+
+Action taken: sent the missing starting-capital acceptance-criterion review to
+specifier.
+
+## 2026-07-29T14:39:46Z — architect sent Phase 15 starting-capital implementation follow-up
+
+Handoff message sent:
+
+```
+id: 20260729T143946Z_000059_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 07c95bf1e9
+created_at: 2026-07-29T14:39:46.034889Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 07c95bf1e9
+```
+
+Action taken: sent the €5 pre-game-debit removal and regression coverage to
+coder; its normal review path is coder to refactorer to architect.
