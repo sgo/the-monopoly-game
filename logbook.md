@@ -10973,3 +10973,30 @@ merge_and_process refactorer 7e82624c22
 Action taken: returned the reviewed invalid-count reporting fix after 3 CLI
 tests, 17 property tests, and 246 acceptance tests passed; DRY found no new
 duplication. The Gherkin boundary mutation issue remains with specifier.
+
+## 2026-07-29T14:12:02Z — refactorer received coder CLI executable follow-up
+
+Handoff message received:
+
+```
+id: 20260729T141115Z_000034_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 460573dc41
+created_at: 2026-07-29T14:11:15.021788Z
+enqueued_at: 2026-07-29T14:11:15.032469Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:11:22.864636Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 460573dc41
+```
+
+Action taken: merged the standalone CLI executable entry point and verified
+five CLI tests pass. The documented `-h`/`--h` behavior is covered; no new
+DRY duplication was introduced.
