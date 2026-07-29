@@ -8698,6 +8698,31 @@ behaviour, so send the priority-`00` architect follow-up to coder. The two
 surviving Gherkin examples are a specifier-owned content defect; route that
 priority-`00` follow-up to specifier after the coder review loop returns.
 
+## 2026-07-29T12:15:56Z — architect sent phase 14 follow-up to coder
+
+Handoff message sent:
+
+```
+id: 20260729T121544Z_000044_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: 8141a9c0ba
+created_at: 2026-07-29T12:15:44.210095Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 8141a9c0ba
+```
+
+Summary: sent the observable bankruptcy hardening for full asset liquidation
+and creditor inheritance of retained jail-release cards. Coder must validate
+and return this priority-`00` architect review loop before the pending
+bankruptcy Gherkin-example finding is routed to specifier.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
