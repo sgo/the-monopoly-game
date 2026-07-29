@@ -12,6 +12,7 @@ import the.monopoly.game.rules.Building;
 import the.monopoly.game.rules.Cards;
 import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Initiative;
+import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
 import the.monopoly.game.rules.Rent;
@@ -41,6 +42,7 @@ public class Game {
   private final Strategy.OfPlayers strategies;
   private final Deeds deeds;
   private final Cards.Decks decks;
+  private final Jail jail;
 
   public Game(Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies) {
     this(rules, players, cups, strategies, new Deeds(), Cards.Decks.EMPTY);
@@ -53,12 +55,20 @@ public class Game {
   public Game(
       Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds, Cards.Decks decks
   ) {
+    this(rules, players, cups, strategies, deeds, decks, new Jail(rules));
+  }
+
+  public Game(
+      Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
+      Cards.Decks decks, Jail jail
+  ) {
     this.rules = rules;
     this.players = players;
     this.cups = cups;
     this.strategies = strategies;
     this.deeds = deeds;
     this.decks = decks;
+    this.jail = jail;
   }
 
   /** A game whose players leave every choice they are offered alone. */
@@ -83,6 +93,7 @@ public class Game {
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
 
     Journalling journalling = new Journalling(journal);
+    jail.observe(journalling);
     Building building = new Building(deeds, rules, strategies, journalling);
     Player builder = turnOrder.getFirst();
     turnOrder.forEach(player -> {
@@ -101,25 +112,26 @@ public class Game {
 
   private void takeTurn(Player player, Journal journal, Turn.Events events, Landings landings) {
     journal.log(new Journal.Entry.TurnStarted(player.id()));
-    new Turn(rules, cups.forPlayer(player), events, landings).take(player);
+    new Turn(rules, cups.forPlayer(player), events, landings, jail, strategies.forPlayer(player), deeds).take(player);
   }
 
   private Landings landingsFor(Player player, List<Player> turnOrder, Journalling journalling) {
     Landings rent = new Rent(deeds, rules, turnOrder, strategies, journalling);
     Landings landSale = new LandSale(deeds, rules, turnOrder, strategies, journalling);
-    Landings cards = new Cards(deeds, rules, turnOrder, strategies, decks, journalling, cups.forPlayer(player));
+    Landings cards = new Cards(deeds, rules, turnOrder, strategies, decks, journalling, cups.forPlayer(player), jail);
     Landings taxes = new Taxes(journalling);
     return (who, space, roll) -> {
       rent.resolve(who, space, roll);
       landSale.resolve(who, space, roll);
       cards.resolve(who, space, roll);
       taxes.resolve(who, space, roll);
+      jail.resolve(who, space, roll);
     };
   }
 
   /** Writes down what a turn and a sale say they did, as the game's account of it. */
   private record Journalling(Journal journal)
-      implements Turn.Events, LandSale.Events, Rent.Events, Building.Events, Cards.Events, Taxes.Events {
+      implements Turn.Events, LandSale.Events, Rent.Events, Building.Events, Cards.Events, Taxes.Events, Jail.Events {
     @Override
     public void rolled(Player player, Roll roll) {
       journal.log(new Journal.Entry.Rolled(player.id(), roll.total()));
@@ -183,6 +195,16 @@ public class Game {
     @Override
     public void paidBank(Player player, Money amount) {
       journal.log(new Journal.Entry.BankPaid(player.id(), amount));
+    }
+
+    @Override
+    public void sentToJail(Player player, Street.Type cause) {
+      journal.log(new Journal.Entry.JailEntered(player.id(), cause));
+    }
+
+    @Override
+    public void leftJailByPaying(Player player, Money fine) {
+      journal.log(new Journal.Entry.JailFinePaid(player.id(), fine));
     }
   }
 
@@ -289,6 +311,12 @@ public class Game {
       }
 
       record BankPaid(Player.ID player, Money amount) implements Entry {
+      }
+
+      record JailEntered(Player.ID player, Street.Type cause) implements Entry {
+      }
+
+      record JailFinePaid(Player.ID player, Money fine) implements Entry {
       }
     }
   }

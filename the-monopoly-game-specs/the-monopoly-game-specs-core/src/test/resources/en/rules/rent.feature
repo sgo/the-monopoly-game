@@ -19,7 +19,7 @@ Feature: street rent
   # rent-1
   Scenario Outline: an owner claims rent when a tenant lands on their unimproved, non-monopoly street
     Given pawn "high hat" owns "<property>"
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" will claim rent for "<property>"
     When pawn "dog" lands on "<property>"
     Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
     And pawn "high hat"'s account balance is $<expected_owner_final_balance>
@@ -33,7 +33,7 @@ Feature: street rent
   Scenario Outline: an owner of every street in a colour group charges double rent while unimproved
     Given pawn "high hat" owns "Rue Grande Dinant"
     And pawn "high hat" owns "Diestsestraat Leuven"
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" will claim rent for "Diestsestraat Leuven"
     When pawn "dog" lands on "Diestsestraat Leuven"
     Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
     And pawn "high hat"'s account balance is $<expected_owner_final_balance>
@@ -58,7 +58,7 @@ Feature: street rent
   Scenario Outline: rent scales with the number of houses built on the street
     Given pawn "high hat" owns "Diestsestraat Leuven"
     And the street "Diestsestraat Leuven" has 2 house(s) built
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" will claim rent for "Diestsestraat Leuven"
     When pawn "dog" lands on "Diestsestraat Leuven"
     Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
     And pawn "high hat"'s account balance is $<expected_owner_final_balance>
@@ -71,7 +71,7 @@ Feature: street rent
   Scenario Outline: a hotel charges the hotel rent printed on the title deed
     Given pawn "high hat" owns "Diestsestraat Leuven"
     And the street "Diestsestraat Leuven" has a hotel built
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" will claim rent for "Diestsestraat Leuven"
     When pawn "dog" lands on "Diestsestraat Leuven"
     Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
     And pawn "high hat"'s account balance is $<expected_owner_final_balance>
@@ -85,7 +85,7 @@ Feature: street rent
     Given pawn "high hat" owns "Rue Grande Dinant"
     And pawn "high hat" owns "Diestsestraat Leuven"
     And the street "Rue Grande Dinant" has 2 house(s) built
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" will claim rent for "Diestsestraat Leuven"
     When pawn "dog" lands on "Diestsestraat Leuven"
     Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
     And pawn "high hat"'s account balance is $<expected_owner_final_balance>

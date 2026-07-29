@@ -66,3 +66,33 @@ Feature: movement
     Examples:
       | starting balance | starting position | first double | second double | third double | final position | final balance |
       | 1500              | 0                  | 2             | 5              | 1            | 10              | 1500          |
+
+  # movement-5
+  Scenario Outline: rolling doubles while in jail releases the player and moves that number of spaces
+    And the player is in jail
+    And the next roll will be <die> and <die>
+    When the player takes a turn
+    Then the player is at position <final position>
+    And the player is no longer in jail
+
+    Examples:
+      | die | final position |
+      | 3   | 16             |
+
+  # movement-6
+  Scenario Outline: failing to roll doubles for three turns in jail forces the fine before moving
+    And with $<starting balance> in his account
+    And the player is in jail
+    And the next roll will be <first die 1> and <first die 2>
+    And the next roll will be <second die 1> and <second die 2>
+    And the next roll will be <third die 1> and <third die 2>
+    When the player takes a turn
+    And the player takes a turn
+    And the player takes a turn
+    Then the player is at position <final position>
+    And the player's account balance is $<final balance>
+    And the player is no longer in jail
+
+    Examples:
+      | starting balance | first die 1 | first die 2 | second die 1 | second die 2 | third die 1 | third die 2 | final position | final balance |
+      | 100               | 1           | 2           | 2            | 4            | 3           | 5           | 18             | 50            |

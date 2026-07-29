@@ -180,6 +180,9 @@ public final class MonopolyStepHandlers {
         step("^the player takes a turn$",
             (world, arguments) -> world.takeTurn()),
 
+        given("^the player is in jail$",
+            (world, arguments) -> world.startPlayerInJail()),
+
         step("^pawn \"" + NAME + "\" will roll " + VALUE + " for initiative$",
             (world, arguments) -> world.queueInitiativeRoll(arguments.text(1), arguments.number(2))),
 
@@ -348,6 +351,12 @@ public final class MonopolyStepHandlers {
         given("^pawn \"" + NAME + "\" follows the \"" + NAME + "\" strategy$",
             (world, arguments) -> world.pawnFollows(arguments.text(1), Vocabulary.strategy(arguments.text(2)))),
 
+        given("^pawn \"" + NAME + "\" starts in jail$",
+            (world, arguments) -> world.startPawnInJail(arguments.text(1))),
+
+        given("^pawn \"" + NAME + "\" already holds a Get Out of Jail Free card$",
+            (world, arguments) -> world.givePawnGetOutOfJailFreeCard(arguments.text(1))),
+
         given("^pawn \"" + NAME + "\" has \\$" + VALUE + " to spend$",
             (world, arguments) -> world.arrangePawnBalance(arguments.text(1), money(arguments.number(2)))),
 
@@ -379,12 +388,18 @@ public final class MonopolyStepHandlers {
         given("^pawn \"" + NAME + "\" declines to claim rent for \"" + NAME + "\"$",
             (world, arguments) -> world.pawnDeclinesRent(arguments.text(1), SpaceNames.of(arguments.text(2)))),
 
+        given("^pawn \"" + NAME + "\" will claim rent for \"" + NAME + "\"$",
+            (world, arguments) -> world.pawnWillClaimRent(arguments.text(1))),
+
         given("^pawn \"" + NAME + "\" will build a house on \"" + NAME + "\"$",
             (world, arguments) -> world.pawnWillBuildHouseOn(
                 arguments.text(1), SpaceNames.of(arguments.text(2)))),
 
         step("^pawn \"" + NAME + "\" lands on \"" + NAME + "\"$",
             (world, arguments) -> world.landPawnOn(arguments.text(1), SpaceNames.of(arguments.text(2)))),
+
+        step("^pawn \"" + NAME + "\" will use the Get Out of Jail Free card to leave jail$",
+            (world, arguments) -> world.pawnWillUseGetOutOfJailFreeCard(arguments.text(1))),
 
         step("^pawn \"" + NAME + "\" sells a house on \"" + NAME + "\" back to the bank$",
             (world, arguments) -> world.sellHouse(arguments.text(1), SpaceNames.of(arguments.text(2)))),
@@ -422,6 +437,18 @@ public final class MonopolyStepHandlers {
 
         then("^pawn \"" + NAME + "\" holds a \"Get Out of Jail Free\" card$",
             (world, arguments) -> assertThat(world.holdsGetOutOfJailFreeCard(arguments.text(1))).isTrue()),
+
+        then("^pawn \"" + NAME + "\" no longer holds a Get Out of Jail Free card$",
+            (world, arguments) -> assertThat(world.holdsGetOutOfJailFreeCard(arguments.text(1))).isFalse()),
+
+        then("^pawn \"" + NAME + "\" is in jail$",
+            (world, arguments) -> assertThat(world.isInJail(arguments.text(1))).isTrue()),
+
+        then("^pawn \"" + NAME + "\" is just visiting$",
+            (world, arguments) -> assertThat(world.isInJail(arguments.text(1))).isFalse()),
+
+        then("^the player is no longer in jail$",
+            (world, arguments) -> assertThat(world.playerIsInJail()).isFalse()),
 
         then("^the street \"" + NAME + "\" has " + VALUE + " house\\(s\\) built$",
             (world, arguments) -> assertThat(world.housesBuiltOn(SpaceNames.of(arguments.text(1))))
@@ -493,6 +520,16 @@ public final class MonopolyStepHandlers {
                 + "\" moves before it records that pawn \"" + NAME + "\" pays the bank \\$" + VALUE + "$",
             (world, arguments) -> recordsInOrder(world,
                 moves(arguments.text(1)), bankPaid(arguments.text(2), arguments.number(3)))),
+
+        then("^the game journal records that pawn \"" + NAME
+                + "\" moves before it records that pawn \"" + NAME
+                + "\" is sent to jail from landing on \"" + NAME + "\"$",
+            (world, arguments) -> recordsInOrder(world,
+                moves(arguments.text(1)), jailEntered(arguments.text(2), arguments.text(3)))),
+
+        then("^the game journal records that pawn \"" + NAME
+                + "\" leaves jail by paying the \\$" + VALUE + " fine$",
+            (world, arguments) -> records(world, jailFinePaid(arguments.text(1), arguments.number(2)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" moves before it records that pawn \""
                 + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + " rent for \"" + NAME + "\"$",
@@ -589,6 +626,16 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> saysInOrder(world,
                 movesAnywhere(arguments.text(1)), bankPaidLine(arguments.text(2), arguments.number(3)))),
 
+        then("^the game report says that pawn \"" + NAME
+                + "\" moves before it says that pawn \"" + NAME
+                + "\" is sent to jail from landing on \"" + NAME + "\"$",
+            (world, arguments) -> saysInOrder(world,
+                movesAnywhere(arguments.text(1)), jailEnteredLine(arguments.text(2), arguments.text(3)))),
+
+        then("^the game report says that pawn \"" + NAME
+                + "\" leaves jail by paying the \\$" + VALUE + " fine$",
+            (world, arguments) -> says(world, jailFinePaidLine(arguments.text(1), arguments.number(2)))),
+
         step("^each face was rolled about " + VALUE + " times within a " + VALUE + "% margin$",
             (world, arguments) -> {
               int expected = arguments.number(1);
@@ -678,6 +725,14 @@ public final class MonopolyStepHandlers {
     return Claim.of(new Entry.BankPaid(idOf(pawnName), money(amount)));
   }
 
+  private static Claim jailEntered(String pawnName, String spaceName) {
+    return Claim.of(new Entry.JailEntered(idOf(pawnName), SpaceNames.of(spaceName)));
+  }
+
+  private static Claim jailFinePaid(String pawnName, int fine) {
+    return Claim.of(new Entry.JailFinePaid(idOf(pawnName), money(fine)));
+  }
+
   /** A pawn moving anywhere, for a step that says when it moved rather than where to. */
   private static Claim moves(String pawnName) {
     return new Claim(
@@ -741,6 +796,14 @@ public final class MonopolyStepHandlers {
 
   private static String bankPaidLine(String pawnName, int amount) {
     return pawnName + " pays the bank $" + amount;
+  }
+
+  private static String jailEnteredLine(String pawnName, String spaceName) {
+    return pawnName + " is sent to jail from landing on " + spaceName;
+  }
+
+  private static String jailFinePaidLine(String pawnName, int fine) {
+    return pawnName + " leaves jail by paying the $" + fine + " fine";
   }
 
   private static Player.ID idOf(String pawnName) {

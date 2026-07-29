@@ -26,6 +26,11 @@ public final class AgreeIfAffordable implements Strategy {
   public boolean builds(BuildOffer offer) {
     return offer.isAffordable();
   }
+
+  @Override
+  public boolean pays(JailFine fine) {
+    return fine.isAffordable();
+  }
 }
 
 /* mutate4java-manifest

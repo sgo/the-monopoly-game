@@ -8146,6 +8146,160 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T07:35:18Z — architect sent phase 11 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T073514Z_000038_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase11-taxes
+commit: d9f082b1bc
+created_at: 2026-07-29T07:35:14.212114Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d9f082b1bc
+```
+
+Summary: sent the Phase 11 completion sync after accepting the tax-rule architecture and registering the tax specification in the normal and mutation acceptance pipeline. The sync points specifier at architect commit `d9f082b1bc`.
+
+## 2026-07-29T09:15:06Z — architect received phase 12 refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260729T091451Z_000034_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: fb772d1075
+created_at: 2026-07-29T09:14:51.313351Z
+enqueued_at: 2026-07-29T09:14:51.843534Z
+task: phase12-jail
+dequeued_at: 2026-07-29T09:14:59.918971Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer fb772d1075
+```
+
+Action taken: began architectural review of the Phase 12 refactorer handoff.
+
+## 2026-07-29T09:13:49Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T090451Z_000022_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 61f7ecd378
+created_at: 2026-07-29T09:04:51.253333Z
+enqueued_at: 2026-07-29T09:04:51.293468Z
+task: phase12-jail
+dequeued_at: 2026-07-29T09:04:59.645260Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 61f7ecd378
+```
+
+Action taken: merged coder commit `61f7ecd378`, extracted the jail-attempt
+branch in `Turn`, added targeted coverage for failed jail double attempts and
+the unaffordable-prisoner turn path, and verified unit, property, and
+acceptance suites. CRAP is at or below 6 for all non-exempt production
+methods; `Report.line` remains the documented exhaustive sealed-switch
+exception. Mutation-site counts remain below 100 per changed source file.
+
+## 2026-07-29T08:56:28Z — coder received phase 12 jail handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260729T085628Z_000018_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase12-jail
+commit: d4409e59e4
+created_at: 2026-07-29T08:56:28Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d4409e59e4
+```
+
+Action taken: merged the accepted Phase 12 jail specification and implemented
+jail entry, jail state, and the specified exit paths.
+
+## 2026-07-29T09:04:03Z — coder prepared phase 12 jail handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase12-jail
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: Go To Jail now sends and marks a pawn as imprisoned; Just Visiting
+does not. A jailed player may leave by an affordable $50 fine, an explicitly
+used Get Out of Jail Free card, doubles, or the compulsory fine after three
+failed doubles attempts. Jail entry and paid-fine exit are journalled and
+reported. Unit verification passed with 236 tests; normal generated acceptance
+verification passed with 217 tests.
+
+## 2026-07-29T06:24:46Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260729T062446Z_000017_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase11-taxes
+commit: 7f2d9d2d36
+created_at: 2026-07-29T06:24:46.965423Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7f2d9d2d36
+```
+
+Summary: specified Phase 11 taxes — new `tax.feature` covering both
+fixed-amount tax spaces (Income Tax M200, Luxury Tax M100), each paid
+outright to the bank on landing. Both tax types are single-occurrence
+board spaces, so the existing generic "lands on" step resolves the
+correct position directly, with no Chance/Community-Chest-style
+first-occurrence workaround needed. Added journal-16/report-16
+recording the tax payment after the landing movement, reusing the
+existing "pays the bank $X" wording from the cards phase and adding a
+"moves before it records ... pays the bank" ordering combinator
+consistent with the existing per-mechanic ordering assertions (buy,
+auction, rent). No open design questions this phase: RULES.md's tax
+rule is an unconditional flat payment with no player decision
+involved, so no strategy-override step was needed.
+
 ## 2026-07-29T06:24:46Z — coder received phase 11 taxes handoff from specifier
 
 Handoff message received:
@@ -8312,12 +8466,42 @@ created_at: 2026-07-29T07:28:41.818041Z
 enqueued_at: 2026-07-29T07:28:42.815784Z
 task: phase11-taxes
 dequeued_at: 2026-07-29T07:29:31.014153Z
+Re-read your role and constitution.
+
+merge_and_process refactorer a9fe953896
+```
+
+## 2026-07-29T07:28:41Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260729T072841Z_000033_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase11-taxes
+commit: a9fe953896
+created_at: 2026-07-29T07:28:41.818041Z
 
 Re-read your role and constitution.
 
 merge_and_process refactorer a9fe953896
 ```
 
+Summary: merged the Phase 11 tax rule and the architect's own Phase 10
+follow-up (both new to this branch). Resolved an unusual `logbook.md`
+conflict where my own Phase 10 "sent" entry had been split by the merge
+into two fragments around the architect's follow-up entries — root cause
+was that the coder's branch history never carried my two Phase 10 entries
+at all, apparently lost somewhere upstream. All gates clean without
+changes: CRAP exceeds only for the exempt `Report.line` (21,1, unchanged
+shape), DRY findings are the same two long-standing reviewed categories,
+mutation-site scan on every changed/new file (`Cards`, `Deeds`, `Game`,
+`Report`, `Taxes`) stays well under 100. 249 unit tests, 17 property
+tests, and 209 acceptance tests all pass.
 Action taken: began architectural review of the Phase 11 refactorer handoff.
 
 ## 2026-07-29T07:34:29Z — architect accepted phase 11 taxes
@@ -8338,9 +8522,9 @@ Verification:
 
 Routing: the acceptance-pipeline registration and mutation manifests are non-functional verification infrastructure; no coder or refactorer follow-up is warranted. All Phase 11 loops are closed, so send the phase-complete sync to specifier at priority `50`.
 
-## 2026-07-29T07:35:18Z — architect sent phase 11 completion handoff to specifier
+## 2026-07-29T07:37:54Z — specifier received phase-complete handoff from architect
 
-Handoff message sent:
+Handoff message received:
 
 ```
 id: 20260729T073514Z_000038_from_architect
@@ -8351,36 +8535,36 @@ type: git_handoff
 role: architect
 task: phase11-taxes
 commit: d9f082b1bc
-created_at: 2026-07-29T07:35:14.212114Z
 
 Re-read your role and constitution.
 
 merge_and_process architect d9f082b1bc
 ```
 
-Summary: sent the Phase 11 completion sync after accepting the tax-rule architecture and registering the tax specification in the normal and mutation acceptance pipeline. The sync points specifier at architect commit `d9f082b1bc`.
+Action taken: merged architect commit `d9f082b1bc` into `main`, closing out
+the `phase11-taxes` task. This brought in the coder's `Taxes` rule
+(implementing `Landings` for `TaxSpace`, withdrawing the printed amount and
+reporting `paidBank`), the architect's own priority-`00` follow-up carried
+in the same chain fixing a latent `advanceToNearestStation`/
+`advanceToNearestUtility` bug from Phase 10's table-driven `Cards` rewrite
+(both branches of the original switch shared the bug, so it survived the
+DRY-up unnoticed) and collapsing `payEveryOtherPlayer`/
+`collectFromEveryOtherPlayer` into a shared `forEveryOtherPlayer`/
+`transfer` pair, and the architect's own correction registering
+`en/rules/tax.feature` in `acceptance/pipeline-features.txt` — the
+specifier had created the feature file but never wired it into the
+acceptance/mutation pipeline, so neither exercised it until the architect
+caught the gap this phase.
 
-## 2026-07-29T09:15:06Z — architect received phase 12 refactorer handoff
+One conflict, in `logbook.md`, resolved at entry granularity as
+established: kept the specifier's own "sent handoff" entry alongside the
+coder's parallel "received handoff" entry for the same handoff (each with
+its own complete quoted message; the coder's copy carries an added
+`recipient` field and a slightly different `created_at` rendering, kept
+as each side actually recorded it), then preserved the full unmodified
+coder→refactorer→architect chain verbatim. No entries dropped, no header
+collisions, fences balanced (412, even) after resolution.
 
-Handoff message received:
+Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
-```
-id: 20260729T091451Z_000034_from_refactorer
-from: refactorer
-to: architect
-recipient: architect
-priority: 50
-type: git_handoff
-role: refactorer
-commit: fb772d1075
-created_at: 2026-07-29T09:14:51.313351Z
-enqueued_at: 2026-07-29T09:14:51.843534Z
-task: phase12-jail
-dequeued_at: 2026-07-29T09:14:59.918971Z
-
-Re-read your role and constitution.
-
-merge_and_process refactorer fb772d1075
-```
-
-Action taken: began architectural review of the Phase 12 refactorer handoff.
+Per role rules, will now ask the user for the next feature to add.

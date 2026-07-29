@@ -47,7 +47,7 @@ Feature: mortgaging
   Scenario Outline: no rent may be collected for mortgaged land
     Given pawn "high hat" owns "Diestsestraat Leuven"
     And the land "Diestsestraat Leuven" is mortgaged
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" will claim rent for "Diestsestraat Leuven"
     When pawn "dog" lands on "Diestsestraat Leuven"
     Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
     And pawn "high hat"'s account balance is $<expected_owner_final_balance>
@@ -61,7 +61,7 @@ Feature: mortgaging
     Given pawn "high hat" owns "Rue Grande Dinant"
     And pawn "high hat" owns "Diestsestraat Leuven"
     And the land "Rue Grande Dinant" is mortgaged
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" will claim rent for "Diestsestraat Leuven"
     When pawn "dog" lands on "Diestsestraat Leuven"
     Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
     And pawn "high hat"'s account balance is $<expected_owner_final_balance>
@@ -75,7 +75,6 @@ Feature: mortgaging
     Given pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" owns "Diestsestraat Leuven"
     And the land "Rue Grande Dinant" is mortgaged
-    And pawn "dog" follows the "Agree if affordable" strategy
     And pawn "dog" will build a house on "Diestsestraat Leuven"
     And pawn "dog" has $100 to spend
     When we play the game
