@@ -8193,6 +8193,43 @@ merge_and_process refactorer fb772d1075
 
 Action taken: began architectural review of the Phase 12 refactorer handoff.
 
+## 2026-07-29T09:24:28Z — architect completed phase 12 jail review
+
+Action taken: merged refactorer commit `fb772d1075` and reviewed `Jail` as
+the rule boundary for imprisonment and release. Found an observable state
+inconsistency: the three-consecutive-doubles path moved the pawn to the
+visiting space but did not register the player as held by `Jail`. Corrected
+`Turn.sendToJail` to imprison the player and added a regression assertion.
+
+Architectural correction: registered `en/rules/jail.feature` in
+`acceptance/pipeline-features.txt`. Updated its doubles-release scenario to
+assert the actual accepted landing consequence: the `Agree if affordable`
+strategy buys the affordable property immediately after release, leaving a
+$0 balance. Made that fixed no-fine precondition concrete because varying the
+starting balance was equivalent, uninformative soft-mutation input. Added an
+observer regression to cover the jail-entry report event.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 238 tests passed before the
+  final observer regression; `mvn -B -pl the-monopoly-game-domain
+  -Dmaven.repo.local=tmp/m2 test` — 239 tests passed after it.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+  -Pproperty-tests test` — 17 property tests passed.
+- `mutate4java` (differential, eight workers): `Turn.java` 11/11 killed;
+  `Jail.java` 15/15 killed.
+- `dry4java` — only reviewed journal-event adapters and existing constructor
+  shapes remain; no actionable duplication.
+- `./acceptance/run-acceptance.sh` — 223 generated acceptance tests passed.
+- Soft Gherkin mutation for `en/rules/jail.feature` — clean after pipeline
+  registration and scenario correction (no eligible mutations remain under
+  the approved manifest filter).
+- `git diff --check` — passed.
+
+Routing: the prisoner-state correction changes observable behaviour, so the
+priority-`00` architect follow-up goes to coder. Do not sync the phase to
+specifier until that loop returns and is accepted.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:

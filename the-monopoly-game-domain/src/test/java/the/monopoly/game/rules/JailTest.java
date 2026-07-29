@@ -26,6 +26,16 @@ class JailTest {
   }
 
   @Test
+  void anObserverRecordsWhyThePawnWasSentToJail() {
+    Reported reported = new Reported();
+    jail.observe(reported);
+
+    jail.resolve(dog, rules.create(Street.Type.NaarDeGevangenis), new Roll(1, 2));
+
+    assertThat(reported.cause).isEqualTo(Street.Type.NaarDeGevangenis);
+  }
+
+  @Test
   void anAffordableFineFreesThePawn() {
     jail.imprison(dog);
 
@@ -76,5 +86,14 @@ class JailTest {
     Player player = new Player(id, bank.accountOf(id));
     player.account().deposit(new Money(balance));
     return player;
+  }
+
+  private static final class Reported implements Jail.Events {
+    private Street.Type cause;
+
+    @Override
+    public void sentToJail(Player player, Street.Type cause) {
+      this.cause = cause;
+    }
   }
 }
