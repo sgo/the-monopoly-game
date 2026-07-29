@@ -26,7 +26,7 @@ public final class Simulator {
     players.forEach(player -> player.account().withdraw(player.account().balance().amount().minus(new Money(5))));
     Game.Result game = new Game(rules, players, simulationCups(players), strategies).playToCompletion();
     Player winner = game.winner().orElseThrow();
-    return new Result(0, Report.of(game.journal()) + System.lineSeparator() + winner.id().value() + " wins the game");
+    return new Result(0, Report.of(game.journal()));
   }
 
   private static Game.Cups simulationCups(List<Player> players) {
