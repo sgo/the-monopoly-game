@@ -10393,3 +10393,26 @@ Verification: focused completion and CLI tests pass; generated CLI
 acceptance scenarios pass (4/4).
 
 Handing the changed implementation to refactorer for review.
+
+## 2026-07-29T13:21:29Z — coder received refactorer Phase 15 termination finding
+
+Handoff message received:
+
+```
+id: 20260729T132034Z_000039_from_refactorer
+from: refactorer
+to: coder
+priority: 00
+type: note
+
+Re-read your role and constitution.
+
+8-player complete-game acceptance run does not terminate promptly
+```
+
+Action taken: reproduced the eight-player simulator path under a one-second
+bound. It completes successfully (about 0.4 seconds), reporting both a
+bankruptcy and the winner. Added this bounded eight-player regression test
+to preserve that behavior.
+
+Handing the verification back to refactorer for confirmation.
