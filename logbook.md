@@ -10328,6 +10328,35 @@ the CLI implementation.
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
 
+## 2026-07-29T18:10:00Z — refactorer received coder standard-setup acceptance steps
+
+Handoff message received:
+
+```
+id: 20260729T160840Z_000040_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: b37d43bc02
+created_at: 2026-07-29T16:08:40.665594Z
+enqueued_at: 2026-07-29T16:08:40.869168Z
+task: phase15-cli
+dequeued_at: 2026-07-29T16:08:43.982521Z
+
+Re-read your role and constitution.
+
+merge_and_process coder b37d43bc02
+```
+
+Action taken: merged the standard setup acceptance assertions and reset logic.
+The specs-core reactor build passed; domain tests passed 250/250 and CLI tests
+passed 11/11. Mutation scan reports 182 sites in the existing step-handler
+file and additional sites in `World`; no mutation testing was run. DRY output
+only reports pre-existing duplicate regions outside the added setup methods.
+
 ## 2026-07-29T16:08:20Z — coder received standard-setup specification
 
 Handoff message received:
