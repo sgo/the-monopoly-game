@@ -62,6 +62,9 @@ The game result report and journal should have a human-readable format.
 
 ### CLI
 
+- The CLI is a standalone executable process. It must accept command-line
+  arguments, print the report to stdout, include a `-h`/`--h` flag explaining
+  how to use it, and return a nonzero exit code for invalid input.
 - prompts for or accepts the number of players and a strategy per player
   (defaulting to "Agree if affordable");
 - runs one game
