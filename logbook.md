@@ -10695,6 +10695,32 @@ merge_and_process architect b7f855bc13
 
 Action taken: sent the completed ten-run specification review to specifier.
 
+## 2026-07-29T16:04:13Z — architect received Phase 15 setup-specification return
+
+Handoff message received:
+
+```
+id: 20260729T160402Z_000031_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 8639b0007b
+created_at: 2026-07-29T16:04:02.503108Z
+enqueued_at: 2026-07-29T16:04:02.968920Z
+task: phase15-cli
+dequeued_at: 2026-07-29T16:04:07.397084Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 8639b0007b
+```
+
+Action taken: began architectural review of the returned normal-setup and
+completion-policy criteria.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
