@@ -8188,3 +8188,87 @@ Added focused rule and game tests, acceptance ordering handlers, and updated
 the earlier turn-loop scenario that intentionally lands on Income Tax. Unit
 verification passed with 232 tests; the normal generated acceptance pipeline
 passed with 209 tests.
+
+## 2026-07-29T07:22:12Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/50_20260729T063026Z_000021_from_coder_to_refactorer.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase11-taxes
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder d7d3efb7db
+```
+
+Action taken: merged `d7d3efb7db` into `swarmforge-refactorer` as `e36ed29`.
+Only `logbook.md` conflicted, and this one had an unusual shape: rather than
+alternating whole entries, my own single "refactorer sent handoff to
+architect" entry (22:14:40Z) had been split into two pieces by the conflict,
+with the architect's two follow-up entries (22:26:34Z, 22:27:44Z) landing in
+between. This happened because both entries share the same
+"Handoff message sent:\n\n```\n" boilerplate line, which the merge aligned as
+common text at the point where the two branches' content happened to
+coincide, even though it logically belongs to two different entries at that
+position. Root cause: the coder's branch history never carried my two Phase
+10 entries at all (`git show d7d3efb7db:logbook.md` jumps directly from
+"20:20:44Z — refactorer sent handoff to architect" [Phase 9] to
+"22:26:34Z — architect completed phase 10 review follow-up", skipping my
+Phase 10 "received"/"sent" pair entirely — apparently lost somewhere in the
+architect's or specifier's own conflict resolution on the way to `main`).
+Resolved by reconstructing chronologically: kept my complete "received"
+entry, then reassembled my complete "sent" entry (header + boilerplate +
+body + summary, sourced from the two separated HEAD-side fragments), then
+the architect's "completed follow-up" entry complete, then the architect's
+"sent to coder" entry (header + a second copy of the same boilerplate +
+body, sourced from the theirs-side fragments), then the rest of theirs'
+already-coherent, non-conflicting chain verbatim (coder's receipt and
+return of the follow-up, the architect's acceptance, the specifier's
+phase-complete merge into `main`, and the specifier's phase 11 taxes
+handoff through to the coder's return). Header-count arithmetic: 236
+(common ancestor) + 2 (mine, already known but missing from theirs) + 12
+(theirs, new) = 250, matching the merged file exactly; `uniq -d` clean.
+
+In substance, the merge brought in two things I hadn't seen yet: the
+architect's own priority-`00` follow-up on my Phase 10 `Cards` work (fixed
+`advanceToNearestStation`/`advanceToNearestUtility` resolving the deed for
+`CentraalStation`/`Elektriciteitscentrale` unconditionally instead of the
+station/utility actually reached — a real bug my table-driven rewrite
+carried over unnoticed from the original switch, since both branches of
+the original switch had the same latent bug; also collapsed
+`payEveryOtherPlayer`/`collectFromEveryOtherPlayer` into a shared
+`forEveryOtherPlayer`/`transfer(payer, payee, amount)` pair — the same
+duplicate I had deliberately left alone in Phase 10 for named-method
+clarity, but the architect found a middle ground that keeps both named
+call sites while sharing the loop and the withdraw/deposit body via named
+lambdas rather than a boolean flag; a better outcome than my own choice,
+not a conflict with it) — and Phase 11 itself: a new `Taxes` class
+implementing `Landings`, resolving `TaxSpace` landings by withdrawing the
+printed tax and reporting `paidBank`, wired into `Game`'s landing pipeline
+and `Journalling`. `Report.java` and `Deeds.java` carried no code changes
+in this window, only stale mutation-manifest churn.
+
+Verification: 249 unit tests, 17 property tests, and 209 acceptance tests
+(up from 207) all pass. `crap4java`: only the exempt `Report.line` exceeds
+threshold, now at 21,1 (unchanged shape — no new `Journal.Entry` variant
+was added for tax payments, since `paidBank`/`BankPaid` already existed
+from Phase 10's bank-payment cards). Every other production method is at
+or below CRAP 6,0, including `Cards.repair` and `Cards.resolve` at exactly
+6,0. `dry4java` on `src/main`: all findings are the same two long-standing,
+already-reviewed categories — Game.java's per-event-type
+`Journalling` overrides (each translates one event interface method to one
+distinct `Journal.Entry` record constructor; collapsing them to a generic
+dispatcher would trade away compile-time type safety and the
+self-documenting one-name-per-event-type shape for a smaller count, the
+same tradeoff declined every prior phase) and pre-existing
+constructor-field-assignment pairs in `LandSale`/`Rent` and
+`Building`/`Turn`, neither touched this phase. Nothing new or actionable.
+Mutation-site scan on every changed/new file stays far under the
+100-site threshold: `Cards.java` 34, `Deeds.java` 33, `Game.java` 6,
+`Report.java` 1, `Taxes.java` 2 (new file). No refactor was needed this
+round — the coder's and architect's own work already left the tree clean
+against every gate.
