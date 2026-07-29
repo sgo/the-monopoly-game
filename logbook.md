@@ -10328,6 +10328,13 @@ the CLI implementation.
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
 
+## 2026-07-29T14:42:23Z — architect accepted Phase 15 starting-capital criterion
+
+Action taken: accepted the new CLI-level $1500 pre-turn assertion. Forwarding
+the revised feature to coder so implementation and acceptance support are
+reviewed against the same contract. The refactorer return remains required
+before this reopened phase can close.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
