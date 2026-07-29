@@ -196,3 +196,24 @@ Feature: game report
     Examples:
       | amount |
       | 200    |
+
+  # report-17
+  Scenario Outline: the report narrates jail entry and its cause
+    When pawn "dog" lands on "<space>"
+    Then the game report says that pawn "dog" moves before it says that pawn "dog" is sent to jail from landing on "<space>"
+
+    Examples:
+      | space                                 |
+      | Naar de Gevangenis / Allez en Prison   |
+
+  # report-18
+  Scenario Outline: the report narrates jail exit and its method
+    Given pawn "dog" starts in jail
+    And pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" will roll 4 and 6 for their turn
+    When we play the game
+    Then the game report says that pawn "dog" leaves jail by paying the $<fine> fine
+
+    Examples:
+      | fine |
+      | 50   |

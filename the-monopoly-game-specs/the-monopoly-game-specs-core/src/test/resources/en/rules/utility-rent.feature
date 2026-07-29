@@ -21,7 +21,7 @@ Feature: utility rent
     Given pawn "dog" starts at position 7
     And pawn "dog" will roll 1 and 4 for their turn
     And pawn "high hat" owns "Elektriciteitscentrale"
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" will claim rent for "Elektriciteitscentrale"
     When we play the game
     Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
     And pawn "high hat"'s account balance is $<expected_owner_final_balance>
@@ -36,7 +36,7 @@ Feature: utility rent
     And pawn "dog" will roll 2 and 5 for their turn
     And pawn "high hat" owns "Elektriciteitscentrale"
     And pawn "high hat" owns "Watermaatschappij"
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" will claim rent for "Elektriciteitscentrale"
     When we play the game
     Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
     And pawn "high hat"'s account balance is $<expected_owner_final_balance>

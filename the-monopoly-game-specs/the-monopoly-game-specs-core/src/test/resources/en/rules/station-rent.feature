@@ -19,7 +19,7 @@ Feature: station rent
   # station-rent-1
   Scenario Outline: an owner of one station collects rent from a tenant who lands there
     Given pawn "high hat" owns "Noord Station"
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" will claim rent for "Noord Station"
     When pawn "dog" lands on "Noord Station"
     Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
     And pawn "high hat"'s account balance is $<expected_owner_final_balance>
@@ -34,7 +34,7 @@ Feature: station rent
     And pawn "high hat" owns "Centraal Station"
     And pawn "high hat" owns "Buurtspoorwegen"
     And pawn "high hat" owns "Zuid Station"
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" will claim rent for "Zuid Station"
     When pawn "dog" lands on "Zuid Station"
     Then pawn "dog"'s account balance is $<expected_tenant_final_balance>
     And pawn "high hat"'s account balance is $<expected_owner_final_balance>

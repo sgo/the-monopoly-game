@@ -114,7 +114,6 @@ Feature: chance and community chest cards
   # cards-9
   Scenario Outline: a card that advances to the nearest station lets the pawn buy it if unsold
     Given the next chance card will be "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs."
-    And pawn "dog" follows the "Agree if affordable" strategy
     And pawn "dog" will buy "Centraal Station"
     When pawn "dog" lands on "Kans / Chance"
     Then pawn "dog" is at position <position>
