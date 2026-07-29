@@ -11358,3 +11358,16 @@ merge_and_process architect 07c95bf1e9
 Action taken: merged architect commit `07c95bf1e9`, preserving the reopened
 Phase 15 review record. Accepted the starting-capital finding for
 specification revision.
+
+## 2026-07-29T14:50:00Z — specifier revised Phase 15 starting-capital criterion
+
+Decision: accepted the architect's finding that the simulator artificially
+debits players to €5 before the first turn, violating the official €1500
+starting capital.
+
+Revision: added an independent `starting balance` assertion to the default
+strategy CLI scenario, requiring every player to begin with $1500 before the
+first turn.
+
+Verification: the revised feature parses successfully and `ir-dry-checker`
+reported only intentional possible-synonym findings.
