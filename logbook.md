@@ -10493,6 +10493,18 @@ will confirm the complete acceptance suite before architect handoff.
 Verification follow-up: coder confirms all four generated CLI acceptance
 scenarios pass, including the eight-player case, in 0.072 seconds.
 
+## 2026-07-29T13:43:48Z — architect processed queued Phase 15 handoff notification
+
+Queued message received while the previous refactorer return was being merged:
+
+```
+You have new handoff mail. If idle, run ready_for_next.sh.
+```
+
+Action taken: completed that active batch first. `done_with_current.sh` then
+delivered the specifier's priority-`00` Phase 15 handoff; the local queue
+marker can be removed before processing it.
+
 ## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
 
 Handoff message received:
