@@ -10536,3 +10536,26 @@ merge_and_process architect a81eaca30a
 
 Action taken: sent the behavior-preserving CLI/domain module boundary change
 to refactorer for the architect review loop.
+
+## 2026-07-29T13:41:59Z — architect sent Phase 15 CLI example correction to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T134154Z_000051_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 1495026905
+created_at: 2026-07-29T13:41:54.265878Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 1495026905
+```
+
+Action taken: sent the invalid-count boundary mutation finding to specifier
+for the required Gherkin-content decision.
