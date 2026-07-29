@@ -10335,6 +10335,29 @@ the revised feature to coder so implementation and acceptance support are
 reviewed against the same contract. The refactorer return remains required
 before this reopened phase can close.
 
+## 2026-07-29T14:43:59Z — architect sent Phase 15 revised starting-capital contract to coder
+
+Handoff message sent:
+
+```
+id: 20260729T144359Z_000060_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 53e9a1f8dc
+created_at: 2026-07-29T14:43:59.044208Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 53e9a1f8dc
+```
+
+Action taken: supplied coder the accepted Gherkin revision for the existing
+starting-capital remediation loop.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
