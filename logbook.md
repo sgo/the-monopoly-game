@@ -8157,8 +8157,8 @@ to: coder
 priority: 50
 type: git_handoff
 role: specifier
-task: phase15-cli
 commit: e60240e986
+task: phase15-cli
 created_at: 2026-07-29T12:45:50.366475Z
 
 Re-read your role and constitution.
@@ -8170,6 +8170,66 @@ Summary: handed off the Phase 15 CLI specification and dedicated
 `the-monopoly-game-specs-cli` module. The commit moves CLI Gherkin out of
 `specs-core`, nests the module under `the-monopoly-game-specs` Maven parent,
 and updates acceptance feature resolution for module-qualified paths.
+## 2026-07-29T12:49:59Z — coder received Phase 15 CLI specification
+
+Handoff message received:
+
+```
+id: 20260729T124550Z_000024_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase15-cli
+commit: e60240e986
+created_at: 2026-07-29T12:45:50.366475Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e60240e986
+```
+
+Action taken: fast-forward merged `e60240e986`; implemented the command
+simulation boundary, CLI acceptance bindings for default and
+Agree-if-affordable strategies, validation of the official two-to-eight
+player range, and focused simulator tests.
+
+Verification: `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+test` passed (251 tests); `acceptance/run-acceptance.sh` passed (246 tests).
+
+Handing implementation to refactorer for the required review.
+
+## 2026-07-29T12:53:15Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T125034Z_000028_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 76ee254a97
+created_at: 2026-07-29T12:50:34.109935Z
+enqueued_at: 2026-07-29T12:50:34.145696Z
+task: phase15-cli
+dequeued_at: 2026-07-29T12:50:41.535934Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 76ee254a97
+```
+
+Action taken: merged coder commit `76ee254a97` cleanly. Extracted
+`Bankruptcy.sellImprovementsIfNeeded` to keep non-exempt CRAP within the
+role threshold, then re-ran CRAP/DRY and mutation scans. Non-exempt CRAP is
+at most 6; `Report.line` remains the documented exhaustive sealed-switch
+exception. Changed production files have mutation counts below the split
+threshold. Unit, property, and acceptance verification passed.
 
 ## 2026-07-29T12:03:58Z — refactorer received handoff from coder
 
@@ -8199,6 +8259,30 @@ for bankruptcy asset liquidation, auctions, creditor transfers, and mortgage
 settlement, then re-ran CRAP, DRY, mutation-site, unit, property, and
 acceptance verification. All non-exempt CRAP is at or below 6; changed
 production files remain below the mutation split threshold.
+
+## 2026-07-29T12:04:30Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260729T120421Z_000037_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase14-bankruptcy-and-winning
+commit: 4ab31d3d7c
+created_at: 2026-07-29T12:04:21.501846Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 4ab31d3d7c
+```
+
+Summary: handed the verified Phase 14 bankruptcy-and-winning state to the
+architect at commit `4ab31d3d7c`, including focused bankruptcy coverage
+added to satisfy the CRAP threshold.
 
 ## 2026-07-29T11:17:00Z — refactorer sent handoff to architect
 
@@ -8857,6 +8941,31 @@ Verification:
 No changed production source requires another Java-mutation or DRY run; the
 accepted Phase 14 source results remain applicable. All Phase 14 review loops
 are closed. Send the final phase-complete sync to specifier at priority `50`.
+
+## 2026-07-29T12:24:26Z — architect sent phase 14 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T122418Z_000046_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: d066219aac
+created_at: 2026-07-29T12:24:18.207795Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d066219aac
+```
+
+Action taken: sent the final Phase 14 sync after accepting the coder-verified
+bankruptcy rule hardening and the specifier's Gherkin correction. The final
+acceptance commit is `d066219aac`; soft bankruptcy Gherkin mutation is 4/4
+killed with zero survivors.
 
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
@@ -10081,3 +10190,103 @@ place for the first time.
 Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
+
+## 2026-07-29T12:56:08Z — architect received Phase 15 CLI handoff from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T125551Z_000038_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: f2817b1489
+created_at: 2026-07-29T12:55:51.534366Z
+enqueued_at: 2026-07-29T12:55:51.623101Z
+task: phase15-cli
+dequeued_at: 2026-07-29T12:55:56.065617Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer f2817b1489
+```
+
+Action taken: began architectural review of the Phase 15 CLI state.
+
+## 2026-07-29T12:58:08Z — architect found a Phase 15 simulator completion defect
+
+Review finding: `Simulator.run` calls `Game.play`, but `Game.play` performs
+only one round. `Simulator` then reports the first player in initiative order
+as the winner, without checking for bankruptcy or a `Won` journal entry. The
+Phase 15 complete-game scenarios therefore pass against an arbitrary first
+player rather than an actually completed game.
+
+Action taken: route this observable defect to coder at priority `00` for
+implementation and focused verification. No phase-complete handoff is sent
+while that review loop is outstanding.
+
+## 2026-07-29T12:58:33Z — architect sent Phase 15 completion correction to coder
+
+Handoff message sent:
+
+```
+id: 20260729T125826Z_000047_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: d4daa26893
+created_at: 2026-07-29T12:58:26.864170Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d4daa26893
+```
+
+Action taken: sent the simulator-completion correction through the required
+coder review loop. The coder must return the verified state to architect, or
+forward it to refactorer if implementation changes require that normal review.
+
+## 2026-07-29T13:00:51Z — architect found a Phase 15 Gherkin completion gap
+
+Review finding: the Phase 15 CLI scenarios call for a complete game and a
+winner, but prove only that the output contains a report prefix and the words
+`wins the game`. A one-round simulation that labels the initiative leader as
+winner satisfies those assertions. The scenarios need an observable criterion
+that distinguishes a genuine terminal game result from a fabricated winner.
+
+Action taken: route this Gherkin-content defect to specifier at priority `00`.
+This runs alongside the already-open coder correction; Phase 15 remains open
+until both review loops return and are accepted.
+
+## 2026-07-29T13:02:57Z — specifier received Phase 15 architect follow-up
+
+Handoff message received:
+
+```
+id: 20260729T130109Z_000048_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: 2eae6cbf21
+created_at: 2026-07-29T13:01:09.390840Z
+enqueued_at: 2026-07-29T13:01:10.347903Z
+task: phase15-cli
+
+Re-read your role and constitution.
+
+merge_and_process architect 2eae6cbf21
+```
+
+Action taken: merged architect commit `2eae6cbf21`, resolving the
+`logbook.md` conflict while preserving the complete Phase 15 handoff chain.
+The architect's Gherkin finding is accepted for specification review; the
+CLI scenarios will be revised under the existing `phase15-cli` task.
