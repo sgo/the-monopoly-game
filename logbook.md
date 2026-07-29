@@ -10290,3 +10290,17 @@ Action taken: merged architect commit `2eae6cbf21`, resolving the
 `logbook.md` conflict while preserving the complete Phase 15 handoff chain.
 The architect's Gherkin finding is accepted for specification review; the
 CLI scenarios will be revised under the existing `phase15-cli` task.
+
+## 2026-07-29T13:05:00Z — specifier accepted and revised Phase 15 Gherkin finding
+
+Decision: accepted the architect's finding that the successful CLI scenarios
+could pass after a one-round simulation that merely labels the initiative
+leader as winner.
+
+Revision: added the assertion that the report contains a bankruptcy before
+the game's winner in both successful CLI scenarios. This requires an
+observable terminal-game event before winner reporting without prescribing
+the CLI implementation.
+
+Verification: the revised feature parses successfully and `ir-dry-checker`
+reported only intentional possible-synonym findings.
