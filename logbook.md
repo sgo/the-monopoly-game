@@ -10328,6 +10328,14 @@ the CLI implementation.
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
 
+## 2026-07-29T18:30:14Z — coder aligned the CLI with the completion policy
+
+Action taken: removed the deterministic dice trace, pre-owned hotel, moved
+pawns, and all simulated starting-state shortcuts. The CLI now constructs a
+normal official game and gives each player a real two-die cup until the domain
+game reaches its ordinary bankruptcy conclusion. Focused `SimulatorTest`
+passed (7 tests).
+
 ## 2026-07-29T16:08:20Z — coder received standard-setup specification
 
 Handoff message received:
