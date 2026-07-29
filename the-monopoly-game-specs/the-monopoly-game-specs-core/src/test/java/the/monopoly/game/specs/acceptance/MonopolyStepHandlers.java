@@ -132,6 +132,33 @@ public final class MonopolyStepHandlers {
         step("^we select <players> players$",
             (world, arguments) -> world.selectPlayers(8)),
 
+        step("^the simulator is configured for (.+) players without strategy choices$",
+            (world, arguments) -> world.configureSimulator(arguments.number(1), false)),
+
+        step("^the simulator is configured for (.+) players$",
+            (world, arguments) -> world.configureSimulator(arguments.number(1), false)),
+
+        step("^every player selects the \"Agree if affordable\" strategy$",
+            (world, arguments) -> world.configureSimulatorWithAgreeIfAffordable()),
+
+        step("^I run the simulator$", (world, arguments) -> world.runSimulator()),
+
+        then("^the simulator exits successfully$",
+            (world, arguments) -> assertThat(world.simulatorResult().succeeded()).isTrue()),
+
+        then("^the simulator exits unsuccessfully$",
+            (world, arguments) -> assertThat(world.simulatorResult().succeeded()).isFalse()),
+
+        then("^the output contains a human-readable game report$",
+            (world, arguments) -> assertThat(world.simulatorResult().output()).contains("The game starts")),
+
+        then("^the report contains the game's winner$",
+            (world, arguments) -> assertThat(world.simulatorResult().output()).contains("wins the game")),
+
+        then("^the output explains that the number of players must be between 2 and 8$",
+            (world, arguments) -> assertThat(world.simulatorResult().output())
+                .contains("number of players must be between 2 and 8")),
+
         step("^we play " + VALUE + " times$",
             (world, arguments) -> world.playMonopolyGames(arguments.number(1))),
 

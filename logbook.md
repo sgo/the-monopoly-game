@@ -8146,6 +8146,31 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T12:49:59Z — coder received Phase 15 CLI specification
+
+Handoff message received:
+
+```
+id: 20260729T124550Z_000024_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: e60240e986
+task: phase15-cli
+```
+
+Action taken: fast-forward merged `e60240e986`; implemented the command
+simulation boundary, CLI acceptance bindings for default and
+Agree-if-affordable strategies, validation of the official two-to-eight
+player range, and focused simulator tests.
+
+Verification: `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+test` passed (251 tests); `acceptance/run-acceptance.sh` passed (246 tests).
+
+Handing implementation to refactorer for the required review.
+
 ## 2026-07-29T12:03:58Z — refactorer received handoff from coder
 
 Handoff message received:

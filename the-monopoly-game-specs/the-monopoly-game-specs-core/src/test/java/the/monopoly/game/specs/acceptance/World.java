@@ -3,6 +3,7 @@ package the.monopoly.game.specs.acceptance;
 import the.monopoly.game.Game;
 import the.monopoly.game.Game.Journal.Entry;
 import the.monopoly.game.Report;
+import the.monopoly.game.cli.Simulator;
 import the.monopoly.game.components.dice.Dice;
 import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Money;
@@ -65,6 +66,9 @@ public class World {
   private Deeds deeds;
   private Jail jail = new Jail(ruleSet);
   private boolean monopolyRunsCompleted;
+  private Integer simulatorPlayers;
+  private Strategy.OfPlayers simulatorStrategies = Strategy.OfPlayers.NOBODY_DECIDES;
+  private Simulator.Result simulatorResult;
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
@@ -117,6 +121,27 @@ public class World {
 
   public boolean monopolyRunsCompleted() {
     return monopolyRunsCompleted;
+  }
+
+  public void configureSimulator(int players, boolean withChoices) {
+    simulatorPlayers = players;
+    simulatorStrategies = withChoices ? player -> new the.monopoly.game.strategies.AgreeIfAffordable()
+        : Strategy.OfPlayers.NOBODY_DECIDES;
+  }
+
+  public void configureSimulatorWithAgreeIfAffordable() {
+    if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
+    simulatorStrategies = player -> new the.monopoly.game.strategies.AgreeIfAffordable();
+  }
+
+  public void runSimulator() {
+    if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
+    simulatorResult = Simulator.run(simulatorPlayers, simulatorStrategies);
+  }
+
+  public Simulator.Result simulatorResult() {
+    if (simulatorResult == null) throw new AssertionError("The simulator has not been run.");
+    return simulatorResult;
   }
 
   public Player pawn(String pawnName) {
