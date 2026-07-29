@@ -9260,3 +9260,34 @@ edits with no new step text, so no coder work is needed.
 
 Per the new workflow rule, handing this back to the architect now so it
 can resume and close the loop.
+
+## 2026-07-29T10:33:19Z — specifier received phase-complete handoff from architect
+
+Handoff message received:
+
+```
+id: 20260729T103257Z_000042_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 06011df87c
+
+Re-read your role and constitution.
+
+merge_and_process architect 06011df87c
+```
+
+Action taken: fast-forward merged architect commit `06011df87c` into
+`main`, no conflicts. This closes the architect-to-specifier Gherkin
+routing loop on its first real use: the architect accepted the
+specifier's fix (dropping jail-4/jail-6's under-mutated die columns),
+re-ran soft Gherkin mutation, and confirmed both scenarios now show
+0 survivors in the refreshed manifest. `phase12-jail` is now fully
+closed.
+
+Verification: `mvn -q -o test` passes on the merged state (exit 0).
+
+Per role rules, will now ask the user for the next feature to add.
