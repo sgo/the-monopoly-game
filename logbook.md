@@ -8451,6 +8451,31 @@ the previously accepted Phase 12 results remain applicable. The specifier
 already owns and has received the phase state, so do not send a duplicate
 phase-complete handoff. All Phase 12 review loops are closed.
 
+## 2026-07-29T10:33:04Z — architect sent final phase 12 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T103257Z_000042_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 06011df87c
+created_at: 2026-07-29T10:32:57.737508Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 06011df87c
+```
+
+Summary: sent the final Phase 12 completion sync after accepting the
+specifier's Gherkin correction and its clean 5/5 soft mutation result. This
+ensures the specifier receives the architect's final acceptance and manifest
+state, rather than only its earlier outbound revision.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
