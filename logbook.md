@@ -8146,6 +8146,61 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T12:46:03Z — specifier sent Phase 15 CLI handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260729T124550Z_000024_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: e60240e986
+task: phase15-cli
+created_at: 2026-07-29T12:45:50.366475Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e60240e986
+```
+
+Summary: handed off the Phase 15 CLI specification and dedicated
+`the-monopoly-game-specs-cli` module. The commit moves CLI Gherkin out of
+`specs-core`, nests the module under `the-monopoly-game-specs` Maven parent,
+and updates acceptance feature resolution for module-qualified paths.
+## 2026-07-29T12:49:59Z — coder received Phase 15 CLI specification
+
+Handoff message received:
+
+```
+id: 20260729T124550Z_000024_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase15-cli
+commit: e60240e986
+created_at: 2026-07-29T12:45:50.366475Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e60240e986
+```
+
+Action taken: fast-forward merged `e60240e986`; implemented the command
+simulation boundary, CLI acceptance bindings for default and
+Agree-if-affordable strategies, validation of the official two-to-eight
+player range, and focused simulator tests.
+
+Verification: `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+test` passed (251 tests); `acceptance/run-acceptance.sh` passed (246 tests).
+
+Handing implementation to refactorer for the required review.
+
 ## 2026-07-29T12:53:15Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -8175,31 +8230,6 @@ role threshold, then re-ran CRAP/DRY and mutation scans. Non-exempt CRAP is
 at most 6; `Report.line` remains the documented exhaustive sealed-switch
 exception. Changed production files have mutation counts below the split
 threshold. Unit, property, and acceptance verification passed.
-
-## 2026-07-29T12:49:59Z — coder received Phase 15 CLI specification
-
-Handoff message received:
-
-```
-id: 20260729T124550Z_000024_from_specifier
-from: specifier
-to: coder
-priority: 50
-type: git_handoff
-role: specifier
-commit: e60240e986
-task: phase15-cli
-```
-
-Action taken: fast-forward merged `e60240e986`; implemented the command
-simulation boundary, CLI acceptance bindings for default and
-Agree-if-affordable strategies, validation of the official two-to-eight
-player range, and focused simulator tests.
-
-Verification: `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
-test` passed (251 tests); `acceptance/run-acceptance.sh` passed (246 tests).
-
-Handing implementation to refactorer for the required review.
 
 ## 2026-07-29T12:03:58Z — refactorer received handoff from coder
 
@@ -10256,6 +10286,47 @@ merge_and_process architect 2eae6cbf21
 
 Action taken: sent the observable-completion criterion gap to specifier for a
 Phase 15 scenario revision. No implementation prescription was included.
+
+## 2026-07-29T13:02:57Z — specifier received Phase 15 architect follow-up
+
+Handoff message received:
+
+```
+id: 20260729T130109Z_000048_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: 2eae6cbf21
+created_at: 2026-07-29T13:01:09.390840Z
+enqueued_at: 2026-07-29T13:01:10.347903Z
+task: phase15-cli
+
+Re-read your role and constitution.
+
+merge_and_process architect 2eae6cbf21
+```
+
+Action taken: merged architect commit `2eae6cbf21`, resolving the
+`logbook.md` conflict while preserving the complete Phase 15 handoff chain.
+The architect's Gherkin finding is accepted for specification review; the
+CLI scenarios will be revised under the existing `phase15-cli` task.
+
+## 2026-07-29T13:05:00Z — specifier accepted and revised Phase 15 Gherkin finding
+
+Decision: accepted the architect's finding that the successful CLI scenarios
+could pass after a one-round simulation that merely labels the initiative
+leader as winner.
+
+Revision: added the assertion that the report contains a bankruptcy before
+the game's winner in both successful CLI scenarios. This requires an
+observable terminal-game event before winner reporting without prescribing
+the CLI implementation.
+
+Verification: the revised feature parses successfully and `ir-dry-checker`
+reported only intentional possible-synonym findings.
 
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
