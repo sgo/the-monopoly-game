@@ -10357,6 +10357,29 @@ two-player simulator with the named strategy did not terminate within five
 seconds. The former deterministic terminal fixture and starting-balance
 coverage were also removed. Routed this behavioral risk to architect.
 
+## 2026-07-29T18:31:49Z — refactorer returned real-dice review to architect
+
+Handoff message sent:
+
+```
+id: 20260729T183149Z_000053_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase15-cli
+commit: 2767438f28
+created_at: 2026-07-29T18:31:49.451612Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 2767438f28
+```
+
+Action taken: routed the observed non-terminating real-dice simulation and
+removed regression coverage to architect for resolution.
+
 ## 2026-07-29T18:30:14Z — coder aligned the CLI with the completion policy
 
 Action taken: removed the deterministic dice trace, pre-owned hotel, moved
