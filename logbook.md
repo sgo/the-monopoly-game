@@ -10602,6 +10602,105 @@ library facade.
 Action taken: route this Gherkin-content gap to specifier at priority `00`.
 No phase-complete sync is sent while that specification loop is open.
 
+## 2026-07-29T14:03:12Z — architect sent Phase 15 executable CLI specification handoff
+
+Handoff message sent:
+
+```
+id: 20260729T140307Z_000053_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 3ab5e54bf8
+created_at: 2026-07-29T14:03:07.193252Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 3ab5e54bf8
+```
+
+Action taken: sent the executable CLI acceptance gap to specifier for the
+required specification revision.
+
+## 2026-07-29T14:08:44Z — architect received Phase 15 executable CLI note from specifier
+
+Handoff message received:
+
+```
+id: 20260729T140829Z_000028_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 50
+type: note
+message: Processed commit 3ab5e54bf8; no specifier changes; ready for next task.
+created_at: 2026-07-29T14:08:29.430697Z
+enqueued_at: 2026-07-29T14:08:29.687628Z
+dequeued_at: 2026-07-29T14:08:33.911583Z
+
+Re-read your role and constitution.
+
+Processed commit 3ab5e54bf8; no specifier changes; ready for next task.
+```
+
+Action taken: accepted the no-change decision because the Phase 15 deliverables
+already define the executable CLI behavior. Route that missing observable
+implementation to coder.
+
+## 2026-07-29T14:09:12Z — architect sent Phase 15 executable CLI implementation handoff
+
+Handoff message sent:
+
+```
+id: 20260729T140906Z_000054_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 0ae1fe2dc3
+created_at: 2026-07-29T14:09:06.824254Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 0ae1fe2dc3
+```
+
+Action taken: sent the outstanding executable CLI implementation to coder.
+
+Coder implementation: added the standalone `main` boundary, `-h`/`--h` usage,
+optional player-count parsing, and nonzero invalid-input process status while
+keeping parsing testable without process termination.
+
+## 2026-07-29T14:14:01Z — architect received Phase 15 executable CLI return from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T141224Z_000045_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: e6c3d20096
+created_at: 2026-07-29T14:12:24.685380Z
+enqueued_at: 2026-07-29T14:12:25.219171Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:13:35.282861Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer e6c3d20096
+```
+
+Action taken: began architectural review of the executable CLI return.
+
 ## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
 
 Handoff message received:
@@ -10908,6 +11007,7 @@ implementation and review records. No new specification defect was routed;
 the merged state is ready for the next role action.
 
 ## 2026-07-29T14:08:35Z — specifier notified architect of completion
+## 2026-07-29T13:59:25Z — refactorer returned invalid-count review
 
 Handoff message sent:
 
@@ -10927,3 +11027,283 @@ Processed commit 3ab5e54bf8; no specifier changes; ready for next task.
 
 Summary: explicitly notified the architect that the already-processed
 priority-00 task is complete and the specifier is available.
+id: 20260729T135925Z_000044_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase15-cli
+commit: 7e82624c22
+created_at: 2026-07-29T13:59:25.116720Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7e82624c22
+```
+
+Action taken: returned the reviewed invalid-count reporting fix after 3 CLI
+tests, 17 property tests, and 246 acceptance tests passed; DRY found no new
+duplication. The Gherkin boundary mutation issue remains with specifier.
+
+## 2026-07-29T14:12:02Z — refactorer received coder CLI executable follow-up
+
+Handoff message received:
+
+```
+id: 20260729T141115Z_000034_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 460573dc41
+created_at: 2026-07-29T14:11:15.021788Z
+enqueued_at: 2026-07-29T14:11:15.032469Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:11:22.864636Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 460573dc41
+```
+
+Action taken: merged the standalone CLI executable entry point and verified
+five CLI tests pass. The documented `-h`/`--h` behavior is covered; no new
+DRY duplication was introduced.
+
+## 2026-07-29T14:15:46Z — architect found Phase 15 CLI strategy-selection defect
+
+Architectural review found that `Simulator.execute` accepts only zero or one
+argument (the player count) and always supplies `AgreeIfAffordable` for every
+player. Phase 15 requires a strategy selection for each player, defaulting to
+Agree if affordable, with registry/lookup plumbing that can support future
+strategies without changing the CLI shape.
+
+Action taken: route this remaining observable CLI contract gap to coder at
+priority 00. The executable entry point, help output, stdout report, and
+invalid-input exit path are already in place.
+
+## 2026-07-29T14:16:19Z — architect sent Phase 15 CLI strategy-selection handoff
+
+Handoff message sent:
+
+```
+id: 20260729T141619Z_000055_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: ca8b1b2144
+created_at: 2026-07-29T14:16:19.376348Z
+
+Re-read your role and constitution.
+
+merge_and_process architect ca8b1b2144
+```
+
+Action taken: sent the remaining strategy-selection and lookup work to coder.
+
+## 2026-07-29T14:21:02Z — architect received Phase 15 strategy-selection return from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T142049Z_000046_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 427c4e33ee
+created_at: 2026-07-29T14:20:49.967808Z
+enqueued_at: 2026-07-29T14:20:50.061692Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:20:53.583236Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 427c4e33ee
+```
+
+Action taken: began architectural review of the refactorer-returned
+strategy-selection implementation.
+
+## 2026-07-29T14:17:59Z — coder received architect strategy-selection follow-up
+
+Handoff message received:
+
+```
+id: 20260729T141619Z_000055_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: ca8b1b2144
+
+Re-read your role and constitution.
+
+merge_and_process architect ca8b1b2144
+```
+
+Action taken: merged `ca8b1b2144`; added a named strategy registry and
+per-player command-line selection. Omitted selections default to
+`agree-if-affordable`; supplied selections are validated one-for-one against
+the player count, with clear errors for unknown strategies.
+
+Verification: CLI reactor tests pass (257); generated acceptance passes
+(246 scenarios).
+
+Handing implementation to refactorer for review.
+
+## 2026-07-29T14:20:11Z — refactorer received coder strategy-selection follow-up
+
+Handoff message received:
+
+```
+id: 20260729T141826Z_000035_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 093668a142
+created_at: 2026-07-29T14:18:26.313823Z
+enqueued_at: 2026-07-29T14:18:26.903745Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:18:30.726397Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 093668a142
+```
+
+Action taken: merged named strategy registry and per-player selection support;
+default and unknown-strategy paths are covered by focused tests.
+
+## 2026-07-29T14:25:46Z — architect hardened Phase 15 CLI adapter verification
+
+Action taken: accepted the registry at the CLI boundary, where it preserves
+domain dependency direction. Added process-boundary verification for invalid
+input exit status, plus focused tests for default mappings and incomplete
+strategy lists. The 53 CLI source mutations were killed after hardening;
+DRY reported no CLI duplication; targeted soft Gherkin mutation completed
+without survivors. Existing DRY findings remain confined to unchanged domain
+code.
+
+Handing the behavior-preserving adapter-test hardening to refactorer for
+review.
+
+## 2026-07-29T14:26:17Z — architect sent Phase 15 CLI adapter-hardening review
+
+Handoff message sent:
+
+```
+id: 20260729T142617Z_000056_from_architect
+from: architect
+to: refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: bd3d62e157
+created_at: 2026-07-29T14:26:17.082301Z
+
+Re-read your role and constitution.
+
+merge_and_process architect bd3d62e157
+```
+
+Action taken: sent the behavior-preserving adapter hardening to refactorer
+for the final structural loop.
+
+## 2026-07-29T14:27:23Z — architect received Phase 15 adapter-hardening return from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T142713Z_000047_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: bb144e906a
+created_at: 2026-07-29T14:27:13.237607Z
+enqueued_at: 2026-07-29T14:27:13.313396Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:27:17.234715Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer bb144e906a
+```
+
+Action taken: began the final architectural review of the CLI adapter
+hardening return.
+
+## 2026-07-29T14:20:49Z — refactorer returned strategy-selection review
+
+Handoff message sent:
+
+```
+id: 20260729T142049Z_000046_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase15-cli
+commit: 427c4e33ee
+created_at: 2026-07-29T14:20:49.967808Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 427c4e33ee
+```
+
+Action taken: returned strategy registry and per-player CLI selection after
+seven focused CLI tests, DRY review, and the coder-reported 246 acceptance
+scenarios passed.
+
+## 2026-07-29T14:28:19Z — architect accepted Phase 15 CLI completion
+
+Action taken: accepted the final refactorer return. The CLI remains an adapter
+module depending inward on the domain; its strategy registry is local to that
+boundary, and its process behavior is verified separately from domain logic.
+All coder and refactorer follow-up loops for `phase15-cli` are closed. Routing
+the completed phase to specifier for branch synchronization.
+
+## 2026-07-29T14:30:00Z — specifier received Phase 15 phase-complete sync
+
+Handoff message received:
+
+```
+id: 20260729T142834Z_000057_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 9d21d62fec
+created_at: 2026-07-29T14:28:34.599751Z
+enqueued_at: 2026-07-29T14:28:35.014672Z
+task: phase15-cli
+
+Re-read your role and constitution.
+
+merge_and_process architect 9d21d62fec
+```
+
+Action taken: merged architect commit `9d21d62fec`, including the completed
+standalone CLI, strategy selection, executable help behavior, and final
+review records. Phase 15 is complete.
