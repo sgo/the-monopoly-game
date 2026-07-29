@@ -209,7 +209,7 @@ Feature: game report
   # report-18
   Scenario Outline: the report narrates jail exit and its method
     Given pawn "dog" starts in jail
-    And pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" will pay the fine to leave jail
     And pawn "dog" will roll 4 and 6 for their turn
     When we play the game
     Then the game report says that pawn "dog" leaves jail by paying the $<fine> fine
