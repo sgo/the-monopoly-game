@@ -10729,6 +10729,30 @@ positions, assets, or card decks. Forwarding the revised specification to
 coder. The complete-game termination policy is intentionally left for the
 specifier to settle with the user before a full CLI game can be accepted.
 
+## 2026-07-29T16:07:06Z — architect sent Phase 15 normal-setup implementation to coder
+
+Handoff message sent:
+
+```
+id: 20260729T160706Z_000064_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: c7fcea90f0
+created_at: 2026-07-29T16:07:06.159667Z
+
+Re-read your role and constitution.
+
+merge_and_process architect c7fcea90f0
+```
+
+Action taken: sent the core-owned normal-setup implementation to coder; it
+returns through refactorer. Completion policy remains pending user/specifier
+direction.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
