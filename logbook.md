@@ -10650,6 +10650,35 @@ Action taken: accepted the no-change decision because the Phase 15 deliverables
 already define the executable CLI behavior. Route that missing observable
 implementation to coder.
 
+## 2026-07-29T14:10:48Z — coder received architect executable CLI follow-up
+
+Handoff message received:
+
+```
+id: 20260729T140906Z_000054_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 0ae1fe2dc3
+
+Re-read your role and constitution.
+
+merge_and_process architect 0ae1fe2dc3
+```
+
+Action taken: merged `0ae1fe2dc3`; added the standalone `main` boundary,
+`-h`/`--h` usage output, optional player-count parsing, and nonzero process
+status for invalid command-line input. The argument parser remains testable
+without terminating the test process.
+
+Verification: CLI reactor tests pass (255); generated acceptance passes
+(246 scenarios).
+
+Handing implementation to refactorer for review.
+
 ## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
 
 Handoff message received:
