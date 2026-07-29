@@ -10765,6 +10765,61 @@ Action taken: route this authoritative policy to specifier for acceptance
 criteria and coder for implementation alignment. The existing normal-setup
 loop remains open.
 
+## 2026-07-29T16:09:50Z — architect sent real-game completion policy to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T160950Z_000065_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 00ac6d5436
+created_at: 2026-07-29T16:09:50.272629Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 00ac6d5436
+```
+
+Action taken: sent the user-approved real-game completion policy to specifier.
+
+## 2026-07-29T16:09:50Z — architect sent real-game completion policy to coder
+
+Handoff message sent:
+
+```
+id: 20260729T160950Z_000066_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 00ac6d5436
+created_at: 2026-07-29T16:09:50.397154Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 00ac6d5436
+```
+
+Action taken: sent the user-approved real-game completion policy to coder.
+
+## 2026-07-29T16:09:50Z — architect queued incoming-handoff notification
+
+Queued message received while recording the completion-policy handoffs:
+
+```
+You have new handoff mail. If idle, run ready_for_next.sh.
+```
+
+Action taken: deferred the notification until the active handoff records were
+committed; it is now next for processing.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
