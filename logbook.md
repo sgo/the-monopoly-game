@@ -10932,6 +10932,29 @@ Action taken: accepted the specification of real random dice and natural
 bankruptcy completion with one player left. Forwarding the revised contract to
 coder; no fixture, turn cap, or synthetic winner is permitted.
 
+## 2026-07-29T18:30:56Z — architect sent Phase 15 natural completion contract to coder
+
+Handoff message sent:
+
+```
+id: 20260729T183056Z_000067_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 35916ecd42
+created_at: 2026-07-29T18:30:56.957543Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 35916ecd42
+```
+
+Action taken: sent the natural real-game completion contract to coder; its
+normal return path is through refactorer.
+
 ## 2026-07-29T18:28:58Z — architect queued incoming-handoff notification
 
 Queued message received while processing the active return:
