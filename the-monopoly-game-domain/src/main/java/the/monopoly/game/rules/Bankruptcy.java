@@ -46,12 +46,15 @@ public final class Bankruptcy {
     for (Street.Type type : ownedLandInBoardOrder(debtor)) {
       if (!Money.ZERO.exceeds(debtor.account().balance().amount())) return;
       Street street = rules.create(type);
-      if (street instanceof ColourStreet colour) {
-        if (deeds.hasHotelOn(colour)) deeds.exchangeHotelForHouses(colour, debtor);
-        while (debtor.account().balance().amount().amount() < 0 && deeds.housesBuiltOn(colour) > 0)
-          deeds.sellHouse(colour, debtor);
-      }
+      sellImprovementsIfNeeded(street, debtor);
     }
+  }
+
+  private void sellImprovementsIfNeeded(Street street, Player debtor) {
+    if (!(street instanceof ColourStreet colour)) return;
+    if (deeds.hasHotelOn(colour)) deeds.exchangeHotelForHouses(colour, debtor);
+    while (debtor.account().balance().amount().amount() < 0 && deeds.housesBuiltOn(colour) > 0)
+      deeds.sellHouse(colour, debtor);
   }
 
   private void mortgageUntilSolvent(Player debtor) {

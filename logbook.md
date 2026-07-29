@@ -8146,6 +8146,36 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T12:53:15Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T125034Z_000028_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 76ee254a97
+created_at: 2026-07-29T12:50:34.109935Z
+enqueued_at: 2026-07-29T12:50:34.145696Z
+task: phase15-cli
+dequeued_at: 2026-07-29T12:50:41.535934Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 76ee254a97
+```
+
+Action taken: merged coder commit `76ee254a97` cleanly. Extracted
+`Bankruptcy.sellImprovementsIfNeeded` to keep non-exempt CRAP within the
+role threshold, then re-ran CRAP/DRY and mutation scans. Non-exempt CRAP is
+at most 6; `Report.line` remains the documented exhaustive sealed-switch
+exception. Changed production files have mutation counts below the split
+threshold. Unit, property, and acceptance verification passed.
+
 ## 2026-07-29T12:49:59Z — coder received Phase 15 CLI specification
 
 Handoff message received:
