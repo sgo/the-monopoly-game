@@ -10336,14 +10336,13 @@ Handoff message received:
 id: 20260729T130425Z_000025_from_specifier
 from: specifier
 to: architect
-recipient: architect
 priority: 00
 type: git_handoff
 role: specifier
+task: phase15-cli
 commit: 85c9e76959
 created_at: 2026-07-29T13:04:25.792106Z
 enqueued_at: 2026-07-29T13:04:26.457382Z
-task: phase15-cli
 dequeued_at: 2026-07-29T13:04:30.884512Z
 
 Re-read your role and constitution.
@@ -10467,6 +10466,83 @@ merge_and_process coder cb84e51bcd
 Action taken: merged the bounded eight-player simulator regression test and
 will confirm the complete acceptance suite before architect handoff.
 
+Verification follow-up: coder confirms all four generated CLI acceptance
+scenarios pass, including the eight-player case, in 0.072 seconds.
+
+## 2026-07-29T13:43:48Z — architect processed queued Phase 15 handoff notification
+
+Queued message received while the previous refactorer return was being merged:
+
+```
+You have new handoff mail. If idle, run ready_for_next.sh.
+```
+
+Action taken: completed that active batch first. `done_with_current.sh` then
+delivered the specifier's priority-`00` Phase 15 handoff; the local queue
+marker can be removed before processing it.
+
+## 2026-07-29T13:44:39Z — architect received Phase 15 CLI boundary revision from specifier
+
+Handoff message received:
+
+```
+id: 20260729T134321Z_000026_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: bdcd920ce4
+created_at: 2026-07-29T13:43:21.622583Z
+enqueued_at: 2026-07-29T13:43:21.862903Z
+task: phase15-cli
+dequeued_at: 2026-07-29T13:43:42.657374Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier bdcd920ce4
+```
+
+Action taken: began review of the specifier's Phase 15 CLI boundary-example
+revision.
+
+## 2026-07-29T13:45:53Z — architect accepted Phase 15 CLI boundary revision
+
+Action taken: accepted specifier commit `bdcd920ce4`. Each invalid-count
+example now independently states the count the CLI must report, pinning both
+official boundaries.
+
+Verification: targeted soft mutation for `specs-cli:en/cli.feature` killed
+4/4 mutations with zero survivors and zero errors; the runner refreshed the
+feature manifest. The specifier loop is closed. Await the outstanding
+refactorer boundary-review loop before Phase 15 completion.
+
+## 2026-07-29T13:46:13Z — architect received Phase 15 CLI boundary review from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T134405Z_000043_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 8d58bc58f0
+created_at: 2026-07-29T13:44:05.571304Z
+enqueued_at: 2026-07-29T13:44:05.843593Z
+task: phase15-cli
+dequeued_at: 2026-07-29T13:46:04.299115Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 8d58bc58f0
+```
+
+Action taken: began final architectural review of the Phase 15 CLI boundary.
+
 ## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
 
 Handoff message received:
@@ -10514,56 +10590,226 @@ Action taken: route this Gherkin-content defect to specifier at priority `00`.
 Phase 15 remains open until that loop and the structural refactor review
 return and are accepted.
 
-## 2026-07-29T13:44:05Z — refactorer returned Phase 15 structural review
+## 2026-07-29T13:41:35Z — architect sent Phase 15 CLI boundary review to refactorer
 
 Handoff message sent:
-
-```
-id: 20260729T134405Z_000043_from_refactorer
-from: refactorer
-to: architect
-priority: 50
-type: git_handoff
-role: refactorer
-task: phase15-cli
-commit: 8d58bc58f0
-created_at: 2026-07-29T13:44:05.571304Z
-
-Re-read your role and constitution.
-
-merge_and_process refactorer 8d58bc58f0
-```
-
-Action taken: returned the isolated CLI module after 250 domain tests, 3 CLI
-tests, 17 property tests, and 246 acceptance tests passed. CLI mutation review
-reported 19/19 killed and DRY found no new duplication. The invalid-boundary
-Gherkin mutation finding remains correctly routed to specifier.
-
-## 2026-07-29T13:45:00Z — refactorer received architect Phase 15 refactor
-
-Handoff message received:
 
 ```
 id: 20260729T134130Z_000050_from_architect
 from: architect
 to: refactorer
-recipient: refactorer
 priority: 00
 type: git_handoff
 role: architect
+task: phase15-cli
 commit: a81eaca30a
 created_at: 2026-07-29T13:41:30.338059Z
-enqueued_at: 2026-07-29T13:41:31.030127Z
-task: phase15-cli
-dequeued_at: 2026-07-29T13:41:34.654049Z
 
 Re-read your role and constitution.
 
 merge_and_process architect a81eaca30a
 ```
 
-Action taken: merged the architect's CLI-module isolation and acceptance
-fixture updates, preserving all logbook history. The architect reports 250
-domain tests, 3 CLI tests, acceptance generation, and 19/19 CLI mutations
-passing; the remaining invalid-boundary Gherkin finding is routed to the
-specifier and is not a refactorer edit.
+Action taken: sent the behavior-preserving CLI/domain module boundary change
+to refactorer for the architect review loop.
+
+Refactorer decision: accepted the CLI-module isolation and fixture updates;
+the already-routed invalid-boundary Gherkin issue needs no refactorer edit.
+
+## 2026-07-29T13:41:59Z — architect sent Phase 15 CLI example correction to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T134154Z_000051_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 1495026905
+created_at: 2026-07-29T13:41:54.265878Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 1495026905
+```
+
+Action taken: sent the invalid-count boundary mutation finding to specifier
+for the required Gherkin-content decision.
+
+Specifier decision: accepted the invalid-boundary mutation finding and
+revised the feature so the reported invalid count is an independent example
+column.
+
+## 2026-07-29T13:42:27Z — architect processed queued handoff notification
+
+Queued message received while the Phase 15 module extraction was in progress:
+
+```
+You have new handoff mail. If idle, run ready_for_next.sh.
+```
+
+Action taken: completed the active extraction and its required handoffs first.
+`done_with_current.sh` then delivered the queued refactorer handoff as the
+next active batch; the local queue marker can be removed.
+
+## 2026-07-29T13:42:55Z — architect received Phase 15 refactorer return
+
+Handoff message received:
+
+```
+id: 20260729T133225Z_000042_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 8507da29ae
+created_at: 2026-07-29T13:32:25.462484Z
+enqueued_at: 2026-07-29T13:32:25.853309Z
+task: phase15-cli
+dequeued_at: 2026-07-29T13:42:14.234606Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 8507da29ae
+```
+
+Action taken: began architectural review of the returned Phase 15 state.
+
+Action taken: merged architect commit `1495026905`, preserving the
+architect's Phase 15 review chain. Accepted the invalid-boundary mutation
+finding and revised the CLI feature so the expected reported invalid count
+is an independent example column.
+
+## 2026-07-29T13:44:00Z — specifier returned Phase 15 boundary revision to architect
+
+Handoff message sent:
+
+```
+id: 20260729T134321Z_000026_from_specifier
+from: specifier
+to: architect
+priority: 00
+type: git_handoff
+role: specifier
+task: phase15-cli
+commit: bdcd920ce4
+created_at: 2026-07-29T13:43:21.622583Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier bdcd920ce4
+```
+
+Summary: returned the revised invalid-player-boundary specification after
+separating the arranged count from the asserted reported count.
+
+## 2026-07-29T13:47:16Z — specifier processed duplicate queued architect handoff
+
+Handoff message received:
+
+```
+id: 20260729T134154Z_000051_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: 1495026905
+created_at: 2026-07-29T13:41:54.265878Z
+enqueued_at: 2026-07-29T13:41:55.205822Z
+task: phase15-cli
+
+Re-read your role and constitution.
+
+merge_and_process architect 1495026905
+```
+
+Action taken: identified this as a duplicate of the already merged and
+closed `phase15-cli` handoff, so no second merge or role action was needed.
+The queued duplicate can now be removed.
+
+## 2026-07-29T13:47:30Z — specifier received Phase 15 architect review handoff
+
+Handoff message received:
+
+```
+id: 20260729T134659Z_000052_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 1c7cb534b4
+created_at: 2026-07-29T13:46:59.372559Z
+enqueued_at: 2026-07-29T13:47:00.203951Z
+task: phase15-cli
+
+Re-read your role and constitution.
+
+merge_and_process architect 1c7cb534b4
+```
+
+Action taken: merged architect commit `1c7cb534b4`, resolving the
+`logbook.md` conflict while preserving the complete Phase 15 review history.
+
+## 2026-07-29T13:56:56Z — coder received Phase 15 invalid-boundary revision
+
+Handoff message received:
+
+```
+id: 20260729T135532Z_000027_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase15-cli
+commit: 85b25c87cf
+
+Re-read your role and constitution.
+
+merge_and_process specifier 85b25c87cf
+```
+
+Action taken: merged `85b25c87cf`. The CLI now reports the supplied invalid
+player count alongside the official two-to-eight range, with one
+regex-capturing acceptance handler binding the independent expected count.
+
+Verification: CLI reactor tests pass (253); generated acceptance passes
+(246 scenarios).
+
+Handing the implementation to refactorer for review.
+
+## 2026-07-29T13:58:13Z — refactorer received coder invalid-count fix
+
+Handoff message received:
+
+```
+id: 20260729T135724Z_000033_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: ef66b4c033
+created_at: 2026-07-29T13:57:24.047287Z
+enqueued_at: 2026-07-29T13:57:24.276829Z
+task: phase15-cli
+dequeued_at: 2026-07-29T13:57:28.238195Z
+
+Re-read your role and constitution.
+
+merge_and_process coder ef66b4c033
+```
+
+Action taken: merged the invalid-player-count reporting fix and preserved the
+architect/specifier review history. The coder reports 253 CLI reactor tests
+and 246 acceptance scenarios passing.
