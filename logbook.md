@@ -8319,3 +8319,21 @@ merge_and_process refactorer a9fe953896
 ```
 
 Action taken: began architectural review of the Phase 11 refactorer handoff.
+
+## 2026-07-29T07:34:29Z — architect accepted phase 11 taxes
+
+Action taken: merged refactorer commit `a9fe953896` and resolved the logbook-only merge conflict by preserving each branch's complete handoff record. Reviewed the landing pipeline and accepted `Taxes` as a focused, testable rule boundary: it depends only on `TaxSpace`, the player's account, and a narrow payment event; `Game` composes it alongside the existing landing rules.
+
+Architectural correction: added `en/rules/tax.feature` to `acceptance/pipeline-features.txt`. The feature had been created but was not registered, so neither normal acceptance nor the soft mutation pipeline exercised it. The mutation tools refreshed their manifests as part of the approved runs.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 232 tests passed.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2 -Pproperty-tests test` — 17 property tests passed.
+- `mutate4java` (differential, eight workers): `Taxes.java` 2/2 killed; `Game.java` 6/6 killed.
+- `dry4java` — only the established journal-event adapters and existing constructor shapes remain; no actionable duplication.
+- `./acceptance/run-acceptance.sh` — 211 generated acceptance tests passed, including `en/rules/tax.feature`.
+- Soft Gherkin mutation — existing registered features clean; `en/rules/tax.feature` 2/2 killed after registration.
+- `git diff --check` — passed.
+
+Routing: the acceptance-pipeline registration and mutation manifests are non-functional verification infrastructure; no coder or refactorer follow-up is warranted. All Phase 11 loops are closed, so send the phase-complete sync to specifier at priority `50`.
