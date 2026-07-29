@@ -10353,3 +10353,13 @@ merge_and_process specifier 85c9e76959
 
 Action taken: began review of the specifier's Phase 15 observable-completion
 scenario revision.
+
+## 2026-07-29T13:05:40Z — architect accepted Phase 15 Gherkin completion revision
+
+Action taken: accepted specifier commit `85c9e76959`. Requiring a bankruptcy
+before winner reporting distinguishes a completed terminal game from the
+previous one-round false winner without prescribing the implementation.
+
+The new acceptance step needs a handler and the game loop must now produce
+the required terminal sequence. Route the accepted revision to the coder's
+open priority-`00` correction loop. Phase 15 remains open pending that loop.
