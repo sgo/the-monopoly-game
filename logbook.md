@@ -10328,6 +10328,35 @@ the CLI implementation.
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
 
+## 2026-07-29T20:32:00Z — refactorer received coder real-dice CLI handoff
+
+Handoff message received:
+
+```
+id: 20260729T183044Z_000041_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 2f75ea2574
+created_at: 2026-07-29T18:30:44.341948Z
+enqueued_at: 2026-07-29T18:30:44.889785Z
+task: phase15-cli
+dequeued_at: 2026-07-29T18:30:49.669590Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 2f75ea2574
+```
+
+Action taken: merged the real-dice change. The focused CLI suite passes 7/7,
+but the removed success/timeout tests expose a regression: running the
+two-player simulator with the named strategy did not terminate within five
+seconds. The former deterministic terminal fixture and starting-balance
+coverage were also removed. Routed this behavioral risk to architect.
+
 ## 2026-07-29T18:30:14Z — coder aligned the CLI with the completion policy
 
 Action taken: removed the deterministic dice trace, pre-owned hotel, moved
