@@ -8282,6 +8282,23 @@ merge_and_process coder ae778bd6b8
 Action taken: began review of the coder's priority-`00` return for the Phase
 12 jail correction.
 
+## 2026-07-29T09:35:16Z — architect accepted phase 12 jail follow-up
+
+Action taken: merged coder commit `ae778bd6b8`. The coder confirmed the
+shared `Jail` state correction needs no further coder-owned change: 239
+focused domain tests and all 223 generated acceptance tests pass, including
+the newly registered jail feature. The returned commit contains the required
+verification record only; the corrected implementation remains architect
+commit `44c3a48104`.
+
+Verification: re-ran `git diff --check` on the merged state; it passed with a
+clean worktree. The accepted architect review already covered the full unit
+and property suites, both changed-source mutation runs, DRY review, normal
+acceptance, and the jail-feature soft mutation gate.
+
+Routing: all Phase 12 loops are now closed. Send one priority-`50`
+phase-complete sync to specifier.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
