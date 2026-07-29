@@ -8378,6 +8378,31 @@ defect, not a production or test-helper implementation defect. Under the
 workflow's Gherkin-routing rule, send the finding to specifier at priority
 `00`; do not edit the scenario content here.
 
+## 2026-07-29T10:18:08Z — architect sent phase 12 Gherkin finding to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T101800Z_000041_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 5dfbd58acd
+created_at: 2026-07-29T10:18:00.272381Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 5dfbd58acd
+```
+
+Summary: routed the two equivalent surviving dice-example mutations in the
+jail no-payment scenario to specifier, as required for Gherkin-content
+defects. Phase 12 is not advanceable again until that priority-`00`
+specifier loop returns and is accepted.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
