@@ -11138,30 +11138,68 @@ merge_and_process coder 093668a142
 Action taken: merged named strategy registry and per-player selection support;
 default and unknown-strategy paths are covered by focused tests.
 
-## 2026-07-29T14:27:13Z — refactorer returned strategy hardening review
+## 2026-07-29T14:25:46Z — architect hardened Phase 15 CLI adapter verification
+
+Action taken: accepted the registry at the CLI boundary, where it preserves
+domain dependency direction. Added process-boundary verification for invalid
+input exit status, plus focused tests for default mappings and incomplete
+strategy lists. The 53 CLI source mutations were killed after hardening;
+DRY reported no CLI duplication; targeted soft Gherkin mutation completed
+without survivors. Existing DRY findings remain confined to unchanged domain
+code.
+
+Handing the behavior-preserving adapter-test hardening to refactorer for
+review.
+
+## 2026-07-29T14:26:17Z — architect sent Phase 15 CLI adapter-hardening review
 
 Handoff message sent:
+
+```
+id: 20260729T142617Z_000056_from_architect
+from: architect
+to: refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: bd3d62e157
+created_at: 2026-07-29T14:26:17.082301Z
+
+Re-read your role and constitution.
+
+merge_and_process architect bd3d62e157
+```
+
+Action taken: sent the behavior-preserving adapter hardening to refactorer
+for the final structural loop.
+
+## 2026-07-29T14:27:23Z — architect received Phase 15 adapter-hardening return from refactorer
+
+Handoff message received:
 
 ```
 id: 20260729T142713Z_000047_from_refactorer
 from: refactorer
 to: architect
+recipient: architect
 priority: 50
 type: git_handoff
 role: refactorer
-task: phase15-cli
 commit: bb144e906a
 created_at: 2026-07-29T14:27:13.237607Z
+enqueued_at: 2026-07-29T14:27:13.313396Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:27:17.234715Z
 
 Re-read your role and constitution.
 
 merge_and_process refactorer bb144e906a
 ```
 
-Action taken: returned strategy-selection hardening after 10 focused CLI
-tests and DRY review passed; acceptance remains green per coder verification.
+Action taken: began the final architectural review of the CLI adapter
+hardening return.
 
-<<<<<<< HEAD
 ## 2026-07-29T14:20:49Z — refactorer returned strategy-selection review
 
 Handoff message sent:
@@ -11185,17 +11223,100 @@ merge_and_process refactorer 427c4e33ee
 Action taken: returned strategy registry and per-player CLI selection after
 seven focused CLI tests, DRY review, and the coder-reported 246 acceptance
 scenarios passed.
-=======
-## 2026-07-29T14:25:46Z — architect hardened Phase 15 CLI adapter verification
 
-Action taken: accepted the registry at the CLI boundary, where it preserves
-domain dependency direction. Added process-boundary verification for invalid
-input exit status, plus focused tests for default mappings and incomplete
-strategy lists. The 53 CLI source mutations were killed after hardening;
-DRY reported no CLI duplication; targeted soft Gherkin mutation completed
-without survivors. Existing DRY findings remain confined to unchanged domain
-code.
+## 2026-07-29T14:28:19Z — architect accepted Phase 15 CLI completion
 
-Handing the behavior-preserving adapter-test hardening to refactorer for
-review.
->>>>>>> bd3d62e157
+Action taken: accepted the final refactorer return. The CLI remains an adapter
+module depending inward on the domain; its strategy registry is local to that
+boundary, and its process behavior is verified separately from domain logic.
+All coder and refactorer follow-up loops for `phase15-cli` are closed. Routing
+the completed phase to specifier for branch synchronization.
+
+## 2026-07-29T14:28:34Z — architect sent Phase 15 completion sync to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T142834Z_000057_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 9d21d62fec
+created_at: 2026-07-29T14:28:34.599751Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 9d21d62fec
+```
+
+Action taken: sent the Phase 15 completion sync so the specifier can merge
+the architect branch before beginning subsequent work.
+
+## 2026-07-29T14:39:24Z — architect reopened Phase 15 for starting-capital defect
+
+User observation confirmed an observable CLI defect: `Simulator.run` debits
+every newly selected player to €5 before the game starts. That shortcut
+contradicts the official €1500 starting capital in `RULES.md` and makes an
+early €200 obligation cause immediate bankruptcy.
+
+Action taken: send priority-00 follow-ups in parallel. Coder owns removing the
+pre-game debit and adding regression coverage for normal initial capital;
+specifier owns an acceptance criterion that a simulated player begins with
+the official capital and is not artificially debited before the first turn.
+The coder returns through refactorer; architect will accept both loops before
+closing the reopened phase.
+
+## 2026-07-29T15:47:57Z — coder received starting-capital correction
+
+Handoff message received:
+
+```
+id: 20260729T143946Z_000059_from_architect_to_coder
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 07c95bf1e9
+```
+
+Action taken: merged the architect handoff, removed the simulator's artificial
+pre-game debit, and replaced it with a deterministic terminal fixture that
+preserves every selected player's official €1500 balance. Added regression
+coverage for that balance and for prompt eight-player completion.
+
+Verification: `SimulatorTest` passed (11 tests). The normal acceptance command
+was attempted twice; it entered the existing generated `en/monopoly.feature`
+whole-game loop and produced unbounded journal output, so it did not reach a
+completion summary. The focused CLI acceptance report remains green (4 tests).
+
+## 2026-07-29T16:30:00Z — refactorer received coder starting-capital fix
+
+Handoff message received:
+
+```
+id: 20260729T154852Z_000036_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 5653a571b7
+created_at: 2026-07-29T15:48:52.616967Z
+enqueued_at: 2026-07-29T15:48:53.547354Z
+task: phase15-cli
+dequeued_at: 2026-07-29T15:48:59.651634Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 5653a571b7
+```
+
+Action taken: merged the official-capital terminal fixture and regression
+coverage; focused CLI verification remains green while the broader acceptance
+loop limitation is recorded above.

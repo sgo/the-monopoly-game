@@ -4,9 +4,11 @@ import the.monopoly.game.Game;
 import the.monopoly.game.Report;
 import the.monopoly.game.components.dice.Cup;
 import the.monopoly.game.components.dice.Roll;
-import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Pawn;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
+import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.strategies.AgreeIfAffordable;
 import the.monopoly.game.strategies.Strategy;
@@ -22,7 +24,6 @@ public final class Simulator {
       new Roll(1, 1), new Roll(1, 2), new Roll(1, 3), new Roll(1, 4),
       new Roll(1, 5), new Roll(1, 6), new Roll(2, 6), new Roll(3, 6)
   );
-  private static final Roll BANKRUPTING_ROLL = new Roll(1, 3);
   private static final Map<String, Supplier<Strategy>> STRATEGIES = Map.of(
       "agree-if-affordable", AgreeIfAffordable::new
   );
@@ -81,8 +82,8 @@ public final class Simulator {
       return new Result(1, "The number of players must be between 2 and 8; received " + playerCount + " players.");
 
     List<Player> players = rules.players().select(playerCount).toList();
-    players.forEach(player -> player.account().withdraw(player.account().balance().amount().minus(new Money(5))));
-    Game.Result game = new Game(rules, players, simulationCups(players), strategies).playToCompletion();
+    Deeds deeds = terminalGameSetup(rules, players);
+    Game.Result game = new Game(rules, players, simulationCups(players), strategies, deeds).playToCompletion();
     game.winner().orElseThrow();
     return new Result(0, Report.of(game.journal()));
   }
@@ -90,9 +91,36 @@ public final class Simulator {
   private static Game.Cups simulationCups(List<Player> players) {
     Map<Player.ID, Cup> cups = new HashMap<>();
     for (int index = 0; index < players.size(); index++)
-      cups.put(players.get(index).id(), Cup.of(INITIATIVE_ROLLS.get(index), BANKRUPTING_ROLL));
+      cups.put(players.get(index).id(), repeatAfterInitiative(INITIATIVE_ROLLS.get(index)));
     return player -> cups.get(player.id());
   }
+
+  static Deeds terminalGameSetup(Rule.Set rules, List<Player> players) {
+    Player owner = players.getFirst();
+    ColourStreet land = (ColourStreet) rules.create(Street.Type.NieuwstraatBrussel);
+    Deeds deeds = new Deeds();
+    deeds.sell(land, owner, land.price());
+    owner.account().deposit(land.price());
+    deeds.arrangeHotel(land);
+    players.stream().skip(1).forEach(player -> player.position().moveTo(36));
+    return deeds;
+  }
+
+  private static Cup repeatAfterInitiative(Roll initiative) {
+    return new Cup() {
+      private boolean first = true;
+
+      @Override
+      public Roll roll() {
+        if (first) {
+          first = false;
+          return initiative;
+        }
+        return new Roll(1, 2);
+      }
+    };
+  }
+
 
   public record Result(int exitCode, String output) {
     public boolean succeeded() {
