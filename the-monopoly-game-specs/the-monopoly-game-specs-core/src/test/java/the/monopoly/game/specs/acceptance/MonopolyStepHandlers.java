@@ -334,6 +334,11 @@ public final class MonopolyStepHandlers {
                 arguments.text(1) + " starts a turn",
                 rollsATotalOf(arguments.text(2), arguments.number(3)))),
 
+        then("^the game report says that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " to " + VALUE + "$",
+            (world, arguments) -> says(world,
+                movesFromPosition(arguments.text(1), arguments.number(2), arguments.number(3)))),
+
         then("^the game report says that pawn \"" + NAME + "\" rolls a total of " + VALUE
                 + " before it says that pawn \"" + NAME + "\" moves from position " + VALUE
                 + " to " + VALUE + "$",

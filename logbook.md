@@ -8707,6 +8707,50 @@ merge_and_process architect a6f1734876
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
 
+## 2026-07-29T11:14:19Z — coder received phase 13 free parking handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260729T111139Z_000021_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: fbde16eb55
+created_at: 2026-07-29T11:11:39.215675Z
+enqueued_at: 2026-07-29T11:11:39.549176Z
+task: phase13-free-parking
+dequeued_at: 2026-07-29T11:11:46.845042Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier fbde16eb55
+```
+
+Action taken: merged the Phase 13 Free Parking specification. Registered its
+feature in the normal acceptance pipeline, added focused game coverage that the
+landing changes only position, and added the direct report-movement assertion
+needed by its report scenario. Domain tests (241) and generated acceptance
+tests (228) pass.
+
+## 2026-07-29T11:14:19Z — coder prepared phase 13 free parking handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase13-free-parking
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: the uneventful Free Parking landing is covered in the game and normal
+acceptance pipeline, with movement narration available as a direct assertion.
+
 ## 2026-07-29T10:09:48Z — coder received phase 12 jail follow-up from specifier
 
 Handoff message received:
