@@ -9005,6 +9005,49 @@ merge_and_process architect a6f1734876
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
 
+## 2026-07-29T12:17:09Z — coder received phase 14 bankruptcy architect follow-up
+
+Handoff message received:
+
+```
+id: 20260729T121544Z_000044_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 8141a9c0ba
+created_at: 2026-07-29T12:15:44.210095Z
+enqueued_at: 2026-07-29T12:15:44.901517Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T12:15:49.749229Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 8141a9c0ba
+```
+
+Action taken: fast-forward merged and reviewed the architect's bankruptcy
+hardening. Its hotel/house liquidation and retained-card transfer protections
+need no further coder changes. Focused domain tests (249) and the normal
+generated acceptance pipeline (242 tests) pass.
+
+## 2026-07-29T12:17:09Z — coder prepared phase 14 bankruptcy verification return to architect
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: phase14-bankruptcy-and-winning
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: architect hardening is verified; the priority-00 review loop returns
+directly to architect without further coder implementation.
+
 ## 2026-07-29T12:00:07Z — coder received phase 14 bankruptcy and winning handoff from specifier
 
 Handoff message received:
