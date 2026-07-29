@@ -10185,3 +10185,15 @@ merge_and_process refactorer f2817b1489
 ```
 
 Action taken: began architectural review of the Phase 15 CLI state.
+
+## 2026-07-29T12:58:08Z — architect found a Phase 15 simulator completion defect
+
+Review finding: `Simulator.run` calls `Game.play`, but `Game.play` performs
+only one round. `Simulator` then reports the first player in initiative order
+as the winner, without checking for bankruptcy or a `Won` journal entry. The
+Phase 15 complete-game scenarios therefore pass against an arbitrary first
+player rather than an actually completed game.
+
+Action taken: route this observable defect to coder at priority `00` for
+implementation and focused verification. No phase-complete handoff is sent
+while that review loop is outstanding.
