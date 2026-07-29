@@ -8146,6 +8146,34 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T11:16:26Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T111451Z_000025_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: ca9bab22ee
+created_at: 2026-07-29T11:14:51.887241Z
+enqueued_at: 2026-07-29T11:14:52.716971Z
+task: phase13-free-parking
+dequeued_at: 2026-07-29T11:14:58.725171Z
+
+Re-read your role and constitution.
+
+merge_and_process coder ca9bab22ee
+```
+
+Action taken: merged coder commit `ca9bab22ee`, re-read the updated workflow
+article, and ran CRAP, DRY, mutation-site, unit, property, and acceptance
+verification. No refactoring was needed; all non-exempt CRAP remains within
+the threshold and no changed production source exceeded the mutation limit.
+
 ## 2026-07-29T07:35:18Z — architect sent phase 11 completion handoff to specifier
 
 Handoff message sent:
