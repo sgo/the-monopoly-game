@@ -9891,3 +9891,114 @@ Verification: `./acceptance/run-acceptance.sh` passes (228/228), including
 added the missing standalone step).
 
 Per role rules, will now ask the user for the next feature to add.
+
+## 2026-07-29T11:48:52Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260729T114852Z_000022_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase14-bankruptcy-and-winning
+commit: 55c969a94a
+created_at: 2026-07-29T11:48:52.237278Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 55c969a94a
+```
+
+Summary: specified Phase 14 bankruptcy and winning - by far the largest
+spec this session. New `bankruptcy.feature` (7 scenarios) covers: a
+debt exceeding cash first triggers automatic liquidation (mortgage
+property, sell houses, stopping once the shortfall is covered) before
+bankruptcy is even considered; bank-debt bankruptcy (forfeit
+everything, bank auctions the now-mortgaged land, Get Out of Jail Free
+cards return to the bottom of their deck); player-debt bankruptcy (the
+creditor receives the debtor's remaining cash and mortgaged property
+directly); and a new creditor mortgage-choice strategy hook ("Agree if
+affordable" pays off an inherited mortgage when affordable, keeps it
+paying only the mandatory 10% interest when not). Fixed
+`monopoly.feature`'s pre-existing `Scenario` -> `Scenario Outline`
+violation (it predates that convention). Added journal-20/21/22 and
+report-20/21/22 for bankruptcy-to-bank, bankruptcy-to-player, and the
+game's winner.
+
+Two assumptions flagged explicitly to the user, both confirmed as
+acceptable: houses sold before mortgaging during liquidation, in
+board-position order when there's a choice among streets (no RULES.md
+text pins this down); and the mortgage-choice hook applies uniformly
+whether a mortgaged property is acquired via direct creditor-
+inheritance (RULES.md's explicit case) or via winning an auction for
+bank-forfeited land (RULES.md is silent there).
+
+During review the user caught that bankruptcy-6/7's titles didn't
+name "Agree if affordable" explicitly, reading as generic mechanic
+scenarios rather than algorithm-specific ones - the same issue already
+fixed for jail-5/6 earlier this session, which I should have applied
+here from the start. Retitled both to name the strategy directly.
+
+This is the point where the rules engine needs a real game loop for
+the first time - Game.play() currently plays exactly one round, ever,
+and Game.Result needs to carry a winner. None of this can be verified
+against the current implementation; it is entirely new production
+work, consistent with this phase's role of completing the rules engine
+end-to-end before the CLI (Phase 15).
+
+## 2026-07-29T12:20:14Z — specifier received architect Gherkin follow-up
+
+Handoff message received:
+
+```
+id: 20260729T121925Z_000045_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: 5bbf369b66
+
+Re-read your role and constitution.
+
+merge_and_process architect 5bbf369b66
+```
+
+Action taken: merged architect commit `5bbf369b66` into `main`. Clean
+merge (only `logbook.md` auto-merged, no conflicts). This brought in the
+coder's implementation, the refactorer's pass, and a real architect-found
+production bug fixed through the normal coder follow-up loop (already
+closed before this handoff arrived): retained Get Out of Jail Free cards
+were being discarded instead of transferred to the creditor in
+player-debt bankruptcy - RULES.md is explicit that the creditor receives
+"all your money, title deeds, and Get Out of Jail Free cards." Also
+strengthened liquidation to sell as many houses as needed (and exchange
+a hotel) rather than assuming a single house sale always suffices.
+
+The routed Gherkin finding: soft mutation on `bankruptcy.feature` found
+two equivalent surviving mutations, both in the `starting balance`
+column of bankruptcy-3 and bankruptcy-4 (the bank-debt scenarios) - any
+sufficiently low value produces the identical outcome (still can't
+cover the debt, still bankrupt), so the specific value $5 wasn't pinned
+to any real boundary. Same class of finding as jail-4/6 earlier this
+session.
+
+Decision: accepted the finding. Hardcoded the balance as literal step
+text in both scenarios. bankruptcy-4 had nothing left to parameterize
+afterward my first attempt introduced an unreferenced placeholder
+column, caught and fixed before committing by giving it a genuine
+referenced column instead: which bank-owed space triggers the
+bankruptcy, mirroring jail-1's existing pattern for the identical
+situation (a scenario whose only real parameter is which named space
+is used, not the debt amount). Committed as `e079ab3`.
+
+Verification: `./acceptance/run-acceptance.sh` passes (242/242) against
+the already-accepted implementation; the fix is a pure Examples-table
+edit with no new step text, so no coder work is needed.
+
+Per the workflow rule, handing this back to the architect now so it
+can resume and close the loop.
