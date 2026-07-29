@@ -10482,6 +10482,30 @@ Action taken: route the specification gap to specifier at priority 00. The
 specifier may need user direction to settle the intended completion policy;
 the current coder correction remains open.
 
+## 2026-07-29T15:54:57Z — architect sent Phase 15 CLI setup-specification follow-up
+
+Handoff message sent:
+
+```
+id: 20260729T155457Z_000062_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: b633110da5
+created_at: 2026-07-29T15:54:57.478058Z
+
+Re-read your role and constitution.
+
+merge_and_process architect b633110da5
+```
+
+Action taken: requested normal-setup and non-prearranged-completion criteria
+from specifier, with user consultation where the simulation policy is not yet
+defined.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
