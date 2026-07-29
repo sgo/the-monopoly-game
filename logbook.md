@@ -11137,3 +11137,16 @@ merge_and_process coder 093668a142
 
 Action taken: merged named strategy registry and per-player selection support;
 default and unknown-strategy paths are covered by focused tests.
+
+## 2026-07-29T14:25:46Z — architect hardened Phase 15 CLI adapter verification
+
+Action taken: accepted the registry at the CLI boundary, where it preserves
+domain dependency direction. Added process-boundary verification for invalid
+input exit status, plus focused tests for default mappings and incomplete
+strategy lists. The 53 CLI source mutations were killed after hardening;
+DRY reported no CLI duplication; targeted soft Gherkin mutation completed
+without survivors. Existing DRY findings remain confined to unchanged domain
+code.
+
+Handing the behavior-preserving adapter-test hardening to refactorer for
+review.
