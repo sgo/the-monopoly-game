@@ -10388,6 +10388,85 @@ Action taken: sent the accepted Gherkin revision to the same open coder
 correction loop, so implementation and binding verification use the current
 specification.
 
+## 2026-07-29T13:14:34Z — coder received accepted Phase 15 completion criterion
+
+Handoff message received:
+
+```
+id: 20260729T130601Z_000049_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 73fda5f617
+
+Re-read your role and constitution.
+
+merge_and_process architect 73fda5f617
+```
+
+Action taken: merged `73fda5f617`, retaining its accepted Gherkin revision.
+Bound the new requirement to the rendered report: a bankruptcy must occur
+before the rendered winner. The simulator now reports the game journal
+directly, so the result is an observable terminal game event rather than an
+appended winner label.
+
+Verification: focused completion and CLI tests pass; generated CLI
+acceptance scenarios pass (4/4).
+
+Handing the changed implementation to refactorer for review.
+
+## 2026-07-29T13:21:29Z — coder received refactorer Phase 15 termination finding
+
+Handoff message received:
+
+```
+id: 20260729T132034Z_000039_from_refactorer
+from: refactorer
+to: coder
+priority: 00
+type: note
+
+Re-read your role and constitution.
+
+8-player complete-game acceptance run does not terminate promptly
+```
+
+Action taken: reproduced the eight-player simulator path under a one-second
+bound. It completes successfully (about 0.4 seconds), reporting both a
+bankruptcy and the winner. Added this bounded eight-player regression test
+to preserve that behavior.
+
+Handing the verification back to refactorer for confirmation.
+
+## 2026-07-29T13:27:00Z — refactorer received coder termination regression test
+
+Handoff message received:
+
+```
+id: 20260729T132154Z_000031_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: coder
+commit: cb84e51bcd
+created_at: 2026-07-29T13:21:54.109531Z
+enqueued_at: 2026-07-29T13:21:54.493521Z
+task: phase15-cli
+dequeued_at: 2026-07-29T13:25:25.887189Z
+
+Re-read your role and constitution.
+
+merge_and_process coder cb84e51bcd
+```
+
+Action taken: merged the bounded eight-player simulator regression test and
+will confirm the complete acceptance suite before architect handoff.
+
 ## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
 
 Handoff message received:

@@ -152,6 +152,13 @@ public final class MonopolyStepHandlers {
         then("^the output contains a human-readable game report$",
             (world, arguments) -> assertThat(world.simulatorResult().output()).contains("The game starts")),
 
+        then("^the report contains a bankruptcy before the game's winner$",
+            (world, arguments) -> {
+              String report = world.simulatorResult().output();
+              assertThat(report).contains("goes bankrupt").contains("wins the game");
+              assertThat(report.indexOf("goes bankrupt")).isLessThan(report.indexOf("wins the game"));
+            }),
+
         then("^the report contains the game's winner$",
             (world, arguments) -> assertThat(world.simulatorResult().output()).contains("wins the game")),
 
