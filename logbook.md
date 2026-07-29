@@ -11034,3 +11034,25 @@ strategies without changing the CLI shape.
 Action taken: route this remaining observable CLI contract gap to coder at
 priority 00. The executable entry point, help output, stdout report, and
 invalid-input exit path are already in place.
+
+## 2026-07-29T14:16:19Z — architect sent Phase 15 CLI strategy-selection handoff
+
+Handoff message sent:
+
+```
+id: 20260729T141619Z_000055_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: ca8b1b2144
+created_at: 2026-07-29T14:16:19.376348Z
+
+Re-read your role and constitution.
+
+merge_and_process architect ca8b1b2144
+```
+
+Action taken: sent the remaining strategy-selection and lookup work to coder.
