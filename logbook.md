@@ -8146,6 +8146,36 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T13:11:19Z — coder received architect Phase 15 completion follow-up
+
+Handoff message received:
+
+```
+id: 20260729T125826Z_000047_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: d4daa26893
+
+Re-read your role and constitution.
+
+merge_and_process architect d4daa26893
+```
+
+Action taken: merged `d4daa26893` and corrected the completion defect. A
+complete game now continues through turns until one non-bankrupt player
+remains, exposes that player on `Game.Result`, and stops immediately when
+the final bankruptcy settles. The simulator now reports that actual winner
+rather than the initiative leader.
+
+Verification: domain tests pass (252); generated acceptance tests pass,
+including all four CLI scenarios.
+
+The implementation changed, so it is being sent through refactorer review.
+
 ## 2026-07-29T12:53:15Z — refactorer received handoff from coder
 
 Handoff message received:

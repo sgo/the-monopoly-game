@@ -110,6 +110,25 @@ class GameTest {
     assertThat(result.turnOrder()).containsExactlyInAnyOrderElementsOf(players);
   }
 
+  @Test
+  void aCompleteGameKeepsTakingTurnsUntilBankruptcyLeavesOneWinner() {
+    List<Player> twoPlayers = ruleSet.players().select(2).toList();
+    Player dog = twoPlayers.getFirst();
+    dog.position().moveTo(1);
+    dog.account().withdraw(dog.account().balance().amount().minus(new Money(5)));
+
+    Map<Player.ID, Cup> cups = Map.of(
+        dog.id(), Cup.of(new Roll(2, 2), new Roll(1, 2)),
+        twoPlayers.get(1).id(), Cup.of(new Roll(5, 5), new Roll(4, 6))
+    );
+    Game.Result result = new Game(ruleSet, twoPlayers, player -> cups.get(player.id())).playToCompletion();
+
+    assertThat(result.journal()).endsWith(
+        new Entry.Bankrupt(dog.id(), null), new Entry.Won(twoPlayers.get(1).id())
+    );
+    assertThat(result.winner()).contains(twoPlayers.get(1));
+  }
+
   /**
    * The three turn rolls differ from each other, so a game that moved everyone
    * by one roll, or moved only whoever leads, lands them somewhere else.

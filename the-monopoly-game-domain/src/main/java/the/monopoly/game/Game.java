@@ -24,6 +24,7 @@ import the.monopoly.game.strategies.Strategy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -88,6 +89,15 @@ public class Game {
   }
 
   public Result play() {
+    return play(false);
+  }
+
+  /** Plays successive turns until only one player remains at the table. */
+  public Result playToCompletion() {
+    return play(true);
+  }
+
+  private Result play(boolean untilComplete) {
     var journal = new Journal();
     journal.log(new Journal.Entry.Start(ids(players)));
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
@@ -97,12 +107,25 @@ public class Game {
     jail.observe(journalling);
     Building building = new Building(deeds, rules, strategies, journalling);
     Player builder = turnOrder.getFirst();
-    turnOrder.forEach(player -> {
-      takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
-      if (player.id().equals(builder.id())) building.develop(player);
-    });
+    do {
+      for (Player player : turnOrder) {
+        if (deeds.isBankrupt(player)) continue;
+        takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
+        if (player.id().equals(builder.id()) && !deeds.isBankrupt(player)) building.develop(player);
+        if (remainingPlayers().size() <= 1) break;
+      }
+    } while (untilComplete && remainingPlayers().size() > 1);
 
-    return new Result(turnOrder, journal.entries(), deeds);
+    return new Result(turnOrder, journal.entries(), deeds, winner());
+  }
+
+  private List<Player> remainingPlayers() {
+    return players.stream().filter(player -> !deeds.isBankrupt(player)).toList();
+  }
+
+  private Optional<Player> winner() {
+    List<Player> remaining = remainingPlayers();
+    return remaining.size() == 1 ? Optional.of(remaining.getFirst()) : Optional.empty();
   }
 
   private int initiativeRollFor(Player player, Journal journal) {
@@ -244,7 +267,7 @@ public class Game {
    * account of what happened, and who ended up owning what. The account is data
    * rather than written text, so that rendering it stays somebody else's job.
    */
-  public record Result(List<Player> turnOrder, List<Journal.Entry> journal, Deeds deeds) {
+  public record Result(List<Player> turnOrder, List<Journal.Entry> journal, Deeds deeds, Optional<Player> winner) {
   }
 
   public static class Journal {
