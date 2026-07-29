@@ -10505,6 +10505,32 @@ Action taken: completed that active batch first. `done_with_current.sh` then
 delivered the specifier's priority-`00` Phase 15 handoff; the local queue
 marker can be removed before processing it.
 
+## 2026-07-29T13:44:39Z — architect received Phase 15 CLI boundary revision from specifier
+
+Handoff message received:
+
+```
+id: 20260729T134321Z_000026_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: bdcd920ce4
+created_at: 2026-07-29T13:43:21.622583Z
+enqueued_at: 2026-07-29T13:43:21.862903Z
+task: phase15-cli
+dequeued_at: 2026-07-29T13:43:42.657374Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier bdcd920ce4
+```
+
+Action taken: began review of the specifier's Phase 15 CLI boundary-example
+revision.
+
 ## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
 
 Handoff message received:
