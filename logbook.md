@@ -7953,3 +7953,28 @@ merge_and_process architect a6f1734876
 ```
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
+
+## 2026-07-29T07:29:37Z — architect received phase 11 refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260729T072841Z_000033_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: a9fe953896
+created_at: 2026-07-29T07:28:41.818041Z
+enqueued_at: 2026-07-29T07:28:42.815784Z
+task: phase11-taxes
+dequeued_at: 2026-07-29T07:29:31.014153Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer a9fe953896
+```
+
+Action taken: began architectural review of the Phase 11 refactorer handoff.
