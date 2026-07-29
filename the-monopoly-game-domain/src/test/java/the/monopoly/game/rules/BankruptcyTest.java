@@ -1,0 +1,134 @@
+package the.monopoly.game.rules;
+
+import org.junit.jupiter.api.Test;
+import the.monopoly.game.components.finance.Bank;
+import the.monopoly.game.components.finance.Money;
+import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
+import the.monopoly.game.components.streets.Ownable;
+import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.strategies.Strategy;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class BankruptcyTest {
+  private final Rule.Set rules = Rule.Set.Type.official.create();
+  private final Player dog = player("dog");
+  private final Player highHat = player("high hat");
+  private final List<Player> players = List.of(dog, highHat);
+
+  @Test
+  void aSolventPlayerIsUntouched() {
+    Events events = new Events();
+
+    new Bankruptcy(new Deeds(), rules, players, Strategy.OfPlayers.NOBODY_DECIDES, events)
+        .resolve(dog, null);
+
+    assertThat(events.bankrupt).isFalse();
+  }
+
+  @Test
+  void aPlayerSellsAHouseBeforeMortgagingLand() {
+    Deeds deeds = new Deeds();
+    ColourStreet street = (ColourStreet) rules.create(Street.Type.RueGrandeDinant);
+    give(deeds, street, dog);
+    deeds.arrangeHouses(street, 1);
+    dog.account().withdraw(new Money(1510));
+
+    new Bankruptcy(deeds, rules, players, Strategy.OfPlayers.NOBODY_DECIDES, new Events())
+        .resolve(dog, null);
+
+    assertThat(deeds.housesBuiltOn(street)).isZero();
+    assertThat(dog.account().balance().amount().amount()).isEqualTo(15);
+    assertThat(deeds.isBankrupt(dog)).isFalse();
+  }
+
+  @Test
+  void aBankruptPlayerLosesLandToTheBankAuction() {
+    Deeds deeds = new Deeds();
+    Ownable land = (Ownable) rules.create(Street.Type.DiestsestraatLeuven);
+    give(deeds, land, dog);
+    dog.account().withdraw(new Money(1600));
+    Strategy.OfPlayers strategies = player -> player.equals(highHat) ? bidding(10) : Strategy.UNDECIDED;
+    Events events = new Events();
+
+    new Bankruptcy(deeds, rules, players, strategies, events).resolve(dog, null);
+
+    assertThat(deeds.isBankrupt(dog)).isTrue();
+    assertThat(deeds.ownerOf(land.type())).contains(highHat.id());
+    assertThat(events.winner).isEqualTo(highHat);
+  }
+
+  @Test
+  void aBankruptPlayerTransfersMortgagedLandToTheCreditor() {
+    Deeds deeds = new Deeds();
+    Ownable land = (Ownable) rules.create(Street.Type.RueGrandeDinant);
+    give(deeds, land, dog);
+    dog.account().withdraw(new Money(2600));
+    Events events = new Events();
+
+    new Bankruptcy(deeds, rules, players, Strategy.OfPlayers.NOBODY_DECIDES, events)
+        .resolve(dog, highHat);
+
+    assertThat(deeds.isBankrupt(dog)).isTrue();
+    assertThat(deeds.ownerOf(land.type())).contains(highHat.id());
+    assertThat(deeds.isMortgaged(land)).isTrue();
+    assertThat(events.winner).isEqualTo(highHat);
+  }
+
+  @Test
+  void anAgreeableCreditorLiftsAnInheritedMortgageWhenAffordable() {
+    Deeds deeds = new Deeds();
+    Ownable land = (Ownable) rules.create(Street.Type.RueGrandeDinant);
+    give(deeds, land, dog);
+    dog.account().withdraw(new Money(2600));
+    Strategy.OfPlayers strategies = player -> player.equals(highHat)
+        ? new the.monopoly.game.strategies.AgreeIfAffordable()
+        : Strategy.UNDECIDED;
+
+    new Bankruptcy(deeds, rules, players, strategies, new Events()).resolve(dog, highHat);
+
+    assertThat(deeds.ownerOf(land.type())).contains(highHat.id());
+    assertThat(deeds.isMortgaged(land)).isFalse();
+  }
+
+  private void give(Deeds deeds, Ownable land, Player owner) {
+    deeds.sell(land, owner, land.price());
+    owner.account().deposit(land.price());
+  }
+
+  private Player player(String name) {
+    Bank bank = rules.bank();
+    Player.ID id = new Player.ID(name);
+    bank.createAccountFor(id);
+    Player player = new Player(id, bank.accountOf(id));
+    player.account().deposit(new Money(1500));
+    return player;
+  }
+
+  private Strategy bidding(int amount) {
+    return new Strategy() {
+      @Override
+      public Money bidFor(Offer offer) {
+        return new Money(amount);
+      }
+    };
+  }
+
+  private static final class Events implements Bankruptcy.Events {
+    private boolean bankrupt;
+    private Player winner;
+
+    @Override
+    public void bankrupt(Player debtor, Player creditor) {
+      bankrupt = true;
+    }
+
+    @Override
+    public void won(Player player) {
+      winner = player;
+    }
+  }
+}

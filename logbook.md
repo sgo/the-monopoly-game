@@ -8146,6 +8146,35 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T12:03:58Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T120038Z_000026_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: a3226167e4
+created_at: 2026-07-29T12:00:38.403960Z
+enqueued_at: 2026-07-29T12:00:38.666827Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T12:00:44.511252Z
+
+Re-read your role and constitution.
+
+merge_and_process coder a3226167e4
+```
+
+Action taken: merged coder commit `a3226167e4`, added focused unit coverage
+for bankruptcy asset liquidation, auctions, creditor transfers, and mortgage
+settlement, then re-ran CRAP, DRY, mutation-site, unit, property, and
+acceptance verification. All non-exempt CRAP is at or below 6; changed
+production files remain below the mutation split threshold.
+
 ## 2026-07-29T11:17:00Z — refactorer sent handoff to architect
 
 Handoff message sent:
