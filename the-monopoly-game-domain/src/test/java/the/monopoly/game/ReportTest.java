@@ -108,6 +108,26 @@ class ReportTest {
     ))).isEqualTo("dog is refused building a house on Diestsestraat Leuven for $50 because a street in the colour group is mortgaged");
   }
 
+  @Test
+  void aReportTellsWhenAChanceCardIsDrawn() {
+    assertThat(report(new Entry.ChanceCardDrawn(
+        Pawn.dog.id(), "Boete voor te snel rijden. Betaal M15."
+    ))).isEqualTo("dog draws the chance card \"Boete voor te snel rijden. Betaal M15.\"");
+  }
+
+  @Test
+  void aReportTellsWhenACommunityChestCardIsDrawn() {
+    assertThat(report(new Entry.CommunityChestCardDrawn(
+        Pawn.dog.id(), "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler."
+    ))).isEqualTo("dog draws the community chest card \"je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler.\"");
+  }
+
+  @Test
+  void aReportTellsWhenAPlayerPaysTheBank() {
+    assertThat(report(new Entry.BankPaid(Pawn.dog.id(), new Money(15))))
+        .isEqualTo("dog pays the bank $15");
+  }
+
   /** A space is spelled as the board spells it, in words rather than as one. */
   @Test
   void aReportSpellsASpaceOfOneWordAsTheOneWordItIs() {

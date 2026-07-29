@@ -54,6 +54,8 @@ public class World {
   private Map<Dice.Face, Integer> rolls;
   private final Deque<Roll> queuedRolls = new ArrayDeque<>();
   private final Map<String, Deque<Roll>> queuedPawnRolls = new HashMap<>();
+  private final Deque<String> queuedChanceCards = new ArrayDeque<>();
+  private final Deque<String> queuedCommunityChestCards = new ArrayDeque<>();
   private final Map<String, Strategy> pawnStrategies = new HashMap<>();
   private List<Player> turnOrder;
   private boolean othersRollWhatTheyLike;
@@ -95,6 +97,12 @@ public class World {
 
   public void selectPlayers(int count) {
     players = ruleSet.players().select(count).toList();
+    Money startingCapital = ruleSet.players().startingCapital();
+    for (Player player : players) {
+      Money current = player.account().balance().amount();
+      if (current.exceeds(startingCapital)) player.account().withdraw(current.minus(startingCapital));
+      else if (startingCapital.exceeds(current)) player.account().deposit(startingCapital.minus(current));
+    }
   }
 
   public Player pawn(String pawnName) {
@@ -182,7 +190,18 @@ public class World {
   public void playGame() {
     Game.Result result = new Game(
         ruleSet, players(), player -> () -> nextQueuedPawnRoll(player), this::strategyOf,
-        deeds == null ? deeds = new Deeds() : deeds
+        deeds == null ? deeds = new Deeds() : deeds,
+        new the.monopoly.game.rules.Cards.Decks() {
+          @Override
+          public String drawChance() {
+            return queuedChanceCards.pollFirst();
+          }
+
+          @Override
+          public String drawCommunityChest() {
+            return queuedCommunityChestCards.pollFirst();
+          }
+        }
     ).play();
     turnOrder = result.turnOrder();
     journal = result.journal();
@@ -254,12 +273,53 @@ public class World {
     pawnStrategies.put(pawnName, strategy);
   }
 
+  public void queueChanceCard(String card) {
+    queuedChanceCards.add(card);
+  }
+
+  public void queueCommunityChestCard(String card) {
+    queuedCommunityChestCards.add(card);
+  }
+
   public void pawnDeclines(String pawnName, Street.Type land) {
     scriptFor(pawnName).declines(land);
   }
 
   public void pawnWillBid(String pawnName, Street.Type land, Money amount) {
     scriptFor(pawnName).bids(land, amount);
+  }
+
+  public void pawnWillBuy(String pawnName, Street.Type land) {
+    Strategy strategy = pawnStrategies.get(pawnName);
+    if (strategy == null) {
+      scriptFor(pawnName).buys(land);
+      return;
+    }
+    if (strategy instanceof Scripted scripted) {
+      scripted.buys(land);
+      return;
+    }
+    pawnStrategies.put(pawnName, new Strategy() {
+      @Override
+      public boolean accepts(Offer offer) {
+        return offer.land().type() == land || strategy.accepts(offer);
+      }
+
+      @Override
+      public Money bidFor(Offer offer) {
+        return strategy.bidFor(offer);
+      }
+
+      @Override
+      public boolean claims(RentClaim claim) {
+        return strategy.claims(claim);
+      }
+
+      @Override
+      public boolean builds(BuildOffer offer) {
+        return strategy.builds(offer);
+      }
+    });
   }
 
   public void pawnWillBuildHouseOn(String pawnName, Street.Type land) {
@@ -392,6 +452,17 @@ public class World {
     sale.sell(pawn(sellerName), ownable(land), pawn(buyerName), price);
   }
 
+  public boolean holdsGetOutOfJailFreeCard(String pawnName) {
+    if (deeds == null) return false;
+    return deeds.holdsGetOutOfJailFreeCard(pawn(pawnName));
+  }
+
+  public void sellGetOutOfJailFreeCard(String sellerName, String buyerName, Money price) {
+    if (deeds == null)
+      throw new AssertionError("No deeds exist yet, so no Get Out of Jail Free card can be sold.");
+    deeds.sellGetOutOfJailFreeCard(pawn(sellerName), pawn(buyerName), price);
+  }
+
   /**
    * Leaves a pawn with the money the scenario says it has to spend. The rules
    * open every account with the same starting capital and no rule pays anyone
@@ -470,6 +541,7 @@ public class World {
    */
   private static final class Scripted implements Strategy {
     private final Set<Street.Type> declined = new HashSet<>();
+    private final Set<Street.Type> bought = new HashSet<>();
     private final Map<Street.Type, Money> bids = new HashMap<>();
     private final Set<Street.Type> builds = new HashSet<>();
 
@@ -481,12 +553,17 @@ public class World {
       bids.put(land, amount);
     }
 
+    void buys(Street.Type land) {
+      bought.add(land);
+    }
+
     void builds(Street.Type land) {
       builds.add(land);
     }
 
     @Override
     public boolean accepts(Offer offer) {
+      if (bought.contains(offer.land().type())) return true;
       if (!declined.contains(offer.land().type()))
         throw new AssertionError(
             "This pawn was offered " + offer.land().type()
