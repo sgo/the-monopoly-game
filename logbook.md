@@ -8843,3 +8843,59 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0);
 correction.
 
 Per role rules, will now ask the user for the next feature to add.
+
+## 2026-07-29T10:07:20Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260729T100720Z_000019_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase12-jail
+commit: d7f81d2ad3
+created_at: 2026-07-29T10:07:20.818034Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d7f81d2ad3
+```
+
+Summary: after the phase-complete merge, the user asked two follow-up
+questions about jail-4 that led to a further specifier-owned
+refinement of `jail.feature`, `journal.feature`, and `report.feature`
+(commits `60d86c2` and `d7f81d2`, both included in this handoff since
+neither needed new production code on its own - the second one does
+now).
+
+First (`60d86c2`): jail-4 no longer needs to demonstrate a successful
+doubles escape at all - that mechanic is already covered independently
+by movement-5/6. Retitled to focus purely on the decision: "Agree if
+affordable", unable to afford the fine, does not pay it and stays
+jailed, proven with a non-double roll so `Turn.takeFromJail` never
+calls `move()` - no movement, no landing, no chance of any confound.
+Verified against the already-accepted implementation (223/223
+generated acceptance tests still passed, no coder work needed).
+
+Second (`d7f81d2`): the user then pointed out that jail-3/jail-4 were
+each conflating two concerns - the raw mechanic of choosing to pay (or
+not pay) the jail fine, versus "Agree if affordable"'s specific
+affordability-driven decision to do one or the other - and asked for
+both to be specced separately. Split into two pairs: jail-3/jail-4 now
+test the mechanic via the default `Scripted` strategy and a new "will
+pay the fine to leave jail" override (paying leaves jail and moves the
+same turn; not choosing to pay attempts to roll doubles instead, which
+can fail and leave the player jailed); jail-5/jail-6 (renamed from the
+prior jail-3/jail-4) test "Agree if affordable" itself making that
+same choice based on affordability - the literal Phase 12 strategy-hook
+deliverable. Renumbered the Get-Out-of-Jail-Free-card and
+rent-while-jailed scenarios to jail-7/8, and switched journal-18/
+report-18 to the new mechanic override too, since those entries record
+the jail-exit event itself, not which strategy caused it.
+
+The new "will pay the fine to leave jail" step has no glue code yet -
+this is the one piece of this handoff that needs real coder work; the
+rest is confirmed already passing.
