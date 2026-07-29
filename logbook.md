@@ -10328,6 +10328,27 @@ the CLI implementation.
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
 
+## 2026-07-29T15:58:00Z — coder reviewed the Monopoly ten-run specification
+
+Handoff message received:
+
+```
+id: 20260729T154809Z_000030_from_specifier_to_coder
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: monopoly-10-runs
+commit: d6ac140f28
+```
+
+Finding: the acceptance world's `playMonopolyGames` currently marks success
+without playing a game. Implementing the requested ten real games depends on
+the same missing bounded, rules-driven completion mechanism identified in the
+priority-00 CLI review. This must be resolved architecturally before the stub
+can be replaced without creating a false acceptance result.
+
 ## 2026-07-29T14:42:20Z — specifier returned Phase 15 starting-capital revision
 
 Handoff message sent:
