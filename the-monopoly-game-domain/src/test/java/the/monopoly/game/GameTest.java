@@ -154,6 +154,21 @@ class GameTest {
   }
 
   @Test
+  void landingOnFreeParkingChangesNothingButThePawnPosition() {
+    players.getFirst().position().moveTo(17);
+
+    Game.Result result = play(
+        new Roll(5, 5), new Roll(1, 1), new Roll(1, 2),
+        new Roll(1, 2), new Roll(4, 6), new Roll(4, 6)
+    );
+
+    Player dog = players.getFirst();
+    assertThat(dog.position().index()).isEqualTo(20);
+    assertThat(dog.account().balance()).isEqualTo(Balance.of(1500));
+    assertThat(result.journal()).containsSubsequence(new Entry.Moved(Pawn.dog.id(), 17, 20));
+  }
+
+  @Test
   void aGameSellsUnownedLandToWhoeverStopsOnItAndAgreesToBuyIt() {
     Game.Result result = playWith(Map.of(Pawn.dog.id(), new AgreeIfAffordable()));
 

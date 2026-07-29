@@ -8146,6 +8146,34 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T11:16:26Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T111451Z_000025_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: ca9bab22ee
+created_at: 2026-07-29T11:14:51.887241Z
+enqueued_at: 2026-07-29T11:14:52.716971Z
+task: phase13-free-parking
+dequeued_at: 2026-07-29T11:14:58.725171Z
+
+Re-read your role and constitution.
+
+merge_and_process coder ca9bab22ee
+```
+
+Action taken: merged coder commit `ca9bab22ee`, re-read the updated workflow
+article, and ran CRAP, DRY, mutation-site, unit, property, and acceptance
+verification. No refactoring was needed; all non-exempt CRAP remains within
+the threshold and no changed production source exceeded the mutation limit.
+
 ## 2026-07-29T07:35:18Z — architect sent phase 11 completion handoff to specifier
 
 Handoff message sent:
@@ -8451,6 +8479,88 @@ the previously accepted Phase 12 results remain applicable. The specifier
 already owns and has received the phase state, so do not send a duplicate
 phase-complete handoff. All Phase 12 review loops are closed.
 
+## 2026-07-29T10:33:04Z — architect sent final phase 12 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T103257Z_000042_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 06011df87c
+created_at: 2026-07-29T10:32:57.737508Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 06011df87c
+```
+
+Summary: sent the final Phase 12 completion sync after accepting the
+specifier's Gherkin correction and its clean 5/5 soft mutation result. This
+ensures the specifier receives the architect's final acceptance and manifest
+state, rather than only its earlier outbound revision.
+
+## 2026-07-29T11:17:09Z — architect received phase 13 refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260729T111656Z_000036_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 27fb5af98b
+created_at: 2026-07-29T11:16:56.042026Z
+enqueued_at: 2026-07-29T11:16:57.082939Z
+task: phase13-free-parking
+dequeued_at: 2026-07-29T11:17:02.050785Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 27fb5af98b
+```
+
+Action taken: began architectural review of the Phase 13 free-parking
+refactorer handoff.
+
+## 2026-07-29T11:19:23Z — architect accepted phase 13 free parking
+
+Action taken: merged refactorer commit `27fb5af98b` and accepted the Free
+Parking rule as an explicit specification of the existing `UnownableSpace`
+no-op path. It introduces no special-case production dependency: `Game` keeps
+movement and its journal event in the shared turn pipeline, while Free Parking
+adds neither a financial effect nor a new domain rule object. The report
+assertion is a narrow acceptance adapter over that existing movement event.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 241 tests passed.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+  -Pproperty-tests test` — 17 property tests passed.
+- `mutate4java` (differential, six selected sites, eight-worker limit) for
+  `Game.java` — 6/6 killed. The first runner invocation could not use its
+  relative local Maven repository from the module directory; the rerun used
+  the absolute local repository and passed.
+- `dry4java` — only the established `Game` journal-adapter repetitions, the
+  existing `LandSale`/`Rent` construction shape, and `Game`/`Turn`
+  constructor shape remain; no actionable duplication.
+- `./acceptance/run-acceptance.sh` — 228 generated acceptance tests passed,
+  including `en/rules/free-parking.feature`.
+- Soft Gherkin mutation for `en/rules/free-parking.feature` — 2/2 killed,
+  zero survivors and zero errors; runner manifests refreshed.
+- `git diff --check` — passed.
+
+Routing: no architect correction or coder/refactorer follow-up is warranted.
+All Phase 13 loops are closed; send the phase-complete sync to specifier at
+priority `50`.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -8706,6 +8816,50 @@ merge_and_process architect a6f1734876
 ```
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
+
+## 2026-07-29T11:14:19Z — coder received phase 13 free parking handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260729T111139Z_000021_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: fbde16eb55
+created_at: 2026-07-29T11:11:39.215675Z
+enqueued_at: 2026-07-29T11:11:39.549176Z
+task: phase13-free-parking
+dequeued_at: 2026-07-29T11:11:46.845042Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier fbde16eb55
+```
+
+Action taken: merged the Phase 13 Free Parking specification. Registered its
+feature in the normal acceptance pipeline, added focused game coverage that the
+landing changes only position, and added the direct report-movement assertion
+needed by its report scenario. Domain tests (241) and generated acceptance
+tests (228) pass.
+
+## 2026-07-29T11:14:19Z — coder prepared phase 13 free parking handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase13-free-parking
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: the uneventful Free Parking landing is covered in the game and normal
+acceptance pipeline, with movement narration available as a direct assertion.
 
 ## 2026-07-29T10:09:48Z — coder received phase 12 jail follow-up from specifier
 
@@ -9215,6 +9369,35 @@ Re-read your role and constitution.
 merge_and_process architect 5dfbd58acd
 ```
 
+Action taken: merged coder commit `95ea8a1d7c`, re-ran CRAP, DRY, mutation
+site scans, unit tests, property tests, and acceptance tests. No further
+structural changes were needed; CRAP remains within the threshold except
+for the documented `Report.line` exemption, and changed source files stay
+below the mutation split limit.
+
+## 2026-07-29T10:14:58Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260729T101454Z_000035_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase12-jail
+commit: 2c973562b8
+created_at: 2026-07-29T10:14:54.320297Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 2c973562b8
+```
+
+Summary: handed the verified Phase 12 follow-up state to the architect at
+commit `2c973562b8`; no additional refactoring was required after the
+coder's follow-up.
 Action taken: merged architect commit `5dfbd58acd` into `main` - the first
 use of the new architect-to-specifier Gherkin-routing rule. One conflict, in
 `logbook.md`; resolved at entry granularity as established, with one mistake
