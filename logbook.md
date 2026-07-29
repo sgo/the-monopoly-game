@@ -10363,6 +10363,30 @@ do not use pre-arranged state, a turn limit, or a synthetic winner.
 Verification: the updated CLI feature parses successfully and
 `gherkin-ir-dry-checker` reports only reviewed possible-synonym findings.
 
+## 2026-07-29T18:29:07Z — specifier returned Phase 15 completion policy to architect
+
+Handoff message sent:
+
+```
+id: 20260729T182907Z_000032_from_specifier
+from: specifier
+to: architect
+priority: 00
+type: git_handoff
+role: specifier
+task: phase15-cli
+commit: de36f0eb2a
+created_at: 2026-07-29T18:29:07.034011Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier de36f0eb2a
+```
+
+Summary: returned the CLI and simulator acceptance update requiring real
+random play from standard setup through natural bankruptcy termination, with
+no turn limit or synthetic winner.
+
 ## 2026-07-29T14:42:20Z — specifier returned Phase 15 starting-capital revision
 ## 2026-07-29T15:55:04Z — refactorer received coder starting-balance acceptance fix
 
