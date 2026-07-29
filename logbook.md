@@ -8299,6 +8299,158 @@ acceptance, and the jail-feature soft mutation gate.
 Routing: all Phase 12 loops are now closed. Send one priority-`50`
 phase-complete sync to specifier.
 
+## 2026-07-29T09:35:44Z — architect sent phase 12 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T093538Z_000040_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 149762d57f
+created_at: 2026-07-29T09:35:38.294665Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 149762d57f
+```
+
+Summary: sent the sole Phase 12 completion sync after accepting the coder's
+priority-`00` verification return. The specifier can merge
+`149762d57f` into its branch to close the jail phase and begin the next phase
+cleanly.
+
+## 2026-07-29T10:15:06Z — architect received late phase 12 refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260729T101454Z_000035_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 2c973562b8
+created_at: 2026-07-29T10:14:54.320297Z
+enqueued_at: 2026-07-29T10:14:55.298784Z
+task: phase12-jail
+dequeued_at: 2026-07-29T10:14:59.428986Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 2c973562b8
+```
+
+Action taken: began review of the late Phase 12 refactorer return. The phase
+has already been sent to specifier, so this review will determine whether the
+handoff is a harmless duplicate or requires a corrective follow-up.
+
+## 2026-07-29T10:17:08Z — architect reviewed late phase 12 jail follow-up
+
+Action taken: merged refactorer commit `2c973562b8`. It carries the
+specifier-directed split between the mechanic of choosing a jail-fine payment
+and `Agree if affordable`'s affordability decision. The acceptance scripted
+strategy remains a test helper; no production boundary or dependency direction
+changed. The restored unaffordable-strategy scenario has a precise rule
+assertion, but its example dice merely need to be non-doubles: changing either
+die to another non-double pair produces exactly the same observable outcome.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 240 tests passed.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+  -Pproperty-tests test` — 17 property tests passed.
+- `./acceptance/run-acceptance.sh` — 225 generated acceptance tests passed.
+- Soft Gherkin mutation for `en/rules/jail.feature` — two surviving,
+  equivalent dice-example mutations in the no-payment scenario; the runner
+  refreshed its manifest accordingly.
+- `git diff --check` — passed before the runner's manifest refresh.
+
+No production source changed, so the accepted Phase 12 source mutation and
+DRY results remain applicable. The two survivors are a Gherkin example-design
+defect, not a production or test-helper implementation defect. Under the
+workflow's Gherkin-routing rule, send the finding to specifier at priority
+`00`; do not edit the scenario content here.
+
+## 2026-07-29T10:18:08Z — architect sent phase 12 Gherkin finding to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T101800Z_000041_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 5dfbd58acd
+created_at: 2026-07-29T10:18:00.272381Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 5dfbd58acd
+```
+
+Summary: routed the two equivalent surviving dice-example mutations in the
+jail no-payment scenario to specifier, as required for Gherkin-content
+defects. Phase 12 is not advanceable again until that priority-`00`
+specifier loop returns and is accepted.
+
+## 2026-07-29T10:30:55Z — architect received phase 12 Gherkin review return
+
+Handoff message received:
+
+```
+id: 20260729T103044Z_000020_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 7e250ab97f
+created_at: 2026-07-29T10:30:44.399750Z
+enqueued_at: 2026-07-29T10:30:44.411981Z
+task: phase12-jail
+dequeued_at: 2026-07-29T10:30:51.580462Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7e250ab97f
+```
+
+Action taken: began review of the specifier's priority-`00` decision on the
+Phase 12 Gherkin mutation finding.
+
+## 2026-07-29T10:31:29Z — architect accepted phase 12 Gherkin revision
+
+Action taken: merged specifier commit `7e250ab97f` and accepted its revision:
+the no-payment and unaffordable-strategy scenarios keep only
+mutation-sensitive outcomes in their Examples tables and express the required
+non-double roll as fixed scenario text. This preserves the intended rule while
+removing equivalent input dimensions. No production boundary, implementation,
+or acceptance helper changed.
+
+Verification:
+
+- The specifier's `./acceptance/run-acceptance.sh` run passed 225 generated
+  acceptance tests.
+- Soft Gherkin mutation for `en/rules/jail.feature` — 5/5 killed, zero
+  survivors and zero errors. The runner refreshed its manifest.
+- `git diff --check` — passed.
+
+No changed production source requires another language-mutation or DRY run;
+the previously accepted Phase 12 results remain applicable. The specifier
+already owns and has received the phase state, so do not send a duplicate
+phase-complete handoff. All Phase 12 review loops are closed.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -8555,6 +8707,50 @@ merge_and_process architect a6f1734876
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
 
+## 2026-07-29T11:14:19Z — coder received phase 13 free parking handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260729T111139Z_000021_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: fbde16eb55
+created_at: 2026-07-29T11:11:39.215675Z
+enqueued_at: 2026-07-29T11:11:39.549176Z
+task: phase13-free-parking
+dequeued_at: 2026-07-29T11:11:46.845042Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier fbde16eb55
+```
+
+Action taken: merged the Phase 13 Free Parking specification. Registered its
+feature in the normal acceptance pipeline, added focused game coverage that the
+landing changes only position, and added the direct report-movement assertion
+needed by its report scenario. Domain tests (241) and generated acceptance
+tests (228) pass.
+
+## 2026-07-29T11:14:19Z — coder prepared phase 13 free parking handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase13-free-parking
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: the uneventful Free Parking landing is covered in the game and normal
+acceptance pipeline, with movement narration available as a direct assertion.
+
 ## 2026-07-29T10:09:48Z — coder received phase 12 jail follow-up from specifier
 
 Handoff message received:
@@ -8598,6 +8794,59 @@ commit: recorded after commit creation in the actual handoff file
 
 Summary: adds the acceptance strategy hook for an explicit jail-fine payment,
 leaving the affordability strategy as a separate concern.
+
+## 2026-07-29T09:15:08Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260729T091451Z_000034_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase12-jail
+commit: fb772d1075
+created_at: 2026-07-29T09:14:51.313351Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer fb772d1075
+```
+
+Summary: handed the verified Phase 12 jail refactor to the architect at
+commit `fb772d1075`, including the reduced-complexity `Turn` branch and
+targeted jail coverage.
+
+## 2026-07-29T10:14:21Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T101023Z_000024_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 95ea8a1d7c
+created_at: 2026-07-29T10:10:23.304583Z
+enqueued_at: 2026-07-29T10:10:23.748173Z
+task: phase12-jail
+dequeued_at: 2026-07-29T10:10:29.325733Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 95ea8a1d7c
+```
+
+Action taken: merged coder commit `95ea8a1d7c`, re-ran CRAP, DRY, mutation
+site scans, unit tests, property tests, and acceptance tests. No further
+structural changes were needed; CRAP remains within the threshold except
+for the documented `Report.line` exemption, and changed source files stay
+below the mutation split limit.
 
 ## 2026-07-29T09:28:45Z — coder received phase 12 jail architect follow-up
 
@@ -8888,51 +9137,126 @@ correction.
 
 Per role rules, will now ask the user for the next feature to add.
 
-## 2026-07-29T09:15:08Z — refactorer sent handoff to architect
+## 2026-07-29T10:07:20Z — specifier sent handoff to coder
 
 Handoff message sent:
 
 ```
-id: 20260729T091451Z_000034_from_refactorer
-from: refactorer
-to: architect
+id: 20260729T100720Z_000019_from_specifier
+from: specifier
+to: coder
 priority: 50
 type: git_handoff
-role: refactorer
+role: specifier
 task: phase12-jail
-commit: fb772d1075
-created_at: 2026-07-29T09:14:51.313351Z
+commit: d7f81d2ad3
+created_at: 2026-07-29T10:07:20.818034Z
 
 Re-read your role and constitution.
 
-merge_and_process refactorer fb772d1075
+merge_and_process specifier d7f81d2ad3
 ```
 
-Summary: handed the verified Phase 12 jail refactor to the architect at
-commit `fb772d1075`, including the reduced-complexity `Turn` branch and
-targeted jail coverage.
+Summary: after the phase-complete merge, the user asked two follow-up
+questions about jail-4 that led to a further specifier-owned
+refinement of `jail.feature`, `journal.feature`, and `report.feature`
+(commits `60d86c2` and `d7f81d2`, both included in this handoff since
+neither needed new production code on its own - the second one does
+now).
 
-## 2026-07-29T10:14:21Z — refactorer received handoff from coder
+First (`60d86c2`): jail-4 no longer needs to demonstrate a successful
+doubles escape at all - that mechanic is already covered independently
+by movement-5/6. Retitled to focus purely on the decision: "Agree if
+affordable", unable to afford the fine, does not pay it and stays
+jailed, proven with a non-double roll so `Turn.takeFromJail` never
+calls `move()` - no movement, no landing, no chance of any confound.
+Verified against the already-accepted implementation (223/223
+generated acceptance tests still passed, no coder work needed).
+
+Second (`d7f81d2`): the user then pointed out that jail-3/jail-4 were
+each conflating two concerns - the raw mechanic of choosing to pay (or
+not pay) the jail fine, versus "Agree if affordable"'s specific
+affordability-driven decision to do one or the other - and asked for
+both to be specced separately. Split into two pairs: jail-3/jail-4 now
+test the mechanic via the default `Scripted` strategy and a new "will
+pay the fine to leave jail" override (paying leaves jail and moves the
+same turn; not choosing to pay attempts to roll doubles instead, which
+can fail and leave the player jailed); jail-5/jail-6 (renamed from the
+prior jail-3/jail-4) test "Agree if affordable" itself making that
+same choice based on affordability - the literal Phase 12 strategy-hook
+deliverable. Renumbered the Get-Out-of-Jail-Free-card and
+rent-while-jailed scenarios to jail-7/8, and switched journal-18/
+report-18 to the new mechanic override too, since those entries record
+the jail-exit event itself, not which strategy caused it.
+
+The new "will pay the fine to leave jail" step has no glue code yet -
+this is the one piece of this handoff that needs real coder work; the
+rest is confirmed already passing.
+
+## 2026-07-29T10:13:15Z — specifier amended workflow.prompt (user-authorized)
+
+Action taken: committed `577c071`, adding a rule to
+`swarmforge/constitution/articles/workflow.prompt` at the user's
+explicit request, following their review of the phase12-jail merge.
+
+Context: during Phase 12's review, the architect found a real defect
+in jail-4 (escaping jail via doubles lands on unowned property, and
+"Agree if affordable" always bids its entire available balance at
+auction, an established mechanic - so it wins its own uncontested
+auction and zeroes its balance; not a bug, but an unaccounted-for
+confound in the specifier's original scenario design). The architect's
+fix edited `jail.feature` directly: flattening the `Scenario Outline`
+to a plain `Scenario` and hardcoding the confounded values. This
+silently dropped the scenario out of mutation coverage (the
+acceptance-mutation tool only mutates `Examples:` table values, never
+literal step text) and would have gone unnoticed had the user not
+caught it during their own review of the phase-complete merge summary.
+
+The gap: the architect's own verification sequence already includes
+running soft Gherkin acceptance mutation, so it will keep surfacing
+genuine specification defects - but neither `workflow.prompt` nor
+`architect.prompt` drew a line between the architect's own territory
+(pipeline registration, mutation-manifest housekeeping - e.g. adding a
+feature file to `acceptance/pipeline-features.txt`, done correctly and
+without incident in both Phase 11 and Phase 12) and the specifier's
+exclusive ownership of "acceptance criteria and examples" per
+`specifier.prompt`.
+
+Change: added a new `workflow.prompt` rule (after the existing
+architect/coder/refactorer priority-`00` review-loop block): when the
+architect's review finds a defect in Gherkin scenario *content*, it
+must send a priority-`00` follow-up to the specifier describing the
+finding rather than editing the feature file directly, and treat the
+task as not advanceable until that loop returns - mirroring exactly
+how the architect already waits for coder/refactorer follow-ups to
+close. Also widened the existing "use priority `00` for architect
+handoffs to coder or refactorer" note to include specifier.
+
+This is the third prompt/constitution edit in this project's history.
+Unlike the first two (each an architect-originated change discovered
+after the fact, requiring the specifier to ask about authorization
+before or after merging), this one originated from the user directly
+instructing the specifier to make it, so there is no separate
+authorization question to raise - this entry itself is the audit
+trail.
+
+## 2026-07-29T10:18:20Z — specifier received architect Gherkin follow-up
 
 Handoff message received:
 
 ```
-id: 20260729T101023Z_000024_from_coder
-from: coder
-to: refactorer
-recipient: refactorer
-priority: 50
+id: 20260729T101800Z_000041_from_architect
+from: architect
+to: specifier
+priority: 00
 type: git_handoff
-role: coder
-commit: 95ea8a1d7c
-created_at: 2026-07-29T10:10:23.304583Z
-enqueued_at: 2026-07-29T10:10:23.748173Z
+role: architect
 task: phase12-jail
-dequeued_at: 2026-07-29T10:10:29.325733Z
+commit: 5dfbd58acd
 
 Re-read your role and constitution.
 
-merge_and_process coder 95ea8a1d7c
+merge_and_process architect 5dfbd58acd
 ```
 
 Action taken: merged coder commit `95ea8a1d7c`, re-ran CRAP, DRY, mutation
@@ -8964,3 +9288,79 @@ merge_and_process refactorer 2c973562b8
 Summary: handed the verified Phase 12 follow-up state to the architect at
 commit `2c973562b8`; no additional refactoring was required after the
 coder's follow-up.
+Action taken: merged architect commit `5dfbd58acd` into `main` - the first
+use of the new architect-to-specifier Gherkin-routing rule. One conflict, in
+`logbook.md`; resolved at entry granularity as established, with one mistake
+along the way: my first resolution attempt re-inserted several entries
+(coder/refactorer/architect's late Phase 12 cycle) that git had already
+placed correctly via its own non-conflicting auto-merge elsewhere in the
+file, creating four true duplicate headers. Caught this via the standard
+duplicate-header check, then over-corrected by truncating the whole
+manually-reconstructed block, which also deleted two entries that were
+NOT duplicates ("refactorer sent handoff to architect" at 09:15:08Z,
+commit `fb772d1075`; "refactorer received handoff from coder" at
+10:14:21Z, commit `95ea8a1d7c`). Caught this by diffing the full expected
+header union (HEAD-only headers plus theirs-only headers, both computed
+against the merge-base commit `d7f81d2ad3`) against the merged file's
+actual headers, found exactly these two missing, and reinserted them
+next to their already-present siblings. Final state verified: 279
+headers, matching the expected union exactly; no duplicates; fences
+balanced (452, even).
+
+The routed finding: the architect's own soft Gherkin acceptance mutation
+run surfaced two surviving mutations in jail-4 (the "has not chosen to
+pay" scenario) - its `<die 1>`/`<die 2>` example columns don't get killed,
+since the scenario only cares whether the roll is a double, and any
+non-double pair produces the identical observable outcome. Per its own
+new role rule, the architect did not edit the scenario; it registered the
+finding in the logbook and routed it here at priority `00` instead.
+
+Decision: accepted the finding as correctly diagnosed. Fixed jail-4 by
+dropping the die columns entirely and writing the roll as hardcoded
+literal text ("will roll 4 and 6"), matching the exact same pattern
+already used by jail-3/jail-5/jail-7 for the same reason - keeping only
+`position` and `final balance` as Examples columns, since both are
+genuinely mutation-sensitive (either one being wrong means real behavior
+changed). Found and fixed the identical defect proactively in jail-6
+too (same die-parameterization mistake, not yet flagged by the
+architect): `starting balance` stays parameterized there since $50 is a
+real, mutation-sensitive affordability boundary, but its roll was
+equally incidental. Committed as `fbe4068`.
+
+Verification: `./acceptance/run-acceptance.sh` passes (225/225) against
+the already-accepted implementation; both fixes are pure Examples-table
+edits with no new step text, so no coder work is needed.
+
+Per the new workflow rule, handing this back to the architect now so it
+can resume and close the loop.
+
+## 2026-07-29T10:33:19Z — specifier received phase-complete handoff from architect
+
+Handoff message received:
+
+```
+id: 20260729T103257Z_000042_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 06011df87c
+
+Re-read your role and constitution.
+
+merge_and_process architect 06011df87c
+```
+
+Action taken: fast-forward merged architect commit `06011df87c` into
+`main`, no conflicts. This closes the architect-to-specifier Gherkin
+routing loop on its first real use: the architect accepted the
+specifier's fix (dropping jail-4/jail-6's under-mutated die columns),
+re-ran soft Gherkin mutation, and confirmed both scenarios now show
+0 survivors in the refreshed manifest. `phase12-jail` is now fully
+closed.
+
+Verification: `mvn -q -o test` passes on the merged state (exit 0).
+
+Per role rules, will now ask the user for the next feature to add.
