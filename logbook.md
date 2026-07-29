@@ -8940,3 +8940,27 @@ site scans, unit tests, property tests, and acceptance tests. No further
 structural changes were needed; CRAP remains within the threshold except
 for the documented `Report.line` exemption, and changed source files stay
 below the mutation split limit.
+
+## 2026-07-29T10:14:58Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260729T101454Z_000035_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase12-jail
+commit: 2c973562b8
+created_at: 2026-07-29T10:14:54.320297Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 2c973562b8
+```
+
+Summary: handed the verified Phase 12 follow-up state to the architect at
+commit `2c973562b8`; no additional refactoring was required after the
+coder's follow-up.
