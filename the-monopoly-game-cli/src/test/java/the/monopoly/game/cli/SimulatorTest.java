@@ -22,7 +22,7 @@ class SimulatorTest {
     Simulator.Result result = Simulator.run(2, Strategy.OfPlayers.NOBODY_DECIDES);
 
     assertThat(result.succeeded()).isTrue();
-    assertThat(result.output()).contains("The game starts").contains("wins the game");
+    assertThat(result.output()).contains("The game starts").contains("dog wins the game");
   }
 
   @Test
@@ -32,6 +32,21 @@ class SimulatorTest {
     );
 
     assertThat(result.succeeded()).isTrue();
-    assertThat(result.output()).contains("goes bankrupt").contains("wins the game");
+    assertThat(result.output()).contains("dog rolls 2 for initiative")
+        .contains("high hat rolls 3 for initiative")
+        .contains("iron box rolls 4 for initiative")
+        .contains("racecar rolls 5 for initiative")
+        .contains("ship rolls 6 for initiative")
+        .contains("shoe rolls 7 for initiative")
+        .contains("thimble rolls 8 for initiative")
+        .contains("wheelbarrow rolls 9 for initiative")
+        .contains("wheelbarrow goes bankrupt")
+        .contains("dog goes bankrupt")
+        .contains("high hat goes bankrupt")
+        .contains("iron box goes bankrupt")
+        .contains("racecar goes bankrupt")
+        .contains("ship goes bankrupt")
+        .contains("shoe goes bankrupt")
+        .contains("thimble wins the game");
   }
 }

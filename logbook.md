@@ -10491,3 +10491,25 @@ merge_and_process refactorer bb31d20c44
 ```
 
 Action taken: began architectural review of the corrected Phase 15 CLI state.
+
+## 2026-07-29T13:40:55Z — architect isolated the Phase 15 CLI adapter
+
+Action taken: moved `Simulator` and its focused tests from the domain artifact
+to the new `the-monopoly-game-cli` module. The module depends inward on the
+domain; core acceptance bindings reference it only with test scope. The CLI
+test now pins the deterministic terminal-game trace.
+
+Verification: affected reactor tests passed (250 domain tests and 3 CLI
+tests); acceptance generation passed. CLI source mutation killed 19/19 sites.
+DRY found no new CLI duplication.
+
+## 2026-07-29T13:40:55Z — architect found a Phase 15 CLI boundary-example gap
+
+Review finding: soft Gherkin mutation of `specs-cli:en/cli.feature` survives
+both `players: 1 -> -3` and `players: 9 -> 17`. The invalid-count scenario
+only proves that some out-of-range input fails, not the official lower and
+upper bounds named in its examples.
+
+Action taken: route this Gherkin-content defect to specifier at priority `00`.
+Phase 15 remains open until that loop and the structural refactor review
+return and are accepted.

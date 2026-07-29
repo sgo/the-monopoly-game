@@ -10,6 +10,7 @@
 
     <modules>
         <module>the-monopoly-game-domain</module>
+        <module>the-monopoly-game-cli</module>
         <module>the-monopoly-game-specs</module>
     </modules>
 
@@ -18,6 +19,11 @@
             <dependency>
                 <groupId>the.monopoly.game</groupId>
                 <artifactId>the-monopoly-game-domain</artifactId>
+                <version>0.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>the.monopoly.game</groupId>
+                <artifactId>the-monopoly-game-cli</artifactId>
                 <version>0.0.0-SNAPSHOT</version>
             </dependency>
             <dependency>
