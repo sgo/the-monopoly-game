@@ -10351,6 +10351,29 @@ merge_and_process specifier c7a0dde7dc
 Summary: returned the revised CLI acceptance criterion requiring every player
 to begin with the official $1500 before the first turn.
 
+## 2026-07-29T15:48:20Z — specifier sent monopoly-10-runs handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260729T154809Z_000030_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: monopoly-10-runs
+commit: d6ac140f28
+created_at: 2026-07-29T15:48:09.474026Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d6ac140f28
+```
+
+Summary: handed off the approved `monopoly-1` change reducing the simulated
+game count from 1000 to 10.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
