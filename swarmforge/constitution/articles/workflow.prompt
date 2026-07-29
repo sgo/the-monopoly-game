@@ -25,10 +25,13 @@
   - If the coder needs implementation changes for an architect follow-up, the coder may make and verify them, then hand the result to the refactorer as normal; after the refactorer completes, the result returns to the architect.
   - If the refactorer needs structural changes for an architect follow-up, the refactorer may make and verify them, then hand the result back to the architect.
   - The architect alone sends the phase-complete specifier sync after all coder/refactorer follow-up loops for the task are closed and accepted.
+- If the architect's review finds a defect in Gherkin scenario content (acceptance criteria or examples, not pipeline registration or mutation-manifest housekeeping), the architect must not edit the feature file directly. Send a priority `00` follow-up to the specifier describing the finding instead, and treat the task as not yet advanceable until that loop returns.
+  - The specifier reviews the finding under its own role rules and decides whether to accept, revise, or decline the proposed change, then commits its decision and hands the result back to the architect using the same task name.
+  - The architect resumes the review only after this specifier loop returns and is accepted, the same way it waits for a coder or refactorer follow-up loop to close.
 - If one or more messages arrive while you are busy:
   - Save each complete message as its own file in a local untracked `pending-messages/` directory in your assigned worktree.
   - Name queued message files with this format: `PP-YYYYMMDD-HHMMSS-source.txt`, where `PP` is the two-digit priority.
-  - Use priority `00` for architect handoffs to coder or refactorer.
+  - Use priority `00` for architect handoffs to coder, refactorer, or specifier.
   - Use priority `50` for normal messages unless a role prompt or explicit user instruction sets a different priority.
   - Finish the current job before acting on queued messages.
   - After the current job is complete and any required handoff has been sent, process queued message files in sorted filename order.
