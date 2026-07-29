@@ -11034,3 +11034,32 @@ strategies without changing the CLI shape.
 Action taken: route this remaining observable CLI contract gap to coder at
 priority 00. The executable entry point, help output, stdout report, and
 invalid-input exit path are already in place.
+
+## 2026-07-29T14:17:59Z — coder received architect strategy-selection follow-up
+
+Handoff message received:
+
+```
+id: 20260729T141619Z_000055_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: ca8b1b2144
+
+Re-read your role and constitution.
+
+merge_and_process architect ca8b1b2144
+```
+
+Action taken: merged `ca8b1b2144`; added a named strategy registry and
+per-player command-line selection. Omitted selections default to
+`agree-if-affordable`; supplied selections are validated one-for-one against
+the player count, with clear errors for unknown strategies.
+
+Verification: CLI reactor tests pass (257); generated acceptance passes
+(246 scenarios).
+
+Handing implementation to refactorer for review.
