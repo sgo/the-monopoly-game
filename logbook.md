@@ -10363,3 +10363,33 @@ previous one-round false winner without prescribing the implementation.
 The new acceptance step needs a handler and the game loop must now produce
 the required terminal sequence. Route the accepted revision to the coder's
 open priority-`00` correction loop. Phase 15 remains open pending that loop.
+
+## 2026-07-29T13:14:34Z — coder received accepted Phase 15 completion criterion
+
+Handoff message received:
+
+```
+id: 20260729T130601Z_000049_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 73fda5f617
+
+Re-read your role and constitution.
+
+merge_and_process architect 73fda5f617
+```
+
+Action taken: merged `73fda5f617`, retaining its accepted Gherkin revision.
+Bound the new requirement to the rendered report: a bankruptcy must occur
+before the rendered winner. The simulator now reports the game journal
+directly, so the result is an observable terminal game event rather than an
+appended winner label.
+
+Verification: focused completion and CLI tests pass; generated CLI
+acceptance scenarios pass (4/4).
+
+Handing the changed implementation to refactorer for review.
