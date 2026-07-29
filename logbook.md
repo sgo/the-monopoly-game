@@ -8787,3 +8787,59 @@ Verification: all touched feature files re-parsed and passed the
 `ir-dry-checker` with only the established baseline "possible-synonym"
 noise (no new duplicate findings); `mvn -q -o test` passes unaffected
 (feature-file-only changes, no compiled Java touched).
+
+## 2026-07-29T09:43:47Z — specifier received phase-complete handoff from architect
+
+Handoff message received:
+
+```
+id: 20260729T093538Z_000040_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 149762d57f
+
+Re-read your role and constitution.
+
+merge_and_process architect 149762d57f
+```
+
+Action taken: merged architect commit `149762d57f` into `main`, closing out
+the `phase12-jail` task. Clean merge (only `logbook.md` auto-merged, no
+conflicts). This brought in the coder's `Jail` rule (imprisonment,
+fine/card/doubles exits, forced fine after three failed attempts, the
+new `Strategy.pays`/`Strategy.JailFine` hook, and `AgreeIfAffordable`'s
+matching override), the refactorer's pass, and the architect's own
+priority-`00` follow-up fixing a real state bug: the pre-existing
+3-doubles-in-a-row path (`Turn.sendToJail`) moved the pawn to the
+visiting space but never registered it as held by `Jail`, so a
+3-doubles player could freely take normal turns instead of being
+confined. Also registered `en/rules/jail.feature` in
+`acceptance/pipeline-features.txt` (the specifier had created the file
+but never wired it in, the same gap caught in Phase 11).
+
+The architect's follow-up also touched jail-4 directly: it correctly
+diagnosed that escaping jail via doubles lands on unowned Lippenslaan
+Knokke, and `AgreeIfAffordable.bidFor()` always bids the pawn's entire
+available balance (an established mechanic already covered by
+`buying-land-2`) — so with nobody else bidding, dog wins its own
+auction at its full $40, zeroing its balance. Not a bug. But the fix
+flattened the scenario from `Scenario Outline` to a plain `Scenario`
+with the confound hardcoded, which drops it out of mutation coverage
+entirely per the specifier's own mandated convention, and broadens the
+scenario beyond its stated intent (the fine-vs-doubles choice, not the
+auction-bidding mechanic). Corrected this as commit `55fc584`: restored
+jail-4 as a `Scenario Outline`, landing on Free Parking instead of an
+ownable street (the same avoidance technique already used in
+jail-3/jail-5), so the fine-affordability threshold is the only thing
+under test. Verified against the real implementation: all 223
+generated acceptance tests pass (`./acceptance/run-acceptance.sh`).
+
+Verification: `mvn -q -o test` passes on the merged state (exit 0);
+`./acceptance/run-acceptance.sh` passes (223/223) after the jail-4
+correction.
+
+Per role rules, will now ask the user for the next feature to add.
