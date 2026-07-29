@@ -4,6 +4,7 @@ import the.monopoly.game.Game;
 import the.monopoly.game.Report;
 import the.monopoly.game.components.dice.Cup;
 import the.monopoly.game.components.dice.Roll;
+import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Pawn;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
@@ -82,10 +83,11 @@ public final class Simulator {
       return new Result(1, "The number of players must be between 2 and 8; received " + playerCount + " players.");
 
     List<Player> players = rules.players().select(playerCount).toList();
+    List<Money> startingBalances = players.stream().map(player -> player.account().balance().amount()).toList();
     Deeds deeds = terminalGameSetup(rules, players);
     Game.Result game = new Game(rules, players, simulationCups(players), strategies, deeds).playToCompletion();
     game.winner().orElseThrow();
-    return new Result(0, Report.of(game.journal()));
+    return new Result(0, Report.of(game.journal()), startingBalances);
   }
 
   private static Game.Cups simulationCups(List<Player> players) {
@@ -122,7 +124,11 @@ public final class Simulator {
   }
 
 
-  public record Result(int exitCode, String output) {
+  public record Result(int exitCode, String output, List<Money> startingBalances) {
+    public Result(int exitCode, String output) {
+      this(exitCode, output, List.of());
+    }
+
     public boolean succeeded() {
       return exitCode == 0;
     }

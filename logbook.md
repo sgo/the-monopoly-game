@@ -10354,6 +10354,56 @@ ownership and improvements, inventory, and complete Chance and Community
 Chest decks.
 
 ## 2026-07-29T14:42:20Z — specifier returned Phase 15 starting-capital revision
+## 2026-07-29T15:55:04Z — refactorer received coder starting-balance acceptance fix
+
+Handoff message received:
+
+```
+id: 20260729T155356Z_000037_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 0748405346
+created_at: 2026-07-29T15:53:56.732311Z
+enqueued_at: 2026-07-29T15:53:56.787262Z
+task: phase15-cli
+dequeued_at: 2026-07-29T15:54:04.317802Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 0748405346
+```
+
+Action taken: merged the observable starting-balance acceptance assertion and
+verified 11 focused CLI tests; the broader generated acceptance limitation is
+recorded in the preceding coder review entry.
+
+## 2026-07-29T15:48:52Z — coder received specification synchronization
+
+Handoff message received:
+
+```
+id: 20260729T144359Z_000060_from_architect_to_coder
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 53e9a1f8dc
+```
+
+Action taken: merged the architect synchronization, including the independent
+CLI starting-balance acceptance criterion. Resolving the shared logbook record
+before verifying the merged acceptance criterion.
+
+Verification: regenerated the CLI acceptance entry point and passed its four
+scenarios, including the new starting-balance assertion. `SimulatorTest` also
+passed all 11 tests.
+
 ## 2026-07-29T14:42:23Z — architect accepted Phase 15 starting-capital criterion
 
 Action taken: accepted the new CLI-level $1500 pre-turn assertion. Forwarding
@@ -10366,25 +10416,6 @@ before this reopened phase can close.
 Handoff message sent:
 
 ```
-id: 20260729T144211Z_000029_from_specifier
-from: specifier
-to: architect
-priority: 00
-type: git_handoff
-role: specifier
-task: phase15-cli
-commit: c7a0dde7dc
-created_at: 2026-07-29T14:42:11.171871Z
-
-Re-read your role and constitution.
-
-merge_and_process specifier c7a0dde7dc
-```
-
-Summary: returned the revised CLI acceptance criterion requiring every player
-to begin with the official $1500 before the first turn.
-
-## 2026-07-29T15:48:20Z — specifier sent monopoly-10-runs handoff to coder
 id: 20260729T144359Z_000060_from_architect
 from: architect
 to: coder
@@ -10495,23 +10526,6 @@ priority 00. The starting-capital Gherkin criterion remains accepted.
 Handoff message sent:
 
 ```
-id: 20260729T154809Z_000030_from_specifier
-from: specifier
-to: coder
-priority: 50
-type: git_handoff
-role: specifier
-task: monopoly-10-runs
-commit: d6ac140f28
-created_at: 2026-07-29T15:48:09.474026Z
-
-Re-read your role and constitution.
-
-merge_and_process specifier d6ac140f28
-```
-
-Summary: handed off the approved `monopoly-1` change reducing the simulated
-game count from 1000 to 10.
 id: 20260729T155222Z_000061_from_architect
 from: architect
 to: coder
@@ -10544,32 +10558,238 @@ Action taken: route the specification gap to specifier at priority 00. The
 specifier may need user direction to settle the intended completion policy;
 the current coder correction remains open.
 
-## 2026-07-29T15:55:36Z — specifier received Phase 15 setup-policy follow-up
+## 2026-07-29T15:54:57Z — architect sent Phase 15 CLI setup-specification follow-up
 
-Handoff message received:
+Handoff message sent:
 
 ```
 id: 20260729T155457Z_000062_from_architect
 from: architect
 to: specifier
-recipient: specifier
 priority: 00
 type: git_handoff
 role: architect
+task: phase15-cli
 commit: b633110da5
 created_at: 2026-07-29T15:54:57.478058Z
-enqueued_at: 2026-07-29T15:54:58.351392Z
-task: phase15-cli
 
 Re-read your role and constitution.
 
 merge_and_process architect b633110da5
 ```
 
-Action taken: merged architect commit `b633110da5`, preserving the review
-history. The architect identified an ambiguity requiring user direction on
-the valid completion policy for a full CLI simulation without pre-arranged
-balances, positions, or assets.
+Action taken: requested normal-setup and non-prearranged-completion criteria
+from specifier, with user consultation where the simulation policy is not yet
+defined.
+
+## 2026-07-29T15:55:53Z — architect received Phase 15 initial-state return from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T155542Z_000049_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 6598335d45
+created_at: 2026-07-29T15:55:42.031574Z
+enqueued_at: 2026-07-29T15:55:42.259330Z
+task: phase15-cli
+dequeued_at: 2026-07-29T15:55:46.851105Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 6598335d45
+```
+
+Action taken: began architectural review of the refactorer-returned
+initial-state correction while the specification loop remains outstanding.
+
+## 2026-07-29T15:55:53Z — architect rejected Phase 15 initial-state closure
+
+Review found that the return snapshots the €1500 balances for the new
+assertion but retains the pre-owned hotel and player repositioning fixture.
+That does not restore normal standard setup. The already-sent priority-00
+coder correction remains outstanding, as does the specifier's broader setup
+criteria; no phase-complete handoff is warranted.
+
+## 2026-07-29T16:00:47Z — architect received further Phase 15 initial-state return from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T160034Z_000050_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: cc23e95b1f
+created_at: 2026-07-29T16:00:34.702898Z
+enqueued_at: 2026-07-29T16:00:35.762761Z
+task: phase15-cli
+dequeued_at: 2026-07-29T16:00:39.769202Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer cc23e95b1f
+```
+
+Action taken: began review of the further initial-state correction return.
+
+## 2026-07-29T15:54:00Z — coder reviewed the initial-state defect
+
+Handoff message received:
+
+```
+id: 20260729T155222Z_000061_from_architect_to_coder
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 22da133076
+```
+
+Decision: no replacement shortcut was committed. The pre-owned hotel fixture
+is not valid; a normal initial state requires the pending specification of a
+legitimate completion policy.
+
+## 2026-07-29T16:00:34Z — refactorer returned initial-state review
+
+Decision: no product changes. The refactorer correctly retained normal setup
+as the requirement and did not accept a substitute fixture. The specifier's
+normal-setup and completion-policy loop remains the next required input.
+
+## 2026-07-29T16:02:11Z — architect received `monopoly-10-runs` return from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T160200Z_000051_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: d5ca084455
+created_at: 2026-07-29T16:02:00.234017Z
+enqueued_at: 2026-07-29T16:02:00.553896Z
+task: monopoly-10-runs
+dequeued_at: 2026-07-29T16:02:05.475535Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d5ca084455
+```
+
+Action taken: began architectural review of the separate ten-run simulator
+return.
+
+## 2026-07-29T16:02:11Z — architect accepted `monopoly-10-runs` review
+
+Action taken: accepted the behavior specification's ten-run bound. It changes
+only the Gherkin example count and introduces no CLI, domain, or module
+boundary change. Routing this independent completed task to specifier for
+branch synchronization.
+
+## 2026-07-29T16:03:13Z — architect sent `monopoly-10-runs` completion sync to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T160313Z_000063_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: monopoly-10-runs
+commit: b7f855bc13
+created_at: 2026-07-29T16:03:13.426989Z
+
+Re-read your role and constitution.
+
+merge_and_process architect b7f855bc13
+```
+
+Action taken: sent the completed ten-run specification review to specifier.
+
+## 2026-07-29T16:04:13Z — architect received Phase 15 setup-specification return
+
+Handoff message received:
+
+```
+id: 20260729T160402Z_000031_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 8639b0007b
+created_at: 2026-07-29T16:04:02.503108Z
+enqueued_at: 2026-07-29T16:04:02.968920Z
+task: phase15-cli
+dequeued_at: 2026-07-29T16:04:07.397084Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 8639b0007b
+```
+
+Action taken: began architectural review of the returned normal-setup and
+completion-policy criteria.
+
+## 2026-07-29T16:04:13Z — architect accepted Phase 15 normal-setup criteria
+
+Action taken: accepted the standard-setup criteria: the core owns the initial
+configuration, and the CLI consumes it without mutating player balances,
+positions, assets, or card decks. Forwarding the revised specification to
+coder. The complete-game termination policy is intentionally left for the
+specifier to settle with the user before a full CLI game can be accepted.
+
+## 2026-07-29T16:07:06Z — architect sent Phase 15 normal-setup implementation to coder
+
+Handoff message sent:
+
+```
+id: 20260729T160706Z_000064_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: c7fcea90f0
+created_at: 2026-07-29T16:07:06.159667Z
+
+Re-read your role and constitution.
+
+merge_and_process architect c7fcea90f0
+```
+
+Action taken: sent the core-owned normal-setup implementation to coder; it
+returns through refactorer. Completion policy remains pending user/specifier
+direction.
+
+## 2026-07-29T16:09:30Z — user set Phase 15 CLI completion policy
+
+User direction: the CLI does not need prompt completion. It must use real
+random dice, start from the normal standard configuration, and let each
+selected strategy play normally until bankruptcies leave one player. No
+pre-arranged balances, positions, assets, dice trace, turn cap, or synthetic
+winner is permitted.
+
+Action taken: route this authoritative policy to specifier for acceptance
+criteria and coder for implementation alignment. The existing normal-setup
+loop remains open.
 
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
