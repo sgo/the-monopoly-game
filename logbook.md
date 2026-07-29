@@ -10615,6 +10615,31 @@ merge_and_process refactorer cc23e95b1f
 
 Action taken: began review of the further initial-state correction return.
 
+## 2026-07-29T15:54:00Z — coder reviewed the initial-state defect
+
+Handoff message received:
+
+```
+id: 20260729T155222Z_000061_from_architect_to_coder
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 22da133076
+```
+
+Decision: no replacement shortcut was committed. The pre-owned hotel fixture
+is not valid; a normal initial state requires the pending specification of a
+legitimate completion policy.
+
+## 2026-07-29T16:00:34Z — refactorer returned initial-state review
+
+Decision: no product changes. The refactorer correctly retained normal setup
+as the requirement and did not accept a substitute fixture. The specifier's
+normal-setup and completion-policy loop remains the next required input.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
