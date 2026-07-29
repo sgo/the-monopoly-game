@@ -10328,6 +10328,34 @@ the CLI implementation.
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
 
+## 2026-07-29T15:59:59Z — refactorer received coder initial-state review
+
+Handoff message received:
+
+```
+id: 20260729T155634Z_000038_from_coder_to_refactorer
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: aae224e0ba
+created_at: 2026-07-29T15:56:34.132829Z
+enqueued_at: 2026-07-29T15:56:34.460760Z
+task: phase15-cli
+dequeued_at: 2026-07-29T15:56:39.339679Z
+
+Re-read your role and constitution.
+
+merge_and_process coder aae224e0ba
+```
+
+Action taken: merged coder commit `aae224e0ba`. It records that removing the
+invalid pre-owned hotel fixture restores official initial state but leaves the
+deterministic cup without a terminal path. No production code changed. Ran
+the focused CLI suite: 11 tests passed.
+
 ## 2026-07-29T15:55:04Z — refactorer received coder starting-balance acceptance fix
 
 Handoff message received:
