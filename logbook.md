@@ -10328,6 +10328,32 @@ the CLI implementation.
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
 
+## 2026-07-29T15:48:52Z — coder received specification synchronization
+
+Handoff message received:
+
+```
+id: 20260729T144359Z_000060_from_architect_to_coder
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 53e9a1f8dc
+```
+
+Action taken: merged the architect synchronization, including the independent
+CLI starting-balance acceptance criterion. Resolving the shared logbook record
+before verifying the merged acceptance criterion.
+
+## 2026-07-29T14:42:23Z — architect accepted Phase 15 starting-capital criterion
+
+Action taken: accepted the new CLI-level $1500 pre-turn assertion. Forwarding
+the revised feature to coder so implementation and acceptance support are
+reviewed against the same contract. The refactorer return remains required
+before this reopened phase can close.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
@@ -11269,12 +11295,35 @@ the official capital and is not artificially debited before the first turn.
 The coder returns through refactorer; architect will accept both loops before
 closing the reopened phase.
 
-## 2026-07-29T15:47:57Z — coder received starting-capital correction
+## 2026-07-29T14:39:45Z — architect sent Phase 15 starting-capital specification follow-up
 
-Handoff message received:
+Handoff message sent:
 
 ```
-id: 20260729T143946Z_000059_from_architect_to_coder
+id: 20260729T143945Z_000058_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 07c95bf1e9
+created_at: 2026-07-29T14:39:45.905924Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 07c95bf1e9
+```
+
+Action taken: sent the missing starting-capital acceptance-criterion review to
+specifier.
+
+## 2026-07-29T14:39:46Z — architect sent Phase 15 starting-capital implementation follow-up
+
+Handoff message sent:
+
+```
+id: 20260729T143946Z_000059_from_architect
 from: architect
 to: coder
 priority: 00
@@ -11282,14 +11331,77 @@ type: git_handoff
 role: architect
 task: phase15-cli
 commit: 07c95bf1e9
+created_at: 2026-07-29T14:39:46.034889Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 07c95bf1e9
 ```
 
-Action taken: merged the architect handoff, removed the simulator's artificial
-pre-game debit, and replaced it with a deterministic terminal fixture that
-preserves every selected player's official €1500 balance. Added regression
-coverage for that balance and for prompt eight-player completion.
+Action taken: sent the €5 pre-game-debit removal and regression coverage to
+coder; its normal review path is coder to refactorer to architect.
 
-Verification: `SimulatorTest` passed (11 tests). The normal acceptance command
-was attempted twice; it entered the existing generated `en/monopoly.feature`
-whole-game loop and produced unbounded journal output, so it did not reach a
-completion summary. The focused CLI acceptance report remains green (4 tests).
+## 2026-07-29T14:42:23Z — architect received Phase 15 starting-capital specification return
+
+Handoff message received:
+
+```
+id: 20260729T144211Z_000029_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: c7a0dde7dc
+created_at: 2026-07-29T14:42:11.171871Z
+enqueued_at: 2026-07-29T14:42:11.924152Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:42:17.073532Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier c7a0dde7dc
+```
+
+Action taken: began review of the returned starting-capital acceptance
+criterion; the coder/remediation loop remains outstanding.
+
+## 2026-07-29T14:45:00Z — specifier received Phase 15 starting-capital follow-up
+
+Handoff message received:
+
+```
+id: 20260729T143945Z_000058_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: 07c95bf1e9
+created_at: 2026-07-29T14:39:45.905924Z
+enqueued_at: 2026-07-29T14:39:46.535839Z
+task: phase15-cli
+
+Re-read your role and constitution.
+
+merge_and_process architect 07c95bf1e9
+```
+
+Action taken: merged architect commit `07c95bf1e9`, preserving the reopened
+Phase 15 review record. Accepted the starting-capital finding for
+specification revision.
+
+## 2026-07-29T14:50:00Z — specifier revised Phase 15 starting-capital criterion
+
+Decision: accepted the architect's finding that the simulator artificially
+debits players to €5 before the first turn, violating the official €1500
+starting capital.
+
+Revision: added an independent `starting balance` assertion to the default
+strategy CLI scenario, requiring every player to begin with $1500 before the
+first turn.
+
+Verification: the revised feature parses successfully and `ir-dry-checker`
+reported only intentional possible-synonym findings.

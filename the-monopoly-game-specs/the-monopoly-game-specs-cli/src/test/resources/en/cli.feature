@@ -12,13 +12,14 @@ Feature: Monopoly command line interface
     Given the simulator is configured for <players> players without strategy choices
     When I run the simulator
     Then the simulator exits successfully
+    And every player starts with $<starting balance> before the first turn
     And the output contains a human-readable game report
     And the report contains a bankruptcy before the game's winner
     And the report contains the game's winner
 
     Examples:
-      | players |
-      | 2       |
+      | players | starting balance |
+      | 2       | 1500             |
 
   # cli-2
   Scenario Outline: the CLI runs a complete game with selected player strategies
