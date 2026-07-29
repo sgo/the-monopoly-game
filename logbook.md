@@ -8911,3 +8911,32 @@ merge_and_process refactorer fb772d1075
 Summary: handed the verified Phase 12 jail refactor to the architect at
 commit `fb772d1075`, including the reduced-complexity `Turn` branch and
 targeted jail coverage.
+
+## 2026-07-29T10:14:21Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T101023Z_000024_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 95ea8a1d7c
+created_at: 2026-07-29T10:10:23.304583Z
+enqueued_at: 2026-07-29T10:10:23.748173Z
+task: phase12-jail
+dequeued_at: 2026-07-29T10:10:29.325733Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 95ea8a1d7c
+```
+
+Action taken: merged coder commit `95ea8a1d7c`, re-ran CRAP, DRY, mutation
+site scans, unit tests, property tests, and acceptance tests. No further
+structural changes were needed; CRAP remains within the threshold except
+for the documented `Report.line` exemption, and changed source files stay
+below the mutation split limit.
