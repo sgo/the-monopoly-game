@@ -8272,3 +8272,35 @@ Mutation-site scan on every changed/new file stays far under the
 `Report.java` 1, `Taxes.java` 2 (new file). No refactor was needed this
 round — the coder's and architect's own work already left the tree clean
 against every gate.
+
+## 2026-07-29T07:28:41Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260729T072841Z_000033_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase11-taxes
+commit: a9fe953896
+created_at: 2026-07-29T07:28:41.818041Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer a9fe953896
+```
+
+Summary: merged the Phase 11 tax rule and the architect's own Phase 10
+follow-up (both new to this branch). Resolved an unusual `logbook.md`
+conflict where my own Phase 10 "sent" entry had been split by the merge
+into two fragments around the architect's follow-up entries — root cause
+was that the coder's branch history never carried my two Phase 10 entries
+at all, apparently lost somewhere upstream. All gates clean without
+changes: CRAP exceeds only for the exempt `Report.line` (21,1, unchanged
+shape), DRY findings are the same two long-standing reviewed categories,
+mutation-site scan on every changed/new file (`Cards`, `Deeds`, `Game`,
+`Report`, `Taxes`) stays well under 100. 249 unit tests, 17 property
+tests, and 209 acceptance tests all pass.
