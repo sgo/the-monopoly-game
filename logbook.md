@@ -7850,6 +7850,137 @@ entries for card draws and bank payments. Verification passed with `mvn -B
 -Dmaven.repo.local=/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/tmp/m2
 test` and `acceptance/run-acceptance.sh` (using the same local Maven repo).
 
+## 2026-07-28T21:42:19Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/50_20260728T214219Z_000019_from_coder_to_refactorer.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase10-chance-and-community-chest
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder f79d6ebfdc
+```
+
+Action taken: merged `f79d6ebfdc` into `swarmforge-refactorer` as `d82297a`.
+Only `logbook.md` conflicted, on the now-familiar entry-alignment pattern:
+the coder's branch carried 4 new entries I didn't have (the architect's
+receipt of my phase 9 handoff, the specifier's merge that closed phase 9 and
+carried a second undocumented-but-user-confirmed prompt edit — this one
+adding explicit return routing for the architect's priority-`00` follow-up
+loop — and the specifier→coder chain opening phase 10), against my own two
+already-logged phase 9 entries. All 6 fell into one chronological chain.
+Header-count arithmetic: 226 (common ancestor) + 2 (mine, already known) + 8
+(coder's, new — 4 in the conflict region, 4 auto-merged elsewhere in the
+file without conflict) = 236, matching the merged file exactly, `uniq -d`
+clean.
+
+The card slice: new `Cards` class implements `Landings` for Chance and
+Community Chest, dispatching on the literal Dutch card text via two switch
+statements (15 chance cases, 16 community chest cases) covering movement
+(with/without passing-Start salary), flat bank payments and receipts,
+player-to-player collections, nearest-station and nearest-utility routing
+(buy-if-unowned or pay-double/roll-and-pay-tenfold if owned), a
+per-house/per-hotel repair charge, and retained Get Out of Jail Free cards
+(`Deeds` gained `hold`/`holdsGetOutOfJailFreeCard`/`sellGetOutOfJailFreeCard`
+backed by a new `RetainedCard` enum). `Journal`/`Report` gained
+`ChanceCardDrawn`, `CommunityChestCardDrawn`, and `BankPaid`. Production
+`Game` still defaults to `Cards.Decks.EMPTY` (always draws nothing) — the
+same staging pattern as mortgaging in Phase 8 and land sale in Phase 9,
+where a mechanic's domain plumbing lands before it's wired into the turn
+loop's live deck source. Not treated as a defect. Also noticed in passing:
+the architect's own review of the Phase 9 handoff replaced my
+`buildableMonopoliesOwnedBy`/`mortgagedMonopoliesOwnedBy` bodies with a
+shared `monopoliesOwnedBy(player, Predicate)` helper — the two named
+accessors I'd deliberately kept separate are still there and still what
+callers see; only the body duplication I'd left alone is gone. Better
+outcome than my own choice, not a conflict with it.
+
+CRAP was not clean this time, and not eligible for the sealed-switch
+exemption: `resolveChance` measured CRAP 100,4 (CC 17, 33,9% covered) and
+`resolveCommunityChest` measured 247,4 (CC 18, 10,9% covered) — both far
+past the tool's own 8.0 gate and this role's 6.0 target. The exemption in
+`refactorer.prompt` is narrowly for "a switch over a sealed type that is
+exhaustive by compilation"; a `String` switch carries no compiler-checked
+exhaustiveness, so unlike `Report.line` this could not simply be recorded
+and left alone — it needed an actual fix. Replaced both switches with a
+`Map<String, Consumer<Player>>` built once per `Cards` instance (one per
+deck), collapsing `resolveChance`/`resolveCommunityChest` to a single map
+lookup each. Every card string was extracted from the original switch by a
+small script reading the source directly, rather than retyped by hand — a
+single mistyped character in a 31-entry table of Dutch sentences would
+silently turn a card into a no-op with no compiler or test signal, which is
+exactly the failure mode this dispatch shape already has once live (an
+unmatched string falls through to a no-op default). Full unit, property,
+and acceptance verification confirmed identical behavior before and after
+the swap — same 219 assertions' worth of cards exercised, same journal
+entries, same balances.
+
+That swap didn't fully close CRAP: `repair` (CC 6, 0% covered → CRAP 42,0),
+`collectFromEveryOtherPlayer` (CC 3, 0% → CRAP 12,0), and
+`nearestStationFrom` (CC 4, 29,4% → CRAP 9,6) were flagged for the same
+reason `Deeds` and `Rent` were in earlier phases: real logic the acceptance
+suite exercises but that `crap4java` can't see, since it only reads the
+unit-test JaCoCo run. Added five `GameTest` cases: a repair charge across a
+houses-owned and a hotel-owned street, a repair no-op when nothing is
+improved, a community-chest collection from every other player, and two
+more `nearestStationFrom` branches (Buurtspoorwegen and NoordStation,
+reached by landing exactly on the Chance space at board positions 22 and 36
+respectively — the fourth branch, ZuidStation, has no Chance space in its
+range on the official board and isn't reachable through `Cards`' only entry
+point). `repair` now measures 100% covered at CRAP 6,0 (satisfies "6 or
+below"); the other two dropped well clear of the threshold too.
+
+dry4java then caught a duplicate I introduced myself:
+`resolveChance`/`resolveCommunityChest` were now identical two-line bodies
+differing only in which map they read. Extracted `applyEffect(effects, card,
+player)`, the same shape as `firstOfferedBuild` in Phase 9 — DRY count 35.
+Left `payEveryOtherPlayer`/`collectFromEveryOtherPlayer` alone despite also
+being near-identical (opposite withdraw/deposit direction): collapsing them
+to a boolean-flag parameter would cost the same clarity the project has
+declined to trade away before.
+
+Full verification on the final state: 219 unit tests, 17 property tests,
+and 207 acceptance tests (up from 162 — `cards.feature`) all pass. CRAP
+clean but for the exempt `Report.line` (now 21,1, three more `Journal.Entry`
+variants). Mutation scan on every changed file stays well under the
+100-site threshold (`Cards` is the largest of the changed files at 34).
+Nothing else left to do on this state.
+
+## 2026-07-28T22:14:40Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260728T221440Z_000032_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase10-chance-and-community-chest
+commit: d990a64b1d
+created_at: 2026-07-28T22:14:40.127984Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d990a64b1d
+```
+
+Summary: merged the card-handling slice and replaced its two String-switch
+dispatches (CRAP 100,4 and 247,4 — the sealed-switch exemption does not
+cover a non-exhaustive String switch) with a table-driven
+`Map<String, Consumer<Player>>` lookup, verified string-for-string against
+the original switch by script rather than retyped by hand. Added targeted
+`GameTest` coverage for three more CRAP-flagged methods the acceptance
+suite already exercised but unit coverage didn't. Extracted one duplicate
+my own fix introduced. Unit (219), property (17), and acceptance (207, up
+from 162) verification all pass.
+
 ## 2026-07-28T22:26:34Z — architect completed phase 10 review follow-up
 
 Action taken: merged refactorer commit `d990a64b1d`, reviewed the Phase 10 chance/community chest implementation, and applied architect follow-up fixes.
@@ -8048,3 +8179,195 @@ consistent with the existing per-mechanic ordering assertions (buy,
 auction, rent). No open design questions this phase: RULES.md's tax
 rule is an unconditional flat payment with no player decision
 involved, so no strategy-override step was needed.
+
+## 2026-07-29T06:24:46Z — coder received phase 11 taxes handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260729T062446Z_000017_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase11-taxes
+commit: 7f2d9d2d36
+created_at: 2026-07-29T06:24:46Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7f2d9d2d36
+```
+
+Action taken: merged the accepted Phase 11 taxes specification and implemented
+the tax landing rule.
+
+## 2026-07-29T06:28:48Z — coder prepared phase 11 taxes handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase11-taxes
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: landing on Income Tax or Luxury Tax now withdraws the fixed tax from
+the player and records the existing bank-payment journal entry after movement.
+Added focused rule and game tests, acceptance ordering handlers, and updated
+the earlier turn-loop scenario that intentionally lands on Income Tax. Unit
+verification passed with 232 tests; the normal generated acceptance pipeline
+passed with 209 tests.
+
+## 2026-07-29T07:22:12Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/refactorer/.swarmforge/handoffs/inbox/in_process/50_20260729T063026Z_000021_from_coder_to_refactorer.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: phase11-taxes
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder d7d3efb7db
+```
+
+Action taken: merged `d7d3efb7db` into `swarmforge-refactorer` as `e36ed29`.
+Only `logbook.md` conflicted, and this one had an unusual shape: rather than
+alternating whole entries, my own single "refactorer sent handoff to
+architect" entry (22:14:40Z) had been split into two pieces by the conflict,
+with the architect's two follow-up entries (22:26:34Z, 22:27:44Z) landing in
+between. This happened because both entries share the same
+"Handoff message sent:\n\n```\n" boilerplate line, which the merge aligned as
+common text at the point where the two branches' content happened to
+coincide, even though it logically belongs to two different entries at that
+position. Root cause: the coder's branch history never carried my two Phase
+10 entries at all (`git show d7d3efb7db:logbook.md` jumps directly from
+"20:20:44Z — refactorer sent handoff to architect" [Phase 9] to
+"22:26:34Z — architect completed phase 10 review follow-up", skipping my
+Phase 10 "received"/"sent" pair entirely — apparently lost somewhere in the
+architect's or specifier's own conflict resolution on the way to `main`).
+Resolved by reconstructing chronologically: kept my complete "received"
+entry, then reassembled my complete "sent" entry (header + boilerplate +
+body + summary, sourced from the two separated HEAD-side fragments), then
+the architect's "completed follow-up" entry complete, then the architect's
+"sent to coder" entry (header + a second copy of the same boilerplate +
+body, sourced from the theirs-side fragments), then the rest of theirs'
+already-coherent, non-conflicting chain verbatim (coder's receipt and
+return of the follow-up, the architect's acceptance, the specifier's
+phase-complete merge into `main`, and the specifier's phase 11 taxes
+handoff through to the coder's return). Header-count arithmetic: 236
+(common ancestor) + 2 (mine, already known but missing from theirs) + 12
+(theirs, new) = 250, matching the merged file exactly; `uniq -d` clean.
+
+In substance, the merge brought in two things I hadn't seen yet: the
+architect's own priority-`00` follow-up on my Phase 10 `Cards` work (fixed
+`advanceToNearestStation`/`advanceToNearestUtility` resolving the deed for
+`CentraalStation`/`Elektriciteitscentrale` unconditionally instead of the
+station/utility actually reached — a real bug my table-driven rewrite
+carried over unnoticed from the original switch, since both branches of
+the original switch had the same latent bug; also collapsed
+`payEveryOtherPlayer`/`collectFromEveryOtherPlayer` into a shared
+`forEveryOtherPlayer`/`transfer(payer, payee, amount)` pair — the same
+duplicate I had deliberately left alone in Phase 10 for named-method
+clarity, but the architect found a middle ground that keeps both named
+call sites while sharing the loop and the withdraw/deposit body via named
+lambdas rather than a boolean flag; a better outcome than my own choice,
+not a conflict with it) — and Phase 11 itself: a new `Taxes` class
+implementing `Landings`, resolving `TaxSpace` landings by withdrawing the
+printed tax and reporting `paidBank`, wired into `Game`'s landing pipeline
+and `Journalling`. `Report.java` and `Deeds.java` carried no code changes
+in this window, only stale mutation-manifest churn.
+
+Verification: 249 unit tests, 17 property tests, and 209 acceptance tests
+(up from 207) all pass. `crap4java`: only the exempt `Report.line` exceeds
+threshold, now at 21,1 (unchanged shape — no new `Journal.Entry` variant
+was added for tax payments, since `paidBank`/`BankPaid` already existed
+from Phase 10's bank-payment cards). Every other production method is at
+or below CRAP 6,0, including `Cards.repair` and `Cards.resolve` at exactly
+6,0. `dry4java` on `src/main`: all findings are the same two long-standing,
+already-reviewed categories — Game.java's per-event-type
+`Journalling` overrides (each translates one event interface method to one
+distinct `Journal.Entry` record constructor; collapsing them to a generic
+dispatcher would trade away compile-time type safety and the
+self-documenting one-name-per-event-type shape for a smaller count, the
+same tradeoff declined every prior phase) and pre-existing
+constructor-field-assignment pairs in `LandSale`/`Rent` and
+`Building`/`Turn`, neither touched this phase. Nothing new or actionable.
+Mutation-site scan on every changed/new file stays far under the
+100-site threshold: `Cards.java` 34, `Deeds.java` 33, `Game.java` 6,
+`Report.java` 1, `Taxes.java` 2 (new file). No refactor was needed this
+round — the coder's and architect's own work already left the tree clean
+against every gate.
+
+## 2026-07-28T22:32:26Z — architect sent phase 10 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260728T223226Z_000037_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase10-chance-and-community-chest
+commit: a6f1734876
+created_at: 2026-07-28T22:32:26.216524Z
+
+Re-read your role and constitution.
+
+merge_and_process architect a6f1734876
+```
+
+Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
+
+## 2026-07-29T07:29:37Z — architect received phase 11 refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260729T072841Z_000033_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: a9fe953896
+created_at: 2026-07-29T07:28:41.818041Z
+enqueued_at: 2026-07-29T07:28:42.815784Z
+task: phase11-taxes
+dequeued_at: 2026-07-29T07:29:31.014153Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer a9fe953896
+```
+
+Action taken: began architectural review of the Phase 11 refactorer handoff.
+
+## 2026-07-29T07:34:29Z — architect accepted phase 11 taxes
+
+Action taken: merged refactorer commit `a9fe953896` and resolved the logbook-only merge conflict by preserving each branch's complete handoff record. Reviewed the landing pipeline and accepted `Taxes` as a focused, testable rule boundary: it depends only on `TaxSpace`, the player's account, and a narrow payment event; `Game` composes it alongside the existing landing rules.
+
+Architectural correction: added `en/rules/tax.feature` to `acceptance/pipeline-features.txt`. The feature had been created but was not registered, so neither normal acceptance nor the soft mutation pipeline exercised it. The mutation tools refreshed their manifests as part of the approved runs.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 232 tests passed.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2 -Pproperty-tests test` — 17 property tests passed.
+- `mutate4java` (differential, eight workers): `Taxes.java` 2/2 killed; `Game.java` 6/6 killed.
+- `dry4java` — only the established journal-event adapters and existing constructor shapes remain; no actionable duplication.
+- `./acceptance/run-acceptance.sh` — 211 generated acceptance tests passed, including `en/rules/tax.feature`.
+- Soft Gherkin mutation — existing registered features clean; `en/rules/tax.feature` 2/2 killed after registration.
+- `git diff --check` — passed.
+
+Routing: the acceptance-pipeline registration and mutation manifests are non-functional verification infrastructure; no coder or refactorer follow-up is warranted. All Phase 11 loops are closed, so send the phase-complete sync to specifier at priority `50`.
