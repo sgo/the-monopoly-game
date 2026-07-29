@@ -10328,6 +10328,31 @@ the CLI implementation.
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
 
+## 2026-07-29T16:04:02Z — specifier returned Phase 15 standard-setup revision to architect
+
+Handoff message sent:
+
+```
+id: 20260729T160402Z_000031_from_specifier
+from: specifier
+to: architect
+priority: 00
+type: git_handoff
+role: specifier
+task: phase15-cli
+commit: 8639b0007b
+created_at: 2026-07-29T16:04:02.503108Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 8639b0007b
+```
+
+Summary: added a reusable core acceptance contract for the standard game
+starting configuration and CLI assertions for starting cash and position,
+ownership and improvements, inventory, and complete Chance and Community
+Chest decks.
+
 ## 2026-07-29T14:42:20Z — specifier returned Phase 15 starting-capital revision
 ## 2026-07-29T14:42:23Z — architect accepted Phase 15 starting-capital criterion
 
