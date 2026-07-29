@@ -7,6 +7,7 @@ import the.monopoly.game.components.dice.Roll;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.rules.Rule;
+import the.monopoly.game.strategies.AgreeIfAffordable;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.HashMap;
@@ -22,6 +23,29 @@ public final class Simulator {
   private static final Roll BANKRUPTING_ROLL = new Roll(1, 3);
 
   private Simulator() {
+  }
+
+  /** Starts the simulator as a command-line program. */
+  public static void main(String[] arguments) {
+    Result result = execute(arguments);
+    System.out.println(result.output());
+    if (!result.succeeded()) System.exit(result.exitCode());
+  }
+
+  /** Parses the command line without performing process termination. */
+  public static Result execute(String... arguments) {
+    if (arguments.length == 1 && (arguments[0].equals("-h") || arguments[0].equals("--h")))
+      return new Result(0, "Usage: simulator [number of players]");
+    if (arguments.length > 1)
+      return new Result(1, "Usage: simulator [number of players]");
+
+    try {
+      int playerCount = arguments.length == 0 ? 2 : Integer.parseInt(arguments[0]);
+      return run(playerCount, player -> new AgreeIfAffordable());
+    } catch (NumberFormatException cause) {
+      String received = arguments.length == 0 ? "" : arguments[0];
+      return new Result(1, "The number of players must be between 2 and 8; received " + received + " players.");
+    }
   }
 
   public static Result run(int playerCount, Strategy.OfPlayers strategies) {

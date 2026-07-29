@@ -10543,6 +10543,142 @@ merge_and_process refactorer 8d58bc58f0
 
 Action taken: began final architectural review of the Phase 15 CLI boundary.
 
+## 2026-07-29T13:47:04Z — architect sent Phase 15 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T134659Z_000052_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 1c7cb534b4
+created_at: 2026-07-29T13:46:59.372559Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 1c7cb534b4
+```
+
+Action taken: sent the final Phase 15 sync after accepting the CLI module
+extraction, completion behavior, and strengthened boundary examples.
+
+## 2026-07-29T13:59:39Z — architect received final Phase 15 refactorer return
+
+Handoff message received:
+
+```
+id: 20260729T135925Z_000044_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 7e82624c22
+created_at: 2026-07-29T13:59:25.116720Z
+enqueued_at: 2026-07-29T13:59:25.458953Z
+task: phase15-cli
+dequeued_at: 2026-07-29T13:59:32.871282Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7e82624c22
+```
+
+Action taken: began review of the final returned Phase 15 state.
+
+## 2026-07-29T14:00:20Z — architect found Phase 15 executable CLI specification gap
+
+Review finding: the returned Phase 15 deliverables require a standalone
+command-line process with arguments, `-h`/`--h`, stdout reporting, and nonzero
+invalid-input status. The current CLI feature and bindings invoke only the
+in-process `Simulator` API, so they cannot distinguish an executable from a
+library facade.
+
+Action taken: route this Gherkin-content gap to specifier at priority `00`.
+No phase-complete sync is sent while that specification loop is open.
+
+## 2026-07-29T14:03:12Z — architect sent Phase 15 executable CLI specification handoff
+
+Handoff message sent:
+
+```
+id: 20260729T140307Z_000053_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 3ab5e54bf8
+created_at: 2026-07-29T14:03:07.193252Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 3ab5e54bf8
+```
+
+Action taken: sent the executable CLI acceptance gap to specifier for the
+required specification revision.
+
+## 2026-07-29T14:08:44Z — architect received Phase 15 executable CLI note from specifier
+
+Handoff message received:
+
+```
+id: 20260729T140829Z_000028_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 50
+type: note
+message: Processed commit 3ab5e54bf8; no specifier changes; ready for next task.
+created_at: 2026-07-29T14:08:29.430697Z
+enqueued_at: 2026-07-29T14:08:29.687628Z
+dequeued_at: 2026-07-29T14:08:33.911583Z
+
+Re-read your role and constitution.
+
+Processed commit 3ab5e54bf8; no specifier changes; ready for next task.
+```
+
+Action taken: accepted the no-change decision because the Phase 15 deliverables
+already define the executable CLI behavior. Route that missing observable
+implementation to coder.
+
+## 2026-07-29T14:10:48Z — coder received architect executable CLI follow-up
+
+Handoff message received:
+
+```
+id: 20260729T140906Z_000054_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 0ae1fe2dc3
+
+Re-read your role and constitution.
+
+merge_and_process architect 0ae1fe2dc3
+```
+
+Action taken: merged `0ae1fe2dc3`; added the standalone `main` boundary,
+`-h`/`--h` usage output, optional player-count parsing, and nonzero process
+status for invalid command-line input. The argument parser remains testable
+without terminating the test process.
+
+Verification: CLI reactor tests pass (255); generated acceptance passes
+(246 scenarios).
+
+Handing implementation to refactorer for review.
+
 ## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
 
 Handoff message received:

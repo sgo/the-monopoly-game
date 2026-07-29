@@ -18,6 +18,22 @@ class SimulatorTest {
   }
 
   @Test
+  void explainsHowToUseTheExecutable() {
+    Simulator.Result result = Simulator.execute("--h");
+
+    assertThat(result.succeeded()).isTrue();
+    assertThat(result.output()).contains("Usage: simulator");
+  }
+
+  @Test
+  void rejectsANonNumericPlayerCountWithoutTerminatingTheTestProcess() {
+    Simulator.Result result = Simulator.execute("many");
+
+    assertThat(result.succeeded()).isFalse();
+    assertThat(result.output()).contains("received many players");
+  }
+
+  @Test
   void producesAReadableReportAndWinnerForAnOfficialGame() {
     Simulator.Result result = Simulator.run(2, Strategy.OfPlayers.NOBODY_DECIDES);
 
