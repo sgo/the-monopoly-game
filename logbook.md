@@ -8014,3 +8014,37 @@ collisions, fences balanced (394, even) after resolution.
 Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
+
+## 2026-07-29T06:24:46Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260729T062446Z_000017_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase11-taxes
+commit: 7f2d9d2d36
+created_at: 2026-07-29T06:24:46.965423Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7f2d9d2d36
+```
+
+Summary: specified Phase 11 taxes — new `tax.feature` covering both
+fixed-amount tax spaces (Income Tax M200, Luxury Tax M100), each paid
+outright to the bank on landing. Both tax types are single-occurrence
+board spaces, so the existing generic "lands on" step resolves the
+correct position directly, with no Chance/Community-Chest-style
+first-occurrence workaround needed. Added journal-16/report-16
+recording the tax payment after the landing movement, reusing the
+existing "pays the bank $X" wording from the cards phase and adding a
+"moves before it records ... pays the bank" ordering combinator
+consistent with the existing per-mechanic ordering assertions (buy,
+auction, rent). No open design questions this phase: RULES.md's tax
+rule is an unconditional flat payment with no player decision
+involved, so no strategy-override step was needed.
