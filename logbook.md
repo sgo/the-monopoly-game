@@ -10513,3 +10513,26 @@ upper bounds named in its examples.
 Action taken: route this Gherkin-content defect to specifier at priority `00`.
 Phase 15 remains open until that loop and the structural refactor review
 return and are accepted.
+
+## 2026-07-29T13:41:35Z — architect sent Phase 15 CLI boundary review to refactorer
+
+Handoff message sent:
+
+```
+id: 20260729T134130Z_000050_from_architect
+from: architect
+to: refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: a81eaca30a
+created_at: 2026-07-29T13:41:30.338059Z
+
+Re-read your role and constitution.
+
+merge_and_process architect a81eaca30a
+```
+
+Action taken: sent the behavior-preserving CLI/domain module boundary change
+to refactorer for the architect review loop.
