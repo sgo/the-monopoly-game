@@ -8146,6 +8146,31 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T12:49:59Z — coder received Phase 15 CLI specification
+
+Handoff message received:
+
+```
+id: 20260729T124550Z_000024_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: e60240e986
+task: phase15-cli
+```
+
+Action taken: fast-forward merged `e60240e986`; implemented the command
+simulation boundary, CLI acceptance bindings for default and
+Agree-if-affordable strategies, validation of the official two-to-eight
+player range, and focused simulator tests.
+
+Verification: `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+test` passed (251 tests); `acceptance/run-acceptance.sh` passed (246 tests).
+
+Handing implementation to refactorer for the required review.
+
 ## 2026-07-29T12:03:58Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -8637,6 +8662,226 @@ Routing: no architect correction or coder/refactorer follow-up is warranted.
 All Phase 13 loops are closed; send the phase-complete sync to specifier at
 priority `50`.
 
+## 2026-07-29T11:20:09Z — architect sent phase 13 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T112000Z_000043_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase13-free-parking
+commit: 97630aba9b
+created_at: 2026-07-29T11:20:00.806525Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 97630aba9b
+```
+
+Summary: sent the Phase 13 completion sync after accepting the explicit Free
+Parking no-op specification, its shared movement journal/report coverage, and
+the clean unit, property, Java-mutation, DRY, acceptance, and soft-Gherkin
+mutation gates.
+
+## 2026-07-29T12:04:30Z — architect received phase 14 refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260729T120421Z_000037_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 4ab31d3d7c
+created_at: 2026-07-29T12:04:21.501846Z
+enqueued_at: 2026-07-29T12:04:22.324909Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T12:04:26.511490Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 4ab31d3d7c
+```
+
+Action taken: began architectural review of the Phase 14 bankruptcy-and-winning
+refactorer handoff.
+
+## 2026-07-29T12:14:24Z — architect completed phase 14 bankruptcy review
+
+Action taken: merged refactorer commit `4ab31d3d7c` and reviewed `Bankruptcy`
+as the focused boundary between a charged landing debt and the resulting asset
+liquidation or elimination. Corrected two observable rule gaps: liquidation
+now exchanges a hotel and sells as many houses as needed before mortgaging,
+and a player-bankruptcy transfers retained Get Out of Jail Free cards to the
+creditor instead of discarding them. Bank bankruptcy still returns retained
+cards to their decks. Added regressions for multi-house liquidation,
+hotel liquidation, and creditor card inheritance.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 249 tests passed.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+  -Pproperty-tests test` — 17 property tests passed.
+- `mutate4java` (differential, eight-worker limit) was run for
+  `Bankruptcy.java`, `Deeds.java`, `Game.java`, and `Report.java`; the
+  Bankruptcy and Deeds manifests were refreshed after the strengthened
+  liquidation and retained-card regressions.
+- `dry4java` — only the established journal-event adapters, rule constructor
+  shapes (`Bankruptcy`/`LandSale`/`Rent`), and existing `Game`/`Turn`
+  constructor shape remain; no actionable duplication.
+- `./acceptance/run-acceptance.sh` — 242 generated acceptance tests passed.
+- Soft Gherkin mutation for `en/rules/bankruptcy.feature` — 3/5 killed with
+  two equivalent surviving starting-balance mutations in bank-bankruptcy card
+  return scenarios; the runner refreshed its partial manifest.
+- `git diff --check` — passed.
+
+Routing: the liquidation and card-transfer corrections change observable
+behaviour, so send the priority-`00` architect follow-up to coder. The two
+surviving Gherkin examples are a specifier-owned content defect; route that
+priority-`00` follow-up to specifier after the coder review loop returns.
+
+## 2026-07-29T12:15:56Z — architect sent phase 14 follow-up to coder
+
+Handoff message sent:
+
+```
+id: 20260729T121544Z_000044_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: 8141a9c0ba
+created_at: 2026-07-29T12:15:44.210095Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 8141a9c0ba
+```
+
+Summary: sent the observable bankruptcy hardening for full asset liquidation
+and creditor inheritance of retained jail-release cards. Coder must validate
+and return this priority-`00` architect review loop before the pending
+bankruptcy Gherkin-example finding is routed to specifier.
+
+## 2026-07-29T12:17:46Z — architect received phase 14 coder follow-up
+
+Handoff message received:
+
+```
+id: 20260729T121736Z_000027_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: 88749b96bb
+created_at: 2026-07-29T12:17:36.122737Z
+enqueued_at: 2026-07-29T12:17:36.513843Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T12:17:42.176831Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 88749b96bb
+```
+
+Action taken: began review of the coder's priority-`00` return for the Phase
+14 bankruptcy correction.
+
+## 2026-07-29T12:19:01Z — architect accepted phase 14 coder verification
+
+Action taken: merged coder commit `88749b96bb`. The coder confirmed the
+hotel/house liquidation and retained-card transfer corrections require no
+further implementation change; focused domain verification passed 249 tests
+and the normal generated acceptance pipeline passed 242 tests. Re-ran
+`git diff --check` on the merged state; it passed cleanly.
+
+Routing: the coder priority-`00` loop is closed. The phase remains
+unadvanceable only for the already-recorded Gherkin examples whose starting
+balances are mutation-equivalent; send that content finding to specifier at
+priority `00`.
+
+## 2026-07-29T12:19:33Z — architect sent phase 14 Gherkin finding to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T121925Z_000045_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: 5bbf369b66
+created_at: 2026-07-29T12:19:25.775127Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 5bbf369b66
+```
+
+Summary: routed the two mutation-equivalent starting-balance examples in the
+bankruptcy card-return scenarios to specifier, under the Gherkin-content
+workflow rule. Do not advance Phase 14 until this priority-`00` specifier loop
+returns and is accepted.
+
+## 2026-07-29T12:23:14Z — architect received phase 14 Gherkin review return
+
+Handoff message received:
+
+```
+id: 20260729T122303Z_000023_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: a55eee6d42
+created_at: 2026-07-29T12:23:03.242026Z
+enqueued_at: 2026-07-29T12:23:03.591803Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T12:23:09.924729Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier a55eee6d42
+```
+
+Action taken: began review of the specifier's priority-`00` decision on the
+Phase 14 bankruptcy Gherkin mutation finding.
+
+## 2026-07-29T12:23:55Z — architect accepted phase 14 Gherkin revision
+
+Action taken: merged specifier commit `a55eee6d42` and accepted the revision.
+The bank-debt balance is fixed as scenario text because any sufficiently low
+amount is equivalent, while the former card-return scenario now parameterizes
+the genuine observable input: which bank-owed space triggers bankruptcy.
+No production boundary, implementation, or acceptance helper changed.
+
+Verification:
+
+- The specifier's `./acceptance/run-acceptance.sh` run passed 242 generated
+  acceptance tests.
+- Soft Gherkin mutation for `en/rules/bankruptcy.feature` — 4/4 killed,
+  zero survivors and zero errors. The runner refreshed its manifest.
+- `git diff --check` — passed.
+
+No changed production source requires another Java-mutation or DRY run; the
+accepted Phase 14 source results remain applicable. All Phase 14 review loops
+are closed. Send the final phase-complete sync to specifier at priority `50`.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -8892,6 +9137,49 @@ merge_and_process architect a6f1734876
 ```
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
+
+## 2026-07-29T12:17:09Z — coder received phase 14 bankruptcy architect follow-up
+
+Handoff message received:
+
+```
+id: 20260729T121544Z_000044_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 8141a9c0ba
+created_at: 2026-07-29T12:15:44.210095Z
+enqueued_at: 2026-07-29T12:15:44.901517Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T12:15:49.749229Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 8141a9c0ba
+```
+
+Action taken: fast-forward merged and reviewed the architect's bankruptcy
+hardening. Its hotel/house liquidation and retained-card transfer protections
+need no further coder changes. Focused domain tests (249) and the normal
+generated acceptance pipeline (242 tests) pass.
+
+## 2026-07-29T12:17:09Z — coder prepared phase 14 bankruptcy verification return to architect
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: phase14-bankruptcy-and-winning
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: architect hardening is verified; the priority-00 review loop returns
+directly to architect without further coder implementation.
 
 ## 2026-07-29T12:00:07Z — coder received phase 14 bankruptcy and winning handoff from specifier
 
@@ -9670,5 +9958,150 @@ movement pipeline.
 Verification: `./acceptance/run-acceptance.sh` passes (228/228), including
 `report-19` (previously failing with "Unsupported step" before the coder
 added the missing standalone step).
+
+Per role rules, will now ask the user for the next feature to add.
+
+## 2026-07-29T11:48:52Z — specifier sent handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260729T114852Z_000022_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase14-bankruptcy-and-winning
+commit: 55c969a94a
+created_at: 2026-07-29T11:48:52.237278Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 55c969a94a
+```
+
+Summary: specified Phase 14 bankruptcy and winning - by far the largest
+spec this session. New `bankruptcy.feature` (7 scenarios) covers: a
+debt exceeding cash first triggers automatic liquidation (mortgage
+property, sell houses, stopping once the shortfall is covered) before
+bankruptcy is even considered; bank-debt bankruptcy (forfeit
+everything, bank auctions the now-mortgaged land, Get Out of Jail Free
+cards return to the bottom of their deck); player-debt bankruptcy (the
+creditor receives the debtor's remaining cash and mortgaged property
+directly); and a new creditor mortgage-choice strategy hook ("Agree if
+affordable" pays off an inherited mortgage when affordable, keeps it
+paying only the mandatory 10% interest when not). Fixed
+`monopoly.feature`'s pre-existing `Scenario` -> `Scenario Outline`
+violation (it predates that convention). Added journal-20/21/22 and
+report-20/21/22 for bankruptcy-to-bank, bankruptcy-to-player, and the
+game's winner.
+
+Two assumptions flagged explicitly to the user, both confirmed as
+acceptable: houses sold before mortgaging during liquidation, in
+board-position order when there's a choice among streets (no RULES.md
+text pins this down); and the mortgage-choice hook applies uniformly
+whether a mortgaged property is acquired via direct creditor-
+inheritance (RULES.md's explicit case) or via winning an auction for
+bank-forfeited land (RULES.md is silent there).
+
+During review the user caught that bankruptcy-6/7's titles didn't
+name "Agree if affordable" explicitly, reading as generic mechanic
+scenarios rather than algorithm-specific ones - the same issue already
+fixed for jail-5/6 earlier this session, which I should have applied
+here from the start. Retitled both to name the strategy directly.
+
+This is the point where the rules engine needs a real game loop for
+the first time - Game.play() currently plays exactly one round, ever,
+and Game.Result needs to carry a winner. None of this can be verified
+against the current implementation; it is entirely new production
+work, consistent with this phase's role of completing the rules engine
+end-to-end before the CLI (Phase 15).
+
+## 2026-07-29T12:20:14Z — specifier received architect Gherkin follow-up
+
+Handoff message received:
+
+```
+id: 20260729T121925Z_000045_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: 5bbf369b66
+
+Re-read your role and constitution.
+
+merge_and_process architect 5bbf369b66
+```
+
+Action taken: merged architect commit `5bbf369b66` into `main`. Clean
+merge (only `logbook.md` auto-merged, no conflicts). This brought in the
+coder's implementation, the refactorer's pass, and a real architect-found
+production bug fixed through the normal coder follow-up loop (already
+closed before this handoff arrived): retained Get Out of Jail Free cards
+were being discarded instead of transferred to the creditor in
+player-debt bankruptcy - RULES.md is explicit that the creditor receives
+"all your money, title deeds, and Get Out of Jail Free cards." Also
+strengthened liquidation to sell as many houses as needed (and exchange
+a hotel) rather than assuming a single house sale always suffices.
+
+The routed Gherkin finding: soft mutation on `bankruptcy.feature` found
+two equivalent surviving mutations, both in the `starting balance`
+column of bankruptcy-3 and bankruptcy-4 (the bank-debt scenarios) - any
+sufficiently low value produces the identical outcome (still can't
+cover the debt, still bankrupt), so the specific value $5 wasn't pinned
+to any real boundary. Same class of finding as jail-4/6 earlier this
+session.
+
+Decision: accepted the finding. Hardcoded the balance as literal step
+text in both scenarios. bankruptcy-4 had nothing left to parameterize
+afterward my first attempt introduced an unreferenced placeholder
+column, caught and fixed before committing by giving it a genuine
+referenced column instead: which bank-owed space triggers the
+bankruptcy, mirroring jail-1's existing pattern for the identical
+situation (a scenario whose only real parameter is which named space
+is used, not the debt amount). Committed as `e079ab3`.
+
+Verification: `./acceptance/run-acceptance.sh` passes (242/242) against
+the already-accepted implementation; the fix is a pure Examples-table
+edit with no new step text, so no coder work is needed.
+
+Per the workflow rule, handing this back to the architect now so it
+can resume and close the loop.
+
+## 2026-07-29T12:24:47Z — specifier received phase-complete handoff from architect
+
+Handoff message received:
+
+```
+id: 20260729T122418Z_000046_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: d066219aac
+
+Re-read your role and constitution.
+
+merge_and_process architect d066219aac
+```
+
+Action taken: fast-forward merged architect commit `d066219aac` into
+`main`, no conflicts. This closes the architect-to-specifier Gherkin
+routing loop for Phase 14: the architect accepted the specifier's fix
+(hardcoding bankruptcy-3/4's under-mutated starting balances,
+parameterizing the triggering space in bankruptcy-4 instead), re-ran
+soft Gherkin mutation, and confirmed both scenarios now show 0
+survivors in the refreshed manifest. `phase14-bankruptcy-and-winning`
+is now fully closed - the rules engine is complete end-to-end, with a
+real game loop, both bankruptcy paths, and winner detection all in
+place for the first time.
+
+Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.

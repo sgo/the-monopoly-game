@@ -10,6 +10,7 @@
     <modules>
         <module>the-monopoly-game-specs-core</module>
         <module>the-monopoly-game-specs-domain</module>
+        <module>the-monopoly-game-specs-cli</module>
     </modules>
 
     <!-- The acceptance pipeline runs generated JUnit entry points over the

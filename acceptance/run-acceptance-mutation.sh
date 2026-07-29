@@ -19,7 +19,8 @@ if [[ "${1:-}" == "--level" ]]; then
 fi
 
 # The pipeline features live in one file both scripts read; see
-# pipeline-features.txt.
+# pipeline-features.txt. A module-qualified entry is resolved from that
+# module's test resources.
 PIPELINE_FEATURES=()
 while IFS= read -r feature_line; do
   # Features marked !no-mutation are held back; see pipeline-features.txt.
@@ -60,6 +61,16 @@ chmod +x "$WORKER"
 
 status=0
 for feature in "${FEATURE_FILES[@]}"; do
+  module="${feature%%:*}"
+  feature_path="${feature#*:}"
+  if [[ "$module" == "$feature" ]]; then
+    module_root="$SPECS"
+  elif [[ "$module" == specs-* ]]; then
+    module_root="$ROOT/the-monopoly-game-specs/the-monopoly-game-$module"
+  else
+    module_root="$ROOT/the-monopoly-game-$module"
+  fi
+  feature_file="$module_root/src/test/resources/$feature_path"
   slug="$(echo "$feature" | tr '/' '-' | sed 's/\.feature$//')"
   work_dir="$WORK/$slug"
   generated="$work_dir/generated"
@@ -70,12 +81,12 @@ for feature in "${FEATURE_FILES[@]}"; do
   # The mutator reads the base entry point metadata from --generated-dir, so
   # generate it there from the unmutated IR first.
   ir="$work_dir/base.json"
-  (cd "$APS" && bb gherkin-parser "$FEATURES/$feature" "$ir")
+  (cd "$APS" && bb gherkin-parser "$feature_file" "$ir")
   "$ROOT/acceptance/acceptance-entrypoint-generator.bb" --feature-path "$feature" "$ir" "$generated"
 
   echo "== mutating $feature (level $LEVEL) =="
   (cd "$APS" && bb gherkin-mutator \
-    --feature "$FEATURES/$feature" \
+    --feature "$feature_file" \
     --work-dir "$work_dir" \
     --generated-dir "$generated" \
     --runner-worker "$WORKER" \
