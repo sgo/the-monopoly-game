@@ -46,6 +46,40 @@ class BankruptcyTest {
   }
 
   @Test
+  void aPlayerSellsEveryNeededHouseBeforeMortgagingLand() {
+    Deeds deeds = new Deeds();
+    ColourStreet street = (ColourStreet) rules.create(Street.Type.RueGrandeDinant);
+    give(deeds, street, dog);
+    deeds.arrangeHouses(street, 2);
+    dog.account().withdraw(new Money(1550));
+
+    new Bankruptcy(deeds, rules, players, Strategy.OfPlayers.NOBODY_DECIDES, new Events())
+        .resolve(dog, null);
+
+    assertThat(deeds.housesBuiltOn(street)).isZero();
+    assertThat(deeds.isMortgaged(street)).isFalse();
+    assertThat(dog.account().balance().amount().amount()).isZero();
+    assertThat(deeds.isBankrupt(dog)).isFalse();
+  }
+
+  @Test
+  void aPlayerExchangesAHotelThenSellsEnoughHousesBeforeMortgagingLand() {
+    Deeds deeds = new Deeds();
+    ColourStreet street = (ColourStreet) rules.create(Street.Type.RueGrandeDinant);
+    give(deeds, street, dog);
+    deeds.arrangeHotel(street);
+    dog.account().withdraw(new Money(1700));
+
+    new Bankruptcy(deeds, rules, players, Strategy.OfPlayers.NOBODY_DECIDES, new Events())
+        .resolve(dog, null);
+
+    assertThat(deeds.housesBuiltOn(street)).isEqualTo(1);
+    assertThat(deeds.isMortgaged(street)).isFalse();
+    assertThat(dog.account().balance().amount().amount()).isZero();
+    assertThat(deeds.isBankrupt(dog)).isFalse();
+  }
+
+  @Test
   void aBankruptPlayerLosesLandToTheBankAuction() {
     Deeds deeds = new Deeds();
     Ownable land = (Ownable) rules.create(Street.Type.DiestsestraatLeuven);
@@ -92,6 +126,19 @@ class BankruptcyTest {
 
     assertThat(deeds.ownerOf(land.type())).contains(highHat.id());
     assertThat(deeds.isMortgaged(land)).isFalse();
+  }
+
+  @Test
+  void aCreditorInheritsTheBankruptPlayersGetOutOfJailFreeCard() {
+    Deeds deeds = new Deeds();
+    deeds.hold(Deeds.RetainedCard.CHANCE_GET_OUT_OF_JAIL_FREE, dog);
+    dog.account().withdraw(new Money(1600));
+
+    new Bankruptcy(deeds, rules, players, Strategy.OfPlayers.NOBODY_DECIDES, new Events())
+        .resolve(dog, highHat);
+
+    assertThat(deeds.holdsGetOutOfJailFreeCard(dog)).isFalse();
+    assertThat(deeds.holdsGetOutOfJailFreeCard(highHat)).isTrue();
   }
 
   private void give(Deeds deeds, Ownable land, Player owner) {

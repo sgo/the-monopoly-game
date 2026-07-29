@@ -8664,6 +8664,40 @@ merge_and_process refactorer 4ab31d3d7c
 Action taken: began architectural review of the Phase 14 bankruptcy-and-winning
 refactorer handoff.
 
+## 2026-07-29T12:14:24Z — architect completed phase 14 bankruptcy review
+
+Action taken: merged refactorer commit `4ab31d3d7c` and reviewed `Bankruptcy`
+as the focused boundary between a charged landing debt and the resulting asset
+liquidation or elimination. Corrected two observable rule gaps: liquidation
+now exchanges a hotel and sells as many houses as needed before mortgaging,
+and a player-bankruptcy transfers retained Get Out of Jail Free cards to the
+creditor instead of discarding them. Bank bankruptcy still returns retained
+cards to their decks. Added regressions for multi-house liquidation,
+hotel liquidation, and creditor card inheritance.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 249 tests passed.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+  -Pproperty-tests test` — 17 property tests passed.
+- `mutate4java` (differential, eight-worker limit) was run for
+  `Bankruptcy.java`, `Deeds.java`, `Game.java`, and `Report.java`; the
+  Bankruptcy and Deeds manifests were refreshed after the strengthened
+  liquidation and retained-card regressions.
+- `dry4java` — only the established journal-event adapters, rule constructor
+  shapes (`Bankruptcy`/`LandSale`/`Rent`), and existing `Game`/`Turn`
+  constructor shape remain; no actionable duplication.
+- `./acceptance/run-acceptance.sh` — 242 generated acceptance tests passed.
+- Soft Gherkin mutation for `en/rules/bankruptcy.feature` — 3/5 killed with
+  two equivalent surviving starting-balance mutations in bank-bankruptcy card
+  return scenarios; the runner refreshed its partial manifest.
+- `git diff --check` — passed.
+
+Routing: the liquidation and card-transfer corrections change observable
+behaviour, so send the priority-`00` architect follow-up to coder. The two
+surviving Gherkin examples are a specifier-owned content defect; route that
+priority-`00` follow-up to specifier after the coder review loop returns.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
