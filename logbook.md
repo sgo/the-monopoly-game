@@ -8146,6 +8146,31 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T12:46:03Z — specifier sent Phase 15 CLI handoff to coder
+
+Handoff message sent:
+
+```
+id: 20260729T124550Z_000024_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase15-cli
+commit: e60240e986
+created_at: 2026-07-29T12:45:50.366475Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e60240e986
+```
+
+Summary: handed off the Phase 15 CLI specification and dedicated
+`the-monopoly-game-specs-cli` module. The commit moves CLI Gherkin out of
+`specs-core`, nests the module under `the-monopoly-game-specs` Maven parent,
+and updates acceptance feature resolution for module-qualified paths.
+
 ## 2026-07-29T12:03:58Z — refactorer received handoff from coder
 
 Handoff message received:
