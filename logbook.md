@@ -8230,6 +8230,32 @@ Routing: the prisoner-state correction changes observable behaviour, so the
 priority-`00` architect follow-up goes to coder. Do not sync the phase to
 specifier until that loop returns and is accepted.
 
+## 2026-07-29T09:26:22Z — architect sent phase 12 follow-up to coder
+
+Handoff message sent:
+
+```
+id: 20260729T092608Z_000039_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 44c3a48104
+created_at: 2026-07-29T09:26:08.345606Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 44c3a48104
+```
+
+Summary: sent the focused observable-behaviour correction for the
+three-doubles jail path, together with its acceptance-pipeline registration
+and regression hardening. Coder must validate and return this priority-`00`
+architect review loop to architect before Phase 12 can be synced to
+specifier.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
