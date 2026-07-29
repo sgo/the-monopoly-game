@@ -10602,6 +10602,29 @@ library facade.
 Action taken: route this Gherkin-content gap to specifier at priority `00`.
 No phase-complete sync is sent while that specification loop is open.
 
+## 2026-07-29T14:03:12Z — architect sent Phase 15 executable CLI specification handoff
+
+Handoff message sent:
+
+```
+id: 20260729T140307Z_000053_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 3ab5e54bf8
+created_at: 2026-07-29T14:03:07.193252Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 3ab5e54bf8
+```
+
+Action taken: sent the executable CLI acceptance gap to specifier for the
+required specification revision.
+
 ## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
 
 Handoff message received:
