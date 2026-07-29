@@ -14,7 +14,7 @@ class SimulatorTest {
     Simulator.Result result = Simulator.run(1, Strategy.OfPlayers.NOBODY_DECIDES);
 
     assertThat(result.exitCode()).isEqualTo(1);
-    assertThat(result.output()).contains("number of players must be between 2 and 8");
+    assertThat(result.output()).contains("number of players must be between 2 and 8").contains("received 1 players");
   }
 
   @Test

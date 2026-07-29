@@ -10543,6 +10543,65 @@ merge_and_process refactorer 8d58bc58f0
 
 Action taken: began final architectural review of the Phase 15 CLI boundary.
 
+## 2026-07-29T13:47:04Z — architect sent Phase 15 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T134659Z_000052_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 1c7cb534b4
+created_at: 2026-07-29T13:46:59.372559Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 1c7cb534b4
+```
+
+Action taken: sent the final Phase 15 sync after accepting the CLI module
+extraction, completion behavior, and strengthened boundary examples.
+
+## 2026-07-29T13:59:39Z — architect received final Phase 15 refactorer return
+
+Handoff message received:
+
+```
+id: 20260729T135925Z_000044_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 7e82624c22
+created_at: 2026-07-29T13:59:25.116720Z
+enqueued_at: 2026-07-29T13:59:25.458953Z
+task: phase15-cli
+dequeued_at: 2026-07-29T13:59:32.871282Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7e82624c22
+```
+
+Action taken: began review of the final returned Phase 15 state.
+
+## 2026-07-29T14:00:20Z — architect found Phase 15 executable CLI specification gap
+
+Review finding: the returned Phase 15 deliverables require a standalone
+command-line process with arguments, `-h`/`--h`, stdout reporting, and nonzero
+invalid-input status. The current CLI feature and bindings invoke only the
+in-process `Simulator` API, so they cannot distinguish an executable from a
+library facade.
+
+Action taken: route this Gherkin-content gap to specifier at priority `00`.
+No phase-complete sync is sent while that specification loop is open.
+
 ## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
 
 Handoff message received:
@@ -10762,6 +10821,9 @@ Action taken: merged architect commit `1c7cb534b4`, resolving the
 ## 2026-07-29T13:55:39Z — specifier sent Phase 15 executable-CLI clarification to coder
 
 Handoff message sent:
+## 2026-07-29T13:56:56Z — coder received Phase 15 invalid-boundary revision
+
+Handoff message received:
 
 ```
 id: 20260729T135532Z_000027_from_specifier
@@ -10783,3 +10845,64 @@ Summary: clarified in `SIMULATOR.md` and `tasks.md` that Phase 15 must
 deliver a standalone executable process with command-line arguments, stdout
 reporting, `-h`/`--h` usage guidance, and nonzero invalid-input status; updated
 verification to invoke those process behaviors end-to-end.
+Action taken: merged `85b25c87cf`. The CLI now reports the supplied invalid
+player count alongside the official two-to-eight range, with one
+regex-capturing acceptance handler binding the independent expected count.
+
+Verification: CLI reactor tests pass (253); generated acceptance passes
+(246 scenarios).
+
+Handing the implementation to refactorer for review.
+
+## 2026-07-29T13:58:13Z — refactorer received coder invalid-count fix
+
+Handoff message received:
+
+```
+id: 20260729T135724Z_000033_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: ef66b4c033
+created_at: 2026-07-29T13:57:24.047287Z
+enqueued_at: 2026-07-29T13:57:24.276829Z
+task: phase15-cli
+dequeued_at: 2026-07-29T13:57:28.238195Z
+
+Re-read your role and constitution.
+
+merge_and_process coder ef66b4c033
+```
+
+Action taken: merged the invalid-player-count reporting fix and preserved the
+architect/specifier review history. The coder reports 253 CLI reactor tests
+and 246 acceptance scenarios passing.
+
+## 2026-07-29T14:04:00Z — specifier received Phase 15 architect follow-up
+
+Handoff message received:
+
+```
+id: 20260729T140307Z_000053_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: 3ab5e54bf8
+created_at: 2026-07-29T14:03:07.193252Z
+enqueued_at: 2026-07-29T14:03:08.011909Z
+task: phase15-cli
+
+Re-read your role and constitution.
+
+merge_and_process architect 3ab5e54bf8
+```
+
+Action taken: merged architect commit `3ab5e54bf8`, preserving the Phase 15
+implementation and review records. No new specification defect was routed;
+the merged state is ready for the next role action.
