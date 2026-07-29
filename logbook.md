@@ -10530,6 +10530,17 @@ merge_and_process specifier bdcd920ce4
 Action taken: began review of the specifier's Phase 15 CLI boundary-example
 revision.
 
+## 2026-07-29T13:45:53Z — architect accepted Phase 15 CLI boundary revision
+
+Action taken: accepted specifier commit `bdcd920ce4`. Each invalid-count
+example now independently states the count the CLI must report, pinning both
+official boundaries.
+
+Verification: targeted soft mutation for `specs-cli:en/cli.feature` killed
+4/4 mutations with zero survivors and zero errors; the runner refreshed the
+feature manifest. The specifier loop is closed. Await the outstanding
+refactorer boundary-review loop before Phase 15 completion.
+
 ## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
 
 Handoff message received:
