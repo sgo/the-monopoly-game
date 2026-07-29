@@ -10022,3 +10022,37 @@ edit with no new step text, so no coder work is needed.
 
 Per the workflow rule, handing this back to the architect now so it
 can resume and close the loop.
+
+## 2026-07-29T12:24:47Z — specifier received phase-complete handoff from architect
+
+Handoff message received:
+
+```
+id: 20260729T122418Z_000046_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: d066219aac
+
+Re-read your role and constitution.
+
+merge_and_process architect d066219aac
+```
+
+Action taken: fast-forward merged architect commit `d066219aac` into
+`main`, no conflicts. This closes the architect-to-specifier Gherkin
+routing loop for Phase 14: the architect accepted the specifier's fix
+(hardcoding bankruptcy-3/4's under-mutated starting balances,
+parameterizing the triggering space in bankruptcy-4 instead), re-ran
+soft Gherkin mutation, and confirmed both scenarios now show 0
+survivors in the refreshed manifest. `phase14-bankruptcy-and-winning`
+is now fully closed - the rules engine is complete end-to-end, with a
+real game loop, both bankruptcy paths, and winner detection all in
+place for the first time.
+
+Verification: `mvn -q -o test` passes on the merged state (exit 0).
+
+Per role rules, will now ask the user for the next feature to add.
