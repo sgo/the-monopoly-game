@@ -9122,3 +9122,68 @@ before or after merging), this one originated from the user directly
 instructing the specifier to make it, so there is no separate
 authorization question to raise - this entry itself is the audit
 trail.
+
+## 2026-07-29T10:18:20Z — specifier received architect Gherkin follow-up
+
+Handoff message received:
+
+```
+id: 20260729T101800Z_000041_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 5dfbd58acd
+
+Re-read your role and constitution.
+
+merge_and_process architect 5dfbd58acd
+```
+
+Action taken: merged architect commit `5dfbd58acd` into `main` - the first
+use of the new architect-to-specifier Gherkin-routing rule. One conflict, in
+`logbook.md`; resolved at entry granularity as established, with one mistake
+along the way: my first resolution attempt re-inserted several entries
+(coder/refactorer/architect's late Phase 12 cycle) that git had already
+placed correctly via its own non-conflicting auto-merge elsewhere in the
+file, creating four true duplicate headers. Caught this via the standard
+duplicate-header check, then over-corrected by truncating the whole
+manually-reconstructed block, which also deleted two entries that were
+NOT duplicates ("refactorer sent handoff to architect" at 09:15:08Z,
+commit `fb772d1075`; "refactorer received handoff from coder" at
+10:14:21Z, commit `95ea8a1d7c`). Caught this by diffing the full expected
+header union (HEAD-only headers plus theirs-only headers, both computed
+against the merge-base commit `d7f81d2ad3`) against the merged file's
+actual headers, found exactly these two missing, and reinserted them
+next to their already-present siblings. Final state verified: 279
+headers, matching the expected union exactly; no duplicates; fences
+balanced (452, even).
+
+The routed finding: the architect's own soft Gherkin acceptance mutation
+run surfaced two surviving mutations in jail-4 (the "has not chosen to
+pay" scenario) - its `<die 1>`/`<die 2>` example columns don't get killed,
+since the scenario only cares whether the roll is a double, and any
+non-double pair produces the identical observable outcome. Per its own
+new role rule, the architect did not edit the scenario; it registered the
+finding in the logbook and routed it here at priority `00` instead.
+
+Decision: accepted the finding as correctly diagnosed. Fixed jail-4 by
+dropping the die columns entirely and writing the roll as hardcoded
+literal text ("will roll 4 and 6"), matching the exact same pattern
+already used by jail-3/jail-5/jail-7 for the same reason - keeping only
+`position` and `final balance` as Examples columns, since both are
+genuinely mutation-sensitive (either one being wrong means real behavior
+changed). Found and fixed the identical defect proactively in jail-6
+too (same die-parameterization mistake, not yet flagged by the
+architect): `starting balance` stays parameterized there since $50 is a
+real, mutation-sensitive affordability boundary, but its roll was
+equally incidental. Committed as `fbe4068`.
+
+Verification: `./acceptance/run-acceptance.sh` passes (225/225) against
+the already-accepted implementation; both fixes are pure Examples-table
+edits with no new step text, so no coder work is needed.
+
+Per the new workflow rule, handing this back to the architect now so it
+can resume and close the loop.
