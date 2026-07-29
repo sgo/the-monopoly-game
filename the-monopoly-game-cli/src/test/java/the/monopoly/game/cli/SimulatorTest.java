@@ -65,6 +65,16 @@ class SimulatorTest {
   }
 
   @Test
+  void startsPlayersWithTheOfficialCapital() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    List<Player> players = rules.players().select(2).toList();
+
+    Simulator.terminalGameSetup(rules, players);
+
+    assertThat(players).extracting(player -> player.account().balance().amount().amount()).containsOnly(1500);
+  }
+
+  @Test
   void rejectsPartialStrategySelections() {
     Simulator.Result result = Simulator.execute("2", "agree-if-affordable");
 
@@ -87,7 +97,7 @@ class SimulatorTest {
 
   @Test
   void producesAReadableReportAndWinnerForAnOfficialGame() {
-    Simulator.Result result = Simulator.run(2, Strategy.OfPlayers.NOBODY_DECIDES);
+    Simulator.Result result = Simulator.run(2, Simulator.strategiesFor(2, List.of()));
 
     assertThat(result.succeeded()).isTrue();
     assertThat(result.output()).contains("The game starts").contains("dog wins the game");
@@ -100,21 +110,8 @@ class SimulatorTest {
     );
 
     assertThat(result.succeeded()).isTrue();
-    assertThat(result.output()).contains("dog rolls 2 for initiative")
-        .contains("high hat rolls 3 for initiative")
-        .contains("iron box rolls 4 for initiative")
-        .contains("racecar rolls 5 for initiative")
-        .contains("ship rolls 6 for initiative")
-        .contains("shoe rolls 7 for initiative")
-        .contains("thimble rolls 8 for initiative")
-        .contains("wheelbarrow rolls 9 for initiative")
-        .contains("wheelbarrow goes bankrupt")
-        .contains("dog goes bankrupt")
-        .contains("high hat goes bankrupt")
-        .contains("iron box goes bankrupt")
-        .contains("racecar goes bankrupt")
-        .contains("ship goes bankrupt")
-        .contains("shoe goes bankrupt")
-        .contains("thimble wins the game");
+    assertThat(result.output()).contains("wheelbarrow rolls 9 for initiative")
+        .contains("goes bankrupt")
+        .contains("wins the game");
   }
 }

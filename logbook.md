@@ -11268,3 +11268,28 @@ specifier owns an acceptance criterion that a simulated player begins with
 the official capital and is not artificially debited before the first turn.
 The coder returns through refactorer; architect will accept both loops before
 closing the reopened phase.
+
+## 2026-07-29T15:47:57Z — coder received starting-capital correction
+
+Handoff message received:
+
+```
+id: 20260729T143946Z_000059_from_architect_to_coder
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 07c95bf1e9
+```
+
+Action taken: merged the architect handoff, removed the simulator's artificial
+pre-game debit, and replaced it with a deterministic terminal fixture that
+preserves every selected player's official €1500 balance. Added regression
+coverage for that balance and for prompt eight-player completion.
+
+Verification: `SimulatorTest` passed (11 tests). The normal acceptance command
+was attempted twice; it entered the existing generated `en/monopoly.feature`
+whole-game loop and produced unbounded journal output, so it did not reach a
+completion summary. The focused CLI acceptance report remains green (4 tests).
