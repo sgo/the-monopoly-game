@@ -10926,6 +10926,12 @@ merge_and_process specifier de36f0eb2a
 
 Action taken: began review of the user-approved natural completion criteria.
 
+## 2026-07-29T18:30:12Z — architect accepted Phase 15 natural completion criteria
+
+Action taken: accepted the specification of real random dice and natural
+bankruptcy completion with one player left. Forwarding the revised contract to
+coder; no fixture, turn cap, or synthetic winner is permitted.
+
 ## 2026-07-29T18:28:58Z — architect queued incoming-handoff notification
 
 Queued message received while processing the active return:
