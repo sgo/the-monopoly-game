@@ -9897,3 +9897,57 @@ and Game.Result needs to carry a winner. None of this can be verified
 against the current implementation; it is entirely new production
 work, consistent with this phase's role of completing the rules engine
 end-to-end before the CLI (Phase 15).
+
+## 2026-07-29T12:20:14Z — specifier received architect Gherkin follow-up
+
+Handoff message received:
+
+```
+id: 20260729T121925Z_000045_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase14-bankruptcy-and-winning
+commit: 5bbf369b66
+
+Re-read your role and constitution.
+
+merge_and_process architect 5bbf369b66
+```
+
+Action taken: merged architect commit `5bbf369b66` into `main`. Clean
+merge (only `logbook.md` auto-merged, no conflicts). This brought in the
+coder's implementation, the refactorer's pass, and a real architect-found
+production bug fixed through the normal coder follow-up loop (already
+closed before this handoff arrived): retained Get Out of Jail Free cards
+were being discarded instead of transferred to the creditor in
+player-debt bankruptcy - RULES.md is explicit that the creditor receives
+"all your money, title deeds, and Get Out of Jail Free cards." Also
+strengthened liquidation to sell as many houses as needed (and exchange
+a hotel) rather than assuming a single house sale always suffices.
+
+The routed Gherkin finding: soft mutation on `bankruptcy.feature` found
+two equivalent surviving mutations, both in the `starting balance`
+column of bankruptcy-3 and bankruptcy-4 (the bank-debt scenarios) - any
+sufficiently low value produces the identical outcome (still can't
+cover the debt, still bankrupt), so the specific value $5 wasn't pinned
+to any real boundary. Same class of finding as jail-4/6 earlier this
+session.
+
+Decision: accepted the finding. Hardcoded the balance as literal step
+text in both scenarios. bankruptcy-4 had nothing left to parameterize
+afterward my first attempt introduced an unreferenced placeholder
+column, caught and fixed before committing by giving it a genuine
+referenced column instead: which bank-owed space triggers the
+bankruptcy, mirroring jail-1's existing pattern for the identical
+situation (a scenario whose only real parameter is which named space
+is used, not the debt amount). Committed as `e079ab3`.
+
+Verification: `./acceptance/run-acceptance.sh` passes (242/242) against
+the already-accepted implementation; the fix is a pure Examples-table
+edit with no new step text, so no coder work is needed.
+
+Per the workflow rule, handing this back to the architect now so it
+can resume and close the loop.
