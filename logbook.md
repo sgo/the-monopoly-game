@@ -10256,3 +10256,29 @@ merge_and_process architect 2eae6cbf21
 
 Action taken: sent the observable-completion criterion gap to specifier for a
 Phase 15 scenario revision. No implementation prescription was included.
+
+## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
+
+Handoff message received:
+
+```
+id: 20260729T130425Z_000025_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 85c9e76959
+created_at: 2026-07-29T13:04:25.792106Z
+enqueued_at: 2026-07-29T13:04:26.457382Z
+task: phase15-cli
+dequeued_at: 2026-07-29T13:04:30.884512Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 85c9e76959
+```
+
+Action taken: began review of the specifier's Phase 15 observable-completion
+scenario revision.
