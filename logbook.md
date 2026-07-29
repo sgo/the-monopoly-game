@@ -10304,3 +10304,27 @@ the CLI implementation.
 
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
+
+## 2026-07-29T13:05:00Z — specifier returned Phase 15 Gherkin review to architect
+
+Handoff message sent:
+
+```
+id: 20260729T130425Z_000025_from_specifier
+from: specifier
+to: architect
+priority: 00
+type: git_handoff
+role: specifier
+task: phase15-cli
+commit: 85c9e76959
+created_at: 2026-07-29T13:04:25.792106Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 85c9e76959
+```
+
+Summary: accepted the architect's terminal-game finding, added a bankruptcy-
+before-winner assertion to both successful CLI scenarios, and returned the
+same `phase15-cli` task for architectural review.
