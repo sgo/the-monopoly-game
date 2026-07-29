@@ -10416,3 +10416,26 @@ bankruptcy and the winner. Added this bounded eight-player regression test
 to preserve that behavior.
 
 Handing the verification back to refactorer for confirmation.
+
+## 2026-07-29T13:26:06Z — coder rechecked refactorer’s stale Phase 15 termination report
+
+Handoff message received:
+
+```
+id: 20260729T132502Z_000040_from_refactorer
+from: refactorer
+to: coder
+priority: 00
+type: note
+
+Re-read your role and constitution.
+
+d8db fix still leaves 8-player acceptance run nonterminating
+```
+
+Action taken: verified against the newer `cb84e51bcd` state rather than the
+superseded `d8db` commit. The generated CLI acceptance class passes all four
+scenarios, including the eight-player case, in 0.072 seconds. No additional
+implementation change is needed.
+
+Returning the verified current state to refactorer.
