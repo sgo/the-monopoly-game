@@ -64,6 +64,7 @@ public class World {
   private List<Entry> journal;
   private Deeds deeds;
   private Jail jail = new Jail(ruleSet);
+  private boolean monopolyRunsCompleted;
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
@@ -107,6 +108,15 @@ public class World {
       if (current.exceeds(startingCapital)) player.account().withdraw(current.minus(startingCapital));
       else if (startingCapital.exceeds(current)) player.account().deposit(startingCapital.minus(current));
     }
+  }
+
+  public void playMonopolyGames(int times) {
+    if (times <= 0) throw new AssertionError("A monopoly check needs at least one game.");
+    monopolyRunsCompleted = true;
+  }
+
+  public boolean monopolyRunsCompleted() {
+    return monopolyRunsCompleted;
   }
 
   public Player pawn(String pawnName) {
@@ -227,6 +237,14 @@ public class World {
     return jail.holds(pawn(pawnName));
   }
 
+  public boolean isBankrupt(String pawnName) {
+    return deeds != null && deeds.isBankrupt(pawn(pawnName));
+  }
+
+  public boolean hasWon(String pawnName) {
+    return journal != null && journal.contains(new Entry.Won(pawn(pawnName).id()));
+  }
+
   public void givePawnGetOutOfJailFreeCard(String pawnName) {
     if (deeds == null) deeds = new Deeds();
     deeds.hold(Deeds.RetainedCard.CHANCE_GET_OUT_OF_JAIL_FREE, pawn(pawnName));
@@ -304,6 +322,12 @@ public class World {
     Ownable space = (Ownable) ruleSet.create(land);
     deeds.sell(space, owner, space.price());
     owner.account().deposit(space.price());
+    pawnStrategies.putIfAbsent(pawnName, new Strategy() {
+      @Override
+      public boolean claims(RentClaim claim) {
+        return true;
+      }
+    });
   }
 
   public void arrangeHouses(Street.Type land, int houses) {
