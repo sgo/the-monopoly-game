@@ -10591,6 +10591,17 @@ merge_and_process refactorer 7e82624c22
 
 Action taken: began review of the final returned Phase 15 state.
 
+## 2026-07-29T14:00:20Z — architect found Phase 15 executable CLI specification gap
+
+Review finding: the returned Phase 15 deliverables require a standalone
+command-line process with arguments, `-h`/`--h`, stdout reporting, and nonzero
+invalid-input status. The current CLI feature and bindings invoke only the
+in-process `Simulator` API, so they cannot distinguish an executable from a
+library facade.
+
+Action taken: route this Gherkin-content gap to specifier at priority `00`.
+No phase-complete sync is sent while that specification loop is open.
+
 ## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
 
 Handoff message received:
