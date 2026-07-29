@@ -10221,3 +10221,15 @@ merge_and_process architect d4daa26893
 Action taken: sent the simulator-completion correction through the required
 coder review loop. The coder must return the verified state to architect, or
 forward it to refactorer if implementation changes require that normal review.
+
+## 2026-07-29T13:00:51Z — architect found a Phase 15 Gherkin completion gap
+
+Review finding: the Phase 15 CLI scenarios call for a complete game and a
+winner, but prove only that the output contains a report prefix and the words
+`wins the game`. A one-round simulation that labels the initiative leader as
+winner satisfies those assertions. The scenarios need an observable criterion
+that distinguishes a genuine terminal game result from a fabricated winner.
+
+Action taken: route this Gherkin-content defect to specifier at priority `00`.
+This runs alongside the already-open coder correction; Phase 15 remains open
+until both review loops return and are accepted.
