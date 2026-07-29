@@ -11285,6 +11285,9 @@ the completed phase to specifier for branch synchronization.
 ## 2026-07-29T14:30:00Z — specifier received Phase 15 phase-complete sync
 
 Handoff message received:
+## 2026-07-29T14:28:34Z — architect sent Phase 15 completion sync to specifier
+
+Handoff message sent:
 
 ```
 id: 20260729T142834Z_000057_from_architect
@@ -11298,6 +11301,12 @@ commit: 9d21d62fec
 created_at: 2026-07-29T14:28:34.599751Z
 enqueued_at: 2026-07-29T14:28:35.014672Z
 task: phase15-cli
+priority: 50
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 9d21d62fec
+created_at: 2026-07-29T14:28:34.599751Z
 
 Re-read your role and constitution.
 
@@ -11307,3 +11316,45 @@ merge_and_process architect 9d21d62fec
 Action taken: merged architect commit `9d21d62fec`, including the completed
 standalone CLI, strategy selection, executable help behavior, and final
 review records. Phase 15 is complete.
+Action taken: sent the Phase 15 completion sync so the specifier can merge
+the architect branch before beginning subsequent work.
+
+## 2026-07-29T14:39:24Z — architect reopened Phase 15 for starting-capital defect
+
+User observation confirmed an observable CLI defect: `Simulator.run` debits
+every newly selected player to €5 before the game starts. That shortcut
+contradicts the official €1500 starting capital in `RULES.md` and makes an
+early €200 obligation cause immediate bankruptcy.
+
+Action taken: send priority-00 follow-ups in parallel. Coder owns removing the
+pre-game debit and adding regression coverage for normal initial capital;
+specifier owns an acceptance criterion that a simulated player begins with
+the official capital and is not artificially debited before the first turn.
+The coder returns through refactorer; architect will accept both loops before
+closing the reopened phase.
+
+## 2026-07-29T14:45:00Z — specifier received Phase 15 starting-capital follow-up
+
+Handoff message received:
+
+```
+id: 20260729T143945Z_000058_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: 07c95bf1e9
+created_at: 2026-07-29T14:39:45.905924Z
+enqueued_at: 2026-07-29T14:39:46.535839Z
+task: phase15-cli
+
+Re-read your role and constitution.
+
+merge_and_process architect 07c95bf1e9
+```
+
+Action taken: merged architect commit `07c95bf1e9`, preserving the reopened
+Phase 15 review record. Accepted the starting-capital finding for
+specification revision.
