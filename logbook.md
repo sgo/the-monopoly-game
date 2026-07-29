@@ -10650,9 +10650,9 @@ Action taken: accepted the no-change decision because the Phase 15 deliverables
 already define the executable CLI behavior. Route that missing observable
 implementation to coder.
 
-## 2026-07-29T14:10:48Z — coder received architect executable CLI follow-up
+## 2026-07-29T14:09:12Z — architect sent Phase 15 executable CLI implementation handoff
 
-Handoff message received:
+Handoff message sent:
 
 ```
 id: 20260729T140906Z_000054_from_architect
@@ -10663,21 +10663,43 @@ type: git_handoff
 role: architect
 task: phase15-cli
 commit: 0ae1fe2dc3
+created_at: 2026-07-29T14:09:06.824254Z
 
 Re-read your role and constitution.
 
 merge_and_process architect 0ae1fe2dc3
 ```
 
-Action taken: merged `0ae1fe2dc3`; added the standalone `main` boundary,
-`-h`/`--h` usage output, optional player-count parsing, and nonzero process
-status for invalid command-line input. The argument parser remains testable
-without terminating the test process.
+Action taken: sent the outstanding executable CLI implementation to coder.
 
-Verification: CLI reactor tests pass (255); generated acceptance passes
-(246 scenarios).
+Coder implementation: added the standalone `main` boundary, `-h`/`--h` usage,
+optional player-count parsing, and nonzero invalid-input process status while
+keeping parsing testable without process termination.
 
-Handing implementation to refactorer for review.
+## 2026-07-29T14:14:01Z — architect received Phase 15 executable CLI return from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T141224Z_000045_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: e6c3d20096
+created_at: 2026-07-29T14:12:24.685380Z
+enqueued_at: 2026-07-29T14:12:25.219171Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:13:35.282861Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer e6c3d20096
+```
+
+Action taken: began architectural review of the executable CLI return.
 
 ## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
 
@@ -11001,26 +11023,69 @@ Action taken: merged the standalone CLI executable entry point and verified
 five CLI tests pass. The documented `-h`/`--h` behavior is covered; no new
 DRY duplication was introduced.
 
-## 2026-07-29T14:12:24Z — refactorer returned CLI executable review
+## 2026-07-29T14:15:46Z — architect found Phase 15 CLI strategy-selection defect
 
-Handoff message sent:
+Architectural review found that `Simulator.execute` accepts only zero or one
+argument (the player count) and always supplies `AgreeIfAffordable` for every
+player. Phase 15 requires a strategy selection for each player, defaulting to
+Agree if affordable, with registry/lookup plumbing that can support future
+strategies without changing the CLI shape.
+
+Action taken: route this remaining observable CLI contract gap to coder at
+priority 00. The executable entry point, help output, stdout report, and
+invalid-input exit path are already in place.
+
+## 2026-07-29T14:17:59Z — coder received architect strategy-selection follow-up
+
+Handoff message received:
 
 ```
-id: 20260729T141224Z_000045_from_refactorer
-from: refactorer
-to: architect
-priority: 50
+id: 20260729T141619Z_000055_from_architect
+from: architect
+to: coder
+priority: 00
 type: git_handoff
-role: refactorer
+role: architect
 task: phase15-cli
-commit: e6c3d20096
-created_at: 2026-07-29T14:12:24.685380Z
+commit: ca8b1b2144
 
 Re-read your role and constitution.
 
-merge_and_process refactorer e6c3d20096
+merge_and_process architect ca8b1b2144
 ```
 
-Action taken: returned the executable CLI review after five focused CLI,
-property, and acceptance verification passed; the specifier-owned Gherkin
-boundary finding remains separately routed.
+Action taken: merged `ca8b1b2144`; added a named strategy registry and
+per-player command-line selection. Omitted selections default to
+`agree-if-affordable`; supplied selections are validated one-for-one against
+the player count, with clear errors for unknown strategies.
+
+Verification: CLI reactor tests pass (257); generated acceptance passes
+(246 scenarios).
+
+Handing implementation to refactorer for review.
+
+## 2026-07-29T14:20:11Z — refactorer received coder strategy-selection follow-up
+
+Handoff message received:
+
+```
+id: 20260729T141826Z_000035_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 093668a142
+created_at: 2026-07-29T14:18:26.313823Z
+enqueued_at: 2026-07-29T14:18:26.903745Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:18:30.726397Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 093668a142
+```
+
+Action taken: merged named strategy registry and per-player selection support;
+default and unknown-strategy paths are covered by focused tests.
