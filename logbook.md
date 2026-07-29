@@ -8555,6 +8555,50 @@ merge_and_process architect a6f1734876
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
 
+## 2026-07-29T10:09:48Z — coder received phase 12 jail follow-up from specifier
+
+Handoff message received:
+
+```
+id: 20260729T100720Z_000019_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: d7f81d2ad3
+created_at: 2026-07-29T10:07:20.818034Z
+enqueued_at: 2026-07-29T10:07:20.884993Z
+task: phase12-jail
+dequeued_at: 2026-07-29T10:07:26.272861Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d7f81d2ad3
+```
+
+Action taken: merged the Phase 12 specification follow-up and implemented its
+explicit scripted choice to pay the jail fine. The step handler now routes that
+choice to the acceptance world's scripted strategy; a focused jail test records
+the independently selected payment behaviour. Domain tests (240) and generated
+acceptance tests (225) pass.
+
+## 2026-07-29T10:09:48Z — coder prepared phase 12 jail handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase12-jail
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: adds the acceptance strategy hook for an explicit jail-fine payment,
+leaving the affordability strategy as a separate concern.
+
 ## 2026-07-29T09:28:45Z — coder received phase 12 jail architect follow-up
 
 Handoff message received:

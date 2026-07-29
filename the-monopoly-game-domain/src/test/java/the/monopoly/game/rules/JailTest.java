@@ -45,6 +45,20 @@ class JailTest {
   }
 
   @Test
+  void anExplicitChoiceToPayTheFineFreesThePawn() {
+    jail.imprison(dog);
+
+    assertThat(jail.mayTakeTurn(dog, new Strategy() {
+      @Override
+      public boolean pays(JailFine fine) {
+        return true;
+      }
+    }, new Deeds())).isTrue();
+    assertThat(dog.account().balance()).isEqualTo(Balance.of(1450));
+    assertThat(jail.holds(dog)).isFalse();
+  }
+
+  @Test
   void anUnaffordableFineLeavesThePawnToTryDoubles() {
     dog.account().withdraw(new Money(1460));
     jail.imprison(dog);
