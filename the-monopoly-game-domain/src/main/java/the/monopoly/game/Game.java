@@ -16,6 +16,7 @@ import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
 import the.monopoly.game.rules.Rent;
 import the.monopoly.game.rules.Rule;
+import the.monopoly.game.rules.Taxes;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
 
@@ -107,16 +108,18 @@ public class Game {
     Landings rent = new Rent(deeds, rules, turnOrder, strategies, journalling);
     Landings landSale = new LandSale(deeds, rules, turnOrder, strategies, journalling);
     Landings cards = new Cards(deeds, rules, turnOrder, strategies, decks, journalling, cups.forPlayer(player));
+    Landings taxes = new Taxes(journalling);
     return (who, space, roll) -> {
       rent.resolve(who, space, roll);
       landSale.resolve(who, space, roll);
       cards.resolve(who, space, roll);
+      taxes.resolve(who, space, roll);
     };
   }
 
   /** Writes down what a turn and a sale say they did, as the game's account of it. */
   private record Journalling(Journal journal)
-      implements Turn.Events, LandSale.Events, Rent.Events, Building.Events, Cards.Events {
+      implements Turn.Events, LandSale.Events, Rent.Events, Building.Events, Cards.Events, Taxes.Events {
     @Override
     public void rolled(Player player, Roll roll) {
       journal.log(new Journal.Entry.Rolled(player.id(), roll.total()));

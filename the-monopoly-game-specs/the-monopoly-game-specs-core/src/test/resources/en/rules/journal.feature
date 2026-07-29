@@ -200,3 +200,12 @@ Feature: game journal
     Examples:
       | amount |
       | 15     |
+
+  # journal-16
+  Scenario Outline: the journal records a tax payment after the landing movement
+    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    Then the game journal records that pawn "dog" moves before it records that pawn "dog" pays the bank $<amount>
+
+    Examples:
+      | amount |
+      | 200    |

@@ -187,3 +187,12 @@ Feature: game report
     Examples:
       | amount |
       | 15     |
+
+  # report-16
+  Scenario Outline: the report narrates a tax payment after the landing movement
+    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    Then the game report says that pawn "dog" moves before it says that pawn "dog" pays the bank $<amount>
+
+    Examples:
+      | amount |
+      | 200    |

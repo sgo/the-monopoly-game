@@ -489,6 +489,11 @@ public final class MonopolyStepHandlers {
                 chanceCardDrawn(arguments.text(1), arguments.text(2)),
                 bankPaid(arguments.text(3), arguments.number(4)))),
 
+        then("^the game journal records that pawn \"" + NAME
+                + "\" moves before it records that pawn \"" + NAME + "\" pays the bank \\$" + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                moves(arguments.text(1)), bankPaid(arguments.text(2), arguments.number(3)))),
+
         then("^the game journal records that pawn \"" + NAME + "\" moves before it records that pawn \""
                 + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + " rent for \"" + NAME + "\"$",
             (world, arguments) -> recordsInOrder(world, moves(arguments.text(1)), rentPaid(
@@ -578,6 +583,11 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> saysInOrder(world,
                 chanceCardDrawnLine(arguments.text(1), arguments.text(2)),
                 bankPaidLine(arguments.text(3), arguments.number(4)))),
+
+        then("^the game report says that pawn \"" + NAME
+                + "\" moves before it says that pawn \"" + NAME + "\" pays the bank \\$" + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                movesAnywhere(arguments.text(1)), bankPaidLine(arguments.text(2), arguments.number(3)))),
 
         step("^each face was rolled about " + VALUE + " times within a " + VALUE + "% margin$",
             (world, arguments) -> {
