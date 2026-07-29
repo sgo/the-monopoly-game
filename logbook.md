@@ -8175,6 +8175,30 @@ settlement, then re-ran CRAP, DRY, mutation-site, unit, property, and
 acceptance verification. All non-exempt CRAP is at or below 6; changed
 production files remain below the mutation split threshold.
 
+## 2026-07-29T12:04:30Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260729T120421Z_000037_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase14-bankruptcy-and-winning
+commit: 4ab31d3d7c
+created_at: 2026-07-29T12:04:21.501846Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 4ab31d3d7c
+```
+
+Summary: handed the verified Phase 14 bankruptcy-and-winning state to the
+architect at commit `4ab31d3d7c`, including focused bankruptcy coverage
+added to satisfy the CRAP threshold.
+
 ## 2026-07-29T11:17:00Z — refactorer sent handoff to architect
 
 Handoff message sent:
