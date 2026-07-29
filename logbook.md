@@ -8530,6 +8530,37 @@ merge_and_process refactorer 27fb5af98b
 Action taken: began architectural review of the Phase 13 free-parking
 refactorer handoff.
 
+## 2026-07-29T11:19:23Z — architect accepted phase 13 free parking
+
+Action taken: merged refactorer commit `27fb5af98b` and accepted the Free
+Parking rule as an explicit specification of the existing `UnownableSpace`
+no-op path. It introduces no special-case production dependency: `Game` keeps
+movement and its journal event in the shared turn pipeline, while Free Parking
+adds neither a financial effect nor a new domain rule object. The report
+assertion is a narrow acceptance adapter over that existing movement event.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 241 tests passed.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+  -Pproperty-tests test` — 17 property tests passed.
+- `mutate4java` (differential, six selected sites, eight-worker limit) for
+  `Game.java` — 6/6 killed. The first runner invocation could not use its
+  relative local Maven repository from the module directory; the rerun used
+  the absolute local repository and passed.
+- `dry4java` — only the established `Game` journal-adapter repetitions, the
+  existing `LandSale`/`Rent` construction shape, and `Game`/`Turn`
+  constructor shape remain; no actionable duplication.
+- `./acceptance/run-acceptance.sh` — 228 generated acceptance tests passed,
+  including `en/rules/free-parking.feature`.
+- Soft Gherkin mutation for `en/rules/free-parking.feature` — 2/2 killed,
+  zero survivors and zero errors; runner manifests refreshed.
+- `git diff --check` — passed.
+
+Routing: no architect correction or coder/refactorer follow-up is warranted.
+All Phase 13 loops are closed; send the phase-complete sync to specifier at
+priority `50`.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
