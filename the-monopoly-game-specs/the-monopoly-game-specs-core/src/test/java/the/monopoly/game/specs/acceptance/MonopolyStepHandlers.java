@@ -129,6 +129,34 @@ public final class MonopolyStepHandlers {
         step("^we select ([0-9]+) players$",
             (world, arguments) -> world.selectPlayers(arguments.number(1))),
 
+        step("^the standard game setup$", (world, arguments) -> world.selectStandardGameSetup()),
+
+        then("^every selected player starts at position " + VALUE + "$",
+            (world, arguments) -> assertThat(world.selectedPlayers())
+                .extracting(player -> player.position().index()).containsOnly(arguments.number(1))),
+
+        then("^every selected player has \\$" + VALUE + "$",
+            (world, arguments) -> assertThat(world.selectedPlayers())
+                .extracting(player -> player.account().balance().amount()).containsOnly(money(arguments.number(1)))),
+
+        then("^no selected player owns any street$",
+            (world, arguments) -> assertThat(world.bankOwnsEveryOwnableSpace()).isTrue()),
+
+        then("^no selected player has any house or hotel$",
+            (world, arguments) -> assertThat(world.bankHasAllImprovements()).isTrue()),
+
+        then("^the bank owns every ownable space$",
+            (world, arguments) -> assertThat(world.bankOwnsEveryOwnableSpace()).isTrue()),
+
+        then("^the bank has all houses$", (world, arguments) -> assertThat(world.bankHasAllImprovements()).isTrue()),
+        then("^the bank has all hotels$", (world, arguments) -> assertThat(world.bankHasAllImprovements()).isTrue()),
+        then("^all Chance cards are available in the Chance deck$",
+            (world, arguments) -> assertThat(world.cardDecksAreComplete()).isTrue()),
+        then("^all Community Chest cards are available in the Community Chest deck$",
+            (world, arguments) -> assertThat(world.cardDecksAreComplete()).isTrue()),
+        then("^no selected player holds a Get Out of Jail Free card$",
+            (world, arguments) -> assertThat(world.noSelectedPlayerHoldsGetOutOfJailFreeCard()).isTrue()),
+
         step("^we select <players> players$",
             (world, arguments) -> world.selectPlayers(8)),
 
