@@ -6,6 +6,7 @@ import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.StartSpace;
 import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.strategies.Strategy;
 
 /**
  * One player's turn: roll, move, resolve where the pawn landed, and roll again
@@ -19,12 +20,25 @@ public class Turn {
   private final Cup cup;
   private final Events events;
   private final Landings landings;
+  private final Jail jail;
+  private final Strategy strategy;
+  private final Deeds deeds;
 
   public Turn(Rule.Set rules, Cup cup, Events events, Landings landings) {
+    this(rules, cup, events, landings, new Jail(rules), Strategy.UNDECIDED, new Deeds());
+  }
+
+  public Turn(
+      Rule.Set rules, Cup cup, Events events, Landings landings,
+      Jail jail, Strategy strategy, Deeds deeds
+  ) {
     this.rules = rules;
     this.cup = cup;
     this.events = events;
     this.landings = landings;
+    this.jail = jail;
+    this.strategy = strategy;
+    this.deeds = deeds;
   }
 
   /** A turn played where stopping on a space is worth nothing. */
@@ -39,6 +53,13 @@ public class Turn {
   }
 
   public void take(Player player) {
+    if (!jail.mayTakeTurn(player, strategy, deeds)) {
+      Roll roll = cup.roll();
+      events.rolled(player, roll);
+      if (jail.leavesOn(roll, player)) move(player, roll);
+      return;
+    }
+
     int doubles = 0;
     for (;;) {
       Roll roll = cup.roll();

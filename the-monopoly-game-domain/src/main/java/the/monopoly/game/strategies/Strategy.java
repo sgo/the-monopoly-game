@@ -36,6 +36,11 @@ public interface Strategy {
     return false;
   }
 
+  /** Whether to pay the fine to begin this turn outside jail. */
+  default boolean pays(JailFine fine) {
+    return false;
+  }
+
   /** A visitor, the land they stopped on, and the rent its owner may claim. */
   record RentClaim(Player tenant, Ownable land, Money amount) {
   }
@@ -51,6 +56,12 @@ public interface Strategy {
   record BuildOffer(ColourStreet land, Money price, Money available, boolean hotel) {
     public boolean isAffordable() {
       return available.covers(price);
+    }
+  }
+
+  record JailFine(Money amount, Money available) {
+    public boolean isAffordable() {
+      return available.covers(amount);
     }
   }
 

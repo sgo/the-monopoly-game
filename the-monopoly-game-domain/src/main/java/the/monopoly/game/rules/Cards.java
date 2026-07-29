@@ -37,12 +37,20 @@ public final class Cards implements Landings {
   private final Decks decks;
   private final Events events;
   private final Cup cup;
+  private final Jail jail;
   private final Map<String, Consumer<Player>> chanceEffects;
   private final Map<String, Consumer<Player>> communityChestEffects;
 
   public Cards(
       Deeds deeds, Rule.Set rules, List<Player> players, Strategy.OfPlayers strategies,
       Decks decks, Events events, Cup cup
+  ) {
+    this(deeds, rules, players, strategies, decks, events, cup, new Jail(rules));
+  }
+
+  public Cards(
+      Deeds deeds, Rule.Set rules, List<Player> players, Strategy.OfPlayers strategies,
+      Decks decks, Events events, Cup cup, Jail jail
   ) {
     this.deeds = deeds;
     this.rules = rules;
@@ -51,6 +59,7 @@ public final class Cards implements Landings {
     this.decks = decks;
     this.events = events;
     this.cup = cup;
+    this.jail = jail;
     this.chanceEffects = Map.ofEntries(
       Map.entry(
           "Ga door naar Nieuwstraat (Brussel) / Rue Neuve (Bruxelles).",
@@ -90,7 +99,7 @@ public final class Cards implements Landings {
       ),
       Map.entry(
           "Ga naar de gevangenis. Passeer niet langs START, je ontvangt geen M200.",
-          (Consumer<Player>) player -> player.position().moveTo(rules.gameboard().positionOf(OpBezoek))
+          (Consumer<Player>) jail::imprison
       ),
       Map.entry(
           "Renoveer al je eigendommen. Je betaald M25 voor ek huis. en M100 voor elk hotel.",
@@ -140,7 +149,7 @@ public final class Cards implements Landings {
       ),
       Map.entry(
           "Luide muziek diep in de nacht? Je buren zijn boos. Ga naar de gevangenis. Je komt niet langs start START. Je ontvangt geen M200.",
-          (Consumer<Player>) player -> player.position().moveTo(rules.gameboard().positionOf(OpBezoek))
+          (Consumer<Player>) jail::imprison
       ),
       Map.entry(
           "Je helpt jouw buur met haar boodschappen. Ze bedankt je met een lekkere lunch! Je ontvangt M20.",

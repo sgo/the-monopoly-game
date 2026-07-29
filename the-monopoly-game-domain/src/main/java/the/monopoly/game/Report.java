@@ -78,6 +78,10 @@ public final class Report {
           name(it.player()) + " draws the community chest card \"" + it.card() + "\"";
       case Entry.BankPaid it ->
           name(it.player()) + " pays the bank $" + it.amount().amount();
+      case Entry.JailEntered it ->
+          name(it.player()) + " is sent to jail from landing on " + jailCauseName(it.cause());
+      case Entry.JailFinePaid it ->
+          name(it.player()) + " leaves jail by paying the $" + it.fine().amount() + " fine";
     };
   }
 
@@ -89,6 +93,11 @@ public final class Report {
    */
   private static String spaceName(Street.Type land) {
     return land.name().replaceAll("(?<=[a-z])(?=[A-Z])", " ");
+  }
+
+  private static String jailCauseName(Street.Type cause) {
+    if (cause == Street.Type.NaarDeGevangenis) return "Naar de Gevangenis / Allez en Prison";
+    return spaceName(cause);
   }
 
   private static String names(List<Player.ID> players) {
