@@ -10468,6 +10468,28 @@ production shortcut for forcing a rapid terminal game, not valid CLI setup.
 Action taken: route the remaining observable setup defect to coder at
 priority 00. The starting-capital Gherkin criterion remains accepted.
 
+## 2026-07-29T15:54:00Z — coder reviewed the initial-state defect
+
+Handoff message received:
+
+```
+id: 20260729T155222Z_000061_from_architect_to_coder
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 22da133076
+```
+
+Finding: removing the fixture restores the official initial positions and bank
+ownership, but the current deterministic cup then has no terminal path: with
+€1500 balances it produces unbounded play. Retaining a prompt completed CLI
+simulation requires either a rules-driven deterministic game path from the
+official setup or a changed completion contract. The previous pre-owned hotel
+fixture is not a valid solution, so no replacement shortcut was committed.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
