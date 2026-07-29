@@ -114,6 +114,39 @@ public class World {
     }
   }
 
+  public void selectStandardGameSetup() {
+    selectRuleSet(Rule.Set.Type.official);
+    deeds = new Deeds();
+    queuedChanceCards.clear();
+    queuedCommunityChestCards.clear();
+  }
+
+  public List<Player> selectedPlayers() {
+    if (players == null) throw new AssertionError("No players have been selected yet.");
+    return players;
+  }
+
+  public boolean bankOwnsEveryOwnableSpace() {
+    return (deeds == null ? new Deeds() : deeds).landOwnedBy(selectedPlayers().getFirst()).isEmpty()
+        && ruleSet.streets().filter(Ownable.class::isInstance)
+            .allMatch(street -> (deeds == null ? new Deeds() : deeds).isUnowned(street.type()));
+  }
+
+  public boolean bankHasAllImprovements() {
+    Deeds titles = deeds == null ? new Deeds() : deeds;
+    return ruleSet.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
+        .noneMatch(street -> titles.housesBuiltOn(street) > 0 || titles.hasHotelOn(street));
+  }
+
+  public boolean cardDecksAreComplete() {
+    return queuedChanceCards.isEmpty() && queuedCommunityChestCards.isEmpty();
+  }
+
+  public boolean noSelectedPlayerHoldsGetOutOfJailFreeCard() {
+    Deeds titles = deeds == null ? new Deeds() : deeds;
+    return selectedPlayers().stream().noneMatch(titles::holdsGetOutOfJailFreeCard);
+  }
+
   public void playMonopolyGames(int times) {
     if (times <= 0) throw new AssertionError("A monopoly check needs at least one game.");
     monopolyRunsCompleted = true;
@@ -141,10 +174,6 @@ public class World {
   public Simulator.Result simulatorResult() {
     if (simulatorResult == null) throw new AssertionError("The simulator has not been run.");
     return simulatorResult;
-  }
-
-  public List<Money> simulatorStartingBalances() {
-    return simulatorResult().startingBalances();
   }
 
   public Player pawn(String pawnName) {

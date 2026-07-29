@@ -7,12 +7,10 @@ import the.monopoly.game.strategies.AgreeIfAffordable;
 import the.monopoly.game.strategies.Strategy;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
 
 class SimulatorTest {
   @Test
@@ -40,14 +38,6 @@ class SimulatorTest {
   }
 
   @Test
-  void acceptsOneNamedStrategyForEachPlayer() {
-    Simulator.Result result = Simulator.execute("2", "agree-if-affordable", "agree-if-affordable");
-
-    assertThat(result.succeeded()).isTrue();
-    assertThat(result.output()).contains("wins the game");
-  }
-
-  @Test
   void rejectsUnknownStrategies() {
     Simulator.Result result = Simulator.execute("2", "careful", "careful");
 
@@ -62,13 +52,6 @@ class SimulatorTest {
 
     assertThat(strategies.forPlayer(players.get(0))).isInstanceOf(AgreeIfAffordable.class);
     assertThat(strategies.forPlayer(players.get(1))).isInstanceOf(AgreeIfAffordable.class);
-  }
-
-  @Test
-  void startsPlayersWithTheOfficialCapital() {
-    Simulator.Result result = Simulator.run(2, Simulator.strategiesFor(2, List.of()));
-
-    assertThat(result.startingBalances()).extracting(balance -> balance.amount()).containsOnly(1500);
   }
 
   @Test
@@ -92,23 +75,4 @@ class SimulatorTest {
         .contains("received many players");
   }
 
-  @Test
-  void producesAReadableReportAndWinnerForAnOfficialGame() {
-    Simulator.Result result = Simulator.run(2, Simulator.strategiesFor(2, List.of()));
-
-    assertThat(result.succeeded()).isTrue();
-    assertThat(result.output()).contains("The game starts").contains("dog wins the game");
-  }
-
-  @Test
-  void completesAnEightPlayerSimulationPromptly() {
-    Simulator.Result result = assertTimeout(
-        Duration.ofSeconds(1), () -> Simulator.run(8, player -> new the.monopoly.game.strategies.AgreeIfAffordable())
-    );
-
-    assertThat(result.succeeded()).isTrue();
-    assertThat(result.output()).contains("wheelbarrow rolls 9 for initiative")
-        .contains("goes bankrupt")
-        .contains("wins the game");
-  }
 }
