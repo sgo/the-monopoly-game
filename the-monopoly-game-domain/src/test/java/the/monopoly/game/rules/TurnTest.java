@@ -9,6 +9,7 @@ import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.strategies.Strategy;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -109,12 +110,30 @@ class TurnTest {
   }
 
   @Test
-  void rollingDoublesThreeTimesInARowSendsThePawnStraightToJail() {
-    Player player = playerAt(0, 1500);
+  void anUnaffordablePrisonerTriesDoublesBeforeMoving() {
+    Player player = playerAt(10, 40);
+    Jail jail = new Jail(ruleSet);
+    jail.imprison(player);
 
-    takeTurn(player, new Roll(2, 2), new Roll(5, 5), new Roll(1, 1));
+    new Turn(ruleSet, Cup.of(new Roll(1, 2)), new Turn.Events() {
+    }, Landings.UNEVENTFUL, jail, Strategy.UNDECIDED, new Deeds()).take(player);
 
     assertThat(player.position().index()).isEqualTo(JAIL);
+    assertThat(jail.holds(player)).isTrue();
+  }
+
+  @Test
+  void rollingDoublesThreeTimesInARowSendsThePawnStraightToJail() {
+    Player player = playerAt(0, 1500);
+    Jail jail = new Jail(ruleSet);
+
+    new Turn(
+        ruleSet, Cup.of(new Roll(2, 2), new Roll(5, 5), new Roll(1, 1)), new Turn.Events() {
+        }, Landings.UNEVENTFUL, jail, Strategy.UNDECIDED, new Deeds()
+    ).take(player);
+
+    assertThat(player.position().index()).isEqualTo(JAIL);
+    assertThat(jail.holds(player)).isTrue();
   }
 
   @Test

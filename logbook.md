@@ -8146,6 +8146,232 @@ Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
 
+## 2026-07-29T07:35:18Z — architect sent phase 11 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T073514Z_000038_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase11-taxes
+commit: d9f082b1bc
+created_at: 2026-07-29T07:35:14.212114Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d9f082b1bc
+```
+
+Summary: sent the Phase 11 completion sync after accepting the tax-rule architecture and registering the tax specification in the normal and mutation acceptance pipeline. The sync points specifier at architect commit `d9f082b1bc`.
+
+## 2026-07-29T09:15:06Z — architect received phase 12 refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260729T091451Z_000034_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: fb772d1075
+created_at: 2026-07-29T09:14:51.313351Z
+enqueued_at: 2026-07-29T09:14:51.843534Z
+task: phase12-jail
+dequeued_at: 2026-07-29T09:14:59.918971Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer fb772d1075
+```
+
+Action taken: began architectural review of the Phase 12 refactorer handoff.
+
+## 2026-07-29T09:24:28Z — architect completed phase 12 jail review
+
+Action taken: merged refactorer commit `fb772d1075` and reviewed `Jail` as
+the rule boundary for imprisonment and release. Found an observable state
+inconsistency: the three-consecutive-doubles path moved the pawn to the
+visiting space but did not register the player as held by `Jail`. Corrected
+`Turn.sendToJail` to imprison the player and added a regression assertion.
+
+Architectural correction: registered `en/rules/jail.feature` in
+`acceptance/pipeline-features.txt`. Updated its doubles-release scenario to
+assert the actual accepted landing consequence: the `Agree if affordable`
+strategy buys the affordable property immediately after release, leaving a
+$0 balance. Made that fixed no-fine precondition concrete because varying the
+starting balance was equivalent, uninformative soft-mutation input. Added an
+observer regression to cover the jail-entry report event.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 238 tests passed before the
+  final observer regression; `mvn -B -pl the-monopoly-game-domain
+  -Dmaven.repo.local=tmp/m2 test` — 239 tests passed after it.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+  -Pproperty-tests test` — 17 property tests passed.
+- `mutate4java` (differential, eight workers): `Turn.java` 11/11 killed;
+  `Jail.java` 15/15 killed.
+- `dry4java` — only reviewed journal-event adapters and existing constructor
+  shapes remain; no actionable duplication.
+- `./acceptance/run-acceptance.sh` — 223 generated acceptance tests passed.
+- Soft Gherkin mutation for `en/rules/jail.feature` — clean after pipeline
+  registration and scenario correction (no eligible mutations remain under
+  the approved manifest filter).
+- `git diff --check` — passed.
+
+Routing: the prisoner-state correction changes observable behaviour, so the
+priority-`00` architect follow-up goes to coder. Do not sync the phase to
+specifier until that loop returns and is accepted.
+
+## 2026-07-29T09:26:22Z — architect sent phase 12 follow-up to coder
+
+Handoff message sent:
+
+```
+id: 20260729T092608Z_000039_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 44c3a48104
+created_at: 2026-07-29T09:26:08.345606Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 44c3a48104
+```
+
+Summary: sent the focused observable-behaviour correction for the
+three-doubles jail path, together with its acceptance-pipeline registration
+and regression hardening. Coder must validate and return this priority-`00`
+architect review loop to architect before Phase 12 can be synced to
+specifier.
+
+## 2026-07-29T09:34:41Z — architect received phase 12 coder follow-up
+
+Handoff message received:
+
+```
+id: 20260729T093431Z_000023_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: ae778bd6b8
+created_at: 2026-07-29T09:34:31.735940Z
+enqueued_at: 2026-07-29T09:34:31.780121Z
+task: phase12-jail
+dequeued_at: 2026-07-29T09:34:36.391619Z
+
+Re-read your role and constitution.
+
+merge_and_process coder ae778bd6b8
+```
+
+Action taken: began review of the coder's priority-`00` return for the Phase
+12 jail correction.
+
+## 2026-07-29T09:35:16Z — architect accepted phase 12 jail follow-up
+
+Action taken: merged coder commit `ae778bd6b8`. The coder confirmed the
+shared `Jail` state correction needs no further coder-owned change: 239
+focused domain tests and all 223 generated acceptance tests pass, including
+the newly registered jail feature. The returned commit contains the required
+verification record only; the corrected implementation remains architect
+commit `44c3a48104`.
+
+Verification: re-ran `git diff --check` on the merged state; it passed with a
+clean worktree. The accepted architect review already covered the full unit
+and property suites, both changed-source mutation runs, DRY review, normal
+acceptance, and the jail-feature soft mutation gate.
+
+Routing: all Phase 12 loops are now closed. Send one priority-`50`
+phase-complete sync to specifier.
+
+## 2026-07-29T09:13:49Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T090451Z_000022_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 61f7ecd378
+created_at: 2026-07-29T09:04:51.253333Z
+enqueued_at: 2026-07-29T09:04:51.293468Z
+task: phase12-jail
+dequeued_at: 2026-07-29T09:04:59.645260Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 61f7ecd378
+```
+
+Action taken: merged coder commit `61f7ecd378`, extracted the jail-attempt
+branch in `Turn`, added targeted coverage for failed jail double attempts and
+the unaffordable-prisoner turn path, and verified unit, property, and
+acceptance suites. CRAP is at or below 6 for all non-exempt production
+methods; `Report.line` remains the documented exhaustive sealed-switch
+exception. Mutation-site counts remain below 100 per changed source file.
+
+## 2026-07-29T08:56:28Z — coder received phase 12 jail handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260729T085628Z_000018_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: phase12-jail
+commit: d4409e59e4
+created_at: 2026-07-29T08:56:28Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d4409e59e4
+```
+
+Action taken: merged the accepted Phase 12 jail specification and implemented
+jail entry, jail state, and the specified exit paths.
+
+## 2026-07-29T09:04:03Z — coder prepared phase 12 jail handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase12-jail
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: Go To Jail now sends and marks a pawn as imprisoned; Just Visiting
+does not. A jailed player may leave by an affordable $50 fine, an explicitly
+used Get Out of Jail Free card, doubles, or the compulsory fine after three
+failed doubles attempts. Jail entry and paid-fine exit are journalled and
+reported. Unit verification passed with 236 tests; normal generated acceptance
+verification passed with 217 tests.
+
 ## 2026-07-29T06:24:46Z — specifier sent handoff to coder
 
 Handoff message sent:
@@ -8329,6 +8555,51 @@ merge_and_process architect a6f1734876
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
 
+## 2026-07-29T09:28:45Z — coder received phase 12 jail architect follow-up
+
+Handoff message received:
+
+```
+id: 20260729T092608Z_000039_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 44c3a48104
+created_at: 2026-07-29T09:26:08.345606Z
+enqueued_at: 2026-07-29T09:26:08.990473Z
+task: phase12-jail
+dequeued_at: 2026-07-29T09:26:14.679271Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 44c3a48104
+```
+
+Action taken: fast-forward merged the architect's Phase 12 review follow-up.
+Reviewed the shared `Jail` state integration for the three-consecutive-doubles
+path and found no coder-owned implementation changes required. Focused unit
+verification passed with 239 tests; the normal generated acceptance pipeline
+passed with 223 tests, including the registered jail feature. `git diff --check`
+passed on a clean worktree.
+
+## 2026-07-29T09:28:45Z — coder prepared phase 12 jail verification return to architect
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: phase12-jail
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: the architect's shared-jail-state correction is verified; returning
+the priority-00 review loop directly to architect without further changes.
+
 ## 2026-07-29T07:29:37Z — architect received phase 11 refactorer handoff
 
 Handoff message received:
@@ -8346,12 +8617,42 @@ created_at: 2026-07-29T07:28:41.818041Z
 enqueued_at: 2026-07-29T07:28:42.815784Z
 task: phase11-taxes
 dequeued_at: 2026-07-29T07:29:31.014153Z
+Re-read your role and constitution.
+
+merge_and_process refactorer a9fe953896
+```
+
+## 2026-07-29T07:28:41Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260729T072841Z_000033_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase11-taxes
+commit: a9fe953896
+created_at: 2026-07-29T07:28:41.818041Z
 
 Re-read your role and constitution.
 
 merge_and_process refactorer a9fe953896
 ```
 
+Summary: merged the Phase 11 tax rule and the architect's own Phase 10
+follow-up (both new to this branch). Resolved an unusual `logbook.md`
+conflict where my own Phase 10 "sent" entry had been split by the merge
+into two fragments around the architect's follow-up entries — root cause
+was that the coder's branch history never carried my two Phase 10 entries
+at all, apparently lost somewhere upstream. All gates clean without
+changes: CRAP exceeds only for the exempt `Report.line` (21,1, unchanged
+shape), DRY findings are the same two long-standing reviewed categories,
+mutation-site scan on every changed/new file (`Cards`, `Deeds`, `Game`,
+`Report`, `Taxes`) stays well under 100. 249 unit tests, 17 property
+tests, and 209 acceptance tests all pass.
 Action taken: began architectural review of the Phase 11 refactorer handoff.
 
 ## 2026-07-29T07:34:29Z — architect accepted phase 11 taxes
