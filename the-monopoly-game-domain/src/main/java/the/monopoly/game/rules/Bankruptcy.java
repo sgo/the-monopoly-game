@@ -39,7 +39,8 @@ public final class Bankruptcy {
     if (creditor == null) bankruptToBank(debtor);
     else bankruptToPlayer(debtor, creditor);
     events.bankrupt(debtor, creditor);
-    players.stream().filter(it -> !deeds.isBankrupt(it)).findFirst().ifPresent(events::won);
+    List<Player> playersStillInGame = players.stream().filter(it -> !deeds.isBankrupt(it)).toList();
+    if (playersStillInGame.size() == 1) events.won(playersStillInGame.getFirst());
   }
 
   private void sellHousesUntilSolvent(Player debtor) {

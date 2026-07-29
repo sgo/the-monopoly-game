@@ -1,3 +1,7 @@
+# acceptance-mutation-manifest-begin
+# {"version":1,"tested_at":"2026-07-29T13:40:32.576579Z","feature_name":"Monopoly command line interface","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-cli/src/test/resources/en/cli.feature","background_hash":"74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b","implementation_hash":"unknown","scenarios":[{"index":0,"name":"the CLI runs a complete game with the default strategy","scenario_hash":"faf2e3fadbfc5efb5170144de99cda0bf43a41a98ee2cb5f7b7385744d92e5dd","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-07-29T13:40:13.247310Z"},{"index":1,"name":"the CLI runs a complete game with selected player strategies","scenario_hash":"67c5a3b977f2703c80f4961d0dacea7c427404bba17aca6a879e13f93bed386b","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-07-29T13:40:13.247310Z"}]}
+# acceptance-mutation-manifest-end
+
 # language: en
 
 Feature: Monopoly command line interface
@@ -34,9 +38,9 @@ Feature: Monopoly command line interface
     Given the simulator is configured for <players> players
     When I run the simulator
     Then the simulator exits unsuccessfully
-    And the output explains that the number of players must be between 2 and 8
+    And the output explains that the number of players must be between 2 and 8 and received <reported players> players
 
     Examples:
-      | players |
-      | 1       |
-      | 9       |
+      | players | reported players |
+      | 1       | 1                |
+      | 9       | 9                |

@@ -13,6 +13,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>the.monopoly.game</groupId>
+            <artifactId>the-monopoly-game-cli</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <scope>test</scope>

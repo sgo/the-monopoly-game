@@ -10264,6 +10264,29 @@ Action taken: route this Gherkin-content defect to specifier at priority `00`.
 This runs alongside the already-open coder correction; Phase 15 remains open
 until both review loops return and are accepted.
 
+## 2026-07-29T13:01:13Z — architect sent Phase 15 Gherkin correction to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T130109Z_000048_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 2eae6cbf21
+created_at: 2026-07-29T13:01:09.390840Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 2eae6cbf21
+```
+
+Action taken: sent the observable-completion criterion gap to specifier for a
+Phase 15 scenario revision. No implementation prescription was included.
+
 ## 2026-07-29T13:02:57Z — specifier received Phase 15 architect follow-up
 
 Handoff message received:
@@ -10305,9 +10328,9 @@ the CLI implementation.
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
 
-## 2026-07-29T13:05:00Z — specifier returned Phase 15 Gherkin review to architect
+## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
-Handoff message sent:
+Handoff message received:
 
 ```
 id: 20260729T130425Z_000025_from_specifier
@@ -10319,12 +10342,223 @@ role: specifier
 task: phase15-cli
 commit: 85c9e76959
 created_at: 2026-07-29T13:04:25.792106Z
+enqueued_at: 2026-07-29T13:04:26.457382Z
+dequeued_at: 2026-07-29T13:04:30.884512Z
 
 Re-read your role and constitution.
 
 merge_and_process specifier 85c9e76959
 ```
 
-Summary: accepted the architect's terminal-game finding, added a bankruptcy-
-before-winner assertion to both successful CLI scenarios, and returned the
-same `phase15-cli` task for architectural review.
+Action taken: began review of the specifier's Phase 15 observable-completion
+scenario revision.
+
+## 2026-07-29T13:05:40Z — architect accepted Phase 15 Gherkin completion revision
+
+Action taken: accepted specifier commit `85c9e76959`. Requiring a bankruptcy
+before winner reporting distinguishes a completed terminal game from the
+previous one-round false winner without prescribing the implementation.
+
+The new acceptance step needs a handler and the game loop must now produce
+the required terminal sequence. Route the accepted revision to the coder's
+open priority-`00` correction loop. Phase 15 remains open pending that loop.
+
+## 2026-07-29T13:06:06Z — architect sent accepted Phase 15 revision to coder
+
+Handoff message sent:
+
+```
+id: 20260729T130601Z_000049_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 73fda5f617
+created_at: 2026-07-29T13:06:01.494376Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 73fda5f617
+```
+
+Action taken: sent the accepted Gherkin revision to the same open coder
+correction loop, so implementation and binding verification use the current
+specification.
+
+## 2026-07-29T13:14:34Z — coder received accepted Phase 15 completion criterion
+
+Handoff message received:
+
+```
+id: 20260729T130601Z_000049_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 73fda5f617
+
+Re-read your role and constitution.
+
+merge_and_process architect 73fda5f617
+```
+
+Action taken: merged `73fda5f617`, retaining its accepted Gherkin revision.
+Bound the new requirement to the rendered report: a bankruptcy must occur
+before the rendered winner. The simulator now reports the game journal
+directly, so the result is an observable terminal game event rather than an
+appended winner label.
+
+Verification: focused completion and CLI tests pass; generated CLI
+acceptance scenarios pass (4/4).
+
+Handing the changed implementation to refactorer for review.
+
+## 2026-07-29T13:21:29Z — coder received refactorer Phase 15 termination finding
+
+Handoff message received:
+
+```
+id: 20260729T132034Z_000039_from_refactorer
+from: refactorer
+to: coder
+priority: 00
+type: note
+
+Re-read your role and constitution.
+
+8-player complete-game acceptance run does not terminate promptly
+```
+
+Action taken: reproduced the eight-player simulator path under a one-second
+bound. It completes successfully (about 0.4 seconds), reporting both a
+bankruptcy and the winner. Added this bounded eight-player regression test
+to preserve that behavior.
+
+Handing the verification back to refactorer for confirmation.
+
+## 2026-07-29T13:27:00Z — refactorer received coder termination regression test
+
+Handoff message received:
+
+```
+id: 20260729T132154Z_000031_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: coder
+commit: cb84e51bcd
+created_at: 2026-07-29T13:21:54.109531Z
+enqueued_at: 2026-07-29T13:21:54.493521Z
+task: phase15-cli
+dequeued_at: 2026-07-29T13:25:25.887189Z
+
+Re-read your role and constitution.
+
+merge_and_process coder cb84e51bcd
+```
+
+Action taken: merged the bounded eight-player simulator regression test and
+will confirm the complete acceptance suite before architect handoff.
+
+## 2026-07-29T13:29:18Z — architect received Phase 15 correction from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T132900Z_000041_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: bb31d20c44
+created_at: 2026-07-29T13:29:00.934529Z
+enqueued_at: 2026-07-29T13:29:01.027273Z
+task: phase15-cli
+dequeued_at: 2026-07-29T13:29:10.607956Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer bb31d20c44
+```
+
+Action taken: began architectural review of the corrected Phase 15 CLI state.
+
+## 2026-07-29T13:40:55Z — architect isolated the Phase 15 CLI adapter
+
+Action taken: moved `Simulator` and its focused tests from the domain artifact
+to the new `the-monopoly-game-cli` module. The module depends inward on the
+domain; core acceptance bindings reference it only with test scope. The CLI
+test now pins the deterministic terminal-game trace.
+
+Verification: affected reactor tests passed (250 domain tests and 3 CLI
+tests); acceptance generation passed. CLI source mutation killed 19/19 sites.
+DRY found no new CLI duplication.
+
+## 2026-07-29T13:40:55Z — architect found a Phase 15 CLI boundary-example gap
+
+Review finding: soft Gherkin mutation of `specs-cli:en/cli.feature` survives
+both `players: 1 -> -3` and `players: 9 -> 17`. The invalid-count scenario
+only proves that some out-of-range input fails, not the official lower and
+upper bounds named in its examples.
+
+Action taken: route this Gherkin-content defect to specifier at priority `00`.
+Phase 15 remains open until that loop and the structural refactor review
+return and are accepted.
+
+## 2026-07-29T13:41:35Z — architect sent Phase 15 CLI boundary review to refactorer
+
+Handoff message sent:
+
+```
+id: 20260729T134130Z_000050_from_architect
+from: architect
+to: refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: a81eaca30a
+created_at: 2026-07-29T13:41:30.338059Z
+
+Re-read your role and constitution.
+
+merge_and_process architect a81eaca30a
+```
+
+Action taken: sent the behavior-preserving CLI/domain module boundary change
+to refactorer for the architect review loop.
+
+## 2026-07-29T13:43:03Z — specifier received Phase 15 architect boundary follow-up
+
+Handoff message received:
+
+```
+id: 20260729T134154Z_000051_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: 1495026905
+created_at: 2026-07-29T13:41:54.265878Z
+enqueued_at: 2026-07-29T13:41:55.205822Z
+task: phase15-cli
+
+Re-read your role and constitution.
+
+merge_and_process architect 1495026905
+```
+
+Action taken: merged architect commit `1495026905`, preserving the
+architect's Phase 15 review chain. Accepted the invalid-boundary mutation
+finding and revised the CLI feature so the expected reported invalid count
+is an independent example column.
