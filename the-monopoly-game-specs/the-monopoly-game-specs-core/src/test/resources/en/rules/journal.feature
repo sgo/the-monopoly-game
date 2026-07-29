@@ -230,3 +230,12 @@ Feature: game journal
     Examples:
       | fine |
       | 50   |
+
+  # journal-19
+  Scenario Outline: the journal records landing on Free Parking even though nothing happens
+    When pawn "dog" lands on "Gratis Parkeren / Parc Gratuit"
+    Then the game journal records that pawn "dog" moves from position <start position> to <position>
+
+    Examples:
+      | start position | position |
+      | 17              | 20       |
