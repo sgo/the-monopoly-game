@@ -125,8 +125,7 @@ public class World {
 
   public void configureSimulator(int players, boolean withChoices) {
     simulatorPlayers = players;
-    simulatorStrategies = withChoices ? player -> new the.monopoly.game.strategies.AgreeIfAffordable()
-        : Strategy.OfPlayers.NOBODY_DECIDES;
+    simulatorStrategies = player -> new the.monopoly.game.strategies.AgreeIfAffordable();
   }
 
   public void configureSimulatorWithAgreeIfAffordable() {
@@ -142,6 +141,10 @@ public class World {
   public Simulator.Result simulatorResult() {
     if (simulatorResult == null) throw new AssertionError("The simulator has not been run.");
     return simulatorResult;
+  }
+
+  public List<Money> simulatorStartingBalances() {
+    return simulatorResult().startingBalances();
   }
 
   public Player pawn(String pawnName) {

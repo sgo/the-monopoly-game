@@ -10347,6 +10347,10 @@ Action taken: merged the architect synchronization, including the independent
 CLI starting-balance acceptance criterion. Resolving the shared logbook record
 before verifying the merged acceptance criterion.
 
+Verification: regenerated the CLI acceptance entry point and passed its four
+scenarios, including the new starting-balance assertion. `SimulatorTest` also
+passed all 11 tests.
+
 ## 2026-07-29T14:42:23Z — architect accepted Phase 15 starting-capital criterion
 
 Action taken: accepted the new CLI-level $1500 pre-turn assertion. Forwarding
