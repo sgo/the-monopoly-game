@@ -11254,3 +11254,17 @@ merge_and_process architect 9d21d62fec
 
 Action taken: sent the Phase 15 completion sync so the specifier can merge
 the architect branch before beginning subsequent work.
+
+## 2026-07-29T14:39:24Z — architect reopened Phase 15 for starting-capital defect
+
+User observation confirmed an observable CLI defect: `Simulator.run` debits
+every newly selected player to €5 before the game starts. That shortcut
+contradicts the official €1500 starting capital in `RULES.md` and makes an
+early €200 obligation cause immediate bankruptcy.
+
+Action taken: send priority-00 follow-ups in parallel. Coder owns removing the
+pre-game debit and adding regression coverage for normal initial capital;
+specifier owns an acceptance criterion that a simulated player begins with
+the official capital and is not artificially debited before the first turn.
+The coder returns through refactorer; architect will accept both loops before
+closing the reopened phase.
