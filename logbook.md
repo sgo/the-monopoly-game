@@ -8299,6 +8299,85 @@ acceptance, and the jail-feature soft mutation gate.
 Routing: all Phase 12 loops are now closed. Send one priority-`50`
 phase-complete sync to specifier.
 
+## 2026-07-29T09:35:44Z — architect sent phase 12 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T093538Z_000040_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 149762d57f
+created_at: 2026-07-29T09:35:38.294665Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 149762d57f
+```
+
+Summary: sent the sole Phase 12 completion sync after accepting the coder's
+priority-`00` verification return. The specifier can merge
+`149762d57f` into its branch to close the jail phase and begin the next phase
+cleanly.
+
+## 2026-07-29T10:15:06Z — architect received late phase 12 refactorer handoff
+
+Handoff message received:
+
+```
+id: 20260729T101454Z_000035_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 2c973562b8
+created_at: 2026-07-29T10:14:54.320297Z
+enqueued_at: 2026-07-29T10:14:55.298784Z
+task: phase12-jail
+dequeued_at: 2026-07-29T10:14:59.428986Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 2c973562b8
+```
+
+Action taken: began review of the late Phase 12 refactorer return. The phase
+has already been sent to specifier, so this review will determine whether the
+handoff is a harmless duplicate or requires a corrective follow-up.
+
+## 2026-07-29T10:17:08Z — architect reviewed late phase 12 jail follow-up
+
+Action taken: merged refactorer commit `2c973562b8`. It carries the
+specifier-directed split between the mechanic of choosing a jail-fine payment
+and `Agree if affordable`'s affordability decision. The acceptance scripted
+strategy remains a test helper; no production boundary or dependency direction
+changed. The restored unaffordable-strategy scenario has a precise rule
+assertion, but its example dice merely need to be non-doubles: changing either
+die to another non-double pair produces exactly the same observable outcome.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 240 tests passed.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+  -Pproperty-tests test` — 17 property tests passed.
+- `./acceptance/run-acceptance.sh` — 225 generated acceptance tests passed.
+- Soft Gherkin mutation for `en/rules/jail.feature` — two surviving,
+  equivalent dice-example mutations in the no-payment scenario; the runner
+  refreshed its manifest accordingly.
+- `git diff --check` — passed before the runner's manifest refresh.
+
+No production source changed, so the accepted Phase 12 source mutation and
+DRY results remain applicable. The two survivors are a Gherkin example-design
+defect, not a production or test-helper implementation defect. Under the
+workflow's Gherkin-routing rule, send the finding to specifier at priority
+`00`; do not edit the scenario content here.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -8554,6 +8633,103 @@ merge_and_process architect a6f1734876
 ```
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
+
+## 2026-07-29T10:09:48Z — coder received phase 12 jail follow-up from specifier
+
+Handoff message received:
+
+```
+id: 20260729T100720Z_000019_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: d7f81d2ad3
+created_at: 2026-07-29T10:07:20.818034Z
+enqueued_at: 2026-07-29T10:07:20.884993Z
+task: phase12-jail
+dequeued_at: 2026-07-29T10:07:26.272861Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d7f81d2ad3
+```
+
+Action taken: merged the Phase 12 specification follow-up and implemented its
+explicit scripted choice to pay the jail fine. The step handler now routes that
+choice to the acceptance world's scripted strategy; a focused jail test records
+the independently selected payment behaviour. Domain tests (240) and generated
+acceptance tests (225) pass.
+
+## 2026-07-29T10:09:48Z — coder prepared phase 12 jail handoff to refactorer
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: phase12-jail
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: adds the acceptance strategy hook for an explicit jail-fine payment,
+leaving the affordability strategy as a separate concern.
+
+## 2026-07-29T09:15:08Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260729T091451Z_000034_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase12-jail
+commit: fb772d1075
+created_at: 2026-07-29T09:14:51.313351Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer fb772d1075
+```
+
+Summary: handed the verified Phase 12 jail refactor to the architect at
+commit `fb772d1075`, including the reduced-complexity `Turn` branch and
+targeted jail coverage.
+
+## 2026-07-29T10:14:21Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+id: 20260729T101023Z_000024_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 95ea8a1d7c
+created_at: 2026-07-29T10:10:23.304583Z
+enqueued_at: 2026-07-29T10:10:23.748173Z
+task: phase12-jail
+dequeued_at: 2026-07-29T10:10:29.325733Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 95ea8a1d7c
+```
+
+Action taken: merged coder commit `95ea8a1d7c`, re-ran CRAP, DRY, mutation
+site scans, unit tests, property tests, and acceptance tests. No further
+structural changes were needed; CRAP remains within the threshold except
+for the documented `Report.line` exemption, and changed source files stay
+below the mutation split limit.
 
 ## 2026-07-29T09:28:45Z — coder received phase 12 jail architect follow-up
 
