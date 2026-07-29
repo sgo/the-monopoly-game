@@ -10585,3 +10585,29 @@ merge_and_process specifier bdcd920ce4
 
 Summary: returned the revised invalid-player-boundary specification after
 separating the arranged count from the asserted reported count.
+
+## 2026-07-29T13:47:16Z — specifier processed duplicate queued architect handoff
+
+Handoff message received:
+
+```
+id: 20260729T134154Z_000051_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: 1495026905
+created_at: 2026-07-29T13:41:54.265878Z
+enqueued_at: 2026-07-29T13:41:55.205822Z
+task: phase15-cli
+
+Re-read your role and constitution.
+
+merge_and_process architect 1495026905
+```
+
+Action taken: identified this as a duplicate of the already merged and
+closed `phase15-cli` handoff, so no second merge or role action was needed.
+The queued duplicate can now be removed.
