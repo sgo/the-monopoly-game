@@ -467,6 +467,9 @@ can run genuinely complete games rather than partial ones.
   `the-monopoly-game-domain` and `the-monopoly-game-specs`.
 - Deliver a standalone executable process with a command-line entry point,
   rather than only a programmatic simulator API.
+- Define the standard game starting configuration in the core module, including
+  player cash and positions, unowned land, unused houses and hotels, and full
+  Chance and Community Chest decks.
 - Accepts the number of players (2–8, per [Setup](RULES.md#setup)) and, per
   player, a strategy selection — defaulting to "Agree if affordable" when not
   specified.
@@ -481,7 +484,8 @@ can run genuinely complete games rather than partial ones.
   out-of-scope list).
 - Verification: invoke the standalone executable end-to-end for a couple of
   player counts, the help flag, and invalid input; confirm complete readable
-  reports, usage guidance, stdout output, and nonzero failure status.
+  reports, usage guidance, stdout output, nonzero failure status, and correct
+  application of the standard game starting configuration.
 
 ### BDD/TDD Process (mandatory):
 

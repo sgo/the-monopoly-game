@@ -21,6 +21,7 @@ en/components/stations.feature
 en/components/utilities.feature
 en/components/tax.feature
 en/rules/official.feature
+en/rules/setup.feature
 en/rules/movement.feature
 en/rules/initiative.feature
 en/rules/jail.feature
