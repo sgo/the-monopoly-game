@@ -11314,3 +11314,29 @@ merge_and_process architect 07c95bf1e9
 
 Action taken: sent the €5 pre-game-debit removal and regression coverage to
 coder; its normal review path is coder to refactorer to architect.
+
+## 2026-07-29T14:42:23Z — architect received Phase 15 starting-capital specification return
+
+Handoff message received:
+
+```
+id: 20260729T144211Z_000029_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: c7a0dde7dc
+created_at: 2026-07-29T14:42:11.171871Z
+enqueued_at: 2026-07-29T14:42:11.924152Z
+task: phase15-cli
+dequeued_at: 2026-07-29T14:42:17.073532Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier c7a0dde7dc
+```
+
+Action taken: began review of the returned starting-capital acceptance
+criterion; the coder/remediation loop remains outstanding.
