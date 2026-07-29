@@ -10328,268 +10328,49 @@ the CLI implementation.
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
 
-## 2026-07-29T16:00:34Z — refactorer returned initial-state review to architect
+## 2026-07-29T15:58:00Z — coder reviewed the Monopoly ten-run specification
+
+Handoff message received:
+
+```
+id: 20260729T154809Z_000030_from_specifier_to_coder
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: monopoly-10-runs
+commit: d6ac140f28
+```
+
+Finding: the acceptance world's `playMonopolyGames` currently marks success
+without playing a game. Implementing the requested ten real games depends on
+the same missing bounded, rules-driven completion mechanism identified in the
+priority-00 CLI review. This must be resolved architecturally before the stub
+can be replaced without creating a false acceptance result.
+
+## 2026-07-29T14:42:20Z — specifier returned Phase 15 starting-capital revision
 
 Handoff message sent:
 
 ```
-id: 20260729T160034Z_000050_from_refactorer
-from: refactorer
+id: 20260729T144211Z_000029_from_specifier
+from: specifier
 to: architect
-priority: 50
-type: git_handoff
-role: refactorer
-task: phase15-cli
-commit: cc23e95b1f
-created_at: 2026-07-29T16:00:34.702898Z
-
-Re-read your role and constitution.
-
-merge_and_process refactorer cc23e95b1f
-```
-
-Action taken: routed the coder's initial-state finding to architect. No
-production refactor was needed; focused CLI tests remain 11/11 green.
-
-## 2026-07-29T15:59:59Z — refactorer received coder initial-state review
-
-Handoff message received:
-
-```
-id: 20260729T155634Z_000038_from_coder_to_refactorer
-from: coder
-to: refactorer
-recipient: refactorer
-priority: 50
-type: git_handoff
-role: coder
-commit: aae224e0ba
-created_at: 2026-07-29T15:56:34.132829Z
-enqueued_at: 2026-07-29T15:56:34.460760Z
-task: phase15-cli
-dequeued_at: 2026-07-29T15:56:39.339679Z
-
-Re-read your role and constitution.
-
-merge_and_process coder aae224e0ba
-```
-
-Action taken: merged coder commit `aae224e0ba`. It records that removing the
-invalid pre-owned hotel fixture restores official initial state but leaves the
-deterministic cup without a terminal path. No production code changed. Ran
-the focused CLI suite: 11 tests passed.
-
-## 2026-07-29T15:55:04Z — refactorer received coder starting-balance acceptance fix
-
-Handoff message received:
-
-```
-id: 20260729T155356Z_000037_from_coder
-from: coder
-to: refactorer
-recipient: refactorer
-priority: 50
-type: git_handoff
-role: coder
-commit: 0748405346
-created_at: 2026-07-29T15:53:56.732311Z
-enqueued_at: 2026-07-29T15:53:56.787262Z
-task: phase15-cli
-dequeued_at: 2026-07-29T15:54:04.317802Z
-
-Re-read your role and constitution.
-
-merge_and_process coder 0748405346
-```
-
-Action taken: merged the observable starting-balance acceptance assertion and
-verified 11 focused CLI tests; the broader generated acceptance limitation is
-recorded in the preceding coder review entry.
-
-## 2026-07-29T15:55:42Z — refactorer returned starting-balance acceptance review
-
-Handoff message sent:
-
-```
-id: 20260729T155542Z_000049_from_refactorer
-from: refactorer
-to: architect
-priority: 50
-type: git_handoff
-role: refactorer
-task: phase15-cli
-commit: 6598335d45
-created_at: 2026-07-29T15:55:42.031574Z
-
-Re-read your role and constitution.
-
-merge_and_process refactorer 6598335d45
-```
-
-Action taken: returned the acceptance starting-balance verification after 11
-focused CLI tests, DRY review, and mutation scan (56 sites) passed.
-
-## 2026-07-29T15:48:52Z — coder received specification synchronization
-
-Handoff message received:
-
-```
-id: 20260729T144359Z_000060_from_architect_to_coder
-from: architect
-to: coder
 priority: 00
 type: git_handoff
-role: architect
+role: specifier
 task: phase15-cli
-commit: 53e9a1f8dc
-```
-
-Action taken: merged the architect synchronization, including the independent
-CLI starting-balance acceptance criterion. Resolving the shared logbook record
-before verifying the merged acceptance criterion.
-
-Verification: regenerated the CLI acceptance entry point and passed its four
-scenarios, including the new starting-balance assertion. `SimulatorTest` also
-passed all 11 tests.
-
-## 2026-07-29T14:42:23Z — architect accepted Phase 15 starting-capital criterion
-
-Action taken: accepted the new CLI-level $1500 pre-turn assertion. Forwarding
-the revised feature to coder so implementation and acceptance support are
-reviewed against the same contract. The refactorer return remains required
-before this reopened phase can close.
-
-## 2026-07-29T14:43:59Z — architect sent Phase 15 revised starting-capital contract to coder
-
-Handoff message sent:
-
-```
-id: 20260729T144359Z_000060_from_architect
-from: architect
-to: coder
-priority: 00
-type: git_handoff
-role: architect
-task: phase15-cli
-commit: 53e9a1f8dc
-created_at: 2026-07-29T14:43:59.044208Z
+commit: c7a0dde7dc
+created_at: 2026-07-29T14:42:11.171871Z
 
 Re-read your role and constitution.
 
-merge_and_process architect 53e9a1f8dc
+merge_and_process specifier c7a0dde7dc
 ```
 
-Action taken: supplied coder the accepted Gherkin revision for the existing
-starting-capital remediation loop.
-
-## 2026-07-29T15:50:50Z — architect received Phase 15 starting-capital return from refactorer
-
-Handoff message received:
-
-```
-id: 20260729T155038Z_000048_from_refactorer
-from: refactorer
-to: architect
-recipient: architect
-priority: 50
-type: git_handoff
-role: refactorer
-commit: b7064ba9bc
-created_at: 2026-07-29T15:50:38.260004Z
-enqueued_at: 2026-07-29T15:50:38.679576Z
-task: phase15-cli
-dequeued_at: 2026-07-29T15:50:44.258939Z
-
-Re-read your role and constitution.
-
-merge_and_process refactorer b7064ba9bc
-```
-
-Action taken: began architectural review of the refactorer-returned
-starting-capital remediation.
-
-## 2026-07-29T15:47:57Z — coder received starting-capital correction
-
-Handoff message received:
-
-```
-id: 20260729T143946Z_000059_from_architect_to_coder
-from: architect
-to: coder
-priority: 00
-type: git_handoff
-role: architect
-task: phase15-cli
-commit: 07c95bf1e9
-```
-
-Action taken: merged the architect handoff, removed the simulator's artificial
-pre-game debit, and replaced it with a deterministic terminal fixture that
-preserves every selected player's official €1500 balance. Added regression
-coverage for that balance and for prompt eight-player completion.
-
-Verification: `SimulatorTest` passed (11 tests). The focused CLI acceptance
-report remains green.
-
-## 2026-07-29T16:30:00Z — refactorer received coder starting-capital fix
-
-Handoff message received:
-
-```
-id: 20260729T154852Z_000036_from_coder
-from: coder
-to: refactorer
-recipient: refactorer
-priority: 50
-type: git_handoff
-role: coder
-commit: 5653a571b7
-created_at: 2026-07-29T15:48:52.616967Z
-enqueued_at: 2026-07-29T15:48:53.547354Z
-task: phase15-cli
-dequeued_at: 2026-07-29T15:48:59.651634Z
-
-Re-read your role and constitution.
-
-merge_and_process coder 5653a571b7
-```
-
-Action taken: merged the official-capital terminal fixture and regression
-coverage; focused CLI verification remains green.
-
-## 2026-07-29T15:52:01Z — architect found Phase 15 initial-state defect
-
-Architectural review found that the replacement terminal fixture gives the
-first player a hotel on Nieuwstraat Brussel and moves the other players to
-position 36 before play. Although it restores €1500 after the purchase, this
-still contradicts the standard setup: all pawns begin on START and the bank
-retains title deeds and hotels until a player buys them. It is another
-production shortcut for forcing a rapid terminal game, not valid CLI setup.
-
-Action taken: route the remaining observable setup defect to coder at
-priority 00. The starting-capital Gherkin criterion remains accepted.
-
-## 2026-07-29T15:54:00Z — coder reviewed the initial-state defect
-
-Handoff message received:
-
-```
-id: 20260729T155222Z_000061_from_architect_to_coder
-from: architect
-to: coder
-priority: 00
-type: git_handoff
-role: architect
-task: phase15-cli
-commit: 22da133076
-```
-
-Finding: removing the fixture restores the official initial positions and bank
-ownership, but the current deterministic cup then has no terminal path: with
-€1500 balances it produces unbounded play. Retaining a prompt completed CLI
-simulation requires either a rules-driven deterministic game path from the
-official setup or a changed completion contract. The previous pre-owned hotel
-fixture is not a valid solution, so no replacement shortcut was committed.
+Summary: returned the revised CLI acceptance criterion requiring every player
+to begin with the official $1500 before the first turn.
 
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
@@ -11180,6 +10961,9 @@ merge_and_process architect 1c7cb534b4
 Action taken: merged architect commit `1c7cb534b4`, resolving the
 `logbook.md` conflict while preserving the complete Phase 15 review history.
 
+## 2026-07-29T13:55:39Z — specifier sent Phase 15 executable-CLI clarification to coder
+
+Handoff message sent:
 ## 2026-07-29T13:56:56Z — coder received Phase 15 invalid-boundary revision
 
 Handoff message received:
@@ -11193,12 +10977,17 @@ type: git_handoff
 role: specifier
 task: phase15-cli
 commit: 85b25c87cf
+created_at: 2026-07-29T13:55:32.090811Z
 
 Re-read your role and constitution.
 
 merge_and_process specifier 85b25c87cf
 ```
 
+Summary: clarified in `SIMULATOR.md` and `tasks.md` that Phase 15 must
+deliver a standalone executable process with command-line arguments, stdout
+reporting, `-h`/`--h` usage guidance, and nonzero invalid-input status; updated
+verification to invoke those process behaviors end-to-end.
 Action taken: merged `85b25c87cf`. The CLI now reports the supplied invalid
 player count alongside the official two-to-eight range, with one
 regex-capturing acceptance handler binding the independent expected count.
@@ -11235,11 +11024,53 @@ Action taken: merged the invalid-player-count reporting fix and preserved the
 architect/specifier review history. The coder reports 253 CLI reactor tests
 and 246 acceptance scenarios passing.
 
+## 2026-07-29T14:04:00Z — specifier received Phase 15 architect follow-up
+
+Handoff message received:
+
+```
+id: 20260729T140307Z_000053_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: 3ab5e54bf8
+created_at: 2026-07-29T14:03:07.193252Z
+enqueued_at: 2026-07-29T14:03:08.011909Z
+task: phase15-cli
+
+Re-read your role and constitution.
+
+merge_and_process architect 3ab5e54bf8
+```
+
+Action taken: merged architect commit `3ab5e54bf8`, preserving the Phase 15
+implementation and review records. No new specification defect was routed;
+the merged state is ready for the next role action.
+
+## 2026-07-29T14:08:35Z — specifier notified architect of completion
 ## 2026-07-29T13:59:25Z — refactorer returned invalid-count review
 
 Handoff message sent:
 
 ```
+id: 20260729T140829Z_000028_from_specifier
+from: specifier
+to: architect
+priority: 50
+type: note
+message: Processed commit 3ab5e54bf8; no specifier changes; ready for next task.
+created_at: 2026-07-29T14:08:29.430697Z
+
+Re-read your role and constitution.
+
+Processed commit 3ab5e54bf8; no specifier changes; ready for next task.
+```
+
+Summary: explicitly notified the architect that the already-processed
+priority-00 task is complete and the specifier is available.
 id: 20260729T135925Z_000044_from_refactorer
 from: refactorer
 to: architect
@@ -11495,6 +11326,9 @@ boundary, and its process behavior is verified separately from domain logic.
 All coder and refactorer follow-up loops for `phase15-cli` are closed. Routing
 the completed phase to specifier for branch synchronization.
 
+## 2026-07-29T14:30:00Z — specifier received Phase 15 phase-complete sync
+
+Handoff message received:
 ## 2026-07-29T14:28:34Z — architect sent Phase 15 completion sync to specifier
 
 Handoff message sent:
@@ -11503,6 +11337,14 @@ Handoff message sent:
 id: 20260729T142834Z_000057_from_architect
 from: architect
 to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 9d21d62fec
+created_at: 2026-07-29T14:28:34.599751Z
+enqueued_at: 2026-07-29T14:28:35.014672Z
+task: phase15-cli
 priority: 50
 type: git_handoff
 role: architect
@@ -11515,6 +11357,9 @@ Re-read your role and constitution.
 merge_and_process architect 9d21d62fec
 ```
 
+Action taken: merged architect commit `9d21d62fec`, including the completed
+standalone CLI, strategy selection, executable help behavior, and final
+review records. Phase 15 is complete.
 Action taken: sent the Phase 15 completion sync so the specifier can merge
 the architect branch before beginning subsequent work.
 
@@ -11531,78 +11376,6 @@ specifier owns an acceptance criterion that a simulated player begins with
 the official capital and is not artificially debited before the first turn.
 The coder returns through refactorer; architect will accept both loops before
 closing the reopened phase.
-
-## 2026-07-29T14:39:45Z — architect sent Phase 15 starting-capital specification follow-up
-
-Handoff message sent:
-
-```
-id: 20260729T143945Z_000058_from_architect
-from: architect
-to: specifier
-priority: 00
-type: git_handoff
-role: architect
-task: phase15-cli
-commit: 07c95bf1e9
-created_at: 2026-07-29T14:39:45.905924Z
-
-Re-read your role and constitution.
-
-merge_and_process architect 07c95bf1e9
-```
-
-Action taken: sent the missing starting-capital acceptance-criterion review to
-specifier.
-
-## 2026-07-29T14:39:46Z — architect sent Phase 15 starting-capital implementation follow-up
-
-Handoff message sent:
-
-```
-id: 20260729T143946Z_000059_from_architect
-from: architect
-to: coder
-priority: 00
-type: git_handoff
-role: architect
-task: phase15-cli
-commit: 07c95bf1e9
-created_at: 2026-07-29T14:39:46.034889Z
-
-Re-read your role and constitution.
-
-merge_and_process architect 07c95bf1e9
-```
-
-Action taken: sent the €5 pre-game-debit removal and regression coverage to
-coder; its normal review path is coder to refactorer to architect.
-
-## 2026-07-29T14:42:23Z — architect received Phase 15 starting-capital specification return
-
-Handoff message received:
-
-```
-id: 20260729T144211Z_000029_from_specifier
-from: specifier
-to: architect
-recipient: architect
-priority: 00
-type: git_handoff
-role: specifier
-commit: c7a0dde7dc
-created_at: 2026-07-29T14:42:11.171871Z
-enqueued_at: 2026-07-29T14:42:11.924152Z
-task: phase15-cli
-dequeued_at: 2026-07-29T14:42:17.073532Z
-
-Re-read your role and constitution.
-
-merge_and_process specifier c7a0dde7dc
-```
-
-Action taken: began review of the returned starting-capital acceptance
-criterion; the coder/remediation loop remains outstanding.
 
 ## 2026-07-29T14:45:00Z — specifier received Phase 15 starting-capital follow-up
 
