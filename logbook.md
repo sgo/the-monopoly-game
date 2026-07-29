@@ -8429,6 +8429,28 @@ merge_and_process specifier 7e250ab97f
 Action taken: began review of the specifier's priority-`00` decision on the
 Phase 12 Gherkin mutation finding.
 
+## 2026-07-29T10:31:29Z — architect accepted phase 12 Gherkin revision
+
+Action taken: merged specifier commit `7e250ab97f` and accepted its revision:
+the no-payment and unaffordable-strategy scenarios keep only
+mutation-sensitive outcomes in their Examples tables and express the required
+non-double roll as fixed scenario text. This preserves the intended rule while
+removing equivalent input dimensions. No production boundary, implementation,
+or acceptance helper changed.
+
+Verification:
+
+- The specifier's `./acceptance/run-acceptance.sh` run passed 225 generated
+  acceptance tests.
+- Soft Gherkin mutation for `en/rules/jail.feature` — 5/5 killed, zero
+  survivors and zero errors. The runner refreshed its manifest.
+- `git diff --check` — passed.
+
+No changed production source requires another language-mutation or DRY run;
+the previously accepted Phase 12 results remain applicable. The specifier
+already owns and has received the phase state, so do not send a duplicate
+phase-complete handoff. All Phase 12 review loops are closed.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
