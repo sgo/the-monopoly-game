@@ -10349,6 +10349,57 @@ the same missing bounded, rules-driven completion mechanism identified in the
 priority-00 CLI review. This must be resolved architecturally before the stub
 can be replaced without creating a false acceptance result.
 
+## 2026-07-29T16:02:00Z — refactorer returned Monopoly ten-run review
+
+Handoff message sent:
+
+```
+id: 20260729T160200Z_000051_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: monopoly-10-runs
+commit: d5ca084455
+created_at: 2026-07-29T16:02:00.234017Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d5ca084455
+```
+
+Action taken: routed the unresolved ten-run stub and its dependency on a
+bounded rules-driven completion mechanism to architect. No production code
+changed.
+
+## 2026-07-29T16:02:00Z — refactorer received coder Monopoly ten-run review
+
+Handoff message received:
+
+```
+id: 20260729T160037Z_000039_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 0d78573bc9
+created_at: 2026-07-29T16:00:37.740131Z
+enqueued_at: 2026-07-29T16:00:38.136835Z
+task: monopoly-10-runs
+dequeued_at: 2026-07-29T16:01:15.703016Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 0d78573bc9
+```
+
+Action taken: merged coder commit `0d78573bc9`; it changes only the logbook.
+The ten-run acceptance step remains a stub and awaits an architectural,
+rules-driven bounded game-completion solution.
+
 ## 2026-07-29T14:42:20Z — specifier returned Phase 15 starting-capital revision
 
 Handoff message sent:
