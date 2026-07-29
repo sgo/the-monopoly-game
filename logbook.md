@@ -8299,6 +8299,31 @@ acceptance, and the jail-feature soft mutation gate.
 Routing: all Phase 12 loops are now closed. Send one priority-`50`
 phase-complete sync to specifier.
 
+## 2026-07-29T09:35:44Z — architect sent phase 12 completion handoff to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T093538Z_000040_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase12-jail
+commit: 149762d57f
+created_at: 2026-07-29T09:35:38.294665Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 149762d57f
+```
+
+Summary: sent the sole Phase 12 completion sync after accepting the coder's
+priority-`00` verification return. The specifier can merge
+`149762d57f` into its branch to close the jail phase and begin the next phase
+cleanly.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
