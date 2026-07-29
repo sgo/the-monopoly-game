@@ -8521,3 +8521,27 @@ collisions, fences balanced (412, even) after resolution.
 Verification: `mvn -q -o test` passes on the merged state (exit 0).
 
 Per role rules, will now ask the user for the next feature to add.
+
+## 2026-07-29T09:15:08Z — refactorer sent handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260729T091451Z_000034_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: phase12-jail
+commit: fb772d1075
+created_at: 2026-07-29T09:14:51.313351Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer fb772d1075
+```
+
+Summary: handed the verified Phase 12 jail refactor to the architect at
+commit `fb772d1075`, including the reduced-complexity `Turn` branch and
+targeted jail coverage.
