@@ -8351,6 +8351,33 @@ Action taken: began review of the late Phase 12 refactorer return. The phase
 has already been sent to specifier, so this review will determine whether the
 handoff is a harmless duplicate or requires a corrective follow-up.
 
+## 2026-07-29T10:17:08Z — architect reviewed late phase 12 jail follow-up
+
+Action taken: merged refactorer commit `2c973562b8`. It carries the
+specifier-directed split between the mechanic of choosing a jail-fine payment
+and `Agree if affordable`'s affordability decision. The acceptance scripted
+strategy remains a test helper; no production boundary or dependency direction
+changed. The restored unaffordable-strategy scenario has a precise rule
+assertion, but its example dice merely need to be non-doubles: changing either
+die to another non-double pair produces exactly the same observable outcome.
+
+Verification:
+
+- `mvn -B -Dmaven.repo.local=tmp/m2 test` — 240 tests passed.
+- `mvn -B -pl the-monopoly-game-domain -Dmaven.repo.local=tmp/m2
+  -Pproperty-tests test` — 17 property tests passed.
+- `./acceptance/run-acceptance.sh` — 225 generated acceptance tests passed.
+- Soft Gherkin mutation for `en/rules/jail.feature` — two surviving,
+  equivalent dice-example mutations in the no-payment scenario; the runner
+  refreshed its manifest accordingly.
+- `git diff --check` — passed before the runner's manifest refresh.
+
+No production source changed, so the accepted Phase 12 source mutation and
+DRY results remain applicable. The two survivors are a Gherkin example-design
+defect, not a production or test-helper implementation defect. Under the
+workflow's Gherkin-routing rule, send the finding to specifier at priority
+`00`; do not edit the scenario content here.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
