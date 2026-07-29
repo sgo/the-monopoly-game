@@ -8723,6 +8723,32 @@ and creditor inheritance of retained jail-release cards. Coder must validate
 and return this priority-`00` architect review loop before the pending
 bankruptcy Gherkin-example finding is routed to specifier.
 
+## 2026-07-29T12:17:46Z — architect received phase 14 coder follow-up
+
+Handoff message received:
+
+```
+id: 20260729T121736Z_000027_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: 88749b96bb
+created_at: 2026-07-29T12:17:36.122737Z
+enqueued_at: 2026-07-29T12:17:36.513843Z
+task: phase14-bankruptcy-and-winning
+dequeued_at: 2026-07-29T12:17:42.176831Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 88749b96bb
+```
+
+Action taken: began review of the coder's priority-`00` return for the Phase
+14 bankruptcy correction.
+
 ## 2026-07-29T09:13:49Z — refactorer received handoff from coder
 
 Handoff message received:
