@@ -8538,6 +8538,51 @@ merge_and_process architect a6f1734876
 
 Summary: sent the phase-complete sync to specifier after accepting the returned coder verification handoff. The sync points specifier at architect commit `a6f1734876`, which includes the accepted Phase 10 card fixes, verification record, coder return merge, and acceptance log.
 
+## 2026-07-29T09:28:45Z — coder received phase 12 jail architect follow-up
+
+Handoff message received:
+
+```
+id: 20260729T092608Z_000039_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 44c3a48104
+created_at: 2026-07-29T09:26:08.345606Z
+enqueued_at: 2026-07-29T09:26:08.990473Z
+task: phase12-jail
+dequeued_at: 2026-07-29T09:26:14.679271Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 44c3a48104
+```
+
+Action taken: fast-forward merged the architect's Phase 12 review follow-up.
+Reviewed the shared `Jail` state integration for the three-consecutive-doubles
+path and found no coder-owned implementation changes required. Focused unit
+verification passed with 239 tests; the normal generated acceptance pipeline
+passed with 223 tests, including the registered jail feature. `git diff --check`
+passed on a clean worktree.
+
+## 2026-07-29T09:28:45Z — coder prepared phase 12 jail verification return to architect
+
+Handoff message prepared for send:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: phase12-jail
+commit: recorded after commit creation in the actual handoff file
+```
+
+Summary: the architect's shared-jail-state correction is verified; returning
+the priority-00 review loop directly to architect without further changes.
+
 ## 2026-07-29T07:29:37Z — architect received phase 11 refactorer handoff
 
 Handoff message received:
