@@ -13323,3 +13323,30 @@ path, confirmed clean under soft Gherkin acceptance mutation.
 
 No further coder/refactorer follow-up is warranted. Sending the
 phase-complete sync to the specifier under the `journal-logging` task name.
+
+## 2026-07-31T20:42:00Z — architect sent journal-logging phase-complete sync to specifier
+
+Handoff message sent:
+
+```
+id: 20260731T204200Z_000073_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 0077e1a326
+created_at: 2026-07-31T20:42:00Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process architect 0077e1a326
+```
+
+Summary: closed the `journal-logging` task — SLF4J journal logging, the
+bounded-time CLI simulator API, the `Simulator.run` delegation fix, and the
+fully-hoteled-group `Building` fix are all merged, reviewed, and verified
+clean (mutation, DRY, soft Gherkin acceptance mutation). This is also the
+close of the `monopoly-pipeline-hang` concern this thread absorbed.
