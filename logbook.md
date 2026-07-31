@@ -13350,3 +13350,31 @@ Action taken: acknowledged delayed queue delivery. This commit was already
 merged at `61bfaf3` and processed by the specifier on 2026-07-31T08:10:00Z,
 which resulted in the CLI scenario rework (`3e718ed`) and forward handoff to
 the coder (`a70bd23`). No further action required.
+
+## 2026-07-31T21:10:34Z — specifier sent CLI SLF4J configuration requirement to coder
+
+Handoff message sent:
+
+```
+id: 20260731T211034Z_000036_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: cli-logging
+commit: f16bbb499a
+created_at: 2026-07-31T21:10:34Z
+enqueued_at: 2026-07-31T21:10:34Z
+```
+
+Summary: sent the CLI SLF4J configuration requirement (`f16bbb499a`, task
+`cli-logging`) to the coder. New feature `cli-1` in
+`en/cli-slf4j-config.feature` specifies that the CLI module must declare
+`org.slf4j:slf4j-api` (1.7.0+) as compile-scope and
+`ch.qos.logback:logback-classic` (1.2.0+) as runtime-scope dependencies.
+This requirement emerged during journal-logging implementation: the
+acceptance tests expect SLF4J logging to be available in the CLI runtime
+but the pom.xml did not include the dependencies. The coder must add both
+dependencies to `the-monopoly-game-cli/pom.xml` and verify the CLI builds
+and can initialize logging.
