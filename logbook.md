@@ -12941,3 +12941,31 @@ around. Handing this back to the architect per the priority-`00` follow-up
 routing rule (refactorer hands architect-follow-up results back to the
 architect, not forward to the coder), for the architect to route to the
 coder as it did for the prior `Simulator.run` finding.
+
+## 2026-07-31T20:12:27Z — refactorer sent journal-logging review to architect
+
+Handoff message sent:
+
+```
+id: 20260731T201227Z_000055_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: journal-logging
+commit: 7ac4652419
+created_at: 2026-07-31T20:12:27.345133Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7ac4652419
+```
+
+Summary: CRAP/DRY/mutation-scan all clean on the `Simulator.run` follow-up;
+acceptance (271/271) and domain unit tests (255/255 pre-existing) green.
+Found and precisely reproduced a new, pre-existing defect while verifying —
+`Building.develop` throws once a colour group is fully hoteled, intermittently
+crashing the background simulator thread — with a new deterministic
+`BuildingTest`, committed failing as the reproduction for the coder. Not
+fixed here since it requires a behavior change.
