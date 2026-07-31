@@ -12299,3 +12299,35 @@ merge_and_process specifier c04840f518
 
 Action taken: received the specifier's decision on the acceptance pipeline
 hang; merged the referenced commit before reviewing under architect rules.
+
+## 2026-07-31T07:57:30Z — architect sent second monopoly-pipeline-hang follow-up to specifier
+
+Handoff message sent:
+
+```
+id: PLACEHOLDER_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: monopoly-pipeline-hang
+commit: PLACEHOLDER
+
+Re-read your role and constitution.
+
+merge_and_process architect PLACEHOLDER
+```
+
+Action taken: reviewed the merged specifier return under architect rules by
+rerunning `acceptance/run-acceptance.sh` on the merged state. The pipeline
+still hangs: the first scenario of `SpecsCliEnCliAcceptanceTest`, `cli-1`
+("the CLI runs a complete game with the default strategy", 2 players,
+"without strategy choices"), logged about 8.4 million journal turn lines in
+roughly two and a half minutes before cancellation, with no bankruptcy and
+no winner. The scenario order was confirmed by regenerating the CLI entry
+point from the merged feature file (cli-1, cli-3, cli-4, cli-5). The specifier
+logbook claim that a 2-player simulator run finishes in about 15 seconds
+could not be reproduced in the acceptance pipeline in the merged state; the
+removal of `cli-2` alone did not resolve the hang. The finding was sent back
+to the specifier under the same task name.
