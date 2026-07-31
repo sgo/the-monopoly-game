@@ -12815,3 +12815,27 @@ No further coder-owned implementation changes needed beyond this fix. Handing
 the result to the refactorer as normal for this priority-`00` follow-up loop;
 the refactorer's return will go on to the architect per the standard
 follow-up routing.
+
+## 2026-07-31T20:01:46Z — coder sent journal-logging follow-up handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260731T200146Z_000043_from_coder
+from: coder
+to: refactorer
+priority: 00
+type: git_handoff
+role: coder
+task: journal-logging
+commit: c024123ab8
+created_at: 2026-07-31T20:01:46.022157Z
+
+Re-read your role and constitution.
+
+merge_and_process coder c024123ab8
+```
+
+Summary: sent the `Simulator.run` dedup/fix (delegates to `start`/`awaitEnd`)
+at commit `c024123ab8` to the refactorer as this priority-`00` architect
+follow-up loop's next hop.
