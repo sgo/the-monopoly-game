@@ -12609,3 +12609,27 @@ Verification after the split: acceptance pipeline green (271/271); domain
 251 and cli 9 unit tests green.
 
 Handing the verified state to the architect.
+
+## 2026-07-31T19:12:03Z — refactorer sent journal-logging review to architect
+
+Handoff message sent:
+
+```
+id: 20260731T191203Z_000054_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: journal-logging
+commit: 9b6e77deb0
+created_at: 2026-07-31T19:12:03.608907Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 9b6e77deb0
+```
+
+Summary: returned the journal-logging/bounded-CLI implementation after the
+mutation-site-driven `MonopolyStepHandlers` split, with CRAP/DRY/mutation-scan
+and full acceptance/unit verification all green.
