@@ -12372,3 +12372,31 @@ game ends", "the simulator process ends") need coder implementation: a
 background/subprocess simulator run with journal capture, plus the steps
 reading the SLF4J journal output. This builds directly on the journal-logging
 handoff (task `journal-logging`).
+
+## 2026-07-31T08:21:54Z — specifier sent CLI bounded-time scenario rework to coder
+
+Handoff message sent:
+
+```
+id: 20260731T082154Z_000035_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: journal-logging
+commit: 3e718ed0d6
+created_at: 2026-07-31T08:21:54.122709Z
+enqueued_at: 2026-07-31T08:21:54.122709Z
+```
+
+Summary: sent the CLI bounded-time scenario rework (`3e718ed0d6`, task
+`journal-logging`) to the coder. The reworked `cli.feature` replaces the
+never-terminating real-dice scenarios (cli-1, cli-2, cli-5) with
+journal-inspection checks: start the simulator, verify the game log records
+real play (game start, at least 50 rolls, totals between 2 and 12, at least
+two different totals, no winner, still playing), stop the simulator, assert
+the process ends. cli-2 is re-enabled; cli-4 held back as a comment. The
+coder must implement the new step handlers plus a background/subprocess
+simulator run with SLF4J journal capture — the natural continuation of the
+journal-logging implementation.
