@@ -12120,3 +12120,37 @@ official dice cups for normal play and completes only by the game's ordinary
 bankruptcy rule; all coder/refactorer follow-up loops were closed and accepted
 by the architect before this sync. Per the specifier role, asking the user
 for the next feature to add.
+
+## 2026-07-31T07:25:00Z — specifier sent journal logging specification to coder
+
+Handoff message sent:
+
+```
+id: 20260731T072456Z_000033_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: journal-logging
+commit: 8722cf186d
+created_at: 2026-07-31T07:24:56.316881Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 8722cf186d
+```
+
+Summary: committed the Phase 3 SLF4J journal logging specification as
+`8722cf186d`, adding `en/rules/logging.feature` to the acceptance pipeline.
+The feature mirrors `journal.feature`'s 22 scenarios with "the game log
+records ..." vocabulary, pinning that every journal event kind is emitted
+through SLF4J. The accompanying documentation commit `34de4ef` records the
+SIMULATOR.md requirements (SLF4J journal logging; CLI final report written to
+`the-monopoly-game.report` in the system temporary directory) and the
+corresponding tasks.md Phase 3/15 updates.
+
+Verification: the new feature parses successfully with the APS
+`gherkin-parser`, and `ir-dry-checker` reported only the established baseline
+possible-synonym findings; the mutation-manifest header will be stamped by
+the pipeline on its first mutation run.
