@@ -58,6 +58,8 @@ Provided it has the financial means to do so.
 As the game is played, game events should be written to a journal and included
 in the game result report shown at the end of the game.
 
+The game should log the events written to the journal using SLF4J.
+
 The game result report and journal should have a human-readable format.
 
 ### CLI
@@ -73,3 +75,5 @@ The game result report and journal should have a human-readable format.
 - uses real random dice and lets the game continue until bankruptcies leave
   one player; it must not use pre-arranged state, a turn limit, or a synthetic
   winner
+- writes the final game report to a file, which defaults to
+  `the-monopoly-game.report` in the system temporary directory

@@ -143,6 +143,9 @@ about the seams later phases will fill in.
 - Add a report renderer that turns a completed journal into a human-readable,
   chronological account, kept decoupled from the structured `Entry` records so
   report formatting doesn't leak into the engine's internal logging.
+- Log the events written to the journal through SLF4J, so the running game
+  exposes its progress via the standard Java logging facade (per
+  [`SIMULATOR.md`](SIMULATOR.md)).
 - Spec: journal captures the turn-loop events from Phase 2, and the renderer
   produces readable text for a short simulated game.
 
@@ -474,7 +477,9 @@ can run genuinely complete games rather than partial ones.
   player, a strategy selection — defaulting to "Agree if affordable" when not
   specified.
 - Accepts command-line arguments, runs one game via the domain module's `Game`,
-  and prints the rendered game report (Phase 3's renderer) to stdout.
+  prints the rendered game report (Phase 3's renderer) to stdout, and writes
+  the final game report to a file, which defaults to `the-monopoly-game.report`
+  in the system temporary directory (per [`SIMULATOR.md`](SIMULATOR.md)).
 - Provides a `-h`/`--h` flag explaining how to use the CLI.
 - Returns a nonzero exit code for invalid input.
 - Since "Agree if affordable" is the only strategy for now, strategy selection
@@ -484,10 +489,11 @@ can run genuinely complete games rather than partial ones.
   out-of-scope list).
 - Verification: invoke the standalone executable end-to-end for a couple of
   player counts, the help flag, and invalid input; confirm complete readable
-  reports, usage guidance, stdout output, nonzero failure status, and correct
-  application of the standard game starting configuration. Confirm that a
-  complete game uses real random dice and reaches its natural terminal state
-  when bankruptcies leave one player, without a turn limit or synthetic
+  reports, usage guidance, stdout output, the report file written to its
+  default location in the system temporary directory, nonzero failure status,
+  and correct application of the standard game starting configuration. Confirm
+  that a complete game uses real random dice and reaches its natural terminal
+  state when bankruptcies leave one player, without a turn limit or synthetic
   winner.
 
 ### BDD/TDD Process (mandatory):
