@@ -32,21 +32,28 @@ public final class Simulator {
 
   /** Parses the command line without performing process termination. */
   public static Result execute(String... arguments) {
-    if (arguments.length == 1 && (arguments[0].equals("-h") || arguments[0].equals("--h")))
-      return new Result(0, usage());
+    if (isHelpRequested(arguments)) return new Result(0, usage());
 
     try {
-      int playerCount = arguments.length == 0 ? 2 : Integer.parseInt(arguments[0]);
-      List<String> strategyNames = List.of(arguments).subList(Math.min(1, arguments.length), arguments.length);
-      if (!strategyNames.isEmpty() && strategyNames.size() != playerCount)
-        return new Result(1, "Supply one strategy for each player. " + usage());
-      return run(playerCount, strategiesFor(playerCount, strategyNames));
+      return runSelected(arguments);
     } catch (NumberFormatException cause) {
       String received = arguments.length == 0 ? "" : arguments[0];
       return new Result(1, "The number of players must be between 2 and 8; received " + received + " players.");
     } catch (IllegalArgumentException cause) {
       return new Result(1, cause.getMessage() + " " + usage());
     }
+  }
+
+  private static boolean isHelpRequested(String... arguments) {
+    return arguments.length == 1 && (arguments[0].equals("-h") || arguments[0].equals("--h"));
+  }
+
+  private static Result runSelected(String... arguments) {
+    int playerCount = arguments.length == 0 ? 2 : Integer.parseInt(arguments[0]);
+    List<String> strategyNames = List.of(arguments).subList(Math.min(1, arguments.length), arguments.length);
+    if (!strategyNames.isEmpty() && strategyNames.size() != playerCount)
+      return new Result(1, "Supply one strategy for each player. " + usage());
+    return run(playerCount, strategiesFor(playerCount, strategyNames));
   }
 
   static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames) {
