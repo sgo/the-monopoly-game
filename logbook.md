@@ -12770,6 +12770,34 @@ coverage are what fell out of step with each other.
 Committed the hardening tests and the mutation-refreshed feature manifests
 together with this review.
 
+## 2026-07-31T19:52:59Z — architect sent journal-logging CLI-entrypoint finding to coder
+
+Handoff message sent:
+
+```
+id: 20260731T195259Z_000071_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 9f4961c78a
+created_at: 2026-07-31T19:52:59.308106Z
+enqueued_at: 2026-07-31T19:52:59.444426Z
+task: journal-logging
+dequeued_at: 2026-07-31T19:53:04.228070Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 9f4961c78a
+```
+
+Summary: sent the review commit (mutation-hardening tests across
+`Simulator.java`/`Game.java`/`Bankruptcy.java`, no production code changes)
+to the coder, carrying the logbook finding above about `Simulator.run`'s
+uncovered, still-unbounded blocking CLI path.
+
 ## 2026-07-31T19:53:04Z — coder received architect priority-00 follow-up
 
 Handoff message received:
@@ -12839,6 +12867,30 @@ No further coder-owned implementation changes needed beyond this fix. Handing
 the result to the refactorer as normal for this priority-`00` follow-up loop;
 the refactorer's return will go on to the architect per the standard
 follow-up routing.
+
+## 2026-07-31T20:01:46Z — coder sent journal-logging follow-up handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260731T200146Z_000043_from_coder
+from: coder
+to: refactorer
+priority: 00
+type: git_handoff
+role: coder
+task: journal-logging
+commit: c024123ab8
+created_at: 2026-07-31T20:01:46.022157Z
+
+Re-read your role and constitution.
+
+merge_and_process coder c024123ab8
+```
+
+Summary: sent the `Simulator.run` dedup/fix (delegates to `start`/`awaitEnd`)
+at commit `c024123ab8` to the refactorer as this priority-`00` architect
+follow-up loop's next hop.
 
 ## 2026-07-31T22:05:00Z — refactorer received journal-logging follow-up from coder
 
@@ -12969,3 +13021,135 @@ Found and precisely reproduced a new, pre-existing defect while verifying —
 crashing the background simulator thread — with a new deterministic
 `BuildingTest`, committed failing as the reproduction for the coder. Not
 fixed here since it requires a behavior change.
+
+## 2026-07-31T20:14:39Z — architect received journal-logging follow-up return from refactorer
+
+Handoff message received:
+
+```
+id: 20260731T201227Z_000055_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 7ac4652419
+created_at: 2026-07-31T20:12:27Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7ac4652419
+```
+
+Action taken: merged `7ac4652419` into `swarmforge-architect` (commit
+`994c0de`, resolving an append-only conflict in this file the same way as
+the coder-to-refactorer merge — both sides' entries kept, ordered
+chronologically, no content lost).
+
+Reviewed the merged state under architect rules. The CLI-boundary fix for
+the earlier `Simulator.run` finding is exactly what was asked: `run` is now
+`return start(playerCount, strategies).awaitEnd();` — no new coupling, the
+CLI stays a thin boundary over the domain, and the previously-duplicated
+blocking implementation is gone rather than left as a second untested path.
+
+Confirmed the refactorer's new finding directly: ran `BuildingTest`, and
+`developDoesNotOfferAFurtherBuildOnAColourGroupAlreadyFullyHoteled` fails
+exactly as reported —
+`IllegalStateException: RueGrandeDinant already has a hotel.` at
+`Deeds.buildHouse` via `Building$Build.apply` via `Building.develop`. Read
+`Building.java` to verify the diagnosis: `levelOf` correctly ranks a
+fully-hoteled street above ordinary house levels
+(`hotelConstructionRequiresNumberOfHouses() + 1`), but once every street in
+an owned group reaches that level together, it becomes the group's *only*
+(and therefore *lowest*) level, so `candidateBuildsFor` keeps offering all
+of them. `buildFor` then compares `housesBuiltOn(street)` — which
+`Deeds.buildHotel` resets to 0 — against `hotelConstructionRequiresNumberOfHouses()`,
+finds them unequal, and emits a house-build for an already-hoteled street.
+`Building.develop`'s unconditional `for (;;)` loop then applies it and
+throws. This is real production logic, not a Gherkin content question:
+`candidateBuildsFor`/`buildFor` need to recognize a fully-hoteled group as
+having nothing left to offer, rather than construction-selection logic
+falling to the coder for a fix.
+
+This is not something the architect should implement directly (new domain
+behavior, not a structural change), so sending it to the coder as a
+priority-`00` follow-up under the same `journal-logging` task name, per the
+established loop-routing rule.
+
+## 2026-07-31T20:15:35Z — coder received second architect priority-00 follow-up
+
+Handoff message received:
+
+```
+id: 20260731T201511Z_000072_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: d5bd579068
+created_at: 2026-07-31T20:15:11.060998Z
+enqueued_at: 2026-07-31T20:15:11.839293Z
+task: journal-logging
+dequeued_at: 2026-07-31T20:15:35.510728Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d5bd579068
+```
+
+Action taken: another architect review loop under the same `journal-logging`
+task name — this time a real domain defect the refactorer found and the
+architect confirmed while reviewing the `Simulator.run` fix: a fully-hoteled
+colour group still offers a further house-build, which `Building.develop`
+then applies and crashes on (`IllegalStateException: ... already has a
+hotel.`). Merging `d5bd579068` into `swarmforge-coder` and fixing under coder
+rules next.
+
+## 2026-07-31T22:26:00Z — coder fixed the fully-hoteled-group build defect
+
+Root cause (matches the refactorer's and architect's diagnosis exactly):
+`Building.candidateBuildsFor` picks the group's lowest `levelOf` and offers a
+build for every street tied at that level. `levelOf` ranks a hoteled street
+above ordinary house levels, so it's normally excluded — except once every
+street in the group is hoteled, that shared level becomes the group's only
+(and therefore lowest) value, so the filter stops excluding them.
+`buildFor` then sees `housesBuiltOn == 0` (reset by `Deeds.buildHotel`)
+`!= hotelConstructionRequiresNumberOfHouses()` and emits a house-build for an
+already-hoteled street, which `Building.develop`'s unconditional loop applies
+and `Deeds.buildHouse` rejects by throwing.
+
+Fix: `candidateBuildsFor` now filters out `deeds.hasHotelOn(it)` streets
+outright, before the lowest-level comparison, so a fully-hoteled group always
+offers nothing (empty stream) rather than falling into the tie case. One line
+in `the-monopoly-game-domain/.../rules/Building.java`. The pre-existing
+`BuildingTest.developDoesNotOfferAFurtherBuildOnAColourGroupAlreadyFullyHoteled`
+(committed failing by the refactorer as the reproduction) now passes, and no
+other `Building`/`Deeds` test's behavior changed, since the new filter only
+ever removes candidates that would otherwise fail identically.
+
+Verification: domain suite green, 256/256 (`BuildingTest` included).
+Acceptance pipeline green, 271/271. Re-ran the crash's original symptom,
+`SimulatorTest.keepsPlayingUntilToldToStop`, 10 times in isolation
+(`-Dtest=SimulatorTest#keepsPlayingUntilToldToStop`): 0/10
+`IllegalStateException`s, versus 5/10 on the pre-fix code in the same
+sampling (confirmed by temporarily stashing this change and re-running).
+
+Separate, pre-existing flakiness noted but not touched: with the crash gone,
+that same test still fails intermittently (~3/12 in a later sample) on
+`assertThat(running.isPlaying()).isTrue()` after a hardcoded 1-second sleep,
+with no exception at all — confirmed by temporarily instrumenting the test to
+print the finished game's report: real 2-player `AgreeIfAffordable` games
+sometimes legitimately end (one player bankrupts on rent) within that one
+second. Reproduced identically on the pre-fix code, so this is a pre-existing
+test-design assumption (real, unseeded dice can finish faster than the
+sleep), not a regression from this fix and not part of the assigned finding;
+leaving it for whoever next touches that test to harden, rather than
+expanding this fix's scope. The acceptance pipeline doesn't exercise this
+timing-sensitive unit test, so it isn't affected.
+
+No further coder-owned implementation changes needed. Handing the result to
+the refactorer as normal for this priority-`00` follow-up loop.
