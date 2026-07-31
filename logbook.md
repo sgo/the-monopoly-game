@@ -12969,3 +12969,59 @@ around. Handing this back to the architect per the priority-`00` follow-up
 routing rule (refactorer hands architect-follow-up results back to the
 architect, not forward to the coder), for the architect to route to the
 coder as it did for the prior `Simulator.run` finding.
+
+## 2026-07-31T20:14:39Z — architect received journal-logging follow-up return from refactorer
+
+Handoff message received:
+
+```
+id: 20260731T201227Z_000055_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 7ac4652419
+created_at: 2026-07-31T20:12:27Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7ac4652419
+```
+
+Action taken: merged `7ac4652419` into `swarmforge-architect` (commit
+`994c0de`, resolving an append-only conflict in this file the same way as
+the coder-to-refactorer merge — both sides' entries kept, ordered
+chronologically, no content lost).
+
+Reviewed the merged state under architect rules. The CLI-boundary fix for
+the earlier `Simulator.run` finding is exactly what was asked: `run` is now
+`return start(playerCount, strategies).awaitEnd();` — no new coupling, the
+CLI stays a thin boundary over the domain, and the previously-duplicated
+blocking implementation is gone rather than left as a second untested path.
+
+Confirmed the refactorer's new finding directly: ran `BuildingTest`, and
+`developDoesNotOfferAFurtherBuildOnAColourGroupAlreadyFullyHoteled` fails
+exactly as reported —
+`IllegalStateException: RueGrandeDinant already has a hotel.` at
+`Deeds.buildHouse` via `Building$Build.apply` via `Building.develop`. Read
+`Building.java` to verify the diagnosis: `levelOf` correctly ranks a
+fully-hoteled street above ordinary house levels
+(`hotelConstructionRequiresNumberOfHouses() + 1`), but once every street in
+an owned group reaches that level together, it becomes the group's *only*
+(and therefore *lowest*) level, so `candidateBuildsFor` keeps offering all
+of them. `buildFor` then compares `housesBuiltOn(street)` — which
+`Deeds.buildHotel` resets to 0 — against `hotelConstructionRequiresNumberOfHouses()`,
+finds them unequal, and emits a house-build for an already-hoteled street.
+`Building.develop`'s unconditional `for (;;)` loop then applies it and
+throws. This is real production logic, not a Gherkin content question:
+`candidateBuildsFor`/`buildFor` need to recognize a fully-hoteled group as
+having nothing left to offer, rather than construction-selection logic
+falling to the coder for a fix.
+
+This is not something the architect should implement directly (new domain
+behavior, not a structural change), so sending it to the coder as a
+priority-`00` follow-up under the same `journal-logging` task name, per the
+established loop-routing rule.
