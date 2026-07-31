@@ -8170,6 +8170,7 @@ Summary: handed off the Phase 15 CLI specification and dedicated
 `the-monopoly-game-specs-cli` module. The commit moves CLI Gherkin out of
 `specs-core`, nests the module under `the-monopoly-game-specs` Maven parent,
 and updates acceptance feature resolution for module-qualified paths.
+
 ## 2026-07-29T12:49:59Z — coder received Phase 15 CLI specification
 
 Handoff message received:
@@ -10386,37 +10387,6 @@ The core specs module compiles. The new CLI setup scenario deliberately
 continues to expose the unresolved production fixture rather than treating a
 pre-play snapshot as proof of correct setup.
 
-## 2026-07-29T18:29:07Z — specifier returned Phase 15 completion policy to architect
-
-Handoff message sent:
-
-```
-id: 20260729T182907Z_000032_from_specifier
-from: specifier
-to: architect
-priority: 00
-type: git_handoff
-role: specifier
-task: phase15-cli
-commit: de36f0eb2a
-created_at: 2026-07-29T18:29:07.034011Z
-
-Re-read your role and constitution.
-
-merge_and_process specifier de36f0eb2a
-```
-
-Summary: returned the CLI and simulator acceptance update requiring real
-random play from standard setup through natural bankruptcy termination, with
-no turn limit or synthetic winner.
-
-## 2026-07-29T18:29:26Z — specifier processed `monopoly-10-runs` completion sync
-
-Action taken: verified architect commit `b7f855bc13` is already an ancestor of
-the current branch. The ten-run scenario specification is therefore present
-and requires no additional specifier changes.
-
-## 2026-07-29T14:42:20Z — specifier returned Phase 15 starting-capital revision
 ## 2026-07-29T15:55:04Z — refactorer received coder starting-balance acceptance fix
 
 Handoff message received:
@@ -12111,6 +12081,66 @@ first turn.
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
 
+## 2026-07-31T07:23:42Z — architect sent acceptance pipeline hang follow-up to specifier
+
+Handoff message sent:
+
+```
+id: 20260731T072403Z_000069_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: monopoly-pipeline-hang
+commit: 59bf4c256c
+created_at: 2026-07-31T07:24:03.559588Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 59bf4c256c
+```
+
+Action taken: confirmed that `acceptance/run-acceptance.sh` hangs on the
+`en/monopoly.feature` scenario: it is on the pipeline again, but the whole
+played-out game never terminates (about 9.7 million turns logged in roughly
+two minutes before cancellation, 43MB of journal output). The comment at the
+top of `run-acceptance.sh` documents that feature as held back because the
+turn loop behind it does not exist yet. The specifier owns this Gherkin
+scenario content defect; the architect did not edit the feature file.
+
+## 2026-07-29T14:42:20Z — specifier returned Phase 15 starting-capital revision
+
+## 2026-07-29T18:29:07Z — specifier returned Phase 15 completion policy to architect
+
+Handoff message sent:
+
+```
+id: 20260729T182907Z_000032_from_specifier
+from: specifier
+to: architect
+priority: 00
+type: git_handoff
+role: specifier
+task: phase15-cli
+commit: de36f0eb2a
+created_at: 2026-07-29T18:29:07.034011Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier de36f0eb2a
+```
+
+Summary: returned the CLI and simulator acceptance update requiring real
+random play from standard setup through natural bankruptcy termination, with
+no turn limit or synthetic winner.
+
+## 2026-07-29T18:29:26Z — specifier processed `monopoly-10-runs` completion sync
+
+Action taken: verified architect commit `b7f855bc13` is already an ancestor of
+the current branch. The ten-run scenario specification is therefore present
+and requires no additional specifier changes.
+
 ## 2026-07-31T06:32:00Z — specifier received phase-complete handoff from architect
 
 Handoff message received:
@@ -12142,33 +12172,6 @@ official dice cups for normal play and completes only by the game's ordinary
 bankruptcy rule; all coder/refactorer follow-up loops were closed and accepted
 by the architect before this sync. Per the specifier role, asking the user
 for the next feature to add.
-
-## 2026-07-31T07:23:42Z — architect sent acceptance pipeline hang follow-up to specifier
-
-Handoff message sent:
-
-```
-id: 20260731T072342Z_PLACEHOLDER_from_architect
-from: architect
-to: specifier
-priority: 00
-type: git_handoff
-role: architect
-task: monopoly-pipeline-hang
-commit: PLACEHOLDER
-
-Re-read your role and constitution.
-
-merge_and_process architect PLACEHOLDER
-```
-
-Action taken: confirmed that `acceptance/run-acceptance.sh` hangs on the
-`en/monopoly.feature` scenario: it is on the pipeline again, but the whole
-played-out game never terminates (about 9.7 million turns logged in roughly
-two minutes before cancellation, 43MB of journal output). The comment at the
-top of `run-acceptance.sh` documents that feature as held back because the
-turn loop behind it does not exist yet. The specifier owns this Gherkin
-scenario content defect; the architect did not edit the feature file.
 
 ## 2026-07-31T07:25:00Z — specifier sent journal logging specification to coder
 
@@ -12273,19 +12276,25 @@ those unsupported steps — a clear signal to the architect, not a hang.
 
 ## 2026-07-31T07:53:00Z — specifier sent pipeline hang resolution handoff to architect
 
-Handoff message sent:
+Handoff message sent (full record as logged by architect on receipt):
 
 ```
 id: 20260731T075307Z_000034_from_specifier
 from: specifier
 to: architect
+recipient: architect
 priority: 50
 type: git_handoff
 role: specifier
-task: monopoly-pipeline-hang
 commit: c04840f518
 created_at: 2026-07-31T07:53:07.408989Z
-enqueued_at: 2026-07-31T07:53:07.408989Z
+enqueued_at: 2026-07-31T07:53:07.977123Z
+task: monopoly-pipeline-hang
+dequeued_at: 2026-07-31T07:53:11.445865Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier c04840f518
 ```
 
 Summary: handoff of the acceptance-pipeline hang fix (`c04840f518`) to the
@@ -12294,3 +12303,40 @@ simulator game never terminates) in `en/cli.feature` at the user's explicit
 instruction; all other scenarios keep stable indexes. The architect is asked
 to re-run the acceptance pipeline: it should now fail fast on the
 unsupported `cli-4`/`cli-5` steps (no handlers exist) instead of hanging.
+
+Architect action taken: received the specifier's decision on the acceptance
+pipeline hang; merged the referenced commit before reviewing under architect
+rules.
+
+## 2026-07-31T07:57:30Z — architect sent second monopoly-pipeline-hang follow-up to specifier
+
+Handoff message sent:
+
+```
+id: 20260731T075742Z_000070_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: monopoly-pipeline-hang
+commit: ef68ac3aa3
+created_at: 2026-07-31T07:57:42.452290Z
+
+Re-read your role and constitution.
+
+merge_and_process architect ef68ac3aa3
+```
+
+Action taken: reviewed the merged specifier return under architect rules by
+rerunning `acceptance/run-acceptance.sh` on the merged state. The pipeline
+still hangs: the first scenario of `SpecsCliEnCliAcceptanceTest`, `cli-1`
+("the CLI runs a complete game with the default strategy", 2 players,
+"without strategy choices"), logged about 8.4 million journal turn lines in
+roughly two and a half minutes before cancellation, with no bankruptcy and
+no winner. The scenario order was confirmed by regenerating the CLI entry
+point from the merged feature file (cli-1, cli-3, cli-4, cli-5). The specifier
+logbook claim that a 2-player simulator run finishes in about 15 seconds
+could not be reproduced in the acceptance pipeline in the merged state; the
+removal of `cli-2` alone did not resolve the hang. The finding was sent back
+to the specifier under the same task name.
