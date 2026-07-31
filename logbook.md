@@ -12400,3 +12400,30 @@ the process ends. cli-2 is re-enabled; cli-4 held back as a comment. The
 coder must implement the new step handlers plus a background/subprocess
 simulator run with SLF4J journal capture — the natural continuation of the
 journal-logging implementation.
+
+## 2026-07-31T20:42:13Z — specifier received queued architect priority-00 follow-up for monopoly-pipeline-hang
+
+Handoff message received (dequeued from queue after 13+ hour delay):
+
+```
+id: 20260731T072403Z_000069_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: monopoly-pipeline-hang
+commit: 59bf4c256c
+created_at: 2026-07-31T07:24:03.559588Z
+enqueued_at: 2026-07-31T07:24:03.640057Z
+dequeued_at: 2026-07-31T20:42:13.802498Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 59bf4c256c
+```
+
+Action taken: acknowledged delayed queue delivery. This commit was already
+merged at `61bfaf3` and processed by the specifier on 2026-07-31T08:10:00Z,
+which resulted in the CLI scenario rework (`3e718ed`) and forward handoff to
+the coder (`a70bd23`). No further action required.
