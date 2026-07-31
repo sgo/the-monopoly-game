@@ -12839,3 +12839,35 @@ No further coder-owned implementation changes needed beyond this fix. Handing
 the result to the refactorer as normal for this priority-`00` follow-up loop;
 the refactorer's return will go on to the architect per the standard
 follow-up routing.
+
+## 2026-07-31T22:05:00Z — refactorer received journal-logging follow-up from coder
+
+Handoff message received:
+
+```
+id: 20260731T200146Z_000043_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: coder
+commit: c024123ab8
+created_at: 2026-07-31T20:01:46.022157Z
+enqueued_at: 2026-07-31T20:01:46.874291Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process coder c024123ab8
+```
+
+Action taken: this is an architect priority-`00` follow-up loop for the
+already-accepted `journal-logging` task, routed to the coder for the
+`Simulator.run` fix and now returned to the refactorer as normal. Merged
+`c024123ab8` into `swarmforge-refactorer` (commit `7c418b7`, resolving an
+append-only conflict in this file by ordering both sides' entries
+chronologically — no content lost). Reviewing the merged state
+(`Simulator.run` now delegating to `start`/`awaitEnd`, plus the architect's
+mutation-hardening tests in `SimulatorTest`, `GameTest`, `BankruptcyTest`)
+under refactorer rules next.
