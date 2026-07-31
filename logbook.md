@@ -12079,3 +12079,30 @@ first turn.
 
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
+
+## 2026-07-31T07:23:42Z — architect sent acceptance pipeline hang follow-up to specifier
+
+Handoff message sent:
+
+```
+id: 20260731T072342Z_PLACEHOLDER_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: monopoly-pipeline-hang
+commit: PLACEHOLDER
+
+Re-read your role and constitution.
+
+merge_and_process architect PLACEHOLDER
+```
+
+Action taken: confirmed that `acceptance/run-acceptance.sh` hangs on the
+`en/monopoly.feature` scenario: it is on the pipeline again, but the whole
+played-out game never terminates (about 9.7 million turns logged in roughly
+two minutes before cancellation, 43MB of journal output). The comment at the
+top of `run-acceptance.sh` documents that feature as held back because the
+turn loop behind it does not exist yet. The specifier owns this Gherkin
+scenario content defect; the architect did not edit the feature file.
