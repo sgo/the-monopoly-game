@@ -65,15 +65,21 @@ public record StepHandler(String keyword, Pattern pattern, Body body) {
     public String text(int group) {
       String captured = matcher.group(group);
       Matcher placeholder = PLACEHOLDER.matcher(captured);
-      if (!placeholder.matches()) return captured;
-
-      String column = placeholder.group(1);
-      String value = example.get(column);
-      if (value == null)
-        throw new AssertionError(
-            "Step wants <" + column + "> but the example row only has " + example.keySet() + "."
-        );
-      return value;
+      StringBuilder resolved = new StringBuilder();
+      int end = 0;
+      while (placeholder.find()) {
+        resolved.append(captured, end, placeholder.start());
+        String column = placeholder.group(1);
+        String value = example.get(column);
+        if (value == null)
+          throw new AssertionError(
+              "Step wants <" + column + "> but the example row only has " + example.keySet() + "."
+          );
+        resolved.append(value);
+        end = placeholder.end();
+      }
+      resolved.append(captured, end, captured.length());
+      return resolved.toString();
     }
 
     public int number(int group) {
