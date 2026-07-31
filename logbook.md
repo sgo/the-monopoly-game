@@ -12340,3 +12340,35 @@ logbook claim that a 2-player simulator run finishes in about 15 seconds
 could not be reproduced in the acceptance pipeline in the merged state; the
 removal of `cli-2` alone did not resolve the hang. The finding was sent back
 to the specifier under the same task name.
+
+## 2026-07-31T08:10:00Z — specifier reworked CLI real-dice scenarios into bounded-time journal-inspection checks
+
+Committed as `3e718ed`, following the user's design direction: without
+pinning that the CLI is wired to real dice with no early-termination tricks,
+the coder could make the simulator end quickly in a way that violates the
+phase 15 requirements. Instead of waiting for natural bankruptcy (which does
+not occur in bounded time for real-dice games), the CLI acceptance scenarios
+now verify real play through the journal log and then stop the simulator
+before it completes:
+
+- `cli-1` (2 players, default strategy) and `cli-5` (2 players, real dice,
+  no turn limit, no synthetic winner): start the simulator, assert the game
+  log records the game start and at least 50 rolls (all totals between 2 and
+  12, at least two different totals, no winner yet, simulator still playing),
+  then stop the simulator and assert the process ends.
+- `cli-2` (8 players, selected strategies) is re-enabled: it no longer needs
+  to finish, so the 8-player configuration can be verified bounded-time.
+- `cli-3` (invalid player count) unchanged — it cannot hang.
+- `cli-4` is held back as a comment: its pre-play setup assertions (position
+  0, $1500, no streets, complete decks, no Get Out of Jail Free card) were
+  never implemented as step handlers and cannot be inspected on a killed
+  process; they are covered by the domain features. Re-enable when the
+  journal records the setup state.
+
+The new steps ("I start the simulator", "the game log records at least N
+rolls", "the game log records no winner", "the simulator is still playing
+when the game log has recorded N rolls", "I stop the simulator before the
+game ends", "the simulator process ends") need coder implementation: a
+background/subprocess simulator run with journal capture, plus the steps
+reading the SLF4J journal output. This builds directly on the journal-logging
+handoff (task `journal-logging`).
