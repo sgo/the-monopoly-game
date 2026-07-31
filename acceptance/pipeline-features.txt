@@ -38,6 +38,7 @@ en/rules/mortgage-transfer.feature
 en/rules/cards.feature
 en/rules/journal.feature
 en/rules/report.feature
+en/rules/logging.feature
 en/rules/rent.feature
 en/rules/station-rent.feature
 en/rules/utility-rent.feature

@@ -21,6 +21,7 @@ import the.monopoly.game.strategies.Strategy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
@@ -127,6 +128,23 @@ class GameTest {
         new Entry.Bankrupt(dog.id(), null), new Entry.Won(twoPlayers.get(1).id())
     );
     assertThat(result.winner()).contains(twoPlayers.get(1));
+  }
+
+  @Test
+  void aGameStopsBetweenRoundsWhenToldTo() {
+    AtomicBoolean stop = new AtomicBoolean();
+
+    Game.Result result = new Game(ruleSet, players, Cup.of(
+        new Roll(2, 2), new Roll(5, 5), new Roll(3, 3),
+        new Roll(1, 2), new Roll(2, 4), new Roll(4, 3)
+    )).playUntilStopped(() -> !stop.compareAndSet(false, true));
+
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.TurnStarted(Pawn.dog.id()),
+        new Entry.Rolled(Pawn.dog.id(), 7),
+        new Entry.Moved(Pawn.dog.id(), 0, 7)
+    );
+    assertThat(result.winner()).isEmpty();
   }
 
   /**

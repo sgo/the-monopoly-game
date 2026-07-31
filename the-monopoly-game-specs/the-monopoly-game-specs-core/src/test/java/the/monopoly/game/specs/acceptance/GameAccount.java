@@ -34,6 +34,43 @@ final class GameAccount {
     recordedAt(world.journal(), claim);
   }
 
+  /** Whether the game log records what the journal recorded. */
+  static void logRecords(World world, Claim claim) {
+    world.awaitGameLog(1, claim.matches(), claim.description());
+  }
+
+  static void logRecordsInOrder(World world, Claim first, Claim second) {
+    List<Entry> log = world.gameLog();
+    if (logRecordedAt(log, first) >= logRecordedAt(log, second))
+      throw new AssertionError(
+          "The game log records " + second.description() + " before "
+              + first.description() + ":\n" + written(log)
+      );
+  }
+
+  /** Whether a game started with these pawns seated in this order, on the log. */
+  static void logRecordsStartWith(World world, String firstPawn, String secondPawn) {
+    List<String> seated = world.gameLog().stream()
+        .filter(Entry.Start.class::isInstance)
+        .map(Entry.Start.class::cast)
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("The game log records no start."))
+        .players().stream().map(it -> it.value()).toList();
+    if (seated.indexOf(firstPawn) < 0 || seated.indexOf(secondPawn) < 0
+        || seated.indexOf(firstPawn) >= seated.indexOf(secondPawn))
+      throw new AssertionError(
+          "The game started with " + seated + ", not with \"" + firstPawn
+              + "\" before \"" + secondPawn + "\"."
+      );
+  }
+
+  /** Whether the log records no winner, as when the game is stopped before it ends. */
+  static void logRecordsNoWinner(World world) {
+    List<Entry> log = world.gameLog();
+    if (log.stream().anyMatch(Entry.Won.class::isInstance))
+      throw new AssertionError("The game log records a winner:\n" + written(log));
+  }
+
   static void recordsInOrder(World world, Claim first, Claim second) {
     List<Entry> journal = world.journal();
     if (recordedAt(journal, first) >= recordedAt(journal, second))
@@ -90,6 +127,14 @@ final class GameAccount {
       if (claim.matches().test(journal.get(at))) return at;
     throw new AssertionError(
         "The game journal records no " + claim.description() + "; it records:\n" + written(journal)
+    );
+  }
+
+  private static int logRecordedAt(List<Entry> log, Claim claim) {
+    for (int at = 0; at < log.size(); at++)
+      if (claim.matches().test(log.get(at))) return at;
+    throw new AssertionError(
+        "The game log records no " + claim.description() + "; it records:\n" + written(log)
     );
   }
 

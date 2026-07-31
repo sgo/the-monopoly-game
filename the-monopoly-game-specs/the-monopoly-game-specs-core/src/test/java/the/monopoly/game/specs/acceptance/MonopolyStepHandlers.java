@@ -15,6 +15,7 @@ import the.monopoly.game.components.streets.TaxSpace;
 import the.monopoly.game.components.streets.Utility;
 
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +23,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static the.monopoly.game.rules.Rule.Type.double_salary_when_landing_on_start;
 import static the.monopoly.game.specs.acceptance.GameAccount.Claim;
+import static the.monopoly.game.specs.acceptance.GameAccount.logRecords;
+import static the.monopoly.game.specs.acceptance.GameAccount.logRecordsInOrder;
+import static the.monopoly.game.specs.acceptance.GameAccount.logRecordsNoWinner;
+import static the.monopoly.game.specs.acceptance.GameAccount.logRecordsStartWith;
 import static the.monopoly.game.specs.acceptance.GameAccount.records;
 import static the.monopoly.game.specs.acceptance.GameAccount.recordsInOrder;
 import static the.monopoly.game.specs.acceptance.GameAccount.recordsStartWith;
@@ -170,6 +175,45 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> world.configureSimulatorWithAgreeIfAffordable()),
 
         step("^I run the simulator$", (world, arguments) -> world.runSimulator()),
+
+        step("^I start the simulator$", (world, arguments) -> world.startSimulator()),
+
+        step("^I stop the simulator before the game ends$", (world, arguments) -> world.stopSimulator()),
+
+        then("^the simulator process ends$", (world, arguments) -> world.awaitSimulatorEnd()),
+
+        then("^the simulator is still playing when the game log has recorded " + VALUE + " rolls$",
+            (world, arguments) -> {
+              world.awaitGameLog(arguments.number(1), Entry.Rolled.class::isInstance,
+                  "at least " + arguments.number(1) + " rolls");
+              assertThat(world.simulatorIsPlaying()).isTrue();
+            }),
+
+        then("^the game log records that the game starts$",
+            (world, arguments) -> logRecords(world, Claim.ofAny(Entry.Start.class))),
+
+        then("^the game log records at least " + VALUE + " rolls$",
+            (world, arguments) -> world.awaitGameLog(arguments.number(1), Entry.Rolled.class::isInstance,
+                "at least " + arguments.number(1) + " rolls")),
+
+        then("^the game log records at least " + VALUE + " rolls of a total between 2 and 12$",
+            (world, arguments) -> world.awaitGameLog(arguments.number(1),
+                entry -> entry instanceof Entry.Rolled rolled
+                    && rolled.total() >= 2 && rolled.total() <= 12,
+                "at least " + arguments.number(1) + " rolls of a total between 2 and 12")),
+
+        then("^the game log records at least two different roll totals$",
+            (world, arguments) -> {
+              Set<Integer> totals = Set.copyOf(world.gameLog().stream()
+                  .filter(Entry.Rolled.class::isInstance)
+                  .map(Entry.Rolled.class::cast)
+                  .map(Entry.Rolled::total)
+                  .toList());
+              assertThat(totals.size()).isGreaterThanOrEqualTo(2);
+            }),
+
+        then("^the game log records no winner$",
+            (world, arguments) -> logRecordsNoWinner(world)),
 
         then("^the simulator exits successfully$",
             (world, arguments) -> assertThat(world.simulatorResult().succeeded()).isTrue()),
@@ -657,6 +701,184 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> recordsInOrder(world,
                 moves(arguments.text(1)),
                 auctionWon(arguments.text(2), arguments.text(3), arguments.number(4)))),
+
+        then("^the game log records that the game starts with pawn \"" + NAME
+                + "\" before pawn \"" + NAME + "\"$",
+            (world, arguments) -> logRecordsStartWith(world, arguments.text(1), arguments.text(2))),
+
+        then("^the game log records that pawn \"" + NAME + "\" rolls " + VALUE + " for initiative$",
+            (world, arguments) -> logRecords(world, initiativeRoll(arguments.text(1), arguments.number(2)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" wins initiative$",
+            (world, arguments) -> logRecords(world, initiativeWon(arguments.text(1)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" starts a turn$",
+            (world, arguments) -> logRecords(world, turnStarted(arguments.text(1)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" rolls a total of " + VALUE + "$",
+            (world, arguments) -> logRecords(world, rolled(arguments.text(1), arguments.number(2)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " to " + VALUE + "$",
+            (world, arguments) -> logRecords(world,
+                moved(arguments.text(1), arguments.number(2), arguments.number(3)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
+            (world, arguments) -> logRecords(world, salaryCollected(arguments.text(1), arguments.number(2)))),
+
+        then("^the game log records game start before it records that pawn \"" + NAME
+                + "\" rolls " + VALUE + " for initiative$",
+            (world, arguments) -> logRecordsInOrder(world,
+                Claim.ofAny(Entry.Start.class),
+                initiativeRoll(arguments.text(1), arguments.number(2)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" rolls " + VALUE
+                + " for initiative before it records that pawn \"" + NAME + "\" rolls " + VALUE
+                + " for initiative$",
+            (world, arguments) -> logRecordsInOrder(world,
+                initiativeRoll(arguments.text(1), arguments.number(2)),
+                initiativeRoll(arguments.text(3), arguments.number(4)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" rolls " + VALUE
+                + " for initiative before it records that pawn \"" + NAME + "\" wins initiative$",
+            (world, arguments) -> logRecordsInOrder(world,
+                initiativeRoll(arguments.text(1), arguments.number(2)),
+                initiativeWon(arguments.text(3)))),
+
+        then("^the game log records that pawn \"" + NAME
+                + "\" wins initiative before starting a turn$",
+            (world, arguments) -> logRecordsInOrder(world,
+                initiativeWon(arguments.text(1)),
+                Claim.ofAny(Entry.TurnStarted.class))),
+
+        then("^the game log records that pawn \"" + NAME
+                + "\" starts a turn before it records that pawn \"" + NAME + "\" rolls a total of "
+                + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                turnStarted(arguments.text(1)),
+                rolled(arguments.text(2), arguments.number(3)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" rolls a total of " + VALUE
+                + " before it records that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " to " + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                rolled(arguments.text(1), arguments.number(2)),
+                moved(arguments.text(3), arguments.number(4), arguments.number(5)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " to " + VALUE + " before it records that pawn \"" + NAME + "\" collects a salary of \\$"
+                + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                moved(arguments.text(1), arguments.number(2), arguments.number(3)),
+                salaryCollected(arguments.text(4), arguments.number(5)))),
+
+        then("^the game log records that pawn \"" + NAME
+                + "\" starts its turn before pawn \"" + NAME + "\"$",
+            (world, arguments) -> logRecordsInOrder(world,
+                turnStarted(arguments.text(1)), turnStarted(arguments.text(2)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" buys \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> logRecords(world,
+                bought(arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" wins the auction for \""
+                + NAME + "\" at \\$" + VALUE + "$",
+            (world, arguments) -> logRecords(world,
+                auctionWon(arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" pays pawn \"" + NAME
+                + "\" \\$" + VALUE + " rent for \"" + NAME + "\"$",
+            (world, arguments) -> logRecords(world, rentPaid(
+                arguments.text(1), arguments.text(2), arguments.text(4), arguments.number(3)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" builds a house on \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> logRecords(world, houseBuilt(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" sells a house on \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> logRecords(world, houseSold(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" mortgages \"" + NAME + "\" for \\$"
+                + VALUE + "$",
+            (world, arguments) -> logRecords(world, mortgaged(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" lifts the mortgage on \"" + NAME
+                + "\" for \\$" + VALUE + " including \\$" + VALUE + " interest$",
+            (world, arguments) -> logRecords(world, mortgageLifted(
+                arguments.text(1), arguments.text(2), arguments.number(3), arguments.number(4)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" sells \"" + NAME + "\" to pawn \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> logRecords(world, landSold(
+                arguments.text(1), arguments.text(2), arguments.text(3), arguments.number(4)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" is refused selling \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \\$" + VALUE
+                + " because the colour group has houses built$",
+            (world, arguments) -> logRecords(world, landSaleRefused(
+                arguments.text(1), arguments.text(2), arguments.text(3), arguments.number(4)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" is refused building a house on \"" + NAME
+                + "\" for \\$" + VALUE + " because a street in the colour group is mortgaged$",
+            (world, arguments) -> logRecords(world, buildingRefused(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" draws the chance card \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" pays the bank \\$" + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                chanceCardDrawn(arguments.text(1), arguments.text(2)),
+                bankPaid(arguments.text(3), arguments.number(4)))),
+
+        then("^the game log records that pawn \"" + NAME
+                + "\" moves before it records that pawn \"" + NAME + "\" pays the bank \\$" + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                moves(arguments.text(1)), bankPaid(arguments.text(2), arguments.number(3)))),
+
+        then("^the game log records that pawn \"" + NAME
+                + "\" moves before it records that pawn \"" + NAME
+                + "\" is sent to jail from landing on \"" + NAME + "\"$",
+            (world, arguments) -> logRecordsInOrder(world,
+                moves(arguments.text(1)), jailEntered(arguments.text(2), arguments.text(3)))),
+
+        then("^the game log records that pawn \"" + NAME
+                + "\" leaves jail by paying the \\$" + VALUE + " fine$",
+            (world, arguments) -> logRecords(world, jailFinePaid(arguments.text(1), arguments.number(2)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" goes bankrupt to the bank$",
+            (world, arguments) -> logRecords(world,
+                Claim.of(new Entry.Bankrupt(idOf(arguments.text(1)), null)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" goes bankrupt to pawn \"" + NAME + "\"$",
+            (world, arguments) -> logRecords(world,
+                Claim.of(new Entry.Bankrupt(idOf(arguments.text(1)), idOf(arguments.text(2)))))),
+
+        then("^the game log records that pawn \"" + NAME + "\" wins the game$",
+            (world, arguments) -> logRecords(world, Claim.of(new Entry.Won(idOf(arguments.text(1)))))),
+
+        then("^the game log records that pawn \"" + NAME + "\" moves before it records that pawn \""
+                + NAME + "\" buys \"" + NAME + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                moves(arguments.text(1)),
+                bought(arguments.text(2), arguments.text(3), arguments.number(4)))),
+
+        then("^the game log records that pawn \"" + NAME
+                + "\" moves before it records that pawn \"" + NAME + "\" wins the auction for \""
+                + NAME + "\" at \\$" + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                moves(arguments.text(1)),
+                auctionWon(arguments.text(2), arguments.text(3), arguments.number(4)))),
+
+        then("^the game log records that pawn \"" + NAME
+                + "\" moves before it records that pawn \"" + NAME + "\" pays pawn \"" + NAME
+                + "\" \\$" + VALUE + " rent for \"" + NAME + "\"$",
+            (world, arguments) -> logRecordsInOrder(world,
+                moves(arguments.text(1)),
+                rentPaid(arguments.text(2), arguments.text(3), arguments.text(5), arguments.number(4)))),
 
         then("^the game report says that pawn \"" + NAME + "\" moves before it says that pawn \""
                 + NAME + "\" buys \"" + NAME + "\" for \\$" + VALUE + "$",
