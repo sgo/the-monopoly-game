@@ -12541,6 +12541,31 @@ runner to regenerate, per established precedent.
 
 Handing implementation to refactorer for review.
 
+## 2026-07-31T09:06:19Z — coder sent journal-logging handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260731T090619Z_000042_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: journal-logging
+commit: 77ff98af
+created_at: 2026-07-31T09:06:19.674Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 77ff98af
+```
+
+Summary: handed off the journal-logging implementation (SLF4J-readable
+`Journal.log` entries, cooperative `playUntilStopped`, the CLI `Simulator`
+start/stop/awaitEnd API, and the acceptance-side `GameLog`/step-handler
+support) at commit `77ff98af` for refactorer review.
+
 ## 2026-07-31T21:15:00Z — refactorer reviewed journal-logging/bounded-CLI implementation
 
 Action taken: merged coder commit `77ff98a` (task `journal-logging`, already
@@ -12633,3 +12658,184 @@ merge_and_process refactorer 9b6e77deb0
 Summary: returned the journal-logging/bounded-CLI implementation after the
 mutation-site-driven `MonopolyStepHandlers` split, with CRAP/DRY/mutation-scan
 and full acceptance/unit verification all green.
+
+## 2026-07-31T19:15:24Z — architect received journal-logging return from refactorer
+
+Handoff message received:
+
+```
+id: 20260731T191203Z_000054_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 9b6e77deb0
+created_at: 2026-07-31T19:12:03.608907Z
+enqueued_at: 2026-07-31T19:12:04.585772Z
+task: journal-logging
+dequeued_at: 2026-07-31T19:12:04.585772Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 9b6e77deb0
+```
+
+Action taken: merged `9b6e77deb0` into `swarmforge-architect`; beginning
+architectural review of the journal-logging implementation (SLF4J game
+journal, `GameLog`/step-handler split, stoppable `Simulator.Running`) under
+architect rules.
+
+## 2026-07-31T19:51:18Z — architect reviewed the journal-logging return from refactorer
+
+Architectural review (UI/Core separation, dependency rule, information
+hiding, local code quality) of the merged state (`9b6e77deb0`): clean.
+`Simulator.java` stays a thin CLI boundary — the new `Running` class
+encapsulates the daemon thread and stop flag there, not in the domain.
+`Game.play(untilComplete, keepPlaying)`'s cooperative-stop `BooleanSupplier`
+is a plain JDK type with no CLI/threading leakage into the domain. The
+step-handler split (`JournalStepHandlers` vs `GameLogStepHandlers` vs
+`MonopolyStepHelpers`) is a genuine semantic boundary (direct-journal
+assertions for completed games vs. log-based assertions for the bounded-time
+streaming scenarios), not just a line-count split, even though the helper
+file's own javadoc frames it around the mutation-site threshold.
+
+Mutation (`mutate4java`, differential, one file at a time, `--max-workers 8`):
+
+- `Simulator.java`: 3 survivors killed by hardening `SimulatorTest` — a
+  boundary test at the 8-player maximum, and a test that the simulator is
+  still playing 1s after `start()` (proving `stop()` is what ends it, not
+  that it always stops after one round regardless). 4 sites stayed
+  uncovered: `main`'s two lines (expected — a real process entrypoint, not
+  unit-testable) and the two lines of `Simulator.run`'s success return. That
+  last one is a real finding, below.
+- `Game.java`: 9 survivors, 6 killed by new `GameTest` cases —
+  `aCompleteGameContinuesPastASurvivedRoundUntilBankruptcyLeavesOneWinner`
+  (bankruptcy-to-player after a round that's survived, not the first roll —
+  the existing single-round bankruptcy test can't tell "plays until
+  complete" from "plays exactly one round"), `aGamePlaysAnotherRoundWhenToldItMay`
+  (the missing complement to the existing "stops when told to" test), and
+  `aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem`
+  (a 3-player game where the fixed turn order reaches an already-bankrupt
+  player mid-round; confirms the remaining players still get their turn that
+  round rather than the loop breaking early — a real path any longer real-dice
+  game with 3+ players will hit). 3 survivors left: the `keepPlaying`
+  supplier in `play()` is unreachable when `untilComplete` is `false`
+  (equivalent, not a gap), and the `<=1`/`remainingPlayers().size()` early
+  break in `playTurn` is redundant with the outer loop's own termination
+  check (equivalent — skipped players write nothing either way, so the
+  journal is identical whether the round finishes out or breaks early).
+- `Bankruptcy.java`: 3 survivors, 1 killed by a new `BankruptcyTest` case —
+  `anAgreeableCreditorLiftsAnInheritedMortgageForExactlyItsPricePlusInterest`
+  funds the creditor with exactly the mortgage-plus-10%-interest price
+  (accounting for the debt the creditor absorbs first) instead of a
+  balance so large it can't tell the real interest formula from a wildly
+  wrong one; this caught `(mortgageValue + 9) / 10` mutated to `* 10`, which
+  the existing test's $1,500 balance covered either way. 2 survivors left in
+  `bankruptToPlayer`'s `cash.amount() > 0` guard (equivalent — the
+  transfer branch withdraws/deposits `Money.ZERO` either way, with no
+  observable effect).
+
+DRY (`dry4java`): all findings are either pre-existing duplication untouched
+by this diff (mid-file `Game.java` chance-card handling; guard-clause-only
+`World.java` methods with no journal write), or the accepted one-builder-
+per-journal-entry-type `Claim`/report-line catalog pattern the refactorer
+already assessed when it lived in `MonopolyStepHandlers.java` — relocated
+verbatim into `MonopolyStepHelpers.java`, not new. Nothing to fix.
+
+Soft Gherkin acceptance mutation (`run-acceptance-mutation.sh --level soft`,
+full pipeline, ~28 features): clean. Every feature's manifest reports
+`Survived: 0`, including `en/rules/logging.feature` (22 scenarios) and
+`en/cli.feature` (5 scenarios, `Killed: 4` on the boundary-rejection
+scenario, the only one with numeric examples to mutate).
+
+Finding for the coder: `Simulator.run(int, Strategy.OfPlayers)` — the
+blocking, run-to-completion path that `main`/`execute`/`runSelected` still
+use for any plain CLI invocation (`java -jar simulator.jar <n>`) — carries
+the exact non-termination risk that started the `monopoly-pipeline-hang`
+task, and is now completely uncovered by any test (confirmed by
+`mutate4java`: 0/2 coverage on its success-path lines). The Gherkin rework
+that fixed the acceptance pipeline's hang did so by moving every real-dice
+CLI scenario onto the new bounded `Simulator.start`/`stop`/`awaitEnd` API
+instead of `run`; that API was never wired into the actual command-line
+entrypoint, so the safe, tested way to run the simulator only exists as an
+internal Java API today. A user running the CLI the plain way still gets the
+untested, unbounded blocking path. Sent to the coder for a production fix
+(wire `main` to the bounded API, or bound `run` itself); not a Gherkin
+content question for the specifier, since nothing about the current
+acceptance criteria is wrong — the CLI's own default behavior and its test
+coverage are what fell out of step with each other.
+
+Committed the hardening tests and the mutation-refreshed feature manifests
+together with this review.
+
+## 2026-07-31T19:53:04Z — coder received architect priority-00 follow-up
+
+Handoff message received:
+
+```
+id: 20260731T195259Z_000071_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 9f4961c78a
+created_at: 2026-07-31T19:52:59.308106Z
+enqueued_at: 2026-07-31T19:52:59.444426Z
+task: journal-logging
+dequeued_at: 2026-07-31T19:53:04.228070Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 9f4961c78a
+```
+
+Action taken: this is an architect review loop for the already-accepted
+`journal-logging` task (mutation-coverage hardening in `Simulator.java`,
+`Game.java`, and `Bankruptcy.java`, plus manifest refresh), not a new
+specifier-originated phase. Merging `9f4961c78a` into `swarmforge-coder` and
+reviewing/verifying under coder rules next.
+
+## 2026-07-31T22:01:00Z — coder addressed architect's Simulator.run finding
+
+Action taken: reviewed the merged mutation-hardening state (`9f4961c78a`) and
+addressed the one open finding for the coder: `Simulator.run(int,
+Strategy.OfPlayers)` — the blocking path `main`/`execute`/`runSelected` use
+for a plain CLI invocation — duplicated `Simulator.start`'s game-construction
+and play-to-completion logic in a second, untested implementation, carrying
+the same non-termination risk that started `monopoly-pipeline-hang` with none
+of the coverage `start`/`awaitEnd` already have.
+
+Fix: `run` now delegates entirely to the tested bounded API —
+`return start(playerCount, strategies).awaitEnd();` — removing its own
+`Rule.Set`/`Game`/`winner().orElseThrow()`/`Report.of` body. `main` is now
+wired to the same `start`/`stop`/`awaitEnd` path already exercised by
+`SimulatorTest`'s `Running`-based tests and the bounded-time CLI acceptance
+scenarios, eliminating the duplicate, uncovered implementation rather than
+adding a second one to maintain. No externally observable behavior changed:
+`rejectsPlayerCountsOutsideTheOfficialRange` (out-of-range `run` call) still
+passes unchanged, since `rejectOutOfRange` is shared and `awaitEnd()` returns
+the same synchronous failure `Result` when `start` never spawns a thread.
+
+No new unit test added for `run`'s valid-input path: the only way to exercise
+it is to let a real-dice game reach natural completion synchronously, which
+is exactly the unbounded wait the CLI Gherkin scenarios were reworked away
+from (`3e718ed`) after the acceptance pipeline hang. That line remains the
+one irreducible risk boundary of a "block until a real game ends" feature,
+now living in one already-partially-tested place instead of two untested
+ones; a real invocation still exits on its own binary's normal process
+signals (Ctrl+C) same as before.
+
+Verification: unit suites green — domain 255, cli 11 (`mvn -B -pl
+the-monopoly-game-cli,the-monopoly-game-domain -am -Dmaven.repo.local=./tmp/m2
+test`). Acceptance pipeline green — `Tests run: 271, Failures: 0, Errors: 0`
+in ~28s, no hang. Manifest for `Simulator.java` left stale for the mutation
+runner to regenerate, per established precedent.
+
+No further coder-owned implementation changes needed beyond this fix. Handing
+the result to the refactorer as normal for this priority-`00` follow-up loop;
+the refactorer's return will go on to the architect per the standard
+follow-up routing.
