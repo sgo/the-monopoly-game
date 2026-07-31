@@ -12457,3 +12457,63 @@ logbook claim that a 2-player simulator run finishes in about 15 seconds
 could not be reproduced in the acceptance pipeline in the merged state; the
 removal of `cli-2` alone did not resolve the hang. The finding was sent back
 to the specifier under the same task name.
+
+## 2026-07-31T09:06:00Z — coder implemented journal-logging and bounded-time CLI simulator checks
+
+Action taken: implemented specifier `3e718ed0d6` (task `journal-logging`) on
+top of its merged follow-up `9267933`.
+
+Failing-first evidence (before implementation, `acceptance/run-acceptance.sh`):
+`Tests run: 271, Failures: 25, Errors: 0` in 27.7s, no hang. Every failure an
+`Unsupported step` error, exactly the 22 `en/rules/logging.feature` scenarios
+(`EnRulesLoggingAcceptanceTest`) and the 3 reworked bounded-time CLI scenarios
+(`SpecsCliEnCliAcceptanceTest`); all other surefire reports clean.
+
+Implementation:
+
+- Domain (`Game.java`): `play()` -> `play(false, () -> true)`; new
+  `playToCompletion()` -> `play(true, () -> true)`; new
+  `playUntilStopped(BooleanSupplier keepPlaying)` -> `play(true, keepPlaying)`.
+  `playTurns` now loops
+  `while (untilComplete && keepPlaying.getAsBoolean() && remainingPlayers().size() > 1)`,
+  so stopping is cooperative: the game finishes the round it is on, then ends.
+  `Journal.log` now logs `logger.info("{}", evt)` instead of
+  `logger.info(evt.toString())`, so the entry object rides in the SLF4J
+  argument array and the log can be read as entries, not just text.
+- CLI (`Simulator.java`): range validation extracted to `rejectOutOfRange`;
+  new `public static Running start(int, Strategy.OfPlayers)`; new nested
+  `Running` class playing on a daemon thread ("monopoly-simulator") via
+  `playUntilStopped(() -> !stopRequested.get())`, with `stop()`, `isPlaying()`,
+  and `awaitEnd()` (join; interrupted wait re-interrupts and throws
+  AssertionError). Out-of-range starts return a failed `Running` without a
+  thread.
+- Harness (specs-core acceptance): new `GameLog.java` attaches a logback
+  `AppenderBase` to `(Logger) LoggerFactory.getLogger(Game.Journal.class)` and
+  reads each `Entry` back from the event's argument array; scenarios window it
+  via `GameLog.offset()`/`recordedSince(int)`. `World` holds that window
+  (`gameLogOffset`), the running simulator, and `awaitGameLog(count, matches,
+  description)` which polls the log for up to 5s before failing with the log
+  dump; fabricated entries (sellHouse, mortgage, liftMortgage, land sale) are
+  now written through a real `Journal` so they reach the log like game entries.
+  `GameAccount` gained `logRecords`, `logRecordsInOrder`, `logRecordsStartWith`,
+  and `logRecordsNoWinner`. `MonopolyStepHandlers` gained ~30 "the game log
+  records ..." handlers mirroring the journal vocabulary (including the
+  ordering pairs) and the CLI handlers "I start the simulator", "I stop the
+  simulator before the game ends", "the simulator process ends", "the simulator
+  is still playing when the game log has recorded <N> rolls", "the game log
+  records that the game starts", "at least <N> rolls", "at least <N> rolls of a
+  total between 2 and 12", "at least two different roll totals", and "records
+  no winner".
+- Unit tests: `GameTest.aGameStopsBetweenRoundsWhenToldTo` (scripted rolls for
+  exactly one round; `compareAndSet` predicate stops between rounds);
+  `SimulatorTest` covers `start`/`stop`/`awaitEnd`/`isPlaying` and out-of-range
+  rejection of a started simulator.
+
+Verification: acceptance pipeline green — `Tests run: 271, Failures: 0,
+Errors: 0` in 26.6s (`EnRulesLoggingAcceptanceTest` 22/22 in 0.047s,
+`SpecsCliEnCliAcceptanceTest` 5/5 in 0.037s — bounded-time CLI checks no longer
+hang or complete naturally). Unit suites green: domain 251, cli 9. Manifests
+(CLI rework in `en/cli.feature`, `Simulator.java`) left stale for the mutation
+runner to regenerate, per established precedent.
+
+Handing implementation to refactorer for review.

@@ -75,4 +75,27 @@ class SimulatorTest {
         .contains("received many players");
   }
 
+  @Test
+  void startsPlayingInTheBackgroundUntilStopped() {
+    Simulator.Running running = Simulator.start(2, Simulator.strategiesFor(2, List.of()));
+
+    assertThat(running.isPlaying()).isTrue();
+
+    running.stop();
+    Simulator.Result result = running.awaitEnd();
+
+    assertThat(result.succeeded()).isTrue();
+    assertThat(result.output()).contains("The game starts");
+    assertThat(running.isPlaying()).isFalse();
+  }
+
+  @Test
+  void rejectsAPlayerCountOutsideTheOfficialRangeWhenStarted() {
+    Simulator.Running running = Simulator.start(9, Strategy.OfPlayers.NOBODY_DECIDES);
+
+    assertThat(running.isPlaying()).isFalse();
+    assertThat(running.awaitEnd().succeeded()).isFalse();
+    assertThat(running.awaitEnd().output()).contains("received 9 players");
+  }
+
 }
