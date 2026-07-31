@@ -12270,3 +12270,27 @@ limit", "the report contains no synthetic winner"). They were specified in
 `de36f0e` (Phase 15, after the last green acceptance run) and the coder never
 implemented them. With `cli-2` gone the acceptance run will fail fast on
 those unsupported steps — a clear signal to the architect, not a hang.
+
+## 2026-07-31T07:53:00Z — specifier sent pipeline hang resolution handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260731T075307Z_000034_from_specifier
+from: specifier
+to: architect
+priority: 50
+type: git_handoff
+role: specifier
+task: monopoly-pipeline-hang
+commit: c04840f518
+created_at: 2026-07-31T07:53:07.408989Z
+enqueued_at: 2026-07-31T07:53:07.408989Z
+```
+
+Summary: handoff of the acceptance-pipeline hang fix (`c04840f518`) to the
+architect. The specifier disabled scenario `cli-2` (8-player real-dice
+simulator game never terminates) in `en/cli.feature` at the user's explicit
+instruction; all other scenarios keep stable indexes. The architect is asked
+to re-run the acceptance pipeline: it should now fail fast on the
+unsupported `cli-4`/`cli-5` steps (no handlers exist) instead of hanging.
