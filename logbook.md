@@ -12048,3 +12048,11 @@ merge_and_process specifier 8722cf186d
 
 Action taken: merged specifier commit `8722cf186d` into `swarmforge-coder`;
 implementation review is next.
+
+## 2026-07-31T07:30:00Z — coder suspended journal-logging merge on user direction
+
+Action taken: aborted the merge of specifier commit `8722cf186d` (task
+`journal-logging`) while resolving the `logbook.md` conflict. User direction:
+the specifier needs to deal with a bug; wait for further instructions from
+them before proceeding. The handoff remains in `in_process`; no
+implementation work was started.
