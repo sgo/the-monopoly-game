@@ -13183,3 +13183,65 @@ filtered `deeds.hasHotelOn(it)` streets out of `candidateBuildsFor` before
 the lowest-level tie comparison, so a fully-hoteled group now offers nothing
 rather than falling into the ambiguous tie case. Reviewing under refactorer
 rules next.
+
+## 2026-07-31T22:40:00Z — refactorer verified the Building fix and closed remaining gaps
+
+CRAP (`crap4java`, domain + cli): clean. `Building.candidateBuildsFor` is now
+1.0 with 100% coverage (exercised by `BuildingTest`, added two follow-ups
+ago); the rest of `Building.java` is unchanged and low. Only the long-exempt
+`Report.line` (31.6) exceeds the threshold.
+
+DRY (`dry4java`): the only new finding touches `BuildingTest`'s `ownerWith`
+helper (score 0.84 against `DeedsPropertyTest`'s) — the same already-accepted
+per-test-class `ownerWith` pattern every `*PropertyTest` file already repeats
+on its own; not a new category, left alone.
+
+Mutation-site scan (`mutate4java --scan`) on the one changed production
+file: `Building.java` 8 sites — no split needed.
+
+`BuildingTest` (added earlier as the failing reproduction) now passes: the
+coder's one-line filter fix is verified correct, and confirmed to actually
+matter by temporarily reverting it locally and watching both `BuildingTest`
+and the new `BuildingPropertyTest` (below) fail again with the identical
+`IllegalStateException`, then restoring it (no net diff against the merged
+commit).
+
+Re-ran the originally-reported flake, `SimulatorTest.
+keepsPlayingUntilToldToStop`, 20 times in isolation after the fix: 0/20
+failures — but only once `./tmp/m2` itself was rebuilt against the fixed
+domain source; the first re-run attempt still intermittently threw the exact
+same exception because that local repo still held the pre-fix domain jar
+from an earlier `-am install` that had only targeted the global repo. Once
+rebuilt, the crash is gone.
+
+Separately hardened `keepsPlayingUntilToldToStop` itself (test-only change,
+no production code touched): switched it from 2 players to 8. With real,
+unseeded dice a 2-player `AgreeIfAffordable` game can legitimately finish
+inside the test's 1-second sleep — measured empirically at ~60% of runs
+(18/30) — which fails the "still playing" assertion for a reason that has
+nothing to do with the simulator's correctness (this matches the "separate,
+pre-existing flakiness" the coder noted but explicitly left unfixed). 8
+players measured 0/30 finishing that fast in the same sampling, matching
+`acceptsThePlayerCountAtTheUpperBoundaryWhenStarted`'s existing precedent of
+using the upper bound for this kind of test. Combined with the domain fix,
+the test is now reliably green (20/20 sampled).
+
+Property-test assessment: generalized the `BuildingTest` regression pin into
+`BuildingPropertyTest` (`@Tag("property-test")`), sweeping all eight of the
+board's colour groups rather than only the reported two-street `brown` one —
+`Building.java` had no property-test coverage at all before this, unlike its
+siblings (`Deeds`, `Bankruptcy`, `Rent` each have one). Used
+`PropertyChecker.customized().withIterationCount(8)`, since jetCheck's
+default iteration count expects more distinct values than an 8-element
+`sampledFrom` domain can supply and throws `CannotSatisfyCondition`
+otherwise; 8 iterations exhaustively covers every group once. Confirmed the
+property test also catches the reverted-fix case identically.
+
+Verification, all green: acceptance pipeline 271/271; domain unit suite
+256/256; domain property-test suite (`-Pproperty-tests`) 20/20, including the
+new `BuildingPropertyTest`; cli unit suite 11/11, `keepsPlayingUntilToldToStop`
+sampled 20/20 with the domain fix and the player-count hardening.
+
+No further refactorer-owned issues found. Committing and handing the
+verified state back to the architect, closing this priority-`00` follow-up
+loop.
