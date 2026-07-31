@@ -12517,3 +12517,28 @@ hang or complete naturally). Unit suites green: domain 251, cli 9. Manifests
 runner to regenerate, per established precedent.
 
 Handing implementation to refactorer for review.
+
+## 2026-07-31T09:06:19Z — coder sent journal-logging handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260731T090619Z_000042_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: journal-logging
+commit: 77ff98af
+created_at: 2026-07-31T09:06:19.674Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 77ff98af
+```
+
+Summary: handed off the journal-logging implementation (SLF4J-readable
+`Journal.log` entries, cooperative `playUntilStopped`, the CLI `Simulator`
+start/stop/awaitEnd API, and the acceptance-side `GameLog`/step-handler
+support) at commit `77ff98af` for refactorer review.
