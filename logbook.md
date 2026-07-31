@@ -13409,3 +13409,56 @@ journal logging (`SLF4J(W): No SLF4J providers were found` seen throughout
 this session's CLI test runs) unlike the specs-core acceptance module, which
 already carries logback. Merging `f16bbb499a` into `swarmforge-coder` and
 implementing under coder rules next.
+
+## 2026-07-31T23:47:12Z — coder implemented cli-logging
+
+Action taken: implemented specifier `f16bbb499a` (task `cli-logging`).
+
+Failing-first evidence (before implementation): `the-monopoly-game-cli`'s
+`pom.xml` declared no `org.slf4j:slf4j-api` or `ch.qos.logback:logback-classic`
+dependency, so the new `cli-1` scenario in `en/cli-slf4j-config.feature` had
+no step handlers to execute it (`Unsupported step`) even after being added to
+`acceptance/pipeline-features.txt`.
+
+Implementation:
+
+- `the-monopoly-game-cli/pom.xml`: added `org.slf4j:slf4j-api` and
+  `ch.qos.logback:logback-classic` dependencies (unversioned, inherited from
+  the root `dependencyManagement`: 2.0.17 and 1.5.32 respectively — both above
+  the scenario's minimums of 1.7.0 and 1.2.0).
+- `acceptance/pipeline-features.txt`: registered
+  `specs-cli:en/cli-slf4j-config.feature` on the pipeline.
+- New `PomInspector.java` (specs-core acceptance support): resolves a
+  module's declared dependencies to `"groupId:artifactId" -> version`,
+  falling back to the repository root pom's `dependencyManagement` when the
+  module dependency carries no version of its own; locates the repo root by
+  walking up from the working directory until `moduleDirectory` is found
+  beneath it, since surefire's working directory is the specs-core module,
+  not the repo root.
+- New `PomStepHandlers.java`: step vocabulary for `Given the CLI module's
+  pom.xml in "<module>"`, `When I inspect the declared dependencies`, `Then
+  the project includes dependency "<groupId>:<artifactId>"`, and `And the
+  dependency version is at least "<minimum>"`; also carries a small
+  numeric dot-separated `atLeast` version comparator. Registered in
+  `MonopolyStepHandlers.handlers()` alongside the existing
+  Journal/GameLog handler groups.
+- `World.java`: added `selectPomModule`, `inspectPomDependencies`,
+  `assertPomDeclaresDependency`, and
+  `assertLastCheckedPomDependencyVersionAtLeast`, thinly delegating to
+  `PomInspector`/`PomStepHandlers` and remembering the last-checked
+  dependency coordinate between the two `Then` steps of the scenario.
+- `StepHandler.java`: generalized `Arguments.text(int)` to resolve every
+  `<placeholder>` found anywhere within a captured group, not only when the
+  whole capture is exactly one placeholder. Needed because
+  `"<groupId>:<artifactId>"` in the new scenario's `Then` step packs two
+  placeholders into one quoted capture; the prior implementation only
+  substituted when the entire capture matched a single `<name>`, so it left
+  the literal text `<groupId>:<artifactId>` unresolved. Backward compatible:
+  a capture that is exactly one placeholder still resolves the same way.
+
+Verification: full acceptance pipeline green —
+`acceptance/run-acceptance.sh`: `Tests run: 273, Failures: 0, Errors: 0`
+(271 prior + 2 new `cli-1` examples). Full `mvn test` across all modules:
+exit 0, no failures in any surefire report.
+
+Handing implementation to refactorer for review.
