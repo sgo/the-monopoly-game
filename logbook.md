@@ -13080,3 +13080,48 @@ colour group still offers a further house-build, which `Building.develop`
 then applies and crashes on (`IllegalStateException: ... already has a
 hotel.`). Merging `d5bd579068` into `swarmforge-coder` and fixing under coder
 rules next.
+
+## 2026-07-31T22:26:00Z — coder fixed the fully-hoteled-group build defect
+
+Root cause (matches the refactorer's and architect's diagnosis exactly):
+`Building.candidateBuildsFor` picks the group's lowest `levelOf` and offers a
+build for every street tied at that level. `levelOf` ranks a hoteled street
+above ordinary house levels, so it's normally excluded — except once every
+street in the group is hoteled, that shared level becomes the group's only
+(and therefore lowest) value, so the filter stops excluding them.
+`buildFor` then sees `housesBuiltOn == 0` (reset by `Deeds.buildHotel`)
+`!= hotelConstructionRequiresNumberOfHouses()` and emits a house-build for an
+already-hoteled street, which `Building.develop`'s unconditional loop applies
+and `Deeds.buildHouse` rejects by throwing.
+
+Fix: `candidateBuildsFor` now filters out `deeds.hasHotelOn(it)` streets
+outright, before the lowest-level comparison, so a fully-hoteled group always
+offers nothing (empty stream) rather than falling into the tie case. One line
+in `the-monopoly-game-domain/.../rules/Building.java`. The pre-existing
+`BuildingTest.developDoesNotOfferAFurtherBuildOnAColourGroupAlreadyFullyHoteled`
+(committed failing by the refactorer as the reproduction) now passes, and no
+other `Building`/`Deeds` test's behavior changed, since the new filter only
+ever removes candidates that would otherwise fail identically.
+
+Verification: domain suite green, 256/256 (`BuildingTest` included).
+Acceptance pipeline green, 271/271. Re-ran the crash's original symptom,
+`SimulatorTest.keepsPlayingUntilToldToStop`, 10 times in isolation
+(`-Dtest=SimulatorTest#keepsPlayingUntilToldToStop`): 0/10
+`IllegalStateException`s, versus 5/10 on the pre-fix code in the same
+sampling (confirmed by temporarily stashing this change and re-running).
+
+Separate, pre-existing flakiness noted but not touched: with the crash gone,
+that same test still fails intermittently (~3/12 in a later sample) on
+`assertThat(running.isPlaying()).isTrue()` after a hardcoded 1-second sleep,
+with no exception at all — confirmed by temporarily instrumenting the test to
+print the finished game's report: real 2-player `AgreeIfAffordable` games
+sometimes legitimately end (one player bankrupts on rent) within that one
+second. Reproduced identically on the pre-fix code, so this is a pre-existing
+test-design assumption (real, unseeded dice can finish faster than the
+sleep), not a regression from this fix and not part of the assigned finding;
+leaving it for whoever next touches that test to harden, rather than
+expanding this fix's scope. The acceptance pipeline doesn't exercise this
+timing-sensitive unit test, so it isn't affected.
+
+No further coder-owned implementation changes needed. Handing the result to
+the refactorer as normal for this priority-`00` follow-up loop.
