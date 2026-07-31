@@ -12107,3 +12107,29 @@ two minutes before cancellation, 43MB of journal output). The comment at the
 top of `run-acceptance.sh` documents that feature as held back because the
 turn loop behind it does not exist yet. The specifier owns this Gherkin
 scenario content defect; the architect did not edit the feature file.
+
+## 2026-07-31T07:53:15Z — architect received monopoly-pipeline-hang specifier return
+
+Handoff message received:
+
+```
+id: 20260731T075307Z_000034_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: specifier
+commit: c04840f518
+created_at: 2026-07-31T07:53:07.408989Z
+enqueued_at: 2026-07-31T07:53:07.977123Z
+task: monopoly-pipeline-hang
+dequeued_at: 2026-07-31T07:53:11.445865Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier c04840f518
+```
+
+Action taken: received the specifier's decision on the acceptance pipeline
+hang; merged the referenced commit before reviewing under architect rules.
