@@ -12839,3 +12839,34 @@ merge_and_process coder c024123ab8
 Summary: sent the `Simulator.run` dedup/fix (delegates to `start`/`awaitEnd`)
 at commit `c024123ab8` to the refactorer as this priority-`00` architect
 follow-up loop's next hop.
+
+## 2026-07-31T20:15:35Z — coder received second architect priority-00 follow-up
+
+Handoff message received:
+
+```
+id: 20260731T201511Z_000072_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: d5bd579068
+created_at: 2026-07-31T20:15:11.060998Z
+enqueued_at: 2026-07-31T20:15:11.839293Z
+task: journal-logging
+dequeued_at: 2026-07-31T20:15:35.510728Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d5bd579068
+```
+
+Action taken: another architect review loop under the same `journal-logging`
+task name — this time a real domain defect the refactorer found and the
+architect confirmed while reviewing the `Simulator.run` fix: a fully-hoteled
+colour group still offers a further house-build, which `Building.develop`
+then applies and crashes on (`IllegalStateException: ... already has a
+hotel.`). Merging `d5bd579068` into `swarmforge-coder` and fixing under coder
+rules next.
