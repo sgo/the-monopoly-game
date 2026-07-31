@@ -12871,3 +12871,73 @@ chronologically — no content lost). Reviewing the merged state
 (`Simulator.run` now delegating to `start`/`awaitEnd`, plus the architect's
 mutation-hardening tests in `SimulatorTest`, `GameTest`, `BankruptcyTest`)
 under refactorer rules next.
+
+## 2026-07-31T22:20:00Z — refactorer reviewed the Simulator.run follow-up and found a new defect
+
+CRAP (`crap4java`, domain + cli): clean. Only the long-exempt `Report.line`
+(31.6) exceeds the threshold, per the 2026-07-28 precedent. `Simulator.java`'s
+own methods are all at or under 6.0 (`main` sits exactly at 6.0), matching the
+figures from before this follow-up — the `run`→`start`/`awaitEnd` delegation
+didn't raise anything.
+
+DRY (`dry4java`, domain + cli): no finding touches `Simulator.java` or
+`SimulatorTest.java`. Everything reported is pre-existing duplication already
+assessed in earlier reviews (test-setup boilerplate, the accepted
+`Claim`/report-line builder catalog). Nothing to fix.
+
+Mutation-site scan (`mutate4java --scan`) on the one changed production file:
+`Simulator.java` 24 sites (down from before, since `run`'s body shrank to a
+single delegating line) — no split needed.
+
+Verification: domain unit suite green, 255/255. Acceptance pipeline green,
+271/271. The cli unit suite is not reliably green: `SimulatorTest.
+keepsPlayingUntilToldToStop` — new in this follow-up, letting a background
+game play for a full real second on real, unseeded dice with the default
+`AgreeIfAffordable` strategy — fails about 40% of the time locally (4/10 and
+then 4/10 again across two separate sampling runs) with an uncaught
+`IllegalStateException` in the `monopoly-simulator` daemon thread:
+`RueGrandeDinant already has a hotel.`, thrown from `Deeds.buildHouse` via
+`Building$Build.apply` via `Building.develop`. The thread dies silently
+(daemon, no handler), which is why `isPlaying()` reads back `false` and the
+assertion fails — the test failure is a symptom, the thread death is the real
+defect.
+
+Root cause, traced without modifying any production code (out of
+refactorer's remit — this is a behavior fix, not structural): `Building.
+buildFor` decides house-vs-hotel by comparing `deeds.housesBuiltOn(street) ==
+street.hotelConstructionRequiresNumberOfHouses()`, but `Deeds.buildHotel`
+resets house count to 0 once a hotel is built
+(`Improvement.withHotel()` → `new Improvement(0, true)`). So once every
+street in a colour group already has a hotel, `candidateBuildsFor` still
+selects them (their `levelOf` is tied at `requiresHouses + 1`, the group's
+current lowest), and `buildFor` sees `housesBuiltOn == 0 != requiresHouses`
+and emits a house-build instead of recognizing the group has nothing left to
+build. `Building.develop`'s `for (;;)` then calls `Deeds.buildHouse` on an
+already-hoteled street, which throws by design. This is a real, pre-existing
+gap in `Building`/`Deeds` (no notion of "this group is maxed, offer nothing
+more"), invisible until now because no earlier test let a real, undirected
+game run long enough with a strategy that always builds when affordable to
+reach a fully-hoteled group. Not a Gherkin content question either — this is
+implementation, not acceptance-criteria correctness.
+
+Property-test assessment: `Building.java` had no dedicated test file at all
+before this review — every earlier path to it went through full `Game`/
+`Simulator` runs with controlled dice that happened never to reach a
+fully-hoteled group. Added `BuildingTest.
+developDoesNotOfferAFurtherBuildOnAColourGroupAlreadyFullyHoteled`: gives a
+player the two-street `brown` group with both streets already hoteled and an
+`AgreeIfAffordable` strategy, then calls `Building.develop` directly.
+Deterministically reproduces the exact defect every run (confirmed 100% via
+repeated execution), isolating it from the 40%-flaky, 1-second real-dice path
+`SimulatorTest.keepsPlayingUntilToldToStop` needed to find it. This is
+coverage, not a behavior change: the test documents the invariant
+("develop() has nothing left to offer once a group is fully hoteled") and is
+committed failing, as the reproduction the coder needs. Domain suite is
+therefore 256 tests, 255 green, this one red by design until fixed.
+
+Not something for the refactorer to fix directly (requires changing
+`Building`'s build-selection logic, i.e., new behavior) or to silently work
+around. Handing this back to the architect per the priority-`00` follow-up
+routing rule (refactorer hands architect-follow-up results back to the
+architect, not forward to the coder), for the architect to route to the
+coder as it did for the prior `Simulator.run` finding.
