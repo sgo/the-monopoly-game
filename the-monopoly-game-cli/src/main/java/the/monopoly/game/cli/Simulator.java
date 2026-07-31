@@ -77,14 +77,7 @@ public final class Simulator {
   }
 
   public static Result run(int playerCount, Strategy.OfPlayers strategies) {
-    Result rejected = rejectOutOfRange(playerCount);
-    if (rejected != null) return rejected;
-
-    Rule.Set rules = Rule.Set.Type.official.create();
-    List<Player> players = rules.players().select(playerCount).toList();
-    Game.Result game = new Game(rules, players, player -> Cup.of(rules.dice().toList()), strategies).playToCompletion();
-    game.winner().orElseThrow();
-    return new Result(0, Report.of(game.journal()));
+    return start(playerCount, strategies).awaitEnd();
   }
 
   /**

@@ -12541,6 +12541,31 @@ runner to regenerate, per established precedent.
 
 Handing implementation to refactorer for review.
 
+## 2026-07-31T09:06:19Z — coder sent journal-logging handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260731T090619Z_000042_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: journal-logging
+commit: 77ff98af
+created_at: 2026-07-31T09:06:19.674Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 77ff98af
+```
+
+Summary: handed off the journal-logging implementation (SLF4J-readable
+`Journal.log` entries, cooperative `playUntilStopped`, the CLI `Simulator`
+start/stop/awaitEnd API, and the acceptance-side `GameLog`/step-handler
+support) at commit `77ff98af` for refactorer review.
+
 ## 2026-07-31T21:15:00Z — refactorer reviewed journal-logging/bounded-CLI implementation
 
 Action taken: merged coder commit `77ff98a` (task `journal-logging`, already
@@ -12609,6 +12634,30 @@ Verification after the split: acceptance pipeline green (271/271); domain
 251 and cli 9 unit tests green.
 
 Handing the verified state to the architect.
+
+## 2026-07-31T19:12:03Z — refactorer sent journal-logging review to architect
+
+Handoff message sent:
+
+```
+id: 20260731T191203Z_000054_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: journal-logging
+commit: 9b6e77deb0
+created_at: 2026-07-31T19:12:03.608907Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 9b6e77deb0
+```
+
+Summary: returned the journal-logging/bounded-CLI implementation after the
+mutation-site-driven `MonopolyStepHandlers` split, with CRAP/DRY/mutation-scan
+and full acceptance/unit verification all green.
 
 ## 2026-07-31T19:15:24Z — architect received journal-logging return from refactorer
 
@@ -12748,3 +12797,175 @@ Summary: sent the review commit (mutation-hardening tests across
 `Simulator.java`/`Game.java`/`Bankruptcy.java`, no production code changes)
 to the coder, carrying the logbook finding above about `Simulator.run`'s
 uncovered, still-unbounded blocking CLI path.
+
+## 2026-07-31T19:53:04Z — coder received architect priority-00 follow-up
+
+Handoff message received:
+
+```
+id: 20260731T195259Z_000071_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 9f4961c78a
+created_at: 2026-07-31T19:52:59.308106Z
+enqueued_at: 2026-07-31T19:52:59.444426Z
+task: journal-logging
+dequeued_at: 2026-07-31T19:53:04.228070Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 9f4961c78a
+```
+
+Action taken: this is an architect review loop for the already-accepted
+`journal-logging` task (mutation-coverage hardening in `Simulator.java`,
+`Game.java`, and `Bankruptcy.java`, plus manifest refresh), not a new
+specifier-originated phase. Merging `9f4961c78a` into `swarmforge-coder` and
+reviewing/verifying under coder rules next.
+
+## 2026-07-31T22:01:00Z — coder addressed architect's Simulator.run finding
+
+Action taken: reviewed the merged mutation-hardening state (`9f4961c78a`) and
+addressed the one open finding for the coder: `Simulator.run(int,
+Strategy.OfPlayers)` — the blocking path `main`/`execute`/`runSelected` use
+for a plain CLI invocation — duplicated `Simulator.start`'s game-construction
+and play-to-completion logic in a second, untested implementation, carrying
+the same non-termination risk that started `monopoly-pipeline-hang` with none
+of the coverage `start`/`awaitEnd` already have.
+
+Fix: `run` now delegates entirely to the tested bounded API —
+`return start(playerCount, strategies).awaitEnd();` — removing its own
+`Rule.Set`/`Game`/`winner().orElseThrow()`/`Report.of` body. `main` is now
+wired to the same `start`/`stop`/`awaitEnd` path already exercised by
+`SimulatorTest`'s `Running`-based tests and the bounded-time CLI acceptance
+scenarios, eliminating the duplicate, uncovered implementation rather than
+adding a second one to maintain. No externally observable behavior changed:
+`rejectsPlayerCountsOutsideTheOfficialRange` (out-of-range `run` call) still
+passes unchanged, since `rejectOutOfRange` is shared and `awaitEnd()` returns
+the same synchronous failure `Result` when `start` never spawns a thread.
+
+No new unit test added for `run`'s valid-input path: the only way to exercise
+it is to let a real-dice game reach natural completion synchronously, which
+is exactly the unbounded wait the CLI Gherkin scenarios were reworked away
+from (`3e718ed`) after the acceptance pipeline hang. That line remains the
+one irreducible risk boundary of a "block until a real game ends" feature,
+now living in one already-partially-tested place instead of two untested
+ones; a real invocation still exits on its own binary's normal process
+signals (Ctrl+C) same as before.
+
+Verification: unit suites green — domain 255, cli 11 (`mvn -B -pl
+the-monopoly-game-cli,the-monopoly-game-domain -am -Dmaven.repo.local=./tmp/m2
+test`). Acceptance pipeline green — `Tests run: 271, Failures: 0, Errors: 0`
+in ~28s, no hang. Manifest for `Simulator.java` left stale for the mutation
+runner to regenerate, per established precedent.
+
+No further coder-owned implementation changes needed beyond this fix. Handing
+the result to the refactorer as normal for this priority-`00` follow-up loop;
+the refactorer's return will go on to the architect per the standard
+follow-up routing.
+
+## 2026-07-31T22:05:00Z — refactorer received journal-logging follow-up from coder
+
+Handoff message received:
+
+```
+id: 20260731T200146Z_000043_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: coder
+commit: c024123ab8
+created_at: 2026-07-31T20:01:46.022157Z
+enqueued_at: 2026-07-31T20:01:46.874291Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process coder c024123ab8
+```
+
+Action taken: this is an architect priority-`00` follow-up loop for the
+already-accepted `journal-logging` task, routed to the coder for the
+`Simulator.run` fix and now returned to the refactorer as normal. Merged
+`c024123ab8` into `swarmforge-refactorer` (commit `7c418b7`, resolving an
+append-only conflict in this file by ordering both sides' entries
+chronologically — no content lost). Reviewing the merged state
+(`Simulator.run` now delegating to `start`/`awaitEnd`, plus the architect's
+mutation-hardening tests in `SimulatorTest`, `GameTest`, `BankruptcyTest`)
+under refactorer rules next.
+
+## 2026-07-31T22:20:00Z — refactorer reviewed the Simulator.run follow-up and found a new defect
+
+CRAP (`crap4java`, domain + cli): clean. Only the long-exempt `Report.line`
+(31.6) exceeds the threshold, per the 2026-07-28 precedent. `Simulator.java`'s
+own methods are all at or under 6.0 (`main` sits exactly at 6.0), matching the
+figures from before this follow-up — the `run`→`start`/`awaitEnd` delegation
+didn't raise anything.
+
+DRY (`dry4java`, domain + cli): no finding touches `Simulator.java` or
+`SimulatorTest.java`. Everything reported is pre-existing duplication already
+assessed in earlier reviews (test-setup boilerplate, the accepted
+`Claim`/report-line builder catalog). Nothing to fix.
+
+Mutation-site scan (`mutate4java --scan`) on the one changed production file:
+`Simulator.java` 24 sites (down from before, since `run`'s body shrank to a
+single delegating line) — no split needed.
+
+Verification: domain unit suite green, 255/255. Acceptance pipeline green,
+271/271. The cli unit suite is not reliably green: `SimulatorTest.
+keepsPlayingUntilToldToStop` — new in this follow-up, letting a background
+game play for a full real second on real, unseeded dice with the default
+`AgreeIfAffordable` strategy — fails about 40% of the time locally (4/10 and
+then 4/10 again across two separate sampling runs) with an uncaught
+`IllegalStateException` in the `monopoly-simulator` daemon thread:
+`RueGrandeDinant already has a hotel.`, thrown from `Deeds.buildHouse` via
+`Building$Build.apply` via `Building.develop`. The thread dies silently
+(daemon, no handler), which is why `isPlaying()` reads back `false` and the
+assertion fails — the test failure is a symptom, the thread death is the real
+defect.
+
+Root cause, traced without modifying any production code (out of
+refactorer's remit — this is a behavior fix, not structural): `Building.
+buildFor` decides house-vs-hotel by comparing `deeds.housesBuiltOn(street) ==
+street.hotelConstructionRequiresNumberOfHouses()`, but `Deeds.buildHotel`
+resets house count to 0 once a hotel is built
+(`Improvement.withHotel()` → `new Improvement(0, true)`). So once every
+street in a colour group already has a hotel, `candidateBuildsFor` still
+selects them (their `levelOf` is tied at `requiresHouses + 1`, the group's
+current lowest), and `buildFor` sees `housesBuiltOn == 0 != requiresHouses`
+and emits a house-build instead of recognizing the group has nothing left to
+build. `Building.develop`'s `for (;;)` then calls `Deeds.buildHouse` on an
+already-hoteled street, which throws by design. This is a real, pre-existing
+gap in `Building`/`Deeds` (no notion of "this group is maxed, offer nothing
+more"), invisible until now because no earlier test let a real, undirected
+game run long enough with a strategy that always builds when affordable to
+reach a fully-hoteled group. Not a Gherkin content question either — this is
+implementation, not acceptance-criteria correctness.
+
+Property-test assessment: `Building.java` had no dedicated test file at all
+before this review — every earlier path to it went through full `Game`/
+`Simulator` runs with controlled dice that happened never to reach a
+fully-hoteled group. Added `BuildingTest.
+developDoesNotOfferAFurtherBuildOnAColourGroupAlreadyFullyHoteled`: gives a
+player the two-street `brown` group with both streets already hoteled and an
+`AgreeIfAffordable` strategy, then calls `Building.develop` directly.
+Deterministically reproduces the exact defect every run (confirmed 100% via
+repeated execution), isolating it from the 40%-flaky, 1-second real-dice path
+`SimulatorTest.keepsPlayingUntilToldToStop` needed to find it. This is
+coverage, not a behavior change: the test documents the invariant
+("develop() has nothing left to offer once a group is fully hoteled") and is
+committed failing, as the reproduction the coder needs. Domain suite is
+therefore 256 tests, 255 green, this one red by design until fixed.
+
+Not something for the refactorer to fix directly (requires changing
+`Building`'s build-selection logic, i.e., new behavior) or to silently work
+around. Handing this back to the architect per the priority-`00` follow-up
+routing rule (refactorer hands architect-follow-up results back to the
+architect, not forward to the coder), for the architect to route to the
+coder as it did for the prior `Simulator.run` finding.
