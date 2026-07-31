@@ -12085,18 +12085,19 @@ reported only intentional possible-synonym findings.
 Handoff message sent:
 
 ```
-id: 20260731T072342Z_PLACEHOLDER_from_architect
+id: 20260731T072403Z_000069_from_architect
 from: architect
 to: specifier
 priority: 00
 type: git_handoff
 role: architect
 task: monopoly-pipeline-hang
-commit: PLACEHOLDER
+commit: 59bf4c256c
+created_at: 2026-07-31T07:24:03.559588Z
 
 Re-read your role and constitution.
 
-merge_and_process architect PLACEHOLDER
+merge_and_process architect 59bf4c256c
 ```
 
 Action taken: confirmed that `acceptance/run-acceptance.sh` hangs on the
