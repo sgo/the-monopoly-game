@@ -13275,3 +13275,165 @@ coder had noted but left unfixed. Generalized the `BuildingTest` regression
 pin into `BuildingPropertyTest`, sweeping all eight colour groups. All green:
 acceptance 271/271, domain unit 256/256, domain property tests 20/20, cli
 unit 11/11 (flake sampled 20/20).
+
+id: 20260731T203852Z_000056_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 54a959e3ed
+created_at: 2026-07-31T20:38:52Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 54a959e3ed
+```
+
+Action taken: merged `54a959e3ed` into `swarmforge-architect` (commit
+`79dcfb0`, resolving another append-only `logbook.md` conflict the same
+chronological way as the previous two).
+
+Independent verification of the merged state: `Building.candidateBuildsFor`
+now filters `deeds.hasHotelOn(it)` streets out before the lowest-level
+comparison — a minimal, structurally sound one-line fix that stays inside
+`Building`'s own responsibility, no boundary or coupling change.
+`mutate4java` on `Building.java` (differential): 7/8 killed. The one
+survivor — `levelOf`'s `hotelConstructionRequiresNumberOfHouses() + 1`
+mutated to `+ 0` — is equivalent now that the fix filters hoteled streets
+out unconditionally: a hoteled street's exact level value can no longer
+reach the output regardless of what it's compared against, so nothing
+distinguishes the two values. `dry4java` across `Building.java`,
+`BuildingTest.java`, `BuildingPropertyTest.java`, and the hardened
+`SimulatorTest.java`: no duplicates. Did not re-run the full soft Gherkin
+acceptance mutation pass again — nothing in this follow-up touched a
+feature file, and the last full pipeline run (this task, four follow-ups
+ago) was already clean.
+
+Both findings from this review thread are now resolved and independently
+verified: `Simulator.run` no longer duplicates an untested blocking
+implementation, and the fully-hoteled-group build crash is fixed with
+regression and property-test coverage. This also closes out the
+`monopoly-pipeline-hang` concern this thread absorbed — the real-dice CLI
+scenarios that used to hang now run on the bounded `start`/`stop`/`awaitEnd`
+path, confirmed clean under soft Gherkin acceptance mutation.
+
+No further coder/refactorer follow-up is warranted. Sending the
+phase-complete sync to the specifier under the `journal-logging` task name.
+
+## 2026-07-31T20:42:13Z — specifier received queued architect priority-00 follow-up for monopoly-pipeline-hang
+
+Handoff message received (dequeued from queue after 13+ hour delay):
+
+```
+id: 20260731T072403Z_000069_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: monopoly-pipeline-hang
+commit: 59bf4c256c
+created_at: 2026-07-31T07:24:03.559588Z
+enqueued_at: 2026-07-31T07:24:03.640057Z
+dequeued_at: 2026-07-31T20:42:13.802498Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 59bf4c256c
+```
+
+Action taken: acknowledged delayed queue delivery. This commit was already
+merged at `61bfaf3` and processed by the specifier on 2026-07-31T08:10:00Z,
+which resulted in the CLI scenario rework (`3e718ed`) and forward handoff to
+
+
+## 2026-07-31T21:14:20Z — coder received specifier handoff for cli-logging
+
+Handoff message received:
+
+```
+id: 20260731T211034Z_000036_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: f16bbb499a
+created_at: 2026-07-31T21:10:34.927070Z
+enqueued_at: 2026-07-31T21:10:35.175941Z
+task: cli-logging
+dequeued_at: 2026-07-31T21:14:20.604870Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier f16bbb499a
+```
+
+Action taken: a new specifier-originated task, `cli-logging` (the
+`journal-logging` task closed after the architect's phase-complete sync).
+The new scenario (`en/cli-slf4j-config.feature`, `cli-1`) specifies that the
+CLI module's `pom.xml` declares `org.slf4j:slf4j-api` (>=1.7.0) and
+`ch.qos.logback:logback-classic` (>=1.2.0) as dependencies — closing the gap
+where `Game.Journal.log` writes through SLF4J but the CLI module has no
+logging backend wired in, so `Simulator`-run games silently no-op their
+journal logging (`SLF4J(W): No SLF4J providers were found` seen throughout
+this session's CLI test runs) unlike the specs-core acceptance module, which
+already carries logback. Merging `f16bbb499a` into `swarmforge-coder` and
+implementing under coder rules next.
+
+## 2026-07-31T23:47:12Z — coder implemented cli-logging
+
+Action taken: implemented specifier `f16bbb499a` (task `cli-logging`).
+
+Failing-first evidence (before implementation): `the-monopoly-game-cli`'s
+`pom.xml` declared no `org.slf4j:slf4j-api` or `ch.qos.logback:logback-classic`
+dependency, so the new `cli-1` scenario in `en/cli-slf4j-config.feature` had
+no step handlers to execute it (`Unsupported step`) even after being added to
+`acceptance/pipeline-features.txt`.
+
+Implementation:
+
+- `the-monopoly-game-cli/pom.xml`: added `org.slf4j:slf4j-api` and
+  `ch.qos.logback:logback-classic` dependencies (unversioned, inherited from
+  the root `dependencyManagement`: 2.0.17 and 1.5.32 respectively — both above
+  the scenario's minimums of 1.7.0 and 1.2.0).
+- `acceptance/pipeline-features.txt`: registered
+  `specs-cli:en/cli-slf4j-config.feature` on the pipeline.
+- New `PomInspector.java` (specs-core acceptance support): resolves a
+  module's declared dependencies to `"groupId:artifactId" -> version`,
+  falling back to the repository root pom's `dependencyManagement` when the
+  module dependency carries no version of its own; locates the repo root by
+  walking up from the working directory until `moduleDirectory` is found
+  beneath it, since surefire's working directory is the specs-core module,
+  not the repo root.
+- New `PomStepHandlers.java`: step vocabulary for `Given the CLI module's
+  pom.xml in "<module>"`, `When I inspect the declared dependencies`, `Then
+  the project includes dependency "<groupId>:<artifactId>"`, and `And the
+  dependency version is at least "<minimum>"`; also carries a small
+  numeric dot-separated `atLeast` version comparator. Registered in
+  `MonopolyStepHandlers.handlers()` alongside the existing
+  Journal/GameLog handler groups.
+- `World.java`: added `selectPomModule`, `inspectPomDependencies`,
+  `assertPomDeclaresDependency`, and
+  `assertLastCheckedPomDependencyVersionAtLeast`, thinly delegating to
+  `PomInspector`/`PomStepHandlers` and remembering the last-checked
+  dependency coordinate between the two `Then` steps of the scenario.
+- `StepHandler.java`: generalized `Arguments.text(int)` to resolve every
+  `<placeholder>` found anywhere within a captured group, not only when the
+  whole capture is exactly one placeholder. Needed because
+  `"<groupId>:<artifactId>"` in the new scenario's `Then` step packs two
+  placeholders into one quoted capture; the prior implementation only
+  substituted when the entire capture matched a single `<name>`, so it left
+  the literal text `<groupId>:<artifactId>` unresolved. Backward compatible:
+  a capture that is exactly one placeholder still resolves the same way.
+
+Verification: full acceptance pipeline green —
+`acceptance/run-acceptance.sh`: `Tests run: 273, Failures: 0, Errors: 0`
+(271 prior + 2 new `cli-1` examples). Full `mvn test` across all modules:
+exit 0, no failures in any surefire report.
+
+Handing implementation to refactorer for review.

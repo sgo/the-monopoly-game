@@ -77,6 +77,9 @@ public class World {
   private Simulator.Result simulatorResult;
   private Simulator.Running runningSimulator;
   private final int gameLogOffset = GameLog.offset();
+  private String pomModuleDirectory;
+  private Map<String, String> pomDependencies;
+  private String lastCheckedPomDependency;
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
@@ -724,6 +727,38 @@ public class World {
     if (turnOrder == null)
       throw new AssertionError("Initiative has not been rolled for yet.");
     return turnOrder;
+  }
+
+  public void selectPomModule(String moduleDirectory) {
+    pomModuleDirectory = moduleDirectory;
+  }
+
+  public void inspectPomDependencies() {
+    if (pomModuleDirectory == null)
+      throw new AssertionError("No pom.xml module has been selected yet.");
+    pomDependencies = PomInspector.declaredDependencies(pomModuleDirectory);
+  }
+
+  public void assertPomDeclaresDependency(String coordinate) {
+    if (pomDependencies == null)
+      throw new AssertionError("The declared dependencies have not been inspected yet.");
+    if (!pomDependencies.containsKey(coordinate))
+      throw new AssertionError(
+          "Expected \"" + pomModuleDirectory + "\"'s pom.xml to declare \"" + coordinate
+              + "\" but it declares: " + pomDependencies.keySet());
+    lastCheckedPomDependency = coordinate;
+  }
+
+  public void assertLastCheckedPomDependencyVersionAtLeast(String minimum) {
+    String version = pomDependencies.get(lastCheckedPomDependency);
+    if (version == null)
+      throw new AssertionError(
+          "\"" + lastCheckedPomDependency + "\" has no resolvable version: not pinned in \""
+              + pomModuleDirectory + "\" and not managed by the parent pom.");
+    if (!PomStepHandlers.atLeast(version, minimum))
+      throw new AssertionError(
+          "Expected \"" + lastCheckedPomDependency + "\" version to be at least \"" + minimum
+              + "\" but found \"" + version + "\".");
   }
 
   private List<Player> players() {
