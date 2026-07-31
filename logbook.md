@@ -12088,3 +12088,35 @@ first turn.
 
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
+
+## 2026-07-31T06:32:00Z — specifier received phase-complete handoff from architect
+
+Handoff message received:
+
+```
+id: 20260729T183328Z_000068_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: a1021bbf07
+created_at: 2026-07-29T18:33:28.329639Z
+enqueued_at: 2026-07-29T18:33:29.360477Z
+task: phase15-cli
+dequeued_at: 2026-07-29T18:33:32.388249Z
+completed_at: 2026-07-29T18:33:57.409166Z
+
+Re-read your role and constitution.
+
+merge_and_process architect a1021bbf07
+```
+
+Action taken: merged architect commit `a1021bbf07` into `main` at merge
+commit `4095363`, resolving the `logbook.md` conflict while preserving both
+sides' entries. This closes the `phase15-cli` task: the CLI now creates
+official dice cups for normal play and completes only by the game's ordinary
+bankruptcy rule; all coder/refactorer follow-up loops were closed and accepted
+by the architect before this sync. Per the specifier role, asking the user
+for the next feature to add.
