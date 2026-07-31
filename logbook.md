@@ -13153,3 +13153,33 @@ timing-sensitive unit test, so it isn't affected.
 
 No further coder-owned implementation changes needed. Handing the result to
 the refactorer as normal for this priority-`00` follow-up loop.
+
+## 2026-07-31T22:30:00Z — refactorer received the Building fix from coder
+
+Handoff message received:
+
+```
+id: 20260731T202535Z_000044_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: coder
+commit: a4ba99df38
+created_at: 2026-07-31T20:25:35Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process coder a4ba99df38
+```
+
+Action taken: merged `a4ba99df38` into `swarmforge-refactorer` (commit
+`068813c`, resolving another append-only conflict in this file the same way
+as before — both sides' entries kept, ordered chronologically). This closes
+the loop on the `BuildingTest` finding sent up two follow-ups ago: the coder
+filtered `deeds.hasHotelOn(it)` streets out of `candidateBuildsFor` before
+the lowest-level tie comparison, so a fully-hoteled group now offers nothing
+rather than falling into the ambiguous tie case. Reviewing under refactorer
+rules next.
