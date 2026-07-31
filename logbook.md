@@ -12022,3 +12022,29 @@ Source: `pending-messages/50-20260729-164300-user.txt`.
 Action taken: checked the inbox (`ready_for_next.sh` reported `NO_TASK`);
 the mail this notification refers to was already delivered and processed in
 earlier sessions. The notification is stale; removed after logging.
+
+## 2026-07-31T07:25:06Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260731T072456Z_000033_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 8722cf186d
+created_at: 2026-07-31T07:24:56.316881Z
+enqueued_at: 2026-07-31T07:24:56.873506Z
+task: journal-logging
+dequeued_at: 2026-07-31T07:25:00.290084Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 8722cf186d
+```
+
+Action taken: merged specifier commit `8722cf186d` into `swarmforge-coder`;
+implementation review is next.
