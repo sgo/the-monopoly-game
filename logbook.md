@@ -12542,3 +12542,32 @@ Summary: handed off the journal-logging implementation (SLF4J-readable
 `Journal.log` entries, cooperative `playUntilStopped`, the CLI `Simulator`
 start/stop/awaitEnd API, and the acceptance-side `GameLog`/step-handler
 support) at commit `77ff98af` for refactorer review.
+
+## 2026-07-31T19:53:04Z — coder received architect priority-00 follow-up
+
+Handoff message received:
+
+```
+id: 20260731T195259Z_000071_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 9f4961c78a
+created_at: 2026-07-31T19:52:59.308106Z
+enqueued_at: 2026-07-31T19:52:59.444426Z
+task: journal-logging
+dequeued_at: 2026-07-31T19:53:04.228070Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 9f4961c78a
+```
+
+Action taken: this is an architect review loop for the already-accepted
+`journal-logging` task (mutation-coverage hardening in `Simulator.java`,
+`Game.java`, and `Bankruptcy.java`, plus manifest refresh), not a new
+specifier-originated phase. Merging `9f4961c78a` into `swarmforge-coder` and
+reviewing/verifying under coder rules next.
