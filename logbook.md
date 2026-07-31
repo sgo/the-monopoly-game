@@ -13245,3 +13245,33 @@ sampled 20/20 with the domain fix and the player-count hardening.
 No further refactorer-owned issues found. Committing and handing the
 verified state back to the architect, closing this priority-`00` follow-up
 loop.
+
+## 2026-07-31T20:38:52Z — refactorer sent journal-logging review to architect
+
+Handoff message sent:
+
+```
+id: 20260731T203852Z_000056_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: journal-logging
+commit: 54a959e3ed
+created_at: 2026-07-31T20:38:52.832316Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 54a959e3ed
+```
+
+Summary: verified the coder's `Building.candidateBuildsFor` fix (CRAP/DRY/
+mutation-scan clean, confirmed the fix actually matters by reverting it
+locally and watching `BuildingTest`/`BuildingPropertyTest` fail identically,
+then restoring). Hardened `SimulatorTest.keepsPlayingUntilToldToStop`
+(test-only, 2→8 players) to remove a separate, pre-existing timing flake the
+coder had noted but left unfixed. Generalized the `BuildingTest` regression
+pin into `BuildingPropertyTest`, sweeping all eight colour groups. All green:
+acceptance 271/271, domain unit 256/256, domain property tests 20/20, cli
+unit 11/11 (flake sampled 20/20).
