@@ -12868,6 +12868,30 @@ the result to the refactorer as normal for this priority-`00` follow-up loop;
 the refactorer's return will go on to the architect per the standard
 follow-up routing.
 
+## 2026-07-31T20:01:46Z — coder sent journal-logging follow-up handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260731T200146Z_000043_from_coder
+from: coder
+to: refactorer
+priority: 00
+type: git_handoff
+role: coder
+task: journal-logging
+commit: c024123ab8
+created_at: 2026-07-31T20:01:46.022157Z
+
+Re-read your role and constitution.
+
+merge_and_process coder c024123ab8
+```
+
+Summary: sent the `Simulator.run` dedup/fix (delegates to `start`/`awaitEnd`)
+at commit `c024123ab8` to the refactorer as this priority-`00` architect
+follow-up loop's next hop.
+
 ## 2026-07-31T22:05:00Z — refactorer received journal-logging follow-up from coder
 
 Handoff message received:
@@ -12970,6 +12994,34 @@ routing rule (refactorer hands architect-follow-up results back to the
 architect, not forward to the coder), for the architect to route to the
 coder as it did for the prior `Simulator.run` finding.
 
+## 2026-07-31T20:12:27Z — refactorer sent journal-logging review to architect
+
+Handoff message sent:
+
+```
+id: 20260731T201227Z_000055_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: journal-logging
+commit: 7ac4652419
+created_at: 2026-07-31T20:12:27.345133Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7ac4652419
+```
+
+Summary: CRAP/DRY/mutation-scan all clean on the `Simulator.run` follow-up;
+acceptance (271/271) and domain unit tests (255/255 pre-existing) green.
+Found and precisely reproduced a new, pre-existing defect while verifying —
+`Building.develop` throws once a colour group is fully hoteled, intermittently
+crashing the background simulator thread — with a new deterministic
+`BuildingTest`, committed failing as the reproduction for the coder. Not
+fixed here since it requires a behavior change.
+
 ## 2026-07-31T20:14:39Z — architect received journal-logging follow-up return from refactorer
 
 Handoff message received:
@@ -13051,3 +13103,171 @@ merge_and_process architect d5bd579068
 Summary: sent the merged, reviewed state (refactorer's `Simulator.run` fix
 confirmation plus the new `Building.develop` fully-hoteled-group defect,
 reproduced and confirmed) to the coder to fix the build-selection logic.
+
+## 2026-07-31T20:15:35Z — coder received second architect priority-00 follow-up
+
+Handoff message received:
+
+```
+id: 20260731T201511Z_000072_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: d5bd579068
+created_at: 2026-07-31T20:15:11.060998Z
+enqueued_at: 2026-07-31T20:15:11.839293Z
+task: journal-logging
+dequeued_at: 2026-07-31T20:15:35.510728Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d5bd579068
+```
+
+Action taken: another architect review loop under the same `journal-logging`
+task name — this time a real domain defect the refactorer found and the
+architect confirmed while reviewing the `Simulator.run` fix: a fully-hoteled
+colour group still offers a further house-build, which `Building.develop`
+then applies and crashes on (`IllegalStateException: ... already has a
+hotel.`). Merging `d5bd579068` into `swarmforge-coder` and fixing under coder
+rules next.
+
+## 2026-07-31T22:26:00Z — coder fixed the fully-hoteled-group build defect
+
+Root cause (matches the refactorer's and architect's diagnosis exactly):
+`Building.candidateBuildsFor` picks the group's lowest `levelOf` and offers a
+build for every street tied at that level. `levelOf` ranks a hoteled street
+above ordinary house levels, so it's normally excluded — except once every
+street in the group is hoteled, that shared level becomes the group's only
+(and therefore lowest) value, so the filter stops excluding them.
+`buildFor` then sees `housesBuiltOn == 0` (reset by `Deeds.buildHotel`)
+`!= hotelConstructionRequiresNumberOfHouses()` and emits a house-build for an
+already-hoteled street, which `Building.develop`'s unconditional loop applies
+and `Deeds.buildHouse` rejects by throwing.
+
+Fix: `candidateBuildsFor` now filters out `deeds.hasHotelOn(it)` streets
+outright, before the lowest-level comparison, so a fully-hoteled group always
+offers nothing (empty stream) rather than falling into the tie case. One line
+in `the-monopoly-game-domain/.../rules/Building.java`. The pre-existing
+`BuildingTest.developDoesNotOfferAFurtherBuildOnAColourGroupAlreadyFullyHoteled`
+(committed failing by the refactorer as the reproduction) now passes, and no
+other `Building`/`Deeds` test's behavior changed, since the new filter only
+ever removes candidates that would otherwise fail identically.
+
+Verification: domain suite green, 256/256 (`BuildingTest` included).
+Acceptance pipeline green, 271/271. Re-ran the crash's original symptom,
+`SimulatorTest.keepsPlayingUntilToldToStop`, 10 times in isolation
+(`-Dtest=SimulatorTest#keepsPlayingUntilToldToStop`): 0/10
+`IllegalStateException`s, versus 5/10 on the pre-fix code in the same
+sampling (confirmed by temporarily stashing this change and re-running).
+
+Separate, pre-existing flakiness noted but not touched: with the crash gone,
+that same test still fails intermittently (~3/12 in a later sample) on
+`assertThat(running.isPlaying()).isTrue()` after a hardcoded 1-second sleep,
+with no exception at all — confirmed by temporarily instrumenting the test to
+print the finished game's report: real 2-player `AgreeIfAffordable` games
+sometimes legitimately end (one player bankrupts on rent) within that one
+second. Reproduced identically on the pre-fix code, so this is a pre-existing
+test-design assumption (real, unseeded dice can finish faster than the
+sleep), not a regression from this fix and not part of the assigned finding;
+leaving it for whoever next touches that test to harden, rather than
+expanding this fix's scope. The acceptance pipeline doesn't exercise this
+timing-sensitive unit test, so it isn't affected.
+
+No further coder-owned implementation changes needed. Handing the result to
+the refactorer as normal for this priority-`00` follow-up loop.
+
+## 2026-07-31T22:30:00Z — refactorer received the Building fix from coder
+
+Handoff message received:
+
+```
+id: 20260731T202535Z_000044_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: coder
+commit: a4ba99df38
+created_at: 2026-07-31T20:25:35Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process coder a4ba99df38
+```
+
+Action taken: merged `a4ba99df38` into `swarmforge-refactorer` (commit
+`068813c`, resolving another append-only conflict in this file the same way
+as before — both sides' entries kept, ordered chronologically). This closes
+the loop on the `BuildingTest` finding sent up two follow-ups ago: the coder
+filtered `deeds.hasHotelOn(it)` streets out of `candidateBuildsFor` before
+the lowest-level tie comparison, so a fully-hoteled group now offers nothing
+rather than falling into the ambiguous tie case. Reviewing under refactorer
+rules next.
+
+## 2026-07-31T22:40:00Z — refactorer verified the Building fix and closed remaining gaps
+
+CRAP (`crap4java`, domain + cli): clean. `Building.candidateBuildsFor` is now
+1.0 with 100% coverage (exercised by `BuildingTest`, added two follow-ups
+ago); the rest of `Building.java` is unchanged and low. Only the long-exempt
+`Report.line` (31.6) exceeds the threshold.
+
+DRY (`dry4java`): the only new finding touches `BuildingTest`'s `ownerWith`
+helper (score 0.84 against `DeedsPropertyTest`'s) — the same already-accepted
+per-test-class `ownerWith` pattern every `*PropertyTest` file already repeats
+on its own; not a new category, left alone.
+
+Mutation-site scan (`mutate4java --scan`) on the one changed production
+file: `Building.java` 8 sites — no split needed.
+
+`BuildingTest` (added earlier as the failing reproduction) now passes: the
+coder's one-line filter fix is verified correct, and confirmed to actually
+matter by temporarily reverting it locally and watching both `BuildingTest`
+and the new `BuildingPropertyTest` (below) fail again with the identical
+`IllegalStateException`, then restoring it (no net diff against the merged
+commit).
+
+Re-ran the originally-reported flake, `SimulatorTest.
+keepsPlayingUntilToldToStop`, 20 times in isolation after the fix: 0/20
+failures — but only once `./tmp/m2` itself was rebuilt against the fixed
+domain source; the first re-run attempt still intermittently threw the exact
+same exception because that local repo still held the pre-fix domain jar
+from an earlier `-am install` that had only targeted the global repo. Once
+rebuilt, the crash is gone.
+
+Separately hardened `keepsPlayingUntilToldToStop` itself (test-only change,
+no production code touched): switched it from 2 players to 8. With real,
+unseeded dice a 2-player `AgreeIfAffordable` game can legitimately finish
+inside the test's 1-second sleep — measured empirically at ~60% of runs
+(18/30) — which fails the "still playing" assertion for a reason that has
+nothing to do with the simulator's correctness (this matches the "separate,
+pre-existing flakiness" the coder noted but explicitly left unfixed). 8
+players measured 0/30 finishing that fast in the same sampling, matching
+`acceptsThePlayerCountAtTheUpperBoundaryWhenStarted`'s existing precedent of
+using the upper bound for this kind of test. Combined with the domain fix,
+the test is now reliably green (20/20 sampled).
+
+Property-test assessment: generalized the `BuildingTest` regression pin into
+`BuildingPropertyTest` (`@Tag("property-test")`), sweeping all eight of the
+board's colour groups rather than only the reported two-street `brown` one —
+`Building.java` had no property-test coverage at all before this, unlike its
+siblings (`Deeds`, `Bankruptcy`, `Rent` each have one). Used
+`PropertyChecker.customized().withIterationCount(8)`, since jetCheck's
+default iteration count expects more distinct values than an 8-element
+`sampledFrom` domain can supply and throws `CannotSatisfyCondition`
+otherwise; 8 iterations exhaustively covers every group once. Confirmed the
+property test also catches the reverted-fix case identically.
+
+Verification, all green: acceptance pipeline 271/271; domain unit suite
+256/256; domain property-test suite (`-Pproperty-tests`) 20/20, including the
+new `BuildingPropertyTest`; cli unit suite 11/11, `keepsPlayingUntilToldToStop`
+sampled 20/20 with the domain fix and the player-count hardening.
+
+No further refactorer-owned issues found. Committing and handing the
+verified state back to the architect, closing this priority-`00` follow-up
+loop.

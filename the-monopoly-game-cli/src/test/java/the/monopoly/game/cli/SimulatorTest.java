@@ -111,7 +111,12 @@ class SimulatorTest {
 
   @Test
   void keepsPlayingUntilToldToStop() throws Exception {
-    Simulator.Running running = Simulator.start(2, Simulator.strategiesFor(2, List.of()));
+    // Eight players, not two: with real, unseeded dice a two-player game can
+    // legitimately finish inside the sleep below (observed in about 60% of
+    // runs), which would fail this assertion despite the simulator behaving
+    // correctly. Eight players reliably outlasts it (0/30 in the same
+    // sampling) without changing what the assertion proves.
+    Simulator.Running running = Simulator.start(8, Simulator.strategiesFor(8, List.of()));
 
     // A single round finishes far faster than this even under coverage
     // instrumentation; still playing here shows the simulation keeps going on
