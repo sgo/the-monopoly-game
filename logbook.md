@@ -13437,3 +13437,52 @@ Verification: full acceptance pipeline green —
 exit 0, no failures in any surefire report.
 
 Handing implementation to refactorer for review.
+
+## 2026-08-01T01:50:00Z — refactorer verified cli-logging implementation
+
+Merged `4eec050be1` from coder into `swarmforge-refactorer` (commit
+`2574136`, resolving append-only `logbook.md` conflict chronologically with
+architect's prior processing, specifier's follow-up, and coder's new task).
+
+Code quality assessment:
+
+**PomInspector.java** (new, 102 lines): Clean utility for parsing Maven
+pom.xml files and resolving dependency versions with inheritance fallback to
+the repository root's `dependencyManagement`. Proper XML parsing with DOCTYPE
+disabling for security. Simple, focused implementation with minimal cyclomatic
+complexity.
+
+**PomStepHandlers.java** (new, 43 lines): Focused step handler vocabulary
+plus a numeric dot-separated version comparator (`atLeast`). Straightforward
+logic, properly integrated into `MonopolyStepHandlers.handlers()`.
+
+**StepHandler.java (Arguments.text)** generalization: Extended placeholder
+resolution to handle multiple `<placeholders>` anywhere within a captured
+group (not just a single placeholder filling the entire capture). Uses
+Matcher.find() with StringBuilder for correct, efficient scanning. Backward
+compatible: single-placeholder captures resolve identically. Needed for
+`"<groupId>:<artifactId>"` packing two placeholders into one Gherkin step
+capture.
+
+**World.java** additions: Four thin delegation methods + two new fields
+(`pomModuleDirectory`, `pomDependencies`, `lastCheckedPomDependency`).
+Clean, minimal responsibilities.
+
+**CLI pom.xml**: Added SLF4J and Logback declarations (unversioned, inherit
+from parent at 2.0.17 and 1.5.32 respectively, both exceeding scenario
+requirements). Closes the gap where CLI scenarios run without a logging
+backend, silently no-opping `Game.Journal.log` calls.
+
+**Integration**: `PomStepHandlers` properly registered in
+`MonopolyStepHandlers.handlers()` stream; `pipeline-features.txt` updated to
+include the new scenario.
+
+No CRAP, DRY, or mutation-site concerns identified. All implementations are
+production-quality: focused, minimal complexity, good error messages, proper
+security practices (DOCTYPE disabling in XML parsing).
+
+**Test verification**: Full acceptance pipeline 273/273 (271 prior + 2 new
+`cli-1` examples). Exit 0 across all modules.
+
+No further refactorer-owned issues found. Committing and handing the
+verified state to the architect.
