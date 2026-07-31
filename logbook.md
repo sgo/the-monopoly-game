@@ -12720,3 +12720,31 @@ coverage are what fell out of step with each other.
 
 Committed the hardening tests and the mutation-refreshed feature manifests
 together with this review.
+
+## 2026-07-31T19:52:59Z — architect sent journal-logging CLI-entrypoint finding to coder
+
+Handoff message sent:
+
+```
+id: 20260731T195259Z_000071_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 9f4961c78a
+created_at: 2026-07-31T19:52:59.308106Z
+enqueued_at: 2026-07-31T19:52:59.444426Z
+task: journal-logging
+dequeued_at: 2026-07-31T19:53:04.228070Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 9f4961c78a
+```
+
+Summary: sent the review commit (mutation-hardening tests across
+`Simulator.java`/`Game.java`/`Bankruptcy.java`, no production code changes)
+to the coder, carrying the logbook finding above about `Simulator.run`'s
+uncovered, still-unbounded blocking CLI path.
