@@ -12056,3 +12056,29 @@ Action taken: aborted the merge of specifier commit `8722cf186d` (task
 the specifier needs to deal with a bug; wait for further instructions from
 them before proceeding. The handoff remains in `in_process`; no
 implementation work was started.
+
+## 2026-07-31T07:35:00Z — coder received specifier journal-logging follow-up
+
+Handoff message received:
+
+```
+id: 20260731T082154Z_000035_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 3e718ed0d6
+created_at: 2026-07-31T08:21:54.122709Z
+enqueued_at: 2026-07-31T08:21:54.366715Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3e718ed0d6
+```
+
+Action taken: merged specifier commit `3e718ed0d6`, which reworks the CLI
+real-dice scenarios into bounded-time journal-inspection checks; the earlier
+`8722cf186d` is its ancestor. Implementation review is next.
