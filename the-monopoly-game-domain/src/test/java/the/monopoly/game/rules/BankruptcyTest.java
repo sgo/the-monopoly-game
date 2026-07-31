@@ -128,6 +128,31 @@ class BankruptcyTest {
     assertThat(deeds.isMortgaged(land)).isFalse();
   }
 
+  /**
+   * The previous test gives the creditor a balance far beyond what lifting
+   * the mortgage costs, so it cannot tell the real mortgage-plus-interest
+   * price from a wildly wrong one. This one funds the creditor with exactly
+   * enough to absorb dog's $1,100 debt (withdrawn $2,600 against a $1,500
+   * balance) and then the $30 mortgage plus its $3 (10%, rounded up)
+   * interest, and nothing more.
+   */
+  @Test
+  void anAgreeableCreditorLiftsAnInheritedMortgageForExactlyItsPricePlusInterest() {
+    Deeds deeds = new Deeds();
+    Ownable land = (Ownable) rules.create(Street.Type.RueGrandeDinant);
+    give(deeds, land, dog);
+    dog.account().withdraw(new Money(2600));
+    highHat.account().withdraw(highHat.account().balance().amount().minus(new Money(1100 + 33)));
+    Strategy.OfPlayers strategies = player -> player.equals(highHat)
+        ? new the.monopoly.game.strategies.AgreeIfAffordable()
+        : Strategy.UNDECIDED;
+
+    new Bankruptcy(deeds, rules, players, strategies, new Events()).resolve(dog, highHat);
+
+    assertThat(deeds.ownerOf(land.type())).contains(highHat.id());
+    assertThat(deeds.isMortgaged(land)).isFalse();
+  }
+
   @Test
   void aCreditorInheritsTheBankruptPlayersGetOutOfJailFreeCard() {
     Deeds deeds = new Deeds();

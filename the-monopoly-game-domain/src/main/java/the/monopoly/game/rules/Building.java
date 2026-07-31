@@ -57,6 +57,7 @@ public class Building {
   private Stream<Build> candidateBuildsFor(List<ColourStreet> group) {
     int lowestLevel = group.stream().mapToInt(this::levelOf).min().orElse(Integer.MAX_VALUE);
     return group.stream()
+        .filter(it -> !deeds.hasHotelOn(it))
         .filter(it -> levelOf(it) == lowestLevel)
         .map(this::buildFor);
   }

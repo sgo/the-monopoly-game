@@ -21,6 +21,8 @@ import the.monopoly.game.strategies.Strategy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
@@ -127,6 +129,109 @@ class GameTest {
         new Entry.Bankrupt(dog.id(), null), new Entry.Won(twoPlayers.get(1).id())
     );
     assertThat(result.winner()).contains(twoPlayers.get(1));
+  }
+
+  /**
+   * The previous test's bankruptcy lands on the losing player's very first
+   * turn, so on its own it cannot tell a game that plays every round until
+   * completion from one that stops after just one round regardless. This
+   * scenario survives a first round unscathed and only goes bankrupt, to a
+   * player rather than the bank, on the second.
+   */
+  @Test
+  void aCompleteGameContinuesPastASurvivedRoundUntilBankruptcyLeavesOneWinner() {
+    List<Player> twoPlayers = ruleSet.players().select(2).toList();
+    Player dog = twoPlayers.getFirst();
+    Player highHat = twoPlayers.get(1);
+    dog.account().withdraw(dog.account().balance().amount().minus(new Money(5)));
+
+    Deeds deeds = new Deeds();
+    ColourStreet rentedStreet = street(Street.Type.SteenstraatBrugge);
+    giveStreetTo(deeds, highHat, rentedStreet);
+
+    Map<Player.ID, Cup> cups = Map.of(
+        dog.id(), Cup.of(new Roll(2, 2), new Roll(1, 2), new Roll(1, 2)),
+        highHat.id(), Cup.of(new Roll(5, 5), new Roll(4, 6), new Roll(2, 6))
+    );
+    Strategy.OfPlayers strategies = player ->
+        player.id().equals(highHat.id()) ? new AgreeIfAffordable() : Strategy.UNDECIDED;
+    Game.Result result = new Game(
+        ruleSet, twoPlayers, player -> cups.get(player.id()), strategies, deeds
+    ).playToCompletion();
+
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.Moved(dog.id(), 0, 3),
+        new Entry.Moved(dog.id(), 3, 6),
+        new Entry.RentPaid(dog.id(), highHat.id(), Street.Type.SteenstraatBrugge, new Money(6)),
+        new Entry.Bankrupt(dog.id(), highHat.id()), new Entry.Won(highHat.id())
+    );
+    assertThat(result.winner()).contains(highHat);
+  }
+
+  @Test
+  void aGameStopsBetweenRoundsWhenToldTo() {
+    AtomicBoolean stop = new AtomicBoolean();
+
+    Game.Result result = new Game(ruleSet, players, Cup.of(
+        new Roll(2, 2), new Roll(5, 5), new Roll(3, 3),
+        new Roll(1, 2), new Roll(2, 4), new Roll(4, 3)
+    )).playUntilStopped(() -> !stop.compareAndSet(false, true));
+
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.TurnStarted(Pawn.dog.id()),
+        new Entry.Rolled(Pawn.dog.id(), 7),
+        new Entry.Moved(Pawn.dog.id(), 0, 7)
+    );
+    assertThat(result.winner()).isEmpty();
+  }
+
+  /**
+   * Bankruptcy happens once, but the fixed turn order is asked about every
+   * player every round for as long as the game goes on. A bankrupt player
+   * must be skipped without ending the round early for whoever is still
+   * playing after them in that same order.
+   */
+  @Test
+  void aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem() {
+    List<Player> threePlayers = ruleSet.players().select(3).toList();
+    Player dog = threePlayers.get(0);
+    Player highHat = threePlayers.get(1);
+    Player ironBox = threePlayers.get(2);
+    ironBox.account().withdraw(ironBox.account().balance().amount().minus(new Money(5)));
+
+    Map<Player.ID, Cup> cups = Map.of(
+        dog.id(), Cup.of(new Roll(2, 2), new Roll(2, 3), new Roll(1, 4)),
+        highHat.id(), Cup.of(new Roll(5, 5), new Roll(2, 3), new Roll(2, 4)),
+        ironBox.id(), Cup.of(new Roll(3, 3), new Roll(1, 3))
+    );
+    AtomicInteger additionalRoundsAllowed = new AtomicInteger(1);
+    Game.Result result = new Game(
+        ruleSet, threePlayers, player -> cups.get(player.id()), Strategy.OfPlayers.NOBODY_DECIDES
+    ).playUntilStopped(() -> additionalRoundsAllowed.getAndDecrement() > 0);
+
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.Bankrupt(ironBox.id(), null),
+        new Entry.TurnStarted(highHat.id()),
+        new Entry.TurnStarted(dog.id())
+    );
+  }
+
+  @Test
+  void aGamePlaysAnotherRoundWhenToldItMay() {
+    AtomicInteger additionalRoundsAllowed = new AtomicInteger(1);
+
+    Game.Result result = new Game(ruleSet, players, Cup.of(
+        new Roll(2, 2), new Roll(5, 5), new Roll(3, 3),
+        new Roll(1, 2), new Roll(2, 4), new Roll(4, 3),
+        new Roll(1, 3), new Roll(2, 3), new Roll(1, 4)
+    )).playUntilStopped(() -> additionalRoundsAllowed.getAndDecrement() > 0);
+
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.TurnStarted(Pawn.dog.id()),
+        new Entry.Moved(Pawn.dog.id(), 0, 7),
+        new Entry.TurnStarted(Pawn.dog.id())
+    );
+    assertThat(result.winner()).isEmpty();
   }
 
   /**

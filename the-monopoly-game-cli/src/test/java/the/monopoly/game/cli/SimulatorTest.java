@@ -75,4 +75,60 @@ class SimulatorTest {
         .contains("received many players");
   }
 
+  @Test
+  void startsPlayingInTheBackgroundUntilStopped() {
+    Simulator.Running running = Simulator.start(2, Simulator.strategiesFor(2, List.of()));
+
+    assertThat(running.isPlaying()).isTrue();
+
+    running.stop();
+    Simulator.Result result = running.awaitEnd();
+
+    assertThat(result.succeeded()).isTrue();
+    assertThat(result.output()).contains("The game starts");
+    assertThat(running.isPlaying()).isFalse();
+  }
+
+  @Test
+  void rejectsAPlayerCountOutsideTheOfficialRangeWhenStarted() {
+    Simulator.Running running = Simulator.start(9, Strategy.OfPlayers.NOBODY_DECIDES);
+
+    assertThat(running.isPlaying()).isFalse();
+    assertThat(running.awaitEnd().succeeded()).isFalse();
+    assertThat(running.awaitEnd().output()).contains("received 9 players");
+  }
+
+  @Test
+  void acceptsThePlayerCountAtTheUpperBoundaryWhenStarted() {
+    Simulator.Running running = Simulator.start(8, Simulator.strategiesFor(8, List.of()));
+
+    assertThat(running.isPlaying()).isTrue();
+
+    running.stop();
+
+    assertThat(running.awaitEnd().succeeded()).isTrue();
+  }
+
+  @Test
+  void keepsPlayingUntilToldToStop() throws Exception {
+    // Eight players, not two: with real, unseeded dice a two-player game can
+    // legitimately finish inside the sleep below (observed in about 60% of
+    // runs), which would fail this assertion despite the simulator behaving
+    // correctly. Eight players reliably outlasts it (0/30 in the same
+    // sampling) without changing what the assertion proves.
+    Simulator.Running running = Simulator.start(8, Simulator.strategiesFor(8, List.of()));
+
+    // A single round finishes far faster than this even under coverage
+    // instrumentation; still playing here shows the simulation keeps going on
+    // its own rather than stopping after one round regardless of whether
+    // stop() was ever called.
+    Thread.sleep(1000);
+    assertThat(running.isPlaying()).isTrue();
+
+    running.stop();
+
+    assertThat(running.awaitEnd().succeeded()).isTrue();
+    assertThat(running.isPlaying()).isFalse();
+  }
+
 }

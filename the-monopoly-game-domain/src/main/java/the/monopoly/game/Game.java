@@ -25,6 +25,7 @@ import the.monopoly.game.strategies.Strategy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -89,15 +90,24 @@ public class Game {
   }
 
   public Result play() {
-    return play(false);
+    return play(false, () -> true);
   }
 
   /** Plays successive turns until only one player remains at the table. */
   public Result playToCompletion() {
-    return play(true);
+    return play(true, () -> true);
   }
 
-  private Result play(boolean untilComplete) {
+  /**
+   * Plays successive turns until the game is told to stop or only one player
+   * remains at the table. Stopping is cooperative: the game finishes the round
+   * it is on and then stops, however long the game would still have gone on.
+   */
+  public Result playUntilStopped(BooleanSupplier keepPlaying) {
+    return play(true, keepPlaying);
+  }
+
+  private Result play(boolean untilComplete, BooleanSupplier keepPlaying) {
     var journal = new Journal();
     journal.log(new Journal.Entry.Start(ids(players)));
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
@@ -107,18 +117,19 @@ public class Game {
     jail.observe(journalling);
     Building building = new Building(deeds, rules, strategies, journalling);
     Player builder = turnOrder.getFirst();
-    playTurns(turnOrder, builder, journal, journalling, building, untilComplete);
+    playTurns(turnOrder, builder, journal, journalling, building, untilComplete, keepPlaying);
 
     return new Result(turnOrder, journal.entries(), deeds, winner());
   }
 
   private void playTurns(List<Player> turnOrder, Player builder, Journal journal,
-                         Journalling journalling, Building building, boolean untilComplete) {
+                         Journalling journalling, Building building, boolean untilComplete,
+                         BooleanSupplier keepPlaying) {
     do {
       for (Player player : turnOrder) {
         if (playTurn(player, builder, turnOrder, journal, journalling, building)) break;
       }
-    } while (untilComplete && remainingPlayers().size() > 1);
+    } while (untilComplete && keepPlaying.getAsBoolean() && remainingPlayers().size() > 1);
   }
 
   private boolean playTurn(Player player, Player builder, List<Player> turnOrder, Journal journal,
@@ -287,7 +298,7 @@ public class Game {
 
     public void log(Entry evt) {
       entries.add(evt);
-      logger.info(evt.toString());
+      logger.info("{}", evt);
     }
 
     public List<Entry> entries() {
