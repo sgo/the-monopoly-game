@@ -11994,3 +11994,31 @@ first turn.
 
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
+
+## 2026-07-31T06:30:00Z — coder processed queued handoff notification
+
+Queued message received:
+
+```
+You have new handoff mail. If idle, run ready_for_next.sh.
+```
+
+Source: `pending-messages/50-20260729-130000-user.txt`.
+
+Action taken: checked the inbox (`ready_for_next.sh` reported `NO_TASK`);
+the mail this notification refers to was already delivered and processed in
+earlier sessions. The notification is stale; removed after logging.
+
+## 2026-07-31T06:30:00Z — coder processed queued handoff notification
+
+Queued message received:
+
+```
+You have new handoff mail. If idle, run ready_for_next.sh.
+```
+
+Source: `pending-messages/50-20260729-164300-user.txt`.
+
+Action taken: checked the inbox (`ready_for_next.sh` reported `NO_TASK`);
+the mail this notification refers to was already delivered and processed in
+earlier sessions. The notification is stale; removed after logging.
