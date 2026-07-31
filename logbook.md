@@ -13025,3 +13025,29 @@ This is not something the architect should implement directly (new domain
 behavior, not a structural change), so sending it to the coder as a
 priority-`00` follow-up under the same `journal-logging` task name, per the
 established loop-routing rule.
+
+## 2026-07-31T20:15:11Z — architect sent Building fully-hoteled-group defect to coder
+
+Handoff message sent:
+
+```
+id: 20260731T201511Z_000072_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: d5bd579068
+created_at: 2026-07-31T20:15:11.060998Z
+enqueued_at: 2026-07-31T20:15:11.839293Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process architect d5bd579068
+```
+
+Summary: sent the merged, reviewed state (refactorer's `Simulator.run` fix
+confirmation plus the new `Building.develop` fully-hoteled-group defect,
+reproduced and confirmed) to the coder to fix the build-selection logic.
