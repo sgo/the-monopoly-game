@@ -12635,6 +12635,30 @@ Verification after the split: acceptance pipeline green (271/271); domain
 
 Handing the verified state to the architect.
 
+## 2026-07-31T19:12:03Z — refactorer sent journal-logging review to architect
+
+Handoff message sent:
+
+```
+id: 20260731T191203Z_000054_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: journal-logging
+commit: 9b6e77deb0
+created_at: 2026-07-31T19:12:03.608907Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 9b6e77deb0
+```
+
+Summary: returned the journal-logging/bounded-CLI implementation after the
+mutation-site-driven `MonopolyStepHandlers` split, with CRAP/DRY/mutation-scan
+and full acceptance/unit verification all green.
+
 ## 2026-07-31T19:15:24Z — architect received journal-logging return from refactorer
 
 Handoff message received:
@@ -12746,6 +12770,34 @@ coverage are what fell out of step with each other.
 Committed the hardening tests and the mutation-refreshed feature manifests
 together with this review.
 
+## 2026-07-31T19:52:59Z — architect sent journal-logging CLI-entrypoint finding to coder
+
+Handoff message sent:
+
+```
+id: 20260731T195259Z_000071_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 9f4961c78a
+created_at: 2026-07-31T19:52:59.308106Z
+enqueued_at: 2026-07-31T19:52:59.444426Z
+task: journal-logging
+dequeued_at: 2026-07-31T19:53:04.228070Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 9f4961c78a
+```
+
+Summary: sent the review commit (mutation-hardening tests across
+`Simulator.java`/`Game.java`/`Bankruptcy.java`, no production code changes)
+to the coder, carrying the logbook finding above about `Simulator.run`'s
+uncovered, still-unbounded blocking CLI path.
+
 ## 2026-07-31T19:53:04Z — coder received architect priority-00 follow-up
 
 Handoff message received:
@@ -12839,6 +12891,164 @@ merge_and_process coder c024123ab8
 Summary: sent the `Simulator.run` dedup/fix (delegates to `start`/`awaitEnd`)
 at commit `c024123ab8` to the refactorer as this priority-`00` architect
 follow-up loop's next hop.
+
+## 2026-07-31T22:05:00Z — refactorer received journal-logging follow-up from coder
+
+Handoff message received:
+
+```
+id: 20260731T200146Z_000043_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: coder
+commit: c024123ab8
+created_at: 2026-07-31T20:01:46.022157Z
+enqueued_at: 2026-07-31T20:01:46.874291Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process coder c024123ab8
+```
+
+Action taken: this is an architect priority-`00` follow-up loop for the
+already-accepted `journal-logging` task, routed to the coder for the
+`Simulator.run` fix and now returned to the refactorer as normal. Merged
+`c024123ab8` into `swarmforge-refactorer` (commit `7c418b7`, resolving an
+append-only conflict in this file by ordering both sides' entries
+chronologically — no content lost). Reviewing the merged state
+(`Simulator.run` now delegating to `start`/`awaitEnd`, plus the architect's
+mutation-hardening tests in `SimulatorTest`, `GameTest`, `BankruptcyTest`)
+under refactorer rules next.
+
+## 2026-07-31T22:20:00Z — refactorer reviewed the Simulator.run follow-up and found a new defect
+
+CRAP (`crap4java`, domain + cli): clean. Only the long-exempt `Report.line`
+(31.6) exceeds the threshold, per the 2026-07-28 precedent. `Simulator.java`'s
+own methods are all at or under 6.0 (`main` sits exactly at 6.0), matching the
+figures from before this follow-up — the `run`→`start`/`awaitEnd` delegation
+didn't raise anything.
+
+DRY (`dry4java`, domain + cli): no finding touches `Simulator.java` or
+`SimulatorTest.java`. Everything reported is pre-existing duplication already
+assessed in earlier reviews (test-setup boilerplate, the accepted
+`Claim`/report-line builder catalog). Nothing to fix.
+
+Mutation-site scan (`mutate4java --scan`) on the one changed production file:
+`Simulator.java` 24 sites (down from before, since `run`'s body shrank to a
+single delegating line) — no split needed.
+
+Verification: domain unit suite green, 255/255. Acceptance pipeline green,
+271/271. The cli unit suite is not reliably green: `SimulatorTest.
+keepsPlayingUntilToldToStop` — new in this follow-up, letting a background
+game play for a full real second on real, unseeded dice with the default
+`AgreeIfAffordable` strategy — fails about 40% of the time locally (4/10 and
+then 4/10 again across two separate sampling runs) with an uncaught
+`IllegalStateException` in the `monopoly-simulator` daemon thread:
+`RueGrandeDinant already has a hotel.`, thrown from `Deeds.buildHouse` via
+`Building$Build.apply` via `Building.develop`. The thread dies silently
+(daemon, no handler), which is why `isPlaying()` reads back `false` and the
+assertion fails — the test failure is a symptom, the thread death is the real
+defect.
+
+Root cause, traced without modifying any production code (out of
+refactorer's remit — this is a behavior fix, not structural): `Building.
+buildFor` decides house-vs-hotel by comparing `deeds.housesBuiltOn(street) ==
+street.hotelConstructionRequiresNumberOfHouses()`, but `Deeds.buildHotel`
+resets house count to 0 once a hotel is built
+(`Improvement.withHotel()` → `new Improvement(0, true)`). So once every
+street in a colour group already has a hotel, `candidateBuildsFor` still
+selects them (their `levelOf` is tied at `requiresHouses + 1`, the group's
+current lowest), and `buildFor` sees `housesBuiltOn == 0 != requiresHouses`
+and emits a house-build instead of recognizing the group has nothing left to
+build. `Building.develop`'s `for (;;)` then calls `Deeds.buildHouse` on an
+already-hoteled street, which throws by design. This is a real, pre-existing
+gap in `Building`/`Deeds` (no notion of "this group is maxed, offer nothing
+more"), invisible until now because no earlier test let a real, undirected
+game run long enough with a strategy that always builds when affordable to
+reach a fully-hoteled group. Not a Gherkin content question either — this is
+implementation, not acceptance-criteria correctness.
+
+Property-test assessment: `Building.java` had no dedicated test file at all
+before this review — every earlier path to it went through full `Game`/
+`Simulator` runs with controlled dice that happened never to reach a
+fully-hoteled group. Added `BuildingTest.
+developDoesNotOfferAFurtherBuildOnAColourGroupAlreadyFullyHoteled`: gives a
+player the two-street `brown` group with both streets already hoteled and an
+`AgreeIfAffordable` strategy, then calls `Building.develop` directly.
+Deterministically reproduces the exact defect every run (confirmed 100% via
+repeated execution), isolating it from the 40%-flaky, 1-second real-dice path
+`SimulatorTest.keepsPlayingUntilToldToStop` needed to find it. This is
+coverage, not a behavior change: the test documents the invariant
+("develop() has nothing left to offer once a group is fully hoteled") and is
+committed failing, as the reproduction the coder needs. Domain suite is
+therefore 256 tests, 255 green, this one red by design until fixed.
+
+Not something for the refactorer to fix directly (requires changing
+`Building`'s build-selection logic, i.e., new behavior) or to silently work
+around. Handing this back to the architect per the priority-`00` follow-up
+routing rule (refactorer hands architect-follow-up results back to the
+architect, not forward to the coder), for the architect to route to the
+coder as it did for the prior `Simulator.run` finding.
+
+## 2026-07-31T20:14:39Z — architect received journal-logging follow-up return from refactorer
+
+Handoff message received:
+
+```
+id: 20260731T201227Z_000055_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 7ac4652419
+created_at: 2026-07-31T20:12:27Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7ac4652419
+```
+
+Action taken: merged `7ac4652419` into `swarmforge-architect` (commit
+`994c0de`, resolving an append-only conflict in this file the same way as
+the coder-to-refactorer merge — both sides' entries kept, ordered
+chronologically, no content lost).
+
+Reviewed the merged state under architect rules. The CLI-boundary fix for
+the earlier `Simulator.run` finding is exactly what was asked: `run` is now
+`return start(playerCount, strategies).awaitEnd();` — no new coupling, the
+CLI stays a thin boundary over the domain, and the previously-duplicated
+blocking implementation is gone rather than left as a second untested path.
+
+Confirmed the refactorer's new finding directly: ran `BuildingTest`, and
+`developDoesNotOfferAFurtherBuildOnAColourGroupAlreadyFullyHoteled` fails
+exactly as reported —
+`IllegalStateException: RueGrandeDinant already has a hotel.` at
+`Deeds.buildHouse` via `Building$Build.apply` via `Building.develop`. Read
+`Building.java` to verify the diagnosis: `levelOf` correctly ranks a
+fully-hoteled street above ordinary house levels
+(`hotelConstructionRequiresNumberOfHouses() + 1`), but once every street in
+an owned group reaches that level together, it becomes the group's *only*
+(and therefore *lowest*) level, so `candidateBuildsFor` keeps offering all
+of them. `buildFor` then compares `housesBuiltOn(street)` — which
+`Deeds.buildHotel` resets to 0 — against `hotelConstructionRequiresNumberOfHouses()`,
+finds them unequal, and emits a house-build for an already-hoteled street.
+`Building.develop`'s unconditional `for (;;)` loop then applies it and
+throws. This is real production logic, not a Gherkin content question:
+`candidateBuildsFor`/`buildFor` need to recognize a fully-hoteled group as
+having nothing left to offer, rather than construction-selection logic
+falling to the coder for a fix.
+
+This is not something the architect should implement directly (new domain
+behavior, not a structural change), so sending it to the coder as a
+priority-`00` follow-up under the same `journal-logging` task name, per the
+established loop-routing rule.
 
 ## 2026-07-31T20:15:35Z — coder received second architect priority-00 follow-up
 
