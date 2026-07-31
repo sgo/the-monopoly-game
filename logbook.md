@@ -11026,6 +11026,28 @@ The CLI now creates official dice cups for normal play and completes only by
 the game's ordinary bankruptcy rule. Focused CLI reactor verification passed.
 All coder/refactorer loops are closed; route the completed phase to specifier.
 
+## 2026-07-29T18:33:28Z — architect sent Phase 15 real-game completion sync to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T183328Z_000068_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: a1021bbf07
+created_at: 2026-07-29T18:33:28.329639Z
+
+Re-read your role and constitution.
+
+merge_and_process architect a1021bbf07
+```
+
+Action taken: sent the completed real-game CLI phase to specifier.
+
 ## 2026-07-29T18:28:58Z — architect queued incoming-handoff notification
 
 Queued message received while processing the active return:
@@ -12121,6 +12143,33 @@ bankruptcy rule; all coder/refactorer follow-up loops were closed and accepted
 by the architect before this sync. Per the specifier role, asking the user
 for the next feature to add.
 
+## 2026-07-31T07:23:42Z — architect sent acceptance pipeline hang follow-up to specifier
+
+Handoff message sent:
+
+```
+id: 20260731T072342Z_PLACEHOLDER_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: monopoly-pipeline-hang
+commit: PLACEHOLDER
+
+Re-read your role and constitution.
+
+merge_and_process architect PLACEHOLDER
+```
+
+Action taken: confirmed that `acceptance/run-acceptance.sh` hangs on the
+`en/monopoly.feature` scenario: it is on the pipeline again, but the whole
+played-out game never terminates (about 9.7 million turns logged in roughly
+two minutes before cancellation, 43MB of journal output). The comment at the
+top of `run-acceptance.sh` documents that feature as held back because the
+turn loop behind it does not exist yet. The specifier owns this Gherkin
+scenario content defect; the architect did not edit the feature file.
+
 ## 2026-07-31T07:25:00Z — specifier sent journal logging specification to coder
 
 Handoff message sent:
@@ -12154,3 +12203,34 @@ Verification: the new feature parses successfully with the APS
 `gherkin-parser`, and `ir-dry-checker` reported only the established baseline
 possible-synonym findings; the mutation-manifest header will be stamped by
 the pipeline on its first mutation run.
+
+## 2026-07-31T07:30:00Z — specifier received acceptance pipeline hang handoff from architect
+
+Handoff message received:
+
+```
+id: 20260731T072403Z_000069_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: 59bf4c256c
+created_at: 2026-07-31T07:24:03.559588Z
+enqueued_at: 2026-07-31T07:24:03.640057Z
+task: monopoly-pipeline-hang
+
+Re-read your role and constitution.
+
+merge_and_process architect 59bf4c256c
+```
+
+Action taken: merged architect commit `59bf4c256c`, preserving the architect's
+acceptance-pipeline-hang finding alongside the pending journal-logging
+specification handoff record. The finding: `en/monopoly.feature` is on the
+acceptance pipeline again, but the whole played-out game never terminates
+(about 9.7 million turns logged in roughly two minutes before cancellation,
+43MB of journal output), because the turn loop behind it does not exist yet.
+Per the architect, the specifier owns this Gherkin scenario content defect.
+Investigating the `en/monopoly.feature` scenario content next.
