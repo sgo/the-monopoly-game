@@ -12994,6 +12994,34 @@ routing rule (refactorer hands architect-follow-up results back to the
 architect, not forward to the coder), for the architect to route to the
 coder as it did for the prior `Simulator.run` finding.
 
+## 2026-07-31T20:12:27Z — refactorer sent journal-logging review to architect
+
+Handoff message sent:
+
+```
+id: 20260731T201227Z_000055_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: journal-logging
+commit: 7ac4652419
+created_at: 2026-07-31T20:12:27.345133Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7ac4652419
+```
+
+Summary: CRAP/DRY/mutation-scan all clean on the `Simulator.run` follow-up;
+acceptance (271/271) and domain unit tests (255/255 pre-existing) green.
+Found and precisely reproduced a new, pre-existing defect while verifying —
+`Building.develop` throws once a colour group is fully hoteled, intermittently
+crashing the background simulator thread — with a new deterministic
+`BuildingTest`, committed failing as the reproduction for the coder. Not
+fixed here since it requires a behavior change.
+
 ## 2026-07-31T20:14:39Z — architect received journal-logging follow-up return from refactorer
 
 Handoff message received:
@@ -13049,6 +13077,32 @@ This is not something the architect should implement directly (new domain
 behavior, not a structural change), so sending it to the coder as a
 priority-`00` follow-up under the same `journal-logging` task name, per the
 established loop-routing rule.
+
+## 2026-07-31T20:15:11Z — architect sent Building fully-hoteled-group defect to coder
+
+Handoff message sent:
+
+```
+id: 20260731T201511Z_000072_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: d5bd579068
+created_at: 2026-07-31T20:15:11.060998Z
+enqueued_at: 2026-07-31T20:15:11.839293Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process architect d5bd579068
+```
+
+Summary: sent the merged, reviewed state (refactorer's `Simulator.run` fix
+confirmation plus the new `Building.develop` fully-hoteled-group defect,
+reproduced and confirmed) to the coder to fix the build-selection logic.
 
 ## 2026-07-31T20:15:35Z — coder received second architect priority-00 follow-up
 
@@ -13149,6 +13203,177 @@ merge_and_process coder a4ba99df38
 Summary: sent the `Building.candidateBuildsFor` fully-hoteled-group fix at
 commit `a4ba99df38` to the refactorer as this priority-`00` architect
 follow-up loop's next hop.
+
+## 2026-07-31T22:30:00Z — refactorer received the Building fix from coder
+
+Handoff message received:
+
+```
+id: 20260731T202535Z_000044_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 00
+type: git_handoff
+role: coder
+commit: a4ba99df38
+created_at: 2026-07-31T20:25:35Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process coder a4ba99df38
+```
+
+Action taken: merged `a4ba99df38` into `swarmforge-refactorer` (commit
+`068813c`, resolving another append-only conflict in this file the same way
+as before — both sides' entries kept, ordered chronologically). This closes
+the loop on the `BuildingTest` finding sent up two follow-ups ago: the coder
+filtered `deeds.hasHotelOn(it)` streets out of `candidateBuildsFor` before
+the lowest-level tie comparison, so a fully-hoteled group now offers nothing
+rather than falling into the ambiguous tie case. Reviewing under refactorer
+rules next.
+
+## 2026-07-31T22:40:00Z — refactorer verified the Building fix and closed remaining gaps
+
+CRAP (`crap4java`, domain + cli): clean. `Building.candidateBuildsFor` is now
+1.0 with 100% coverage (exercised by `BuildingTest`, added two follow-ups
+ago); the rest of `Building.java` is unchanged and low. Only the long-exempt
+`Report.line` (31.6) exceeds the threshold.
+
+DRY (`dry4java`): the only new finding touches `BuildingTest`'s `ownerWith`
+helper (score 0.84 against `DeedsPropertyTest`'s) — the same already-accepted
+per-test-class `ownerWith` pattern every `*PropertyTest` file already repeats
+on its own; not a new category, left alone.
+
+Mutation-site scan (`mutate4java --scan`) on the one changed production
+file: `Building.java` 8 sites — no split needed.
+
+`BuildingTest` (added earlier as the failing reproduction) now passes: the
+coder's one-line filter fix is verified correct, and confirmed to actually
+matter by temporarily reverting it locally and watching both `BuildingTest`
+and the new `BuildingPropertyTest` (below) fail again with the identical
+`IllegalStateException`, then restoring it (no net diff against the merged
+commit).
+
+Re-ran the originally-reported flake, `SimulatorTest.
+keepsPlayingUntilToldToStop`, 20 times in isolation after the fix: 0/20
+failures — but only once `./tmp/m2` itself was rebuilt against the fixed
+domain source; the first re-run attempt still intermittently threw the exact
+same exception because that local repo still held the pre-fix domain jar
+from an earlier `-am install` that had only targeted the global repo. Once
+rebuilt, the crash is gone.
+
+Separately hardened `keepsPlayingUntilToldToStop` itself (test-only change,
+no production code touched): switched it from 2 players to 8. With real,
+unseeded dice a 2-player `AgreeIfAffordable` game can legitimately finish
+inside the test's 1-second sleep — measured empirically at ~60% of runs
+(18/30) — which fails the "still playing" assertion for a reason that has
+nothing to do with the simulator's correctness (this matches the "separate,
+pre-existing flakiness" the coder noted but explicitly left unfixed). 8
+players measured 0/30 finishing that fast in the same sampling, matching
+`acceptsThePlayerCountAtTheUpperBoundaryWhenStarted`'s existing precedent of
+using the upper bound for this kind of test. Combined with the domain fix,
+the test is now reliably green (20/20 sampled).
+
+Property-test assessment: generalized the `BuildingTest` regression pin into
+`BuildingPropertyTest` (`@Tag("property-test")`), sweeping all eight of the
+board's colour groups rather than only the reported two-street `brown` one —
+`Building.java` had no property-test coverage at all before this, unlike its
+siblings (`Deeds`, `Bankruptcy`, `Rent` each have one). Used
+`PropertyChecker.customized().withIterationCount(8)`, since jetCheck's
+default iteration count expects more distinct values than an 8-element
+`sampledFrom` domain can supply and throws `CannotSatisfyCondition`
+otherwise; 8 iterations exhaustively covers every group once. Confirmed the
+property test also catches the reverted-fix case identically.
+
+Verification, all green: acceptance pipeline 271/271; domain unit suite
+256/256; domain property-test suite (`-Pproperty-tests`) 20/20, including the
+new `BuildingPropertyTest`; cli unit suite 11/11, `keepsPlayingUntilToldToStop`
+sampled 20/20 with the domain fix and the player-count hardening.
+
+No further refactorer-owned issues found. Committing and handing the
+verified state back to the architect, closing this priority-`00` follow-up
+loop.
+
+## 2026-07-31T20:41:36Z — architect accepted the closed journal-logging follow-up loop
+
+Handoff message received:
+
+```
+id: 20260731T203852Z_000056_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 54a959e3ed
+created_at: 2026-07-31T20:38:52Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 54a959e3ed
+```
+
+Action taken: merged `54a959e3ed` into `swarmforge-architect` (commit
+`79dcfb0`, resolving another append-only `logbook.md` conflict the same
+chronological way as the previous two).
+
+Independent verification of the merged state: `Building.candidateBuildsFor`
+now filters `deeds.hasHotelOn(it)` streets out before the lowest-level
+comparison — a minimal, structurally sound one-line fix that stays inside
+`Building`'s own responsibility, no boundary or coupling change.
+`mutate4java` on `Building.java` (differential): 7/8 killed. The one
+survivor — `levelOf`'s `hotelConstructionRequiresNumberOfHouses() + 1`
+mutated to `+ 0` — is equivalent now that the fix filters hoteled streets
+out unconditionally: a hoteled street's exact level value can no longer
+reach the output regardless of what it's compared against, so nothing
+distinguishes the two values. `dry4java` across `Building.java`,
+`BuildingTest.java`, `BuildingPropertyTest.java`, and the hardened
+`SimulatorTest.java`: no duplicates. Did not re-run the full soft Gherkin
+acceptance mutation pass again — nothing in this follow-up touched a
+feature file, and the last full pipeline run (this task, four follow-ups
+ago) was already clean.
+
+Both findings from this review thread are now resolved and independently
+verified: `Simulator.run` no longer duplicates an untested blocking
+implementation, and the fully-hoteled-group build crash is fixed with
+regression and property-test coverage. This also closes out the
+`monopoly-pipeline-hang` concern this thread absorbed — the real-dice CLI
+scenarios that used to hang now run on the bounded `start`/`stop`/`awaitEnd`
+path, confirmed clean under soft Gherkin acceptance mutation.
+
+No further coder/refactorer follow-up is warranted. Sending the
+phase-complete sync to the specifier under the `journal-logging` task name.
+
+## 2026-07-31T20:42:13Z — specifier received queued architect priority-00 follow-up for monopoly-pipeline-hang
+
+Handoff message received (dequeued from queue after 13+ hour delay):
+
+```
+id: 20260731T072403Z_000069_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: monopoly-pipeline-hang
+commit: 59bf4c256c
+created_at: 2026-07-31T07:24:03.559588Z
+enqueued_at: 2026-07-31T07:24:03.640057Z
+dequeued_at: 2026-07-31T20:42:13.802498Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 59bf4c256c
+```
+
+Action taken: acknowledged delayed queue delivery. This commit was already
+merged at `61bfaf3` and processed by the specifier on 2026-07-31T08:10:00Z,
+which resulted in the CLI scenario rework (`3e718ed`) and forward handoff to
+the coder (`a70bd23`). No further action required.
 
 ## 2026-07-31T21:14:20Z — coder received specifier handoff for cli-logging
 
