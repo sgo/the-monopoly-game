@@ -13271,3 +13271,55 @@ sampled 20/20 with the domain fix and the player-count hardening.
 No further refactorer-owned issues found. Committing and handing the
 verified state back to the architect, closing this priority-`00` follow-up
 loop.
+
+## 2026-07-31T20:41:36Z — architect accepted the closed journal-logging follow-up loop
+
+Handoff message received:
+
+```
+id: 20260731T203852Z_000056_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 54a959e3ed
+created_at: 2026-07-31T20:38:52Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 54a959e3ed
+```
+
+Action taken: merged `54a959e3ed` into `swarmforge-architect` (commit
+`79dcfb0`, resolving another append-only `logbook.md` conflict the same
+chronological way as the previous two).
+
+Independent verification of the merged state: `Building.candidateBuildsFor`
+now filters `deeds.hasHotelOn(it)` streets out before the lowest-level
+comparison — a minimal, structurally sound one-line fix that stays inside
+`Building`'s own responsibility, no boundary or coupling change.
+`mutate4java` on `Building.java` (differential): 7/8 killed. The one
+survivor — `levelOf`'s `hotelConstructionRequiresNumberOfHouses() + 1`
+mutated to `+ 0` — is equivalent now that the fix filters hoteled streets
+out unconditionally: a hoteled street's exact level value can no longer
+reach the output regardless of what it's compared against, so nothing
+distinguishes the two values. `dry4java` across `Building.java`,
+`BuildingTest.java`, `BuildingPropertyTest.java`, and the hardened
+`SimulatorTest.java`: no duplicates. Did not re-run the full soft Gherkin
+acceptance mutation pass again — nothing in this follow-up touched a
+feature file, and the last full pipeline run (this task, four follow-ups
+ago) was already clean.
+
+Both findings from this review thread are now resolved and independently
+verified: `Simulator.run` no longer duplicates an untested blocking
+implementation, and the fully-hoteled-group build crash is fixed with
+regression and property-test coverage. This also closes out the
+`monopoly-pipeline-hang` concern this thread absorbed — the real-dice CLI
+scenarios that used to hang now run on the bounded `start`/`stop`/`awaitEnd`
+path, confirmed clean under soft Gherkin acceptance mutation.
+
+No further coder/refactorer follow-up is warranted. Sending the
+phase-complete sync to the specifier under the `journal-logging` task name.
