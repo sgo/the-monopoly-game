@@ -12540,3 +12540,72 @@ hang or complete naturally). Unit suites green: domain 251, cli 9. Manifests
 runner to regenerate, per established precedent.
 
 Handing implementation to refactorer for review.
+
+## 2026-07-31T21:15:00Z — refactorer reviewed journal-logging/bounded-CLI implementation
+
+Action taken: merged coder commit `77ff98a` (task `journal-logging`, already
+present on this branch as `4efda23`). Also found commit `2bd9c63` already on
+this branch, undocumented: an earlier pass had extracted
+`announceWinnerIfOnlyOneRemains` from `Bankruptcy.resolve` (CRAP 7 -> 6) and
+`isHelpRequested`/`runSelected` from `Simulator.execute` (CRAP 10.1 -> 5), and
+added `BankruptcyPropertyTest` (never a negative balance, bankrupt means
+nothing left, resolving again is a no-op). Logging it now for the record
+since no logbook note existed for it.
+
+Verification before structural changes: acceptance pipeline green (271/271,
+26.6s); domain 251 and cli 9 unit tests green.
+
+`crap4java` (`the-monopoly-game-domain`, `the-monopoly-game-cli`): every
+production method at or below CRAP 6,0 except the long-standing exempt
+sealed-switch dispatch `Report.line` (31,6). No structural changes needed.
+
+`dry4java` on the same two modules: only the two long-standing, already-
+declined categories — `Game.java`'s per-event-type `Journalling` overrides,
+and constructor field-assignment pairs (now also including `Game`'s six-
+argument constructor against `Turn`'s, same shape, same declined tradeoff).
+Nothing new or actionable; test-file duplication (Given/When/Then scaffolding
+repeated across `*Test.java` classes) left alone per precedent.
+
+`mutate4java --scan` on every file the coder's merge changed or added:
+`Simulator.java` 64, `Game.java` 29, `GameLog.java` 7, `GameAccount.java` 33,
+`World.java` 100 (at, not over, the threshold). `MonopolyStepHandlers.java`
+scanned at 226 — over the 100-site limit — because the coder's ~30 new "the
+game log records ..." handlers landed on top of an already-large flat
+`List.of(...)` of ~216 step registrations plus their Claim/report-line
+builder methods, all in one file.
+
+Performed a behavior-preserving split: extracted the shared regex constants
+(`VALUE`, `NAME`, `DICE_DESCRIPTION`) and every `Claim`/report-line builder
+method into a new package-private `MonopolyStepHelpers`, then divided the
+step list itself, in its original order, across three files —
+`MonopolyStepHandlers` (board/setup/simulator/CLI/turn-basics steps, kept as
+the public `handlers()` entry point every generated acceptance test already
+calls), `JournalStepHandlers` (turn-order/initiative-family journal and
+report steps, plus property/ownership/jail/mortgage given/then steps), and
+`GameLogStepHandlers` (the property/trading/building/mortgage/card/
+bankruptcy journal, game-log, and report-says families, plus dice fairness).
+`MonopolyStepHandlers.handlers()` now concatenates its own share with the
+other two via `Stream.of(...).flatMap(List::stream).toList()`, preserving
+exact step order. No behavior changed — every lambda body moved verbatim.
+
+Re-scanned after the split: `MonopolyStepHandlers.java` 53, `JournalStepHandlers.java`
+68, `GameLogStepHandlers.java` 77, `MonopolyStepHelpers.java` 28 — all
+comfortably under the 100-site limit. `dry4java` on the acceptance package
+shows only the same internal near-duplicate one-liners among the relocated
+Claim builders that existed in the original file; nothing new.
+
+Property-test assessment: reviewed `BankruptcyPropertyTest` (already
+covering the resolve invariants). The coder's new production surface —
+`Game.playUntilStopped`'s cooperative round-boundary stop and
+`Simulator.Running`'s thread lifecycle — is either deterministic control
+flow already pinned by an example test (`GameTest.aGameStopsBetweenRoundsWhenToldTo`)
+or thread/timing-based and a poor fit for property testing. No new property
+test added; existing property-test suite (`RollPropertyTest`,
+`MoneyPropertyTest`, `RentPropertyTest`, `OwnedCountBoundsPropertyTest`,
+`InitiativePropertyTest`, `DeedsPropertyTest`, `BankruptcyPropertyTest`) is
+unaffected by this structural split.
+
+Verification after the split: acceptance pipeline green (271/271); domain
+251 and cli 9 unit tests green.
+
+Handing the verified state to the architect.
