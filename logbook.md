@@ -12774,3 +12774,44 @@ Action taken: this is an architect review loop for the already-accepted
 `Game.java`, and `Bankruptcy.java`, plus manifest refresh), not a new
 specifier-originated phase. Merging `9f4961c78a` into `swarmforge-coder` and
 reviewing/verifying under coder rules next.
+
+## 2026-07-31T22:01:00Z — coder addressed architect's Simulator.run finding
+
+Action taken: reviewed the merged mutation-hardening state (`9f4961c78a`) and
+addressed the one open finding for the coder: `Simulator.run(int,
+Strategy.OfPlayers)` — the blocking path `main`/`execute`/`runSelected` use
+for a plain CLI invocation — duplicated `Simulator.start`'s game-construction
+and play-to-completion logic in a second, untested implementation, carrying
+the same non-termination risk that started `monopoly-pipeline-hang` with none
+of the coverage `start`/`awaitEnd` already have.
+
+Fix: `run` now delegates entirely to the tested bounded API —
+`return start(playerCount, strategies).awaitEnd();` — removing its own
+`Rule.Set`/`Game`/`winner().orElseThrow()`/`Report.of` body. `main` is now
+wired to the same `start`/`stop`/`awaitEnd` path already exercised by
+`SimulatorTest`'s `Running`-based tests and the bounded-time CLI acceptance
+scenarios, eliminating the duplicate, uncovered implementation rather than
+adding a second one to maintain. No externally observable behavior changed:
+`rejectsPlayerCountsOutsideTheOfficialRange` (out-of-range `run` call) still
+passes unchanged, since `rejectOutOfRange` is shared and `awaitEnd()` returns
+the same synchronous failure `Result` when `start` never spawns a thread.
+
+No new unit test added for `run`'s valid-input path: the only way to exercise
+it is to let a real-dice game reach natural completion synchronously, which
+is exactly the unbounded wait the CLI Gherkin scenarios were reworked away
+from (`3e718ed`) after the acceptance pipeline hang. That line remains the
+one irreducible risk boundary of a "block until a real game ends" feature,
+now living in one already-partially-tested place instead of two untested
+ones; a real invocation still exits on its own binary's normal process
+signals (Ctrl+C) same as before.
+
+Verification: unit suites green — domain 255, cli 11 (`mvn -B -pl
+the-monopoly-game-cli,the-monopoly-game-domain -am -Dmaven.repo.local=./tmp/m2
+test`). Acceptance pipeline green — `Tests run: 271, Failures: 0, Errors: 0`
+in ~28s, no hang. Manifest for `Simulator.java` left stale for the mutation
+runner to regenerate, per established precedent.
+
+No further coder-owned implementation changes needed beyond this fix. Handing
+the result to the refactorer as normal for this priority-`00` follow-up loop;
+the refactorer's return will go on to the architect per the standard
+follow-up routing.
