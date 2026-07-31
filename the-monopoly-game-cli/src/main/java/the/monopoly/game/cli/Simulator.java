@@ -12,6 +12,7 @@ import the.monopoly.game.strategies.Strategy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 /** Thin command boundary for running a configured Monopoly simulation. */
@@ -32,21 +33,28 @@ public final class Simulator {
 
   /** Parses the command line without performing process termination. */
   public static Result execute(String... arguments) {
-    if (arguments.length == 1 && (arguments[0].equals("-h") || arguments[0].equals("--h")))
-      return new Result(0, usage());
+    if (isHelpRequested(arguments)) return new Result(0, usage());
 
     try {
-      int playerCount = arguments.length == 0 ? 2 : Integer.parseInt(arguments[0]);
-      List<String> strategyNames = List.of(arguments).subList(Math.min(1, arguments.length), arguments.length);
-      if (!strategyNames.isEmpty() && strategyNames.size() != playerCount)
-        return new Result(1, "Supply one strategy for each player. " + usage());
-      return run(playerCount, strategiesFor(playerCount, strategyNames));
+      return runSelected(arguments);
     } catch (NumberFormatException cause) {
       String received = arguments.length == 0 ? "" : arguments[0];
       return new Result(1, "The number of players must be between 2 and 8; received " + received + " players.");
     } catch (IllegalArgumentException cause) {
       return new Result(1, cause.getMessage() + " " + usage());
     }
+  }
+
+  private static boolean isHelpRequested(String... arguments) {
+    return arguments.length == 1 && (arguments[0].equals("-h") || arguments[0].equals("--h"));
+  }
+
+  private static Result runSelected(String... arguments) {
+    int playerCount = arguments.length == 0 ? 2 : Integer.parseInt(arguments[0]);
+    List<String> strategyNames = List.of(arguments).subList(Math.min(1, arguments.length), arguments.length);
+    if (!strategyNames.isEmpty() && strategyNames.size() != playerCount)
+      return new Result(1, "Supply one strategy for each player. " + usage());
+    return run(playerCount, strategiesFor(playerCount, strategyNames));
   }
 
   static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames) {
@@ -69,14 +77,83 @@ public final class Simulator {
   }
 
   public static Result run(int playerCount, Strategy.OfPlayers strategies) {
-    Rule.Set rules = Rule.Set.Type.official.create();
-    if (playerCount < rules.players().min() || playerCount > rules.players().max())
-      return new Result(1, "The number of players must be between 2 and 8; received " + playerCount + " players.");
+    Result rejected = rejectOutOfRange(playerCount);
+    if (rejected != null) return rejected;
 
+    Rule.Set rules = Rule.Set.Type.official.create();
     List<Player> players = rules.players().select(playerCount).toList();
     Game.Result game = new Game(rules, players, player -> Cup.of(rules.dice().toList()), strategies).playToCompletion();
     game.winner().orElseThrow();
     return new Result(0, Report.of(game.journal()));
+  }
+
+  /**
+   * Starts the simulator playing in the background, so its progress can be
+   * watched as it happens. The simulation runs until it is {@link
+   * Running#stop() stopped} or the game reaches its natural end, whichever
+   * comes first.
+   */
+  public static Running start(int playerCount, Strategy.OfPlayers strategies) {
+    Result rejected = rejectOutOfRange(playerCount);
+    if (rejected != null) return new Running(rejected);
+
+    Rule.Set rules = Rule.Set.Type.official.create();
+    List<Player> players = rules.players().select(playerCount).toList();
+    return new Running(new Game(rules, players, player -> Cup.of(rules.dice().toList()), strategies));
+  }
+
+  private static Result rejectOutOfRange(int playerCount) {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    if (playerCount < rules.players().min() || playerCount > rules.players().max())
+      return new Result(1, "The number of players must be between 2 and 8; received " + playerCount + " players.");
+    return null;
+  }
+
+  /**
+   * A simulation being played out of sight, stopped before the game ends.
+   * Stopping is cooperative: the game finishes the round it is on and then
+   * ends, however long it would still have gone on.
+   */
+  public static final class Running {
+    private final AtomicBoolean stopRequested = new AtomicBoolean();
+    private final Thread thread;
+    private volatile Result result;
+
+    private Running(Game game) {
+      thread = new Thread(() -> {
+        Game.Result outcome = game.playUntilStopped(() -> !stopRequested.get());
+        result = new Result(0, Report.of(outcome.journal()));
+      }, "monopoly-simulator");
+      thread.setDaemon(true);
+      thread.start();
+    }
+
+    private Running(Result failure) {
+      thread = null;
+      result = failure;
+    }
+
+    /** Asks the simulation to stop before the game ends. */
+    public void stop() {
+      stopRequested.set(true);
+    }
+
+    /** Whether the simulation is still playing. */
+    public boolean isPlaying() {
+      return thread != null && thread.isAlive();
+    }
+
+    /** Waits for the simulation to end and returns how it ended. */
+    public Result awaitEnd() {
+      if (thread == null) return result;
+      try {
+        thread.join();
+      } catch (InterruptedException cause) {
+        Thread.currentThread().interrupt();
+        throw new AssertionError("Waiting for the simulator to end was interrupted.", cause);
+      }
+      return result;
+    }
   }
 
 

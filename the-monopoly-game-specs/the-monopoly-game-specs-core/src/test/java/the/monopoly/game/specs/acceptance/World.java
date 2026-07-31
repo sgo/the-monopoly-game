@@ -1,6 +1,7 @@
 package the.monopoly.game.specs.acceptance;
 
 import the.monopoly.game.Game;
+import the.monopoly.game.Game.Journal;
 import the.monopoly.game.Game.Journal.Entry;
 import the.monopoly.game.Report;
 import the.monopoly.game.cli.Simulator;
@@ -20,6 +21,7 @@ import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
 
+import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -28,6 +30,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.LockSupport;
+import java.util.function.Predicate;
+
+import static java.util.stream.Collectors.joining;
 
 /**
  * The state shared by the steps of a single scenario execution. Each execution
@@ -69,6 +75,8 @@ public class World {
   private Integer simulatorPlayers;
   private Strategy.OfPlayers simulatorStrategies = Strategy.OfPlayers.NOBODY_DECIDES;
   private Simulator.Result simulatorResult;
+  private Simulator.Running runningSimulator;
+  private final int gameLogOffset = GameLog.offset();
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
@@ -174,6 +182,52 @@ public class World {
   public Simulator.Result simulatorResult() {
     if (simulatorResult == null) throw new AssertionError("The simulator has not been run.");
     return simulatorResult;
+  }
+
+  /** Starts the simulator playing in the background, so the game log fills as it goes. */
+  public void startSimulator() {
+    if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
+    runningSimulator = Simulator.start(simulatorPlayers, simulatorStrategies);
+  }
+
+  public void stopSimulator() {
+    if (runningSimulator == null) throw new AssertionError("The simulator has not been started.");
+    runningSimulator.stop();
+  }
+
+  /** Waits for the simulator to end, as when it has been stopped before the game ends. */
+  public void awaitSimulatorEnd() {
+    if (runningSimulator == null) throw new AssertionError("The simulator has not been started.");
+    runningSimulator.awaitEnd();
+  }
+
+  public boolean simulatorIsPlaying() {
+    if (runningSimulator == null) throw new AssertionError("The simulator has not been started.");
+    return runningSimulator.isPlaying();
+  }
+
+  /** The journal entries the game wrote to its log since this scenario began. */
+  public List<Entry> gameLog() {
+    return GameLog.recordedSince(gameLogOffset);
+  }
+
+  /**
+   * Waits, briefly, until the game log holds at least {@code count} entries the
+   * predicate accepts. The simulator plays in the background, so a scenario
+   * reading its log has to give the game time to write it.
+   */
+  public void awaitGameLog(int count, Predicate<Entry> matches, String description) {
+    long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
+    while (true) {
+      List<Entry> log = gameLog();
+      if (log.stream().filter(matches).count() >= count) return;
+      if (System.nanoTime() >= deadline)
+        throw new AssertionError(
+            "The game log never recorded " + description + "; it records:\n"
+                + log.stream().map(Entry::toString).collect(joining("\n"))
+        );
+      LockSupport.parkNanos(5_000_000);
+    }
   }
 
   public Player pawn(String pawnName) {
@@ -515,6 +569,17 @@ public class World {
     return pawnStrategies.getOrDefault(player.id().value(), Strategy.UNDECIDED);
   }
 
+  /**
+   * Writes a single entry the scenario's own action produced. The action has
+   * no game of its own, so the entry is written through the journal, which is
+   * also what puts it on the game log.
+   */
+  private void record(Entry entry) {
+    Journal journal = new Journal();
+    journal.log(entry);
+    this.journal = journal.entries();
+  }
+
   private Scripted scriptFor(String pawnName) {
     Strategy strategy = pawnStrategies.computeIfAbsent(pawnName, it -> new Scripted());
     if (!(strategy instanceof Scripted scripted))
@@ -542,7 +607,7 @@ public class World {
     Player player = pawn(pawnName);
     ColourStreet street = colourStreet(land);
     Money price = deeds.sellHouse(street, player);
-    journal = List.of(new Entry.HouseSold(player.id(), street.type(), price));
+    record(new Entry.HouseSold(player.id(), street.type(), price));
   }
 
   public void exchangeHotelForHouses(String pawnName, Street.Type land) {
@@ -557,7 +622,7 @@ public class World {
     Player player = pawn(pawnName);
     Ownable ownable = ownable(land);
     Money value = deeds.mortgage(ownable, player);
-    journal = List.of(new Entry.Mortgaged(player.id(), land, value));
+    record(new Entry.Mortgaged(player.id(), land, value));
   }
 
   public void liftMortgage(String pawnName, Street.Type land) {
@@ -565,7 +630,7 @@ public class World {
       throw new AssertionError("No deeds exist yet, so no mortgage can be lifted.");
     Player player = pawn(pawnName);
     Deeds.MortgageCost cost = deeds.liftMortgage(ownable(land), player);
-    journal = List.of(new Entry.MortgageLifted(player.id(), land, cost.total(), cost.interest()));
+    record(new Entry.MortgageLifted(player.id(), land, cost.total(), cost.interest()));
   }
 
   public void keepMortgaged(String pawnName, Street.Type land) {
@@ -588,12 +653,12 @@ public class World {
 
       @Override
       public void sold(Player seller, Ownable soldLand, Player buyer, Money soldPrice) {
-        journal = List.of(new Entry.LandSold(seller.id(), soldLand.type(), buyer.id(), soldPrice));
+        record(new Entry.LandSold(seller.id(), soldLand.type(), buyer.id(), soldPrice));
       }
 
       @Override
       public void saleRefused(Player seller, Ownable soldLand, Player buyer, Money soldPrice) {
-        journal = List.of(new Entry.LandSaleRefused(seller.id(), soldLand.type(), buyer.id(), soldPrice));
+        record(new Entry.LandSaleRefused(seller.id(), soldLand.type(), buyer.id(), soldPrice));
       }
     });
     sale.sell(pawn(sellerName), ownable(land), pawn(buyerName), price);
