@@ -98,4 +98,32 @@ class SimulatorTest {
     assertThat(running.awaitEnd().output()).contains("received 9 players");
   }
 
+  @Test
+  void acceptsThePlayerCountAtTheUpperBoundaryWhenStarted() {
+    Simulator.Running running = Simulator.start(8, Simulator.strategiesFor(8, List.of()));
+
+    assertThat(running.isPlaying()).isTrue();
+
+    running.stop();
+
+    assertThat(running.awaitEnd().succeeded()).isTrue();
+  }
+
+  @Test
+  void keepsPlayingUntilToldToStop() throws Exception {
+    Simulator.Running running = Simulator.start(2, Simulator.strategiesFor(2, List.of()));
+
+    // A single round finishes far faster than this even under coverage
+    // instrumentation; still playing here shows the simulation keeps going on
+    // its own rather than stopping after one round regardless of whether
+    // stop() was ever called.
+    Thread.sleep(1000);
+    assertThat(running.isPlaying()).isTrue();
+
+    running.stop();
+
+    assertThat(running.awaitEnd().succeeded()).isTrue();
+    assertThat(running.isPlaying()).isFalse();
+  }
+
 }
