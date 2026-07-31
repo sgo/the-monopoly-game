@@ -485,7 +485,10 @@ can run genuinely complete games rather than partial ones.
 - Verification: invoke the standalone executable end-to-end for a couple of
   player counts, the help flag, and invalid input; confirm complete readable
   reports, usage guidance, stdout output, nonzero failure status, and correct
-  application of the standard game starting configuration.
+  application of the standard game starting configuration. Confirm that a
+  complete game uses real random dice and reaches its natural terminal state
+  when bankruptcies leave one player, without a turn limit or synthetic
+  winner.
 
 ### BDD/TDD Process (mandatory):
 

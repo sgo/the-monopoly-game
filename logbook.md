@@ -10846,6 +10846,211 @@ Action taken: route this authoritative policy to specifier for acceptance
 criteria and coder for implementation alignment. The existing normal-setup
 loop remains open.
 
+## 2026-07-29T16:09:50Z — architect sent real-game completion policy to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T160950Z_000065_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 00ac6d5436
+created_at: 2026-07-29T16:09:50.272629Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 00ac6d5436
+```
+
+Action taken: sent the user-approved real-game completion policy to specifier.
+
+## 2026-07-29T16:09:50Z — architect sent real-game completion policy to coder
+
+Handoff message sent:
+
+```
+id: 20260729T160950Z_000066_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 00ac6d5436
+created_at: 2026-07-29T16:09:50.397154Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 00ac6d5436
+```
+
+Action taken: sent the user-approved real-game completion policy to coder.
+
+## 2026-07-29T16:09:50Z — architect queued incoming-handoff notification
+
+Queued message received while recording the completion-policy handoffs:
+
+```
+You have new handoff mail. If idle, run ready_for_next.sh.
+```
+
+Action taken: deferred the notification until the active handoff records were
+committed; it is now next for processing.
+
+## 2026-07-29T18:28:58Z — architect received Phase 15 real-game review return from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T160950Z_000052_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 3025ffe4b3
+created_at: 2026-07-29T16:09:50.808254Z
+enqueued_at: 2026-07-29T16:09:51.047841Z
+task: phase15-cli
+dequeued_at: 2026-07-29T18:28:48.020085Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 3025ffe4b3
+```
+
+Action taken: began review of the returned real-game completion alignment.
+
+## 2026-07-29T18:28:58Z — architect accepted Phase 15 standard-setup acceptance support
+
+Action taken: accepted the refactorer-returned core acceptance handlers for
+the standard setup. No CLI runtime behavior changed in this return; the coder
+loop for real random dice and normal bankruptcy remains outstanding.
+
+## 2026-07-29T18:30:12Z — architect received Phase 15 natural-completion specification return
+
+Handoff message received:
+
+```
+id: 20260729T182907Z_000032_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: de36f0eb2a
+created_at: 2026-07-29T18:29:07.034011Z
+enqueued_at: 2026-07-29T18:29:07.780248Z
+task: phase15-cli
+dequeued_at: 2026-07-29T18:30:12.656724Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier de36f0eb2a
+```
+
+Action taken: began review of the user-approved natural completion criteria.
+
+## 2026-07-29T18:30:12Z — architect accepted Phase 15 natural completion criteria
+
+Action taken: accepted the specification of real random dice and natural
+bankruptcy completion with one player left. Forwarding the revised contract to
+coder; no fixture, turn cap, or synthetic winner is permitted.
+
+## 2026-07-29T18:30:56Z — architect sent Phase 15 natural completion contract to coder
+
+Handoff message sent:
+
+```
+id: 20260729T183056Z_000067_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: 35916ecd42
+created_at: 2026-07-29T18:30:56.957543Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 35916ecd42
+```
+
+Action taken: sent the natural real-game completion contract to coder; its
+normal return path is through refactorer.
+
+## 2026-07-29T18:31:53Z — architect received Phase 15 real-dice review return from refactorer
+
+Handoff message received:
+
+```
+id: 20260729T183149Z_000053_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 2767438f28
+created_at: 2026-07-29T18:31:49.451612Z
+enqueued_at: 2026-07-29T18:31:49.977137Z
+task: phase15-cli
+dequeued_at: 2026-07-29T18:31:53.530692Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 2767438f28
+```
+
+Action taken: began review of the refactorer return.
+
+## 2026-07-29T18:31:53Z — architect accepted Phase 15 real-dice completion
+
+Action taken: accepted the removal of fixture setup and deterministic dice.
+The CLI now creates official dice cups for normal play and completes only by
+the game's ordinary bankruptcy rule. Focused CLI reactor verification passed.
+All coder/refactorer loops are closed; route the completed phase to specifier.
+
+## 2026-07-29T18:33:28Z — architect sent Phase 15 real-game completion sync to specifier
+
+Handoff message sent:
+
+```
+id: 20260729T183328Z_000068_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: phase15-cli
+commit: a1021bbf07
+created_at: 2026-07-29T18:33:28.329639Z
+
+Re-read your role and constitution.
+
+merge_and_process architect a1021bbf07
+```
+
+Action taken: sent the completed real-game CLI phase to specifier.
+
+## 2026-07-29T18:28:58Z — architect queued incoming-handoff notification
+
+Queued message received while processing the active return:
+
+```
+You have new handoff mail. If idle, run ready_for_next.sh.
+```
+
+Action taken: deferred the notification until the active batch record was
+committed; it is now next for processing.
+
 ## 2026-07-29T13:04:38Z — architect received Phase 15 Gherkin revision from specifier
 
 Handoff message received:
@@ -11897,3 +12102,30 @@ first turn.
 
 Verification: the revised feature parses successfully and `ir-dry-checker`
 reported only intentional possible-synonym findings.
+
+## 2026-07-31T07:23:42Z — architect sent acceptance pipeline hang follow-up to specifier
+
+Handoff message sent:
+
+```
+id: 20260731T072342Z_PLACEHOLDER_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: monopoly-pipeline-hang
+commit: PLACEHOLDER
+
+Re-read your role and constitution.
+
+merge_and_process architect PLACEHOLDER
+```
+
+Action taken: confirmed that `acceptance/run-acceptance.sh` hangs on the
+`en/monopoly.feature` scenario: it is on the pipeline again, but the whole
+played-out game never terminates (about 9.7 million turns logged in roughly
+two minutes before cancellation, 43MB of journal output). The comment at the
+top of `run-acceptance.sh` documents that feature as held back because the
+turn loop behind it does not exist yet. The specifier owns this Gherkin
+scenario content defect; the architect did not edit the feature file.
