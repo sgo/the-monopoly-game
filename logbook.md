@@ -13149,3 +13149,38 @@ merge_and_process coder a4ba99df38
 Summary: sent the `Building.candidateBuildsFor` fully-hoteled-group fix at
 commit `a4ba99df38` to the refactorer as this priority-`00` architect
 follow-up loop's next hop.
+
+## 2026-07-31T21:14:20Z — coder received specifier handoff for cli-logging
+
+Handoff message received:
+
+```
+id: 20260731T211034Z_000036_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: f16bbb499a
+created_at: 2026-07-31T21:10:34.927070Z
+enqueued_at: 2026-07-31T21:10:35.175941Z
+task: cli-logging
+dequeued_at: 2026-07-31T21:14:20.604870Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier f16bbb499a
+```
+
+Action taken: a new specifier-originated task, `cli-logging` (the
+`journal-logging` task closed after the architect's phase-complete sync).
+The new scenario (`en/cli-slf4j-config.feature`, `cli-1`) specifies that the
+CLI module's `pom.xml` declares `org.slf4j:slf4j-api` (>=1.7.0) and
+`ch.qos.logback:logback-classic` (>=1.2.0) as dependencies — closing the gap
+where `Game.Journal.log` writes through SLF4J but the CLI module has no
+logging backend wired in, so `Simulator`-run games silently no-op their
+journal logging (`SLF4J(W): No SLF4J providers were found` seen throughout
+this session's CLI test runs) unlike the specs-core acceptance module, which
+already carries logback. Merging `f16bbb499a` into `swarmforge-coder` and
+implementing under coder rules next.
