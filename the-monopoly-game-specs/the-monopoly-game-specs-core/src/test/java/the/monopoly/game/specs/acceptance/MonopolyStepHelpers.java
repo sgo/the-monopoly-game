@@ -35,8 +35,23 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.InitiativeWon(idOf(pawnName)));
   }
 
+  /** Matches any balance: for steps that only care that the pawn's turn started. */
   static Claim turnStarted(String pawnName) {
-    return Claim.of(new Entry.TurnStarted(idOf(pawnName)));
+    return new Claim(
+        entry -> entry instanceof Entry.TurnStarted it && it.player().equals(idOf(pawnName)),
+        pawnName + " starts a turn"
+    );
+  }
+
+  static Claim turnStarted(String pawnName, int balance) {
+    return Claim.of(new Entry.TurnStarted(idOf(pawnName), money(balance)));
+  }
+
+  /** Parses a scenario's "$1500" example value into its numeric amount. */
+  static int dollars(String text) {
+    if (!text.startsWith("$"))
+      throw new AssertionError("Expected an amount like \"$1500\" but got \"" + text + "\".");
+    return Integer.parseInt(text.substring(1).replace(",", ""));
   }
 
   static Claim rolled(String pawnName, int total) {

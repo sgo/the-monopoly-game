@@ -13323,6 +13323,33 @@ path, confirmed clean under soft Gherkin acceptance mutation.
 No further coder/refactorer follow-up is warranted. Sending the
 phase-complete sync to the specifier under the `journal-logging` task name.
 
+## 2026-07-31T20:42:00Z — architect sent journal-logging phase-complete sync to specifier
+
+Handoff message sent:
+
+```
+id: 20260731T204200Z_000073_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 0077e1a326
+created_at: 2026-07-31T20:42:00Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process architect 0077e1a326
+```
+
+Summary: closed the `journal-logging` task — SLF4J journal logging, the
+bounded-time CLI simulator API, the `Simulator.run` delegation fix, and the
+fully-hoteled-group `Building` fix are all merged, reviewed, and verified
+clean (mutation, DRY, soft Gherkin acceptance mutation). This is also the
+close of the `monopoly-pipeline-hang` concern this thread absorbed.
+
 ## 2026-07-31T20:42:13Z — specifier received queued architect priority-00 follow-up for monopoly-pipeline-hang
 
 Handoff message received (dequeued from queue after 13+ hour delay):
@@ -13438,6 +13465,30 @@ exit 0, no failures in any surefire report.
 
 Handing implementation to refactorer for review.
 
+## 2026-07-31T23:48:20Z — coder sent cli-logging handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260731T234820Z_000045_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: cli-logging
+commit: 4eec050be1
+created_at: 2026-07-31T23:48:20.904332Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 4eec050be1
+```
+
+Summary: handed the `cli-logging` implementation (CLI `pom.xml` SLF4J/Logback
+dependencies, `cli-1` pom-inspection step handlers, and the multi-placeholder
+`Arguments.text` fix) to the refactorer for quality review.
+
 ## 2026-08-01T01:50:00Z — refactorer verified cli-logging implementation
 
 Merged `4eec050be1` from coder into `swarmforge-refactorer` (commit
@@ -13487,22 +13538,297 @@ security practices (DOCTYPE disabling in XML parsing).
 No further refactorer-owned issues found. Committing and handing the
 verified state to the architect.
 
-## 2026-08-01T01:52:00Z — refactorer sent cli-logging review to architect
+## 2026-08-01T00:00:36Z — architect reviewed the cli-logging task
+
+Handoff message received:
+
+```
+id: 20260731T235209Z_000057_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 347109f06f
+task: cli-logging
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 347109f06f
+```
+
+Action taken: merged `347109f06f` into `swarmforge-architect` (commit
+`a52e313`, resolving another append-only `logbook.md` conflict
+chronologically). This is a new specifier-originated task closing the gap
+noted throughout the `journal-logging` review: the CLI module had no SLF4J
+backend wired in, so `Game.Journal.log` silently no-opped when a real
+simulator ran. `en/cli-slf4j-config.feature` (`cli-1`) now requires the CLI
+module's `pom.xml` to declare `org.slf4j:slf4j-api` (>=1.7.0) and
+`ch.qos.logback:logback-classic` (>=1.2.0).
+
+Architecture review: no production Java changed, only `the-monopoly-game-cli/pom.xml`.
+Adding `slf4j-api` and `logback-classic` as ordinary (non-test) dependencies
+of the CLI module — rather than to `domain`, which already depends only on
+the facade `slf4j-api` — is exactly the right layering: `domain` is a
+library and should never pin a logging implementation; `cli` is the actual
+runnable application and is the correct place to choose one. This mirrors
+`specs-core`'s own `logback-classic` dependency, which is `test`-scoped
+there because that module is only ever a test harness, never packaged as a
+program — appropriately different from `cli`'s unscoped dependency, not an
+inconsistency.
+
+New test-support code (`PomInspector`, `PomStepHandlers`, and `StepHandler.
+Arguments.text`'s generalization to resolve multiple `<placeholders>` inside
+one captured group) reviewed directly: clean, focused, package-private
+where appropriate, XXE-disabled XML parsing, backward-compatible placeholder
+resolution. `dry4java` across all five touched/added acceptance files: only
+the same pre-existing guard-clause and `LandSale.Events`-override
+duplication in `World.java` already assessed in the `journal-logging`
+review (shifted line numbers only) — nothing new.
+
+Soft Gherkin acceptance mutation on the new feature
+(`specs-cli:en/cli-slf4j-config.feature`, the only feature this task
+touched): 5/6 killed, 1 survived. Traced the survivor directly against
+`PomStepHandlers.atLeast` (confirmed with a standalone reproduction,
+`/tmp/AtLeastCheck.java`, matching the tool's `killed=5 survived=1`
+exactly): mutating the *minor* digit of the `slf4j-api` example's minimum
+("1.7.0" → "1.x.0") survives because `atLeast` correctly compares
+most-significant digit first and short-circuits — the actual resolved
+version (2.0.17) already exceeds the minimum at the *major* digit (2 > 1),
+so the corrupted minor digit is never reached. This is a real gap in the
+scenario's own example data, not a defect in `atLeast` or in `PomInspector`:
+as long as the example's minimum has a lower major version than whatever is
+actually resolved, no mutation below the major digit can ever be caught,
+for any implementation. Tightening the two example minimums to share a
+major version with what actually resolves today (e.g. "2.0.0" and "1.5.0"
+instead of "1.7.0" and "1.2.0") would make the comparison sensitive to a
+mutation in the next digit down too, without weakening the "at least"
+guarantee the scenario is making or risking future fragility (a later
+version bump would still satisfy a tighter-but-still-below minimum).
+
+This is a decision about Gherkin example-value content, not an
+implementation defect — the same category of decision as the accepted
+`dice.feature !no-mutation` tolerance, except here tightening the example
+looks achievable rather than the mutation being inherently equivalent.
+Sending it to the specifier as a priority-`00` follow-up under the
+`cli-logging` task name rather than deciding unilaterally or asking the
+coder to touch scenario data. Holding the phase-complete sync until this
+loop returns.
+
+## 2026-08-01T00:01:08Z — architect sent cli-logging Gherkin example-value finding to specifier
 
 Handoff message sent:
 
 ```
+id: 20260801T000108Z_000074_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
 type: git_handoff
-to: architect
-priority: 50
+role: architect
+commit: cf209504d6
+created_at: 2026-08-01T00:01:08.569488Z
+enqueued_at: 2026-08-01T00:01:08.860157Z
 task: cli-logging
-commit: 347109f06f
+dequeued_at: 2026-08-01T00:01:12.463602Z
+
+Re-read your role and constitution.
+
+merge_and_process architect cf209504d6
 ```
 
-Summary: verified the coder's cli-logging implementation (PomInspector for
-dependency resolution, PomStepHandlers for Gherkin vocabulary,
-StepHandler.Arguments generalization for multiple placeholders, World.java
-thin delegation, CLI pom.xml updated with SLF4J/Logback). All
-implementations production-quality, no CRAP/DRY/mutation concerns.
-Acceptance pipeline 273/273. Handing verified state to architect for
-independent verification.
+Summary: sent the reviewed `cli-logging` state (clean architecture, clean
+DRY) to the specifier with one open finding — `en/cli-slf4j-config.feature`'s
+example minimum versions are a major-version tier below what actually
+resolves, so soft Gherkin acceptance mutation can't reach any digit below
+the major one. Asking the specifier to decide: tighten the two example
+minimums to share a major version with today's resolved versions, or accept
+and document as equivalent like the existing `dice.feature` tolerance.
+
+## 2026-08-01T02:03:45Z — specifier reviewed architect's cli-logging Gherkin finding and approved tighter examples
+
+Handoff message received:
+
+```
+id: 20260801T000108Z_000074_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: cf209504d6
+task: cli-logging
+
+Re-read your role and constitution.
+
+merge_and_process architect cf209504d6
+```
+
+Action taken: merged `cf209504d6` into the specifier branch (commit `ddbb9fa`).
+The architect identified a mutation-test survivor in the `cli-1` scenario's
+example minimums: when the minor digit of `slf4j-api`'s "1.7.0" minimum is
+mutated to "1.x.0", it survives because the actual resolved version (2.0.17)
+exceeds the minimum at the major-version level, making lower-digit comparisons
+unreachable. The architect recommended tightening the examples to "2.0.0" and
+"1.5.0" respectively, aligning them with the major versions of what actually
+resolves while staying well below those versions. This improves mutation
+sensitivity without weakening the "at least" guarantees or risking future
+fragility.
+
+Decision: accepted. Updated `cli-slf4j-config.feature` examples:
+- `org.slf4j:slf4j-api` minimum: 1.7.0 → 2.0.0
+- `ch.qos.logback:logback-classic` minimum: 1.2.0 → 1.5.0
+
+Committing and sending the verified state back to the architect.
+
+## 2026-08-01T00:04:05Z — architect verified cli-logging fix and closed the task
+
+The specifier tightened `en/cli-slf4j-config.feature`'s example minimums
+exactly as recommended: `org.slf4j:slf4j-api` 1.7.0 → 2.0.0,
+`ch.qos.logback:logback-classic` 1.2.0 → 1.5.0. Discarded a stale,
+unstamped local mutation-manifest artifact from my own prior run before
+merging (empty `scenarios: []`, superseded by this fix).
+
+Independently re-ran soft Gherkin acceptance mutation on the one affected
+feature: 6/6 killed, 0 survived, 0 errors — the manifest is now stamped
+(`mutation-stamp` present, `Total:6, Killed:6`), confirming both example
+minimums are now fully sensitive to mutation at every digit tested.
+
+Both the `journal-logging` line of work and this `cli-logging` follow-on are
+now closed: SLF4J journal logging, the bounded CLI simulator API, the two
+production defects found and fixed along the way (`Simulator.run`,
+`Building`'s fully-hoteled-group crash), and the CLI's missing logging
+backend are all merged, reviewed, and verified clean end to end. No further
+coder/refactorer/specifier follow-up is warranted. Sending the
+phase-complete sync to the specifier under the `cli-logging` task name.
+
+## 2026-08-01T10:35:00Z — coder received specifier handoff for logging-output
+
+Handoff message received:
+
+```
+id: 20260801T103054Z_000038_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 4649e8d3cf
+created_at: 2026-08-01T10:30:54.218686Z
+enqueued_at: 2026-08-01T10:30:54.452154Z
+task: logging-output
+dequeued_at: 2026-08-01T10:31:09.965389Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 4649e8d3cf
+```
+
+Action taken: a new specifier-originated task, `logging-output`. Merged
+`4649e8d3cf` into `swarmforge-coder` (commit `93f245f`, resolving the
+append-only `logbook.md` conflict chronologically by placing the coder's own
+`cli-logging` handoff-sent entry — recorded before the merge but timestamped
+earlier than the refactorer/architect/specifier entries already on this
+branch's history — right after "Handing implementation to refactorer for
+review", ahead of the refactorer's verification; verified the arithmetic:
+13706 = 13488 (head) + 13682 (theirs) − 13464 (base)).
+
+`4649e8d3cf` only touches
+`en/rules/logging.feature`, adding two requirements:
+- New scenario `log-1` ("logged event text matches report rendering"):
+  for a game event of a given type (`player_buys_property`,
+  `player_pays_rent`, `player_passes_go`, `player_draws_card`), the text
+  logged to the Journal must be identical to the text the report renders for
+  that same event.
+- `logging-2` ("the log records a pawn's turn, roll, and movement") now
+  requires the turn-started log line to also carry the pawn's balance at
+  that point (`starts a turn with balance "<dog_starting_balance>"`).
+
+Failing-first evidence confirmed on the merged tree (before implementation):
+`acceptance/run-acceptance.sh` — `Tests run: 277, Failures: 5, Errors: 0`;
+all 5 failures are `Unsupported step` for the 4 new `log-1` examples and the
+1 reworded `logging-2` step; all other surefire reports clean (272/272
+elsewhere). Exploring `Report.java`/`Journal.java`/`Entry` next to implement
+under coder rules.
+
+## 2026-08-01T10:47:22Z — coder implemented logging-output
+
+Action taken: implemented specifier `4649e8d3cf` (task `logging-output`).
+
+Implementation:
+
+- `Game.java` (`Journal.log`): `logger.info("{}", evt)` →
+  `logger.info(Report.of(List.of(evt)), evt)`. The formatted log line is now
+  exactly the report's rendered text for that entry, reusing `Report.of`
+  rather than duplicating its wording; the entry is still passed as the sole
+  SLF4J argument, so `GameLog.entryOf`'s `event.getArgumentArray()[0]`
+  extraction (used by every existing "game log records ..." step) is
+  unaffected — verified by the full acceptance run below, since every one of
+  those steps still passed. No card or rendered text in the game contains
+  literal `{}`, so treating the rendered text as the SLF4J format pattern is
+  safe.
+- `Game.java` (`Journal.Entry.TurnStarted`): gained a `Money balance` field;
+  `takeTurn` now logs `player.account().balance().amount()` alongside the
+  player id, so a turn's starting entry records what the pawn had going into
+  it. `Report.java`'s rendering of `TurnStarted` is unchanged ("dog starts a
+  turn") — the new field is additive data the report doesn't currently speak
+  to, and nothing in this task asked it to.
+- Domain unit tests: added
+  `aTurnStartedEntryCarriesThePlayersCurrentBalanceRatherThanTheirStartingCapital`
+  (withdraws $200 before play, asserts the logged balance is $1300 — a test
+  that fails against a plausible-wrong implementation that always logs
+  starting capital). Updated every existing `new Entry.TurnStarted(id)` call
+  site in `GameTest.java`/`ReportTest.java` to the two-arg constructor.
+  `aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem`'s
+  expected balances came out as $3000, not $1500: that test computes its own
+  `threePlayers` via a second `ruleSet.players().select(3)` call on top of
+  the class's already-eager `players` field selecting from the same
+  `ruleSet`/bank, and `Player.Pool.select` deposits starting capital on every
+  call rather than only once per id — a pre-existing test-setup quirk (not
+  introduced by, or in scope for, this task) that balance-tracking now makes
+  visible. Left as observed rather than restructured; flagging for the
+  refactorer/architect rather than changing test scope unilaterally.
+- specs-core acceptance support, for `log-1` ("logged event text matches
+  report rendering"): new `SampleEvents.java` maps each scenario's
+  `event_type` string (`player_buys_property`, `player_pays_rent`,
+  `player_passes_go`, `player_draws_card`) to a concrete `Entry`. New
+  `EventStepHandlers.java` implements the four steps (`Given a game with an
+  event of type "..."`, `When the event is rendered for the report`, `And
+  the event is logged to the Journal`, `Then the logged message text is
+  identical to the report's rendered text`), delegating to new `World`
+  methods (`selectEvent`, `renderSelectedEventForReport`,
+  `logSelectedEventToJournal`, `assertLoggedEventTextMatchesReportRendering`)
+  that render via `Report.of`, log through a fresh `Game.Journal()`, and
+  compare against the log's captured formatted message. `GameLog.java`
+  gained `formattedMessage(int index)` alongside the existing entry-based
+  `recordedSince`, reading `ILoggingEvent.getFormattedMessage()` at a given
+  offset. Registered `EventStepHandlers` in `MonopolyStepHandlers.handlers()`
+  alongside the Journal/GameLog/Pom groups.
+- specs-core acceptance support, for `logging-2`'s reworded step ("starts a
+  turn with balance"): `MonopolyStepHelpers.turnStarted(String)` changed from
+  an exact-equality `Claim.of` (which would now also pin balance) to a
+  predicate matching only the player id, preserving every existing
+  balance-agnostic "starts a turn" step unchanged. Added an overload
+  `turnStarted(String, int)` using `Claim.of` for exact player+balance
+  matching, and a `dollars(String)` helper parsing a scenario's `"$1500"`
+  example value. New step `"the game log records that pawn \"...\" starts a
+  turn with balance \"...\""` added to `GameLogStepHandlers.java`.
+
+Verification: full acceptance pipeline green —
+`acceptance/run-acceptance.sh`: `Tests run: 277, Failures: 0, Errors: 0`
+(all 5 previously-failing scenarios now pass; log output inspected directly
+in the run and confirmed human-readable, e.g. "dog pays high hat $20 rent for
+Elektriciteitscentrale" in place of the old raw record `toString()`). Full
+`mvn test` across all modules: domain 257/257, cli 11/11, exit 0. One
+`SimulatorTest.keepsPlayingUntilToldToStop` failure surfaced during a
+full-suite run (`Expecting value to be true but was false` after the 1s
+sleep); reproduced 8/8 clean in isolation immediately after — this is the
+same pre-existing real-dice/real-thread timing flake documented during the
+`journal-logging` task (accepted, not introduced by or in scope for this
+change).
+
+Handing implementation to refactorer for review.
