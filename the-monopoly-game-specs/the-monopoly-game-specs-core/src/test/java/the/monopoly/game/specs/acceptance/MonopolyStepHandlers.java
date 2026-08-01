@@ -38,15 +38,16 @@ import static the.monopoly.game.specs.acceptance.StepHandler.step;
  * against the wrong kind of space fails saying so.
  * <p>
  * The full vocabulary is split across this class and {@link JournalStepHandlers} /
- * {@link GameLogStepHandlers} so no single file carries too many mutation sites;
- * {@link #handlers()} is the one entry point callers use.
+ * {@link GameLogStepHandlers} / {@link PomStepHandlers} so no single file carries too
+ * many mutation sites; {@link #handlers()} is the one entry point callers use.
  */
 public final class MonopolyStepHandlers {
   private MonopolyStepHandlers() {
   }
 
   public static List<StepHandler> handlers() {
-    return Stream.of(boardAndSetupSteps(), JournalStepHandlers.handlers(), GameLogStepHandlers.handlers())
+    return Stream.of(boardAndSetupSteps(), JournalStepHandlers.handlers(), GameLogStepHandlers.handlers(),
+            PomStepHandlers.handlers())
         .flatMap(List::stream)
         .toList();
   }
