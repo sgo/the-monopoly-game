@@ -26,6 +26,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.builtAHouse
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.chanceCardDrawn;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.chanceCardDrawnLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.communityChestCardDrawn;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.dollars;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.houseBuilt;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.houseSold;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.idOf;
@@ -184,6 +185,10 @@ final class GameLogStepHandlers {
 
         then("^the game log records that pawn \"" + NAME + "\" starts a turn$",
             (world, arguments) -> logRecords(world, turnStarted(arguments.text(1)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" starts a turn with balance \"" + NAME + "\"$",
+            (world, arguments) -> logRecords(world,
+                turnStarted(arguments.text(1), dollars(arguments.text(2))))),
 
         then("^the game log records that pawn \"" + NAME + "\" rolls a total of " + VALUE + "$",
             (world, arguments) -> logRecords(world, rolled(arguments.text(1), arguments.number(2)))),

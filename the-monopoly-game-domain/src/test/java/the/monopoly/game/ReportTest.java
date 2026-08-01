@@ -30,7 +30,7 @@ class ReportTest {
   @Test
   void aReportTellsATurnAsItWasPlayed() {
     assertThat(report(
-        new Entry.TurnStarted(Pawn.dog.id()),
+        new Entry.TurnStarted(Pawn.dog.id(), new Money(1500)),
         new Entry.Rolled(Pawn.dog.id(), 5),
         new Entry.Moved(Pawn.dog.id(), 0, 5)
     )).isEqualTo("""

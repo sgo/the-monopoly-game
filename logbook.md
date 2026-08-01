@@ -13754,3 +13754,81 @@ all 5 failures are `Unsupported step` for the 4 new `log-1` examples and the
 1 reworded `logging-2` step; all other surefire reports clean (272/272
 elsewhere). Exploring `Report.java`/`Journal.java`/`Entry` next to implement
 under coder rules.
+
+## 2026-08-01T10:47:22Z — coder implemented logging-output
+
+Action taken: implemented specifier `4649e8d3cf` (task `logging-output`).
+
+Implementation:
+
+- `Game.java` (`Journal.log`): `logger.info("{}", evt)` →
+  `logger.info(Report.of(List.of(evt)), evt)`. The formatted log line is now
+  exactly the report's rendered text for that entry, reusing `Report.of`
+  rather than duplicating its wording; the entry is still passed as the sole
+  SLF4J argument, so `GameLog.entryOf`'s `event.getArgumentArray()[0]`
+  extraction (used by every existing "game log records ..." step) is
+  unaffected — verified by the full acceptance run below, since every one of
+  those steps still passed. No card or rendered text in the game contains
+  literal `{}`, so treating the rendered text as the SLF4J format pattern is
+  safe.
+- `Game.java` (`Journal.Entry.TurnStarted`): gained a `Money balance` field;
+  `takeTurn` now logs `player.account().balance().amount()` alongside the
+  player id, so a turn's starting entry records what the pawn had going into
+  it. `Report.java`'s rendering of `TurnStarted` is unchanged ("dog starts a
+  turn") — the new field is additive data the report doesn't currently speak
+  to, and nothing in this task asked it to.
+- Domain unit tests: added
+  `aTurnStartedEntryCarriesThePlayersCurrentBalanceRatherThanTheirStartingCapital`
+  (withdraws $200 before play, asserts the logged balance is $1300 — a test
+  that fails against a plausible-wrong implementation that always logs
+  starting capital). Updated every existing `new Entry.TurnStarted(id)` call
+  site in `GameTest.java`/`ReportTest.java` to the two-arg constructor.
+  `aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem`'s
+  expected balances came out as $3000, not $1500: that test computes its own
+  `threePlayers` via a second `ruleSet.players().select(3)` call on top of
+  the class's already-eager `players` field selecting from the same
+  `ruleSet`/bank, and `Player.Pool.select` deposits starting capital on every
+  call rather than only once per id — a pre-existing test-setup quirk (not
+  introduced by, or in scope for, this task) that balance-tracking now makes
+  visible. Left as observed rather than restructured; flagging for the
+  refactorer/architect rather than changing test scope unilaterally.
+- specs-core acceptance support, for `log-1` ("logged event text matches
+  report rendering"): new `SampleEvents.java` maps each scenario's
+  `event_type` string (`player_buys_property`, `player_pays_rent`,
+  `player_passes_go`, `player_draws_card`) to a concrete `Entry`. New
+  `EventStepHandlers.java` implements the four steps (`Given a game with an
+  event of type "..."`, `When the event is rendered for the report`, `And
+  the event is logged to the Journal`, `Then the logged message text is
+  identical to the report's rendered text`), delegating to new `World`
+  methods (`selectEvent`, `renderSelectedEventForReport`,
+  `logSelectedEventToJournal`, `assertLoggedEventTextMatchesReportRendering`)
+  that render via `Report.of`, log through a fresh `Game.Journal()`, and
+  compare against the log's captured formatted message. `GameLog.java`
+  gained `formattedMessage(int index)` alongside the existing entry-based
+  `recordedSince`, reading `ILoggingEvent.getFormattedMessage()` at a given
+  offset. Registered `EventStepHandlers` in `MonopolyStepHandlers.handlers()`
+  alongside the Journal/GameLog/Pom groups.
+- specs-core acceptance support, for `logging-2`'s reworded step ("starts a
+  turn with balance"): `MonopolyStepHelpers.turnStarted(String)` changed from
+  an exact-equality `Claim.of` (which would now also pin balance) to a
+  predicate matching only the player id, preserving every existing
+  balance-agnostic "starts a turn" step unchanged. Added an overload
+  `turnStarted(String, int)` using `Claim.of` for exact player+balance
+  matching, and a `dollars(String)` helper parsing a scenario's `"$1500"`
+  example value. New step `"the game log records that pawn \"...\" starts a
+  turn with balance \"...\""` added to `GameLogStepHandlers.java`.
+
+Verification: full acceptance pipeline green —
+`acceptance/run-acceptance.sh`: `Tests run: 277, Failures: 0, Errors: 0`
+(all 5 previously-failing scenarios now pass; log output inspected directly
+in the run and confirmed human-readable, e.g. "dog pays high hat $20 rent for
+Elektriciteitscentrale" in place of the old raw record `toString()`). Full
+`mvn test` across all modules: domain 257/257, cli 11/11, exit 0. One
+`SimulatorTest.keepsPlayingUntilToldToStop` failure surfaced during a
+full-suite run (`Expecting value to be true but was false` after the 1s
+sleep); reproduced 8/8 clean in isolation immediately after — this is the
+same pre-existing real-dice/real-thread timing flake documented during the
+`journal-logging` task (accepted, not introduced by or in scope for this
+change).
+
+Handing implementation to refactorer for review.
