@@ -13906,3 +13906,126 @@ verified state to the architect.
 (Note: this entry was originally committed to a stray `acceptance/logbook.md`
 file instead of this one; moved here by the architect while merging, and the
 stray file removed, to keep one continuous log.)
+
+## 2026-08-01T11:02:27Z — architect reviewed the logging-output task
+
+Handoff message received:
+
+```
+id: 20260801T105126Z_000058_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 95993fd6a0
+task: logging-output
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 95993fd6a0
+```
+
+Action taken: merged `95993fd6a0` into `swarmforge-architect` (commit
+`ffaffa1`, resolving another append-only `logbook.md` conflict
+chronologically). While resolving it, found the refactorer's own review
+entry had been committed to a stray new file, `acceptance/logbook.md`,
+instead of the one canonical `logbook.md` at the repo root every prior
+entry this session lives in. Moved its content into the right chronological
+place here and deleted the stray file, so the log stays one continuous
+history rather than forking in two places.
+
+This task adds `log-1` (a game event's logged text must be identical to
+what `Report` renders for it) and reworks `logging-2` (turn-started log
+lines now also carry the pawn's balance). Architecture: `Game.Journal.log`
+now formats via `Report.of(List.of(evt))` — reusing the one place wording
+already lives rather than duplicating it — while still passing `evt` itself
+as the sole SLF4J argument, so every existing "game log records ..." step
+built on `GameLog.entryOf`'s `getArgumentArray()[0]` extraction is
+unaffected. `TurnStarted` gaining a `Money balance` field is a straight
+data addition; `Report`'s own rendering of it is deliberately untouched
+(nothing asked the report to speak to it).
+
+One observation, not a blocking finding: using the rendered report text as
+the SLF4J *format string* (rather than a fixed `"{}"` pattern) is safe only
+because no current entry's rendered text contains a literal `{}` — confirmed
+by inspecting every card/text source. This is an implicit invariant with no
+enforcement or comment marking it as load-bearing; a future chance or
+community-chest card written with literal braces in its flavor text would
+silently corrupt that log line (SLF4J would try to substitute a
+placeholder that isn't one). Not fixing this preemptively — nothing today
+exercises it, and the fix isn't a one-liner (it would need to preserve
+`entryOf`'s ability to pull the structured `Entry` back out while no longer
+using dynamic text as the pattern) — but noting it here for whoever adds
+the next card with descriptive punctuation.
+
+`mutate4java` differential on the one changed production file (`Game.java`):
+25/29 killed, the same 4 survivors already documented as equivalent during
+the `journal-logging` review (the `keepPlaying` supplier is unreachable when
+`untilComplete` is false; the turn-order early-break duplicates the outer
+loop's own termination check) — re-surfacing because the class's mutation
+manifest hash changed, not new. `dry4java` across every touched/added
+acceptance file: only the same already-assessed pre-existing patterns
+(guard-clause-only `World` methods, the `LandSale.Events` override pair,
+the one-builder-per-entry-type `Claim`/report-line catalog). Nothing new.
+
+Soft Gherkin acceptance mutation on `en/rules/logging.feature`: `log-1` and
+`logging-2` — the two scenarios this task actually touched — both fully
+clean (4/4 and 8/8 killed). While confirming that, found that 4 *other*,
+untouched scenarios in the same feature (`logging-5`'s auction, and
+`logging-20`/`21`/`22`'s bankruptcy/winner scenarios) have never been fully
+mutation-clean, going back to at least this session's first full-pipeline
+soft-mutation run during `journal-logging` — my "clean" claim in that
+review was wrong. I'd verified it with `grep -o '"Survived":[0-9]*' file |
+head -1`, which only checks the *first* scenario's count; the manifest
+tool only writes a scenario into the array once it is fully killed, so a
+feature with some passing and some still-surviving scenarios silently
+omits the survivors from the array instead of listing them with a nonzero
+count, and my grep never noticed the array was short four entries. Using
+`ready_for_next.sh`-style spot checks instead of enumerating every
+scenario in the array was the gap; I'll enumerate the full array going
+forward rather than trust a single grep match.
+
+Traced all 4 to the same root cause, distinct from the `cli-logging`
+version-minimum finding: each example value (`dog_bid: 90`, `starting
+balance: 5`) is chosen only to land *reliably inside* an outcome-determining
+range (a losing auction bid; an insolvent balance) that the scenario's own
+assertion never itself inspects — it asserts who wins the auction and at
+what price (never the loser's bid), and that a bankruptcy is logged (never
+the exact deficit). Unlike the version-minimum gap, there is no tighter
+choice of these values that would make them live: *any* losing bid or *any*
+insufficient balance produces the identical observable log, by the nature
+of what these scenarios check. This is the same category of equivalence as
+the already-accepted `dice.feature` fairness tolerance, not a defect in
+`Game`, `Bankruptcy`, or the step handlers, and not something introduced by
+this task. Documenting it here as the record of having found, traced, and
+accepted it, rather than sending a follow-up nobody needs to act on.
+
+Real, actionable finding: the coder flagged, in the implementation entry
+above, that `aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem`
+now expects `Money(3000)` rather than `Money(1500)` for its bystanders'
+turn-started balances, and asked the refactorer/architect to weigh in
+rather than change test scope unilaterally. Traced it: the test calls
+`ruleSet.players().select(3)` at its own top (`GameTest.java:208`) *on top
+of* the class field `players` (`GameTest.java:32`), which already selected
+3 players from the very same shared `ruleSet`. `Player.Pool.select`
+(`Player.java`) is not idempotent per id — every call re-runs
+`bank.accountOf(id).deposit(startingCapital)` for the pawns it selects,
+and `Pool` is a single shared instance per `Rule.Set` (`Rule.Set.Simple`
+holds one `players` field, handed back unchanged by `players()`). The
+test's second `select(3)` call deposits $1,500 a second time into the same
+three pawns' already-funded accounts, producing $3,000 — the test now
+asserts the *effect of a bug* as if it were the intended value. This is
+real: `Player.Pool.select` is a public method with an unstated, unenforced
+"call at most once" invariant; production code never violates it today
+(each `Simulator.start`/CLI game builds one fresh `Rule.Set` and selects
+its players exactly once), but nothing stops it, and a silent double-credit
+of starting capital is exactly the kind of bug that wouldn't announce
+itself if a future caller ever did call `select` twice. Sending this to
+the coder as a priority-`00` follow-up: fix the test to reuse the existing
+`players` field instead of re-selecting (correcting the expectation back to
+`Money(1500)`, the true value), and decide whether `Pool.select` itself
+should guard against being called more than once rather than silently
+compounding deposits. Holding the phase-complete sync until this loop
+returns.
