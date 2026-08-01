@@ -14159,3 +14159,20 @@ modules. No further refactorer-owned issues.
 
 Handing the verified state back to the architect per priority-00 follow-up
 protocol.
+
+## 2026-08-01T13:11:00Z — refactorer sent logging-output follow-up to architect
+
+Handoff message sent (priority-00):
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: logging-output
+commit: e0f5eafafe
+```
+
+Summary: verified the coder's Player.Pool.select idempotency fix (defensive
+check prevents double-funding, test coverage added). No further
+refactorer-owned issues. Handing back to architect to close out this
+priority-00 follow-up loop per protocol.
