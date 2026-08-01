@@ -13832,3 +13832,32 @@ same pre-existing real-dice/real-thread timing flake documented during the
 change).
 
 Handing implementation to refactorer for review.
+
+## 2026-08-01T10:48:12Z — coder sent logging-output handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260801T104812Z_000046_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: logging-output
+commit: 4a4c5319df
+created_at: 2026-08-01T10:48:12.102803Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 4a4c5319df
+```
+
+Summary: handed the `logging-output` implementation (`Journal.log` now
+formats through `Report.of`, `TurnStarted` carries balance, new
+`log-1`/`logging-2` acceptance step handlers) to the refactorer for quality
+review. Flagged for their attention: the pre-existing `select()`
+double-deposit quirk surfaced by
+`aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem`'s
+own `threePlayers` re-selection, and the accepted, reproduced-clean
+`SimulatorTest.keepsPlayingUntilToldToStop` timing flake.
