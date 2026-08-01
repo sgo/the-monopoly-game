@@ -14269,3 +14269,32 @@ Sending this to architect for decision on whether to:
 2. Revise the specification if the balance inclusion is infeasible
 
 Task: logging-output (same task name as the prior implementation).
+
+## 2026-08-01T15:54:52Z — architect decided the logging-2 balance-rendering gap
+
+Confirmed the specifier's finding directly: `MonopolyStepHelpers.
+turnStarted(pawnName, balance)` builds a `Claim.of(new Entry.
+TurnStarted(...))`, which `logRecords`/`GameLog` checks against the
+structured `Entry` object pulled from `getArgumentArray()[0]` — never
+against the log's rendered text. `Report.line`'s `TurnStarted` case still
+reads `name(it.player()) + " starts a turn"`, with no mention of balance.
+So `logging-2`'s "starts a turn with balance" step currently passes purely
+by checking the in-memory entry's field, while the actual text a real log
+file would show — which, by `log-1`'s own contract from earlier in this
+same task, is defined to be exactly `Report.of(...)`'s output — never
+shows the balance at all. The acceptance criteria pass; the human-readable
+log does not do what the scenario's own words say it does.
+
+Decision: implement, not revise. `Report`'s own documented purpose is that
+"the wording lives here and nowhere else" — any entry field meant to be
+human-visible belongs in its rendering, and there's nothing suggesting the
+turn-start balance was ever meant to be internal-only, audit-trail-for-tests
+data. Add the balance to `Report.line`'s `TurnStarted` case (e.g. "dog
+starts a turn with $1500"), and — since `log-1` already guarantees the
+logged text equals the report's rendering — the `logging-2` "starts a turn
+with balance" step should end up checking that rendered text too (directly
+or via `log-1`'s existing equivalence), so this specific gap (test passes
+on structured data alone while the real log stays silent on it) can't
+recur silently for a future field. Sending to the coder as a priority-`00`
+follow-up under the `logging-output` task name; holding the phase-complete
+sync (already sent once, now reopened) until this loop returns.
