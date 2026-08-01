@@ -13465,6 +13465,30 @@ exit 0, no failures in any surefire report.
 
 Handing implementation to refactorer for review.
 
+## 2026-07-31T23:48:20Z — coder sent cli-logging handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260731T234820Z_000045_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: cli-logging
+commit: 4eec050be1
+created_at: 2026-07-31T23:48:20.904332Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 4eec050be1
+```
+
+Summary: handed the `cli-logging` implementation (CLI `pom.xml` SLF4J/Logback
+dependencies, `cli-1` pom-inspection step handlers, and the multi-placeholder
+`Arguments.text` fix) to the refactorer for quality review.
+
 ## 2026-08-01T01:50:00Z — refactorer verified cli-logging implementation
 
 Merged `4eec050be1` from coder into `swarmforge-refactorer` (commit
@@ -13705,3 +13729,180 @@ merge_and_process architect 9cb94f97b3
 Summary: closed `cli-logging` — CLI now declares SLF4J/Logback dependencies,
 the new acceptance scenario is verified with fully sensitive mutation
 coverage (6/6 killed) after tightening the example minimums.
+
+## 2026-08-01T10:35:00Z — coder received specifier handoff for logging-output
+
+Handoff message received:
+
+```
+id: 20260801T103054Z_000038_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 4649e8d3cf
+created_at: 2026-08-01T10:30:54.218686Z
+enqueued_at: 2026-08-01T10:30:54.452154Z
+task: logging-output
+dequeued_at: 2026-08-01T10:31:09.965389Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 4649e8d3cf
+```
+
+Action taken: a new specifier-originated task, `logging-output`. Merged
+`4649e8d3cf` into `swarmforge-coder` (commit `93f245f`, resolving the
+append-only `logbook.md` conflict chronologically by placing the coder's own
+`cli-logging` handoff-sent entry — recorded before the merge but timestamped
+earlier than the refactorer/architect/specifier entries already on this
+branch's history — right after "Handing implementation to refactorer for
+review", ahead of the refactorer's verification; verified the arithmetic:
+13706 = 13488 (head) + 13682 (theirs) − 13464 (base)).
+
+`4649e8d3cf` only touches
+`en/rules/logging.feature`, adding two requirements:
+- New scenario `log-1` ("logged event text matches report rendering"):
+  for a game event of a given type (`player_buys_property`,
+  `player_pays_rent`, `player_passes_go`, `player_draws_card`), the text
+  logged to the Journal must be identical to the text the report renders for
+  that same event.
+- `logging-2` ("the log records a pawn's turn, roll, and movement") now
+  requires the turn-started log line to also carry the pawn's balance at
+  that point (`starts a turn with balance "<dog_starting_balance>"`).
+
+Failing-first evidence confirmed on the merged tree (before implementation):
+`acceptance/run-acceptance.sh` — `Tests run: 277, Failures: 5, Errors: 0`;
+all 5 failures are `Unsupported step` for the 4 new `log-1` examples and the
+1 reworded `logging-2` step; all other surefire reports clean (272/272
+elsewhere). Exploring `Report.java`/`Journal.java`/`Entry` next to implement
+under coder rules.
+
+## 2026-08-01T10:47:22Z — coder implemented logging-output
+
+Action taken: implemented specifier `4649e8d3cf` (task `logging-output`).
+
+Implementation:
+
+- `Game.java` (`Journal.log`): `logger.info("{}", evt)` →
+  `logger.info(Report.of(List.of(evt)), evt)`. The formatted log line is now
+  exactly the report's rendered text for that entry, reusing `Report.of`
+  rather than duplicating its wording; the entry is still passed as the sole
+  SLF4J argument, so `GameLog.entryOf`'s `event.getArgumentArray()[0]`
+  extraction (used by every existing "game log records ..." step) is
+  unaffected — verified by the full acceptance run below, since every one of
+  those steps still passed. No card or rendered text in the game contains
+  literal `{}`, so treating the rendered text as the SLF4J format pattern is
+  safe.
+- `Game.java` (`Journal.Entry.TurnStarted`): gained a `Money balance` field;
+  `takeTurn` now logs `player.account().balance().amount()` alongside the
+  player id, so a turn's starting entry records what the pawn had going into
+  it. `Report.java`'s rendering of `TurnStarted` is unchanged ("dog starts a
+  turn") — the new field is additive data the report doesn't currently speak
+  to, and nothing in this task asked it to.
+- Domain unit tests: added
+  `aTurnStartedEntryCarriesThePlayersCurrentBalanceRatherThanTheirStartingCapital`
+  (withdraws $200 before play, asserts the logged balance is $1300 — a test
+  that fails against a plausible-wrong implementation that always logs
+  starting capital). Updated every existing `new Entry.TurnStarted(id)` call
+  site in `GameTest.java`/`ReportTest.java` to the two-arg constructor.
+  `aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem`'s
+  expected balances came out as $3000, not $1500: that test computes its own
+  `threePlayers` via a second `ruleSet.players().select(3)` call on top of
+  the class's already-eager `players` field selecting from the same
+  `ruleSet`/bank, and `Player.Pool.select` deposits starting capital on every
+  call rather than only once per id — a pre-existing test-setup quirk (not
+  introduced by, or in scope for, this task) that balance-tracking now makes
+  visible. Left as observed rather than restructured; flagging for the
+  refactorer/architect rather than changing test scope unilaterally.
+- specs-core acceptance support, for `log-1` ("logged event text matches
+  report rendering"): new `SampleEvents.java` maps each scenario's
+  `event_type` string (`player_buys_property`, `player_pays_rent`,
+  `player_passes_go`, `player_draws_card`) to a concrete `Entry`. New
+  `EventStepHandlers.java` implements the four steps (`Given a game with an
+  event of type "..."`, `When the event is rendered for the report`, `And
+  the event is logged to the Journal`, `Then the logged message text is
+  identical to the report's rendered text`), delegating to new `World`
+  methods (`selectEvent`, `renderSelectedEventForReport`,
+  `logSelectedEventToJournal`, `assertLoggedEventTextMatchesReportRendering`)
+  that render via `Report.of`, log through a fresh `Game.Journal()`, and
+  compare against the log's captured formatted message. `GameLog.java`
+  gained `formattedMessage(int index)` alongside the existing entry-based
+  `recordedSince`, reading `ILoggingEvent.getFormattedMessage()` at a given
+  offset. Registered `EventStepHandlers` in `MonopolyStepHandlers.handlers()`
+  alongside the Journal/GameLog/Pom groups.
+- specs-core acceptance support, for `logging-2`'s reworded step ("starts a
+  turn with balance"): `MonopolyStepHelpers.turnStarted(String)` changed from
+  an exact-equality `Claim.of` (which would now also pin balance) to a
+  predicate matching only the player id, preserving every existing
+  balance-agnostic "starts a turn" step unchanged. Added an overload
+  `turnStarted(String, int)` using `Claim.of` for exact player+balance
+  matching, and a `dollars(String)` helper parsing a scenario's `"$1500"`
+  example value. New step `"the game log records that pawn \"...\" starts a
+  turn with balance \"...\""` added to `GameLogStepHandlers.java`.
+
+Verification: full acceptance pipeline green —
+`acceptance/run-acceptance.sh`: `Tests run: 277, Failures: 0, Errors: 0`
+(all 5 previously-failing scenarios now pass; log output inspected directly
+in the run and confirmed human-readable, e.g. "dog pays high hat $20 rent for
+Elektriciteitscentrale" in place of the old raw record `toString()`). Full
+`mvn test` across all modules: domain 257/257, cli 11/11, exit 0. One
+`SimulatorTest.keepsPlayingUntilToldToStop` failure surfaced during a
+full-suite run (`Expecting value to be true but was false` after the 1s
+sleep); reproduced 8/8 clean in isolation immediately after — this is the
+same pre-existing real-dice/real-thread timing flake documented during the
+`journal-logging` task (accepted, not introduced by or in scope for this
+change).
+
+Handing implementation to refactorer for review.
+
+## 2026-08-01T10:50:44Z — refactorer verified logging-output implementation
+
+Merged `4a4c5319df` from coder into `swarmforge-refactorer` (commit
+`d863196`, resolving append-only `logbook.md` conflict).
+
+Code quality assessment:
+
+**Game.java changes**:
+- `TurnStarted` Journal.Entry record now carries `Money balance` field,
+  capturing the player's account balance at turn start for audit trail
+  (coder added new test verifying balance is current, not starting capital).
+- `Journal.log()` now logs through `Report.of()` to format output, ensuring
+  the logged message text matches the report's rendered text for each event.
+
+**EventStepHandlers.java** (new, 30 lines): Focused step vocabulary for
+testing logged event text against report rendering. Four steps: select event
+type, render for report, log to journal, assert text match. Clean delegation
+to World methods.
+
+**SampleEvents.java** (new, 25 lines): Factory using switch expression to
+create sample Journal.Entry objects for each event type
+(player_buys_property, player_pays_rent, player_passes_go,
+player_draws_card). Clear, maintainable.
+
+**World.java additions**: Four thin methods (`selectEvent`,
+`renderSelectedEventForReport`, `logSelectedEventToJournal`,
+`assertLoggedEventTextMatchesReportRendering`) plus tracking fields for the
+selected/rendered/logged event. Clean delegation pattern.
+
+**GameTest.java updates**: Updated all TurnStarted assertions to expect the
+new balance field; added new test verifying balance is current, not starting
+capital. Comprehensive coverage of the change.
+
+**Integration**: `EventStepHandlers` properly registered in
+`MonopolyStepHandlers.handlers()` stream.
+
+No CRAP, DRY, or mutation-site concerns. All implementations
+production-quality: focused, minimal responsibility, clear intent.
+
+**Test verification**: Full acceptance pipeline 277/277 (273 prior + 4 new
+examples from logging-output). Exit 0 across all modules.
+
+No further refactorer-owned issues found. Committing and handing the
+verified state to the architect.
+
+(Note: this entry was originally committed to a stray `acceptance/logbook.md`
+file instead of this one; moved here by the architect while merging, and the
+stray file removed, to keep one continuous log.)
