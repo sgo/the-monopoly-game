@@ -14133,3 +14133,29 @@ test), cli 11/11, exit 0.
 
 Handing the fix to refactorer for review; after refactorer completes, this
 returns to the architect per the priority-00 follow-up protocol.
+
+## 2026-08-01T11:07:18Z — coder sent logging-output follow-up handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260801T110718Z_000047_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: logging-output
+commit: 9b923e648e
+created_at: 2026-08-01T11:07:18.663863Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 9b923e648e
+```
+
+Summary: handed the architect's `logging-output` priority-00 follow-up fix
+(`Player.Pool.select` now idempotent per id; the test that had been
+asserting the double-deposit as if it were correct now reuses the class's
+existing `players` field and expects the true `$1500` balance) to the
+refactorer for review, to return to the architect afterward.
