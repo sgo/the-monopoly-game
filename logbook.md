@@ -13704,3 +13704,53 @@ production defects found and fixed along the way (`Simulator.run`,
 backend are all merged, reviewed, and verified clean end to end. No further
 coder/refactorer/specifier follow-up is warranted. Sending the
 phase-complete sync to the specifier under the `cli-logging` task name.
+
+## 2026-08-01T10:35:00Z — coder received specifier handoff for logging-output
+
+Handoff message received:
+
+```
+id: 20260801T103054Z_000038_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 4649e8d3cf
+created_at: 2026-08-01T10:30:54.218686Z
+enqueued_at: 2026-08-01T10:30:54.452154Z
+task: logging-output
+dequeued_at: 2026-08-01T10:31:09.965389Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 4649e8d3cf
+```
+
+Action taken: a new specifier-originated task, `logging-output`. Merged
+`4649e8d3cf` into `swarmforge-coder` (commit `93f245f`, resolving the
+append-only `logbook.md` conflict chronologically by placing the coder's own
+`cli-logging` handoff-sent entry — recorded before the merge but timestamped
+earlier than the refactorer/architect/specifier entries already on this
+branch's history — right after "Handing implementation to refactorer for
+review", ahead of the refactorer's verification; verified the arithmetic:
+13706 = 13488 (head) + 13682 (theirs) − 13464 (base)).
+
+`4649e8d3cf` only touches
+`en/rules/logging.feature`, adding two requirements:
+- New scenario `log-1` ("logged event text matches report rendering"):
+  for a game event of a given type (`player_buys_property`,
+  `player_pays_rent`, `player_passes_go`, `player_draws_card`), the text
+  logged to the Journal must be identical to the text the report renders for
+  that same event.
+- `logging-2` ("the log records a pawn's turn, roll, and movement") now
+  requires the turn-started log line to also carry the pawn's balance at
+  that point (`starts a turn with balance "<dog_starting_balance>"`).
+
+Failing-first evidence confirmed on the merged tree (before implementation):
+`acceptance/run-acceptance.sh` — `Tests run: 277, Failures: 5, Errors: 0`;
+all 5 failures are `Unsupported step` for the 4 new `log-1` examples and the
+1 reworded `logging-2` step; all other surefire reports clean (272/272
+elsewhere). Exploring `Report.java`/`Journal.java`/`Entry` next to implement
+under coder rules.
