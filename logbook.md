@@ -14191,3 +14191,27 @@ modules. No further refactorer-owned issues.
 
 Handing the verified state back to the architect per priority-00 follow-up
 protocol.
+
+## 2026-08-01T11:12:24Z — architect verified Player.Pool.select fix and closed logging-output
+
+The coder's fix is exactly right and minimal: `Pool.stream()` now checks
+`bank.accounts()` for an existing account matching the id before
+depositing, so a repeat `select()` for an already-funded id just hands back
+a `Player` over the account as it stands. Combined with `Bank.Simple.
+createAccountFor`'s pre-existing `putIfAbsent` (already idempotent), the
+whole selection pipeline is now fully idempotent per id — a stronger fix
+than a "call at most once" guard would have been, since it makes the
+double-selection pattern correct rather than merely detected.
+
+Independently verified: `PlayerTest`/`GameTest` green. `mutate4java`
+differential on `Player.java`: 1/1 killed (the new `!alreadyFunded` guard).
+`dry4java` across `Player.java`/`PlayerTest.java`/`GameTest.java`: only
+pre-existing pass/land test-pair duplication in `PlayerTest` and pre-existing
+`GameTest` duplication already known from earlier reviews — nothing touching
+the new test or the fix itself.
+
+Both findings raised during the `logging-output` review are now resolved
+and independently verified: the event-text/report-rendering and
+turn-balance logging changes, and the `Player.Pool.select` idempotency fix.
+No further coder/refactorer follow-up is warranted. Sending the
+phase-complete sync to the specifier under the `logging-output` task name.
