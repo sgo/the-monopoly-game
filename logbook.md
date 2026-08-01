@@ -13078,32 +13078,6 @@ behavior, not a structural change), so sending it to the coder as a
 priority-`00` follow-up under the same `journal-logging` task name, per the
 established loop-routing rule.
 
-## 2026-07-31T20:15:11Z — architect sent Building fully-hoteled-group defect to coder
-
-Handoff message sent:
-
-```
-id: 20260731T201511Z_000072_from_architect
-from: architect
-to: coder
-recipient: coder
-priority: 00
-type: git_handoff
-role: architect
-commit: d5bd579068
-created_at: 2026-07-31T20:15:11.060998Z
-enqueued_at: 2026-07-31T20:15:11.839293Z
-task: journal-logging
-
-Re-read your role and constitution.
-
-merge_and_process architect d5bd579068
-```
-
-Summary: sent the merged, reviewed state (refactorer's `Simulator.run` fix
-confirmation plus the new `Building.develop` fully-hoteled-group defect,
-reproduced and confirmed) to the coder to fix the build-selection logic.
-
 ## 2026-07-31T20:15:35Z — coder received second architect priority-00 follow-up
 
 Handoff message received:
@@ -13179,30 +13153,6 @@ timing-sensitive unit test, so it isn't affected.
 
 No further coder-owned implementation changes needed. Handing the result to
 the refactorer as normal for this priority-`00` follow-up loop.
-
-## 2026-07-31T20:25:35Z — coder sent Building fix handoff to refactorer
-
-Handoff message sent:
-
-```
-id: 20260731T202535Z_000044_from_coder
-from: coder
-to: refactorer
-priority: 00
-type: git_handoff
-role: coder
-task: journal-logging
-commit: a4ba99df38
-created_at: 2026-07-31T20:25:35.140501Z
-
-Re-read your role and constitution.
-
-merge_and_process coder a4ba99df38
-```
-
-Summary: sent the `Building.candidateBuildsFor` fully-hoteled-group fix at
-commit `a4ba99df38` to the refactorer as this priority-`00` architect
-follow-up loop's next hop.
 
 ## 2026-07-31T22:30:00Z — refactorer received the Building fix from coder
 
@@ -13296,11 +13246,36 @@ No further refactorer-owned issues found. Committing and handing the
 verified state back to the architect, closing this priority-`00` follow-up
 loop.
 
-## 2026-07-31T20:41:36Z — architect accepted the closed journal-logging follow-up loop
+## 2026-07-31T20:38:52Z — refactorer sent journal-logging review to architect
 
-Handoff message received:
+Handoff message sent:
 
 ```
+id: 20260731T203852Z_000056_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: journal-logging
+commit: 54a959e3ed
+created_at: 2026-07-31T20:38:52.832316Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 54a959e3ed
+```
+
+Summary: verified the coder's `Building.candidateBuildsFor` fix (CRAP/DRY/
+mutation-scan clean, confirmed the fix actually matters by reverting it
+locally and watching `BuildingTest`/`BuildingPropertyTest` fail identically,
+then restoring). Hardened `SimulatorTest.keepsPlayingUntilToldToStop`
+(test-only, 2→8 players) to remove a separate, pre-existing timing flake the
+coder had noted but left unfixed. Generalized the `BuildingTest` regression
+pin into `BuildingPropertyTest`, sweeping all eight colour groups. All green:
+acceptance 271/271, domain unit 256/256, domain property tests 20/20, cli
+unit 11/11 (flake sampled 20/20).
+
 id: 20260731T203852Z_000056_from_refactorer
 from: refactorer
 to: architect
@@ -13348,6 +13323,33 @@ path, confirmed clean under soft Gherkin acceptance mutation.
 No further coder/refactorer follow-up is warranted. Sending the
 phase-complete sync to the specifier under the `journal-logging` task name.
 
+## 2026-07-31T20:42:00Z — architect sent journal-logging phase-complete sync to specifier
+
+Handoff message sent:
+
+```
+id: 20260731T204200Z_000073_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 0077e1a326
+created_at: 2026-07-31T20:42:00Z
+task: journal-logging
+
+Re-read your role and constitution.
+
+merge_and_process architect 0077e1a326
+```
+
+Summary: closed the `journal-logging` task — SLF4J journal logging, the
+bounded-time CLI simulator API, the `Simulator.run` delegation fix, and the
+fully-hoteled-group `Building` fix are all merged, reviewed, and verified
+clean (mutation, DRY, soft Gherkin acceptance mutation). This is also the
+close of the `monopoly-pipeline-hang` concern this thread absorbed.
+
 ## 2026-07-31T20:42:13Z — specifier received queued architect priority-00 follow-up for monopoly-pipeline-hang
 
 Handoff message received (dequeued from queue after 13+ hour delay):
@@ -13373,7 +13375,7 @@ merge_and_process architect 59bf4c256c
 Action taken: acknowledged delayed queue delivery. This commit was already
 merged at `61bfaf3` and processed by the specifier on 2026-07-31T08:10:00Z,
 which resulted in the CLI scenario rework (`3e718ed`) and forward handoff to
-the coder (`a70bd23`). No further action required.
+
 
 ## 2026-07-31T21:14:20Z — coder received specifier handoff for cli-logging
 
@@ -13486,3 +13488,219 @@ merge_and_process coder 4eec050be1
 Summary: handed the `cli-logging` implementation (CLI `pom.xml` SLF4J/Logback
 dependencies, `cli-1` pom-inspection step handlers, and the multi-placeholder
 `Arguments.text` fix) to the refactorer for quality review.
+
+## 2026-08-01T01:50:00Z — refactorer verified cli-logging implementation
+
+Merged `4eec050be1` from coder into `swarmforge-refactorer` (commit
+`2574136`, resolving append-only `logbook.md` conflict chronologically with
+architect's prior processing, specifier's follow-up, and coder's new task).
+
+Code quality assessment:
+
+**PomInspector.java** (new, 102 lines): Clean utility for parsing Maven
+pom.xml files and resolving dependency versions with inheritance fallback to
+the repository root's `dependencyManagement`. Proper XML parsing with DOCTYPE
+disabling for security. Simple, focused implementation with minimal cyclomatic
+complexity.
+
+**PomStepHandlers.java** (new, 43 lines): Focused step handler vocabulary
+plus a numeric dot-separated version comparator (`atLeast`). Straightforward
+logic, properly integrated into `MonopolyStepHandlers.handlers()`.
+
+**StepHandler.java (Arguments.text)** generalization: Extended placeholder
+resolution to handle multiple `<placeholders>` anywhere within a captured
+group (not just a single placeholder filling the entire capture). Uses
+Matcher.find() with StringBuilder for correct, efficient scanning. Backward
+compatible: single-placeholder captures resolve identically. Needed for
+`"<groupId>:<artifactId>"` packing two placeholders into one Gherkin step
+capture.
+
+**World.java** additions: Four thin delegation methods + two new fields
+(`pomModuleDirectory`, `pomDependencies`, `lastCheckedPomDependency`).
+Clean, minimal responsibilities.
+
+**CLI pom.xml**: Added SLF4J and Logback declarations (unversioned, inherit
+from parent at 2.0.17 and 1.5.32 respectively, both exceeding scenario
+requirements). Closes the gap where CLI scenarios run without a logging
+backend, silently no-opping `Game.Journal.log` calls.
+
+**Integration**: `PomStepHandlers` properly registered in
+`MonopolyStepHandlers.handlers()` stream; `pipeline-features.txt` updated to
+include the new scenario.
+
+No CRAP, DRY, or mutation-site concerns identified. All implementations are
+production-quality: focused, minimal complexity, good error messages, proper
+security practices (DOCTYPE disabling in XML parsing).
+
+**Test verification**: Full acceptance pipeline 273/273 (271 prior + 2 new
+`cli-1` examples). Exit 0 across all modules.
+
+No further refactorer-owned issues found. Committing and handing the
+verified state to the architect.
+
+## 2026-08-01T00:00:36Z — architect reviewed the cli-logging task
+
+Handoff message received:
+
+```
+id: 20260731T235209Z_000057_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 347109f06f
+task: cli-logging
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 347109f06f
+```
+
+Action taken: merged `347109f06f` into `swarmforge-architect` (commit
+`a52e313`, resolving another append-only `logbook.md` conflict
+chronologically). This is a new specifier-originated task closing the gap
+noted throughout the `journal-logging` review: the CLI module had no SLF4J
+backend wired in, so `Game.Journal.log` silently no-opped when a real
+simulator ran. `en/cli-slf4j-config.feature` (`cli-1`) now requires the CLI
+module's `pom.xml` to declare `org.slf4j:slf4j-api` (>=1.7.0) and
+`ch.qos.logback:logback-classic` (>=1.2.0).
+
+Architecture review: no production Java changed, only `the-monopoly-game-cli/pom.xml`.
+Adding `slf4j-api` and `logback-classic` as ordinary (non-test) dependencies
+of the CLI module — rather than to `domain`, which already depends only on
+the facade `slf4j-api` — is exactly the right layering: `domain` is a
+library and should never pin a logging implementation; `cli` is the actual
+runnable application and is the correct place to choose one. This mirrors
+`specs-core`'s own `logback-classic` dependency, which is `test`-scoped
+there because that module is only ever a test harness, never packaged as a
+program — appropriately different from `cli`'s unscoped dependency, not an
+inconsistency.
+
+New test-support code (`PomInspector`, `PomStepHandlers`, and `StepHandler.
+Arguments.text`'s generalization to resolve multiple `<placeholders>` inside
+one captured group) reviewed directly: clean, focused, package-private
+where appropriate, XXE-disabled XML parsing, backward-compatible placeholder
+resolution. `dry4java` across all five touched/added acceptance files: only
+the same pre-existing guard-clause and `LandSale.Events`-override
+duplication in `World.java` already assessed in the `journal-logging`
+review (shifted line numbers only) — nothing new.
+
+Soft Gherkin acceptance mutation on the new feature
+(`specs-cli:en/cli-slf4j-config.feature`, the only feature this task
+touched): 5/6 killed, 1 survived. Traced the survivor directly against
+`PomStepHandlers.atLeast` (confirmed with a standalone reproduction,
+`/tmp/AtLeastCheck.java`, matching the tool's `killed=5 survived=1`
+exactly): mutating the *minor* digit of the `slf4j-api` example's minimum
+("1.7.0" → "1.x.0") survives because `atLeast` correctly compares
+most-significant digit first and short-circuits — the actual resolved
+version (2.0.17) already exceeds the minimum at the *major* digit (2 > 1),
+so the corrupted minor digit is never reached. This is a real gap in the
+scenario's own example data, not a defect in `atLeast` or in `PomInspector`:
+as long as the example's minimum has a lower major version than whatever is
+actually resolved, no mutation below the major digit can ever be caught,
+for any implementation. Tightening the two example minimums to share a
+major version with what actually resolves today (e.g. "2.0.0" and "1.5.0"
+instead of "1.7.0" and "1.2.0") would make the comparison sensitive to a
+mutation in the next digit down too, without weakening the "at least"
+guarantee the scenario is making or risking future fragility (a later
+version bump would still satisfy a tighter-but-still-below minimum).
+
+This is a decision about Gherkin example-value content, not an
+implementation defect — the same category of decision as the accepted
+`dice.feature !no-mutation` tolerance, except here tightening the example
+looks achievable rather than the mutation being inherently equivalent.
+Sending it to the specifier as a priority-`00` follow-up under the
+`cli-logging` task name rather than deciding unilaterally or asking the
+coder to touch scenario data. Holding the phase-complete sync until this
+loop returns.
+
+## 2026-08-01T00:01:08Z — architect sent cli-logging Gherkin example-value finding to specifier
+
+Handoff message sent:
+
+```
+id: 20260801T000108Z_000074_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: cf209504d6
+created_at: 2026-08-01T00:01:08.569488Z
+enqueued_at: 2026-08-01T00:01:08.860157Z
+task: cli-logging
+dequeued_at: 2026-08-01T00:01:12.463602Z
+
+Re-read your role and constitution.
+
+merge_and_process architect cf209504d6
+```
+
+Summary: sent the reviewed `cli-logging` state (clean architecture, clean
+DRY) to the specifier with one open finding — `en/cli-slf4j-config.feature`'s
+example minimum versions are a major-version tier below what actually
+resolves, so soft Gherkin acceptance mutation can't reach any digit below
+the major one. Asking the specifier to decide: tighten the two example
+minimums to share a major version with today's resolved versions, or accept
+and document as equivalent like the existing `dice.feature` tolerance.
+
+## 2026-08-01T02:03:45Z — specifier reviewed architect's cli-logging Gherkin finding and approved tighter examples
+
+Handoff message received:
+
+```
+id: 20260801T000108Z_000074_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: cf209504d6
+task: cli-logging
+
+Re-read your role and constitution.
+
+merge_and_process architect cf209504d6
+```
+
+Action taken: merged `cf209504d6` into the specifier branch (commit `ddbb9fa`).
+The architect identified a mutation-test survivor in the `cli-1` scenario's
+example minimums: when the minor digit of `slf4j-api`'s "1.7.0" minimum is
+mutated to "1.x.0", it survives because the actual resolved version (2.0.17)
+exceeds the minimum at the major-version level, making lower-digit comparisons
+unreachable. The architect recommended tightening the examples to "2.0.0" and
+"1.5.0" respectively, aligning them with the major versions of what actually
+resolves while staying well below those versions. This improves mutation
+sensitivity without weakening the "at least" guarantees or risking future
+fragility.
+
+Decision: accepted. Updated `cli-slf4j-config.feature` examples:
+- `org.slf4j:slf4j-api` minimum: 1.7.0 → 2.0.0
+- `ch.qos.logback:logback-classic` minimum: 1.2.0 → 1.5.0
+
+Committing and sending the verified state back to the architect.
+
+## 2026-08-01T00:04:05Z — architect verified cli-logging fix and closed the task
+
+The specifier tightened `en/cli-slf4j-config.feature`'s example minimums
+exactly as recommended: `org.slf4j:slf4j-api` 1.7.0 → 2.0.0,
+`ch.qos.logback:logback-classic` 1.2.0 → 1.5.0. Discarded a stale,
+unstamped local mutation-manifest artifact from my own prior run before
+merging (empty `scenarios: []`, superseded by this fix).
+
+Independently re-ran soft Gherkin acceptance mutation on the one affected
+feature: 6/6 killed, 0 survived, 0 errors — the manifest is now stamped
+(`mutation-stamp` present, `Total:6, Killed:6`), confirming both example
+minimums are now fully sensitive to mutation at every digit tested.
+
+Both the `journal-logging` line of work and this `cli-logging` follow-on are
+now closed: SLF4J journal logging, the bounded CLI simulator API, the two
+production defects found and fixed along the way (`Simulator.run`,
+`Building`'s fully-hoteled-group crash), and the CLI's missing logging
+backend are all merged, reviewed, and verified clean end to end. No further
+coder/refactorer/specifier follow-up is warranted. Sending the
+phase-complete sync to the specifier under the `cli-logging` task name.
