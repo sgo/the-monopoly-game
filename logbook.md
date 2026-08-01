@@ -13858,6 +13858,35 @@ change).
 
 Handing implementation to refactorer for review.
 
+## 2026-08-01T10:48:12Z — coder sent logging-output handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260801T104812Z_000046_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: logging-output
+commit: 4a4c5319df
+created_at: 2026-08-01T10:48:12.102803Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 4a4c5319df
+```
+
+Summary: handed the `logging-output` implementation (`Journal.log` now
+formats through `Report.of`, `TurnStarted` carries balance, new
+`log-1`/`logging-2` acceptance step handlers) to the refactorer for quality
+review. Flagged for their attention: the pre-existing `select()`
+double-deposit quirk surfaced by
+`aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem`'s
+own `threePlayers` re-selection, and the accepted, reproduced-clean
+`SimulatorTest.keepsPlayingUntilToldToStop` timing flake.
+
 ## 2026-08-01T10:50:44Z — refactorer verified logging-output implementation
 
 Merged `4a4c5319df` from coder into `swarmforge-refactorer` (commit
@@ -14061,3 +14090,104 @@ double-credited three pawns' starting capital, which the test currently
 asserts as if it were correct ($3000 instead of $1500). Asked the coder to
 fix the test (reuse the existing `players` field) and decide whether
 `Pool.select` itself should guard against repeat calls.
+
+## 2026-08-01T11:03:14Z — coder received architect priority-00 follow-up for logging-output
+
+Handoff message received:
+
+```
+id: 20260801T110314Z_000076_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 3249b34220
+task: logging-output
+
+Re-read your role and constitution.
+
+merge_and_process architect 3249b34220
+```
+
+Action taken: merged `3249b34220` into `swarmforge-coder` (commit
+`2722d8f`, resolving the append-only `logbook.md` conflict chronologically —
+placing the coder's own "sent" entry, timestamped before the merge, ahead of
+the refactorer's and architect's entries already on this branch's history;
+verified arithmetic: 14060 = 13863 (head) + 14031 (theirs) − 13834 (base)).
+This is an architect review loop under the `logging-output` task, not a new
+specifier-originated phase: confirms my own flagged observation was a real
+defect — `Player.Pool.select` deposits starting capital on every call rather
+than only once per id — and asks me to (1) fix
+`aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem` to
+reuse the existing `players` field instead of re-selecting, correcting the
+expected balance back to `Money(1500)`, and (2) decide whether
+`Pool.select` should guard against being called more than once. Implementing
+under coder rules next.
+
+## 2026-08-01T11:06:41Z — coder made Player.Pool.select idempotent per id
+
+Action taken: addressed the architect's `logging-output` follow-up
+(commit `3249b34220`).
+
+Decision on `Pool.select`: made it idempotent per id rather than throwing on
+a second call. `Pool` is a record — it can't carry extra mutable
+"already selected" state of its own without breaking its value semantics —
+so `stream()` now checks the bank directly: before funding an id, it asks
+whether an account for that `Owner` already exists among `bank.accounts()`,
+and only deposits `startingCapital` when it does not. A second `select` for
+an id already funded by an earlier one on the same bank now just hands back
+a `Player` for the account as it stands. This fixes the actual defect (a
+silent double-credit) without adding a "may only be called once" restriction
+a legitimate future caller might trip over; production code already selects
+exactly once per game, so this is unobservable there and only changes
+behavior for the double-selection pattern the architect flagged.
+
+Implementation:
+- `Player.java` (`Pool.stream`): funds an id only when `bank.accounts()`
+  does not already contain an `Owner` matching it.
+- `PlayerTest.java`: new
+  `selectingTheSamePlayersAgainDoesNotFundThemASecondTime` — selects 3, then
+  selects 3 again from the same pool, asserts every returned player's
+  balance is still exactly the starting capital (would fail against the
+  prior double-deposit behavior).
+- `GameTest.java`
+  (`aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem`):
+  dropped its own `ruleSet.players().select(3)` re-selection in favor of the
+  class's existing `players` field; expected `TurnStarted` balances
+  corrected from `Money(3000)` back to `Money(1500)`, the true value once
+  the double-selection is gone (and now also the true value even if it
+  hadn't been, since `select` no longer compounds).
+
+Verification: full acceptance pipeline green — `Tests run: 277, Failures: 0,
+Errors: 0`. Full `mvn test` across all modules: domain 258/258 (+1 new
+test), cli 11/11, exit 0.
+
+Handing the fix to refactorer for review; after refactorer completes, this
+returns to the architect per the priority-00 follow-up protocol.
+
+## 2026-08-01T13:09:00Z — refactorer reviewed Player.Pool.select idempotency fix
+
+Independent verification of the merged state: `Player.Pool.select` now
+checks `bank.accounts()` before depositing starting capital, making the
+operation idempotent per id. Prevents accidental double-funding if select is
+called multiple times on the same pool.
+
+**Code quality**: Simple, focused defensive check in `Pool.stream()`. Only
+deposits if account doesn't already exist. Implementation is minimal and
+correct.
+
+**Test coverage**: New `PlayerTest.selectingTheSamePlayersAgainDoesNotFundThemASecondTime`
+verifies idempotency by calling select(3) twice and confirming balance
+remains 1500 (not 3000). Existing test fixed to use correct player
+instances.
+
+No CRAP, DRY, or mutation-site concerns. Production code already selects
+exactly once per game, so this change is unobservable there — only affects
+the double-selection pattern the architect flagged.
+
+**Verification**: Full acceptance pipeline 277/277. Exit 0 across all
+modules. No further refactorer-owned issues.
+
+Handing the verified state back to the architect per priority-00 follow-up
+protocol.
