@@ -13832,3 +13832,22 @@ same pre-existing real-dice/real-thread timing flake documented during the
 change).
 
 Handing implementation to refactorer for review.
+
+## 2026-08-01T12:51:00Z — refactorer sent logging-output review to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: logging-output
+commit: 95993fd6a0
+```
+
+Summary: verified the coder's logging-output implementation (TurnStarted 
+now carries balance for audit trail, Journal.log() uses Report for formatted 
+output ensuring logged text matches report rendering). New EventStepHandlers 
+vocabulary and SampleEvents factory for testing consistency. All 
+implementations production-quality. Acceptance pipeline 277/277. Handing 
+verified state to architect for independent verification.
