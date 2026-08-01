@@ -14298,3 +14298,31 @@ on structured data alone while the real log stays silent on it) can't
 recur silently for a future field. Sending to the coder as a priority-`00`
 follow-up under the `logging-output` task name; holding the phase-complete
 sync (already sent once, now reopened) until this loop returns.
+
+## 2026-08-01T15:55:20Z — architect sent logging-2 balance-rendering decision to coder
+
+Handoff message sent:
+
+```
+id: 20260801T155520Z_000078_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: fa559a0cbe
+created_at: 2026-08-01T15:55:20.103306Z
+enqueued_at: 2026-08-01T15:55:20.998584Z
+task: logging-output
+dequeued_at: 2026-08-01T15:55:27.046469Z
+
+Re-read your role and constitution.
+
+merge_and_process architect fa559a0cbe
+```
+
+Summary: the specifier's finding is confirmed and decided — implement, not
+revise. Sent to the coder to add the balance to `Report.line`'s
+`TurnStarted` case and strengthen `logging-2`'s assertion so it actually
+exercises the rendered text, not just the structured entry.
