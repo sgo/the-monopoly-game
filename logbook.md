@@ -14498,3 +14498,40 @@ Both `logging-output` follow-up loops (the `Player.Pool.select` idempotency
 fix and this balance-rendering fix) are now closed and independently
 verified. Sending the phase-complete sync to the specifier again under the
 `logging-output` task name.
+
+## 2026-08-01T21:20:48Z — specifier sent handoff to coder (movement-space-names)
+
+Handoff message sent:
+
+```
+id: 20260801T212048Z_000040_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: movement-space-names
+commit: 087fb8fb8f
+
+Re-read your role and constitution.
+
+merge_and_process specifier 087fb8fb8f
+```
+
+Summary: at the user's request, added the canonical board-space name in
+parentheses next to every position number in the "moves from position X to
+Y" lines recorded by the journal, the game log, and the report
+(scenarios 2, 3, and 19 in each of `logging.feature`, `journal.feature`, and
+`report.feature`). Confirmed with the user that non-ownable spaces (Start,
+Chance, tax spaces, Free Parking, Go to Jail, Community Chest) should use
+the full canonical bilingual board name already used elsewhere in these
+specs (e.g. "Gratis Parkeren / Parc Gratuit"), not the short single-language
+name `Report.spaceName()` currently produces for ownable properties.
+Verified the new Gherkin with `bb gherkin-parser` + `bb gherkin-ir-dry-checker`
+on all three files; no new duplicate or synonym steps introduced beyond the
+pre-existing placeholder-naming variance already in these files. Committed
+as `087fb8fb8f`. This is spec-only: `Report.line()`'s `Entry.Moved` case
+still renders bare position numbers, so the coder needs to give `Moved`
+access to a space name (via the board or the `Entry` itself) and update
+`GameLogStepHandlers`/`JournalStepHandlers`/report step handlers to parse
+the new `(<space>)` step wording.
