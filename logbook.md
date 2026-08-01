@@ -13591,3 +13591,40 @@ Sending it to the specifier as a priority-`00` follow-up under the
 `cli-logging` task name rather than deciding unilaterally or asking the
 coder to touch scenario data. Holding the phase-complete sync until this
 loop returns.
+
+## 2026-08-01T02:03:45Z — specifier reviewed architect's cli-logging Gherkin finding and approved tighter examples
+
+Handoff message received:
+
+```
+id: 20260801T000108Z_000074_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: cf209504d6
+task: cli-logging
+
+Re-read your role and constitution.
+
+merge_and_process architect cf209504d6
+```
+
+Action taken: merged `cf209504d6` into the specifier branch (commit `ddbb9fa`).
+The architect identified a mutation-test survivor in the `cli-1` scenario's
+example minimums: when the minor digit of `slf4j-api`'s "1.7.0" minimum is
+mutated to "1.x.0", it survives because the actual resolved version (2.0.17)
+exceeds the minimum at the major-version level, making lower-digit comparisons
+unreachable. The architect recommended tightening the examples to "2.0.0" and
+"1.5.0" respectively, aligning them with the major versions of what actually
+resolves while staying well below those versions. This improves mutation
+sensitivity without weakening the "at least" guarantees or risking future
+fragility.
+
+Decision: accepted. Updated `cli-slf4j-config.feature` examples:
+- `org.slf4j:slf4j-api` minimum: 1.7.0 → 2.0.0
+- `ch.qos.logback:logback-classic` minimum: 1.2.0 → 1.5.0
+
+Committing and sending the verified state back to the architect.
