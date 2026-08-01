@@ -14241,3 +14241,31 @@ Summary: closed `logging-output` — logged event text now matches report
 rendering, turn-started log lines carry the pawn's balance, and the
 `Player.Pool.select` idempotency bug found along the way is fixed and
 verified.
+
+## 2026-08-01T10:47:32Z — specifier identified logging-2 implementation gap and escalated to architect
+
+Discovery: During specification review, examined Report.java line 48 which renders TurnStarted entries. The current rendering is:
+
+```
+case Entry.TurnStarted it -> name(it.player()) + " starts a turn";
+```
+
+This produces log output: "dog starts a turn"
+
+However, the specification in logging-2 requires (via step handler at GameLogStepHandlers line 189-191):
+
+```
+Then the game log records that pawn "dog" starts a turn with balance "<dog_starting_balance>"
+```
+
+And the Examples table includes `dog_starting_balance` with value "$1500".
+
+The TurnStarted record DOES carry a `balance` field (Game.java line 325), but the Report rendering ignores it. The specification requires the balance to be logged, but the implementation does not include it.
+
+The specification is correct per user requirements ("include the player's bank balance at the start of every turn"). The implementation is incomplete: the balance data exists in the entry but is not rendered to the log output.
+
+Sending this to architect for decision on whether to:
+1. Implement the balance rendering in Report.java, or
+2. Revise the specification if the balance inclusion is infeasible
+
+Task: logging-output (same task name as the prior implementation).
