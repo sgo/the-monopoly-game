@@ -14059,6 +14059,38 @@ should guard against being called more than once rather than silently
 compounding deposits. Holding the phase-complete sync until this loop
 returns.
 
+## 2026-08-01T11:03:14Z — architect sent Player.Pool.select finding to coder
+
+Handoff message sent:
+
+```
+id: 20260801T110314Z_000076_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 3249b34220
+created_at: 2026-08-01T11:03:14.239816Z
+enqueued_at: 2026-08-01T11:03:14.837099Z
+task: logging-output
+dequeued_at: 2026-08-01T11:03:17.731080Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 3249b34220
+```
+
+Summary: sent the reviewed `logging-output` state (clean architecture,
+clean DRY, both touched Gherkin scenarios fully mutation-clean) to the
+coder with one open finding — `Player.Pool.select` is not idempotent per
+id, and a test's redundant second `select(3)` call on the shared `ruleSet`
+double-credited three pawns' starting capital, which the test currently
+asserts as if it were correct ($3000 instead of $1500). Asked the coder to
+fix the test (reuse the existing `players` field) and decide whether
+`Pool.select` itself should guard against repeat calls.
+
 ## 2026-08-01T11:03:14Z — coder received architect priority-00 follow-up for logging-output
 
 Handoff message received:
@@ -14159,3 +14191,136 @@ Summary: handed the architect's `logging-output` priority-00 follow-up fix
 asserting the double-deposit as if it were correct now reuses the class's
 existing `players` field and expects the true `$1500` balance) to the
 refactorer for review, to return to the architect afterward.
+
+## 2026-08-01T13:09:00Z — refactorer reviewed Player.Pool.select idempotency fix
+
+Independent verification of the merged state: `Player.Pool.select` now
+checks `bank.accounts()` before depositing starting capital, making the
+operation idempotent per id. Prevents accidental double-funding if select is
+called multiple times on the same pool.
+
+**Code quality**: Simple, focused defensive check in `Pool.stream()`. Only
+deposits if account doesn't already exist. Implementation is minimal and
+correct.
+
+**Test coverage**: New `PlayerTest.selectingTheSamePlayersAgainDoesNotFundThemASecondTime`
+verifies idempotency by calling select(3) twice and confirming balance
+remains 1500 (not 3000). Existing test fixed to use correct player
+instances.
+
+No CRAP, DRY, or mutation-site concerns. Production code already selects
+exactly once per game, so this change is unobservable there — only affects
+the double-selection pattern the architect flagged.
+
+**Verification**: Full acceptance pipeline 277/277. Exit 0 across all
+modules. No further refactorer-owned issues.
+
+Handing the verified state back to the architect per priority-00 follow-up
+protocol.
+
+## 2026-08-01T11:12:24Z — architect verified Player.Pool.select fix and closed logging-output
+
+The coder's fix is exactly right and minimal: `Pool.stream()` now checks
+`bank.accounts()` for an existing account matching the id before
+depositing, so a repeat `select()` for an already-funded id just hands back
+a `Player` over the account as it stands. Combined with `Bank.Simple.
+createAccountFor`'s pre-existing `putIfAbsent` (already idempotent), the
+whole selection pipeline is now fully idempotent per id — a stronger fix
+than a "call at most once" guard would have been, since it makes the
+double-selection pattern correct rather than merely detected.
+
+Independently verified: `PlayerTest`/`GameTest` green. `mutate4java`
+differential on `Player.java`: 1/1 killed (the new `!alreadyFunded` guard).
+`dry4java` across `Player.java`/`PlayerTest.java`/`GameTest.java`: only
+pre-existing pass/land test-pair duplication in `PlayerTest` and pre-existing
+`GameTest` duplication already known from earlier reviews — nothing touching
+the new test or the fix itself.
+
+Both findings raised during the `logging-output` review are now resolved
+and independently verified: the event-text/report-rendering and
+turn-balance logging changes, and the `Player.Pool.select` idempotency fix.
+No further coder/refactorer follow-up is warranted. Sending the
+phase-complete sync to the specifier under the `logging-output` task name.
+
+## 2026-08-01T11:12:46Z — architect sent logging-output phase-complete sync to specifier
+
+Handoff message sent:
+
+```
+id: 20260801T111246Z_000077_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 14b4a98bc9
+created_at: 2026-08-01T11:12:46Z
+task: logging-output
+
+Re-read your role and constitution.
+
+merge_and_process architect 14b4a98bc9
+```
+
+Summary: closed `logging-output` — logged event text now matches report
+rendering, turn-started log lines carry the pawn's balance, and the
+`Player.Pool.select` idempotency bug found along the way is fixed and
+verified.
+
+## 2026-08-01T10:47:32Z — specifier identified logging-2 implementation gap and escalated to architect
+
+Discovery: During specification review, examined Report.java line 48 which renders TurnStarted entries. The current rendering is:
+
+```
+case Entry.TurnStarted it -> name(it.player()) + " starts a turn";
+```
+
+This produces log output: "dog starts a turn"
+
+However, the specification in logging-2 requires (via step handler at GameLogStepHandlers line 189-191):
+
+```
+Then the game log records that pawn "dog" starts a turn with balance "<dog_starting_balance>"
+```
+
+And the Examples table includes `dog_starting_balance` with value "$1500".
+
+The TurnStarted record DOES carry a `balance` field (Game.java line 325), but the Report rendering ignores it. The specification requires the balance to be logged, but the implementation does not include it.
+
+The specification is correct per user requirements ("include the player's bank balance at the start of every turn"). The implementation is incomplete: the balance data exists in the entry but is not rendered to the log output.
+
+Sending this to architect for decision on whether to:
+1. Implement the balance rendering in Report.java, or
+2. Revise the specification if the balance inclusion is infeasible
+
+Task: logging-output (same task name as the prior implementation).
+
+## 2026-08-01T15:54:52Z — architect decided the logging-2 balance-rendering gap
+
+Confirmed the specifier's finding directly: `MonopolyStepHelpers.
+turnStarted(pawnName, balance)` builds a `Claim.of(new Entry.
+TurnStarted(...))`, which `logRecords`/`GameLog` checks against the
+structured `Entry` object pulled from `getArgumentArray()[0]` — never
+against the log's rendered text. `Report.line`'s `TurnStarted` case still
+reads `name(it.player()) + " starts a turn"`, with no mention of balance.
+So `logging-2`'s "starts a turn with balance" step currently passes purely
+by checking the in-memory entry's field, while the actual text a real log
+file would show — which, by `log-1`'s own contract from earlier in this
+same task, is defined to be exactly `Report.of(...)`'s output — never
+shows the balance at all. The acceptance criteria pass; the human-readable
+log does not do what the scenario's own words say it does.
+
+Decision: implement, not revise. `Report`'s own documented purpose is that
+"the wording lives here and nowhere else" — any entry field meant to be
+human-visible belongs in its rendering, and there's nothing suggesting the
+turn-start balance was ever meant to be internal-only, audit-trail-for-tests
+data. Add the balance to `Report.line`'s `TurnStarted` case (e.g. "dog
+starts a turn with $1500"), and — since `log-1` already guarantees the
+logged text equals the report's rendering — the `logging-2` "starts a turn
+with balance" step should end up checking that rendered text too (directly
+or via `log-1`'s existing equivalence), so this specific gap (test passes
+on structured data alone while the real log stays silent on it) can't
+recur silently for a future field. Sending to the coder as a priority-`00`
+follow-up under the `logging-output` task name; holding the phase-complete
+sync (already sent once, now reopened) until this loop returns.
