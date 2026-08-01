@@ -13659,3 +13659,24 @@ Decision: accepted. Updated `cli-slf4j-config.feature` examples:
 - `ch.qos.logback:logback-classic` minimum: 1.2.0 → 1.5.0
 
 Committing and sending the verified state back to the architect.
+
+## 2026-08-01T00:04:05Z — architect verified cli-logging fix and closed the task
+
+The specifier tightened `en/cli-slf4j-config.feature`'s example minimums
+exactly as recommended: `org.slf4j:slf4j-api` 1.7.0 → 2.0.0,
+`ch.qos.logback:logback-classic` 1.2.0 → 1.5.0. Discarded a stale,
+unstamped local mutation-manifest artifact from my own prior run before
+merging (empty `scenarios: []`, superseded by this fix).
+
+Independently re-ran soft Gherkin acceptance mutation on the one affected
+feature: 6/6 killed, 0 survived, 0 errors — the manifest is now stamped
+(`mutation-stamp` present, `Total:6, Killed:6`), confirming both example
+minimums are now fully sensitive to mutation at every digit tested.
+
+Both the `journal-logging` line of work and this `cli-logging` follow-on are
+now closed: SLF4J journal logging, the bounded CLI simulator API, the two
+production defects found and fixed along the way (`Simulator.run`,
+`Building`'s fully-hoteled-group crash), and the CLI's missing logging
+backend are all merged, reviewed, and verified clean end to end. No further
+coder/refactorer/specifier follow-up is warranted. Sending the
+phase-complete sync to the specifier under the `cli-logging` task name.
