@@ -14058,3 +14058,78 @@ the coder as a priority-`00` follow-up: fix the test to reuse the existing
 should guard against being called more than once rather than silently
 compounding deposits. Holding the phase-complete sync until this loop
 returns.
+
+## 2026-08-01T11:03:14Z — coder received architect priority-00 follow-up for logging-output
+
+Handoff message received:
+
+```
+id: 20260801T110314Z_000076_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 3249b34220
+task: logging-output
+
+Re-read your role and constitution.
+
+merge_and_process architect 3249b34220
+```
+
+Action taken: merged `3249b34220` into `swarmforge-coder` (commit
+`2722d8f`, resolving the append-only `logbook.md` conflict chronologically —
+placing the coder's own "sent" entry, timestamped before the merge, ahead of
+the refactorer's and architect's entries already on this branch's history;
+verified arithmetic: 14060 = 13863 (head) + 14031 (theirs) − 13834 (base)).
+This is an architect review loop under the `logging-output` task, not a new
+specifier-originated phase: confirms my own flagged observation was a real
+defect — `Player.Pool.select` deposits starting capital on every call rather
+than only once per id — and asks me to (1) fix
+`aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem` to
+reuse the existing `players` field instead of re-selecting, correcting the
+expected balance back to `Money(1500)`, and (2) decide whether
+`Pool.select` should guard against being called more than once. Implementing
+under coder rules next.
+
+## 2026-08-01T11:06:41Z — coder made Player.Pool.select idempotent per id
+
+Action taken: addressed the architect's `logging-output` follow-up
+(commit `3249b34220`).
+
+Decision on `Pool.select`: made it idempotent per id rather than throwing on
+a second call. `Pool` is a record — it can't carry extra mutable
+"already selected" state of its own without breaking its value semantics —
+so `stream()` now checks the bank directly: before funding an id, it asks
+whether an account for that `Owner` already exists among `bank.accounts()`,
+and only deposits `startingCapital` when it does not. A second `select` for
+an id already funded by an earlier one on the same bank now just hands back
+a `Player` for the account as it stands. This fixes the actual defect (a
+silent double-credit) without adding a "may only be called once" restriction
+a legitimate future caller might trip over; production code already selects
+exactly once per game, so this is unobservable there and only changes
+behavior for the double-selection pattern the architect flagged.
+
+Implementation:
+- `Player.java` (`Pool.stream`): funds an id only when `bank.accounts()`
+  does not already contain an `Owner` matching it.
+- `PlayerTest.java`: new
+  `selectingTheSamePlayersAgainDoesNotFundThemASecondTime` — selects 3, then
+  selects 3 again from the same pool, asserts every returned player's
+  balance is still exactly the starting capital (would fail against the
+  prior double-deposit behavior).
+- `GameTest.java`
+  (`aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem`):
+  dropped its own `ruleSet.players().select(3)` re-selection in favor of the
+  class's existing `players` field; expected `TurnStarted` balances
+  corrected from `Money(3000)` back to `Money(1500)`, the true value once
+  the double-selection is gone (and now also the true value even if it
+  hadn't been, since `select` no longer compounds).
+
+Verification: full acceptance pipeline green — `Tests run: 277, Failures: 0,
+Errors: 0`. Full `mvn test` across all modules: domain 258/258 (+1 new
+test), cli 11/11, exit 0.
+
+Handing the fix to refactorer for review; after refactorer completes, this
+returns to the architect per the priority-00 follow-up protocol.
