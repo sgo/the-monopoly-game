@@ -45,7 +45,7 @@ public final class Report {
       case Entry.Start it -> "The game starts with " + names(it.players());
       case Entry.InitiativeRoll it -> name(it.player()) + " rolls " + it.total() + " for initiative";
       case Entry.InitiativeWon it -> name(it.player()) + " wins initiative";
-      case Entry.TurnStarted it -> name(it.player()) + " starts a turn";
+      case Entry.TurnStarted it -> name(it.player()) + " starts a turn with $" + it.balance().amount();
       case Entry.Rolled it -> name(it.player()) + " rolls a total of " + it.total();
       case Entry.Moved it -> name(it.player()) + " moves from position " + it.from() + " to " + it.to();
       case Entry.SalaryCollected it -> name(it.player()) + " collects a salary of $" + it.salary().amount();

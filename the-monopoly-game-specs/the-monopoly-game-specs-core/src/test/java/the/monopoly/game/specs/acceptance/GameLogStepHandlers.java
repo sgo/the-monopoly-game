@@ -187,8 +187,15 @@ final class GameLogStepHandlers {
             (world, arguments) -> logRecords(world, turnStarted(arguments.text(1)))),
 
         then("^the game log records that pawn \"" + NAME + "\" starts a turn with balance \"" + NAME + "\"$",
-            (world, arguments) -> logRecords(world,
-                turnStarted(arguments.text(1), dollars(arguments.text(2))))),
+            (world, arguments) -> {
+              String pawnName = arguments.text(1);
+              int balance = dollars(arguments.text(2));
+              logRecords(world, turnStarted(pawnName, balance));
+              // log-1 guarantees the logged text is the report's rendered text, so
+              // checking the played game's own report proves what the real log line
+              // says, not just that the structured entry carries the right balance.
+              says(world, pawnName + " starts a turn with $" + balance);
+            }),
 
         then("^the game log records that pawn \"" + NAME + "\" rolls a total of " + VALUE + "$",
             (world, arguments) -> logRecords(world, rolled(arguments.text(1), arguments.number(2)))),

@@ -14059,6 +14059,38 @@ should guard against being called more than once rather than silently
 compounding deposits. Holding the phase-complete sync until this loop
 returns.
 
+## 2026-08-01T11:03:14Z — architect sent Player.Pool.select finding to coder
+
+Handoff message sent:
+
+```
+id: 20260801T110314Z_000076_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 3249b34220
+created_at: 2026-08-01T11:03:14.239816Z
+enqueued_at: 2026-08-01T11:03:14.837099Z
+task: logging-output
+dequeued_at: 2026-08-01T11:03:17.731080Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 3249b34220
+```
+
+Summary: sent the reviewed `logging-output` state (clean architecture,
+clean DRY, both touched Gherkin scenarios fully mutation-clean) to the
+coder with one open finding — `Player.Pool.select` is not idempotent per
+id, and a test's redundant second `select(3)` call on the shared `ruleSet`
+double-credited three pawns' starting capital, which the test currently
+asserts as if it were correct ($3000 instead of $1500). Asked the coder to
+fix the test (reuse the existing `players` field) and decide whether
+`Pool.select` itself should guard against repeat calls.
+
 ## 2026-08-01T11:03:14Z — coder received architect priority-00 follow-up for logging-output
 
 Handoff message received:
@@ -14134,6 +14166,32 @@ test), cli 11/11, exit 0.
 Handing the fix to refactorer for review; after refactorer completes, this
 returns to the architect per the priority-00 follow-up protocol.
 
+## 2026-08-01T11:07:18Z — coder sent logging-output follow-up handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260801T110718Z_000047_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: logging-output
+commit: 9b923e648e
+created_at: 2026-08-01T11:07:18.663863Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 9b923e648e
+```
+
+Summary: handed the architect's `logging-output` priority-00 follow-up fix
+(`Player.Pool.select` now idempotent per id; the test that had been
+asserting the double-deposit as if it were correct now reuses the class's
+existing `players` field and expects the true `$1500` balance) to the
+refactorer for review, to return to the architect afterward.
+
 ## 2026-08-01T13:09:00Z — refactorer reviewed Player.Pool.select idempotency fix
 
 Independent verification of the merged state: `Player.Pool.select` now
@@ -14160,19 +14218,175 @@ modules. No further refactorer-owned issues.
 Handing the verified state back to the architect per priority-00 follow-up
 protocol.
 
-## 2026-08-01T13:11:00Z — refactorer sent logging-output follow-up to architect
+## 2026-08-01T11:12:24Z — architect verified Player.Pool.select fix and closed logging-output
 
-Handoff message sent (priority-00):
+The coder's fix is exactly right and minimal: `Pool.stream()` now checks
+`bank.accounts()` for an existing account matching the id before
+depositing, so a repeat `select()` for an already-funded id just hands back
+a `Player` over the account as it stands. Combined with `Bank.Simple.
+createAccountFor`'s pre-existing `putIfAbsent` (already idempotent), the
+whole selection pipeline is now fully idempotent per id — a stronger fix
+than a "call at most once" guard would have been, since it makes the
+double-selection pattern correct rather than merely detected.
+
+Independently verified: `PlayerTest`/`GameTest` green. `mutate4java`
+differential on `Player.java`: 1/1 killed (the new `!alreadyFunded` guard).
+`dry4java` across `Player.java`/`PlayerTest.java`/`GameTest.java`: only
+pre-existing pass/land test-pair duplication in `PlayerTest` and pre-existing
+`GameTest` duplication already known from earlier reviews — nothing touching
+the new test or the fix itself.
+
+Both findings raised during the `logging-output` review are now resolved
+and independently verified: the event-text/report-rendering and
+turn-balance logging changes, and the `Player.Pool.select` idempotency fix.
+No further coder/refactorer follow-up is warranted. Sending the
+phase-complete sync to the specifier under the `logging-output` task name.
+
+## 2026-08-01T11:12:46Z — architect sent logging-output phase-complete sync to specifier
+
+Handoff message sent:
 
 ```
+id: 20260801T111246Z_000077_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
 type: git_handoff
-to: architect
-priority: 00
+role: architect
+commit: 14b4a98bc9
+created_at: 2026-08-01T11:12:46Z
 task: logging-output
-commit: e0f5eafafe
+
+Re-read your role and constitution.
+
+merge_and_process architect 14b4a98bc9
 ```
 
-Summary: verified the coder's Player.Pool.select idempotency fix (defensive
-check prevents double-funding, test coverage added). No further
-refactorer-owned issues. Handing back to architect to close out this
-priority-00 follow-up loop per protocol.
+Summary: closed `logging-output` — logged event text now matches report
+rendering, turn-started log lines carry the pawn's balance, and the
+`Player.Pool.select` idempotency bug found along the way is fixed and
+verified.
+
+## 2026-08-01T10:47:32Z — specifier identified logging-2 implementation gap and escalated to architect
+
+Discovery: During specification review, examined Report.java line 48 which renders TurnStarted entries. The current rendering is:
+
+```
+case Entry.TurnStarted it -> name(it.player()) + " starts a turn";
+```
+
+This produces log output: "dog starts a turn"
+
+However, the specification in logging-2 requires (via step handler at GameLogStepHandlers line 189-191):
+
+```
+Then the game log records that pawn "dog" starts a turn with balance "<dog_starting_balance>"
+```
+
+And the Examples table includes `dog_starting_balance` with value "$1500".
+
+The TurnStarted record DOES carry a `balance` field (Game.java line 325), but the Report rendering ignores it. The specification requires the balance to be logged, but the implementation does not include it.
+
+The specification is correct per user requirements ("include the player's bank balance at the start of every turn"). The implementation is incomplete: the balance data exists in the entry but is not rendered to the log output.
+
+Sending this to architect for decision on whether to:
+1. Implement the balance rendering in Report.java, or
+2. Revise the specification if the balance inclusion is infeasible
+
+Task: logging-output (same task name as the prior implementation).
+
+## 2026-08-01T15:54:52Z — architect decided the logging-2 balance-rendering gap
+
+Confirmed the specifier's finding directly: `MonopolyStepHelpers.
+turnStarted(pawnName, balance)` builds a `Claim.of(new Entry.
+TurnStarted(...))`, which `logRecords`/`GameLog` checks against the
+structured `Entry` object pulled from `getArgumentArray()[0]` — never
+against the log's rendered text. `Report.line`'s `TurnStarted` case still
+reads `name(it.player()) + " starts a turn"`, with no mention of balance.
+So `logging-2`'s "starts a turn with balance" step currently passes purely
+by checking the in-memory entry's field, while the actual text a real log
+file would show — which, by `log-1`'s own contract from earlier in this
+same task, is defined to be exactly `Report.of(...)`'s output — never
+shows the balance at all. The acceptance criteria pass; the human-readable
+log does not do what the scenario's own words say it does.
+
+Decision: implement, not revise. `Report`'s own documented purpose is that
+"the wording lives here and nowhere else" — any entry field meant to be
+human-visible belongs in its rendering, and there's nothing suggesting the
+turn-start balance was ever meant to be internal-only, audit-trail-for-tests
+data. Add the balance to `Report.line`'s `TurnStarted` case (e.g. "dog
+starts a turn with $1500"), and — since `log-1` already guarantees the
+logged text equals the report's rendering — the `logging-2` "starts a turn
+with balance" step should end up checking that rendered text too (directly
+or via `log-1`'s existing equivalence), so this specific gap (test passes
+on structured data alone while the real log stays silent on it) can't
+recur silently for a future field. Sending to the coder as a priority-`00`
+follow-up under the `logging-output` task name; holding the phase-complete
+sync (already sent once, now reopened) until this loop returns.
+
+## 2026-08-01T13:56:00Z — coder received architect priority-00 follow-up on logging-2 balance rendering
+
+Handoff message received:
+
+```
+id: 20260801T155520Z_000078_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: fa559a0cbe
+task: logging-output
+
+Re-read your role and constitution.
+
+merge_and_process architect fa559a0cbe
+```
+
+Action taken: merged `fa559a0cbe` into `swarmforge-coder` (commit
+`4ba9941`, resolving the append-only `logbook.md` conflict chronologically;
+verified arithmetic: 14326 = 14161 (head) + 14300 (theirs) − 14135 (base)).
+The specifier found, and the architect confirmed and decided: `logging-2`'s
+"starts a turn with balance" step passes purely against the structured
+`Entry.TurnStarted` object pulled from the log's argument array — `Report.
+line`'s `TurnStarted` case never mentions balance, so the actual
+human-readable log text (which `log-1` already guarantees equals `Report.
+of`'s output) never shows it. Decision: implement the rendering, and make
+the acceptance step check rendered text too. Implementing under coder rules
+next.
+
+## 2026-08-01T16:00:26Z — coder rendered turn-start balance in the report
+
+Action taken: addressed the architect's second `logging-output` follow-up
+(commit `fa559a0cbe`).
+
+Implementation:
+- `Report.java` (`TurnStarted` case): `name(it.player()) + " starts a
+  turn"` → `... + " starts a turn with $" + it.balance().amount()`. Since
+  `Journal.log` already formats every entry through `Report.of` (from the
+  `log-1` work), this is the one change needed for the real log line to
+  show the balance — no change to `Journal.log` itself.
+- `ReportTest.java`: `aReportTellsATurnAsItWasPlayed`'s expected text
+  updated to include `with $1500`; new focused
+  `aReportTellsATurnStartWithThePawnsBalanceAtThatPoint` asserting the
+  rendering directly (`"dog starts a turn with $1300"`) — the unit test
+  the original implementation should have had for this field.
+- `GameLogStepHandlers.java` ("starts a turn with balance" step): now also
+  asserts, via the existing `says`/`world.report()` machinery, that the
+  actually-played game's report contains "pawn starts a turn with $balance"
+  — checking the real rendered text the log-1 mechanism produces, not just
+  the structured entry, so this class of gap (entry field correct, wording
+  silent on it) can't recur unnoticed for a future field. `report.feature`'s
+  existing substring/`indexOf`-based "... starts a turn ..." checks are
+  unaffected: "dog starts a turn" is still a literal prefix of the new
+  "dog starts a turn with $1500".
+
+Verification: full acceptance pipeline green — `Tests run: 277, Failures: 0,
+Errors: 0`; log output inspected directly and confirmed, e.g. "dog starts a
+turn with $1500" and "dog starts a turn with $5" (the reduced-balance
+bankruptcy scenario). Full `mvn test` across all modules: domain 259/259
+(+1 new `ReportTest`), cli 11/11, exit 0.
+
+Handing the fix to refactorer for review; after refactorer completes, this
+returns to the architect per the priority-00 follow-up protocol.
