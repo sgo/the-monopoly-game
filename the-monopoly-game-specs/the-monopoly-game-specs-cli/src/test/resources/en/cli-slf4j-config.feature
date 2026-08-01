@@ -14,5 +14,5 @@ Feature: CLI SLF4J and Logback Configuration
 
     Examples:
       | groupId        | artifactId         | minimum |
-      | org.slf4j      | slf4j-api          | 1.7.0   |
-      | ch.qos.logback | logback-classic    | 1.2.0   |
+      | org.slf4j      | slf4j-api          | 2.0.0   |
+      | ch.qos.logback | logback-classic    | 1.5.0   |
