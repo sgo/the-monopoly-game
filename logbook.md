@@ -14324,3 +14324,69 @@ on structured data alone while the real log stays silent on it) can't
 recur silently for a future field. Sending to the coder as a priority-`00`
 follow-up under the `logging-output` task name; holding the phase-complete
 sync (already sent once, now reopened) until this loop returns.
+
+## 2026-08-01T13:56:00Z — coder received architect priority-00 follow-up on logging-2 balance rendering
+
+Handoff message received:
+
+```
+id: 20260801T155520Z_000078_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: fa559a0cbe
+task: logging-output
+
+Re-read your role and constitution.
+
+merge_and_process architect fa559a0cbe
+```
+
+Action taken: merged `fa559a0cbe` into `swarmforge-coder` (commit
+`4ba9941`, resolving the append-only `logbook.md` conflict chronologically;
+verified arithmetic: 14326 = 14161 (head) + 14300 (theirs) − 14135 (base)).
+The specifier found, and the architect confirmed and decided: `logging-2`'s
+"starts a turn with balance" step passes purely against the structured
+`Entry.TurnStarted` object pulled from the log's argument array — `Report.
+line`'s `TurnStarted` case never mentions balance, so the actual
+human-readable log text (which `log-1` already guarantees equals `Report.
+of`'s output) never shows it. Decision: implement the rendering, and make
+the acceptance step check rendered text too. Implementing under coder rules
+next.
+
+## 2026-08-01T16:00:26Z — coder rendered turn-start balance in the report
+
+Action taken: addressed the architect's second `logging-output` follow-up
+(commit `fa559a0cbe`).
+
+Implementation:
+- `Report.java` (`TurnStarted` case): `name(it.player()) + " starts a
+  turn"` → `... + " starts a turn with $" + it.balance().amount()`. Since
+  `Journal.log` already formats every entry through `Report.of` (from the
+  `log-1` work), this is the one change needed for the real log line to
+  show the balance — no change to `Journal.log` itself.
+- `ReportTest.java`: `aReportTellsATurnAsItWasPlayed`'s expected text
+  updated to include `with $1500`; new focused
+  `aReportTellsATurnStartWithThePawnsBalanceAtThatPoint` asserting the
+  rendering directly (`"dog starts a turn with $1300"`) — the unit test
+  the original implementation should have had for this field.
+- `GameLogStepHandlers.java` ("starts a turn with balance" step): now also
+  asserts, via the existing `says`/`world.report()` machinery, that the
+  actually-played game's report contains "pawn starts a turn with $balance"
+  — checking the real rendered text the log-1 mechanism produces, not just
+  the structured entry, so this class of gap (entry field correct, wording
+  silent on it) can't recur unnoticed for a future field. `report.feature`'s
+  existing substring/`indexOf`-based "... starts a turn ..." checks are
+  unaffected: "dog starts a turn" is still a literal prefix of the new
+  "dog starts a turn with $1500".
+
+Verification: full acceptance pipeline green — `Tests run: 277, Failures: 0,
+Errors: 0`; log output inspected directly and confirmed, e.g. "dog starts a
+turn with $1500" and "dog starts a turn with $5" (the reduced-balance
+bankruptcy scenario). Full `mvn test` across all modules: domain 259/259
+(+1 new `ReportTest`), cli 11/11, exit 0.
+
+Handing the fix to refactorer for review; after refactorer completes, this
+returns to the architect per the priority-00 follow-up protocol.
