@@ -13680,3 +13680,35 @@ production defects found and fixed along the way (`Simulator.run`,
 backend are all merged, reviewed, and verified clean end to end. No further
 coder/refactorer/specifier follow-up is warranted. Sending the
 phase-complete sync to the specifier under the `cli-logging` task name.
+
+## 2026-08-01T10:30:54Z — specifier sent logging output requirements to coder
+
+Handoff message sent:
+
+```
+id: 20260801T103054Z_000038_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: logging-output
+commit: 4649e8d3cf
+created_at: 2026-08-01T10:30:54Z
+enqueued_at: 2026-08-01T10:30:54Z
+```
+
+Summary: sent two logging output requirements (task `logging-output`) to the
+coder. Updates to `logging.feature`:
+
+1. **log-1** (new scenario): Logged events must render identically to report
+   events. Verifies event rendering consistency across Journal logging and game
+   report output.
+
+2. **logging-2 (modified)**: Enhanced to verify that player bank balance is
+   included in the turn-start message. New assertion checks that the message
+   includes the starting balance of the player whose turn began, in format:
+   `Player "dog" starts a turn with balance "$1500"`.
+
+Both requirements ensure that logged output is consistent with visible output
+and provides clarity about player financial state at turn boundaries.
