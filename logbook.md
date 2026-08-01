@@ -13513,3 +13513,81 @@ security practices (DOCTYPE disabling in XML parsing).
 
 No further refactorer-owned issues found. Committing and handing the
 verified state to the architect.
+
+## 2026-08-01T00:00:36Z — architect reviewed the cli-logging task
+
+Handoff message received:
+
+```
+id: 20260731T235209Z_000057_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 347109f06f
+task: cli-logging
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 347109f06f
+```
+
+Action taken: merged `347109f06f` into `swarmforge-architect` (commit
+`a52e313`, resolving another append-only `logbook.md` conflict
+chronologically). This is a new specifier-originated task closing the gap
+noted throughout the `journal-logging` review: the CLI module had no SLF4J
+backend wired in, so `Game.Journal.log` silently no-opped when a real
+simulator ran. `en/cli-slf4j-config.feature` (`cli-1`) now requires the CLI
+module's `pom.xml` to declare `org.slf4j:slf4j-api` (>=1.7.0) and
+`ch.qos.logback:logback-classic` (>=1.2.0).
+
+Architecture review: no production Java changed, only `the-monopoly-game-cli/pom.xml`.
+Adding `slf4j-api` and `logback-classic` as ordinary (non-test) dependencies
+of the CLI module — rather than to `domain`, which already depends only on
+the facade `slf4j-api` — is exactly the right layering: `domain` is a
+library and should never pin a logging implementation; `cli` is the actual
+runnable application and is the correct place to choose one. This mirrors
+`specs-core`'s own `logback-classic` dependency, which is `test`-scoped
+there because that module is only ever a test harness, never packaged as a
+program — appropriately different from `cli`'s unscoped dependency, not an
+inconsistency.
+
+New test-support code (`PomInspector`, `PomStepHandlers`, and `StepHandler.
+Arguments.text`'s generalization to resolve multiple `<placeholders>` inside
+one captured group) reviewed directly: clean, focused, package-private
+where appropriate, XXE-disabled XML parsing, backward-compatible placeholder
+resolution. `dry4java` across all five touched/added acceptance files: only
+the same pre-existing guard-clause and `LandSale.Events`-override
+duplication in `World.java` already assessed in the `journal-logging`
+review (shifted line numbers only) — nothing new.
+
+Soft Gherkin acceptance mutation on the new feature
+(`specs-cli:en/cli-slf4j-config.feature`, the only feature this task
+touched): 5/6 killed, 1 survived. Traced the survivor directly against
+`PomStepHandlers.atLeast` (confirmed with a standalone reproduction,
+`/tmp/AtLeastCheck.java`, matching the tool's `killed=5 survived=1`
+exactly): mutating the *minor* digit of the `slf4j-api` example's minimum
+("1.7.0" → "1.x.0") survives because `atLeast` correctly compares
+most-significant digit first and short-circuits — the actual resolved
+version (2.0.17) already exceeds the minimum at the *major* digit (2 > 1),
+so the corrupted minor digit is never reached. This is a real gap in the
+scenario's own example data, not a defect in `atLeast` or in `PomInspector`:
+as long as the example's minimum has a lower major version than whatever is
+actually resolved, no mutation below the major digit can ever be caught,
+for any implementation. Tightening the two example minimums to share a
+major version with what actually resolves today (e.g. "2.0.0" and "1.5.0"
+instead of "1.7.0" and "1.2.0") would make the comparison sensitive to a
+mutation in the next digit down too, without weakening the "at least"
+guarantee the scenario is making or risking future fragility (a later
+version bump would still satisfy a tighter-but-still-below minimum).
+
+This is a decision about Gherkin example-value content, not an
+implementation defect — the same category of decision as the accepted
+`dice.feature !no-mutation` tolerance, except here tightening the example
+looks achievable rather than the mutation being inherently equivalent.
+Sending it to the specifier as a priority-`00` follow-up under the
+`cli-logging` task name rather than deciding unilaterally or asking the
+coder to touch scenario data. Holding the phase-complete sync until this
+loop returns.
