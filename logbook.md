@@ -14459,3 +14459,42 @@ without its content ever reaching the canonical log. Timestamp corrected
 from the entry's stated "18:03:00Z" to match the commit's actual local time
 converted to UTC, since the stated one was several hours off — same
 Z-suffixed-local-time mislabeling as before.)
+
+## 2026-08-01T16:16:56Z — architect verified balance rendering and closed logging-output
+
+Confirmed the refactorer's recovered review is accurate: `Report.line`'s
+`TurnStarted` case now reads `... + " starts a turn with $" + it.balance().
+amount()`, and `GameLogStepHandlers`'s "starts a turn with balance" step
+now also calls `says(world, pawnName + " starts a turn with $" + balance)`
+— a direct check of `world.report()`'s actual text, not just the structured
+entry. `mutate4java` differential on `Report.java`: 2/2 killed. `dry4java`
+across `Report.java`/`ReportTest.java`/`GameLogStepHandlers.java`: only the
+same pre-existing one-test-per-entry-type pattern. `ReportTest` green.
+
+Went further before trusting a clean re-run: `--level soft` (and even
+`--level hard`) on `en/rules/logging.feature` both reported `log-1` and
+`logging-2` as already-clean without re-running a single mutation on
+either — skipped, because differential skip decisions are keyed off each
+scenario's own Gherkin *text* hash, which didn't change (only the Java
+underneath it did), and `hard`'s additional implementation-hash check never
+actually fires here because `resolve-implementation-hash` returns the
+literal string `"unknown"` every time for this module, so old and current
+always compare equal. That would have let me sign off on a "verified" claim
+that was still testing the *pre-fix* code path. Forced a real check with
+`--level full` (bypasses the skip machinery entirely): 50/54 killed, and
+critically, `scenarios[2].examples[0].dog_starting_balance: $1500 -> $150x`
+is now itself a mutation target and gets killed — proof the balance digit
+is genuinely load-bearing in the rendered-text assertion now, not just
+present in the structured entry. The remaining 4 survivors are the exact
+same equivalents already traced and accepted (`logging-5`'s losing bid,
+`logging-20/21/22`'s bankruptcy-margin balances) — unchanged, confirming
+nothing regressed elsewhere. Noting the `implementation_hash: "unknown"`
+gap here for whoever next relies on `--level hard` expecting it to catch
+implementation-only drift under an unchanged scenario — right now it
+cannot, and `--level full` is the only way to force a genuine re-test
+when only the Java changed.
+
+Both `logging-output` follow-up loops (the `Player.Pool.select` idempotency
+fix and this balance-rendering fix) are now closed and independently
+verified. Sending the phase-complete sync to the specifier again under the
+`logging-output` task name.
