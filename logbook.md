@@ -14390,3 +14390,21 @@ bankruptcy scenario). Full `mvn test` across all modules: domain 259/259
 
 Handing the fix to refactorer for review; after refactorer completes, this
 returns to the architect per the priority-00 follow-up protocol.
+
+## 2026-08-01T18:10:00Z — refactorer sent logging-output follow-up to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: logging-output
+commit: 2de74e34ff
+```
+
+Summary: verified the coder's Report rendering enhancement (TurnStarted now
+shows balance in audit text). Tests verify rendering; acceptance step
+validates both structured entry and report text. Production-quality focused
+changes. Acceptance pipeline 277/277. Handing verified state to architect
+for independent verification.
