@@ -31,22 +31,22 @@ Feature: game report
     And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
     When we play the game
     Then the game report says that pawn "dog" starts a turn before it says that pawn "dog" rolls a total of <dog_roll_total>
-    And the game report says that pawn "dog" rolls a total of <expected_dog_roll_total> before it says that pawn "dog" moves from position <expected_dog_start_position> to <dog_final_position>
+    And the game report says that pawn "dog" rolls a total of <expected_dog_roll_total> before it says that pawn "dog" moves from position <expected_dog_start_position> (<expected_dog_start_space>) to <dog_final_position> (<dog_final_space>)
 
     Examples:
-      | dog_die_1 | dog_die_2 | dog_roll_total | expected_dog_roll_total | expected_dog_start_position | dog_final_position |
-      | 2         | 3         | 5               | 5                       | 0                           | 5                  |
+      | dog_die_1 | dog_die_2 | dog_roll_total | expected_dog_roll_total | expected_dog_start_position | expected_dog_start_space | dog_final_position | dog_final_space              |
+      | 2         | 3         | 5               | 5                       | 0                           | Start                     | 5                  | Noord Station / Gare du Nord |
 
   # report-3
   Scenario Outline: the report narrates a salary collected while passing start
     And pawn "dog" starts at position <dog_start_position>
     And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
     When we play the game
-    Then the game report says that pawn "dog" moves from position <expected_dog_start_position> to <dog_final_position> before it says that pawn "dog" collects a salary of $<dog_salary>
+    Then the game report says that pawn "dog" moves from position <expected_dog_start_position> (<expected_dog_start_space>) to <dog_final_position> (<dog_final_space>) before it says that pawn "dog" collects a salary of $<dog_salary>
 
     Examples:
-      | dog_start_position | dog_die_1 | dog_die_2 | expected_dog_start_position | dog_final_position | dog_salary |
-      | 37                 | 1         | 2         | 37                          | 0                  | 200        |
+      | dog_start_position | dog_die_1 | dog_die_2 | expected_dog_start_position | expected_dog_start_space | dog_final_position | dog_final_space | dog_salary |
+      | 37                 | 1         | 2         | 37                          | Meir Antwerpen            | 0                  | Start            | 200        |
 
   # report-4
   Scenario Outline: the report narrates an unowned-land purchase after the landing movement
@@ -220,11 +220,11 @@ Feature: game report
   # report-19
   Scenario Outline: the report narrates landing on Free Parking even though nothing happens
     When pawn "dog" lands on "Gratis Parkeren / Parc Gratuit"
-    Then the game report says that pawn "dog" moves from position <start position> to <position>
+    Then the game report says that pawn "dog" moves from position <start position> (<start space>) to <position> (<space>)
 
     Examples:
-      | start position | position |
-      | 17              | 20       |
+      | start position | start space                            | position | space                           |
+      | 17              | Algemeen Fonds / Caisse de Communauté | 20       | Gratis Parkeren / Parc Gratuit  |
 
   # report-20
   Scenario Outline: the report narrates a bankruptcy to the bank
