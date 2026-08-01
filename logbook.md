@@ -14166,6 +14166,32 @@ test), cli 11/11, exit 0.
 Handing the fix to refactorer for review; after refactorer completes, this
 returns to the architect per the priority-00 follow-up protocol.
 
+## 2026-08-01T11:07:18Z — coder sent logging-output follow-up handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260801T110718Z_000047_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: logging-output
+commit: 9b923e648e
+created_at: 2026-08-01T11:07:18.663863Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 9b923e648e
+```
+
+Summary: handed the architect's `logging-output` priority-00 follow-up fix
+(`Player.Pool.select` now idempotent per id; the test that had been
+asserting the double-deposit as if it were correct now reuses the class's
+existing `players` field and expects the true `$1500` balance) to the
+refactorer for review, to return to the architect afterward.
+
 ## 2026-08-01T13:09:00Z — refactorer reviewed Player.Pool.select idempotency fix
 
 Independent verification of the merged state: `Player.Pool.select` now
@@ -14326,3 +14352,110 @@ Summary: the specifier's finding is confirmed and decided — implement, not
 revise. Sent to the coder to add the balance to `Report.line`'s
 `TurnStarted` case and strengthen `logging-2`'s assertion so it actually
 exercises the rendered text, not just the structured entry.
+
+## 2026-08-01T13:56:00Z — coder received architect priority-00 follow-up on logging-2 balance rendering
+
+Handoff message received:
+
+```
+id: 20260801T155520Z_000078_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: fa559a0cbe
+task: logging-output
+
+Re-read your role and constitution.
+
+merge_and_process architect fa559a0cbe
+```
+
+Action taken: merged `fa559a0cbe` into `swarmforge-coder` (commit
+`4ba9941`, resolving the append-only `logbook.md` conflict chronologically;
+verified arithmetic: 14326 = 14161 (head) + 14300 (theirs) − 14135 (base)).
+The specifier found, and the architect confirmed and decided: `logging-2`'s
+"starts a turn with balance" step passes purely against the structured
+`Entry.TurnStarted` object pulled from the log's argument array — `Report.
+line`'s `TurnStarted` case never mentions balance, so the actual
+human-readable log text (which `log-1` already guarantees equals `Report.
+of`'s output) never shows it. Decision: implement the rendering, and make
+the acceptance step check rendered text too. Implementing under coder rules
+next.
+
+## 2026-08-01T16:00:26Z — coder rendered turn-start balance in the report
+
+Action taken: addressed the architect's second `logging-output` follow-up
+(commit `fa559a0cbe`).
+
+Implementation:
+- `Report.java` (`TurnStarted` case): `name(it.player()) + " starts a
+  turn"` → `... + " starts a turn with $" + it.balance().amount()`. Since
+  `Journal.log` already formats every entry through `Report.of` (from the
+  `log-1` work), this is the one change needed for the real log line to
+  show the balance — no change to `Journal.log` itself.
+- `ReportTest.java`: `aReportTellsATurnAsItWasPlayed`'s expected text
+  updated to include `with $1500`; new focused
+  `aReportTellsATurnStartWithThePawnsBalanceAtThatPoint` asserting the
+  rendering directly (`"dog starts a turn with $1300"`) — the unit test
+  the original implementation should have had for this field.
+- `GameLogStepHandlers.java` ("starts a turn with balance" step): now also
+  asserts, via the existing `says`/`world.report()` machinery, that the
+  actually-played game's report contains "pawn starts a turn with $balance"
+  — checking the real rendered text the log-1 mechanism produces, not just
+  the structured entry, so this class of gap (entry field correct, wording
+  silent on it) can't recur unnoticed for a future field. `report.feature`'s
+  existing substring/`indexOf`-based "... starts a turn ..." checks are
+  unaffected: "dog starts a turn" is still a literal prefix of the new
+  "dog starts a turn with $1500".
+
+Verification: full acceptance pipeline green — `Tests run: 277, Failures: 0,
+Errors: 0`; log output inspected directly and confirmed, e.g. "dog starts a
+turn with $1500" and "dog starts a turn with $5" (the reduced-balance
+bankruptcy scenario). Full `mvn test` across all modules: domain 259/259
+(+1 new `ReportTest`), cli 11/11, exit 0.
+
+Handing the fix to refactorer for review; after refactorer completes, this
+returns to the architect per the priority-00 follow-up protocol.
+
+## 2026-08-01T16:08:48Z — refactorer verified logging-output follow-up (report rendering)
+
+Merged `678fed4805` from coder into `swarmforge-refactorer` (commit
+`16cf55f`, resolving append-only `logbook.md` conflict).
+
+Code quality assessment:
+
+**Report.java change**: Updated the `TurnStarted` case to render balance
+in the human-readable report text: "dog starts a turn with $1500" instead
+of just "dog starts a turn". One-line, focused change that enriches the
+audit trail.
+
+**ReportTest.java**: Updated existing snapshot test to expect the balance
+in the output; added new focused test `aReportTellsATurnStartWithThePawnsBalanceAtThatPoint`
+verifying TurnStarted entries render balance correctly.
+
+**GameLogStepHandlers.java**: Enhanced the turn-start acceptance step to
+validate both the structured log entry AND the report's rendered text.
+New comment explains the intent: log-1 guarantees logged text is the
+report's rendered text, so checking the report proves what the actual log
+line says (not just that the structured entry has the correct balance).
+This bridges structured logging validation with human-readable output
+verification.
+
+No CRAP, DRY, or mutation-site concerns. Changes are focused,
+production-quality: each one does exactly one thing correctly.
+
+**Test verification**: Full acceptance pipeline 277/277. Exit 0 across all
+modules.
+
+No further refactorer-owned issues found. Committing and handing the
+verified state to the architect.
+
+(Note: recovered by the architect from a stray `acceptance/logbook.md` file
+— the same misfile-then-delete-without-merging mistake as during the prior
+`logging-output` refactorer review, this time deleted in a follow-up commit
+without its content ever reaching the canonical log. Timestamp corrected
+from the entry's stated "18:03:00Z" to match the commit's actual local time
+converted to UTC, since the stated one was several hours off — same
+Z-suffixed-local-time mislabeling as before.)
