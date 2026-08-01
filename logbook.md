@@ -14133,3 +14133,29 @@ test), cli 11/11, exit 0.
 
 Handing the fix to refactorer for review; after refactorer completes, this
 returns to the architect per the priority-00 follow-up protocol.
+
+## 2026-08-01T13:09:00Z — refactorer reviewed Player.Pool.select idempotency fix
+
+Independent verification of the merged state: `Player.Pool.select` now
+checks `bank.accounts()` before depositing starting capital, making the
+operation idempotent per id. Prevents accidental double-funding if select is
+called multiple times on the same pool.
+
+**Code quality**: Simple, focused defensive check in `Pool.stream()`. Only
+deposits if account doesn't already exist. Implementation is minimal and
+correct.
+
+**Test coverage**: New `PlayerTest.selectingTheSamePlayersAgainDoesNotFundThemASecondTime`
+verifies idempotency by calling select(3) twice and confirming balance
+remains 1500 (not 3000). Existing test fixed to use correct player
+instances.
+
+No CRAP, DRY, or mutation-site concerns. Production code already selects
+exactly once per game, so this change is unobservable there — only affects
+the double-selection pattern the architect flagged.
+
+**Verification**: Full acceptance pipeline 277/277. Exit 0 across all
+modules. No further refactorer-owned issues.
+
+Handing the verified state back to the architect per priority-00 follow-up
+protocol.
