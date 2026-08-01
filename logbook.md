@@ -14029,3 +14029,35 @@ the coder as a priority-`00` follow-up: fix the test to reuse the existing
 should guard against being called more than once rather than silently
 compounding deposits. Holding the phase-complete sync until this loop
 returns.
+
+## 2026-08-01T11:03:14Z — architect sent Player.Pool.select finding to coder
+
+Handoff message sent:
+
+```
+id: 20260801T110314Z_000076_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 3249b34220
+created_at: 2026-08-01T11:03:14.239816Z
+enqueued_at: 2026-08-01T11:03:14.837099Z
+task: logging-output
+dequeued_at: 2026-08-01T11:03:17.731080Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 3249b34220
+```
+
+Summary: sent the reviewed `logging-output` state (clean architecture,
+clean DRY, both touched Gherkin scenarios fully mutation-clean) to the
+coder with one open finding — `Player.Pool.select` is not idempotent per
+id, and a test's redundant second `select(3)` call on the shared `ruleSet`
+double-credited three pawns' starting capital, which the test currently
+asserts as if it were correct ($3000 instead of $1500). Asked the coder to
+fix the test (reuse the existing `players` field) and decide whether
+`Pool.select` itself should guard against repeat calls.
