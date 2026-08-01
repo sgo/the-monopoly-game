@@ -205,10 +205,9 @@ class GameTest {
    */
   @Test
   void aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem() {
-    List<Player> threePlayers = ruleSet.players().select(3).toList();
-    Player dog = threePlayers.get(0);
-    Player highHat = threePlayers.get(1);
-    Player ironBox = threePlayers.get(2);
+    Player dog = players.get(0);
+    Player highHat = players.get(1);
+    Player ironBox = players.get(2);
     ironBox.account().withdraw(ironBox.account().balance().amount().minus(new Money(5)));
 
     Map<Player.ID, Cup> cups = Map.of(
@@ -218,13 +217,13 @@ class GameTest {
     );
     AtomicInteger additionalRoundsAllowed = new AtomicInteger(1);
     Game.Result result = new Game(
-        ruleSet, threePlayers, player -> cups.get(player.id()), Strategy.OfPlayers.NOBODY_DECIDES
+        ruleSet, players, player -> cups.get(player.id()), Strategy.OfPlayers.NOBODY_DECIDES
     ).playUntilStopped(() -> additionalRoundsAllowed.getAndDecrement() > 0);
 
     assertThat(result.journal()).containsSubsequence(
         new Entry.Bankrupt(ironBox.id(), null),
-        new Entry.TurnStarted(highHat.id(), new Money(3000)),
-        new Entry.TurnStarted(dog.id(), new Money(3000))
+        new Entry.TurnStarted(highHat.id(), new Money(1500)),
+        new Entry.TurnStarted(dog.id(), new Money(1500))
     );
   }
 

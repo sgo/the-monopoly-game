@@ -63,6 +63,18 @@ class PlayerTest {
   }
 
   @Test
+  void selectingTheSamePlayersAgainDoesNotFundThemASecondTime() {
+    Player.Pool pool = new Player.Pool(2, 8, bank, new Money(1500));
+
+    pool.select(3).toList();
+    List<Player> players = pool.select(3).toList();
+
+    assertThat(players).allSatisfy(
+        player -> assertThat(player.account().balance()).isEqualTo(Balance.of(1500))
+    );
+  }
+
+  @Test
   void everyPlayerInAFullPoolIsADistinctPawn() {
     Player.Pool pool = new Player.Pool(2, 8, bank, new Money(1500));
 
