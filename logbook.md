@@ -14498,3 +14498,29 @@ Both `logging-output` follow-up loops (the `Player.Pool.select` idempotency
 fix and this balance-rendering fix) are now closed and independently
 verified. Sending the phase-complete sync to the specifier again under the
 `logging-output` task name.
+
+## 2026-08-01T16:17:21Z — architect sent logging-output phase-complete sync to specifier
+
+Handoff message sent:
+
+```
+id: 20260801T161721Z_000079_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: ae6e3ad4e5
+created_at: 2026-08-01T16:17:21Z
+task: logging-output
+
+Re-read your role and constitution.
+
+merge_and_process architect ae6e3ad4e5
+```
+
+Summary: closed `logging-output` for real this time — the turn-start
+balance is now genuinely load-bearing in both the structured entry and the
+rendered report text, confirmed via a forced full-level mutation pass
+rather than trusting the differential skip.
