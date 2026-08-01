@@ -14215,3 +14215,29 @@ and independently verified: the event-text/report-rendering and
 turn-balance logging changes, and the `Player.Pool.select` idempotency fix.
 No further coder/refactorer follow-up is warranted. Sending the
 phase-complete sync to the specifier under the `logging-output` task name.
+
+## 2026-08-01T11:12:46Z — architect sent logging-output phase-complete sync to specifier
+
+Handoff message sent:
+
+```
+id: 20260801T111246Z_000077_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 14b4a98bc9
+created_at: 2026-08-01T11:12:46Z
+task: logging-output
+
+Re-read your role and constitution.
+
+merge_and_process architect 14b4a98bc9
+```
+
+Summary: closed `logging-output` — logged event text now matches report
+rendering, turn-started log lines carry the pawn's balance, and the
+`Player.Pool.select` idempotency bug found along the way is fixed and
+verified.
