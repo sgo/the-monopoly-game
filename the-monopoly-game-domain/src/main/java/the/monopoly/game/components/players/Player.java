@@ -88,12 +88,22 @@ public record Player(ID id, Bank.Account account, Position position) {
       return stream().limit(numberOfPlayers);
     }
 
+    /**
+     * Selecting the same id from the same bank twice must not fund it twice: a
+     * pawn already holding an account here was already dealt its starting
+     * capital by an earlier selection, so this one only hands back a
+     * {@link Player} for the account as it stands rather than depositing again.
+     */
     private Stream<Player> stream() {
       return Stream.of(Pawn.values())
           .limit(max)
           .map(Pawn::id)
-          .peek(bank::createAccountFor)
-          .peek(id -> bank.accountOf(id).deposit(startingCapital))
+          .peek(id -> {
+            boolean alreadyFunded = bank.accounts().anyMatch(
+                account -> account.owner().equals(new Bank.Account.Owner(id.value())));
+            bank.createAccountFor(id);
+            if (!alreadyFunded) bank.accountOf(id).deposit(startingCapital);
+          })
           .map(id -> new Player(id, bank.accountOf(id)));
     }
   }

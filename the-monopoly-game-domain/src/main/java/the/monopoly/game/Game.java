@@ -156,7 +156,7 @@ public class Game {
   }
 
   private void takeTurn(Player player, Journal journal, Turn.Events events, Landings landings) {
-    journal.log(new Journal.Entry.TurnStarted(player.id()));
+    journal.log(new Journal.Entry.TurnStarted(player.id(), player.account().balance().amount()));
     new Turn(rules, cups.forPlayer(player), events, landings, jail, strategies.forPlayer(player), deeds).take(player);
   }
 
@@ -298,7 +298,7 @@ public class Game {
 
     public void log(Entry evt) {
       entries.add(evt);
-      logger.info("{}", evt);
+      logger.info(Report.of(List.of(evt)), evt);
     }
 
     public List<Entry> entries() {
@@ -321,7 +321,8 @@ public class Game {
       record InitiativeWon(Player.ID player) implements Entry {
       }
 
-      record TurnStarted(Player.ID player) implements Entry {
+      /** The pawn's account balance is carried at this point so the turn's starting money is on record. */
+      record TurnStarted(Player.ID player, Money balance) implements Entry {
       }
 
       record Rolled(Player.ID player, int total) implements Entry {

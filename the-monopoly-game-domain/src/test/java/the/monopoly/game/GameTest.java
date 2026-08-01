@@ -78,16 +78,28 @@ class GameTest {
     );
 
     assertThat(result.journal()).containsSubsequence(
-        new Entry.TurnStarted(Pawn.high_hat.id()),
+        new Entry.TurnStarted(Pawn.high_hat.id(), new Money(1500)),
         new Entry.Rolled(Pawn.high_hat.id(), 3),
         new Entry.Moved(Pawn.high_hat.id(), 0, 3),
-        new Entry.TurnStarted(Pawn.iron_box.id()),
+        new Entry.TurnStarted(Pawn.iron_box.id(), new Money(1500)),
         new Entry.Rolled(Pawn.iron_box.id(), 6),
         new Entry.Moved(Pawn.iron_box.id(), 0, 6),
-        new Entry.TurnStarted(Pawn.dog.id()),
+        new Entry.TurnStarted(Pawn.dog.id(), new Money(1500)),
         new Entry.Rolled(Pawn.dog.id(), 7),
         new Entry.Moved(Pawn.dog.id(), 0, 7)
     );
+  }
+
+  @Test
+  void aTurnStartedEntryCarriesThePlayersCurrentBalanceRatherThanTheirStartingCapital() {
+    players.getFirst().account().withdraw(new Money(200));
+
+    Game.Result result = play(
+        new Roll(2, 2), new Roll(5, 5), new Roll(3, 3),
+        new Roll(1, 2), new Roll(2, 4), new Roll(4, 3)
+    );
+
+    assertThat(result.journal()).contains(new Entry.TurnStarted(Pawn.dog.id(), new Money(1300)));
   }
 
   @Test
@@ -178,7 +190,7 @@ class GameTest {
     )).playUntilStopped(() -> !stop.compareAndSet(false, true));
 
     assertThat(result.journal()).containsSubsequence(
-        new Entry.TurnStarted(Pawn.dog.id()),
+        new Entry.TurnStarted(Pawn.dog.id(), new Money(1500)),
         new Entry.Rolled(Pawn.dog.id(), 7),
         new Entry.Moved(Pawn.dog.id(), 0, 7)
     );
@@ -193,10 +205,9 @@ class GameTest {
    */
   @Test
   void aBankruptPlayerIsSkippedWithoutEndingTheRoundForWhoeverPlaysAfterThem() {
-    List<Player> threePlayers = ruleSet.players().select(3).toList();
-    Player dog = threePlayers.get(0);
-    Player highHat = threePlayers.get(1);
-    Player ironBox = threePlayers.get(2);
+    Player dog = players.get(0);
+    Player highHat = players.get(1);
+    Player ironBox = players.get(2);
     ironBox.account().withdraw(ironBox.account().balance().amount().minus(new Money(5)));
 
     Map<Player.ID, Cup> cups = Map.of(
@@ -206,13 +217,13 @@ class GameTest {
     );
     AtomicInteger additionalRoundsAllowed = new AtomicInteger(1);
     Game.Result result = new Game(
-        ruleSet, threePlayers, player -> cups.get(player.id()), Strategy.OfPlayers.NOBODY_DECIDES
+        ruleSet, players, player -> cups.get(player.id()), Strategy.OfPlayers.NOBODY_DECIDES
     ).playUntilStopped(() -> additionalRoundsAllowed.getAndDecrement() > 0);
 
     assertThat(result.journal()).containsSubsequence(
         new Entry.Bankrupt(ironBox.id(), null),
-        new Entry.TurnStarted(highHat.id()),
-        new Entry.TurnStarted(dog.id())
+        new Entry.TurnStarted(highHat.id(), new Money(1500)),
+        new Entry.TurnStarted(dog.id(), new Money(1500))
     );
   }
 
@@ -227,9 +238,9 @@ class GameTest {
     )).playUntilStopped(() -> additionalRoundsAllowed.getAndDecrement() > 0);
 
     assertThat(result.journal()).containsSubsequence(
-        new Entry.TurnStarted(Pawn.dog.id()),
+        new Entry.TurnStarted(Pawn.dog.id(), new Money(1500)),
         new Entry.Moved(Pawn.dog.id(), 0, 7),
-        new Entry.TurnStarted(Pawn.dog.id())
+        new Entry.TurnStarted(Pawn.dog.id(), new Money(1500))
     );
     assertThat(result.winner()).isEmpty();
   }

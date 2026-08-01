@@ -80,6 +80,9 @@ public class World {
   private String pomModuleDirectory;
   private Map<String, String> pomDependencies;
   private String lastCheckedPomDependency;
+  private Entry selectedEvent;
+  private String renderedEventText;
+  private String loggedEventText;
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
@@ -727,6 +730,32 @@ public class World {
     if (turnOrder == null)
       throw new AssertionError("Initiative has not been rolled for yet.");
     return turnOrder;
+  }
+
+  public void selectEvent(String eventType) {
+    selectedEvent = SampleEvents.of(eventType);
+  }
+
+  public void renderSelectedEventForReport() {
+    renderedEventText = Report.of(List.of(selectedEvent));
+  }
+
+  public void logSelectedEventToJournal() {
+    int offset = GameLog.offset();
+    new Game.Journal().log(selectedEvent);
+    loggedEventText = GameLog.formattedMessage(offset);
+  }
+
+  public void assertLoggedEventTextMatchesReportRendering() {
+    if (renderedEventText == null)
+      throw new AssertionError("The event has not been rendered for the report yet.");
+    if (loggedEventText == null)
+      throw new AssertionError("The event has not been logged to the Journal yet.");
+    if (!loggedEventText.equals(renderedEventText))
+      throw new AssertionError(
+          "The logged message \"" + loggedEventText + "\" does not match the report's rendered text \""
+              + renderedEventText + "\"."
+      );
   }
 
   public void selectPomModule(String moduleDirectory) {

@@ -56,6 +56,13 @@ final class GameLog {
     }
   }
 
+  /** The exact text SLF4J formatted for the log line written at this index. */
+  static String formattedMessage(int index) {
+    synchronized (EVENTS) {
+      return EVENTS.get(index).getFormattedMessage();
+    }
+  }
+
   private static Entry entryOf(ILoggingEvent event) {
     Object[] arguments = event.getArgumentArray();
     if (arguments == null || arguments.length == 0 || !(arguments[0] instanceof Entry entry))
