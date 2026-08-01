@@ -13591,3 +13591,34 @@ Sending it to the specifier as a priority-`00` follow-up under the
 `cli-logging` task name rather than deciding unilaterally or asking the
 coder to touch scenario data. Holding the phase-complete sync until this
 loop returns.
+
+## 2026-08-01T00:01:08Z — architect sent cli-logging Gherkin example-value finding to specifier
+
+Handoff message sent:
+
+```
+id: 20260801T000108Z_000074_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: cf209504d6
+created_at: 2026-08-01T00:01:08.569488Z
+enqueued_at: 2026-08-01T00:01:08.860157Z
+task: cli-logging
+dequeued_at: 2026-08-01T00:01:12.463602Z
+
+Re-read your role and constitution.
+
+merge_and_process architect cf209504d6
+```
+
+Summary: sent the reviewed `cli-logging` state (clean architecture, clean
+DRY) to the specifier with one open finding — `en/cli-slf4j-config.feature`'s
+example minimum versions are a major-version tier below what actually
+resolves, so soft Gherkin acceptance mutation can't reach any digit below
+the major one. Asking the specifier to decide: tighten the two example
+minimums to share a major version with today's resolved versions, or accept
+and document as equivalent like the existing `dice.feature` tolerance.
