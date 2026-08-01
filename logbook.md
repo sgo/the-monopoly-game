@@ -14390,3 +14390,29 @@ bankruptcy scenario). Full `mvn test` across all modules: domain 259/259
 
 Handing the fix to refactorer for review; after refactorer completes, this
 returns to the architect per the priority-00 follow-up protocol.
+
+## 2026-08-01T16:01:08Z — coder sent second logging-output follow-up handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260801T160108Z_000048_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: logging-output
+commit: 678fed4805
+created_at: 2026-08-01T16:01:08.269310Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 678fed4805
+```
+
+Summary: handed the architect's second `logging-output` priority-00
+follow-up fix (`Report.line`'s `TurnStarted` case now renders balance; the
+`logging-2` acceptance step now checks the played game's own report text,
+not just the structured entry) to the refactorer for review, to return to
+the architect afterward.
