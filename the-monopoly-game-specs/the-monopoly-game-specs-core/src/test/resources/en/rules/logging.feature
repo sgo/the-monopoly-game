@@ -13,6 +13,20 @@ Feature: game logging
     And pawn "high hat" will roll 4 for initiative
     And every other player can complete their turn
 
+  # log-1
+  Scenario Outline: logged event text matches report rendering
+    Given a game with an event of type "<event_type>"
+    When the event is rendered for the report
+    And the event is logged to the Journal
+    Then the logged message text is identical to the report's rendered text
+
+    Examples:
+      | event_type           |
+      | player_buys_property |
+      | player_pays_rent     |
+      | player_passes_go     |
+      | player_draws_card    |
+
   # logging-1
   Scenario Outline: the log records game start and initiative
     When we play the game
@@ -33,7 +47,7 @@ Feature: game logging
   Scenario Outline: the log records a pawn's turn, roll, and movement
     And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
     When we play the game
-    Then the game log records that pawn "dog" starts a turn
+    Then the game log records that pawn "dog" starts a turn with balance "<dog_starting_balance>"
     And the game log records that pawn "dog" rolls a total of <dog_roll_total>
     And the game log records that pawn "dog" moves from position <expected_dog_start_position> to <dog_final_position>
     And the game log records that pawn "dog" starts a turn before it records that pawn "dog" rolls a total of <expected_dog_roll_total>
@@ -41,8 +55,8 @@ Feature: game logging
     And the game log records that pawn "dog" starts its turn before pawn "high hat"
 
     Examples:
-      | dog_die_1 | dog_die_2 | dog_roll_total | expected_dog_roll_total | expected_dog_start_position | dog_final_position | expected_dog_final_position |
-      | 2         | 3         | 5               | 5                       | 0                           | 5                  | 5                           |
+      | dog_die_1 | dog_die_2 | dog_roll_total | expected_dog_roll_total | expected_dog_start_position | dog_final_position | expected_dog_final_position | dog_starting_balance |
+      | 2         | 3         | 5               | 5                       | 0                           | 5                  | 5                           | $1500                |
 
   # logging-3
   Scenario Outline: the log records a salary collected while passing start
