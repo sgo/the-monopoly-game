@@ -13680,3 +13680,28 @@ production defects found and fixed along the way (`Simulator.run`,
 backend are all merged, reviewed, and verified clean end to end. No further
 coder/refactorer/specifier follow-up is warranted. Sending the
 phase-complete sync to the specifier under the `cli-logging` task name.
+
+## 2026-08-01T00:04:23Z — architect sent cli-logging phase-complete sync to specifier
+
+Handoff message sent:
+
+```
+id: 20260801T000423Z_000075_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 9cb94f97b3
+created_at: 2026-08-01T00:04:23Z
+task: cli-logging
+
+Re-read your role and constitution.
+
+merge_and_process architect 9cb94f97b3
+```
+
+Summary: closed `cli-logging` — CLI now declares SLF4J/Logback dependencies,
+the new acceptance scenario is verified with fully sensitive mutation
+coverage (6/6 killed) after tightening the example minimums.
