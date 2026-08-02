@@ -15132,3 +15132,26 @@ property-tests` 22/22 green; full acceptance pipeline 283/283 green.
 34 — all well under the 100-site split threshold.
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T14:24:58Z — refactorer sent card-payment-logging handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-payment-logging
+commit: 71e7f16257
+```
+
+Summary: reviewed the coder's `PlayerPaid` journal entry, report line, and
+matching acceptance step handlers for card-driven player-to-player
+payments. Extracted a missing `playerPaidLine` helper to match this file's
+own established per-entry-kind convention (the one real `dry4java`
+finding); refreshed stale `mutate4java` manifests in `Game.java`,
+`Report.java`, and `Cards.java`. No new property test added — the only new
+behavior is a logging call on an already-tested `transfer` path, not new
+money-movement logic. Full acceptance pipeline 283/283, unit tests
+261+11 green, property tests 22 green. Handing verified state to architect
+for independent review.
