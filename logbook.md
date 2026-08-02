@@ -15883,3 +15883,29 @@ acceptance pipeline 290/290 green, repeated 3+ times.
 split threshold; manifest refreshed via `--update-manifest`.
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T16:43:35Z — refactorer sent card-driven-movement-resolution handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-driven-movement-resolution
+commit: c7d162e896
+```
+
+Summary: reviewed the coder's fix making card-driven movement fire real
+`Moved` events (previously silent) and resolve Rue de Diekirch as a
+normal landing (buy-or-pay-rent via the real `Rent` class). Confirmed no
+duplication against the existing station/utility card patterns
+(dry4java: none — the owned-branch logic is genuinely different, full
+rent-table resolution vs. a flat special amount). Found and closed a
+real coverage gap: `moveToAndResolve` had 0% domain unit-test coverage
+(CRAP 12.0) unlike its siblings; added two focused tests (buy path, rent
+path), bringing it to 98% coverage and CRAP 3.0. Also fixed an
+import-ordering slip. Did not reproduce the coder's noted pre-existing
+flaky CLI-simulation failure across 4 repeated runs. Full unit (266+11)
+and property (22) suites green; acceptance 290/290, repeated 3+ times.
+Handing verified state to architect for independent review.
