@@ -17185,3 +17185,59 @@ auction, with utilities exempt from the reserve whenever a purchase would
 complete the buyer's own utility monopoly or deny another player theirs.
 `buying-land-3` through `buying-land-7` specify it, `SIMULATOR.md` and
 `tasks.md` document it. Asking the user for the next feature to specify.
+
+## 2026-08-02T22:00:37Z — specifier writes decline-narration and turn-start-reserve specs
+
+The user asked for two more observability gaps to be closed, both a
+consequence of the reserve strategy just shipped:
+
+1. Declines should be logged with a reason, not silent. Currently, when a
+   strategy declines a purchase (either the plain `!isAffordable()` case or
+   the new reserve case), `LandSale.resolve` and `Cards.buyIfAccepted` both
+   just fall through with no event at all.
+2. The reserve should render alongside the balance on every "starts a turn"
+   line, not just be a hidden strategy parameter.
+
+Added `journal-31`/`32`, `logging-31`/`32`, `report-31`/`32` for decline
+narration via the direct-landing path (`LandSale`), reusing `buying-land-2`'s
+and `buying-land-3`'s exact setups: "declines to buy X because it cannot
+afford the $Y price" and "... because it would drop the balance below the
+$Y reserve".
+
+User then asked to also cover `Cards.buyIfAccepted` — the card-driven
+"advance to X, buy if unowned" path used by the nearest-station,
+nearest-utility, and named-property cards, which shares the identical
+`accepts()` call but is a structurally separate call site (no auction
+fallback on decline, unlike `LandSale`). Added `journal-34`/`35`,
+`logging-34`/`35`, `report-34`/`35` mirroring the same two reasons via a
+card-driven landing (`cards-17`/`18`'s Rue de Diekirch setup). Also added
+`cards-20`: nothing in `cards.feature` had ever proven a card-driven decline
+leaves the land unowned with the balance untouched (no auction exists on
+this path, so this needed its own functional proof) — a genuine gap
+independent of the narration request, since the underlying decision logic
+was already proven via `LandSale`'s tests but this specific call site's
+"then what" was never asserted anywhere.
+
+Didn't duplicate the functional proof per decline reason on the card path
+(unlike `buying-land-2` vs `-3`, which differ in outcome because of the
+auction): with no auction involved, both reasons produce the identical
+observable state (unowned, balance unchanged), so one functional scenario
+covers both; only the wording scenarios need two variants.
+
+For the turn-start reserve, added `journal-33`/`logging-33`/`report-33`:
+"pawn dog starts a turn with $1500 and a $100 reserve", appended as a
+suffix so existing "starts a turn" assertions (confirmed via the step glue
+to be substring checks, not exact-line matches) keep passing unmodified.
+Included a `reserve: 0` example row per the user's "every turn" phrasing,
+so non-reserve-keeping players still render "a $0 reserve" rather than
+omitting the clause conditionally.
+
+Verified all four changed files with `bb gherkin-parser` (clean) and
+`bb gherkin-ir-dry-checker` (zero exact-duplicates in any file; only the
+same class of near-duplicate/possible-synonym noise already established
+this session). Full `mvn test` across domain/CLI/specs-core green — these
+scenarios aren't wired to any implementation yet, so they're expected to
+fail once the coder generates and runs the acceptance pipeline, per the
+usual red-before-green process.
+
+Committing and handing off to coder.

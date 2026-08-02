@@ -386,3 +386,64 @@ Feature: game logging
       | first_die | second_die |
       | 4         | 6          |
       | 3         | 3          |
+
+  # logging-31
+  Scenario Outline: the log records why a player declines to buy land they cannot afford
+    Given pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
+    When pawn "dog" lands on "<property>"
+    Then the game log records that pawn "dog" declines to buy "<property>" because it cannot afford the $<price> price
+
+    Examples:
+      | property             | dog_starting_balance | high_hat_bid | price |
+      | Diestsestraat Leuven | 59                    | 60           | 60    |
+
+  # logging-32
+  Scenario Outline: the log records why a player keeping a reserve declines a purchase that would dip below it
+    Given pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
+    When pawn "dog" lands on "<property>"
+    Then the game log records that pawn "dog" declines to buy "<property>" because it would drop the balance below the $<reserve> reserve
+
+    Examples:
+      | property         | dog_starting_balance | reserve | high_hat_bid |
+      | Rue Grande Dinant | 150                  | 96      | 60           |
+
+  # logging-33
+  Scenario Outline: the log records a player's reserve alongside their balance at the start of a turn
+    Given pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "dog" will roll 2 and 3 for their turn
+    When we play the game
+    Then the game log records that pawn "dog" starts a turn with $<dog_starting_balance> and a $<reserve> reserve
+
+    Examples:
+      | dog_starting_balance | reserve |
+      | 1500                 | 0       |
+      | 1500                 | 100     |
+
+  # logging-34
+  Scenario Outline: the log records why a player declines to buy a card-driven property they cannot afford
+    Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
+    And pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Kans / Chance"
+    Then the game log records that pawn "dog" declines to buy "Rue de Diekirch Arlon" because it cannot afford the $<price> price
+
+    Examples:
+      | dog_starting_balance | price |
+      | 100                  | 140   |
+
+  # logging-35
+  Scenario Outline: the log records why a player keeping a reserve declines a card-driven purchase that would dip below it
+    Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
+    And pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Kans / Chance"
+    Then the game log records that pawn "dog" declines to buy "Rue de Diekirch Arlon" because it would drop the balance below the $<reserve> reserve
+
+    Examples:
+      | dog_starting_balance | reserve |
+      | 200                  | 65      |

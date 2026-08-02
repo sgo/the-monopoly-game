@@ -275,3 +275,17 @@ Feature: chance and community chest cards
     Examples:
       | position | expected_tenant_final_balance | expected_owner_final_balance |
       | 15       | 1100                            | 1900                           |
+
+  # cards-20
+  Scenario Outline: a card that advances to a named property leaves it unowned when the pawn declines to buy
+    Given pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
+    When pawn "dog" lands on "Kans / Chance"
+    Then pawn "dog" is at position <position>
+    And pawn "dog" does not own "Rue de Diekirch Arlon"
+    And pawn "dog"'s account balance is $<expected_balance>
+
+    Examples:
+      | dog_starting_balance | position | expected_balance |
+      | 100                  | 11       | 100               |
