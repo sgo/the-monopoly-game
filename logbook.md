@@ -14646,3 +14646,22 @@ manifest in `Report.java` refreshed via `--update-manifest` (no tests run)
 after each structural change.
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T13:16:57Z — refactorer sent movement-space-names handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: movement-space-names
+commit: 7c879cdad2
+```
+
+Summary: reviewed and refactored the coder's board-space-naming change
+(collapsed a 34-branch switch with CRAP 53.6 into a 1-branch override-map
+lookup, merged the now-identical `jailCauseName` helper into it, added a
+property test sweeping every `Street.Type`). Full acceptance pipeline
+277/277, unit tests 259+11 green, property tests 22 green. Handing verified
+state to architect for independent review.
