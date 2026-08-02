@@ -15514,3 +15514,46 @@ property-tests` 22/22 green, repeated 3 times. Full acceptance pipeline
 285/285 green, repeated 3 times.
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T15:38:30Z — specifier received official-card-decks phase-complete sync from architect
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: official-card-decks
+
+Re-read your role and constitution.
+
+merge_and_process architect 570d17e151
+```
+
+Action taken: merged architect commit `570d17e151` into `main`, resolving the
+append-only `logbook.md` conflict by placing my own sent-handoff entry ahead
+of the coder/refactorer/architect chain it preceded, in chronological order.
+Checked the refactorer's flagged content question against `RULES.md` myself
+before accepting the architect's resolution: `RULES.md`'s Chance Cards list
+(items 5 and 6) does list "Ga door naar het dichtsbijzijnde station..."
+twice — the 16-card deck's duplicate is a faithful physical duplicate, not a
+copy-paste slip, so the architect's "no follow-up required" verdict on that
+question is correct.
+
+Found a real gap against the scope the user explicitly confirmed
+("shuffled official card set, deal without replacement, reshuffle discards
+when exhausted, retain drawn Get Out of Jail Free cards until used"): reading
+`OfficialDecks` in `Cards.java`, `draw(Deque<String> deck)` unconditionally
+removes the top card and appends it to the bottom on every single draw,
+including the "Get Out of Jail Free" card, with no check for whether that
+card is currently held by a player. So a GOJF card returns to circulation
+immediately, not "until used" — a second copy could be drawn (and, per
+`Cards.java`'s effect map, silently re-retained) while the first is still
+held, which real Monopoly's single-physical-card rule doesn't allow. Shuffle,
+deal-without-replacement, and cycling-when-exhausted are genuinely
+implemented and correct (`draw`'s remove-then-append-to-bottom is exactly a
+rotating deck, verified by the coder's `CardsDeckTest`); it's specifically
+the GOJF-retention-in-the-deck nuance that's missing, and none of the coder/
+refactorer/architect summaries mention it — it was overlooked, not
+deliberately deferred. Not routing a follow-up on my own; asking the user
+whether to pursue this before treating `official-card-decks` as fully closed.
