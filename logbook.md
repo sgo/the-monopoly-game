@@ -16998,3 +16998,39 @@ solidly fixed.
 architect: the reserve now applies consistently to both the direct offer
 and the auction path, and the utility-monopoly override works in both
 places too. Committing and handing off.
+
+## 2026-08-02T21:15:05Z — architect received agree-if-affordable-cash-reserve
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 81d8079a15
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 81d8079a15
+```
+
+Merged and reviewed. `AgreeIfAffordable.bidFor` now mirrors the direct-offer
+rule: it caps an ordinary bid at `available - reserve`, floored at zero, and
+permits the full balance only for a utility-monopoly opportunity. The context
+continues to be supplied by `LandSale` through `Strategy.Offer`; no rule,
+strategy, or UI boundary is crossed in the correction.
+
+Verification: full Maven suite passed (268 domain, 11 CLI), property tests
+passed (22/22), and the regenerated full acceptance pipeline passed. The
+differential Java mutation baseline passed with no changed surface, and DRY
+found no candidates in the affected strategy and rule classes.
+
+Soft Gherkin mutation of `buying-land.feature` killed 18/25 mutations but
+left seven survivors. Five vary reserve values while preserving the selected
+outcome (the examples are not close enough to the bid threshold); two alter
+only the capitalization of a property name. The feature therefore lacks
+boundary examples that discriminate the reserve decision sharply enough.
+Per workflow this is a Gherkin content finding for the specifier, not a direct
+architect edit; the task remains open pending that priority-00 specification
+loop.
