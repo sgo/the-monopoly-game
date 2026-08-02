@@ -14569,6 +14569,43 @@ balance is now genuinely load-bearing in both the structured entry and the
 rendered report text, confirmed via a forced full-level mutation pass
 rather than trusting the differential skip.
 
+## 2026-08-01T21:20:48Z — specifier sent handoff to coder (movement-space-names)
+
+Handoff message sent:
+
+```
+id: 20260801T212048Z_000040_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: movement-space-names
+commit: 087fb8fb8f
+
+Re-read your role and constitution.
+
+merge_and_process specifier 087fb8fb8f
+```
+
+Summary: at the user's request, added the canonical board-space name in
+parentheses next to every position number in the "moves from position X to
+Y" lines recorded by the journal, the game log, and the report
+(scenarios 2, 3, and 19 in each of `logging.feature`, `journal.feature`, and
+`report.feature`). Confirmed with the user that non-ownable spaces (Start,
+Chance, tax spaces, Free Parking, Go to Jail, Community Chest) should use
+the full canonical bilingual board name already used elsewhere in these
+specs (e.g. "Gratis Parkeren / Parc Gratuit"), not the short single-language
+name `Report.spaceName()` currently produces for ownable properties.
+Verified the new Gherkin with `bb gherkin-parser` + `bb gherkin-ir-dry-checker`
+on all three files; no new duplicate or synonym steps introduced beyond the
+pre-existing placeholder-naming variance already in these files. Committed
+as `087fb8fb8f`. This is spec-only: `Report.line()`'s `Entry.Moved` case
+still renders bare position numbers, so the coder needs to give `Moved`
+access to a space name (via the board or the `Entry` itself) and update
+`GameLogStepHandlers`/`JournalStepHandlers`/report step handlers to parse
+the new `(<space>)` step wording.
+
 ## 2026-08-01T21:21:44Z — coder received handoff from specifier
 
 Handoff message received:
@@ -14713,3 +14750,63 @@ space-name values to be load-bearing before this phase can close. The
 architectural review also added a regression test proving `Game.play()`
 performs exactly one round; its only remaining mutation survivor is the
 unobserved completion predicate in one-round mode, which is equivalent.
+
+## 2026-08-02T14:44:00Z — specifier received movement-space-names follow-up from architect
+
+Handoff message received:
+
+```
+id: 20260802T132347Z_000080_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: ed77ed4d44
+created_at: 2026-08-02T13:23:47.519493Z
+enqueued_at: 2026-08-02T13:23:48.151475Z
+task: movement-space-names
+dequeued_at: 2026-08-02T13:24:06.660180Z
+
+Re-read your role and constitution.
+
+merge_and_process architect ed77ed4d44
+```
+
+Action taken: merged architect commit `ed77ed4d44` into `main`, resolving the
+append-only `logbook.md` conflict by interleaving both branches' entries in
+chronological order (matched against real commit timestamps, since the
+`logging-output` phase-complete entry on the architect side predates the
+`movement-space-names` handoff already on `main`).
+
+Reviewed the finding: read `journal.feature` scenarios `journal-2` and
+`journal-3` (the movement scenarios with `(<space>)` parameters) and the
+`JournalStepHandlers.java` step definitions that bind them. Both Examples
+tables already carry distinct, non-redundant start/final space-name columns
+alongside the position columns, and the step text already requires a
+`(<space>)` parameter on both ends of every `moves from position ... to ...`
+line — the Gherkin content is not missing anything. The actual gap is in the
+step *implementation*: the three `moves from position ... (...) to ... (...)`
+step definitions in `JournalStepHandlers.java` capture the space-name text
+into regex groups but only forward the two position ints to
+`MonopolyStepHelpers.moved(pawnName, from, to)`; that helper's `Entry.Moved`
+construction independently re-derives `fromSpace`/`toSpace` from the position
+via `officialSpaceAt` (the production board layout), so the value compared
+in the journal assertion never depends on the Gherkin's space-name text at
+all. No edit to the `.feature` Examples or step wording can make an argument
+load-bearing when the step handler that consumes it discards it — this is a
+project step handler defect (coder-owned code per the constitution's
+acceptance-pipeline component list), not a Gherkin scenario-content defect.
+
+Decision: declining to make a feature-file change; none exists that fixes
+this. Recommend the architect route the actual fix to coder: give
+`moved()`/`JournalStepHandlers` a way to translate the captured space-name
+text into a `Street.Type` (e.g. via the existing name-lookup `Vocabulary`
+already used for `pawn "\<name\>" lands on "\<property\>"`-style steps) and
+assert it against the recorded entry's `fromSpace`/`toSpace`, so a mutated
+Examples space-name value is genuinely killed. Not touching the one-round
+`Game.play()` regression test noted in the same review — that is
+architect/coder-owned verification work, unrelated to specifier scope.
+Committing this decision and handing back to the architect under the
+`movement-space-names` task name.
