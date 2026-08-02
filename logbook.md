@@ -14573,3 +14573,76 @@ verification-and-closure entries in chronological order. The incoming
 specification revises movement-related wording in `journal.feature`,
 `logging.feature`, and `report.feature` to name the board space next to each
 position. Implementing under coder rules next.
+
+## 2026-08-02T13:16:01Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: movement-space-names
+commit: c834e49eca
+
+Re-read your role and constitution.
+
+merge_and_process coder c834e49eca
+```
+
+Action taken: merged `c834e49eca` into `swarmforge-refactorer` (commit
+`94f96a4`, resolving an append-only `logbook.md` conflict by keeping both
+branches' entries in chronological order, matched against real commit
+timestamps rather than the entries' own occasionally-mislabeled stated
+times).
+
+Reviewed the coder's change: `Journal.Entry.Moved` and `JailEntered` now
+carry the `Street.Type` of each space they mention, and `Report` prints a
+parenthetical board name alongside every position. The new `boardSpaceName`
+method the coder added was a 34-branch switch that mostly re-typed, one
+literal at a time, what the existing `spaceName` helper already derives
+from the enum's own name via its camelCase-splitting regex — verified this
+programmatically (a script comparing every `Street.Type` constant's
+regex-derived form against the hardcoded literal) before touching anything,
+since preserving the exact rendered text for every space, including the
+accented and bilingual ones, is what a `mutate4java`/acceptance-tested
+`Report` render depends on. `crap4java` confirmed the cost of that
+duplication concretely: CC=23, CRAP=53.6, and — because the switch carried
+a `default` rather than one case per enum constant — it no longer qualified
+for the sealed-switch CRAP exemption recorded for `Report.line` (that
+exemption is conditioned on the case count equalling the type's full
+width; a `default` gives up the same "compiler catches a missing case"
+guarantee the exemption exists to protect, so it can't also claim the
+exemption meant for the guarantee it gave up).
+
+Refactored `boardSpaceName` into a `Map<Street.Type, String>` of just the
+spaces `spaceName` gets wrong (an accent, an apostrophe, a parenthetical, or
+a bilingual translation), defaulting to `spaceName` for everything else:
+CC=1, CRAP=1.0. That made the pre-existing `jailCauseName` helper — which
+special-cased the one space it cared about the same way, then fell back to
+`spaceName` — behaviorally identical to `boardSpaceName` for every possible
+input, so merged the two and updated `line`'s `JailEntered` case to call
+`boardSpaceName` directly. `dry4java` found no new duplication afterward;
+the only survivors are the pre-existing `Game.Journalling` one-adapter-per-
+event-kind methods and a constructor-field-assignment pair, both unrelated
+to this change and already accepted structure.
+
+Added `ReportBoardSpaceNamePropertyTest` (jetCheck, `property-test` tag,
+`Generator.sampledFrom(Street.Type.values())` with iteration count capped
+at the enum's own size — jetCheck's default 100 iterations can't find "
+sufficiently different" samples from a 36-value domain): sweeps every
+space and asserts (1) it is named the same way whether it is where a move
+lands or what sent a pawn to jail — the exact drift the two separate
+hand-written tables risked before being merged — and (2) every name is
+non-blank with no run-together words, guarding the override map's own
+escape hatch for spaces not yet listed.
+
+Verification: full `mvn test` 259 domain + 11 cli green; `mvn test -P
+property-tests` 22 green including the two new cases; full acceptance
+pipeline 277/277 green. `mutate4java --scan` on all three changed/touched
+main-source files: `Report.java` 2 sites, `Game.java` 29, `Turn.java` 11 —
+all well under the 100-site split threshold. Embedded `mutate4java`
+manifest in `Report.java` refreshed via `--update-manifest` (no tests run)
+after each structural change.
+
+Committing and handing the verified state to the architect.
