@@ -17427,3 +17427,35 @@ noted previously did not reproduce this cycle). `mvn test -P
 property-tests` 22/22 green.
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T22:26:13Z — refactorer sent decline-narration-and-turn-start-reserve handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: decline-narration-and-turn-start-reserve
+commit: c345a973bb
+```
+
+Summary: merged and reviewed the coder's decline-narration and
+turn-start-reserve work. `PurchaseDeclined` now fires from both
+`LandSale.resolve` and `Cards.buyIfAccepted` with a `DeclineReason`
+derived cleanly from the existing `isAffordable()` check; `TurnStarted`
+now carries the strategy's reserve, backward-compatibly. Fixed two
+import-ordering slips in `GameLogStepHandlers.java`; no other structural
+issues. `crap4java`/`dry4java` clean (aside from the pre-existing
+exemptions/precedent). Flagged, but did not fix, a narration-accuracy
+edge case: `Offer.declineReason()` would misreport `UNDECIDED`'s
+declines as reserve-protected, since it infers the reason purely from
+affordability — not reachable by any current specified scenario
+(`UNDECIDED` is a null-strategy stub, not a played strategy), and fixing
+it would mean deciding new behavior (a third decline reason?) outside
+this role's mandate. Full unit and property suites green. Acceptance:
+regenerated pipeline (not `mvn test`, which silently undercounted and
+missed the new scenarios entirely) shows all new scenarios passing;
+only the six already-known bankruptcy-narration failures remain,
+repeated twice for stability. Handing verified state to architect for
+independent review.
