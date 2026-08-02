@@ -16428,6 +16428,21 @@ log, and report acceptance assertions cover both behaviors. Domain tests pass
 270/270; all new acceptance scenarios pass. The full acceptance run retains
 only the six previously documented bankruptcy narration failures.
 
+## 2026-08-02T22:10:00Z — coder sent decline-narration-and-turn-start-reserve to refactorer
+
+Handoff message sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: decline-narration-and-turn-start-reserve
+commit: 6c14f5da59
+```
+
+The implementation adds the two decline reasons and reserve-bearing turn
+entries, with acceptance coverage for direct and card-driven purchases.
+
 ## 2026-08-02T19:12:49Z — specifier plays a full game and finds two more gaps
 
 The user asked me to actually play a 2-player game via the CLI simulator
