@@ -14733,6 +14733,44 @@ after each structural change.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T19:27:58Z — architect received nearest-station-rent-and-jail-narration
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: nearest-station-rent-and-jail-narration
+commit: 5ed8253ceb
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 5ed8253ceb
+```
+
+Merged and reviewed. The correction keeps nearest-station card mechanics in
+`Cards`: it obtains the owner from `Deeds`, counts that owner's stations, and
+uses the existing `Station.rentForOwning` schedule before charging double.
+The change continues through the existing owned/unowned landing-resolution
+boundary, so ordinary rent and purchase behavior remain encapsulated there.
+
+The jail narration remains appropriately event based: `Jail` declares the
+outcome, `Game.Journalling` records typed data, and `Report` supplies the
+wording. This covers a failed doubles attempt, a doubles exit, and a Get Out
+of Jail Free exit without leaking presentation concerns into rules.
+
+Verification on the merged state: full `mvn -B -Dmaven.repo.local=tmp/m2
+test` passed (266 domain and 11 CLI tests); explicit property tests passed
+(22/22); differential mutate4java baselines passed for Cards (53 sites),
+Jail (15), Report (2), and Game (30), with no changed surface requiring
+mutants. DRY found only established event-adapter and step-helper boilerplate.
+The complete acceptance pipeline passed, including cards (47), journal (25),
+logging (29), and report (25) scenarios. Soft Gherkin mutation killed 3/3
+new card mutations and 17/17 journal mutations; logging and report had no
+eligible new soft mutations and completed without errors. Updated mutation
+manifests are committed with this review.
+
 ## 2026-08-02T16:05:28Z — architect received official-card-decks GOJF review
 
 Handoff message received from refactorer:
@@ -16230,6 +16268,10 @@ plain moves. Full Maven tests pass (266 domain, 11 CLI) and property tests
 pass 22/22. Differential mutation is current; DRY reports only existing test
 parameterization, and soft `cards.feature` mutation has no changed surface.
 
+## 2026-08-02T16:58:47Z — architect sent card-driven-movement-resolution phase completion
+
+Handoff message sent to specifier at priority 50 for task
+`card-driven-movement-resolution`, commit `e4974ccd94`.
 ## 2026-08-02T16:59:00Z — specifier received card-driven-movement-resolution phase-complete sync from architect
 
 Handoff message received:
@@ -16542,3 +16584,147 @@ narration scenarios (`Bankruptcy.java` doesn't yet fire the events;
 separate, already-specified, not-yet-implemented gap, out of scope for this
 task and for the refactorer role). Handing verified state to architect for
 independent review.
+
+## 2026-08-02T19:39:46Z — specifier receives and independently verifies nearest-station-rent-and-jail-narration closure
+
+Handoff message received from architect:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: nearest-station-rent-and-jail-narration
+
+Re-read your role and constitution.
+
+merge_and_process architect c1c16fd3d7
+```
+
+Action taken: merged (fast-forward, no conflict). Read the actual diff
+before accepting closure, rather than trusting the pipeline's summaries:
+
+- `Cards.advanceToNearestStation` now computes `stationsOwned` via a new
+  `ownedStations(Player)` helper (mirroring `Rent.owned`) and doubles
+  `station.rentForOwning(stationsOwned)`, replacing the old hardcoded
+  `rentForOwning(1)`.
+- `Jail.leavesOn` now calls `events.stayedInJail(player)` on a failed,
+  non-doubles attempt. `Jail.Events` gained `stayedInJail` as a new
+  default method. `Game`'s `Journalling` now overrides all three
+  previously-unwired-or-missing hooks (`leftJailWithCard`,
+  `leftJailByRollingDoubles`, `stayedInJail`), logging new
+  `JailCardUsed`/`JailDoublesRolled`/`JailStayed` entries. `Report`
+  renders them exactly as specified: "leaves jail using the Get Out of
+  Jail Free card", "leaves jail by rolling doubles", "stays in jail".
+
+Ran `mvn test` for the domain, CLI, and full acceptance modules — all
+green. Then independently reproduced both fixes myself through the real
+`World` acceptance harness (not the unit tests, and not by re-reading
+the same tests the coder/refactorer already ran): gave `high hat` all
+four stations and landed `dog` there via the nearest-station card —
+rent charged was $400 (double the 4-station rate), not the old
+hardcoded $50. Separately drove all three jail-exit paths through
+`World.playGame()` and confirmed the exact wording in the rendered
+report: "dog stays in jail", "dog leaves jail by rolling doubles", "dog
+leaves jail using the Get Out of Jail Free card" (correctly ordered
+before the same-turn move in the GOJF-card case).
+
+`nearest-station-rent-and-jail-narration` is closed: the nearest-station
+Chance card now charges the correct double rent regardless of how many
+stations the owner holds, and all four jail transitions (sent to jail,
+pays the fine, rolls doubles, uses a GOJF card, stays jailed) are now
+narrated in the journal, log, and report. Asking the user for the next
+feature to specify.
+
+## 2026-08-02T20:45:08Z — specifier writes selective-buying refinement to "Agree if affordable"
+
+The user asked to go deeper on "selective buying" (raised while discussing
+under what conditions land can be sold between players, which turned out to
+be a real gap: the mechanism exists in `LandSale.sell` but no strategy ever
+proposes a trade, per `SIMULATOR.md`'s own out-of-scope list — that stays
+future work). Selective buying splits into two very different sizes: a
+cash-reserve or land-type rule is answerable from the `Strategy.Offer` record
+as it exists today (no engine change), while monopoly-awareness needs
+`Offer` to carry ownership context it currently lacks. Started with the free
+one, per the user's choice.
+
+First pass wrote the cash-reserve rule as a new, seemingly-standalone Given
+step ("pawn dog keeps a cash reserve of $X"). User corrected this: since
+everything else about the strategy (claims rent unconditionally, builds and
+pays the jail fine if affordable) is silently inherited from `AgreeIfAffordable`,
+it isn't a universal concept — it's a variant of that one strategy. Given the
+choice between naming it honestly as a variant now versus building a real
+composable decorator with nothing yet to compose it with, the user chose the
+honest-variant route. Reworded the step to
+`pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve>
+reserve`, added `buying-land-3` (declines below reserve) and `buying-land-4`
+(buys at and above reserve, proving the boundary is inclusive) to
+`buying-land.feature`.
+
+User then specified a further rule: utilities should override the reserve
+entirely under certain conditions — buy regardless of the reserve whenever
+doing so denies another player a utility monopoly. This left an unstated
+third case: with only two utilities on the board, if a purchase is
+undecided-unowned there are exactly three ownership states beforehand
+(nobody owns either yet; the other player owns the other one; I own the
+other one myself) — the user's two rules covered the first two but not
+completing my *own* monopoly. Asked via `AskUserQuestion` rather than
+guessing; user chose to override the reserve for the own-monopoly case too,
+same as blocking. Added `buying-land-5` (baseline: reserve still applies
+when nobody owns a utility yet), `buying-land-6` (buys anyway to deny
+another player's monopoly), and `buying-land-7` (buys anyway to complete
+its own monopoly) — all using Elektriciteitscentrale/Watermaatschappij, the
+board's only two utilities, so the three cases are exhaustive as specified.
+
+Updated `SIMULATOR.md` and `tasks.md` per the user's request so the
+documented strategy description doesn't go stale ahead of implementation:
+`SIMULATOR.md` renamed the doc's own inconsistent "Buy All"/"Agree if
+affordable" naming to just "Agree if affordable" throughout and described
+the reserve + utility-monopoly rule in Key Concepts; `tasks.md` left Phase
+4's original historical text untouched (per this file's own established
+convention) and added a "Post-plan refinements" entry marked "specified,
+pending implementation" rather than "(done)", since nothing has been built
+yet — pointing at `buying-land-3` through `buying-land-7` as the spec of
+record.
+
+Verified `buying-land.feature` with `bb gherkin-parser` (clean) and
+`bb gherkin-ir-dry-checker` (only the same class of near-duplicate/
+possible-synonym noise already tolerated elsewhere in this file, arising
+from literal-named scenarios coexisting with parameterized ones — nothing
+new in kind).
+
+Committing and handing off to coder.
+## 2026-08-02T20:48:41Z — coder received agree-if-affordable-cash-reserve
+
+Handoff message received:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 4208c8ba83
+
+Re-read your role and constitution.
+
+merge_and_process specifier 4208c8ba83
+```
+
+Action taken: merged the specification and implemented reserve-aware
+`AgreeIfAffordable` purchases, including utility-monopoly overrides for
+completing or blocking a utility monopoly. Added the configured acceptance
+step and passed the buying-land scenarios plus all 266 domain tests.
+
+## 2026-08-02T20:49:10Z — coder sent agree-if-affordable-cash-reserve
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 7db8e8f74f
+```
+
+Summary: implemented reserve-aware buying and utility-monopoly overrides for
+the Agree if affordable strategy.

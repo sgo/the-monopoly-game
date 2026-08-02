@@ -483,6 +483,10 @@ public class World {
     pawnStrategies.put(pawnName, strategy);
   }
 
+  public void pawnFollowsAgreeIfAffordableWithReserve(String pawnName, Money reserve) {
+    pawnStrategies.put(pawnName, new the.monopoly.game.strategies.AgreeIfAffordable(reserve));
+  }
+
   public void queueChanceCard(String card) {
     queuedChanceCards.add(card);
   }

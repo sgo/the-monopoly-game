@@ -636,3 +636,13 @@ didn't already call for.
   deals without replacement, cycles when exhausted, and withholds a drawn
   Get-Out-of-Jail-Free card until `Deeds` reports it released — verified with
   `CardsDeckTest` rather than additional Gherkin, per the reasoning above.
+- **Cash reserve and utility-monopoly awareness for "Agree if affordable"**
+  (specified, pending implementation) — refines Phase 4's "'Agree if
+  affordable' buys whenever it can afford the price" deliverable rather than
+  introducing a new strategy: buying now also declines a purchase that would
+  leave the player below a configured cash reserve. Utilities are an
+  exception — the strategy buys an available utility regardless of the
+  reserve whenever doing so completes its own utility monopoly or denies
+  another player theirs; with neither player owning a utility yet, the
+  reserve still applies normally. See `buying-land-3` through `buying-land-7`
+  in `buying-land.feature`.

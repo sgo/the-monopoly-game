@@ -303,9 +303,18 @@ public final class Cards implements Landings {
   }
 
   private void buyIfAccepted(Player player, Ownable land) {
-    if (!strategies.forPlayer(player).accepts(new Strategy.Offer(land, player.account().balance().amount()))) return;
+    Strategy strategy = strategies.forPlayer(player);
+    if (!strategy.accepts(new Strategy.Offer(land, player.account().balance().amount(), strategy.cashReserve(),
+        utilityMonopolyOpportunity(land)))) return;
     deeds.sell(land, player, land.price());
     events.bought(player, land, land.price());
+  }
+
+  private boolean utilityMonopolyOpportunity(Ownable land) {
+    if (!(land instanceof Utility)) return false;
+    return rules.streets().filter(Utility.class::isInstance)
+        .filter(it -> it.type() != land.type())
+        .anyMatch(it -> deeds.ownerOf(it.type()).isPresent());
   }
 
   private void paySpecialRent(Player player, Ownable land, Money amount) {

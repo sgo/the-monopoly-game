@@ -6,6 +6,7 @@ import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.components.streets.Utility;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
@@ -64,7 +65,16 @@ public class LandSale implements Landings {
   }
 
   private Strategy.Offer offerTo(Player player, Ownable land) {
-    return new Strategy.Offer(land, player.account().balance().amount());
+    Strategy strategy = strategies.forPlayer(player);
+    return new Strategy.Offer(land, player.account().balance().amount(), strategy.cashReserve(),
+        utilityMonopolyOpportunity(player, land));
+  }
+
+  private boolean utilityMonopolyOpportunity(Player player, Ownable land) {
+    if (!(land instanceof Utility)) return false;
+    return rules.streets().filter(Utility.class::isInstance)
+        .filter(it -> it.type() != land.type())
+        .anyMatch(it -> deeds.ownerOf(it.type()).isPresent());
   }
 
   public void sell(Player seller, Ownable land, Player buyer, Money price) {

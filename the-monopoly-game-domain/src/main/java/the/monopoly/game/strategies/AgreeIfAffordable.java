@@ -7,9 +7,26 @@ import the.monopoly.game.components.finance.Money;
  * and at auction it bids the most it can afford rather than lose the land.
  */
 public final class AgreeIfAffordable implements Strategy {
+  private final Money reserve;
+
+  public AgreeIfAffordable() {
+    this(Money.ZERO);
+  }
+
+  public AgreeIfAffordable(Money reserve) {
+    this.reserve = reserve;
+  }
+
   @Override
   public boolean accepts(Offer offer) {
-    return offer.isAffordable();
+    return offer.isAffordable()
+        && (offer.utilityMonopolyOpportunity()
+            || offer.available().minus(offer.land().price()).covers(reserve));
+  }
+
+  @Override
+  public Money cashReserve() {
+    return reserve;
   }
 
   @Override
