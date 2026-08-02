@@ -48,11 +48,11 @@ public class Game {
   private final Jail jail;
 
   public Game(Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies) {
-    this(rules, players, cups, strategies, new Deeds(), Cards.Decks.EMPTY);
+    this(rules, players, cups, strategies, new Deeds(), Cards.Decks.official());
   }
 
   public Game(Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds) {
-    this(rules, players, cups, strategies, deeds, Cards.Decks.EMPTY);
+    this(rules, players, cups, strategies, deeds, Cards.Decks.official());
   }
 
   public Game(

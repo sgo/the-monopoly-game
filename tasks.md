@@ -328,6 +328,27 @@ about the seams later phases will fill in.
 
 ## Phase 10 — Chance and Community Chest
 
+**Status: partially shipped.** Card resolution (every card's effect, drawn-card
+journal entries, get-out-of-jail-free retention/sale) shipped and is spec'd in
+`cards.feature`/`journal.feature`/`logging.feature`/`report.feature`. The
+"shuffled at setup ... placed at the bottom of the deck" deliverable below was
+**not** actually built: `Game`'s public constructors default `decks` to
+`Cards.Decks.EMPTY`, a permanent no-op (`drawChance`/`drawCommunityChest`
+always return `null`), and nothing else in main source implements `Cards.Decks`
+— only test doubles do. So a real game (including every CLI run to date) never
+draws a card at all when landing on Chance or Community Chest; only the
+acceptance fixtures, which inject a scripted next-card double, ever exercised
+card resolution. Found 2026-08-02 from a real CLI trace showing a landing on
+Chance with no draw logged; `cards-15`/`cards-16` in `cards.feature` now pin
+the regression (landing without a scripted override must still log a real
+card draw) and are the first step of actually completing this deliverable.
+Shuffling / deal-without-replacement / reshuffle-on-exhaustion / returning a
+used or sold get-out-of-jail-free card to the deck are real behaviors this
+phase always called for but that still need an implementation plus a property
+test (not Gherkin — see the specifier's note in `logbook.md` around
+2026-08-02 for why these particular invariants don't fit this project's
+full-game-play Gherkin style).
+
 ### Key Deliverables
 
 - Two decks (16 cards each, texts now captured in
@@ -435,7 +456,9 @@ about the seams later phases will fill in.
 ### Key Deliverables
 
 - Debt to the bank: forfeit all money/property, which the bank then auctions
-  (Get-Out-of-Jail-Free cards return to the bottom of their deck).
+  (Get-Out-of-Jail-Free cards return to the bottom of their deck — depends on
+  Phase 10's still-outstanding real-deck implementation; see that phase's
+  status note).
 - Debt to another player: houses/hotels sold to the bank at half price first,
   then the creditor receives remaining money, deeds, and cards (mortgaged
   property transferred per Phase 8's mortgage-transfer rules, with immediate
@@ -578,3 +601,38 @@ can run genuinely complete games rather than partial ones.
   report (Phase 3) but not for a CLI meant to run real games.
 - Phases 16–17 (variants) are last since they're parametrisations of the
   already-complete official ruleset, not new mechanics.
+
+## Plan status
+
+Phases 1–17 above have all shipped (see `logbook.md` and each phase's commit
+history for the specifier/coder/refactorer/architect record). Work since then
+has been incremental refinement requested directly against the running game
+rather than new phases of this plan; it's tracked below instead of renumbered
+into the phase list above, since none of it introduces a new mechanic the plan
+didn't already call for.
+
+## Post-plan refinements
+
+- **`movement-space-names`** (done) — the journal/log/report's "moves from
+  position X to Y" lines now name the board space next to each position
+  number (e.g. "7 (Kans / Chance)"), not just the bare index. Pure
+  readability; not called for by any phase above.
+- **`logging-output`** (done) — the "starts a turn" journal/log/report line
+  now carries the player's balance at that point, not just the player name.
+  An extension of Phase 3's journal-entry deliverable rather than new scope.
+- **`card-payment-logging`** (done) — card effects that pay or collect from
+  every other player (the two multi-player Chance/Community Chest cards) now
+  produce a journal/log/report entry per payment. This was always implied by
+  Phase 10's "record each card drawn and its resolved effect" deliverable;
+  `Cards.java`'s `transfer()` helper simply never logged anything, so
+  multi-player card effects were invisible in the journal even though the
+  money moved correctly.
+- **Real Chance/Community Chest decks** (in progress) — see Phase 10's status
+  note above. `cards-15`/`cards-16` in `cards.feature` specify that landing on
+  either space without a scripted override still draws a real card; this is
+  completing Phase 10's original "shuffled ... placed at the bottom of the
+  deck" deliverable, which was never actually implemented despite Phase 10
+  being closed out. Still needed beyond the current Gherkin: real shuffling,
+  deal-without-replacement, reshuffle-on-exhaustion, and returning a used or
+  sold get-out-of-jail-free card to the deck — expected to be verified with a
+  property test rather than additional Gherkin.

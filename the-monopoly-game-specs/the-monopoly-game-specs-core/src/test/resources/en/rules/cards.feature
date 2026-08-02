@@ -215,3 +215,21 @@ Feature: chance and community chest cards
       | Je vrienden in het dierenasiel zijn je dankbaar voor je gulheid. je betaald M50.                                                              | Je vrienden in het dierenasiel zijn je dankbaar voor je gulheid. je betaald M50.                                                              |
       | Je had beter deelgenomen aan het renovatie project — je zou waardevolle vaardigheden geleerd hebben! Betaal M40 voor elk huis wat je bezit. M115 voor elk hotel. | Je had beter deelgenomen aan het renovatie project — je zou waardevolle vaardigheden geleerd hebben! Betaal M40 voor elk huis wat je bezit. M115 voor elk hotel. |
       | je organiseert een wafelbak voor de plaatstelijke school. Je ontvangt M25.                                                                     | je organiseert een wafelbak voor de plaatstelijke school. Je ontvangt M25.                                                                     |
+
+  # cards-15
+  Scenario Outline: landing on Chance without a scripted card still draws a real card from the official deck
+    When pawn "<pawn>" lands on "Kans / Chance"
+    Then the game journal records that pawn "<pawn>" draws a chance card
+
+    Examples:
+      | pawn |
+      | dog  |
+
+  # cards-16
+  Scenario Outline: landing on Community Chest without a scripted card still draws a real card from the official deck
+    When pawn "<pawn>" lands on "Algemeen Fonds / Caisse de Communauté"
+    Then the game journal records that pawn "<pawn>" draws a community chest card
+
+    Examples:
+      | pawn |
+      | dog  |

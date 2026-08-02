@@ -14733,6 +14733,26 @@ after each structural change.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T14:25:35Z — architect received handoff from refactorer
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-payment-logging
+commit: 71e7f16257
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 71e7f16257
+```
+
+Action taken: merged the refactorer-reviewed card-payment logging work,
+resolved the append-only logbook conflict by preserving both histories, and
+began architect review of its domain and acceptance boundaries.
+
 ## 2026-08-02T13:16:57Z — refactorer sent movement-space-names handoff to architect
 
 Handoff message sent:
@@ -15022,6 +15042,21 @@ of `journal.feature` killed all movement start/end space-name mutations
 three previously accepted equivalent insufficient-balance survivors in
 bankruptcy/winner scenarios.
 
+## 2026-08-02T13:40:47Z — architect sent movement-space-names phase-complete sync to specifier
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: movement-space-names
+commit: 7f9193e9e3
+```
+
+Summary: the coder follow-up makes Gherkin movement-space names load-bearing
+in journal and log assertions. Architect review and verification are complete.
+
 ## 2026-08-02T15:42:00Z — specifier received movement-space-names phase-complete sync from architect
 
 Handoff message received:
@@ -15057,6 +15092,50 @@ the coder follow-up loop (translating captured space-name text through
 `SpaceNames` before comparing the journal entry) is verified and accepted.
 `movement-space-names` is closed. Asking the user for the next feature to
 specify.
+## 2026-08-02T14:00:52Z — specifier sent handoff to coder (card-payment-logging)
+
+Handoff message sent:
+
+```
+id: 20260802T140052Z_000042_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: card-payment-logging
+commit: 3c4c2a75ce
+created_at: 2026-08-02T14:00:52.832611Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3c4c2a75ce
+```
+
+Summary: the user noticed a real report/log trace where a Chance-card draw
+(landing on position 7, "Kans / Chance") was followed only by the next
+player's turn-start balance line, with no sign of the card or its effect.
+Investigated: `ChanceCardDrawn`/`CommunityChestCardDrawn` is logged for
+every card draw, but `Cards.java`'s `transfer()` (used by
+`payEveryOtherPlayer`/`collectFromEveryOtherPlayer`, the "Betaal elke
+speler M50" and "ontvangt M10 van elke speler" card effects) moves money
+directly between accounts with no journal entry at all — unlike every
+other card effect (`payBank`, `paySpecialRent`, `bought`), which does log.
+Added `journal-23`/`journal-24`, `logging-23`/`logging-24`, and
+`report-23`/`report-24`, extending the existing "card drawn before the
+effect it resolves" pattern to these two card types, using the same
+3-player background as `cards-4`/`cards-5`. Each scenario asserts the
+payment to *both* other players (`high hat` and `iron box`), not just one,
+after the user asked whether transfers to and from every other player were
+covered — an implementation that only paid/collected from the first other
+player found would fail these scenarios. Verified with `bb gherkin-parser`
++ `bb gherkin-ir-dry-checker` on all three files; no new duplicate/synonym
+findings beyond the same accepted pattern already used for existing
+same-shape-different-target lines (e.g. rent-for-different-properties).
+This is spec-only: the coder will need a new `Journal.Entry` type and an
+event hook for player-to-player card payments, since nothing currently
+logs `transfer()`.
+
 ## 2026-08-02T14:00:52Z — coder received card-payment-logging handoff
 
 Handoff message received from specifier, commit `3c4c2a75ce`, task
@@ -15155,3 +15234,69 @@ behavior is a logging call on an already-tested `transfer` path, not new
 money-movement logic. Full acceptance pipeline 283/283, unit tests
 261+11 green, property tests 22 green. Handing verified state to architect
 for independent review.
+
+## 2026-08-02T14:30:20Z — architect completed card-payment-logging review
+
+Merged the refactorer review as `36af658`. The change keeps the correct
+boundary: `Cards` reports player-to-player transfers through its event port,
+`Game.Journalling` records the domain journal entry, and `Report` remains a
+pure rendering projection. No architecture follow-up is needed.
+
+Replaced the flaky sampled-enum property test with a deterministic traversal
+of every `Street.Type`; normal domain tests (261) and property tests (22)
+pass. Differential Java mutation for `Game`, `Report`, and `Cards` has no
+surface after the refreshed manifests. The affected acceptance pipeline passes
+283/283; full and soft Gherkin mutation runs refreshed the journal, logging,
+and report manifests. The new card-payment journal/report scenarios kill their
+mutations; remaining soft survivors are unrelated pre-existing journal inputs.
+
+## 2026-08-02T14:30:50Z — specifier received card-payment-logging phase-complete sync from architect
+
+Handoff message received:
+
+```
+id: 20260802T143050Z_000083_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 9cfb75c467
+created_at: 2026-08-02T14:30:50.265062Z
+enqueued_at: 2026-08-02T14:30:50.576243Z
+task: card-payment-logging
+dequeued_at: 2026-08-02T14:30:53.753313Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 9cfb75c467
+```
+
+Action taken: merged architect commit `9cfb75c467` into `main`, resolving the
+append-only `logbook.md` conflict by placing my own sent-handoff entry ahead
+of the coder/refactorer/architect chain it preceded, in chronological order.
+The full pipeline closed: coder added `Journal.Entry.PlayerPaid` and logged
+it from the pre-existing `transfer` helper in `Cards.java` (the actual gap —
+`transfer` moved money with no event at all before this); refactorer
+extracted a `playerPaidLine` helper to match this file's established
+per-entry-kind convention and confirmed no new property test was needed,
+since the only new behavior is the logging call on an already-exercised
+transfer path; architect confirmed the `Cards`/`Game.Journalling`/`Report`
+boundary stayed correct and replaced a flaky sampled-enum property test with
+a deterministic one while verifying. `journal-23/24`, `logging-23/24`, and
+`report-23/24` — including both the `high hat` and `iron box` payment
+assertions added after the user's follow-up question — all kill their
+mutations; full acceptance 283/283, domain+property tests all green.
+`card-payment-logging` is closed. Asking the user for the next feature to
+specify.
+
+## 2026-08-02T17:15:06Z — coder implemented official-card-decks
+
+Merged specifier commit `5d2c2b6820` for `official-card-decks`.
+
+Implemented shuffled 16-card Chance and Community Chest decks as the default
+for public `Game` constructors. Cards are drawn and rotated to the bottom;
+scripted decks remain injectable. Added wildcard acceptance claims for
+unscripted draws and domain deck-cycle tests. Full acceptance passes 285/285;
+the focused deck tests pass 2/2.

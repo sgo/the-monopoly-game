@@ -15,6 +15,9 @@ import the.monopoly.game.strategies.Strategy;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.Deque;
 import java.util.function.Consumer;
 
 import static the.monopoly.game.components.streets.Street.Type.AlgemeenFonds;
@@ -336,6 +339,10 @@ public final class Cards implements Landings {
   }
 
   public interface Decks {
+    static Decks official() {
+      return new OfficialDecks();
+    }
+
     Decks EMPTY = new Decks() {
       @Override
       public String drawChance() {
@@ -351,6 +358,72 @@ public final class Cards implements Landings {
     String drawChance();
 
     String drawCommunityChest();
+  }
+
+  private static final class OfficialDecks implements Decks {
+    private final Deque<String> chance;
+    private final Deque<String> communityChest;
+
+    private OfficialDecks() {
+      chance = shuffled(List.of(
+          "Ga door naar Nieuwstraat (Brussel) / Rue Neuve (Bruxelles).",
+          "Ga door naar START (Ontvang M200).",
+          "Ga door naar Grand Place (Mons). Als je langs START komt, ontvang je M200.",
+          "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200.",
+          "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.",
+          "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.",
+          "Ga door naar het dichtsbijzijnde nutsbedrijf. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, rol de dobbelsteen en betaal de eigenaar tien keer de gerolde waarde.",
+          "De bank betaald je een dividend van M50.",
+          "Verlaat de gevangenis zonder te betalen.",
+          "Keer 3 stappen terug.",
+          "Ga naar de gevangenis. Passeer niet langs START, je ontvangt geen M200.",
+          "Renoveer al je eigendommen. Je betaald M25 voor ek huis. en M100 voor elk hotel.",
+          "Boete voor te snel rijden. Betaal M15.",
+          "Ga door naar Noord Station / Gare du Nord. If you pass START, collect M200.",
+          "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50.",
+          "Je lening is afbetaald. Je ontvangt M150."
+      ));
+      communityChest = shuffled(List.of(
+          "Je maakt elke week tijd vrij voor je bejaarde buurman — Je hebt geweldige verhalen gehoord! Je ontvant M100.",
+          "Je organiseert een groep om de voetpaden op te ruimen. Je ontvangt M50.",
+          "Je bent vrijwilliger bij het rode kruis. Er waren gratis koekjes! Je ontvangt M10.",
+          "Je koopt wat koekjes op het schoolfestival. Lekker! Je betaald M50.",
+          "Je hebt een puppy gered — en je voelt voldoening! Verlaat de gevangenis zonder betalen. Bewaar deze kaart tot je ze nodig hebt. Je kan de kaart ook ruilen of verkopen.",
+          "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler.",
+          "Luide muziek diep in de nacht? Je buren zijn boos. Ga naar de gevangenis. Je komt niet langs start START. Je ontvangt geen M200.",
+          "Je helpt jouw buur met haar boodschappen. Ze bedankt je met een lekkere lunch! Je ontvangt M20.",
+          "Je helpt met het bouwen van een nieuwe speelplaats! Je ontvangt M100.",
+          "Je speelt de hele dag met de kinderen in het kinderhospitaal. Je ontvangt M100.",
+          "Je ging naar de car wash inzamelactie van de school — Maar je vergat de ramen te sluiten! je betaald M100.",
+          "Net wanneer je denkt dat je geen stap verder kan, bereik je de finish! Ga door naar START. je ontvangt M200.",
+          "Je helpt je buren hun tuin opruimen na het onweer. Je ontvangt M200.",
+          "Je vrienden in het dierenasiel zijn je dankbaar voor je gulheid. je betaald M50.",
+          "Je had beter deelgenomen aan het renovatie project — je zou waardevolle vaardigheden geleerd hebben! Betaal M40 voor elk huis wat je bezit. M115 voor elk hotel.",
+          "je organiseert een wafelbak voor de plaatstelijke school. Je ontvangt M25."
+      ));
+    }
+
+    private static Deque<String> shuffled(List<String> cards) {
+      var shuffled = new java.util.ArrayList<>(cards);
+      Collections.shuffle(shuffled);
+      return new ArrayDeque<>(shuffled);
+    }
+
+    @Override
+    public String drawChance() {
+      return draw(chance);
+    }
+
+    @Override
+    public String drawCommunityChest() {
+      return draw(communityChest);
+    }
+
+    private static String draw(Deque<String> deck) {
+      String card = deck.removeFirst();
+      deck.addLast(card);
+      return card;
+    }
   }
 
   public interface Events {
