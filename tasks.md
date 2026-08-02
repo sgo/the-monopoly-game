@@ -328,25 +328,24 @@ about the seams later phases will fill in.
 
 ## Phase 10 — Chance and Community Chest
 
-**Status: partially shipped.** Card resolution (every card's effect, drawn-card
-journal entries, get-out-of-jail-free retention/sale) shipped and is spec'd in
-`cards.feature`/`journal.feature`/`logging.feature`/`report.feature`. The
-"shuffled at setup ... placed at the bottom of the deck" deliverable below was
-**not** actually built: `Game`'s public constructors default `decks` to
-`Cards.Decks.EMPTY`, a permanent no-op (`drawChance`/`drawCommunityChest`
-always return `null`), and nothing else in main source implements `Cards.Decks`
-— only test doubles do. So a real game (including every CLI run to date) never
-draws a card at all when landing on Chance or Community Chest; only the
-acceptance fixtures, which inject a scripted next-card double, ever exercised
-card resolution. Found 2026-08-02 from a real CLI trace showing a landing on
-Chance with no draw logged; `cards-15`/`cards-16` in `cards.feature` now pin
-the regression (landing without a scripted override must still log a real
-card draw) and are the first step of actually completing this deliverable.
-Shuffling / deal-without-replacement / reshuffle-on-exhaustion / returning a
-used or sold get-out-of-jail-free card to the deck are real behaviors this
-phase always called for but that still need an implementation plus a property
-test (not Gherkin — see the specifier's note in `logbook.md` around
-2026-08-02 for why these particular invariants don't fit this project's
+**Status: fully shipped (as of 2026-08-02).** Card resolution (every card's
+effect, drawn-card journal entries, get-out-of-jail-free retention/sale) was
+spec'd first and is covered in `cards.feature`/`journal.feature`/
+`logging.feature`/`report.feature`. The "shuffled at setup ... placed at the
+bottom of the deck" deliverable below, however, was **not** actually built
+alongside it: `Game`'s public constructors defaulted `decks` to
+`Cards.Decks.EMPTY`, a permanent no-op, so a real game (including every CLI
+run to date) never drew a card at all when landing on Chance or Community
+Chest — only the acceptance fixtures' scripted next-card double ever
+exercised card resolution. Found 2026-08-02 from a real CLI trace showing a
+landing on Chance with no draw logged. Fixed via `cards-15`/`cards-16` in
+`cards.feature` (landing without a scripted override must still log a real
+card draw) plus an implementation-only follow-up: `Cards.Decks.official()`
+now shuffles the real 16-card sets, deals without replacement, cycles when
+exhausted, and withholds a drawn Get-Out-of-Jail-Free card from the deck
+until `Deeds` reports it released (`Cards.WithholdingDeck`, covered by
+`CardsDeckTest`, not Gherkin — see the specifier's logbook notes around
+2026-08-02 for why these deck-internal invariants don't fit this project's
 full-game-play Gherkin style).
 
 ### Key Deliverables
@@ -456,9 +455,10 @@ full-game-play Gherkin style).
 ### Key Deliverables
 
 - Debt to the bank: forfeit all money/property, which the bank then auctions
-  (Get-Out-of-Jail-Free cards return to the bottom of their deck — depends on
-  Phase 10's still-outstanding real-deck implementation; see that phase's
-  status note).
+  (Get-Out-of-Jail-Free cards return to the bottom of their deck — confirmed
+  working: `Bankruptcy.java` calls `Deeds.returnRetainedCardsToDeck`, and
+  Phase 10's deck now returns the physical card once `Deeds` no longer
+  reports it held).
 - Debt to another player: houses/hotels sold to the bank at half price first,
   then the creditor receives remaining money, deeds, and cards (mortgaged
   property transferred per Phase 8's mortgage-transfer rules, with immediate
@@ -627,12 +627,12 @@ didn't already call for.
   `Cards.java`'s `transfer()` helper simply never logged anything, so
   multi-player card effects were invisible in the journal even though the
   money moved correctly.
-- **Real Chance/Community Chest decks** (in progress) — see Phase 10's status
-  note above. `cards-15`/`cards-16` in `cards.feature` specify that landing on
-  either space without a scripted override still draws a real card; this is
-  completing Phase 10's original "shuffled ... placed at the bottom of the
-  deck" deliverable, which was never actually implemented despite Phase 10
-  being closed out. Still needed beyond the current Gherkin: real shuffling,
-  deal-without-replacement, reshuffle-on-exhaustion, and returning a used or
-  sold get-out-of-jail-free card to the deck — expected to be verified with a
-  property test rather than additional Gherkin.
+- **Real Chance/Community Chest decks** (done) — see Phase 10's status note
+  above. `cards-15`/`cards-16` in `cards.feature` specify that landing on
+  either space without a scripted override still draws a real card, completing
+  Phase 10's original "shuffled ... placed at the bottom of the deck"
+  deliverable, which was never actually implemented despite Phase 10 being
+  closed out. `Cards.Decks.official()` now shuffles the real 16-card sets,
+  deals without replacement, cycles when exhausted, and withholds a drawn
+  Get-Out-of-Jail-Free card until `Deeds` reports it released — verified with
+  `CardsDeckTest` rather than additional Gherkin, per the reasoning above.

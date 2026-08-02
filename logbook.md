@@ -14733,6 +14733,32 @@ after each structural change.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T16:05:28Z — architect received official-card-decks GOJF review
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: official-card-decks
+commit: d435cf057e
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d435cf057e
+```
+
+Action taken: merged the follow-up and reviewed the Get Out of Jail Free deck
+retention boundary. `Game` supplies its own `Deeds` to the default deck;
+`Cards` withholds that physical card while `Deeds` records it as retained and
+returns it only after release. The internal deck remains behind `Cards.Decks`.
+
+Full Maven tests pass (264 domain and 11 CLI); property tests pass 22/22.
+Differential mutation is current for `Game`, `Cards`, and `Deeds`; DRY reports
+only established adapter patterns. Soft `cards.feature` mutation has no
+changed scenario surface and refreshed its manifest timestamp.
+
 ## 2026-08-02T15:36:00Z — architect received official-card-decks handoff
 
 Handoff message received from refactorer:
@@ -14766,6 +14792,11 @@ pipeline 285/285 pass. Differential mutation found no stale Java-manifest
 surface in `Game` or `Cards`; DRY found only accepted adapter/catalog patterns.
 Soft Gherkin mutation for `cards.feature` killed 2/2 mutations and refreshed
 its manifest. No follow-up is required.
+
+## 2026-08-02T15:38:03Z — architect sent official-card-decks phase completion
+
+Handoff message sent to specifier at priority 50 for task
+`official-card-decks`, commit `570d17e151`.
 
 ## 2026-08-02T14:25:35Z — architect received handoff from refactorer
 
@@ -15595,11 +15626,11 @@ to: coder
 priority: 50
 role: specifier
 task: official-card-decks
-commit: 97c26c702d
+commit: 2f535ace29
 
 Re-read your role and constitution.
 
-merge_and_process specifier 97c26c702d
+merge_and_process specifier 2f535ace29
 ```
 
 Summary: the user asked to pursue the gap noted in the previous entry.
@@ -15728,3 +15759,55 @@ across 10+ repeated full-suite runs given this area's known shuffle-driven
 flakiness risk. Full unit (264+11) and property (22) suites green;
 acceptance 285/285, repeated twice. Handing verified state to architect
 for independent review.
+
+## 2026-08-02T16:06:00Z — specifier received official-card-decks GOJF-retention phase-complete sync from architect
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: official-card-decks
+
+Re-read your role and constitution.
+
+merge_and_process architect e40c7663ef
+```
+
+Action taken: merged architect commit `e40c7663ef` into `main` (no conflict
+this time — the append-only `logbook.md` history merged cleanly). Reviewed
+the fix myself rather than taking the verification summaries on faith: the
+new `WithholdingDeck` (shared by both decks after the refactorer's
+extraction) holds a drawn "Get Out of Jail Free" card out of its rotation
+instead of appending it back, and only returns it once
+`deeds.holds(retainedCard)` is false. Confirmed `Game`'s constructor passes
+its own `deeds` into `Cards.Decks.official(deeds)` (`Game.java:62`), so the
+deck's withholding check sees the same retained-card state the rest of the
+game updates — not a disconnected copy that would never see a release. The
+coder's `CardsDeckTest.anOfficialChanceGetOutOfJailFreeCardStaysOutUntilReleased`
+draws until the real card comes up, holds it, asserts 15 further draws never
+reproduce it, releases it, and asserts it reappears within the next 16 draws
+— exactly the behavior I asked for, verified against the real shuffled deck
+rather than a scripted double.
+
+All four scope items the user confirmed for `official-card-decks` are now
+genuinely implemented: shuffled official set, deal without replacement,
+reshuffle/cycle on exhaustion, and Get-Out-of-Jail-Free retained in the deck
+until released. `official-card-decks` is closed. Asking the user for the
+next feature to specify.
+
+## 2026-08-02T16:30:00Z — coder completed card-driven movement resolution
+
+Received specifier handoff `card-driven-movement-resolution` at commit
+`b6e3187dab` and implemented it. Card-driven movement now emits movement
+events, collects salary when passing START, and resolves the named Rue de
+Diekirch destination as a normal property landing: it buys the unowned land
+when accepted or charges standard rent when owned. Added acceptance handlers
+for draw-before-movement ordering in the journal, game log, and report.
+
+Verification: focused acceptance passed all 290 scenarios; full Maven test
+passed; the full acceptance run reached the existing nondeterministic CLI
+simulation failure (`the game log records no winner`) while all 290 generated
+acceptance scenarios otherwise executed. The unrelated `.lurus/` directory
+was preserved untracked.
