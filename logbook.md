@@ -15772,3 +15772,60 @@ genuinely implemented: shuffled official set, deal without replacement,
 reshuffle/cycle on exhaustion, and Get-Out-of-Jail-Free retained in the deck
 until released. `official-card-decks` is closed. Asking the user for the
 next feature to specify.
+
+## 2026-08-02T16:21:06Z — specifier sent handoff to coder (card-driven-movement-resolution)
+
+Handoff message sent:
+
+```
+id: 20260802T162106Z_000045_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: card-driven-movement-resolution
+commit: b6e3187dab
+created_at: 2026-08-02T16:21:06.496078Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier b6e3187dab
+```
+
+Summary: the user pasted a real CLI trace showing dog draw a chance card
+that advances to Rue de Diekirch (Arlon), then the trace jumped straight to
+the next player's turn with no sign of the move or anything happening at
+the destination. Reproduced directly against `Cards.resolve()` (bypassing
+the shuffled deck with a scripted card) before writing anything: dog's
+position moved correctly to Rue de Diekirch, but no `bought`/`paid` event
+fired and the balance never changed — `Cards.moveTo()` only updates
+position and handles the pass-Start salary; it never logs a `Moved` journal
+entry and never re-enters landing resolution for the destination. This
+affects the four Chance cards that advance to a *named* property
+(Nieuwstraat, Grand Place, Rue de Diekirch, Noord Station); the "advance to
+nearest station"/"advance to nearest utility" cards already call
+`resolveNearestOwnedLand`/their own buy-or-rent logic after moving, so they
+don't have the second half of this gap, though they share the same missing
+movement-logging call.
+
+Added `cards-17`/`cards-18` to `cards.feature` (mirroring `cards-9`/`cards-10`'s
+buy-if-unowned / pays-owner-rent shape, but for a plain named street rather
+than the "nearest station" card's doubled-rent variant — Rue de Diekirch's
+standard unimproved rent is M10 per `RULES.md`, not doubled), and
+`journal-25`/`logging-25`/`report-25` proving the card-driven move itself is
+logged/reported with the same "moves from position X (space) to Y (space)"
+wording already established for ordinary dice-driven movement. One
+representative property (Rue de Diekirch) is enough to prove the mechanic;
+not adding one scenario per affected card, consistent with this project's
+existing "cover the mechanic once" convention for chance/community chest
+cards. Verified with `bb gherkin-parser` + `bb gherkin-ir-dry-checker` on all
+four touched files; only low-confidence substring-overlap findings, the same
+category already accepted elsewhere in these files.
+
+Left to the coder's judgment: whether `Cards.moveTo()` itself gains the
+movement-logging call (so all six "advance" card types benefit uniformly)
+while only the four named-property cards additionally gain generic
+landing-resolution — doing that resolution generically inside `moveTo()`
+itself would double-resolve the station/utility cards, which already handle
+their own follow-up.
