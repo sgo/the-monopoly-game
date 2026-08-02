@@ -15811,3 +15811,75 @@ passed; the full acceptance run reached the existing nondeterministic CLI
 simulation failure (`the game log records no winner`) while all 290 generated
 acceptance scenarios otherwise executed. The unrelated `.lurus/` directory
 was preserved untracked.
+
+## 2026-08-02T16:42:51Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: card-driven-movement-resolution
+commit: 1fd4bbba65
+
+Re-read your role and constitution.
+
+merge_and_process coder 1fd4bbba65
+```
+
+Action taken: merged `1fd4bbba65` into `swarmforge-refactorer` (commit
+`f508868`, resolving an append-only `logbook.md` conflict). Did not
+reproduce the coder's noted "existing nondeterministic CLI simulation
+failure" — full acceptance pipeline ran clean at 290/290 across 4
+repeated runs, and `mvn test` clean across 4 repeated runs; not chasing
+it further since it's flagged as pre-existing and unrelated to this task.
+
+Reviewed the change: the existing `moveTo` helper (used by every
+card-driven movement — start, Grand Place Mons, Nieuwstraat, Noord
+Station, nearest station/utility) now also fires `events.moved(...)`,
+so card-driven moves finally appear in the journal/log/report as actual
+`Moved` entries instead of silently teleporting the pawn. The new
+`moveToAndResolve` sends the Rue de Diekirch chance card through a real
+buy-or-pay-rent resolution: unowned land gets the normal buy offer,
+owned land goes through an inline `Rent` instance for standard
+per-street rent (correctly using the real `Rent` class rather than
+`paySpecialRent`'s flat-amount shortcut, since a `ColourStreet`'s rent
+depends on its rate table, monopoly bonus, and improvements — not
+reducible to a flat special formula the way station/utility rent is).
+
+Checked whether this duplicates the existing
+`advanceToNearestStation`/`advanceToNearestUtility`/`resolveNearestOwnedLand`
+buy-or-pay shape: `dry4java` found nothing — the owned-branch
+implementations differ enough (full `Rent.resolve` vs. a precomputed
+flat amount) that they're genuinely different shapes, not copies. Left
+them separate rather than forcing a shared abstraction the tool doesn't
+support.
+
+Found a real coverage gap: `crap4java` flagged `moveToAndResolve` at
+CRAP 12.0 with 0% domain unit-test coverage — unlike its two siblings,
+which both have a dedicated `GameTest` case
+(`assertNearestStationFrom`/`assertNearestUtilityFrom`), this new path
+had none at the domain level (only exercised indirectly through
+acceptance/simulation runs). Added two focused tests following the same
+`resolveChanceCardAt` pattern already established in this file: buys
+the unowned land when the strategy accepts, and charges the owner's
+vacant rent when it's already owned. The rent test needed the *owner's*
+strategy to claim the rent — `Rent.collect` gates on
+`strategies.forPlayer(owner).claims(...)`, not the tenant's strategy, so
+plain `Map.of()` (defaulting both players to `Strategy.UNDECIDED`, which
+never claims) silently charged nothing on the first attempt; fixed by
+giving the owner the existing `biddingAndClaiming(0)` helper. CRAP
+dropped from 12.0 to 3.0 at 98% coverage after.
+
+Also fixed one import-ordering slip: `movesFromPosition` landed between
+`moved` and `moves` in `GameLogStepHandlers.java` instead of after
+`movesAnywhere`.
+
+Verification: full `mvn test` 266 domain (264 + 2 new) + 11 cli green,
+repeated 4+ times. `mvn test -P property-tests` 22/22 green. Full
+acceptance pipeline 290/290 green, repeated 3+ times.
+`mutate4java --scan`: `Cards.java` 54 sites, well under the 100-site
+split threshold; manifest refreshed via `--update-manifest`.
+
+Committing and handing the verified state to the architect.
