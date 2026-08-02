@@ -36,7 +36,7 @@ class ReportTest {
     )).isEqualTo("""
         dog starts a turn with $1500
         dog rolls a total of 5
-        dog moves from position 0 to 5""");
+        dog moves from position 0 (Start) to 5 (Noord Station / Gare du Nord)""");
   }
 
   @Test

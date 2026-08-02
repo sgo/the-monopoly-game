@@ -146,8 +146,9 @@ final class MonopolyStepHelpers {
     return pawnName + " rolls a total of " + total;
   }
 
-  static String movesFromPosition(String pawnName, int from, int to) {
-    return pawnName + " moves from position " + from + " to " + to;
+  static String movesFromPosition(String pawnName, int from, String fromSpace, int to, String toSpace) {
+    return pawnName + " moves from position " + from + " (" + fromSpace + ") to "
+        + to + " (" + toSpace + ")";
   }
 
   /** A pawn moving anywhere, for a step that says when it moved rather than where to. */
