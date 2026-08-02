@@ -14733,6 +14733,40 @@ after each structural change.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T15:36:00Z — architect received official-card-decks handoff
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: official-card-decks
+commit: f9885c5c88
+
+Re-read your role and constitution.
+
+merge_and_process refactorer f9885c5c88
+```
+
+Action taken: merged the refactorer work, resolved the append-only logbook
+conflict by retaining both histories, and began architectural review of the
+official deck boundary and its acceptance coverage.
+
+## 2026-08-02T15:38:03Z — architect completed official-card-decks review
+
+The official deck remains an internal `Cards.Decks` implementation, while the
+constructor-injected `Decks` port preserves deterministic tests and scripted
+acceptance decks. `Game` owns the default choice, so no UI or infrastructure
+dependency enters the rules layer. The repeated nearest-station Chance card is
+a valid duplicate physical card; it deliberately shares its one effect.
+
+Verification: domain tests 263/263, property tests 22/22, and the acceptance
+pipeline 285/285 pass. Differential mutation found no stale Java-manifest
+surface in `Game` or `Cards`; DRY found only accepted adapter/catalog patterns.
+Soft Gherkin mutation for `cards.feature` killed 2/2 mutations and refreshed
+its manifest. No follow-up is required.
+
 ## 2026-08-02T14:25:35Z — architect received handoff from refactorer
 
 Handoff message received:
@@ -15250,6 +15284,41 @@ surface after the refreshed manifests. The affected acceptance pipeline passes
 and report manifests. The new card-payment journal/report scenarios kill their
 mutations; remaining soft survivors are unrelated pre-existing journal inputs.
 
+## 2026-08-02T14:30:20Z — architect sent card-payment-logging phase completion
+
+Handoff message sent to specifier at priority 50 for task
+`card-payment-logging`, commit `9cfb75c467`.
+
+## 2026-08-02T14:31:30Z — architect received handoff-queue audit note
+
+Handoff message received from coder:
+
+```
+type: note
+from: coder
+priority: 00
+
+Re-read your role and constitution.
+
+Audit queue scripts: stale handoff resurfaced; newer handoff was missed.
+```
+
+Action taken: re-read the architect role and constitution, audited delivery,
+and fixed the local daemon's recipient-inbox collision path. A collision now
+creates a uniquely named queued payload instead of silently dropping the new
+handoff. The runtime scripts are intentionally Git-ignored, so the committed
+record preserves the audit while the operational repair remains local.
+
+## 2026-08-02T14:32:44Z — architect processed queued mail notification
+
+Queued message received:
+
+```
+You have new handoff mail. If idle, run ready_for_next.sh.
+```
+
+Action taken: the current work was complete; ran the handoff helper and found
+no remaining inbox task.
 ## 2026-08-02T14:30:50Z — specifier received card-payment-logging phase-complete sync from architect
 
 Handoff message received:
@@ -15290,6 +15359,63 @@ assertions added after the user's follow-up question — all kill their
 mutations; full acceptance 283/283, domain+property tests all green.
 `card-payment-logging` is closed. Asking the user for the next feature to
 specify.
+
+## 2026-08-02T15:02:10Z — specifier sent handoff to coder (official-card-decks)
+
+Handoff message sent:
+
+```
+id: 20260802T150210Z_000043_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: official-card-decks
+commit: 5d2c2b6820
+created_at: 2026-08-02T15:02:10.498851Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 5d2c2b6820
+```
+
+Summary: the user pasted a real CLI trace (dog lands on position 7, "Kans /
+Chance", with no card drawn before the next turn-start line) that could not
+be explained by the already-closed `card-payment-logging` fix. Ran the CLI
+simulator directly (`java -cp
+the-monopoly-game-domain/target/classes:the-monopoly-game-cli/target/classes:
+...slf4j-api...jar the.monopoly.game.cli.Simulator 2`) and reproduced it:
+`Game`'s public constructors default `decks` to `Cards.Decks.EMPTY`, whose
+`drawChance`/`drawCommunityChest` always return `null`, and `Cards.resolve()`
+silently no-ops on a `null` draw. No real `Cards.Decks` implementation exists
+anywhere in main source — every chance/community-chest scenario to date
+(including `card-payment-logging`'s) only worked because the acceptance
+fixtures inject a scripted "next card" test double, which real play never
+gets. This is Phase 10's original "shuffled ... placed at the bottom of the
+deck" deliverable, called for in `tasks.md` but never actually built;
+recorded that gap on the plan in commit `6e120c7` (previous commit, not part
+of this handoff).
+
+Added `cards-15`/`cards-16` to `cards.feature`: landing on Chance/Community
+Chest with the official rule set and no `"the next ... card will be"`
+override must still log a real card draw (a new generic "draws a chance
+card"/"draws a community chest card" assertion, deliberately not asserting
+which card, since the deck is genuinely random). Verified with `bb
+gherkin-parser` + `bb gherkin-ir-dry-checker`; the only new findings pair
+these against the existing exact-text "draws the chance/community chest
+card "..."" steps, which is expected and necessary — one asserts a specific
+scripted card, the new one asserts "some real card, we don't know which."
+
+Deliberately left out of Gherkin, per the user's confirmed "full real-deck"
+scope: genuine shuffling, deal-without-replacement, reshuffle-on-exhaustion,
+and returning a used/sold "Get Out of Jail Free" card to the deck. Proving
+those needs many sequential draws and internal deck-state inspection, which
+doesn't fit this project's full-game-play Gherkin style without inventing a
+bespoke deck-introspection harness. Recommend the coder implement genuine
+shuffling behavior for these four invariants and cover them with a property
+test (this project's established tool for structural/statistical invariants,
+e.g. `ReportBoardSpaceNamePropertyTest`) rather than additional Gherkin.
 
 ## 2026-08-02T17:15:06Z — coder implemented official-card-decks
 
@@ -15415,3 +15541,100 @@ Also fixed broken import ordering and a stray fully-qualified reference.
 Full unit (263+11) and property (22) suites green across repeated runs;
 acceptance 285/285 across repeated runs. Handing verified state to
 architect for independent review.
+
+## 2026-08-02T15:38:30Z — specifier received official-card-decks phase-complete sync from architect
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: official-card-decks
+
+Re-read your role and constitution.
+
+merge_and_process architect 570d17e151
+```
+
+Action taken: merged architect commit `570d17e151` into `main`, resolving the
+append-only `logbook.md` conflict by placing my own sent-handoff entry ahead
+of the coder/refactorer/architect chain it preceded, in chronological order.
+Checked the refactorer's flagged content question against `RULES.md` myself
+before accepting the architect's resolution: `RULES.md`'s Chance Cards list
+(items 5 and 6) does list "Ga door naar het dichtsbijzijnde station..."
+twice — the 16-card deck's duplicate is a faithful physical duplicate, not a
+copy-paste slip, so the architect's "no follow-up required" verdict on that
+question is correct.
+
+Found a real gap against the scope the user explicitly confirmed
+("shuffled official card set, deal without replacement, reshuffle discards
+when exhausted, retain drawn Get Out of Jail Free cards until used"): reading
+`OfficialDecks` in `Cards.java`, `draw(Deque<String> deck)` unconditionally
+removes the top card and appends it to the bottom on every single draw,
+including the "Get Out of Jail Free" card, with no check for whether that
+card is currently held by a player. So a GOJF card returns to circulation
+immediately, not "until used" — a second copy could be drawn (and, per
+`Cards.java`'s effect map, silently re-retained) while the first is still
+held, which real Monopoly's single-physical-card rule doesn't allow. Shuffle,
+deal-without-replacement, and cycling-when-exhausted are genuinely
+implemented and correct (`draw`'s remove-then-append-to-bottom is exactly a
+rotating deck, verified by the coder's `CardsDeckTest`); it's specifically
+the GOJF-retention-in-the-deck nuance that's missing, and none of the coder/
+refactorer/architect summaries mention it — it was overlooked, not
+deliberately deferred. Not routing a follow-up on my own; asking the user
+whether to pursue this before treating `official-card-decks` as fully closed.
+
+## 2026-08-02T15:50:00Z — specifier sent official-card-decks GOJF-retention follow-up to coder
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+role: specifier
+task: official-card-decks
+commit: 97c26c702d
+
+Re-read your role and constitution.
+
+merge_and_process specifier 97c26c702d
+```
+
+Summary: the user asked to pursue the gap noted in the previous entry.
+`OfficialDecks.draw(Deque<String> deck)` in `Cards.java` unconditionally
+removes the top card and appends it to the bottom on every draw, including
+the "Get Out of Jail Free" card in both the chance and community chest
+decks, with no check for whether a player currently holds one. Real
+Monopoly (and this project's own agreed scope: "retain drawn Get Out of
+Jail Free cards until used") requires that specific card to leave
+circulation the moment it's drawn and stay out until whoever holds it uses
+it, sells it, or forfeits it in bankruptcy — only then does it go back to
+the bottom of its deck. `Deeds.RetainedCard`/`deeds.hold(...)` already
+tracks who holds which retained card (used by `cards-7`/`cards-8`'s "holds
+a Get Out of Jail Free card"/"sold ... to pawn" assertions); the deck
+itself needs to consult that same state before re-queuing a drawn card,
+so a card matching a currently-held `RetainedCard` is withheld rather than
+appended back.
+
+No new Gherkin from me for this specifically: `cards-7`/`cards-8` already
+Gherkin-test the retention *effect* via the scripted card queue, and
+proving the *deck* itself withholds the card requires either controlling
+the shuffle order or inspecting internal deck state — the same reasoning
+that kept shuffle/deal-without-replacement/reshuffle out of Gherkin for
+this task originally. Recommend extending the coder's own `CardsDeckTest`
+(the same one that verified the 16-card rotation) with a case proving a
+drawn "Get Out of Jail Free" card is absent from the next N draws while
+held, and reappears once returned — a unit/property-style test, not an
+acceptance scenario.
+
+## 2026-08-02T17:48:04Z — coder completed official-card-decks GOJF follow-up
+
+Merged specifier follow-up commit `2f535ace29`.
+
+Official decks now bind to `Deeds`: a drawn Get-Out-of-Jail-Free card is
+withheld while retained and returns to the deck after release, including
+use or return through bankruptcy; sale and transfer preserve the hold. Added
+a focused deck test. Full Maven tests pass 264 domain tests and 11 CLI tests;
+full acceptance passes 285/285.

@@ -322,7 +322,7 @@ public class World {
   }
 
   public void playGame() {
-    Cards.Decks officialDecks = Cards.Decks.official();
+    Cards.Decks officialDecks = Cards.Decks.official(deeds == null ? deeds = new Deeds() : deeds);
     Game.Result result = new Game(
         ruleSet, players(), player -> () -> nextQueuedPawnRoll(player), this::strategyOf,
         deeds == null ? deeds = new Deeds() : deeds,
