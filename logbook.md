@@ -16826,3 +16826,33 @@ same eight scenarios fail both times.
 Committing the structural fix and handing the verified-but-not-fully-
 passing state to the architect, with the `bidFor` defect flagged
 explicitly so it can loop back to the coder.
+
+## 2026-08-02T21:00:28Z — architect received agree-if-affordable-cash-reserve
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 68cd733922
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 68cd733922
+```
+
+Merged and reviewed. The refactor moves the utility-monopoly query to
+`Deeds`, the owner of property ownership information, which removes duplicated
+rule logic from `Cards` and `LandSale`. The reserve and utility-opportunity
+facts travel in `Strategy.Offer`, retaining a small cohesive strategy
+boundary and preserving the default strategy API.
+
+The implementation is not phase-complete: `AgreeIfAffordable.accepts` honors
+the reserve for a direct purchase, but `bidFor` still returns all available
+cash. Consequently, a player that properly declines a purchase can immediately
+win the ensuing auction by spending its protected reserve. The new buying-land
+acceptance scenarios demonstrate this for both a normal property and a utility
+monopoly case. This is a functional implementation omission, not a Gherkin
+content defect, and requires a coder follow-up before architectural closure.
