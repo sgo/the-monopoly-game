@@ -14733,6 +14733,40 @@ after each structural change.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T15:36:00Z — architect received official-card-decks handoff
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: official-card-decks
+commit: f9885c5c88
+
+Re-read your role and constitution.
+
+merge_and_process refactorer f9885c5c88
+```
+
+Action taken: merged the refactorer work, resolved the append-only logbook
+conflict by retaining both histories, and began architectural review of the
+official deck boundary and its acceptance coverage.
+
+## 2026-08-02T15:38:03Z — architect completed official-card-decks review
+
+The official deck remains an internal `Cards.Decks` implementation, while the
+constructor-injected `Decks` port preserves deterministic tests and scripted
+acceptance decks. `Game` owns the default choice, so no UI or infrastructure
+dependency enters the rules layer. The repeated nearest-station Chance card is
+a valid duplicate physical card; it deliberately shares its one effect.
+
+Verification: domain tests 263/263, property tests 22/22, and the acceptance
+pipeline 285/285 pass. Differential mutation found no stale Java-manifest
+surface in `Game` or `Cards`; DRY found only accepted adapter/catalog patterns.
+Soft Gherkin mutation for `cards.feature` killed 2/2 mutations and refreshed
+its manifest. No follow-up is required.
+
 ## 2026-08-02T14:25:35Z — architect received handoff from refactorer
 
 Handoff message received:
@@ -15212,6 +15246,29 @@ property-tests` 22/22 green; full acceptance pipeline 283/283 green.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T14:24:58Z — refactorer sent card-payment-logging handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-payment-logging
+commit: 71e7f16257
+```
+
+Summary: reviewed the coder's `PlayerPaid` journal entry, report line, and
+matching acceptance step handlers for card-driven player-to-player
+payments. Extracted a missing `playerPaidLine` helper to match this file's
+own established per-entry-kind convention (the one real `dry4java`
+finding); refreshed stale `mutate4java` manifests in `Game.java`,
+`Report.java`, and `Cards.java`. No new property test added — the only new
+behavior is a logging call on an already-tested `transfer` path, not new
+money-movement logic. Full acceptance pipeline 283/283, unit tests
+261+11 green, property tests 22 green. Handing verified state to architect
+for independent review.
+
 ## 2026-08-02T14:30:20Z — architect completed card-payment-logging review
 
 Merged the refactorer review as `36af658`. The change keeps the correct
@@ -15227,6 +15284,41 @@ surface after the refreshed manifests. The affected acceptance pipeline passes
 and report manifests. The new card-payment journal/report scenarios kill their
 mutations; remaining soft survivors are unrelated pre-existing journal inputs.
 
+## 2026-08-02T14:30:20Z — architect sent card-payment-logging phase completion
+
+Handoff message sent to specifier at priority 50 for task
+`card-payment-logging`, commit `9cfb75c467`.
+
+## 2026-08-02T14:31:30Z — architect received handoff-queue audit note
+
+Handoff message received from coder:
+
+```
+type: note
+from: coder
+priority: 00
+
+Re-read your role and constitution.
+
+Audit queue scripts: stale handoff resurfaced; newer handoff was missed.
+```
+
+Action taken: re-read the architect role and constitution, audited delivery,
+and fixed the local daemon's recipient-inbox collision path. A collision now
+creates a uniquely named queued payload instead of silently dropping the new
+handoff. The runtime scripts are intentionally Git-ignored, so the committed
+record preserves the audit while the operational repair remains local.
+
+## 2026-08-02T14:32:44Z — architect processed queued mail notification
+
+Queued message received:
+
+```
+You have new handoff mail. If idle, run ready_for_next.sh.
+```
+
+Action taken: the current work was complete; ran the handoff helper and found
+no remaining inbox task.
 ## 2026-08-02T14:30:50Z — specifier received card-payment-logging phase-complete sync from architect
 
 Handoff message received:
@@ -15324,3 +15416,101 @@ bespoke deck-introspection harness. Recommend the coder implement genuine
 shuffling behavior for these four invariants and cover them with a property
 test (this project's established tool for structural/statistical invariants,
 e.g. `ReportBoardSpaceNamePropertyTest`) rather than additional Gherkin.
+
+## 2026-08-02T17:15:06Z — coder implemented official-card-decks
+
+Merged specifier commit `5d2c2b6820` for `official-card-decks`.
+
+Implemented shuffled 16-card Chance and Community Chest decks as the default
+for public `Game` constructors. Cards are drawn and rotated to the bottom;
+scripted decks remain injectable. Added wildcard acceptance claims for
+unscripted draws and domain deck-cycle tests. Full acceptance passes 285/285;
+the focused deck tests pass 2/2.
+
+## 2026-08-02T15:34:43Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: official-card-decks
+commit: 89cd93027b
+
+Re-read your role and constitution.
+
+merge_and_process coder 89cd93027b
+```
+
+Action taken: merged `89cd93027b` into `swarmforge-refactorer` (commit
+`1b53f3e`, resolving an append-only `logbook.md` conflict; merge base was
+my own prior card-payment-logging handoff, everything after it on the
+other side was the architect's card-payment-logging review — including
+replacing my `ReportBoardSpaceNamePropertyTest`'s flaky jetCheck sampling
+with a deterministic traversal of every `Street.Type`, which I left
+untouched, it belongs to that already-closed, already-verified phase —
+plus the specifier's and coder's official-card-decks work).
+
+Found a real regression while running the unit suite: `Game`'s
+convenience constructors (the ones `GameTest` uses throughout, and the
+same ones `the-monopoly-game-cli`'s `Simulator` uses) now default to
+`Cards.Decks.official()` instead of `Cards.Decks.EMPTY`. That default
+change is correct — `Simulator` genuinely wants real card effects during
+simulated play, and `World.playGame()`'s own fallback for unscripted
+acceptance draws already handles the acceptance-side need separately and
+correctly. But `GameTest`'s fixed-roll/fixed-position/fixed-journal
+assertions never accounted for a chance/community-chest landing actually
+moving a pawn or changing a balance, so any test using those constructors
+became flaky depending on the shuffle: repeated `mvn test -Dtest=GameTest`
+runs failed a different 0-3 tests each time (`aGamePlaysAnotherRoundWhenToldItMay`,
+`aPlayerWithACupOfTheirOwnRollsThatOneRatherThanTheTable`,
+`everyPlayerTakesATurnMovedByTheirOwnRoll` all observed failing across
+repeated runs). Added small test-local `game(...)` helper overloads that
+pin `Cards.Decks.EMPTY` explicitly — matching what the handful of tests
+that do care about a specific card already did via the existing
+`decks(...)` helper — and routed every direct `new Game(...)` call in the
+file through them. Stable across 8+ repeated runs of `GameTest` alone and
+of the full suite/acceptance pipeline together afterward.
+
+Also flagging, not fixing, a content question for architect/specifier:
+`OfficialDecks.chance` has 16 entries but `chanceEffects` only defines 15
+unique card texts — the "advance to nearest station" text is duplicated
+in the deck. This is either a faithful echo of real Monopoly's two
+physically identical "advance to nearest railroad" cards (in which case
+it's correct and `chanceEffects` legitimately has one fewer *unique*
+behavior than the deck has *physical* cards), or a copy-paste slip that
+should be a 16th distinct card. `cards.feature`'s "every chance card
+resolves without error" scenario only has 15 examples, which is
+consistent with either reading (a duplicate physical card needs no
+separate example). The coder's own `CardsDeckTest.anOfficialChanceDeckRotatesAllSixteenCards`
+asserts `drawn` has size 15 after 16 draws and a 17th draw equal to the
+first — internally consistent with a 16-slot cycle containing one
+duplicate, so this was a deliberate, tested shape, not an overlooked
+accident. I don't have authoritative knowledge of which reading is
+correct, and deciding the deck's actual intended content is a
+specification question, not a structural cleanup; left the card data and
+test untouched rather than guess.
+
+Also fixed, while in the file: import ordering in `Cards.java`/`GameTest.java`/
+`World.java` broken by the new imports (`ArrayDeque`/`Collections`/`Deque`
+appended after `List`/`Map`/`Optional` instead of interleaved; `Cards`
+appended after `Deeds` instead of before), a fully-qualified
+`java.util.ArrayList` replaced with the now-present import, and a redundant
+fully-qualified `Cards.Decks` reference in `World.java` now that `Cards` is
+imported there.
+
+`crap4java`/`dry4java` on `Game.java`/`Cards.java`: nothing new over
+threshold; nothing beyond the same pre-existing `Game.Journalling`
+one-adapter-per-event-kind and `GameTest` boundary-case-per-space test
+patterns already accepted. `mutate4java --scan`: `Game.java` 29 sites,
+`Cards.java` 43 — both well under the 100-site split threshold; manifests
+refreshed via `--update-manifest`.
+
+Verification: full `mvn test` 263 domain + 11 cli green, repeated 8+ times
+for `GameTest` and `SimulatorTest` specifically with zero failures after
+the fix (versus 0-3 failures per run before it). `mvn test -P
+property-tests` 22/22 green, repeated 3 times. Full acceptance pipeline
+285/285 green, repeated 3 times.
+
+Committing and handing the verified state to the architect.

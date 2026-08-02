@@ -117,6 +117,12 @@ final class GameLogStepHandlers {
         then("^the game journal records that pawn \"" + NAME + "\" draws the community chest card \"" + NAME + "\"$",
             (world, arguments) -> records(world, communityChestCardDrawn(arguments.text(1), arguments.text(2)))),
 
+        then("^the game journal records that pawn \"" + NAME + "\" draws a chance card$",
+            (world, arguments) -> records(world, chanceCardDrawn(arguments.text(1)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" draws a community chest card$",
+            (world, arguments) -> records(world, communityChestCardDrawn(arguments.text(1)))),
+
         then("^the game journal records that pawn \"" + NAME + "\" draws the chance card \"" + NAME
                 + "\" before it records that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + "$",
             (world, arguments) -> recordsInOrder(world,
