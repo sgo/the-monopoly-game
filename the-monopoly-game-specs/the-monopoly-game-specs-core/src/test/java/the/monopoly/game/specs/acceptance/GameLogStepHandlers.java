@@ -49,6 +49,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moved;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moves;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesAnywhere;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaid;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaidLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rolled;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.salaryCollected;
@@ -447,13 +448,13 @@ final class GameLogStepHandlers {
                 + "\" before it says that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + "$",
             (world, arguments) -> saysInOrder(world,
                 chanceCardDrawnLine(arguments.text(1), arguments.text(2)),
-                arguments.text(3) + " pays " + arguments.text(4) + " $" + arguments.number(5))),
+                playerPaidLine(arguments.text(3), arguments.text(4), arguments.number(5)))),
 
         then("^the game report says that pawn \"" + NAME + "\" draws the community chest card \"" + NAME
                 + "\" before it says that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + "$",
             (world, arguments) -> saysInOrder(world,
                 communityChestCardDrawnLine(arguments.text(1), arguments.text(2)),
-                arguments.text(3) + " pays " + arguments.text(4) + " $" + arguments.number(5))),
+                playerPaidLine(arguments.text(3), arguments.text(4), arguments.number(5)))),
 
         then("^the game report says that pawn \"" + NAME + "\" draws the chance card \"" + NAME
                 + "\" before it says that pawn \"" + NAME + "\" pays the bank \\$" + VALUE + "$",

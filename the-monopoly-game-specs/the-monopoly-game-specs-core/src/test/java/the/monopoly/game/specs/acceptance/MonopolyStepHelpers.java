@@ -204,6 +204,10 @@ final class MonopolyStepHelpers {
     return pawnName + " pays the bank $" + amount;
   }
 
+  static String playerPaidLine(String payer, String payee, int amount) {
+    return payer + " pays " + payee + " $" + amount;
+  }
+
   static String jailEnteredLine(String pawnName, String spaceName) {
     return pawnName + " is sent to jail from landing on " + spaceName;
   }
