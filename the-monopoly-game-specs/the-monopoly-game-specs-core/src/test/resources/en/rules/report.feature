@@ -257,3 +257,31 @@ Feature: game report
     Examples:
       | starting balance |
       | 5                 |
+
+  # report-23
+  Scenario Outline: the report narrates a card drawn before it pays every other player
+    Given we select 3 players
+    And pawn "iron box" will roll 6 for initiative
+    And pawn "iron box" has $1500 to spend
+    And the next chance card will be "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50."
+    When pawn "dog" lands on "Kans / Chance"
+    Then the game report says that pawn "dog" draws the chance card "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50." before it says that pawn "dog" pays pawn "high hat" $<amount>
+    And the game report says that pawn "dog" draws the chance card "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50." before it says that pawn "dog" pays pawn "iron box" $<amount>
+
+    Examples:
+      | amount |
+      | 50     |
+
+  # report-24
+  Scenario Outline: the report narrates a card drawn before it collects from every other player
+    Given we select 3 players
+    And pawn "iron box" will roll 6 for initiative
+    And pawn "iron box" has $1500 to spend
+    And the next community chest card will be "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler."
+    When pawn "dog" lands on "Algemeen Fonds / Caisse de Communauté"
+    Then the game report says that pawn "dog" draws the community chest card "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler." before it says that pawn "high hat" pays pawn "dog" $<amount>
+    And the game report says that pawn "dog" draws the community chest card "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler." before it says that pawn "iron box" pays pawn "dog" $<amount>
+
+    Examples:
+      | amount |
+      | 10     |
