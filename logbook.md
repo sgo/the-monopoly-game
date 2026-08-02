@@ -16877,3 +16877,10 @@ Merged the architect review commit. Confirmed the reserve leak in
 `AgreeIfAffordable.bidFor`: declining a direct purchase still allowed the
 strategy to bid its entire balance at auction. I am adding the reserve-aware
 bid cap and regression coverage before handing the result to the refactorer.
+
+## 2026-08-02T21:05:10Z — coder sent agree-if-affordable-cash-reserve to refactorer
+
+The reserve-aware auction cap is implemented and covered by unit tests. The
+domain suite passes 268 tests, and the buying-land acceptance scenarios all
+pass. The full acceptance run has only the six previously documented
+bankruptcy narration failures, which are outside this handoff.
