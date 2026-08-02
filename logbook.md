@@ -16182,3 +16182,26 @@ pipeline 290/290 green, repeated twice. `crap4java`/`dry4java` on
 (some scopes had drifted since the small edit).
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T16:58:47Z — architect received named-property movement follow-up
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-driven-movement-resolution
+commit: 9450569bc0
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 9450569bc0
+```
+
+Action taken: merged and verified the scope correction. Nieuwstraat, Grand
+Place, Noord Station, and Rue de Diekirch all route through the shared
+named-property movement and resolution path; START cards correctly remain
+plain moves. Full Maven tests pass (266 domain, 11 CLI) and property tests
+pass 22/22. Differential mutation is current; DRY reports only existing test
+parameterization, and soft `cards.feature` mutation has no changed surface.
