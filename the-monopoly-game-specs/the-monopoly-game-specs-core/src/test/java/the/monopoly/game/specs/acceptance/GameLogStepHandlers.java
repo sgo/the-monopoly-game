@@ -201,9 +201,9 @@ final class GameLogStepHandlers {
             (world, arguments) -> logRecords(world, rolled(arguments.text(1), arguments.number(2)))),
 
         then("^the game log records that pawn \"" + NAME + "\" moves from position " + VALUE
-                + " to " + VALUE + "$",
+                + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\)$",
             (world, arguments) -> logRecords(world,
-                moved(arguments.text(1), arguments.number(2), arguments.number(3)))),
+                moved(arguments.text(1), arguments.number(2), arguments.number(4)))),
 
         then("^the game log records that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
             (world, arguments) -> logRecords(world, salaryCollected(arguments.text(1), arguments.number(2)))),
@@ -361,6 +361,20 @@ final class GameLogStepHandlers {
             (world, arguments) -> logRecordsInOrder(world,
                 moves(arguments.text(1)),
                 rentPaid(arguments.text(2), arguments.text(3), arguments.text(5), arguments.number(4)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" rolls a total of " + VALUE
+                + " before it records that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\)$",
+            (world, arguments) -> logRecordsInOrder(world,
+                rolled(arguments.text(1), arguments.number(2)),
+                moved(arguments.text(3), arguments.number(4), arguments.number(6)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\) before it records that pawn \"" + NAME + "\" collects a salary of \\$"
+                + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                moved(arguments.text(1), arguments.number(2), arguments.number(4)),
+                salaryCollected(arguments.text(6), arguments.number(7)))),
 
         then("^the game report says that pawn \"" + NAME + "\" moves before it says that pawn \""
                 + NAME + "\" buys \"" + NAME + "\" for \\$" + VALUE + "$",

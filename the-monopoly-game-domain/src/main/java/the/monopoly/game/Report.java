@@ -47,7 +47,8 @@ public final class Report {
       case Entry.InitiativeWon it -> name(it.player()) + " wins initiative";
       case Entry.TurnStarted it -> name(it.player()) + " starts a turn with $" + it.balance().amount();
       case Entry.Rolled it -> name(it.player()) + " rolls a total of " + it.total();
-      case Entry.Moved it -> name(it.player()) + " moves from position " + it.from() + " to " + it.to();
+      case Entry.Moved it -> name(it.player()) + " moves from position " + it.from() + " ("
+          + boardSpaceName(it.fromSpace()) + ") to " + it.to() + " (" + boardSpaceName(it.toSpace()) + ")";
       case Entry.SalaryCollected it -> name(it.player()) + " collects a salary of $" + it.salary().amount();
       case Entry.Bought it -> name(it.player()) + " buys " + spaceName(it.land()) + " for $" + it.price().amount();
       case Entry.AuctionWon it ->
@@ -96,6 +97,47 @@ public final class Report {
    */
   private static String spaceName(Street.Type land) {
     return land.name().replaceAll("(?<=[a-z])(?=[A-Z])", " ");
+  }
+
+  private static String boardSpaceName(Street.Type space) {
+    return switch (space) {
+      case start -> "Start";
+      case RueGrandeDinant -> "Rue Grande Dinant";
+      case AlgemeenFonds -> "Algemeen Fonds / Caisse de Communauté";
+      case DiestsestraatLeuven -> "Diestsestraat Leuven";
+      case InkomstenBelasting -> "Inkomsten Belasting / Impôts sur le revenu";
+      case NoordStation -> "Noord Station / Gare du Nord";
+      case SteenstraatBrugge -> "Steenstraat Brugge";
+      case Kans -> "Kans / Chance";
+      case PlaceDuMonumentSpa -> "Place du Monument Spa";
+      case KapellestraatOostende -> "Kapellestraat Oostende";
+      case OpBezoek -> "Op Bezoek / Simple Visite";
+      case RueDeDiekirchArlon -> "Rue de Diekirch Arlon";
+      case Elektriciteitscentrale -> "Elektriciteitscentrale / Centrale Électrique";
+      case BruulMechelen -> "Bruul Mechelen";
+      case PlaceVerteVerviers -> "Place Verte Verviers";
+      case CentraalStation -> "Centraal Station / Gare Centrale";
+      case LippenslaanKnokke -> "Lippenslaan Knokke";
+      case RueRoyaleTournai -> "Rue Royale Tournai";
+      case GroenplaatsAntwerpen -> "Groenplaats Antwerpen";
+      case GratisParkeren -> "Gratis Parkeren / Parc Gratuit";
+      case RueStLeonardLiege -> "Rue St-Léonard Liège";
+      case LangeSteenstraatKortrijk -> "Lange Steenstraat Kortrijk";
+      case GrandPlaceMons -> "Grand Place Mons";
+      case Buurtspoorwegen -> "Buurtspoorwegen / Tramways Vicinaux";
+      case GroteMarktHasselt -> "Grote Markt Hasselt";
+      case PlaceDeLAngeNamur -> "Place de l'Ange Namur";
+      case Watermaatschappij -> "Watermaatschappij / Compagnie des Eaux";
+      case HoogstraatBrussel -> "Hoogstraat (Brussel) / Rue Haute (Bruxelles)";
+      case NaarDeGevangenis -> "Naar de Gevangenis / Allez en Prison";
+      case BoulevardTirouCharleroi -> "Boulevard Tirou Charleroi";
+      case VeldstraatGent -> "Veldstraat Gent";
+      case BoulevardDAvroyLiege -> "Boulevard d'Avroy Liège";
+      case ZuidStation -> "Zuid Station / Gare du Midi";
+      case MeirAntwerpen -> "Meir Antwerpen";
+      case ExtraBelasting -> "Extra Belasting / Taxe de Luxe";
+      case NieuwstraatBrussel -> "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)";
+    };
   }
 
   private static String jailCauseName(Street.Type cause) {

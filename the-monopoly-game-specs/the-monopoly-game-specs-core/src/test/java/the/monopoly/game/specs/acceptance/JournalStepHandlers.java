@@ -80,9 +80,9 @@ final class JournalStepHandlers {
             (world, arguments) -> records(world, rolled(arguments.text(1), arguments.number(2)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" moves from position " + VALUE
-                + " to " + VALUE + "$",
+                + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\)$",
             (world, arguments) -> records(world,
-                moved(arguments.text(1), arguments.number(2), arguments.number(3)))),
+                moved(arguments.text(1), arguments.number(2), arguments.number(4)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
             (world, arguments) -> records(world, salaryCollected(arguments.text(1), arguments.number(2)))),
@@ -121,17 +121,17 @@ final class JournalStepHandlers {
 
         then("^the game journal records that pawn \"" + NAME + "\" rolls a total of " + VALUE
                 + " before it records that pawn \"" + NAME + "\" moves from position " + VALUE
-                + " to " + VALUE + "$",
+                + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\)$",
             (world, arguments) -> recordsInOrder(world,
                 rolled(arguments.text(1), arguments.number(2)),
-                moved(arguments.text(3), arguments.number(4), arguments.number(5)))),
+                moved(arguments.text(3), arguments.number(4), arguments.number(6)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" moves from position " + VALUE
-                + " to " + VALUE + " before it records that pawn \"" + NAME + "\" collects a salary of \\$"
+                + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\) before it records that pawn \"" + NAME + "\" collects a salary of \\$"
                 + VALUE + "$",
             (world, arguments) -> recordsInOrder(world,
-                moved(arguments.text(1), arguments.number(2), arguments.number(3)),
-                salaryCollected(arguments.text(4), arguments.number(5)))),
+                moved(arguments.text(1), arguments.number(2), arguments.number(4)),
+                salaryCollected(arguments.text(6), arguments.number(7)))),
 
         then("^the game journal records that pawn \"" + NAME
                 + "\" starts its turn before pawn \"" + NAME + "\"$",
@@ -173,23 +173,26 @@ final class JournalStepHandlers {
                 rollsATotalOf(arguments.text(2), arguments.number(3)))),
 
         then("^the game report says that pawn \"" + NAME + "\" moves from position " + VALUE
-                + " to " + VALUE + "$",
+                + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\)$",
             (world, arguments) -> says(world,
-                movesFromPosition(arguments.text(1), arguments.number(2), arguments.number(3)))),
+                movesFromPosition(arguments.text(1), arguments.number(2), arguments.text(3),
+                    arguments.number(4), arguments.text(5)))),
 
         then("^the game report says that pawn \"" + NAME + "\" rolls a total of " + VALUE
                 + " before it says that pawn \"" + NAME + "\" moves from position " + VALUE
-                + " to " + VALUE + "$",
+                + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\)$",
             (world, arguments) -> saysInOrder(world,
                 rollsATotalOf(arguments.text(1), arguments.number(2)),
-                movesFromPosition(arguments.text(3), arguments.number(4), arguments.number(5)))),
+                movesFromPosition(arguments.text(3), arguments.number(4), arguments.text(5),
+                    arguments.number(6), arguments.text(7)))),
 
         then("^the game report says that pawn \"" + NAME + "\" moves from position " + VALUE
-                + " to " + VALUE + " before it says that pawn \"" + NAME + "\" collects a salary of \\$"
+                + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\) before it says that pawn \"" + NAME + "\" collects a salary of \\$"
                 + VALUE + "$",
             (world, arguments) -> saysInOrder(world,
-                movesFromPosition(arguments.text(1), arguments.number(2), arguments.number(3)),
-                arguments.text(4) + " collects a salary of $" + arguments.number(5))),
+                movesFromPosition(arguments.text(1), arguments.number(2), arguments.text(3),
+                    arguments.number(4), arguments.text(5)),
+                arguments.text(6) + " collects a salary of $" + arguments.number(7))),
 
         given("^pawn \"" + NAME + "\" follows the \"" + NAME + "\" strategy$",
             (world, arguments) -> world.pawnFollows(arguments.text(1), Vocabulary.strategy(arguments.text(2)))),
