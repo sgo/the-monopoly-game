@@ -15557,3 +15557,47 @@ the GOJF-retention-in-the-deck nuance that's missing, and none of the coder/
 refactorer/architect summaries mention it — it was overlooked, not
 deliberately deferred. Not routing a follow-up on my own; asking the user
 whether to pursue this before treating `official-card-decks` as fully closed.
+
+## 2026-08-02T15:50:00Z — specifier sent official-card-decks GOJF-retention follow-up to coder
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+role: specifier
+task: official-card-decks
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
+
+Summary: the user asked to pursue the gap noted in the previous entry.
+`OfficialDecks.draw(Deque<String> deck)` in `Cards.java` unconditionally
+removes the top card and appends it to the bottom on every draw, including
+the "Get Out of Jail Free" card in both the chance and community chest
+decks, with no check for whether a player currently holds one. Real
+Monopoly (and this project's own agreed scope: "retain drawn Get Out of
+Jail Free cards until used") requires that specific card to leave
+circulation the moment it's drawn and stay out until whoever holds it uses
+it, sells it, or forfeits it in bankruptcy — only then does it go back to
+the bottom of its deck. `Deeds.RetainedCard`/`deeds.hold(...)` already
+tracks who holds which retained card (used by `cards-7`/`cards-8`'s "holds
+a Get Out of Jail Free card"/"sold ... to pawn" assertions); the deck
+itself needs to consult that same state before re-queuing a drawn card,
+so a card matching a currently-held `RetainedCard` is withheld rather than
+appended back.
+
+No new Gherkin from me for this specifically: `cards-7`/`cards-8` already
+Gherkin-test the retention *effect* via the scripted card queue, and
+proving the *deck* itself withholds the card requires either controlling
+the shuffle order or inspecting internal deck state — the same reasoning
+that kept shuffle/deal-without-replacement/reshuffle out of Gherkin for
+this task originally. Recommend extending the coder's own `CardsDeckTest`
+(the same one that verified the 16-card rotation) with a case proving a
+drawn "Get Out of Jail Free" card is absent from the next N draws while
+held, and reappears once returned — a unit/property-style test, not an
+acceptance scenario.
