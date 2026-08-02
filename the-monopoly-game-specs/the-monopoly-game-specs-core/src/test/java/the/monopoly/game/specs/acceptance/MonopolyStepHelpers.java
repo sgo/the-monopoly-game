@@ -144,6 +144,18 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.JailFinePaid(idOf(pawnName), money(fine)));
   }
 
+  static Claim jailCardUsed(String pawnName) {
+    return Claim.of(new Entry.JailCardUsed(idOf(pawnName)));
+  }
+
+  static Claim jailDoublesRolled(String pawnName) {
+    return Claim.of(new Entry.JailDoublesRolled(idOf(pawnName)));
+  }
+
+  static Claim jailStayed(String pawnName) {
+    return Claim.of(new Entry.JailStayed(idOf(pawnName)));
+  }
+
   /** A pawn moving anywhere, for a step that says when it moved rather than where to. */
   static Claim moves(String pawnName) {
     return new Claim(
@@ -224,6 +236,18 @@ final class MonopolyStepHelpers {
 
   static String jailFinePaidLine(String pawnName, int fine) {
     return pawnName + " leaves jail by paying the $" + fine + " fine";
+  }
+
+  static String jailCardUsedLine(String pawnName) {
+    return pawnName + " leaves jail using the Get Out of Jail Free card";
+  }
+
+  static String jailDoublesRolledLine(String pawnName) {
+    return pawnName + " leaves jail by rolling doubles";
+  }
+
+  static String jailStayedLine(String pawnName) {
+    return pawnName + " stays in jail";
   }
 
   static Player.ID idOf(String pawnName) {

@@ -35,8 +35,14 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeR
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEnteredLine;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailCardUsed;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailCardUsedLine;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailDoublesRolled;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailDoublesRolledLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailFinePaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailFinePaidLine;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailStayed;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailStayedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.landSaleRefused;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.landSaleRefusedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.landSold;
@@ -156,6 +162,14 @@ final class GameLogStepHandlers {
         then("^the game journal records that pawn \"" + NAME
                 + "\" leaves jail by paying the \\$" + VALUE + " fine$",
             (world, arguments) -> records(world, jailFinePaid(arguments.text(1), arguments.number(2)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" stays in jail$",
+            (world, arguments) -> records(world, jailStayed(arguments.text(1)))),
+        then("^the game journal records that pawn \"" + NAME + "\" leaves jail by rolling doubles$",
+            (world, arguments) -> records(world, jailDoublesRolled(arguments.text(1)))),
+        then("^the game journal records that pawn \"" + NAME
+                + "\" leaves jail using the Get Out of Jail Free card$",
+            (world, arguments) -> records(world, jailCardUsed(arguments.text(1)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" goes bankrupt to the bank$",
             (world, arguments) -> records(world, Claim.of(new Entry.Bankrupt(idOf(arguments.text(1)), null)))),
@@ -373,6 +387,14 @@ final class GameLogStepHandlers {
                 + "\" leaves jail by paying the \\$" + VALUE + " fine$",
             (world, arguments) -> logRecords(world, jailFinePaid(arguments.text(1), arguments.number(2)))),
 
+        then("^the game log records that pawn \"" + NAME + "\" stays in jail$",
+            (world, arguments) -> logRecords(world, jailStayed(arguments.text(1)))),
+        then("^the game log records that pawn \"" + NAME + "\" leaves jail by rolling doubles$",
+            (world, arguments) -> logRecords(world, jailDoublesRolled(arguments.text(1)))),
+        then("^the game log records that pawn \"" + NAME
+                + "\" leaves jail using the Get Out of Jail Free card$",
+            (world, arguments) -> logRecords(world, jailCardUsed(arguments.text(1)))),
+
         then("^the game log records that pawn \"" + NAME + "\" goes bankrupt to the bank$",
             (world, arguments) -> logRecords(world,
                 Claim.of(new Entry.Bankrupt(idOf(arguments.text(1)), null)))),
@@ -499,6 +521,14 @@ final class GameLogStepHandlers {
         then("^the game report says that pawn \"" + NAME
                 + "\" leaves jail by paying the \\$" + VALUE + " fine$",
             (world, arguments) -> says(world, jailFinePaidLine(arguments.text(1), arguments.number(2)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" stays in jail$",
+            (world, arguments) -> says(world, jailStayedLine(arguments.text(1)))),
+        then("^the game report says that pawn \"" + NAME + "\" leaves jail by rolling doubles$",
+            (world, arguments) -> says(world, jailDoublesRolledLine(arguments.text(1)))),
+        then("^the game report says that pawn \"" + NAME
+                + "\" leaves jail using the Get Out of Jail Free card$",
+            (world, arguments) -> says(world, jailCardUsedLine(arguments.text(1)))),
 
         then("^the game report says that pawn \"" + NAME + "\" goes bankrupt to the bank$",
             (world, arguments) -> says(world, arguments.text(1) + " goes bankrupt to the bank")),

@@ -265,6 +265,21 @@ public class Game {
     }
 
     @Override
+    public void leftJailWithCard(Player player) {
+      journal.log(new Journal.Entry.JailCardUsed(player.id()));
+    }
+
+    @Override
+    public void leftJailByRollingDoubles(Player player) {
+      journal.log(new Journal.Entry.JailDoublesRolled(player.id()));
+    }
+
+    @Override
+    public void stayedInJail(Player player) {
+      journal.log(new Journal.Entry.JailStayed(player.id()));
+    }
+
+    @Override
     public void bankrupt(Player debtor, Player creditor) {
       journal.log(new Journal.Entry.Bankrupt(debtor.id(), creditor == null ? null : creditor.id()));
     }
@@ -395,6 +410,15 @@ public class Game {
       }
 
       record JailFinePaid(Player.ID player, Money fine) implements Entry {
+      }
+
+      record JailCardUsed(Player.ID player) implements Entry {
+      }
+
+      record JailDoublesRolled(Player.ID player) implements Entry {
+      }
+
+      record JailStayed(Player.ID player) implements Entry {
       }
 
       record Bankrupt(Player.ID player, Player.ID creditor) implements Entry {

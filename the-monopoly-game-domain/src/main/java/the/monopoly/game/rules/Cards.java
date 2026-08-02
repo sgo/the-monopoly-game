@@ -270,7 +270,19 @@ public final class Cards implements Landings {
     Street.Type nearestStation = nearestStationFrom(player.position().index());
     moveTo(player, nearestStation, false);
     Station station = (Station) rules.create(nearestStation);
-    resolveNearestOwnedLand(player, station, station.rentForOwning(1).plus(station.rentForOwning(1)));
+    if (deeds.isUnowned(station.type())) {
+      buyIfAccepted(player, station);
+      return;
+    }
+    deeds.ownerOf(station.type()).flatMap(this::playerNamed).ifPresent(owner ->
+        paySpecialRent(player, station,
+            station.rentForOwning(ownedStations(owner)).plus(station.rentForOwning(ownedStations(owner)))));
+  }
+
+  private int ownedStations(Player owner) {
+    return (int) rules.streets().filter(Station.class::isInstance)
+        .filter(it -> deeds.ownerOf(it.type()).filter(owner.id()::equals).isPresent())
+        .count();
   }
 
   private void advanceToNearestUtility(Player player) {

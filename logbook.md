@@ -16393,3 +16393,24 @@ explicit instruction not to hand off without permission. User reviewed
 and confirmed: "handoff".
 
 Committing and handing off to coder.
+## 2026-08-02T19:17:44Z — coder received nearest-station-rent-and-jail-narration
+
+Handoff message received:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: nearest-station-rent-and-jail-narration
+commit: bd21e84106
+
+Re-read your role and constitution.
+
+merge_and_process specifier bd21e84106
+```
+
+Action taken: merged the specification and corrected nearest-station rent to
+use the owner's actual station count before doubling it. Added journal, log,
+and report events for remaining in jail, leaving by doubles, and leaving with
+a Get Out of Jail Free card. Focused acceptance confirms the new scenarios;
+two unrelated bankruptcy house-sale/mortgage scenarios remain failing.
