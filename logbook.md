@@ -16090,7 +16090,7 @@ type: git_handoff
 to: refactorer
 priority: 50
 task: card-driven-movement-resolution
-commit: 21d0b3fbc9
+commit: 2fdb8d2a5d
 ```
 
 Summary: completed named-property card movement resolution for Nieuwstraat,
