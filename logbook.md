@@ -16453,3 +16453,64 @@ commit: 280e527777
 
 Summary: corrected owned-station rent scaling and added journal/log/report
 narration for jail stays and exits.
+
+## 2026-08-02T19:27:58Z — refactorer received nearest-station-rent-and-jail-narration
+
+Handoff message received from coder:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: nearest-station-rent-and-jail-narration
+commit: aa62c8e7fc
+
+Re-read your role and constitution.
+
+merge_and_process coder aa62c8e7fc
+```
+
+Action taken: merged commit `aa62c8e7fc` (resolving the usual append-only
+`logbook.md` conflict by reconstructing chronological order from real
+commit timestamps — the coder's branch's history diverged further back
+than the raw text suggested, so I diffed each side against the merge base
+directly rather than trusting the conflict markers' line grouping).
+
+Reviewed the diff: jail now fires `JailCardUsed`/`JailDoublesRolled`/
+`JailStayed` journal entries (previously three of `Jail.Events`'s four
+hooks were silently unwired), narrated in `Report`; and
+`advanceToNearestStation` now charges double the *owner's actual*
+station-count rent instead of a hardcoded single-station rate.
+
+Found one structural regression in the station-rent fix: it inlined the
+unowned/owned branch instead of reusing the existing `resolveNearestOwnedLand`
+helper (previously the only caller of that helper), which left it dead code
+at 0% coverage per `crap4java`, and it called `ownedStations(owner)` twice
+to build one rent value instead of once. Fixed by computing the rent up
+front and delegating back to `resolveNearestOwnedLand`, matching the shape
+the fix displaced. `crap4java` confirms `resolveNearestOwnedLand` is back
+under threshold (fully covered again) and `advanceToNearestStation` stays
+at CRAP 2.0. `dry4java` on `Cards.java`/`Jail.java`/`Report.java`/`Game.java`
+shows only the pre-existing `Journalling` one-line event-to-journal-entry
+boilerplate (already accepted precedent, not new duplication from this
+change). `mutate4java --scan` on all four touched files: 53/15/2/30 sites,
+all well under the 100-site split threshold; manifests refreshed via
+`--update-manifest` (the resulting diff is almost entirely embedded
+manifest line-number/hash churn from the new jail entries shifting later
+scopes — verified the only real code delta is the `advanceToNearestStation`
+fix itself).
+
+Verification: full `mvn test` green except six pre-existing failures — the
+two bankruptcy forced-mortgage/house-sale narration scenarios (`journal-26`,
+`journal-27` and their `logging.feature`/`report.feature` equivalents) that
+the coder's own handoff already flagged as "unrelated... remain failing":
+`Bankruptcy.java` still doesn't fire `Mortgaged`/`HouseSold` events, a
+separate, already-specified gap not yet implemented, out of scope for this
+task and out of scope for the refactorer role (would require introducing
+new domain behavior). Confirmed via `surefire-reports` that these are the
+exact same two scenarios in all three generated test classes, unrelated to
+station rent or jail. `mvn test -P property-tests` 22/22 green, repeated
+twice. Acceptance pipeline: 309/315 green (the same six), repeated twice
+for stability.
+
+Committing and handing the verified state to the architect.
