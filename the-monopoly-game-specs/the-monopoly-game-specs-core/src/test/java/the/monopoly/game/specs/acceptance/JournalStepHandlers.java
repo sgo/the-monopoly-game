@@ -82,7 +82,7 @@ final class JournalStepHandlers {
         then("^the game journal records that pawn \"" + NAME + "\" moves from position " + VALUE
                 + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\)$",
             (world, arguments) -> records(world,
-                moved(arguments.text(1), arguments.number(2), arguments.number(4)))),
+                moved(arguments.text(1), arguments.number(2), arguments.text(3), arguments.number(4), arguments.text(5)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
             (world, arguments) -> records(world, salaryCollected(arguments.text(1), arguments.number(2)))),
@@ -124,13 +124,13 @@ final class JournalStepHandlers {
                 + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\)$",
             (world, arguments) -> recordsInOrder(world,
                 rolled(arguments.text(1), arguments.number(2)),
-                moved(arguments.text(3), arguments.number(4), arguments.number(6)))),
+                moved(arguments.text(3), arguments.number(4), arguments.text(5), arguments.number(6), arguments.text(7)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" moves from position " + VALUE
                 + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\) before it records that pawn \"" + NAME + "\" collects a salary of \\$"
                 + VALUE + "$",
             (world, arguments) -> recordsInOrder(world,
-                moved(arguments.text(1), arguments.number(2), arguments.number(4)),
+                moved(arguments.text(1), arguments.number(2), arguments.text(3), arguments.number(4), arguments.text(5)),
                 salaryCollected(arguments.text(6), arguments.number(7)))),
 
         then("^the game journal records that pawn \"" + NAME
