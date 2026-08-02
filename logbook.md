@@ -16810,3 +16810,39 @@ same eight scenarios fail both times.
 Committing the structural fix and handing the verified-but-not-fully-
 passing state to the architect, with the `bidFor` defect flagged
 explicitly so it can loop back to the coder.
+
+## 2026-08-02T21:00:30Z — refactorer sent agree-if-affordable-cash-reserve handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 68cd733922
+```
+
+Summary: merged and reviewed the coder's reserve-aware `AgreeIfAffordable`
+and utility-monopoly-override work. Deduplicated an identical private
+`utilityMonopolyOpportunity` check that `Cards` and `LandSale` each
+carried (one copy with an unused parameter) onto `Deeds`, which already
+owns ownership queries; `dry4java`/`crap4java` clean afterward.
+
+**Flagging for architect attention, not fixed by me**: the full
+acceptance pipeline (not just `mvn test`, which silently reuses stale
+generated sources and hides this) shows `buying-land-3` and
+`buying-land-5` failing. `AgreeIfAffordable.bidFor` still bids the
+player's entire balance regardless of the reserve, so a player who
+correctly declines a direct offer to protect its reserve turns around
+and wins the same land at auction anyway by outbidding everyone.
+Confirmed via `git stash` that this is present in the coder's commit as
+merged, not something my structural fix introduced. Deciding the right
+reserve-respecting bid amount is new behavior this role does not own;
+this needs to loop back to the coder. Full unit (266+11) and property
+(22) suites green regardless, since neither exercises the auction path
+for this strategy. Acceptance: 307/315, repeated twice for stability —
+the six already-known bankruptcy-narration failures plus these two new,
+confirmed-pre-existing `bidFor` failures. Handing the verified-but-not-
+fully-passing state to architect for independent review and to route the
+`bidFor` fix back to the coder.
