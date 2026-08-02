@@ -16017,3 +16017,46 @@ for all four cards. Not accepting `card-driven-movement-resolution` as
 closed. Sending a same-task follow-up to coder asking for
 `moveToAndResolve` (or equivalent) to cover all four named-property cards,
 not just the one with a scenario.
+
+## 2026-08-02T16:52:00Z — specifier sent card-driven-movement-resolution scope follow-up to coder
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+role: specifier
+task: card-driven-movement-resolution
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
+
+Summary: verified the movement-logging half of the fix is genuinely
+complete (`moveTo()` fires `events.moved(...)` for every card-driven move,
+confirmed directly for a non-scripted card). The landing-resolution half
+only covers Rue de Diekirch, via the new `moveToAndResolve`; the other
+three named-property Chance cards named explicitly in the original handoff
+— "Ga door naar Nieuwstraat", "Ga door naar Grand Place", "Ga door naar
+Noord Station" — still call plain `moveTo` and so still skip buy/rent
+resolution entirely at their destination. Reproduced directly against
+`Cards.resolve()` with a scripted Grand Place card: the move is logged, but
+the property stays unowned with no `bought` event and no balance change.
+
+Ask: route these three remaining cards through `moveToAndResolve` (or
+whatever the coder judges the right generalization) the same way Rue de
+Diekirch now is, so all four named-property advance cards behave
+identically — this was the original scope, not a new ask. Not adding
+additional Gherkin scenarios for this follow-up: `cards-17`/`cards-18`
+already establish the required behavior for the mechanic via Rue de
+Diekirch; the fix just needs to actually apply to its siblings the same
+way the mechanic's contract already requires, consistent with the
+"cover the mechanic once in Gherkin" convention already used here — three
+more scenarios that are identical in shape but a different property name
+would be the kind of redundant per-card duplication this project's cards.feature
+already avoids elsewhere (e.g. the single "every chance card resolves
+without error" smoke test covering all 16 texts, rather than one scenario
+per card).
