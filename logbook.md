@@ -14959,3 +14959,39 @@ of `journal.feature` killed all movement start/end space-name mutations
 (including both previously surviving names). The soft pass has only the
 three previously accepted equivalent insufficient-balance survivors in
 bankruptcy/winner scenarios.
+
+## 2026-08-02T15:42:00Z — specifier received movement-space-names phase-complete sync from architect
+
+Handoff message received:
+
+```
+id: 20260802T134126Z_000082_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 7f9193e9e3
+created_at: 2026-08-02T13:41:26.934857Z
+enqueued_at: 2026-08-02T13:41:27.774995Z
+task: movement-space-names
+
+Re-read your role and constitution.
+
+merge_and_process architect 7f9193e9e3
+```
+
+Action taken: merged architect commit `7f9193e9e3` into `main`, resolving the
+append-only `logbook.md` conflict by interleaving both branches' entries in
+chronological order. The only non-`logbook.md` change in this commit is a
+`journal.feature` acceptance-mutation-manifest header refresh (tool-generated
+housekeeping, not hand-edited scenario content) confirming scenarios
+"the journal records a pawn's turn, roll, and movement" (10/10 killed) and
+"the journal records a salary collected while passing start" (11/11 killed)
+now kill every movement start/end space-name mutation, closing the gap I
+declined to patch at the Gherkin level. This is the phase-complete sync:
+the coder follow-up loop (translating captured space-name text through
+`SpaceNames` before comparing the journal entry) is verified and accepted.
+`movement-space-names` is closed. Asking the user for the next feature to
+specify.
