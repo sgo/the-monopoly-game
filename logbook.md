@@ -14637,6 +14637,23 @@ specification revises movement-related wording in `journal.feature`,
 `logging.feature`, and `report.feature` to name the board space next to each
 position. Implementing under coder rules next.
 
+## 2026-08-02T12:55:43Z — coder sent movement-space-names to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: movement-space-names
+commit: c834e49eca
+```
+
+Implemented movement entries with source and destination board-space types,
+rendered full board names beside positions, and updated the journal, logging,
+and report acceptance handlers to capture the named spaces. Unit tests and the
+full APS acceptance pipeline pass; acceptance ran 277 generated scenarios.
+
 ## 2026-08-02T13:16:01Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -14647,6 +14664,12 @@ to: refactorer
 priority: 50
 task: movement-space-names
 commit: c834e49eca
+```
+
+Implemented movement entries with source and destination board-space types,
+rendered full board names beside positions, and updated the journal, logging,
+and report acceptance handlers to capture the named spaces. Unit tests and the
+full APS acceptance pipeline pass; acceptance ran 277 generated scenarios.
 
 Re-read your role and constitution.
 
@@ -14848,3 +14871,47 @@ Summary: acceptance step handlers capture movement board-space names but
 discard them before comparison, allowing Gherkin name mutations to survive.
 Correct the handler/helper comparison so the captured names are asserted
 against the structured movement entry.
+
+## 2026-08-02T13:33:45Z — coder received architect follow-up
+
+Handoff message received:
+
+```
+id: 20260802T133102Z_000081_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 6a78076cae
+created_at: 2026-08-02T13:31:02.315573Z
+enqueued_at: 2026-08-02T13:31:03.083012Z
+task: movement-space-names
+
+Re-read your role and constitution.
+
+merge_and_process architect 6a78076cae
+```
+
+Action taken: merged architect commit `6a78076cae`; reviewing the follow-up
+under coder rules now.
+
+## 2026-08-02T13:38:11Z — architect received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: movement-space-names
+commit: 3c644a0181
+
+Re-read your role and constitution.
+
+merge_and_process coder 3c644a0181
+```
+
+Action taken: merged the coder follow-up and began architect review of the
+acceptance step-handler boundary and load-bearing movement-name assertions.
