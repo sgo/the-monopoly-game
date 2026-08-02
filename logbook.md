@@ -14733,6 +14733,45 @@ after each structural change.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T14:25:35Z — architect received handoff from refactorer
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-payment-logging
+commit: 71e7f16257
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 71e7f16257
+```
+
+Action taken: merged the refactorer-reviewed card-payment logging work,
+resolved the append-only logbook conflict by preserving both histories, and
+began architect review of its domain and acceptance boundaries.
+
+## 2026-08-02T13:16:57Z — refactorer sent movement-space-names handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: movement-space-names
+commit: 7c879cdad2
+```
+
+Summary: reviewed and refactored the coder's board-space-naming change
+(collapsed a 34-branch switch with CRAP 53.6 into a 1-branch override-map
+lookup, merged the now-identical `jailCauseName` helper into it, added a
+property test sweeping every `Street.Type`). Full acceptance pipeline
+277/277, unit tests 259+11 green, property tests 22 green. Handing verified
+state to architect for independent review.
+
 ## 2026-08-02T13:17:32Z — architect received handoff from refactorer
 
 Handoff message received:
@@ -14923,6 +14962,48 @@ merge_and_process architect 6a78076cae
 Action taken: merged architect commit `6a78076cae`; reviewing the follow-up
 under coder rules now.
 
+## 2026-08-02T14:06:39Z — coder received card-payment-logging handoff
+
+Handoff message received:
+
+```
+id: 20260802T140052Z_000042_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 3c4c2a75ce
+created_at: 2026-08-02T14:00:52.832611Z
+enqueued_at: 2026-08-02T14:00:53.747590Z
+task: card-payment-logging
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3c4c2a75ce
+```
+
+Action taken: merged specifier commit `3c4c2a75ce`; implementing the new
+card-payment-logging behavior under coder rules.
+
+## 2026-08-02T13:37:09Z — coder sent movement-space-names back to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: movement-space-names
+commit: 3c644a0181
+```
+
+Updated journal and game-log movement claims to translate and compare the
+captured Gherkin source/destination space names instead of reconstructing them
+from positions. Full APS acceptance passes 277/277; the acceptance step
+definitions are no longer duplicated.
+
 ## 2026-08-02T13:38:11Z — architect received handoff from coder
 
 Handoff message received:
@@ -14933,6 +15014,7 @@ to: architect
 priority: 00
 task: movement-space-names
 commit: 3c644a0181
+```
 
 Re-read your role and constitution.
 
@@ -14959,6 +15041,21 @@ of `journal.feature` killed all movement start/end space-name mutations
 (including both previously surviving names). The soft pass has only the
 three previously accepted equivalent insufficient-balance survivors in
 bankruptcy/winner scenarios.
+
+## 2026-08-02T13:40:47Z — architect sent movement-space-names phase-complete sync to specifier
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: movement-space-names
+commit: 7f9193e9e3
+```
+
+Summary: the coder follow-up makes Gherkin movement-space names load-bearing
+in journal and log assertions. Architect review and verification are complete.
 
 ## 2026-08-02T15:42:00Z — specifier received movement-space-names phase-complete sync from architect
 
@@ -14995,7 +15092,6 @@ the coder follow-up loop (translating captured space-name text through
 `SpaceNames` before comparing the journal entry) is verified and accepted.
 `movement-space-names` is closed. Asking the user for the next feature to
 specify.
-
 ## 2026-08-02T14:00:52Z — specifier sent handoff to coder (card-payment-logging)
 
 Handoff message sent:
@@ -15039,3 +15135,94 @@ same-shape-different-target lines (e.g. rent-for-different-properties).
 This is spec-only: the coder will need a new `Journal.Entry` type and an
 event hook for player-to-player card payments, since nothing currently
 logs `transfer()`.
+
+## 2026-08-02T14:00:52Z — coder received card-payment-logging handoff
+
+Handoff message received from specifier, commit `3c4c2a75ce`, task
+`card-payment-logging`; merged as `97f5c0e`.
+
+Implemented `PlayerPaid` journal entries for card-driven player-to-player
+transfers, report rendering, and acceptance claims for journal, log, and
+report ordering. Unit tests and the normal acceptance pipeline are green;
+acceptance passes 283/283.
+
+## 2026-08-02T16:12:18Z — coder sent card-payment-logging implementation to refactorer
+
+Handoff message sent to refactorer at priority 50 for task
+`card-payment-logging`; implementation is ready for refactoring review.
+Mutation and CRAP/DRY analysis were not run because those checks belong to
+the refactorer and architect roles.
+
+## 2026-08-02T14:24:25Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: card-payment-logging
+commit: b70c078330
+
+Re-read your role and constitution.
+
+merge_and_process coder b70c078330
+```
+
+Action taken: merged `b70c078330` into `swarmforge-refactorer` (commit
+`2cd7b4a`, resolving an append-only `logbook.md` conflict — the merge base
+was my own prior `movement-space-names` handoff commit, and everything
+after it on the other side was the full movement-space-names follow-up
+loop plus the card-payment-logging specification and implementation;
+retained both sides in full, in chronological order).
+
+Reviewed the coder's change: a `Journal.Entry.PlayerPaid` entry, a
+`Cards.Events.paid(payer, payee, amount)` overload logged from the
+pre-existing `transfer` helper, a `Report.line` case, and matching
+acceptance step definitions/helpers for journal, log, and report
+assertions. `crap4java` on `Game.java`/`Report.java`/`Cards.java`: nothing
+new over threshold (`Report.line` stays at its accepted exemption, now
+27.2 with the one added case). `dry4java`: one genuine finding — the two
+new "report says ... pays pawn ..." steps in `GameLogStepHandlers.java`
+inlined `text(3) + " pays " + text(4) + " $" + number(5)` identically
+twice, instead of following this same file's own established convention
+of a named `xxxLine` helper per entry kind (`bankPaidLine` and its
+siblings already do this for every other entry). Extracted
+`playerPaidLine` into `MonopolyStepHelpers.java` and used it in both
+steps. Everything else `dry4java` found is the same pre-existing
+`Game.Journalling` one-adapter-per-event-kind and `MonopolyStepHelpers`
+one-helper-per-entry-kind catalog patterns, unrelated to this change.
+
+Considered a new property test (money conservation across a card-driven
+transfer, on the model of `RentPropertyTest`), but the actual new
+behavior here is only the `events.paid(...)` logging call added to the
+already-existing, already-exercised `transfer` method — no new
+money-movement logic to cover. Adding a conservation property test would
+be backfilling a pre-existing `Cards` unit-test gap unrelated to this
+diff, not assessing coverage of what changed; left it out as scope creep.
+
+Refreshed the embedded `mutate4java` manifests in `Game.java`,
+`Report.java`, and `Cards.java` (`--update-manifest`, no tests run) —
+stale since the coder's edits landed without a refresh.
+
+Verification: full `mvn test` 261 domain + 11 cli green; `mvn test -P
+property-tests` 22/22 green; full acceptance pipeline 283/283 green.
+`mutate4java --scan`: `Game.java` 29 sites, `Report.java` 2, `Cards.java`
+34 — all well under the 100-site split threshold.
+
+Committing and handing the verified state to the architect.
+
+## 2026-08-02T14:30:20Z — architect completed card-payment-logging review
+
+Merged the refactorer review as `36af658`. The change keeps the correct
+boundary: `Cards` reports player-to-player transfers through its event port,
+`Game.Journalling` records the domain journal entry, and `Report` remains a
+pure rendering projection. No architecture follow-up is needed.
+
+Replaced the flaky sampled-enum property test with a deterministic traversal
+of every `Street.Type`; normal domain tests (261) and property tests (22)
+pass. Differential Java mutation for `Game`, `Report`, and `Cards` has no
+surface after the refreshed manifests. The affected acceptance pipeline passes
+283/283; full and soft Gherkin mutation runs refreshed the journal, logging,
+and report manifests. The new card-payment journal/report scenarios kill their
+mutations; remaining soft survivors are unrelated pre-existing journal inputs.
