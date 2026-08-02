@@ -46,9 +46,9 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgagedLi
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageLifted;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageLiftedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moved;
-import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesFromPosition;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moves;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesAnywhere;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesFromPosition;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaidLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentPaid;
