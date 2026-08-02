@@ -15073,3 +15073,62 @@ Handoff message sent to refactorer at priority 50 for task
 `card-payment-logging`; implementation is ready for refactoring review.
 Mutation and CRAP/DRY analysis were not run because those checks belong to
 the refactorer and architect roles.
+
+## 2026-08-02T14:24:25Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: card-payment-logging
+commit: b70c078330
+
+Re-read your role and constitution.
+
+merge_and_process coder b70c078330
+```
+
+Action taken: merged `b70c078330` into `swarmforge-refactorer` (commit
+`2cd7b4a`, resolving an append-only `logbook.md` conflict — the merge base
+was my own prior `movement-space-names` handoff commit, and everything
+after it on the other side was the full movement-space-names follow-up
+loop plus the card-payment-logging specification and implementation;
+retained both sides in full, in chronological order).
+
+Reviewed the coder's change: a `Journal.Entry.PlayerPaid` entry, a
+`Cards.Events.paid(payer, payee, amount)` overload logged from the
+pre-existing `transfer` helper, a `Report.line` case, and matching
+acceptance step definitions/helpers for journal, log, and report
+assertions. `crap4java` on `Game.java`/`Report.java`/`Cards.java`: nothing
+new over threshold (`Report.line` stays at its accepted exemption, now
+27.2 with the one added case). `dry4java`: one genuine finding — the two
+new "report says ... pays pawn ..." steps in `GameLogStepHandlers.java`
+inlined `text(3) + " pays " + text(4) + " $" + number(5)` identically
+twice, instead of following this same file's own established convention
+of a named `xxxLine` helper per entry kind (`bankPaidLine` and its
+siblings already do this for every other entry). Extracted
+`playerPaidLine` into `MonopolyStepHelpers.java` and used it in both
+steps. Everything else `dry4java` found is the same pre-existing
+`Game.Journalling` one-adapter-per-event-kind and `MonopolyStepHelpers`
+one-helper-per-entry-kind catalog patterns, unrelated to this change.
+
+Considered a new property test (money conservation across a card-driven
+transfer, on the model of `RentPropertyTest`), but the actual new
+behavior here is only the `events.paid(...)` logging call added to the
+already-existing, already-exercised `transfer` method — no new
+money-movement logic to cover. Adding a conservation property test would
+be backfilling a pre-existing `Cards` unit-test gap unrelated to this
+diff, not assessing coverage of what changed; left it out as scope creep.
+
+Refreshed the embedded `mutate4java` manifests in `Game.java`,
+`Report.java`, and `Cards.java` (`--update-manifest`, no tests run) —
+stale since the coder's edits landed without a refresh.
+
+Verification: full `mvn test` 261 domain + 11 cli green; `mvn test -P
+property-tests` 22/22 green; full acceptance pipeline 283/283 green.
+`mutate4java --scan`: `Game.java` 29 sites, `Report.java` 2, `Cards.java`
+34 — all well under the 100-site split threshold.
+
+Committing and handing the verified state to the architect.
