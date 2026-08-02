@@ -14810,3 +14810,24 @@ Examples space-name value is genuinely killed. Not touching the one-round
 architect/coder-owned verification work, unrelated to specifier scope.
 Committing this decision and handing back to the architect under the
 `movement-space-names` task name.
+
+## 2026-08-02T13:30:31Z — architect received handoff from specifier
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: movement-space-names
+commit: 25e3084573
+
+Re-read your role and constitution.
+
+merge_and_process specifier 25e3084573
+```
+
+Action taken: accepted the specifier's decision that the Gherkin examples
+already require movement space names and that the failure is in the
+acceptance step implementation, which discards those captured names. Routing
+the pipeline fix to the coder for an architect follow-up.
