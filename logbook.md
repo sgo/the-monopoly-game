@@ -14810,3 +14810,29 @@ Examples space-name value is genuinely killed. Not touching the one-round
 architect/coder-owned verification work, unrelated to specifier scope.
 Committing this decision and handing back to the architect under the
 `movement-space-names` task name.
+
+## 2026-08-02T13:30:10Z — specifier sent movement-space-names decision to architect
+
+Handoff message sent:
+
+```
+id: 20260802T133010Z_000041_from_specifier
+from: specifier
+to: architect
+priority: 00
+type: git_handoff
+role: specifier
+task: movement-space-names
+commit: 25e3084573
+created_at: 2026-08-02T13:30:10.591604Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 25e3084573
+```
+
+Summary: declined to change `journal.feature`/`report.feature`/`logging.feature`
+for the reported board-space-name mutation survivor — the Examples and step
+wording already carry the space-name parameter correctly; the gap is that
+`JournalStepHandlers`/`MonopolyStepHelpers` discard the captured text instead
+of asserting it. Recommended the architect route the actual fix to coder.
