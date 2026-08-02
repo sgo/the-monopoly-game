@@ -15638,3 +15638,69 @@ withheld while retained and returns to the deck after release, including
 use or return through bankruptcy; sale and transfer preserve the hold. Added
 a focused deck test. Full Maven tests pass 264 domain tests and 11 CLI tests;
 full acceptance passes 285/285.
+
+## 2026-08-02T16:03:05Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: official-card-decks
+commit: cf8d744743
+
+Re-read your role and constitution.
+
+merge_and_process coder cf8d744743
+```
+
+Action taken: merged `cf8d744743` into `swarmforge-refactorer` (commit
+`7a3a617`, resolving an append-only `logbook.md` conflict). Confirmed via
+that history that the architect already checked my earlier flagged
+duplicate-station-card question against `RULES.md` and closed it as
+intentional (the source lists that card twice) — no follow-up needed
+there, my restraint in not touching it was right. The specifier
+separately found the actual gap: `OfficialDecks.draw` never checked
+whether a drawn Get Out of Jail Free card was currently held, so it could
+re-enter circulation immediately instead of staying out "until used" —
+routed to coder, who just fixed it.
+
+Reviewed the fix: `Cards.Decks.official(Deeds)` now threads the same
+`Deeds` instance the `Game` will use into the deck, so `OfficialDecks` can
+consult `deeds.holds(RetainedCard)` before re-queuing a drawn card — this
+resolves the circular-construction concern I'd noted earlier (`Decks` is
+built before `Cards`/its effects exist) without restructuring anything,
+since `Deeds` was already independently constructible.
+
+Found and fixed two duplication issues in the fix itself: (1) the GOJF
+card text now appeared in up to four independent places (the effects map
+key, the deck's card list, a new pair of constants added for the
+withholding check, and a fourth copy in `CardsDeckTest`'s own test-local
+constant) — three-to-four hand-typed copies of a long string that must
+stay byte-identical or the "retain until used" rule silently stops
+working for that one card. Promoted the two texts to a single
+package-private pair of constants on `Cards`, used everywhere instead of
+retyped, and removed `CardsDeckTest`'s duplicate now that it can
+reference `Cards`'s directly (same package). (2) `dry4java` also flagged
+`drawChance`/`drawCommunityChest` as a 1.00-score duplicate — identical
+withhold-check-then-draw-then-maybe-withhold shape, differing only in
+which deck/`RetainedCard`/card-text they closed over. Extracted a
+`WithholdingDeck` class naming that shape once; `OfficialDecks` now just
+wires up two instances and its own draw methods are one-line
+delegations.
+
+`Deeds.java`'s only change (the new `holds(RetainedCard)` method) was
+clean and well-placed; nothing to fix there beyond a manifest refresh.
+
+Verification: full `mvn test` 264 domain + 11 cli green, repeated 10+
+times total across both my review pass and the coder's own fix (this
+area's shuffle already caused one real flakiness regression earlier this
+session, so repetition here isn't precautionary theater). `mvn test -P
+property-tests` 22/22 green. Full acceptance pipeline 285/285 green,
+repeated twice. `crap4java`/`dry4java` on `Cards.java` clean after the
+extraction — no threshold violations, no remaining duplicates.
+`mutate4java --scan`: `Cards.java` 51 sites, well under the 100-site split
+threshold; manifests refreshed via `--update-manifest`.
+
+Committing and handing the verified state to the architect.
