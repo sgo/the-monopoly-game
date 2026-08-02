@@ -16728,3 +16728,85 @@ commit: 7db8e8f74f
 
 Summary: implemented reserve-aware buying and utility-monopoly overrides for
 the Agree if affordable strategy.
+
+## 2026-08-02T20:59:54Z — refactorer received agree-if-affordable-cash-reserve
+
+Handoff message received from coder:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 15f8c29a7b
+
+Re-read your role and constitution.
+
+merge_and_process coder 15f8c29a7b
+```
+
+Action taken: merged commit `15f8c29a7b` (resolving the usual append-only
+`logbook.md` conflict the same way as before: reconstructing chronological
+order from the merge base rather than trusting the conflict markers'
+grouping, since both sides had added several commits since the base).
+
+Reviewed the diff: `Strategy.Offer` gained `reserve` and
+`utilityMonopolyOpportunity` fields (with a compatibility constructor
+defaulting both for callers that don't care), `Strategy` gained a
+`cashReserve()` default method, and `AgreeIfAffordable` now takes a
+constructor-supplied reserve and only accepts an offer when either it
+opens a utility monopoly or the balance after paying still covers the
+reserve.
+
+Found one real DRY violation: `Cards.utilityMonopolyOpportunity(Ownable)`
+and `LandSale.utilityMonopolyOpportunity(Player, Ownable)` were
+byte-for-byte identical logic (`dry4java` score 0.94), and `LandSale`'s
+copy carried a completely unused `player` parameter. Moved the check onto
+`Deeds` — which already owns ownership queries via `ownerOf` — as
+`utilityMonopolyOpportunity(Rule.Set, Ownable)`, and had both call sites
+delegate to it. `dry4java` now reports no duplicate candidates across
+`Cards.java`/`LandSale.java`/`Deeds.java`/`AgreeIfAffordable.java`/
+`Strategy.java`. `crap4java` clean (`utilityMonopolyOpportunity` on
+`Deeds` is CRAP 2.0 at 100% coverage — the acceptance scenarios already
+exercise it). `mutate4java --scan`: 53/11/36/3/7 sites across the five
+touched files, all well under the split threshold; manifests refreshed.
+
+**Found a real functional defect, not something I can fix under this
+role's "no new behavior" rule**: running the full `./acceptance/run-
+acceptance.sh` pipeline (not just `mvn test`, which reuses stale
+generated acceptance sources and silently hid this) shows `buying-land-3`
+and `buying-land-5` failing — the two scenarios where a reserve-keeping
+player declines an offer and the land goes to auction. Dog ends up
+*owning* the land it was specified to decline. Root cause:
+`AgreeIfAffordable.bidFor(Offer offer)` still returns `offer.available()`
+unconditionally — it was never updated to respect the reserve (or the
+utility-monopoly override) the way `accepts()` was. `accepts()` correctly
+declines the direct offer, so the land goes to auction, and there dog
+bids its *entire* balance regardless of reserve and outbids `high hat`,
+winning the exact land it was meant to walk away from.
+
+Confirmed this is not something my own changes introduced: `git stash`ed
+my structural fix and re-ran `./acceptance/run-acceptance.sh` against the
+coder's commit exactly as merged — the same two scenarios fail identically.
+The coder's own handoff summary claims "passed the buying-land scenarios
+plus all 266 domain tests," which is incorrect for the auction path;
+likely verified only with `mvn test` against stale generated sources
+rather than the regenerating pipeline script.
+
+Deciding a reserve-respecting bid amount is new behavior (what should
+`bidFor` return when the reserve doesn't allow the full balance — bid
+`available - reserve`? Bid nothing? Still override for the
+utility-monopoly case?), which this role does not own. Leaving it
+unfixed and flagging it clearly rather than guessing.
+
+Verification: full `mvn test` — all 266 domain + 11 CLI unit tests green.
+`mvn test -P property-tests` 22/22 green. Full acceptance pipeline:
+8 failures out of 315 — the six already-known, already-flagged bankruptcy
+forced-mortgage/house-sale narration scenarios (separate, pre-existing,
+out of scope), plus these two newly-confirmed `AgreeIfAffordable.bidFor`
+auction-reserve failures. Repeated the acceptance run twice for stability;
+same eight scenarios fail both times.
+
+Committing the structural fix and handing the verified-but-not-fully-
+passing state to the architect, with the `bidFor` defect flagged
+explicitly so it can loop back to the coder.
