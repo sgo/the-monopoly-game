@@ -15187,3 +15187,23 @@ mutations; remaining soft survivors are unrelated pre-existing journal inputs.
 
 Handoff message sent to specifier at priority 50 for task
 `card-payment-logging`, commit `9cfb75c467`.
+
+## 2026-08-02T14:31:30Z — architect received handoff-queue audit note
+
+Handoff message received from coder:
+
+```
+type: note
+from: coder
+priority: 00
+
+Re-read your role and constitution.
+
+Audit queue scripts: stale handoff resurfaced; newer handoff was missed.
+```
+
+Action taken: re-read the architect role and constitution, audited delivery,
+and fixed the local daemon's recipient-inbox collision path. A collision now
+creates a uniquely named queued payload instead of silently dropping the new
+handoff. The runtime scripts are intentionally Git-ignored, so the committed
+record preserves the audit while the operational repair remains local.
