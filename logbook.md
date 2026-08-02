@@ -15300,3 +15300,91 @@ for public `Game` constructors. Cards are drawn and rotated to the bottom;
 scripted decks remain injectable. Added wildcard acceptance claims for
 unscripted draws and domain deck-cycle tests. Full acceptance passes 285/285;
 the focused deck tests pass 2/2.
+
+## 2026-08-02T15:34:43Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: official-card-decks
+commit: 89cd93027b
+
+Re-read your role and constitution.
+
+merge_and_process coder 89cd93027b
+```
+
+Action taken: merged `89cd93027b` into `swarmforge-refactorer` (commit
+`1b53f3e`, resolving an append-only `logbook.md` conflict; merge base was
+my own prior card-payment-logging handoff, everything after it on the
+other side was the architect's card-payment-logging review — including
+replacing my `ReportBoardSpaceNamePropertyTest`'s flaky jetCheck sampling
+with a deterministic traversal of every `Street.Type`, which I left
+untouched, it belongs to that already-closed, already-verified phase —
+plus the specifier's and coder's official-card-decks work).
+
+Found a real regression while running the unit suite: `Game`'s
+convenience constructors (the ones `GameTest` uses throughout, and the
+same ones `the-monopoly-game-cli`'s `Simulator` uses) now default to
+`Cards.Decks.official()` instead of `Cards.Decks.EMPTY`. That default
+change is correct — `Simulator` genuinely wants real card effects during
+simulated play, and `World.playGame()`'s own fallback for unscripted
+acceptance draws already handles the acceptance-side need separately and
+correctly. But `GameTest`'s fixed-roll/fixed-position/fixed-journal
+assertions never accounted for a chance/community-chest landing actually
+moving a pawn or changing a balance, so any test using those constructors
+became flaky depending on the shuffle: repeated `mvn test -Dtest=GameTest`
+runs failed a different 0-3 tests each time (`aGamePlaysAnotherRoundWhenToldItMay`,
+`aPlayerWithACupOfTheirOwnRollsThatOneRatherThanTheTable`,
+`everyPlayerTakesATurnMovedByTheirOwnRoll` all observed failing across
+repeated runs). Added small test-local `game(...)` helper overloads that
+pin `Cards.Decks.EMPTY` explicitly — matching what the handful of tests
+that do care about a specific card already did via the existing
+`decks(...)` helper — and routed every direct `new Game(...)` call in the
+file through them. Stable across 8+ repeated runs of `GameTest` alone and
+of the full suite/acceptance pipeline together afterward.
+
+Also flagging, not fixing, a content question for architect/specifier:
+`OfficialDecks.chance` has 16 entries but `chanceEffects` only defines 15
+unique card texts — the "advance to nearest station" text is duplicated
+in the deck. This is either a faithful echo of real Monopoly's two
+physically identical "advance to nearest railroad" cards (in which case
+it's correct and `chanceEffects` legitimately has one fewer *unique*
+behavior than the deck has *physical* cards), or a copy-paste slip that
+should be a 16th distinct card. `cards.feature`'s "every chance card
+resolves without error" scenario only has 15 examples, which is
+consistent with either reading (a duplicate physical card needs no
+separate example). The coder's own `CardsDeckTest.anOfficialChanceDeckRotatesAllSixteenCards`
+asserts `drawn` has size 15 after 16 draws and a 17th draw equal to the
+first — internally consistent with a 16-slot cycle containing one
+duplicate, so this was a deliberate, tested shape, not an overlooked
+accident. I don't have authoritative knowledge of which reading is
+correct, and deciding the deck's actual intended content is a
+specification question, not a structural cleanup; left the card data and
+test untouched rather than guess.
+
+Also fixed, while in the file: import ordering in `Cards.java`/`GameTest.java`/
+`World.java` broken by the new imports (`ArrayDeque`/`Collections`/`Deque`
+appended after `List`/`Map`/`Optional` instead of interleaved; `Cards`
+appended after `Deeds` instead of before), a fully-qualified
+`java.util.ArrayList` replaced with the now-present import, and a redundant
+fully-qualified `Cards.Decks` reference in `World.java` now that `Cards` is
+imported there.
+
+`crap4java`/`dry4java` on `Game.java`/`Cards.java`: nothing new over
+threshold; nothing beyond the same pre-existing `Game.Journalling`
+one-adapter-per-event-kind and `GameTest` boundary-case-per-space test
+patterns already accepted. `mutate4java --scan`: `Game.java` 29 sites,
+`Cards.java` 43 — both well under the 100-site split threshold; manifests
+refreshed via `--update-manifest`.
+
+Verification: full `mvn test` 263 domain + 11 cli green, repeated 8+ times
+for `GameTest` and `SimulatorTest` specifically with zero failures after
+the fix (versus 0-3 failures per run before it). `mvn test -P
+property-tests` 22/22 green, repeated 3 times. Full acceptance pipeline
+285/285 green, repeated 3 times.
+
+Committing and handing the verified state to the architect.
