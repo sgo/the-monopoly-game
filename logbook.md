@@ -15226,3 +15226,44 @@ surface after the refreshed manifests. The affected acceptance pipeline passes
 283/283; full and soft Gherkin mutation runs refreshed the journal, logging,
 and report manifests. The new card-payment journal/report scenarios kill their
 mutations; remaining soft survivors are unrelated pre-existing journal inputs.
+
+## 2026-08-02T14:30:50Z — specifier received card-payment-logging phase-complete sync from architect
+
+Handoff message received:
+
+```
+id: 20260802T143050Z_000083_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: 9cfb75c467
+created_at: 2026-08-02T14:30:50.265062Z
+enqueued_at: 2026-08-02T14:30:50.576243Z
+task: card-payment-logging
+dequeued_at: 2026-08-02T14:30:53.753313Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 9cfb75c467
+```
+
+Action taken: merged architect commit `9cfb75c467` into `main`, resolving the
+append-only `logbook.md` conflict by placing my own sent-handoff entry ahead
+of the coder/refactorer/architect chain it preceded, in chronological order.
+The full pipeline closed: coder added `Journal.Entry.PlayerPaid` and logged
+it from the pre-existing `transfer` helper in `Cards.java` (the actual gap —
+`transfer` moved money with no event at all before this); refactorer
+extracted a `playerPaidLine` helper to match this file's established
+per-entry-kind convention and confirmed no new property test was needed,
+since the only new behavior is the logging call on an already-exercised
+transfer path; architect confirmed the `Cards`/`Game.Journalling`/`Report`
+boundary stayed correct and replaced a flaky sampled-enum property test with
+a deterministic one while verifying. `journal-23/24`, `logging-23/24`, and
+`report-23/24` — including both the `high hat` and `iron box` payment
+assertions added after the user's follow-up question — all kill their
+mutations; full acceptance 283/283, domain+property tests all green.
+`card-payment-logging` is closed. Asking the user for the next feature to
+specify.
