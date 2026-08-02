@@ -14753,6 +14753,20 @@ Action taken: merged the refactorer work, resolved the append-only logbook
 conflict by retaining both histories, and began architectural review of the
 official deck boundary and its acceptance coverage.
 
+## 2026-08-02T15:38:03Z — architect completed official-card-decks review
+
+The official deck remains an internal `Cards.Decks` implementation, while the
+constructor-injected `Decks` port preserves deterministic tests and scripted
+acceptance decks. `Game` owns the default choice, so no UI or infrastructure
+dependency enters the rules layer. The repeated nearest-station Chance card is
+a valid duplicate physical card; it deliberately shares its one effect.
+
+Verification: domain tests 263/263, property tests 22/22, and the acceptance
+pipeline 285/285 pass. Differential mutation found no stale Java-manifest
+surface in `Game` or `Cards`; DRY found only accepted adapter/catalog patterns.
+Soft Gherkin mutation for `cards.feature` killed 2/2 mutations and refreshed
+its manifest. No follow-up is required.
+
 ## 2026-08-02T14:25:35Z — architect received handoff from refactorer
 
 Handoff message received:
