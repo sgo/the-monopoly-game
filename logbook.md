@@ -16884,3 +16884,13 @@ The reserve-aware auction cap is implemented and covered by unit tests. The
 domain suite passes 268 tests, and the buying-land acceptance scenarios all
 pass. The full acceptance run has only the six previously documented
 bankruptcy narration failures, which are outside this handoff.
+
+Handoff message sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 91e185504d
+```
