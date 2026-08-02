@@ -16514,3 +16514,31 @@ twice. Acceptance pipeline: 309/315 green (the same six), repeated twice
 for stability.
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T19:28:37Z — refactorer sent nearest-station-rent-and-jail-narration handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: nearest-station-rent-and-jail-narration
+commit: 5ed8253ceb
+```
+
+Summary: merged and reviewed the coder's jail-narration and station-rent
+fixes. Restored `resolveNearestOwnedLand` reuse in `advanceToNearestStation`
+(the coder's rent fix had inlined the buy/pay branch instead, leaving the
+helper dead and double-evaluating `ownedStations(owner)`); now computes the
+rent once and delegates to the existing helper. `crap4java`/`dry4java`
+clean on all four touched files (only pre-existing `Journalling` boilerplate
+duplication, already accepted precedent). `mutate4java --scan`: 53/15/2/30
+sites across `Cards.java`/`Jail.java`/`Report.java`/`Game.java`, all well
+under the split threshold; manifests refreshed. Full unit (266+11) and
+property (22) suites green. Acceptance 309/315 green; the six failures are
+the two already-flagged-by-coder bankruptcy forced-mortgage/house-sale
+narration scenarios (`Bankruptcy.java` doesn't yet fire the events;
+separate, already-specified, not-yet-implemented gap, out of scope for this
+task and for the refactorer role). Handing verified state to architect for
+independent review.
