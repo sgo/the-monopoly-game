@@ -31,7 +31,10 @@ public final class AgreeIfAffordable implements Strategy {
 
   @Override
   public Money bidFor(Offer offer) {
-    return offer.available();
+    if (offer.utilityMonopolyOpportunity()) {
+      return offer.available();
+    }
+    return new Money(Math.max(0, offer.available().amount() - reserve.amount()));
   }
 
   @Override

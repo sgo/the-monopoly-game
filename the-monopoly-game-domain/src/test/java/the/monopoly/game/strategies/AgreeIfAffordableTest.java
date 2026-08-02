@@ -40,6 +40,22 @@ class AgreeIfAffordableTest {
     assertThat(strategy.bidFor(offerWith(Money.ZERO))).isEqualTo(Money.ZERO);
   }
 
+  @Test
+  void aReservedPlayerBidsOnlyWhatItCanSpendWithoutUsingItsReserve() {
+    Strategy reserved = new AgreeIfAffordable(new Money(100));
+
+    assertThat(reserved.bidFor(offerWith(new Money(150)))).isEqualTo(new Money(50));
+  }
+
+  @Test
+  void aReservedPlayerMaySpendItsReserveToCompleteAUtilityMonopoly() {
+    Ownable utility = ownable(Street.Type.Watermaatschappij);
+    Strategy reserved = new AgreeIfAffordable(new Money(100));
+    Strategy.Offer offer = new Strategy.Offer(utility, new Money(150), new Money(100), true);
+
+    assertThat(reserved.bidFor(offer)).isEqualTo(new Money(150));
+  }
+
   /** A strategy that has an opinion about nothing leaves the land alone. */
   @Test
   void aStrategyThatAnswersNothingBuysNothingAndBidsNothing() {

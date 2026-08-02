@@ -16856,3 +16856,24 @@ win the ensuing auction by spending its protected reserve. The new buying-land
 acceptance scenarios demonstrate this for both a normal property and a utility
 monopoly case. This is a functional implementation omission, not a Gherkin
 content defect, and requires a coder follow-up before architectural closure.
+
+## 2026-08-02T21:03:30Z — coder received architect review follow-up
+
+Handoff message received from architect:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: agree-if-affordable-cash-reserve
+commit: 0c4364cd4c
+
+Re-read your role and constitution.
+
+merge_and_process architect 0c4364cd4c
+```
+
+Merged the architect review commit. Confirmed the reserve leak in
+`AgreeIfAffordable.bidFor`: declining a direct purchase still allowed the
+strategy to bid its entire balance at auction. I am adding the reserve-aware
+bid cap and regression coverage before handing the result to the refactorer.
