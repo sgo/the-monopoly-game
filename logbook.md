@@ -17340,3 +17340,90 @@ fail once the coder generates and runs the acceptance pipeline, per the
 usual red-before-green process.
 
 Committing and handing off to coder.
+
+## 2026-08-02T22:25:16Z — refactorer received decline-narration-and-turn-start-reserve
+
+Handoff message received from coder:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: decline-narration-and-turn-start-reserve
+commit: 8ad7c66938
+
+Re-read your role and constitution.
+
+merge_and_process coder 8ad7c66938
+```
+
+Action taken: merged commit `8ad7c66938` (append-only `logbook.md`
+conflict — four hunks this time, tangled the same way earlier cycles
+were: git's diff matched independent entries' shared boilerplate
+against each other. Resolved by hand, entry by entry, verifying each
+against `git show <commit>:logbook.md` rather than trusting the raw
+hunk grouping — a mechanical splice from the two branches' tails broke
+the reconstruction the first time through, so I reverted with `git
+merge --abort` and redid it surgically, one hunk at a time).
+
+Reviewed the diff: `Journal.Entry.TurnStarted` gained a `reserve` field
+(with a compatibility 2-arg constructor defaulting it to `Money.ZERO`,
+so existing call sites and `ReportTest`'s 2-arg construction stayed
+valid). New `Journal.Entry.PurchaseDeclined` fires from both
+`LandSale.resolve` and `Cards.buyIfAccepted` on decline, carrying a new
+`Strategy.DeclineReason` enum (`CANNOT_AFFORD`/`CASH_RESERVE`) derived
+from `Offer.declineReason()` — a clean design choice: it re-derives the
+reason from the existing public `isAffordable()` check already used by
+`accepts()`, rather than duplicating that logic. `Report.declineLine`
+is a small standalone 2-branch switch, kept separate from `Report.line`
+so it doesn't inflate the documented CRAP-exempt sealed switch beyond
+its one new case.
+
+Found and fixed two import-ordering slips in `GameLogStepHandlers.java`:
+`playerPaidLine` sorted after `purchaseDeclined*` (should precede them
+alphabetically), and a non-static `Strategy` import placed in the
+middle of the static-import block instead of grouped with the other
+type imports at the top. Structure-only; no behavior change.
+
+**Noted, not fixed — a narration-accuracy edge case outside this task's
+tested scope**: `Offer.declineReason()` infers the reason purely from
+`isAffordable()` — affordable-but-declined is always reported as
+`CASH_RESERVE`, unaffordable as `CANNOT_AFFORD`. That's correct for
+every strategy this project actually plays with (`AgreeIfAffordable`,
+with or without a reserve), but `Strategy.UNDECIDED` (the "leaves every
+choice alone" default, e.g. `NOBODY_DECIDES`) declines every offer
+unconditionally regardless of affordability; if it ever declined an
+affordable offer, this would report "would drop the balance below the
+$0 reserve" — technically true (its default reserve is $0) but
+misleading, since `UNDECIDED` has no reserve concept at all and simply
+never buys. No specified or acceptance-tested scenario exercises this
+(`buying-land-*` all use `AgreeIfAffordable`), and `UNDECIDED` is a
+test/null-strategy stub rather than a real playable strategy today, so
+I did not treat this as blocking. Deciding whether it needs a third
+`DeclineReason` (or some other resolution) is a design call outside
+this role's "no new behavior" mandate — flagging for the architect/
+specifier rather than guessing.
+
+Verification: `crap4java` clean except the already-exempted
+`Report.line` (31 branches now, one more than before, per the
+documented sealed-switch decision). `dry4java` across `Game.java`/
+`Report.java`/`Cards.java`/`LandSale.java`/`Strategy.java`: only the
+pre-existing `Journalling` one-line event-delegation boilerplate,
+already established precedent, nothing new. `mutate4java --scan`:
+30/3/53/11/8 sites, all well under the split threshold; manifests
+refreshed.
+
+Ran the full `./acceptance/run-acceptance.sh` pipeline (not `mvn test`,
+which again silently reused stale generated sources and undercounted —
+`mvn test` showed 33/33/37 tests for journal/report/logging, unchanged
+from before this task, while the regenerated pipeline correctly showed
+39/39/43, proving the new scenarios weren't even running under `mvn
+test` alone). All new decline-narration and turn-start-reserve
+scenarios pass; the only failures are the same six already-known,
+already-flagged bankruptcy forced-mortgage/house-sale narration gaps,
+out of scope for this task. Repeated twice for stability, including a
+`SpecsCliEnCliAcceptanceTest` pass both times (the flaky CLI timing test
+noted previously did not reproduce this cycle). `mvn test -P
+property-tests` 22/22 green.
+
+Committing and handing the verified state to the architect.
