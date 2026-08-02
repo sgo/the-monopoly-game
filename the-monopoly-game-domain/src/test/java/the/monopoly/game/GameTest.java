@@ -91,6 +91,17 @@ class GameTest {
   }
 
   @Test
+  void playStopsAfterOneRoundRatherThanPlayingToCompletion() {
+    Game.Result result = play(
+        new Roll(2, 2), new Roll(5, 5), new Roll(3, 3),
+        new Roll(1, 2), new Roll(2, 4), new Roll(4, 3),
+        new Roll(1, 3), new Roll(2, 3), new Roll(1, 4)
+    );
+
+    assertThat(result.journal()).filteredOn(entry -> entry instanceof Entry.TurnStarted).hasSize(3);
+  }
+
+  @Test
   void aTurnStartedEntryCarriesThePlayersCurrentBalanceRatherThanTheirStartingCapital() {
     players.getFirst().account().withdraw(new Money(200));
 
