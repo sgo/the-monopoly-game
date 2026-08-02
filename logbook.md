@@ -15631,11 +15631,11 @@ to: coder
 priority: 50
 role: specifier
 task: official-card-decks
-commit: 97c26c702d
+commit: 2f535ace29
 
 Re-read your role and constitution.
 
-merge_and_process specifier 97c26c702d
+merge_and_process specifier 2f535ace29
 ```
 
 Summary: the user asked to pursue the gap noted in the previous entry.
@@ -15738,5 +15738,153 @@ repeated twice. `crap4java`/`dry4java` on `Cards.java` clean after the
 extraction — no threshold violations, no remaining duplicates.
 `mutate4java --scan`: `Cards.java` 51 sites, well under the 100-site split
 threshold; manifests refreshed via `--update-manifest`.
+
+Committing and handing the verified state to the architect.
+
+## 2026-08-02T16:03:47Z — refactorer sent official-card-decks handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: official-card-decks
+commit: d435cf057e
+```
+
+Summary: reviewed the coder's GOJF-retention fix (`Cards.Decks.official(Deeds)`
+threading `deeds` into the deck so it can withhold a held card). Found and
+fixed the fix's own duplication: the GOJF card text had spread to 3-4
+independent copies (effects map, deck list, withholding constants, and a
+test-local copy) — consolidated to one package-private pair of constants
+on `Cards`, used everywhere. Also merged `drawChance`/`drawCommunityChest`
+(dry4java: 1.00 duplicate) into a single `WithholdingDeck` class. Stable
+across 10+ repeated full-suite runs given this area's known shuffle-driven
+flakiness risk. Full unit (264+11) and property (22) suites green;
+acceptance 285/285, repeated twice. Handing verified state to architect
+for independent review.
+
+## 2026-08-02T16:06:00Z — specifier received official-card-decks GOJF-retention phase-complete sync from architect
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: official-card-decks
+
+Re-read your role and constitution.
+
+merge_and_process architect e40c7663ef
+```
+
+Action taken: merged architect commit `e40c7663ef` into `main` (no conflict
+this time — the append-only `logbook.md` history merged cleanly). Reviewed
+the fix myself rather than taking the verification summaries on faith: the
+new `WithholdingDeck` (shared by both decks after the refactorer's
+extraction) holds a drawn "Get Out of Jail Free" card out of its rotation
+instead of appending it back, and only returns it once
+`deeds.holds(retainedCard)` is false. Confirmed `Game`'s constructor passes
+its own `deeds` into `Cards.Decks.official(deeds)` (`Game.java:62`), so the
+deck's withholding check sees the same retained-card state the rest of the
+game updates — not a disconnected copy that would never see a release. The
+coder's `CardsDeckTest.anOfficialChanceGetOutOfJailFreeCardStaysOutUntilReleased`
+draws until the real card comes up, holds it, asserts 15 further draws never
+reproduce it, releases it, and asserts it reappears within the next 16 draws
+— exactly the behavior I asked for, verified against the real shuffled deck
+rather than a scripted double.
+
+All four scope items the user confirmed for `official-card-decks` are now
+genuinely implemented: shuffled official set, deal without replacement,
+reshuffle/cycle on exhaustion, and Get-Out-of-Jail-Free retained in the deck
+until released. `official-card-decks` is closed. Asking the user for the
+next feature to specify.
+
+## 2026-08-02T16:30:00Z — coder completed card-driven movement resolution
+
+Received specifier handoff `card-driven-movement-resolution` at commit
+`b6e3187dab` and implemented it. Card-driven movement now emits movement
+events, collects salary when passing START, and resolves the named Rue de
+Diekirch destination as a normal property landing: it buys the unowned land
+when accepted or charges standard rent when owned. Added acceptance handlers
+for draw-before-movement ordering in the journal, game log, and report.
+
+Verification: focused acceptance passed all 290 scenarios; full Maven test
+passed; the full acceptance run reached the existing nondeterministic CLI
+simulation failure (`the game log records no winner`) while all 290 generated
+acceptance scenarios otherwise executed. The unrelated `.lurus/` directory
+was preserved untracked.
+
+## 2026-08-02T16:42:51Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: card-driven-movement-resolution
+commit: 1fd4bbba65
+
+Re-read your role and constitution.
+
+merge_and_process coder 1fd4bbba65
+```
+
+Action taken: merged `1fd4bbba65` into `swarmforge-refactorer` (commit
+`f508868`, resolving an append-only `logbook.md` conflict). Did not
+reproduce the coder's noted "existing nondeterministic CLI simulation
+failure" — full acceptance pipeline ran clean at 290/290 across 4
+repeated runs, and `mvn test` clean across 4 repeated runs; not chasing
+it further since it's flagged as pre-existing and unrelated to this task.
+
+Reviewed the change: the existing `moveTo` helper (used by every
+card-driven movement — start, Grand Place Mons, Nieuwstraat, Noord
+Station, nearest station/utility) now also fires `events.moved(...)`,
+so card-driven moves finally appear in the journal/log/report as actual
+`Moved` entries instead of silently teleporting the pawn. The new
+`moveToAndResolve` sends the Rue de Diekirch chance card through a real
+buy-or-pay-rent resolution: unowned land gets the normal buy offer,
+owned land goes through an inline `Rent` instance for standard
+per-street rent (correctly using the real `Rent` class rather than
+`paySpecialRent`'s flat-amount shortcut, since a `ColourStreet`'s rent
+depends on its rate table, monopoly bonus, and improvements — not
+reducible to a flat special formula the way station/utility rent is).
+
+Checked whether this duplicates the existing
+`advanceToNearestStation`/`advanceToNearestUtility`/`resolveNearestOwnedLand`
+buy-or-pay shape: `dry4java` found nothing — the owned-branch
+implementations differ enough (full `Rent.resolve` vs. a precomputed
+flat amount) that they're genuinely different shapes, not copies. Left
+them separate rather than forcing a shared abstraction the tool doesn't
+support.
+
+Found a real coverage gap: `crap4java` flagged `moveToAndResolve` at
+CRAP 12.0 with 0% domain unit-test coverage — unlike its two siblings,
+which both have a dedicated `GameTest` case
+(`assertNearestStationFrom`/`assertNearestUtilityFrom`), this new path
+had none at the domain level (only exercised indirectly through
+acceptance/simulation runs). Added two focused tests following the same
+`resolveChanceCardAt` pattern already established in this file: buys
+the unowned land when the strategy accepts, and charges the owner's
+vacant rent when it's already owned. The rent test needed the *owner's*
+strategy to claim the rent — `Rent.collect` gates on
+`strategies.forPlayer(owner).claims(...)`, not the tenant's strategy, so
+plain `Map.of()` (defaulting both players to `Strategy.UNDECIDED`, which
+never claims) silently charged nothing on the first attempt; fixed by
+giving the owner the existing `biddingAndClaiming(0)` helper. CRAP
+dropped from 12.0 to 3.0 at 98% coverage after.
+
+Also fixed one import-ordering slip: `movesFromPosition` landed between
+`moved` and `moves` in `GameLogStepHandlers.java` instead of after
+`movesAnywhere`.
+
+Verification: full `mvn test` 266 domain (264 + 2 new) + 11 cli green,
+repeated 4+ times. `mvn test -P property-tests` 22/22 green. Full
+acceptance pipeline 290/290 green, repeated 3+ times.
+`mutate4java --scan`: `Cards.java` 54 sites, well under the 100-site
+split threshold; manifest refreshed via `--update-manifest`.
 
 Committing and handing the verified state to the architect.

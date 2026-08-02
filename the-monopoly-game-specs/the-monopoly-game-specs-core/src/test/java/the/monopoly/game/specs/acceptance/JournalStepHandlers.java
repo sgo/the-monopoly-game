@@ -14,6 +14,7 @@ import static the.monopoly.game.specs.acceptance.GameAccount.saysInOrder;
 import static the.monopoly.game.specs.acceptance.GameAccount.saysStartWith;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.NAME;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.VALUE;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.chanceCardDrawn;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeRoll;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.money;
@@ -125,6 +126,14 @@ final class JournalStepHandlers {
             (world, arguments) -> recordsInOrder(world,
                 rolled(arguments.text(1), arguments.number(2)),
                 moved(arguments.text(3), arguments.number(4), arguments.text(5), arguments.number(6), arguments.text(7)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" draws the chance card \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\)$",
+            (world, arguments) -> recordsInOrder(world,
+                chanceCardDrawn(arguments.text(1), arguments.text(2)),
+                moved(arguments.text(3), arguments.number(4), arguments.text(5),
+                    arguments.number(6), arguments.text(7)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" moves from position " + VALUE
                 + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\) before it records that pawn \"" + NAME + "\" collects a salary of \\$"

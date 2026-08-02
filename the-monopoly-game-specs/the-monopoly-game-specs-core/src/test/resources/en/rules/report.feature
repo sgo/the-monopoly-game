@@ -285,3 +285,13 @@ Feature: game report
     Examples:
       | amount |
       | 10     |
+
+  # report-25
+  Scenario Outline: the report narrates a card drawn before the move it causes
+    Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
+    When pawn "dog" lands on "Kans / Chance"
+    Then the game report says that pawn "dog" draws the chance card "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200." before it says that pawn "dog" moves from position <chance_position> (<chance_space>) to <destination_position> (<destination_space>)
+
+    Examples:
+      | chance_position | chance_space  | destination_position | destination_space     |
+      | 7                | Kans / Chance | 11                    | Rue de Diekirch Arlon |

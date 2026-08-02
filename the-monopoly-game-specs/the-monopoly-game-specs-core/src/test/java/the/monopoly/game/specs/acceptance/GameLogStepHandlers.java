@@ -48,6 +48,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageLif
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moved;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moves;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesAnywhere;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesFromPosition;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaidLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentPaid;
@@ -349,6 +350,14 @@ final class GameLogStepHandlers {
                 chanceCardDrawn(arguments.text(1), arguments.text(2)),
                 bankPaid(arguments.text(3), arguments.number(4)))),
 
+        then("^the game log records that pawn \"" + NAME + "\" draws the chance card \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\)$",
+            (world, arguments) -> logRecordsInOrder(world,
+                chanceCardDrawn(arguments.text(1), arguments.text(2)),
+                moved(arguments.text(3), arguments.number(4), arguments.text(5),
+                    arguments.number(6), arguments.text(7)))),
+
         then("^the game log records that pawn \"" + NAME
                 + "\" moves before it records that pawn \"" + NAME + "\" pays the bank \\$" + VALUE + "$",
             (world, arguments) -> logRecordsInOrder(world,
@@ -467,6 +476,14 @@ final class GameLogStepHandlers {
             (world, arguments) -> saysInOrder(world,
                 chanceCardDrawnLine(arguments.text(1), arguments.text(2)),
                 bankPaidLine(arguments.text(3), arguments.number(4)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" draws the chance card \"" + NAME
+                + "\" before it says that pawn \"" + NAME + "\" moves from position " + VALUE
+                + " \\(" + NAME + "\\) to " + VALUE + " \\(" + NAME + "\\)$",
+            (world, arguments) -> saysInOrder(world,
+                chanceCardDrawnLine(arguments.text(1), arguments.text(2)),
+                movesFromPosition(arguments.text(3), arguments.number(4), arguments.text(5),
+                    arguments.number(6), arguments.text(7)))),
 
         then("^the game report says that pawn \"" + NAME
                 + "\" moves before it says that pawn \"" + NAME + "\" pays the bank \\$" + VALUE + "$",
