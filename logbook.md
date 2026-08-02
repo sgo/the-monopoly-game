@@ -14692,3 +14692,24 @@ merge_and_process refactorer 7c879cdad2
 Action taken: merged the refactorer commit into `swarmforge-architect` and
 resolved the append-only `logbook.md` conflict by retaining both histories.
 Beginning architect review for `movement-space-names`.
+
+## 2026-08-02T13:22:58Z — architect sent movement-space-names follow-up to specifier
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: movement-space-names
+commit: PENDING
+```
+
+Summary: soft Gherkin acceptance mutation found that the revised movement
+examples' board-space-name values survive in `journal.feature` (and related
+report/logging coverage): the journal assertions currently use only position
+values when matching a movement entry. The acceptance criteria need the
+space-name values to be load-bearing before this phase can close. The
+architectural review also added a regression test proving `Game.play()`
+performs exactly one round; its only remaining mutation survivor is the
+unobserved completion predicate in one-round mode, which is equivalent.
