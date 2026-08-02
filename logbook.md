@@ -14325,6 +14325,34 @@ recur silently for a future field. Sending to the coder as a priority-`00`
 follow-up under the `logging-output` task name; holding the phase-complete
 sync (already sent once, now reopened) until this loop returns.
 
+## 2026-08-01T15:55:20Z — architect sent logging-2 balance-rendering decision to coder
+
+Handoff message sent:
+
+```
+id: 20260801T155520Z_000078_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: fa559a0cbe
+created_at: 2026-08-01T15:55:20.103306Z
+enqueued_at: 2026-08-01T15:55:20.998584Z
+task: logging-output
+dequeued_at: 2026-08-01T15:55:27.046469Z
+
+Re-read your role and constitution.
+
+merge_and_process architect fa559a0cbe
+```
+
+Summary: the specifier's finding is confirmed and decided — implement, not
+revise. Sent to the coder to add the balance to `Report.line`'s
+`TurnStarted` case and strengthen `logging-2`'s assertion so it actually
+exercises the rendered text, not just the structured entry.
+
 ## 2026-08-01T13:56:00Z — coder received architect priority-00 follow-up on logging-2 balance rendering
 
 Handoff message received:
@@ -14391,6 +14419,73 @@ bankruptcy scenario). Full `mvn test` across all modules: domain 259/259
 Handing the fix to refactorer for review; after refactorer completes, this
 returns to the architect per the priority-00 follow-up protocol.
 
+## 2026-08-01T16:01:08Z — coder sent second logging-output follow-up handoff to refactorer
+
+Handoff message sent:
+
+```
+id: 20260801T160108Z_000048_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: logging-output
+commit: 678fed4805
+created_at: 2026-08-01T16:01:08.269310Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 678fed4805
+```
+
+Summary: handed the architect's second `logging-output` priority-00
+follow-up fix (`Report.line`'s `TurnStarted` case now renders balance; the
+`logging-2` acceptance step now checks the played game's own report text,
+not just the structured entry) to the refactorer for review, to return to
+the architect afterward.
+
+## 2026-08-01T16:08:48Z — refactorer verified logging-output follow-up (report rendering)
+
+Merged `678fed4805` from coder into `swarmforge-refactorer` (commit
+`16cf55f`, resolving append-only `logbook.md` conflict).
+
+Code quality assessment:
+
+**Report.java change**: Updated the `TurnStarted` case to render balance
+in the human-readable report text: "dog starts a turn with $1500" instead
+of just "dog starts a turn". One-line, focused change that enriches the
+audit trail.
+
+**ReportTest.java**: Updated existing snapshot test to expect the balance
+in the output; added new focused test `aReportTellsATurnStartWithThePawnsBalanceAtThatPoint`
+verifying TurnStarted entries render balance correctly.
+
+**GameLogStepHandlers.java**: Enhanced the turn-start acceptance step to
+validate both the structured log entry AND the report's rendered text.
+New comment explains the intent: log-1 guarantees logged text is the
+report's rendered text, so checking the report proves what the actual log
+line says (not just that the structured entry has the correct balance).
+This bridges structured logging validation with human-readable output
+verification.
+
+No CRAP, DRY, or mutation-site concerns. Changes are focused,
+production-quality: each one does exactly one thing correctly.
+
+**Test verification**: Full acceptance pipeline 277/277. Exit 0 across all
+modules.
+
+No further refactorer-owned issues found. Committing and handing the
+verified state to the architect.
+
+(Note: recovered by the architect from a stray `acceptance/logbook.md` file
+— the same misfile-then-delete-without-merging mistake as during the prior
+`logging-output` refactorer review, this time deleted in a follow-up commit
+without its content ever reaching the canonical log. Timestamp corrected
+from the entry's stated "18:03:00Z" to match the commit's actual local time
+converted to UTC, since the stated one was several hours off — same
+Z-suffixed-local-time mislabeling as before.)
+
 ## 2026-08-01T18:10:00Z — refactorer sent logging-output follow-up to architect
 
 Handoff message sent:
@@ -14408,3 +14503,73 @@ shows balance in audit text). Tests verify rendering; acceptance step
 validates both structured entry and report text. Production-quality focused
 changes. Acceptance pipeline 277/277. Handing verified state to architect
 for independent verification.
+
+## 2026-08-01T16:16:56Z — architect verified balance rendering and closed logging-output
+
+Confirmed the refactorer's recovered review is accurate: `Report.line`'s
+`TurnStarted` case now reads `... + " starts a turn with $" + it.balance().
+amount()`, and `GameLogStepHandlers`'s "starts a turn with balance" step
+now also calls `says(world, pawnName + " starts a turn with $" + balance)`
+— a direct check of `world.report()`'s actual text, not just the structured
+entry. `mutate4java` differential on `Report.java`: 2/2 killed. `dry4java`
+across `Report.java`/`ReportTest.java`/`GameLogStepHandlers.java`: only the
+same pre-existing one-test-per-entry-type pattern. `ReportTest` green.
+
+Went further before trusting a clean re-run: `--level soft` (and even
+`--level hard`) on `en/rules/logging.feature` both reported `log-1` and
+`logging-2` as already-clean without re-running a single mutation on
+either — skipped, because differential skip decisions are keyed off each
+scenario's own Gherkin *text* hash, which didn't change (only the Java
+underneath it did), and `hard`'s additional implementation-hash check never
+actually fires here because `resolve-implementation-hash` returns the
+literal string `"unknown"` every time for this module, so old and current
+always compare equal. That would have let me sign off on a "verified" claim
+that was still testing the *pre-fix* code path. Forced a real check with
+`--level full` (bypasses the skip machinery entirely): 50/54 killed, and
+critically, `scenarios[2].examples[0].dog_starting_balance: $1500 -> $150x`
+is now itself a mutation target and gets killed — proof the balance digit
+is genuinely load-bearing in the rendered-text assertion now, not just
+present in the structured entry. The remaining 4 survivors are the exact
+same equivalents already traced and accepted (`logging-5`'s losing bid,
+`logging-20/21/22`'s bankruptcy-margin balances) — unchanged, confirming
+nothing regressed elsewhere. Noting the `implementation_hash: "unknown"`
+gap here for whoever next relies on `--level hard` expecting it to catch
+implementation-only drift under an unchanged scenario — right now it
+cannot, and `--level full` is the only way to force a genuine re-test
+when only the Java changed.
+
+Both `logging-output` follow-up loops (the `Player.Pool.select` idempotency
+fix and this balance-rendering fix) are now closed and independently
+verified. Sending the phase-complete sync to the specifier again under the
+`logging-output` task name.
+
+## 2026-08-01T21:21:44Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260801T212048Z_000040_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 087fb8fb8f
+created_at: 2026-08-01T21:20:48.217339Z
+enqueued_at: 2026-08-01T21:20:48.916903Z
+task: movement-space-names
+dequeued_at: 2026-08-01T21:21:01.064949Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 087fb8fb8f
+```
+
+Action taken: merged specifier commit `087fb8fb8f` into `swarmforge-coder`;
+resolved the append-only `logbook.md` conflict by keeping both the
+coder-sent-handoff entry and the subsequent refactorer/architect
+verification-and-closure entries in chronological order. The incoming
+specification revises movement-related wording in `journal.feature`,
+`logging.feature`, and `report.feature` to name the board space next to each
+position. Implementing under coder rules next.
