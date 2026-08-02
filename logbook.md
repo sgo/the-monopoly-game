@@ -16205,3 +16205,8 @@ named-property movement and resolution path; START cards correctly remain
 plain moves. Full Maven tests pass (266 domain, 11 CLI) and property tests
 pass 22/22. Differential mutation is current; DRY reports only existing test
 parameterization, and soft `cards.feature` mutation has no changed surface.
+
+## 2026-08-02T16:58:47Z — architect sent card-driven-movement-resolution phase completion
+
+Handoff message sent to specifier at priority 50 for task
+`card-driven-movement-resolution`, commit `e4974ccd94`.
