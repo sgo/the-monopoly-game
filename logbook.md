@@ -14771,6 +14771,22 @@ new card mutations and 17/17 journal mutations; logging and report had no
 eligible new soft mutations and completed without errors. Updated mutation
 manifests are committed with this review.
 
+## 2026-08-02T19:36:10Z — architect sent nearest-station-rent-and-jail-narration
+
+Handoff message sent to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: nearest-station-rent-and-jail-narration
+commit: c1c16fd3d7
+```
+
+The coder–refactorer–architect loop is closed. The owner-aware double station
+rent and complete jail-outcome narration are verified through unit, property,
+acceptance, and soft Gherkin mutation checks.
+
 ## 2026-08-02T16:05:28Z — architect received official-card-decks GOJF review
 
 Handoff message received from refactorer:
