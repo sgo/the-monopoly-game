@@ -524,12 +524,12 @@ public final class Cards implements Landings {
 
 /* mutate4java-manifest
 version=1
-moduleHash=d49aca866651cea7348d8b1277c109dcb66dc51a28ff6ae6f8d2d762560fbd25
+moduleHash=448693e5f28244fb1503a831d09f912ba96bec1fb6e4506c7ef4058e35b7cfea
 scope.0.id=Y2xhc3M6Q2FyZHMjQ2FyZHM6MzY
 scope.0.kind=class
 scope.0.startLine=36
 scope.0.endLine=523
-scope.0.semanticHash=ff506b4d55c234c4da4e5e9ce38c1bc9a543d09a43aa2c97a46858284c100cdf
+scope.0.semanticHash=cbf625d1fbbfc109f4d9dd156953319f8e385f33f9e71e37c972bd431552c112
 scope.1.id=Y2xhc3M6Q2FyZHMuRGVja3MjRGVja3M6Mzcx
 scope.1.kind=class
 scope.1.startLine=371
@@ -689,7 +689,7 @@ scope.32.id=bWV0aG9kOkNhcmRzI2N0b3IoOCk6NjY
 scope.32.kind=method
 scope.32.startLine=66
 scope.32.endLine=206
-scope.32.semanticHash=5eb10ec2f4c8b9d5c2146a217f0e9b569d6fcdb33482bf0a163736203a4739c8
+scope.32.semanticHash=319a6e8ee94b3de844aa95d3d53be7764aeeed93ea44f92048bccce91f7b9c7d
 scope.33.id=bWV0aG9kOkNhcmRzI2ZvckV2ZXJ5T3RoZXJQbGF5ZXIoMik6MzE5
 scope.33.kind=method
 scope.33.startLine=319
@@ -804,7 +804,7 @@ scope.55.id=bWV0aG9kOkNhcmRzLkRlY2tzLiNjdG9yKDApOjM4MA
 scope.55.kind=method
 scope.55.startLine=1
 scope.55.endLine=523
-scope.55.semanticHash=dcfd4b001a9ac5ca7fab0e6d616f6460870d685c9f2fdfa92e4d7b266cbe408a
+scope.55.semanticHash=3891993020dc23f65f357066554ae943e21344177d4eb724198f6b533c5127e1
 scope.56.id=bWV0aG9kOkNhcmRzLkRlY2tzLiNkcmF3Q2hhbmNlKDApOjM4MQ
 scope.56.kind=method
 scope.56.startLine=381
