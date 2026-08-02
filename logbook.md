@@ -14637,6 +14637,23 @@ specification revises movement-related wording in `journal.feature`,
 `logging.feature`, and `report.feature` to name the board space next to each
 position. Implementing under coder rules next.
 
+## 2026-08-02T12:55:43Z — coder sent movement-space-names to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: movement-space-names
+commit: c834e49eca
+```
+
+Implemented movement entries with source and destination board-space types,
+rendered full board names beside positions, and updated the journal, logging,
+and report acceptance handlers to capture the named spaces. Unit tests and the
+full APS acceptance pipeline pass; acceptance ran 277 generated scenarios.
+
 ## 2026-08-02T13:16:01Z — refactorer received handoff from coder
 
 Handoff message received:
@@ -14647,6 +14664,12 @@ to: refactorer
 priority: 50
 task: movement-space-names
 commit: c834e49eca
+```
+
+Implemented movement entries with source and destination board-space types,
+rendered full board names beside positions, and updated the journal, logging,
+and report acceptance handlers to capture the named spaces. Unit tests and the
+full APS acceptance pipeline pass; acceptance ran 277 generated scenarios.
 
 Re-read your role and constitution.
 
@@ -14739,7 +14762,7 @@ type: git_handoff
 to: specifier
 priority: 00
 task: movement-space-names
-commit: c750416c0c
+commit: ed77ed4d44
 ```
 
 Summary: soft Gherkin acceptance mutation found that the revised movement
@@ -14836,3 +14859,103 @@ for the reported board-space-name mutation survivor — the Examples and step
 wording already carry the space-name parameter correctly; the gap is that
 `JournalStepHandlers`/`MonopolyStepHelpers` discard the captured text instead
 of asserting it. Recommended the architect route the actual fix to coder.
+
+## 2026-08-02T13:30:31Z — architect received handoff from specifier
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: movement-space-names
+commit: 25e3084573
+
+Re-read your role and constitution.
+
+merge_and_process specifier 25e3084573
+```
+
+Action taken: accepted the specifier's decision that the Gherkin examples
+already require movement space names and that the failure is in the
+acceptance step implementation, which discards those captured names. Routing
+the pipeline fix to the coder for an architect follow-up.
+
+## 2026-08-02T13:30:31Z — architect sent movement-space-names follow-up to coder
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: movement-space-names
+commit: 6a78076cae
+```
+
+Summary: acceptance step handlers capture movement board-space names but
+discard them before comparison, allowing Gherkin name mutations to survive.
+Correct the handler/helper comparison so the captured names are asserted
+against the structured movement entry.
+
+## 2026-08-02T13:33:45Z — coder received architect follow-up
+
+Handoff message received:
+
+```
+id: 20260802T133102Z_000081_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 6a78076cae
+created_at: 2026-08-02T13:31:02.315573Z
+enqueued_at: 2026-08-02T13:31:03.083012Z
+task: movement-space-names
+
+Re-read your role and constitution.
+
+merge_and_process architect 6a78076cae
+```
+
+Action taken: merged architect commit `6a78076cae`; reviewing the follow-up
+under coder rules now.
+
+## 2026-08-02T13:38:11Z — architect received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: movement-space-names
+commit: 3c644a0181
+
+Re-read your role and constitution.
+
+merge_and_process coder 3c644a0181
+```
+
+Action taken: merged the coder follow-up and began architect review of the
+acceptance step-handler boundary and load-bearing movement-name assertions.
+
+## 2026-08-02T13:40:47Z — architect verified movement-space-names coder follow-up
+
+Architectural review accepted the correction: `JournalStepHandlers` and
+`GameLogStepHandlers` now pass captured board-space names through the shared
+`MonopolyStepHelpers.moved` adapter, which resolves them through the existing
+`SpaceNames` boundary before comparing the structured journal entry. This
+keeps display-name translation at the acceptance edge and avoids new domain
+or report dependencies.
+
+Verification: acceptance pipeline 277/277 green; property tests 22/22
+green. Differential `mutate4java` on `Game.java` retains only the known
+equivalent one-round completion-predicate survivor; DRY reports only the
+established acceptance-helper catalog patterns. Forced full Gherkin mutation
+of `journal.feature` killed all movement start/end space-name mutations
+(including both previously surviving names). The soft pass has only the
+three previously accepted equivalent insufficient-balance survivors in
+bankruptcy/winner scenarios.

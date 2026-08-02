@@ -58,8 +58,9 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.Rolled(idOf(pawnName), total));
   }
 
-  static Claim moved(String pawnName, int from, int to) {
-    return Claim.of(new Entry.Moved(idOf(pawnName), from, to));
+  static Claim moved(String pawnName, int from, String fromSpace, int to, String toSpace) {
+    return Claim.of(new Entry.Moved(
+        idOf(pawnName), from, to, SpaceNames.of(fromSpace), SpaceNames.of(toSpace)));
   }
 
   static Claim salaryCollected(String pawnName, int salary) {
