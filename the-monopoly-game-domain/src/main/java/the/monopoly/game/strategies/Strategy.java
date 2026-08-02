@@ -46,10 +46,18 @@ public interface Strategy {
   }
 
   /** The land a player is being asked about, and what they have to spend on it. */
-  record Offer(Ownable land, Money available) {
+  record Offer(Ownable land, Money available, Money reserve, boolean utilityMonopolyOpportunity) {
+    public Offer(Ownable land, Money available) {
+      this(land, available, Money.ZERO, false);
+    }
+
     public boolean isAffordable() {
       return available.covers(land.price());
     }
+  }
+
+  default Money cashReserve() {
+    return Money.ZERO;
   }
 
   /** The improvement a player is being asked to buy for a street they already own. */

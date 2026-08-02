@@ -16665,3 +16665,23 @@ from literal-named scenarios coexisting with parameterized ones — nothing
 new in kind).
 
 Committing and handing off to coder.
+## 2026-08-02T20:48:41Z — coder received agree-if-affordable-cash-reserve
+
+Handoff message received:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 4208c8ba83
+
+Re-read your role and constitution.
+
+merge_and_process specifier 4208c8ba83
+```
+
+Action taken: merged the specification and implemented reserve-aware
+`AgreeIfAffordable` purchases, including utility-monopoly overrides for
+completing or blocking a utility monopoly. Added the configured acceptance
+step and passed the buying-land scenarios plus all 266 domain tests.
