@@ -14767,6 +14767,11 @@ surface in `Game` or `Cards`; DRY found only accepted adapter/catalog patterns.
 Soft Gherkin mutation for `cards.feature` killed 2/2 mutations and refreshed
 its manifest. No follow-up is required.
 
+## 2026-08-02T15:38:03Z — architect sent official-card-decks phase completion
+
+Handoff message sent to specifier at priority 50 for task
+`official-card-decks`, commit `570d17e151`.
+
 ## 2026-08-02T14:25:35Z — architect received handoff from refactorer
 
 Handoff message received:
