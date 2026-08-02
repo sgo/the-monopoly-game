@@ -14555,3 +14555,20 @@ verification-and-closure entries in chronological order. The incoming
 specification revises movement-related wording in `journal.feature`,
 `logging.feature`, and `report.feature` to name the board space next to each
 position. Implementing under coder rules next.
+
+## 2026-08-02T12:55:43Z — coder sent movement-space-names to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: movement-space-names
+commit: c834e49eca
+```
+
+Implemented movement entries with source and destination board-space types,
+rendered full board names beside positions, and updated the journal, logging,
+and report acceptance handlers to capture the named spaces. Unit tests and the
+full APS acceptance pipeline pass; acceptance ran 277 generated scenarios.
