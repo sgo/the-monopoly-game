@@ -15267,3 +15267,13 @@ assertions added after the user's follow-up question — all kill their
 mutations; full acceptance 283/283, domain+property tests all green.
 `card-payment-logging` is closed. Asking the user for the next feature to
 specify.
+
+## 2026-08-02T17:15:06Z — coder implemented official-card-decks
+
+Merged specifier commit `5d2c2b6820` for `official-card-decks`.
+
+Implemented shuffled 16-card Chance and Community Chest decks as the default
+for public `Game` constructors. Cards are drawn and rotated to the bottom;
+scripted decks remain injectable. Added wildcard acceptance claims for
+unscripted draws and domain deck-cycle tests. Full acceptance passes 285/285;
+the focused deck tests pass 2/2.
