@@ -14486,6 +14486,24 @@ from the entry's stated "18:03:00Z" to match the commit's actual local time
 converted to UTC, since the stated one was several hours off — same
 Z-suffixed-local-time mislabeling as before.)
 
+## 2026-08-01T18:10:00Z — refactorer sent logging-output follow-up to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: logging-output
+commit: 2de74e34ff
+```
+
+Summary: verified the coder's Report rendering enhancement (TurnStarted now
+shows balance in audit text). Tests verify rendering; acceptance step
+validates both structured entry and report text. Production-quality focused
+changes. Acceptance pipeline 277/277. Handing verified state to architect
+for independent verification.
+
 ## 2026-08-01T16:16:56Z — architect verified balance rendering and closed logging-output
 
 Confirmed the refactorer's recovered review is accurate: `Report.line`'s
@@ -14524,6 +14542,69 @@ Both `logging-output` follow-up loops (the `Player.Pool.select` idempotency
 fix and this balance-rendering fix) are now closed and independently
 verified. Sending the phase-complete sync to the specifier again under the
 `logging-output` task name.
+
+## 2026-08-01T16:17:21Z — architect sent logging-output phase-complete sync to specifier
+
+Handoff message sent:
+
+```
+id: 20260801T161721Z_000079_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: ae6e3ad4e5
+created_at: 2026-08-01T16:17:21Z
+task: logging-output
+
+Re-read your role and constitution.
+
+merge_and_process architect ae6e3ad4e5
+```
+
+Summary: closed `logging-output` for real this time — the turn-start
+balance is now genuinely load-bearing in both the structured entry and the
+rendered report text, confirmed via a forced full-level mutation pass
+rather than trusting the differential skip.
+
+## 2026-08-01T21:20:48Z — specifier sent handoff to coder (movement-space-names)
+
+Handoff message sent:
+
+```
+id: 20260801T212048Z_000040_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: movement-space-names
+commit: 087fb8fb8f
+
+Re-read your role and constitution.
+
+merge_and_process specifier 087fb8fb8f
+```
+
+Summary: at the user's request, added the canonical board-space name in
+parentheses next to every position number in the "moves from position X to
+Y" lines recorded by the journal, the game log, and the report
+(scenarios 2, 3, and 19 in each of `logging.feature`, `journal.feature`, and
+`report.feature`). Confirmed with the user that non-ownable spaces (Start,
+Chance, tax spaces, Free Parking, Go to Jail, Community Chest) should use
+the full canonical bilingual board name already used elsewhere in these
+specs (e.g. "Gratis Parkeren / Parc Gratuit"), not the short single-language
+name `Report.spaceName()` currently produces for ownable properties.
+Verified the new Gherkin with `bb gherkin-parser` + `bb gherkin-ir-dry-checker`
+on all three files; no new duplicate or synonym steps introduced beyond the
+pre-existing placeholder-naming variance already in these files. Committed
+as `087fb8fb8f`. This is spec-only: `Report.line()`'s `Entry.Moved` case
+still renders bare position numbers, so the coder needs to give `Moved`
+access to a space name (via the board or the `Entry` itself) and update
+`GameLogStepHandlers`/`JournalStepHandlers`/report step handlers to parse
+the new `(<space>)` step wording.
 
 ## 2026-08-01T21:21:44Z — coder received handoff from specifier
 
@@ -14572,3 +14653,229 @@ Implemented movement entries with source and destination board-space types,
 rendered full board names beside positions, and updated the journal, logging,
 and report acceptance handlers to capture the named spaces. Unit tests and the
 full APS acceptance pipeline pass; acceptance ran 277 generated scenarios.
+
+## 2026-08-02T13:16:01Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: movement-space-names
+commit: c834e49eca
+```
+
+Implemented movement entries with source and destination board-space types,
+rendered full board names beside positions, and updated the journal, logging,
+and report acceptance handlers to capture the named spaces. Unit tests and the
+full APS acceptance pipeline pass; acceptance ran 277 generated scenarios.
+
+Re-read your role and constitution.
+
+merge_and_process coder c834e49eca
+```
+
+Action taken: merged `c834e49eca` into `swarmforge-refactorer` (commit
+`94f96a4`, resolving an append-only `logbook.md` conflict by keeping both
+branches' entries in chronological order, matched against real commit
+timestamps rather than the entries' own occasionally-mislabeled stated
+times).
+
+Reviewed the coder's change: `Journal.Entry.Moved` and `JailEntered` now
+carry the `Street.Type` of each space they mention, and `Report` prints a
+parenthetical board name alongside every position. The new `boardSpaceName`
+method the coder added was a 34-branch switch that mostly re-typed, one
+literal at a time, what the existing `spaceName` helper already derives
+from the enum's own name via its camelCase-splitting regex — verified this
+programmatically (a script comparing every `Street.Type` constant's
+regex-derived form against the hardcoded literal) before touching anything,
+since preserving the exact rendered text for every space, including the
+accented and bilingual ones, is what a `mutate4java`/acceptance-tested
+`Report` render depends on. `crap4java` confirmed the cost of that
+duplication concretely: CC=23, CRAP=53.6, and — because the switch carried
+a `default` rather than one case per enum constant — it no longer qualified
+for the sealed-switch CRAP exemption recorded for `Report.line` (that
+exemption is conditioned on the case count equalling the type's full
+width; a `default` gives up the same "compiler catches a missing case"
+guarantee the exemption exists to protect, so it can't also claim the
+exemption meant for the guarantee it gave up).
+
+Refactored `boardSpaceName` into a `Map<Street.Type, String>` of just the
+spaces `spaceName` gets wrong (an accent, an apostrophe, a parenthetical, or
+a bilingual translation), defaulting to `spaceName` for everything else:
+CC=1, CRAP=1.0. That made the pre-existing `jailCauseName` helper — which
+special-cased the one space it cared about the same way, then fell back to
+`spaceName` — behaviorally identical to `boardSpaceName` for every possible
+input, so merged the two and updated `line`'s `JailEntered` case to call
+`boardSpaceName` directly. `dry4java` found no new duplication afterward;
+the only survivors are the pre-existing `Game.Journalling` one-adapter-per-
+event-kind methods and a constructor-field-assignment pair, both unrelated
+to this change and already accepted structure.
+
+Added `ReportBoardSpaceNamePropertyTest` (jetCheck, `property-test` tag,
+`Generator.sampledFrom(Street.Type.values())` with iteration count capped
+at the enum's own size — jetCheck's default 100 iterations can't find "
+sufficiently different" samples from a 36-value domain): sweeps every
+space and asserts (1) it is named the same way whether it is where a move
+lands or what sent a pawn to jail — the exact drift the two separate
+hand-written tables risked before being merged — and (2) every name is
+non-blank with no run-together words, guarding the override map's own
+escape hatch for spaces not yet listed.
+
+Verification: full `mvn test` 259 domain + 11 cli green; `mvn test -P
+property-tests` 22 green including the two new cases; full acceptance
+pipeline 277/277 green. `mutate4java --scan` on all three changed/touched
+main-source files: `Report.java` 2 sites, `Game.java` 29, `Turn.java` 11 —
+all well under the 100-site split threshold. Embedded `mutate4java`
+manifest in `Report.java` refreshed via `--update-manifest` (no tests run)
+after each structural change.
+
+Committing and handing the verified state to the architect.
+
+## 2026-08-02T13:17:32Z — architect received handoff from refactorer
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: movement-space-names
+commit: 7c879cdad2
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 7c879cdad2
+```
+
+Action taken: merged the refactorer commit into `swarmforge-architect` and
+resolved the append-only `logbook.md` conflict by retaining both histories.
+Beginning architect review for `movement-space-names`.
+
+## 2026-08-02T13:22:58Z — architect sent movement-space-names follow-up to specifier
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: movement-space-names
+commit: ed77ed4d44
+```
+
+Summary: soft Gherkin acceptance mutation found that the revised movement
+examples' board-space-name values survive in `journal.feature` (and related
+report/logging coverage): the journal assertions currently use only position
+values when matching a movement entry. The acceptance criteria need the
+space-name values to be load-bearing before this phase can close. The
+architectural review also added a regression test proving `Game.play()`
+performs exactly one round; its only remaining mutation survivor is the
+unobserved completion predicate in one-round mode, which is equivalent.
+
+## 2026-08-02T14:44:00Z — specifier received movement-space-names follow-up from architect
+
+Handoff message received:
+
+```
+id: 20260802T132347Z_000080_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: ed77ed4d44
+created_at: 2026-08-02T13:23:47.519493Z
+enqueued_at: 2026-08-02T13:23:48.151475Z
+task: movement-space-names
+dequeued_at: 2026-08-02T13:24:06.660180Z
+
+Re-read your role and constitution.
+
+merge_and_process architect ed77ed4d44
+```
+
+Action taken: merged architect commit `ed77ed4d44` into `main`, resolving the
+append-only `logbook.md` conflict by interleaving both branches' entries in
+chronological order (matched against real commit timestamps, since the
+`logging-output` phase-complete entry on the architect side predates the
+`movement-space-names` handoff already on `main`).
+
+Reviewed the finding: read `journal.feature` scenarios `journal-2` and
+`journal-3` (the movement scenarios with `(<space>)` parameters) and the
+`JournalStepHandlers.java` step definitions that bind them. Both Examples
+tables already carry distinct, non-redundant start/final space-name columns
+alongside the position columns, and the step text already requires a
+`(<space>)` parameter on both ends of every `moves from position ... to ...`
+line — the Gherkin content is not missing anything. The actual gap is in the
+step *implementation*: the three `moves from position ... (...) to ... (...)`
+step definitions in `JournalStepHandlers.java` capture the space-name text
+into regex groups but only forward the two position ints to
+`MonopolyStepHelpers.moved(pawnName, from, to)`; that helper's `Entry.Moved`
+construction independently re-derives `fromSpace`/`toSpace` from the position
+via `officialSpaceAt` (the production board layout), so the value compared
+in the journal assertion never depends on the Gherkin's space-name text at
+all. No edit to the `.feature` Examples or step wording can make an argument
+load-bearing when the step handler that consumes it discards it — this is a
+project step handler defect (coder-owned code per the constitution's
+acceptance-pipeline component list), not a Gherkin scenario-content defect.
+
+Decision: declining to make a feature-file change; none exists that fixes
+this. Recommend the architect route the actual fix to coder: give
+`moved()`/`JournalStepHandlers` a way to translate the captured space-name
+text into a `Street.Type` (e.g. via the existing name-lookup `Vocabulary`
+already used for `pawn "\<name\>" lands on "\<property\>"`-style steps) and
+assert it against the recorded entry's `fromSpace`/`toSpace`, so a mutated
+Examples space-name value is genuinely killed. Not touching the one-round
+`Game.play()` regression test noted in the same review — that is
+architect/coder-owned verification work, unrelated to specifier scope.
+Committing this decision and handing back to the architect under the
+`movement-space-names` task name.
+
+## 2026-08-02T13:30:31Z — architect received handoff from specifier
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: movement-space-names
+commit: 25e3084573
+
+Re-read your role and constitution.
+
+merge_and_process specifier 25e3084573
+```
+
+Action taken: accepted the specifier's decision that the Gherkin examples
+already require movement space names and that the failure is in the
+acceptance step implementation, which discards those captured names. Routing
+the pipeline fix to the coder for an architect follow-up.
+
+## 2026-08-02T13:33:45Z — coder received architect follow-up
+
+Handoff message received:
+
+```
+id: 20260802T133102Z_000081_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 6a78076cae
+created_at: 2026-08-02T13:31:02.315573Z
+enqueued_at: 2026-08-02T13:31:03.083012Z
+task: movement-space-names
+
+Re-read your role and constitution.
+
+merge_and_process architect 6a78076cae
+```
+
+Action taken: merged architect commit `6a78076cae`; reviewing the follow-up
+under coder rules now.
