@@ -14750,3 +14750,63 @@ space-name values to be load-bearing before this phase can close. The
 architectural review also added a regression test proving `Game.play()`
 performs exactly one round; its only remaining mutation survivor is the
 unobserved completion predicate in one-round mode, which is equivalent.
+
+## 2026-08-02T14:44:00Z — specifier received movement-space-names follow-up from architect
+
+Handoff message received:
+
+```
+id: 20260802T132347Z_000080_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 00
+type: git_handoff
+role: architect
+commit: ed77ed4d44
+created_at: 2026-08-02T13:23:47.519493Z
+enqueued_at: 2026-08-02T13:23:48.151475Z
+task: movement-space-names
+dequeued_at: 2026-08-02T13:24:06.660180Z
+
+Re-read your role and constitution.
+
+merge_and_process architect ed77ed4d44
+```
+
+Action taken: merged architect commit `ed77ed4d44` into `main`, resolving the
+append-only `logbook.md` conflict by interleaving both branches' entries in
+chronological order (matched against real commit timestamps, since the
+`logging-output` phase-complete entry on the architect side predates the
+`movement-space-names` handoff already on `main`).
+
+Reviewed the finding: read `journal.feature` scenarios `journal-2` and
+`journal-3` (the movement scenarios with `(<space>)` parameters) and the
+`JournalStepHandlers.java` step definitions that bind them. Both Examples
+tables already carry distinct, non-redundant start/final space-name columns
+alongside the position columns, and the step text already requires a
+`(<space>)` parameter on both ends of every `moves from position ... to ...`
+line — the Gherkin content is not missing anything. The actual gap is in the
+step *implementation*: the three `moves from position ... (...) to ... (...)`
+step definitions in `JournalStepHandlers.java` capture the space-name text
+into regex groups but only forward the two position ints to
+`MonopolyStepHelpers.moved(pawnName, from, to)`; that helper's `Entry.Moved`
+construction independently re-derives `fromSpace`/`toSpace` from the position
+via `officialSpaceAt` (the production board layout), so the value compared
+in the journal assertion never depends on the Gherkin's space-name text at
+all. No edit to the `.feature` Examples or step wording can make an argument
+load-bearing when the step handler that consumes it discards it — this is a
+project step handler defect (coder-owned code per the constitution's
+acceptance-pipeline component list), not a Gherkin scenario-content defect.
+
+Decision: declining to make a feature-file change; none exists that fixes
+this. Recommend the architect route the actual fix to coder: give
+`moved()`/`JournalStepHandlers` a way to translate the captured space-name
+text into a `Street.Type` (e.g. via the existing name-lookup `Vocabulary`
+already used for `pawn "\<name\>" lands on "\<property\>"`-style steps) and
+assert it against the recorded entry's `fromSpace`/`toSpace`, so a mutated
+Examples space-name value is genuinely killed. Not touching the one-round
+`Game.play()` regression test noted in the same review — that is
+architect/coder-owned verification work, unrelated to specifier scope.
+Committing this decision and handing back to the architect under the
+`movement-space-names` task name.
