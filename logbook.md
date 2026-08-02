@@ -14933,3 +14933,18 @@ of `journal.feature` killed all movement start/end space-name mutations
 (including both previously surviving names). The soft pass has only the
 three previously accepted equivalent insufficient-balance survivors in
 bankruptcy/winner scenarios.
+
+## 2026-08-02T13:40:47Z — architect sent movement-space-names phase-complete sync to specifier
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: movement-space-names
+commit: 7f9193e9e3
+```
+
+Summary: the coder follow-up makes Gherkin movement-space names load-bearing
+in journal and log assertions. Architect review and verification are complete.
