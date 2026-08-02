@@ -14831,3 +14831,20 @@ Action taken: accepted the specifier's decision that the Gherkin examples
 already require movement space names and that the failure is in the
 acceptance step implementation, which discards those captured names. Routing
 the pipeline fix to the coder for an architect follow-up.
+
+## 2026-08-02T13:30:31Z — architect sent movement-space-names follow-up to coder
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: movement-space-names
+commit: 6a78076cae
+```
+
+Summary: acceptance step handlers capture movement board-space names but
+discard them before comparison, allowing Gherkin name mutations to survive.
+Correct the handler/helper comparison so the captured names are asserted
+against the structured movement entry.
