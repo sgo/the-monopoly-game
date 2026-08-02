@@ -14915,3 +14915,21 @@ merge_and_process coder 3c644a0181
 
 Action taken: merged the coder follow-up and began architect review of the
 acceptance step-handler boundary and load-bearing movement-name assertions.
+
+## 2026-08-02T13:40:47Z — architect verified movement-space-names coder follow-up
+
+Architectural review accepted the correction: `JournalStepHandlers` and
+`GameLogStepHandlers` now pass captured board-space names through the shared
+`MonopolyStepHelpers.moved` adapter, which resolves them through the existing
+`SpaceNames` boundary before comparing the structured journal entry. This
+keeps display-name translation at the acceptance edge and avoids new domain
+or report dependencies.
+
+Verification: acceptance pipeline 277/277 green; property tests 22/22
+green. Differential `mutate4java` on `Game.java` retains only the known
+equivalent one-round completion-predicate survivor; DRY reports only the
+established acceptance-helper catalog patterns. Forced full Gherkin mutation
+of `journal.feature` killed all movement start/end space-name mutations
+(including both previously surviving names). The soft pass has only the
+three previously accepted equivalent insufficient-balance survivors in
+bankruptcy/winner scenarios.
