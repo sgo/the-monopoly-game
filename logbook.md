@@ -14879,3 +14879,20 @@ merge_and_process architect 6a78076cae
 
 Action taken: merged architect commit `6a78076cae`; reviewing the follow-up
 under coder rules now.
+
+## 2026-08-02T13:37:09Z — coder sent movement-space-names back to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: movement-space-names
+commit: 3c644a0181
+```
+
+Updated journal and game-log movement claims to translate and compare the
+captured Gherkin source/destination space names instead of reconstructing them
+from positions. Full APS acceptance passes 277/277; the acceptance step
+definitions are no longer duplicated.
