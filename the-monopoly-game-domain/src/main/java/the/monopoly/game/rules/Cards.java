@@ -341,7 +341,11 @@ public final class Cards implements Landings {
 
   public interface Decks {
     static Decks official() {
-      return new OfficialDecks();
+      return official(new Deeds());
+    }
+
+    static Decks official(Deeds deeds) {
+      return new OfficialDecks(deeds);
     }
 
     Decks EMPTY = new Decks() {
@@ -362,10 +366,20 @@ public final class Cards implements Landings {
   }
 
   private static final class OfficialDecks implements Decks {
+    private static final String CHANCE_GET_OUT_OF_JAIL_FREE =
+        "Verlaat de gevangenis zonder te betalen.";
+    private static final String COMMUNITY_CHEST_GET_OUT_OF_JAIL_FREE =
+        "Je hebt een puppy gered — en je voelt voldoening! Verlaat de gevangenis zonder betalen. "
+            + "Bewaar deze kaart tot je ze nodig hebt. Je kan de kaart ook ruilen of verkopen.";
+
+    private final Deeds deeds;
     private final Deque<String> chance;
     private final Deque<String> communityChest;
+    private String withheldChance;
+    private String withheldCommunityChest;
 
-    private OfficialDecks() {
+    private OfficialDecks(Deeds deeds) {
+      this.deeds = deeds;
       chance = shuffled(List.of(
           "Ga door naar Nieuwstraat (Brussel) / Rue Neuve (Bruxelles).",
           "Ga door naar START (Ontvang M200).",
@@ -412,17 +426,26 @@ public final class Cards implements Landings {
 
     @Override
     public String drawChance() {
-      return draw(chance);
+      if (withheldChance != null && !deeds.holds(Deeds.RetainedCard.CHANCE_GET_OUT_OF_JAIL_FREE)) {
+        chance.addLast(withheldChance);
+        withheldChance = null;
+      }
+      String card = chance.removeFirst();
+      if (card.equals(CHANCE_GET_OUT_OF_JAIL_FREE)) withheldChance = card;
+      else chance.addLast(card);
+      return card;
     }
 
     @Override
     public String drawCommunityChest() {
-      return draw(communityChest);
-    }
-
-    private static String draw(Deque<String> deck) {
-      String card = deck.removeFirst();
-      deck.addLast(card);
+      if (withheldCommunityChest != null
+          && !deeds.holds(Deeds.RetainedCard.COMMUNITY_CHEST_GET_OUT_OF_JAIL_FREE)) {
+        communityChest.addLast(withheldCommunityChest);
+        withheldCommunityChest = null;
+      }
+      String card = communityChest.removeFirst();
+      if (card.equals(COMMUNITY_CHEST_GET_OUT_OF_JAIL_FREE)) withheldCommunityChest = card;
+      else communityChest.addLast(card);
       return card;
     }
   }

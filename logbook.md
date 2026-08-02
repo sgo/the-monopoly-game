@@ -15601,3 +15601,13 @@ this task originally. Recommend extending the coder's own `CardsDeckTest`
 drawn "Get Out of Jail Free" card is absent from the next N draws while
 held, and reappears once returned — a unit/property-style test, not an
 acceptance scenario.
+
+## 2026-08-02T17:48:04Z — coder completed official-card-decks GOJF follow-up
+
+Merged specifier follow-up commit `2f535ace29`.
+
+Official decks now bind to `Deeds`: a drawn Get-Out-of-Jail-Free card is
+withheld while retained and returns to the deck after release, including
+use or return through bankruptcy; sale and transfer preserve the hold. Added
+a focused deck test. Full Maven tests pass 264 domain tests and 11 CLI tests;
+full acceptance passes 285/285.
