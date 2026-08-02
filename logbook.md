@@ -15972,3 +15972,48 @@ Verification: full Maven tests pass (266 domain, 11 CLI), property tests pass
 has no manifest surface; DRY findings are the established helper catalog.
 Soft Gherkin mutation kills all 5 new card mutations; the journal's three
 remaining survivors are unrelated existing insufficient-balance inputs.
+
+## 2026-08-02T16:46:00Z — specifier received card-driven-movement-resolution phase-complete sync from architect
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: card-driven-movement-resolution
+
+Re-read your role and constitution.
+
+merge_and_process architect fbbde7ca46
+```
+
+Action taken: merged architect commit `fbbde7ca46` into `main`, resolving
+the append-only `logbook.md` conflict by placing my own sent-handoff entry
+ahead of the coder/refactorer/architect chain it preceded. Verified the fix
+myself rather than accepting the summaries: `moveTo()` now correctly fires
+`events.moved(...)` for every card-driven move (confirmed directly — a
+scripted "Ga door naar Grand Place" card correctly logged "moved from 7 to
+24"), so the movement-logging half of the gap is genuinely fixed for all six
+"advance" card types, matching the shared helper.
+
+The landing-resolution half is not: only the one card in my Gherkin example
+(Rue de Diekirch, via the new `moveToAndResolve`) got wired to buy/rent
+resolution. Nieuwstraat, Grand Place, and Noord Station — the other three
+named-property cards I explicitly named in my handoff summary as sharing
+this exact defect — still call plain `moveTo` (confirmed by reading
+`Cards.java`'s effect map: lines still read `moveTo(player,
+NieuwstraatBrussel, false)` / `moveTo(player, GrandPlaceMons, true)` /
+`moveTo(player, NoordStation, true)`, not `moveToAndResolve`). Reproduced
+directly: a scripted "Ga door naar Grand Place" card now logs the move
+correctly but still leaves the property unowned with no `bought` event and
+no balance change — identical to the original bug, just for a card I didn't
+happen to put in the Gherkin.
+
+This reads as the fix tracking only what the Gherkin scenario explicitly
+exercised rather than the general defect described in the handoff prose;
+Gherkin can only pin one representative example, but the written scope was
+for all four cards. Not accepting `card-driven-movement-resolution` as
+closed. Sending a same-task follow-up to coder asking for
+`moveToAndResolve` (or equivalent) to cover all four named-property cards,
+not just the one with a scenario.
