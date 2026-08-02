@@ -16856,3 +16856,20 @@ win the ensuing auction by spending its protected reserve. The new buying-land
 acceptance scenarios demonstrate this for both a normal property and a utility
 monopoly case. This is a functional implementation omission, not a Gherkin
 content defect, and requires a coder follow-up before architectural closure.
+
+## 2026-08-02T21:00:28Z — architect sent agree-if-affordable-cash-reserve
+
+Handoff message sent to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: agree-if-affordable-cash-reserve
+commit: 0c4364cd4c
+```
+
+The direct-offer reserve behavior and the auction bid behavior must agree:
+the strategy must not spend the configured reserve in an auction unless the
+specified utility-monopoly exception applies. The return path is this
+architect loop, not a specifier sync.
