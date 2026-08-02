@@ -58,8 +58,9 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.Rolled(idOf(pawnName), total));
   }
 
-  static Claim moved(String pawnName, int from, int to) {
-    return Claim.of(new Entry.Moved(idOf(pawnName), from, to));
+  static Claim moved(String pawnName, int from, String fromSpace, int to, String toSpace) {
+    return Claim.of(new Entry.Moved(
+        idOf(pawnName), from, to, SpaceNames.of(fromSpace), SpaceNames.of(toSpace)));
   }
 
   static Claim salaryCollected(String pawnName, int salary) {
@@ -119,6 +120,10 @@ final class MonopolyStepHelpers {
 
   static Claim bankPaid(String pawnName, int amount) {
     return Claim.of(new Entry.BankPaid(idOf(pawnName), money(amount)));
+  }
+
+  static Claim playerPaid(String payer, String payee, int amount) {
+    return Claim.of(new Entry.PlayerPaid(idOf(payer), idOf(payee), money(amount)));
   }
 
   static Claim jailEntered(String pawnName, String spaceName) {
@@ -189,6 +194,10 @@ final class MonopolyStepHelpers {
 
   static String chanceCardDrawnLine(String pawnName, String card) {
     return pawnName + " draws the chance card \"" + card + "\"";
+  }
+
+  static String communityChestCardDrawnLine(String pawnName, String card) {
+    return pawnName + " draws the community chest card \"" + card + "\"";
   }
 
   static String bankPaidLine(String pawnName, int amount) {

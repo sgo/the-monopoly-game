@@ -56,6 +56,7 @@ public final class Report {
           name(it.player()) + " wins the auction for " + spaceName(it.land()) + " at $" + it.price().amount();
       case Entry.RentPaid it -> name(it.tenant()) + " pays " + name(it.owner()) + " $"
           + it.rent().amount() + " rent for " + spaceName(it.land());
+      case Entry.PlayerPaid it -> name(it.payer()) + " pays " + name(it.payee()) + " $" + it.amount().amount();
       case Entry.HouseBuilt it ->
           name(it.player()) + " builds a house on " + spaceName(it.land()) + " for $" + it.price().amount();
       case Entry.HouseSold it ->

@@ -293,6 +293,7 @@ public final class Cards implements Landings {
   private void transfer(Player payer, Player payee, Money amount) {
     payer.account().withdraw(amount);
     payee.account().deposit(amount);
+    events.paid(payer, payee, amount);
   }
 
   private void repair(Player player, Money perHouse, Money perHotel) {
@@ -369,6 +370,9 @@ public final class Cards implements Landings {
     }
 
     default void paid(Player tenant, Player owner, Ownable land, Money rent) {
+    }
+
+    default void paid(Player payer, Player payee, Money amount) {
     }
   }
 }
