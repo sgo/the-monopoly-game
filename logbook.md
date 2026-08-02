@@ -15915,3 +15915,8 @@ Verification: full Maven tests pass (266 domain, 11 CLI), property tests pass
 has no manifest surface; DRY findings are the established helper catalog.
 Soft Gherkin mutation kills all 5 new card mutations; the journal's three
 remaining survivors are unrelated existing insufficient-balance inputs.
+
+## 2026-08-02T16:45:51Z — architect sent card-driven-movement-resolution phase completion
+
+Handoff message sent to specifier at priority 50 for task
+`card-driven-movement-resolution`, commit `fbbde7ca46`.
