@@ -16241,3 +16241,84 @@ one code path instead of one having a bespoke fix.
 like any other move, and all four named-property Chance cards resolve
 buy-or-rent identically to landing there by dice. Asking the user for the
 next feature to specify.
+
+## 2026-08-02T18:46:47Z — specifier investigates a silent forced house-sale/mortgage during bankruptcy resolution
+
+The user pasted a real trace:
+
+```
+dog starts a turn with $39
+dog rolls a total of 8
+dog moves from position 9 (Kapellestraat Oostende) to 17 (Algemeen Fonds / Caisse de Communauté)
+dog draws the community chest card "Je had beter deelgenomen aan het renovatie project — je zou waardevolle vaardigheden geleerd hebben! Betaal M40 voor elk huis wat je bezit. M115 voor elk hotel."
+dog pays the bank $320
+```
+
+Dog starts the turn with only $39 and pays $320 to the bank — a debt of
+$281 that its cash on hand cannot cover. Read `Bankruptcy.java`: `resolve()`
+is generic over the cause of the debt (rent, tax, or card payment all funnel
+through the same landing pipeline in `Game.landingsFor`), and it already
+correctly sells houses (`sellHousesUntilSolvent`) and mortgages property
+(`mortgageUntilSolvent`) to raise cash before declaring bankruptcy. That
+part works. The bug: neither of those two methods, nor the `Deeds.sellHouse`
+/ `Deeds.mortgage` calls they make, emit any event. `Bankruptcy.Events` only
+declares `bankrupt(...)` and `won(...)` — there is no hook at all for a
+forced sale or a forced mortgage. So when a player narrowly avoids
+bankruptcy by having houses sold or property mortgaged out from under them,
+nothing about it appears in the journal, log, or report; the player just
+sees their cash change with no explanation, or (as in this trace, if dog
+can't fully cover it) no visibility into what was liquidated on the way to
+bankruptcy either.
+
+I confirmed this is a real, currently-silent path, not merely a hypothetical:
+`Cards.repair()` (the per-house/per-hotel card handler) calls the shared
+`payBank`, and `Game.landingsFor` always runs `bankruptcy.resolve(who, null)`
+after `cards.resolve(...)` for community-chest/chance landings, exactly as
+it does after rent/tax. Wrote a standalone repro
+(`ReproBankruptcy.java`) instantiating `Bankruptcy` directly with a debtor
+holding 3 houses on two owned browns and a manufactured negative balance:
+confirmed a house is sold on `Rue Grande Dinant` (3 houses -> 2, balance
+recovers, player stays in the game) with zero events fired — no bankrupt
+event (correct, they didn't go bankrupt) and no notification of the house
+sale at all.
+
+Notably, `bankruptcy.feature` already has two scenarios exercising this
+exact mechanism end-to-end (`bankruptcy-1`: forced mortgage,
+`bankruptcy-2`: forced house sale) — both assert only on account balance
+and house/mortgage state, never on what the journal records. And
+`journal.feature`/`logging.feature`/`report.feature` already have passing
+scenarios for *voluntary* house sales and mortgages (`journal-9`,
+`journal-10`, and their logging/report equivalents) — but those exercise a
+test-only path in `World.java` that constructs the `Entry.HouseSold` /
+`Entry.Mortgaged` journal entries directly, bypassing the domain entirely.
+The real domain has no production code path that emits these events; only
+`World.java`'s test harness does. `Bankruptcy` is the *only* real caller of
+`Deeds.sellHouse`/`Deeds.mortgage` in the whole domain (verified by
+`grep`), and it emits nothing.
+
+Scope decision: the fix is to wire `Bankruptcy`'s forced sale/mortgage
+calls to fire the same `Entry.HouseSold`/`Entry.Mortgaged` events already
+proven correct by the existing voluntary-path scenarios and already
+rendered correctly by `Journal`/`Report`/log formatting — no new entry
+types, no new rendering logic, purely closing the same "action happens in
+the engine but is invisible to the player" gap this pipeline has now fixed
+three times (card draws, card payments, card-driven movement). Explicitly
+out of scope: `Deeds.exchangeHotelForHouses`, which `Bankruptcy` also calls
+before selling houses down from a hotel — there's no existing journal
+entry type for a hotel exchange, it's a mechanical precursor rather than a
+headline financial event, and the house-sold entries that follow already
+communicate the house count changing.
+
+Added two new scenarios each to `journal.feature`, `logging.feature`, and
+`report.feature` (indices 26-27 in each), reusing the exact `Given`/`When`
+setups already proven correct in `bankruptcy-1` and `bankruptcy-2`
+(same starting balances, same $30 mortgage value and $25 house-sale price
+for Rue Grande Dinant) so the new scenarios add journal/log/report
+visibility assertions on top of already-verified financial outcomes rather
+than inventing new game states. Verified with `bb gherkin-parser` on all
+three files (clean parse) and `bb gherkin-ir-dry-checker` (only the same
+class of near-duplicate/possible-synonym noise already tolerated between
+the existing "builds a house" vs "sells a house"/"mortgages" scenarios;
+nothing new in kind).
+
+Committing and handing off to coder.

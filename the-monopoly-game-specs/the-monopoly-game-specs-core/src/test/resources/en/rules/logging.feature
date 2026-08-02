@@ -322,3 +322,28 @@ Feature: game logging
     Examples:
       | chance_position | chance_space  | destination_position | destination_space     |
       | 7                | Kans / Chance | 11                    | Rue de Diekirch Arlon |
+
+  # logging-26
+  Scenario Outline: the log records a mortgage forced by an unaffordable debt
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" has $70 to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then the game log records that pawn "dog" mortgages "Rue Grande Dinant" for $<value>
+
+    Examples:
+      | value |
+      | 30    |
+
+  # logging-27
+  Scenario Outline: the log records a house sale forced by an unaffordable debt
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "Diestsestraat Leuven"
+    And the street "Rue Grande Dinant" has 1 house(s) built
+    And the street "Diestsestraat Leuven" has 1 house(s) built
+    And pawn "dog" has $80 to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then the game log records that pawn "dog" sells a house on "Rue Grande Dinant" for $<price>
+
+    Examples:
+      | price |
+      | 25    |
