@@ -17034,3 +17034,20 @@ boundary examples that discriminate the reserve decision sharply enough.
 Per workflow this is a Gherkin content finding for the specifier, not a direct
 architect edit; the task remains open pending that priority-00 specification
 loop.
+
+## 2026-08-02T21:17:02Z — architect sent agree-if-affordable-cash-reserve
+
+Handoff message sent to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: agree-if-affordable-cash-reserve
+commit: e7646558fb
+```
+
+Soft mutation leaves the reserve scenarios insufficiently discriminating:
+several reserve changes preserve the same example outcomes. Review and decide
+whether to add boundary examples that distinguish the cap and the
+utility-monopoly exception, then return the task to the architect loop.
