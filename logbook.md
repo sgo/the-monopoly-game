@@ -16685,3 +16685,18 @@ Action taken: merged the specification and implemented reserve-aware
 `AgreeIfAffordable` purchases, including utility-monopoly overrides for
 completing or blocking a utility monopoly. Added the configured acceptance
 step and passed the buying-land scenarios plus all 266 domain tests.
+
+## 2026-08-02T20:49:10Z — coder sent agree-if-affordable-cash-reserve
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 7db8e8f74f
+```
+
+Summary: implemented reserve-aware buying and utility-monopoly overrides for
+the Agree if affordable strategy.
