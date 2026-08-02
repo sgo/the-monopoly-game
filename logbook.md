@@ -15888,3 +15888,30 @@ acceptance pipeline 290/290 green, repeated 3+ times.
 split threshold; manifest refreshed via `--update-manifest`.
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T16:45:51Z — architect received card-driven-movement-resolution handoff
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-driven-movement-resolution
+commit: c7d162e896
+
+Re-read your role and constitution.
+
+merge_and_process refactorer c7d162e896
+```
+
+Action taken: merged and reviewed the card-driven movement boundary. `Cards`
+emits moves through its existing event port, preserves salary ordering, and
+delegates named-property rent to `Rent`; acceptance adapters remain outside
+the rules layer. No architecture follow-up is required.
+
+Verification: full Maven tests pass (266 domain, 11 CLI), property tests pass
+22/22, and affected acceptance passes 290/290. Differential `Cards` mutation
+has no manifest surface; DRY findings are the established helper catalog.
+Soft Gherkin mutation kills all 5 new card mutations; the journal's three
+remaining survivors are unrelated existing insufficient-balance inputs.
