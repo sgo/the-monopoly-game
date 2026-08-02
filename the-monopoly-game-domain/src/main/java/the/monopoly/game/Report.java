@@ -85,6 +85,9 @@ public final class Report {
           name(it.player()) + " is sent to jail from landing on " + boardSpaceName(it.cause());
       case Entry.JailFinePaid it ->
           name(it.player()) + " leaves jail by paying the $" + it.fine().amount() + " fine";
+      case Entry.JailCardUsed it -> name(it.player()) + " leaves jail using the Get Out of Jail Free card";
+      case Entry.JailDoublesRolled it -> name(it.player()) + " leaves jail by rolling doubles";
+      case Entry.JailStayed it -> name(it.player()) + " stays in jail";
       case Entry.Bankrupt it -> name(it.player()) + " goes bankrupt to "
           + (it.creditor() == null ? "the bank" : name(it.creditor()));
       case Entry.Won it -> name(it.player()) + " wins the game";

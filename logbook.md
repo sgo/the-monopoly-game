@@ -15999,6 +15999,10 @@ has no manifest surface; DRY findings are the established helper catalog.
 Soft Gherkin mutation kills all 5 new card mutations; the journal's three
 remaining survivors are unrelated existing insufficient-balance inputs.
 
+## 2026-08-02T16:45:51Z — architect sent card-driven-movement-resolution phase completion
+
+Handoff message sent to specifier at priority 50 for task
+`card-driven-movement-resolution`, commit `fbbde7ca46`.
 ## 2026-08-02T16:46:00Z — specifier received card-driven-movement-resolution phase-complete sync from architect
 
 Handoff message received:
@@ -16054,11 +16058,11 @@ to: coder
 priority: 50
 role: specifier
 task: card-driven-movement-resolution
-commit: f4d92e01fc
+commit: 818fb0525d
 
 Re-read your role and constitution.
 
-merge_and_process specifier f4d92e01fc
+merge_and_process specifier 818fb0525d
 ```
 
 Summary: verified the movement-logging half of the fix is genuinely
@@ -16202,3 +16206,250 @@ redundancy the specifier already reasoned against for this mechanic.
 Full unit (266+11) and property (22) suites green; acceptance 290/290,
 repeated twice. Handing verified state to architect for independent
 review.
+
+## 2026-08-02T16:58:47Z — architect received named-property movement follow-up
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-driven-movement-resolution
+commit: 9450569bc0
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 9450569bc0
+```
+
+Action taken: merged and verified the scope correction. Nieuwstraat, Grand
+Place, Noord Station, and Rue de Diekirch all route through the shared
+named-property movement and resolution path; START cards correctly remain
+plain moves. Full Maven tests pass (266 domain, 11 CLI) and property tests
+pass 22/22. Differential mutation is current; DRY reports only existing test
+parameterization, and soft `cards.feature` mutation has no changed surface.
+
+## 2026-08-02T16:59:00Z — specifier received card-driven-movement-resolution phase-complete sync from architect
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: card-driven-movement-resolution
+
+Re-read your role and constitution.
+
+merge_and_process architect e4974ccd94
+```
+
+Action taken: merged architect commit `e4974ccd94` into `main` (clean,
+no conflict). Verified the scope fix myself before accepting it: the
+coder's change is a minimal three-line diff switching Nieuwstraat, Grand
+Place, and Noord Station from `moveTo` to `moveToAndResolve` — exactly the
+three cards I flagged, nothing more, nothing less. Reproduced directly
+against `Cards.resolve()` with a scripted Grand Place card and a real
+`AgreeIfAffordable` strategy (my first repro used `Strategy.UNDECIDED`,
+which never accepts any offer — a false negative in my own test, not a
+second bug): the move logs correctly, the property is bought for $240
+matching `RULES.md`'s price, and the balance drops accordingly. Confirmed
+`moveToAndResolve` delegates to the same `Rent` class already used for
+ordinary dice-driven landings, so station-by-count and colour-group rent
+work correctly without new rent logic — not something I needed to
+individually re-verify per property, since all four named cards now share
+one code path instead of one having a bespoke fix.
+
+`card-driven-movement-resolution` is closed: card-driven moves are logged
+like any other move, and all four named-property Chance cards resolve
+buy-or-rent identically to landing there by dice. Asking the user for the
+next feature to specify.
+
+## 2026-08-02T18:46:47Z — specifier investigates a silent forced house-sale/mortgage during bankruptcy resolution
+
+The user pasted a real trace:
+
+```
+dog starts a turn with $39
+dog rolls a total of 8
+dog moves from position 9 (Kapellestraat Oostende) to 17 (Algemeen Fonds / Caisse de Communauté)
+dog draws the community chest card "Je had beter deelgenomen aan het renovatie project — je zou waardevolle vaardigheden geleerd hebben! Betaal M40 voor elk huis wat je bezit. M115 voor elk hotel."
+dog pays the bank $320
+```
+
+Dog starts the turn with only $39 and pays $320 to the bank — a debt of
+$281 that its cash on hand cannot cover. Read `Bankruptcy.java`: `resolve()`
+is generic over the cause of the debt (rent, tax, or card payment all funnel
+through the same landing pipeline in `Game.landingsFor`), and it already
+correctly sells houses (`sellHousesUntilSolvent`) and mortgages property
+(`mortgageUntilSolvent`) to raise cash before declaring bankruptcy. That
+part works. The bug: neither of those two methods, nor the `Deeds.sellHouse`
+/ `Deeds.mortgage` calls they make, emit any event. `Bankruptcy.Events` only
+declares `bankrupt(...)` and `won(...)` — there is no hook at all for a
+forced sale or a forced mortgage. So when a player narrowly avoids
+bankruptcy by having houses sold or property mortgaged out from under them,
+nothing about it appears in the journal, log, or report; the player just
+sees their cash change with no explanation, or (as in this trace, if dog
+can't fully cover it) no visibility into what was liquidated on the way to
+bankruptcy either.
+
+I confirmed this is a real, currently-silent path, not merely a hypothetical:
+`Cards.repair()` (the per-house/per-hotel card handler) calls the shared
+`payBank`, and `Game.landingsFor` always runs `bankruptcy.resolve(who, null)`
+after `cards.resolve(...)` for community-chest/chance landings, exactly as
+it does after rent/tax. Wrote a standalone repro
+(`ReproBankruptcy.java`) instantiating `Bankruptcy` directly with a debtor
+holding 3 houses on two owned browns and a manufactured negative balance:
+confirmed a house is sold on `Rue Grande Dinant` (3 houses -> 2, balance
+recovers, player stays in the game) with zero events fired — no bankrupt
+event (correct, they didn't go bankrupt) and no notification of the house
+sale at all.
+
+Notably, `bankruptcy.feature` already has two scenarios exercising this
+exact mechanism end-to-end (`bankruptcy-1`: forced mortgage,
+`bankruptcy-2`: forced house sale) — both assert only on account balance
+and house/mortgage state, never on what the journal records. And
+`journal.feature`/`logging.feature`/`report.feature` already have passing
+scenarios for *voluntary* house sales and mortgages (`journal-9`,
+`journal-10`, and their logging/report equivalents) — but those exercise a
+test-only path in `World.java` that constructs the `Entry.HouseSold` /
+`Entry.Mortgaged` journal entries directly, bypassing the domain entirely.
+The real domain has no production code path that emits these events; only
+`World.java`'s test harness does. `Bankruptcy` is the *only* real caller of
+`Deeds.sellHouse`/`Deeds.mortgage` in the whole domain (verified by
+`grep`), and it emits nothing.
+
+Scope decision: the fix is to wire `Bankruptcy`'s forced sale/mortgage
+calls to fire the same `Entry.HouseSold`/`Entry.Mortgaged` events already
+proven correct by the existing voluntary-path scenarios and already
+rendered correctly by `Journal`/`Report`/log formatting — no new entry
+types, no new rendering logic, purely closing the same "action happens in
+the engine but is invisible to the player" gap this pipeline has now fixed
+three times (card draws, card payments, card-driven movement). Explicitly
+out of scope: `Deeds.exchangeHotelForHouses`, which `Bankruptcy` also calls
+before selling houses down from a hotel — there's no existing journal
+entry type for a hotel exchange, it's a mechanical precursor rather than a
+headline financial event, and the house-sold entries that follow already
+communicate the house count changing.
+
+Added two new scenarios each to `journal.feature`, `logging.feature`, and
+`report.feature` (indices 26-27 in each), reusing the exact `Given`/`When`
+setups already proven correct in `bankruptcy-1` and `bankruptcy-2`
+(same starting balances, same $30 mortgage value and $25 house-sale price
+for Rue Grande Dinant) so the new scenarios add journal/log/report
+visibility assertions on top of already-verified financial outcomes rather
+than inventing new game states. Verified with `bb gherkin-parser` on all
+three files (clean parse) and `bb gherkin-ir-dry-checker` (only the same
+class of near-duplicate/possible-synonym noise already tolerated between
+the existing "builds a house" vs "sells a house"/"mortgages" scenarios;
+nothing new in kind).
+
+Committing and handing off to coder.
+
+## 2026-08-02T19:12:49Z — specifier plays a full game and finds two more gaps
+
+The user asked me to actually play a 2-player game via the CLI simulator
+and inspect the report for more gaps, rather than continue waiting on
+pasted traces. Compiled and ran `the.monopoly.game.cli.Simulator 2`,
+captured the full trace, and read it end to end looking for silent or
+suspicious moments.
+
+**Confirmed rent-correctness bug**: `Cards.advanceToNearestStation`
+computes rent as `station.rentForOwning(1).plus(station.rentForOwning(1))`
+— hardcoded to a single station owned, always $50, regardless of how
+many stations the actual owner holds. RULES.md's own card text says
+"betaal je de eigenaar dubbel de huurprijs" (pay the owner double *the*
+rent, i.e. whatever rent currently applies), and the station rent table
+is $25/$50/$100/$200 for 1/2/3/4 stations owned. The existing test
+(`cards-10`) only covers the 1-station case, where the hardcoded bug
+happens to produce the right answer by coincidence, so it was never
+caught. Verified through the real acceptance-test `World` harness (not a
+shortcut): gave `high hat` all four stations and landed `dog` there via
+the card — charged $50, should have been $400 (double the 4-station
+rate). Added `cards-19`, mirroring `station-rent.feature`'s existing
+"owns every station" convention, giving the owner all four stations so
+the wrong hardcoded value is unambiguously wrong.
+
+I initially suspected a second, different bug while reading the trace:
+`dog` landed via a card on a station `high hat` owned and paid zero
+rent. Chased it down and it isn't a new bug — `high hat` had gone into
+debt from an earlier tax landing with no houses yet to sell, and
+`Bankruptcy` silently mortgaged that exact station to cover it (the gap
+already specified this session). Mortgaged land correctly pays no rent,
+so the zero was right; it just looked inexplicable because the mortgage
+itself was never narrated. Confirms the earlier fix's value and isn't a
+separate finding.
+
+**Confirmed jail-narration gap, broader than first reported**: reading
+`Jail.java` and `Game.java`'s `Journalling` wiring shows `Jail.Events`
+declares four hooks — `sentToJail`, `leftJailByPaying`,
+`leftJailByRollingDoubles`, `leftJailWithCard` — but `Journalling` only
+overrides the first two. Rolling doubles to leave jail and using a Get
+Out of Jail Free card to leave jail are both completely unlogged despite
+the hooks already existing; and failing to roll doubles and staying
+jailed has no hook at all. `jail.feature` already tests the functional
+behavior of the stay-jailed case (`jail-4`, `jail-6`) and the GOJF-card
+case (`jail-7`), but never asserts what the journal records. This is the
+same shape as the Free Parking convention (`journal-19`: an explicit
+"nothing happens" entry) — jail's "nothing happens" and "leaves this
+way" moments deserve the same treatment.
+
+Added three scenarios each to `journal.feature`, `logging.feature`, and
+`report.feature` (indices 28-30): stays in jail after failing to roll
+doubles, leaves jail by rolling doubles, leaves jail with a Get Out of
+Jail Free card. Reused `jail-4`'s and `jail-7`'s exact Given/When setups
+so the new assertions sit on top of already-proven game states rather
+than inventing new ones. Parameterized on the dice pair in each (rather
+than a dummy Examples row) since dice value is a genuine, meaningful
+variation for these scenarios.
+
+Verified with `bb gherkin-parser` on all four changed files (clean
+parse) and `bb gherkin-ir-dry-checker` (only near-duplicate/synonym
+noise of the same kind already tolerated elsewhere — e.g. "leaves jail
+by paying" vs "leaves jail by rolling doubles" vs "stays in jail" being
+flagged as related-but-distinct, and the parameterized dice-roll step
+overlapping with existing literal roll steps). No exact-duplicate
+findings anywhere.
+
+Presented both gaps to the user before writing anything, per their
+explicit instruction not to hand off without permission. User reviewed
+and confirmed: "handoff".
+
+Committing and handing off to coder.
+## 2026-08-02T19:17:44Z — coder received nearest-station-rent-and-jail-narration
+
+Handoff message received:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: nearest-station-rent-and-jail-narration
+commit: bd21e84106
+
+Re-read your role and constitution.
+
+merge_and_process specifier bd21e84106
+```
+
+Action taken: merged the specification and corrected nearest-station rent to
+use the owner's actual station count before doubling it. Added journal, log,
+and report events for remaining in jail, leaving by doubles, and leaving with
+a Get Out of Jail Free card. Focused acceptance confirms the new scenarios;
+two unrelated bankruptcy house-sale/mortgage scenarios remain failing.
+
+## 2026-08-02T19:18:20Z — coder sent nearest-station-rent-and-jail-narration
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: nearest-station-rent-and-jail-narration
+commit: 280e527777
+```
+
+Summary: corrected owned-station rent scaling and added journal/log/report
+narration for jail stays and exits.

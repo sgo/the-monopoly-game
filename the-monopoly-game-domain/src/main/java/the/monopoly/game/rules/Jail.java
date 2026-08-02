@@ -75,7 +75,10 @@ public final class Jail implements Landings {
       return true;
     }
     int failedAttempts = failedDoubleAttempts.merge(player.id(), 1, Integer::sum);
-    if (failedAttempts < 3) return false;
+    if (failedAttempts < 3) {
+      events.stayedInJail(player);
+      return false;
+    }
 
     player.account().withdraw(FINE);
     release(player);
@@ -103,6 +106,9 @@ public final class Jail implements Landings {
     }
 
     default void leftJailByRollingDoubles(Player player) {
+    }
+
+    default void stayedInJail(Player player) {
     }
   }
 }

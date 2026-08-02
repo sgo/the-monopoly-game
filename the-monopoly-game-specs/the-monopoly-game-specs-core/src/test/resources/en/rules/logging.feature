@@ -322,3 +322,66 @@ Feature: game logging
     Examples:
       | chance_position | chance_space  | destination_position | destination_space     |
       | 7                | Kans / Chance | 11                    | Rue de Diekirch Arlon |
+
+  # logging-26
+  Scenario Outline: the log records a mortgage forced by an unaffordable debt
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" has $70 to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then the game log records that pawn "dog" mortgages "Rue Grande Dinant" for $<value>
+
+    Examples:
+      | value |
+      | 30    |
+
+  # logging-27
+  Scenario Outline: the log records a house sale forced by an unaffordable debt
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "Diestsestraat Leuven"
+    And the street "Rue Grande Dinant" has 1 house(s) built
+    And the street "Diestsestraat Leuven" has 1 house(s) built
+    And pawn "dog" has $80 to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then the game log records that pawn "dog" sells a house on "Rue Grande Dinant" for $<price>
+
+    Examples:
+      | price |
+      | 25    |
+
+  # logging-28
+  Scenario Outline: the log records a jailed player staying in jail after failing to roll doubles
+    Given pawn "dog" starts in jail
+    And pawn "dog" will roll <first_die> and <second_die> for their turn
+    When we play the game
+    Then the game log records that pawn "dog" stays in jail
+
+    Examples:
+      | first_die | second_die |
+      | 4         | 6          |
+      | 2         | 5          |
+
+  # logging-29
+  Scenario Outline: the log records a jailed player leaving jail by rolling doubles
+    Given pawn "dog" starts in jail
+    And pawn "dog" will roll <first_die> and <second_die> for their turn
+    When we play the game
+    Then the game log records that pawn "dog" leaves jail by rolling doubles
+
+    Examples:
+      | first_die | second_die |
+      | 3         | 3          |
+      | 5         | 5          |
+
+  # logging-30
+  Scenario Outline: the log records a jailed player leaving jail with a Get Out of Jail Free card
+    Given pawn "dog" starts in jail
+    And pawn "dog" already holds a Get Out of Jail Free card
+    And pawn "dog" will use the Get Out of Jail Free card to leave jail
+    And pawn "dog" will roll <first_die> and <second_die> for their turn
+    When we play the game
+    Then the game log records that pawn "dog" leaves jail using the Get Out of Jail Free card
+
+    Examples:
+      | first_die | second_die |
+      | 4         | 6          |
+      | 3         | 3          |
