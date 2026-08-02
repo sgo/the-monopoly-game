@@ -17034,3 +17034,78 @@ boundary examples that discriminate the reserve decision sharply enough.
 Per workflow this is a Gherkin content finding for the specifier, not a direct
 architect edit; the task remains open pending that priority-00 specification
 loop.
+
+## 2026-08-02T21:33:26Z — specifier closes the priority-00 mutation-boundary loop
+
+Handoff received from architect:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: agree-if-affordable-cash-reserve
+
+Re-read your role and constitution.
+
+merge_and_process architect e7646558fb
+```
+
+Merged (fast-forward, no conflict). Reviewed the coder/refactorer chain
+first: `AgreeIfAffordable.bidFor` now mirrors `accepts()` — caps a bid at
+`available - reserve` (floored at zero), full balance for a utility-monopoly
+opportunity — and the duplicated `utilityMonopolyOpportunity` check was
+correctly moved onto `Deeds`. This was a real gap my Gherkin had already
+correctly caught (the decliner still bids at the ensuing auction in
+`LandSale.auction`, so an unbounded `bidFor` let the strategy spend its
+"protected" reserve anyway); good that the pipeline surfaced and fixed it
+before asking me to review.
+
+Then addressed the actual open item: soft Gherkin mutation of
+`buying-land.feature` killed 18/25 (then 32/39 on a full run) with seven
+survivors, all mutations of the `reserve` example value, which isn't
+directly asserted anywhere — only its effect on the buy/decline boundary is
+observable, so a mutated reserve only gets caught if it's close enough to
+flip that boundary. Ran the project's own
+`acceptance/run-acceptance-mutation.sh` directly (plus `bb gherkin-mutator
+--json` for the per-mutation breakdown) to iterate rather than guessing.
+
+Two of the seven turned out not to be boundary-tuning problems at all.
+Investigating `buying-land-4`'s `dog_starting_balance: 160 -> 154` survivor
+with a standalone `World` repro uncovered a real, previously-invisible gap:
+that scenario queues no competing bidder, so when a mutation flips the
+direct-purchase decision to decline, `dog` still ends up owning the land
+anyway by winning its own uncontested auction (bidding
+`available - reserve` against the default strategy's `$0`). A self-won
+auction's final balance is always exactly the reserve by construction, which
+coincidentally equals the boundary row's intended direct-purchase balance —
+so the two code paths were indistinguishable by the scenario's assertions.
+Fixed by adding a competing `high hat` bid high enough to win any auction
+that occurs, matching the pattern `buying-land-3`/`5` already used; harmless
+to the correct path since a direct purchase never reaches the auction at
+all.
+
+The remaining five survivors are genuinely unkillable by any choice of
+example numbers, not spec gaps:
+- `buying-land-4`'s two `high_hat_bid` mutations: inert once the safety-net
+  bidder is added, for the same reason the field is a safety net in the
+  first place — it's never consulted on the correct path.
+- `buying-land-4` row 2's `reserve` mutation: this row deliberately tests
+  `remaining == reserve` (proving the boundary is inclusive); decreasing
+  reserve from an equality point can never flip a "buys" outcome, only
+  increasing it can, and that direction is already covered by row 1.
+- `buying-land-6`/`7`'s `reserve` mutations: these scenarios exist
+  specifically to prove the utility-monopoly override *bypasses* the
+  reserve entirely (`AgreeIfAffordable.accepts` short-circuits on
+  `utilityMonopolyOpportunity()`), so the reserve's value is provably
+  irrelevant to the outcome by design — no number could ever make it
+  observable through Gherkin-level assertions. Java-level mutation of the
+  `||` itself is the correct tool for that boundary, not this one.
+
+Verified: `bb gherkin-parser` clean, `bb gherkin-ir-dry-checker` shows the
+same class of noise as before (nothing new), full `mvn test` across domain/
+CLI/specs-core green, and `acceptance/run-acceptance-mutation.sh --level
+full` on this feature now reports 36/41 killed, 5 survived, 0 errors — the
+5 residual survivors all accounted for above.
+
+Handing back to architect for final review; no coder work needed, this was
+Gherkin-only.
