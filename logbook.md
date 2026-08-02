@@ -17157,3 +17157,19 @@ the Java differential mutation baseline and DRY analysis passed with no
 new surface or duplicate; soft Gherkin mutation completed with 36/41 killed,
 five documented inert survivors, and zero errors. The coder/refactorer and
 specifier loops are closed, so this task is phase-complete.
+
+## 2026-08-02T21:36:43Z — architect sent agree-if-affordable-cash-reserve
+
+Handoff message sent to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: d8845a5c25
+```
+
+Phase closure: reserve-aware direct purchases and auctions are verified, the
+utility-monopoly exception is preserved, and the boundary scenarios now
+distinguish the previously hidden self-auction path.
