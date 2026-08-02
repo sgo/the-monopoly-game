@@ -15167,3 +15167,18 @@ property-tests` 22/22 green; full acceptance pipeline 283/283 green.
 34 — all well under the 100-site split threshold.
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T14:30:20Z — architect completed card-payment-logging review
+
+Merged the refactorer review as `36af658`. The change keeps the correct
+boundary: `Cards` reports player-to-player transfers through its event port,
+`Game.Journalling` records the domain journal entry, and `Report` remains a
+pure rendering projection. No architecture follow-up is needed.
+
+Replaced the flaky sampled-enum property test with a deterministic traversal
+of every `Street.Type`; normal domain tests (261) and property tests (22)
+pass. Differential Java mutation for `Game`, `Report`, and `Cards` has no
+surface after the refreshed manifests. The affected acceptance pipeline passes
+283/283; full and soft Gherkin mutation runs refreshed the journal, logging,
+and report manifests. The new card-payment journal/report scenarios kill their
+mutations; remaining soft survivors are unrelated pre-existing journal inputs.

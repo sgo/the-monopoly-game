@@ -1,7 +1,5 @@
 package the.monopoly.game;
 
-import org.jetbrains.jetCheck.Generator;
-import org.jetbrains.jetCheck.PropertyChecker;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import the.monopoly.game.Game.Journal.Entry;
@@ -9,8 +7,9 @@ import the.monopoly.game.components.players.Pawn;
 import the.monopoly.game.components.streets.Street;
 
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * A board space is named in two unrelated-looking places in {@link Report}:
@@ -26,8 +25,6 @@ import java.util.regex.Pattern;
 @Tag("property-test")
 class ReportBoardSpaceNamePropertyTest {
   private static final Pattern RUN_TOGETHER_WORDS = Pattern.compile("[a-z][A-Z]");
-  private static final Generator<Street.Type> SPACES = Generator.sampledFrom(Street.Type.values());
-
   @Test
   void aSpaceIsNamedTheSameWayWhetherItIsWhereAMoveLandsOrWhatSentAPawnToJail() {
     checkOverEverySpace(space -> nameAsLandingSpot(space).equals(nameAsJailCause(space)));
@@ -42,13 +39,11 @@ class ReportBoardSpaceNamePropertyTest {
   }
 
   /**
-   * {@link Street.Type} has too few values for jetCheck's default 100
-   * iterations to fill with "sufficiently different" samples of a bare
-   * {@link Generator#sampledFrom}; capping the run at the domain's own size
-   * asks for exactly one look at every space instead.
+   * This is a finite domain, so traversing every value directly expresses the
+   * invariant without relying on a random generator to produce a permutation.
    */
-  private static void checkOverEverySpace(Predicate<Street.Type> property) {
-    PropertyChecker.customized().withIterationCount(Street.Type.values().length).forAll(SPACES, property);
+  private static void checkOverEverySpace(java.util.function.Predicate<Street.Type> property) {
+    for (Street.Type space : Street.Type.values()) assertThat(property.test(space)).isTrue();
   }
 
   private static final String LANDING_SPOT_PREFIX = "dog moves from position 0 (Start) to 1 (";
