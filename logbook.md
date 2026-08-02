@@ -15267,3 +15267,60 @@ assertions added after the user's follow-up question — all kill their
 mutations; full acceptance 283/283, domain+property tests all green.
 `card-payment-logging` is closed. Asking the user for the next feature to
 specify.
+
+## 2026-08-02T15:02:10Z — specifier sent handoff to coder (official-card-decks)
+
+Handoff message sent:
+
+```
+id: 20260802T150210Z_000043_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: official-card-decks
+commit: 5d2c2b6820
+created_at: 2026-08-02T15:02:10.498851Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 5d2c2b6820
+```
+
+Summary: the user pasted a real CLI trace (dog lands on position 7, "Kans /
+Chance", with no card drawn before the next turn-start line) that could not
+be explained by the already-closed `card-payment-logging` fix. Ran the CLI
+simulator directly (`java -cp
+the-monopoly-game-domain/target/classes:the-monopoly-game-cli/target/classes:
+...slf4j-api...jar the.monopoly.game.cli.Simulator 2`) and reproduced it:
+`Game`'s public constructors default `decks` to `Cards.Decks.EMPTY`, whose
+`drawChance`/`drawCommunityChest` always return `null`, and `Cards.resolve()`
+silently no-ops on a `null` draw. No real `Cards.Decks` implementation exists
+anywhere in main source — every chance/community-chest scenario to date
+(including `card-payment-logging`'s) only worked because the acceptance
+fixtures inject a scripted "next card" test double, which real play never
+gets. This is Phase 10's original "shuffled ... placed at the bottom of the
+deck" deliverable, called for in `tasks.md` but never actually built;
+recorded that gap on the plan in commit `6e120c7` (previous commit, not part
+of this handoff).
+
+Added `cards-15`/`cards-16` to `cards.feature`: landing on Chance/Community
+Chest with the official rule set and no `"the next ... card will be"`
+override must still log a real card draw (a new generic "draws a chance
+card"/"draws a community chest card" assertion, deliberately not asserting
+which card, since the deck is genuinely random). Verified with `bb
+gherkin-parser` + `bb gherkin-ir-dry-checker`; the only new findings pair
+these against the existing exact-text "draws the chance/community chest
+card "..."" steps, which is expected and necessary — one asserts a specific
+scripted card, the new one asserts "some real card, we don't know which."
+
+Deliberately left out of Gherkin, per the user's confirmed "full real-deck"
+scope: genuine shuffling, deal-without-replacement, reshuffle-on-exhaustion,
+and returning a used/sold "Get Out of Jail Free" card to the deck. Proving
+those needs many sequential draws and internal deck-state inspection, which
+doesn't fit this project's full-game-play Gherkin style without inventing a
+bespoke deck-introspection harness. Recommend the coder implement genuine
+shuffling behavior for these four invariants and cover them with a property
+test (this project's established tool for structural/statistical invariants,
+e.g. `ReportBoardSpaceNamePropertyTest`) rather than additional Gherkin.
