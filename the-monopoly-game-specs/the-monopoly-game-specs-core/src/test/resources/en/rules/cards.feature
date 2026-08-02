@@ -259,3 +259,19 @@ Feature: chance and community chest cards
     Examples:
       | position | expected_tenant_final_balance | expected_owner_final_balance |
       | 11       | 1490                            | 1510                           |
+
+  # cards-19
+  Scenario Outline: a card that advances to the nearest station pays double whatever rent the owner's station count earns, not a flat single-station rate
+    Given pawn "high hat" owns "Noord Station"
+    And pawn "high hat" owns "Centraal Station"
+    And pawn "high hat" owns "Buurtspoorwegen"
+    And pawn "high hat" owns "Zuid Station"
+    And the next chance card will be "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs."
+    When pawn "dog" lands on "Kans / Chance"
+    Then pawn "dog" is at position <position>
+    And pawn "dog"'s account balance is $<expected_tenant_final_balance>
+    And pawn "high hat"'s account balance is $<expected_owner_final_balance>
+
+    Examples:
+      | position | expected_tenant_final_balance | expected_owner_final_balance |
+      | 15       | 1100                            | 1900                           |

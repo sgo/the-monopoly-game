@@ -320,3 +320,41 @@ Feature: game report
     Examples:
       | price |
       | 25    |
+
+  # report-28
+  Scenario Outline: the report narrates a jailed player staying in jail after failing to roll doubles
+    Given pawn "dog" starts in jail
+    And pawn "dog" will roll <first_die> and <second_die> for their turn
+    When we play the game
+    Then the game report says that pawn "dog" stays in jail
+
+    Examples:
+      | first_die | second_die |
+      | 4         | 6          |
+      | 2         | 5          |
+
+  # report-29
+  Scenario Outline: the report narrates a jailed player leaving jail by rolling doubles
+    Given pawn "dog" starts in jail
+    And pawn "dog" will roll <first_die> and <second_die> for their turn
+    When we play the game
+    Then the game report says that pawn "dog" leaves jail by rolling doubles
+
+    Examples:
+      | first_die | second_die |
+      | 3         | 3          |
+      | 5         | 5          |
+
+  # report-30
+  Scenario Outline: the report narrates a jailed player leaving jail with a Get Out of Jail Free card
+    Given pawn "dog" starts in jail
+    And pawn "dog" already holds a Get Out of Jail Free card
+    And pawn "dog" will use the Get Out of Jail Free card to leave jail
+    And pawn "dog" will roll <first_die> and <second_die> for their turn
+    When we play the game
+    Then the game report says that pawn "dog" leaves jail using the Get Out of Jail Free card
+
+    Examples:
+      | first_die | second_die |
+      | 4         | 6          |
+      | 3         | 3          |

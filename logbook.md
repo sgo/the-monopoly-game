@@ -16322,3 +16322,74 @@ the existing "builds a house" vs "sells a house"/"mortgages" scenarios;
 nothing new in kind).
 
 Committing and handing off to coder.
+
+## 2026-08-02T19:12:49Z — specifier plays a full game and finds two more gaps
+
+The user asked me to actually play a 2-player game via the CLI simulator
+and inspect the report for more gaps, rather than continue waiting on
+pasted traces. Compiled and ran `the.monopoly.game.cli.Simulator 2`,
+captured the full trace, and read it end to end looking for silent or
+suspicious moments.
+
+**Confirmed rent-correctness bug**: `Cards.advanceToNearestStation`
+computes rent as `station.rentForOwning(1).plus(station.rentForOwning(1))`
+— hardcoded to a single station owned, always $50, regardless of how
+many stations the actual owner holds. RULES.md's own card text says
+"betaal je de eigenaar dubbel de huurprijs" (pay the owner double *the*
+rent, i.e. whatever rent currently applies), and the station rent table
+is $25/$50/$100/$200 for 1/2/3/4 stations owned. The existing test
+(`cards-10`) only covers the 1-station case, where the hardcoded bug
+happens to produce the right answer by coincidence, so it was never
+caught. Verified through the real acceptance-test `World` harness (not a
+shortcut): gave `high hat` all four stations and landed `dog` there via
+the card — charged $50, should have been $400 (double the 4-station
+rate). Added `cards-19`, mirroring `station-rent.feature`'s existing
+"owns every station" convention, giving the owner all four stations so
+the wrong hardcoded value is unambiguously wrong.
+
+I initially suspected a second, different bug while reading the trace:
+`dog` landed via a card on a station `high hat` owned and paid zero
+rent. Chased it down and it isn't a new bug — `high hat` had gone into
+debt from an earlier tax landing with no houses yet to sell, and
+`Bankruptcy` silently mortgaged that exact station to cover it (the gap
+already specified this session). Mortgaged land correctly pays no rent,
+so the zero was right; it just looked inexplicable because the mortgage
+itself was never narrated. Confirms the earlier fix's value and isn't a
+separate finding.
+
+**Confirmed jail-narration gap, broader than first reported**: reading
+`Jail.java` and `Game.java`'s `Journalling` wiring shows `Jail.Events`
+declares four hooks — `sentToJail`, `leftJailByPaying`,
+`leftJailByRollingDoubles`, `leftJailWithCard` — but `Journalling` only
+overrides the first two. Rolling doubles to leave jail and using a Get
+Out of Jail Free card to leave jail are both completely unlogged despite
+the hooks already existing; and failing to roll doubles and staying
+jailed has no hook at all. `jail.feature` already tests the functional
+behavior of the stay-jailed case (`jail-4`, `jail-6`) and the GOJF-card
+case (`jail-7`), but never asserts what the journal records. This is the
+same shape as the Free Parking convention (`journal-19`: an explicit
+"nothing happens" entry) — jail's "nothing happens" and "leaves this
+way" moments deserve the same treatment.
+
+Added three scenarios each to `journal.feature`, `logging.feature`, and
+`report.feature` (indices 28-30): stays in jail after failing to roll
+doubles, leaves jail by rolling doubles, leaves jail with a Get Out of
+Jail Free card. Reused `jail-4`'s and `jail-7`'s exact Given/When setups
+so the new assertions sit on top of already-proven game states rather
+than inventing new ones. Parameterized on the dice pair in each (rather
+than a dummy Examples row) since dice value is a genuine, meaningful
+variation for these scenarios.
+
+Verified with `bb gherkin-parser` on all four changed files (clean
+parse) and `bb gherkin-ir-dry-checker` (only near-duplicate/synonym
+noise of the same kind already tolerated elsewhere — e.g. "leaves jail
+by paying" vs "leaves jail by rolling doubles" vs "stays in jail" being
+flagged as related-but-distinct, and the parameterized dice-roll step
+overlapping with existing literal roll steps). No exact-duplicate
+findings anywhere.
+
+Presented both gaps to the user before writing anything, per their
+explicit instruction not to hand off without permission. User reviewed
+and confirmed: "handoff".
+
+Committing and handing off to coder.
