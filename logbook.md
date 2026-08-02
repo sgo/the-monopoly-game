@@ -15704,3 +15704,27 @@ extraction — no threshold violations, no remaining duplicates.
 threshold; manifests refreshed via `--update-manifest`.
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T16:03:47Z — refactorer sent official-card-decks handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: official-card-decks
+commit: d435cf057e
+```
+
+Summary: reviewed the coder's GOJF-retention fix (`Cards.Decks.official(Deeds)`
+threading `deeds` into the deck so it can withhold a held card). Found and
+fixed the fix's own duplication: the GOJF card text had spread to 3-4
+independent copies (effects map, deck list, withholding constants, and a
+test-local copy) — consolidated to one package-private pair of constants
+on `Cards`, used everywhere. Also merged `drawChance`/`drawCommunityChest`
+(dry4java: 1.00 duplicate) into a single `WithholdingDeck` class. Stable
+across 10+ repeated full-suite runs given this area's known shuffle-driven
+flakiness risk. Full unit (264+11) and property (22) suites green;
+acceptance 285/285, repeated twice. Handing verified state to architect
+for independent review.
