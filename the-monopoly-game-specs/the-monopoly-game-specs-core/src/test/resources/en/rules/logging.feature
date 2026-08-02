@@ -49,27 +49,27 @@ Feature: game logging
     When we play the game
     Then the game log records that pawn "dog" starts a turn with balance "<dog_starting_balance>"
     And the game log records that pawn "dog" rolls a total of <dog_roll_total>
-    And the game log records that pawn "dog" moves from position <expected_dog_start_position> to <dog_final_position>
+    And the game log records that pawn "dog" moves from position <expected_dog_start_position> (<expected_dog_start_space>) to <dog_final_position> (<dog_final_space>)
     And the game log records that pawn "dog" starts a turn before it records that pawn "dog" rolls a total of <expected_dog_roll_total>
-    And the game log records that pawn "dog" rolls a total of <expected_dog_roll_total> before it records that pawn "dog" moves from position <expected_dog_start_position> to <expected_dog_final_position>
+    And the game log records that pawn "dog" rolls a total of <expected_dog_roll_total> before it records that pawn "dog" moves from position <expected_dog_start_position> (<expected_dog_start_space>) to <expected_dog_final_position> (<expected_dog_final_space>)
     And the game log records that pawn "dog" starts its turn before pawn "high hat"
 
     Examples:
-      | dog_die_1 | dog_die_2 | dog_roll_total | expected_dog_roll_total | expected_dog_start_position | dog_final_position | expected_dog_final_position | dog_starting_balance |
-      | 2         | 3         | 5               | 5                       | 0                           | 5                  | 5                           | $1500                |
+      | dog_die_1 | dog_die_2 | dog_roll_total | expected_dog_roll_total | expected_dog_start_position | expected_dog_start_space | dog_final_position | dog_final_space               | expected_dog_final_position | expected_dog_final_space      | dog_starting_balance |
+      | 2         | 3         | 5               | 5                       | 0                           | Start                     | 5                  | Noord Station / Gare du Nord  | 5                            | Noord Station / Gare du Nord  | $1500                |
 
   # logging-3
   Scenario Outline: the log records a salary collected while passing start
     And pawn "dog" starts at position <dog_start_position>
     And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
     When we play the game
-    Then the game log records that pawn "dog" moves from position <expected_dog_start_position> to <dog_final_position>
+    Then the game log records that pawn "dog" moves from position <expected_dog_start_position> (<expected_dog_start_space>) to <dog_final_position> (<dog_final_space>)
     And the game log records that pawn "dog" collects a salary of $<dog_salary>
-    And the game log records that pawn "dog" moves from position <expected_dog_start_position> to <expected_dog_final_position> before it records that pawn "dog" collects a salary of $<expected_dog_salary>
+    And the game log records that pawn "dog" moves from position <expected_dog_start_position> (<expected_dog_start_space>) to <expected_dog_final_position> (<expected_dog_final_space>) before it records that pawn "dog" collects a salary of $<expected_dog_salary>
 
     Examples:
-      | dog_start_position | dog_die_1 | dog_die_2 | expected_dog_start_position | dog_final_position | expected_dog_final_position | dog_salary | expected_dog_salary |
-      | 37                 | 1         | 2         | 37                          | 0                  | 0                           | 200        | 200                 |
+      | dog_start_position | dog_die_1 | dog_die_2 | expected_dog_start_position | expected_dog_start_space | dog_final_position | dog_final_space | expected_dog_final_position | expected_dog_final_space | dog_salary | expected_dog_salary |
+      | 37                 | 1         | 2         | 37                          | Meir Antwerpen            | 0                  | Start            | 0                            | Start                     | 200        | 200                  |
 
   # logging-4
   Scenario Outline: the log records an unowned-land purchase after the landing movement
@@ -247,11 +247,11 @@ Feature: game logging
   # logging-19
   Scenario Outline: the log records landing on Free Parking even though nothing happens
     When pawn "dog" lands on "Gratis Parkeren / Parc Gratuit"
-    Then the game log records that pawn "dog" moves from position <start position> to <position>
+    Then the game log records that pawn "dog" moves from position <start position> (<start space>) to <position> (<space>)
 
     Examples:
-      | start position | position |
-      | 17              | 20       |
+      | start position | start space                            | position | space                           |
+      | 17              | Algemeen Fonds / Caisse de Communauté | 20       | Gratis Parkeren / Parc Gratuit  |
 
   # logging-20
   Scenario Outline: the log records a bankruptcy to the bank

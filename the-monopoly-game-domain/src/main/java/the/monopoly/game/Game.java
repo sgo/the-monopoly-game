@@ -189,8 +189,8 @@ public class Game {
     }
 
     @Override
-    public void moved(Player player, int from, int to) {
-      journal.log(new Journal.Entry.Moved(player.id(), from, to));
+    public void moved(Player player, int from, int to, Street.Type fromSpace, Street.Type toSpace) {
+      journal.log(new Journal.Entry.Moved(player.id(), from, to, fromSpace, toSpace));
     }
 
     @Override
@@ -328,7 +328,14 @@ public class Game {
       record Rolled(Player.ID player, int total) implements Entry {
       }
 
-      record Moved(Player.ID player, int from, int to) implements Entry {
+      record Moved(Player.ID player, int from, int to, Street.Type fromSpace, Street.Type toSpace) implements Entry {
+        public Moved(Player.ID player, int from, int to) {
+          this(player, from, to, officialSpaceAt(from), officialSpaceAt(to));
+        }
+
+        private static Street.Type officialSpaceAt(int position) {
+          return Rule.Set.Type.official.create().gameboard().layout().get(position);
+        }
       }
 
       record SalaryCollected(Player.ID player, Money salary) implements Entry {

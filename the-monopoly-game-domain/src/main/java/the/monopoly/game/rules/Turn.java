@@ -92,7 +92,9 @@ public class Turn {
     int to = (from + steps) % spaces;
 
     player.position().moveTo(to);
-    events.moved(player, from, to);
+    events.moved(player, from, to,
+        rules.gameboard().layout().get(Math.floorMod(from, spaces)),
+        rules.gameboard().layout().get(Math.floorMod(to, spaces)));
 
     if (from + steps >= spaces) {
       if (to == 0) events.collectedSalary(player, player.land(start()));
@@ -127,6 +129,10 @@ public class Turn {
     }
 
     default void moved(Player player, int from, int to) {
+    }
+
+    default void moved(Player player, int from, int to, Street.Type fromSpace, Street.Type toSpace) {
+      moved(player, from, to);
     }
 
     default void collectedSalary(Player player, Money salary) {
