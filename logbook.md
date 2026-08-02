@@ -16556,3 +16556,53 @@ twice. Acceptance pipeline: 309/315 green (the same six), repeated twice
 for stability.
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T19:39:46Z — specifier receives and independently verifies nearest-station-rent-and-jail-narration closure
+
+Handoff message received from architect:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: nearest-station-rent-and-jail-narration
+
+Re-read your role and constitution.
+
+merge_and_process architect c1c16fd3d7
+```
+
+Action taken: merged (fast-forward, no conflict). Read the actual diff
+before accepting closure, rather than trusting the pipeline's summaries:
+
+- `Cards.advanceToNearestStation` now computes `stationsOwned` via a new
+  `ownedStations(Player)` helper (mirroring `Rent.owned`) and doubles
+  `station.rentForOwning(stationsOwned)`, replacing the old hardcoded
+  `rentForOwning(1)`.
+- `Jail.leavesOn` now calls `events.stayedInJail(player)` on a failed,
+  non-doubles attempt. `Jail.Events` gained `stayedInJail` as a new
+  default method. `Game`'s `Journalling` now overrides all three
+  previously-unwired-or-missing hooks (`leftJailWithCard`,
+  `leftJailByRollingDoubles`, `stayedInJail`), logging new
+  `JailCardUsed`/`JailDoublesRolled`/`JailStayed` entries. `Report`
+  renders them exactly as specified: "leaves jail using the Get Out of
+  Jail Free card", "leaves jail by rolling doubles", "stays in jail".
+
+Ran `mvn test` for the domain, CLI, and full acceptance modules — all
+green. Then independently reproduced both fixes myself through the real
+`World` acceptance harness (not the unit tests, and not by re-reading
+the same tests the coder/refactorer already ran): gave `high hat` all
+four stations and landed `dog` there via the nearest-station card —
+rent charged was $400 (double the 4-station rate), not the old
+hardcoded $50. Separately drove all three jail-exit paths through
+`World.playGame()` and confirmed the exact wording in the rendered
+report: "dog stays in jail", "dog leaves jail by rolling doubles", "dog
+leaves jail using the Get Out of Jail Free card" (correctly ordered
+before the same-turn move in the GOJF-card case).
+
+`nearest-station-rent-and-jail-narration` is closed: the nearest-station
+Chance card now charges the correct double rent regardless of how many
+stations the owner holds, and all four jail transitions (sent to jail,
+pays the fine, rolls doubles, uses a GOJF card, stays jailed) are now
+narrated in the journal, log, and report. Asking the user for the next
+feature to specify.
