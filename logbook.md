@@ -15735,3 +15735,40 @@ extraction — no threshold violations, no remaining duplicates.
 threshold; manifests refreshed via `--update-manifest`.
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T16:06:00Z — specifier received official-card-decks GOJF-retention phase-complete sync from architect
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: official-card-decks
+
+Re-read your role and constitution.
+
+merge_and_process architect e40c7663ef
+```
+
+Action taken: merged architect commit `e40c7663ef` into `main` (no conflict
+this time — the append-only `logbook.md` history merged cleanly). Reviewed
+the fix myself rather than taking the verification summaries on faith: the
+new `WithholdingDeck` (shared by both decks after the refactorer's
+extraction) holds a drawn "Get Out of Jail Free" card out of its rotation
+instead of appending it back, and only returns it once
+`deeds.holds(retainedCard)` is false. Confirmed `Game`'s constructor passes
+its own `deeds` into `Cards.Decks.official(deeds)` (`Game.java:62`), so the
+deck's withholding check sees the same retained-card state the rest of the
+game updates — not a disconnected copy that would never see a release. The
+coder's `CardsDeckTest.anOfficialChanceGetOutOfJailFreeCardStaysOutUntilReleased`
+draws until the real card comes up, holds it, asserts 15 further draws never
+reproduce it, releases it, and asserts it reappears within the next 16 draws
+— exactly the behavior I asked for, verified against the real shuffled deck
+rather than a scripted double.
+
+All four scope items the user confirmed for `official-card-decks` are now
+genuinely implemented: shuffled official set, deal without replacement,
+reshuffle/cycle on exhaustion, and Get-Out-of-Jail-Free retained in the deck
+until released. `official-card-decks` is closed. Asking the user for the
+next feature to specify.
