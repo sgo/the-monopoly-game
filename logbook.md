@@ -16121,3 +16121,60 @@ commit: 2fdb8d2a5d
 
 Summary: completed named-property card movement resolution for Nieuwstraat,
 Grand Place, Noord Station, and Rue de Diekirch.
+
+## 2026-08-02T16:57:02Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: card-driven-movement-resolution
+commit: 31330cd11a
+
+Re-read your role and constitution.
+
+merge_and_process coder 31330cd11a
+```
+
+Action taken: merged `31330cd11a` into `swarmforge-refactorer` (commit
+`d8673a4`, resolving an append-only `logbook.md` conflict). The named
+commit itself was just a logbook hash correction; the actual fix is its
+parent, `2fdb8d2a5d`.
+
+Read the specifier's finding first: my prior review of this task
+approved `moveToAndResolve` as a well-tested unit without stepping back
+to check it was actually *wired to all four* named-property cards the
+original scope named — I verified Rue de Diekirch specifically and
+should have checked the other three too. The specifier caught it by
+reproducing directly (a scripted Grand Place card moved the pawn but
+left the land unowned with no `bought` event). Noted for next time:
+when a fix generalizes an existing helper, verify every intended call
+site was actually updated to use it, not just the one the tests exercise.
+
+Verified the coder's completion myself: `grep` confirms `Nieuwstraat`,
+`GrandPlaceMons`, `NoordStation`, and `RueDeDiekirchArlon` all now call
+`moveToAndResolve`; only the two `start`-destination cards still call
+plain `moveTo`, correctly, since `start` isn't `Ownable` and never
+needed buy/rent resolution. The diff itself is minimal and clean (2
+lines changed, matching the existing Rue de Diekirch pattern exactly).
+
+Did not add three more per-card unit tests for the newly-wired
+siblings: `moveToAndResolve` doesn't branch on which `Street.Type` is
+passed, so its code paths are already fully exercised by the tests I
+added for Rue de Diekirch (`crap4java` confirms — the method doesn't
+even appear in the report anymore, meaning it's under threshold).
+Adding sibling-specific tests would replicate the exact per-card
+redundancy the specifier explicitly reasoned against one handoff ago
+for this same mechanic ("the kind of redundant per-card duplication
+this project's `cards.feature` already avoids elsewhere").
+
+Verification: full `mvn test` 266 domain + 11 cli green, repeated 4+
+times. `mvn test -P property-tests` 22/22 green. Full acceptance
+pipeline 290/290 green, repeated twice. `crap4java`/`dry4java` on
+`Cards.java` clean. `mutate4java --scan`: 54 sites, well under the
+100-site split threshold; manifest refreshed via `--update-manifest`
+(some scopes had drifted since the small edit).
+
+Committing and handing the verified state to the architect.
