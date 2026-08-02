@@ -214,6 +214,11 @@ public class Game {
     }
 
     @Override
+    public void paid(Player payer, Player payee, Money amount) {
+      journal.log(new Journal.Entry.PlayerPaid(payer.id(), payee.id(), amount));
+    }
+
+    @Override
     public void builtHouse(Player player, ColourStreet street, Money price) {
       journal.log(new Journal.Entry.HouseBuilt(player.id(), street.type(), price));
     }
@@ -350,6 +355,9 @@ public class Game {
       }
 
       record RentPaid(Player.ID tenant, Player.ID owner, Street.Type land, Money rent) implements Entry {
+      }
+
+      record PlayerPaid(Player.ID payer, Player.ID payee, Money amount) implements Entry {
       }
 
       record HouseBuilt(Player.ID player, Street.Type land, Money price) implements Entry {

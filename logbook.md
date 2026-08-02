@@ -15038,3 +15038,19 @@ the coder follow-up loop (translating captured space-name text through
 `SpaceNames` before comparing the journal entry) is verified and accepted.
 `movement-space-names` is closed. Asking the user for the next feature to
 specify.
+## 2026-08-02T14:00:52Z — coder received card-payment-logging handoff
+
+Handoff message received from specifier, commit `3c4c2a75ce`, task
+`card-payment-logging`; merged as `97f5c0e`.
+
+Implemented `PlayerPaid` journal entries for card-driven player-to-player
+transfers, report rendering, and acceptance claims for journal, log, and
+report ordering. Unit tests and the normal acceptance pipeline are green;
+acceptance passes 283/283.
+
+## 2026-08-02T16:12:18Z — coder sent card-payment-logging implementation to refactorer
+
+Handoff message sent to refactorer at priority 50 for task
+`card-payment-logging`; implementation is ready for refactoring review.
+Mutation and CRAP/DRY analysis were not run because those checks belong to
+the refactorer and architect roles.

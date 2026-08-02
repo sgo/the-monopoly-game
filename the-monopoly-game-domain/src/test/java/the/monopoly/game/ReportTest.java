@@ -134,6 +134,12 @@ class ReportTest {
         .isEqualTo("dog pays the bank $15");
   }
 
+  @Test
+  void aReportTellsWhenAPlayerPaysAnotherPlayerOutsideRent() {
+    assertThat(report(new Entry.PlayerPaid(Pawn.dog.id(), Pawn.high_hat.id(), new Money(50))))
+        .isEqualTo("dog pays high hat $50");
+  }
+
   /** A space is spelled as the board spells it, in words rather than as one. */
   @Test
   void aReportSpellsASpaceOfOneWordAsTheOneWordItIs() {

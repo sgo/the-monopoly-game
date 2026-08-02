@@ -26,6 +26,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.builtAHouse
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.chanceCardDrawn;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.chanceCardDrawnLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.communityChestCardDrawn;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.communityChestCardDrawnLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.dollars;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.houseBuilt;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.houseSold;
@@ -47,6 +48,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageLif
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moved;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moves;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesAnywhere;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rolled;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.salaryCollected;
@@ -113,6 +115,18 @@ final class GameLogStepHandlers {
 
         then("^the game journal records that pawn \"" + NAME + "\" draws the community chest card \"" + NAME + "\"$",
             (world, arguments) -> records(world, communityChestCardDrawn(arguments.text(1), arguments.text(2)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" draws the chance card \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                chanceCardDrawn(arguments.text(1), arguments.text(2)),
+                playerPaid(arguments.text(3), arguments.text(4), arguments.number(5)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" draws the community chest card \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                communityChestCardDrawn(arguments.text(1), arguments.text(2)),
+                playerPaid(arguments.text(3), arguments.text(4), arguments.number(5)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" draws the chance card \"" + NAME
                 + "\" before it records that pawn \"" + NAME + "\" pays the bank \\$" + VALUE + "$",
@@ -311,6 +325,18 @@ final class GameLogStepHandlers {
                 arguments.text(1), arguments.text(2), arguments.number(3)))),
 
         then("^the game log records that pawn \"" + NAME + "\" draws the chance card \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                chanceCardDrawn(arguments.text(1), arguments.text(2)),
+                playerPaid(arguments.text(3), arguments.text(4), arguments.number(5)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" draws the community chest card \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                communityChestCardDrawn(arguments.text(1), arguments.text(2)),
+                playerPaid(arguments.text(3), arguments.text(4), arguments.number(5)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" draws the chance card \"" + NAME
                 + "\" before it records that pawn \"" + NAME + "\" pays the bank \\$" + VALUE + "$",
             (world, arguments) -> logRecordsInOrder(world,
                 chanceCardDrawn(arguments.text(1), arguments.text(2)),
@@ -416,6 +442,18 @@ final class GameLogStepHandlers {
                 + "\" for \\$" + VALUE + " because a street in the colour group is mortgaged$",
             (world, arguments) -> says(world, buildingRefusedLine(
                 arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" draws the chance card \"" + NAME
+                + "\" before it says that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                chanceCardDrawnLine(arguments.text(1), arguments.text(2)),
+                arguments.text(3) + " pays " + arguments.text(4) + " $" + arguments.number(5))),
+
+        then("^the game report says that pawn \"" + NAME + "\" draws the community chest card \"" + NAME
+                + "\" before it says that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                communityChestCardDrawnLine(arguments.text(1), arguments.text(2)),
+                arguments.text(3) + " pays " + arguments.text(4) + " $" + arguments.number(5))),
 
         then("^the game report says that pawn \"" + NAME + "\" draws the chance card \"" + NAME
                 + "\" before it says that pawn \"" + NAME + "\" pays the bank \\$" + VALUE + "$",
