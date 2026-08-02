@@ -14995,3 +14995,47 @@ the coder follow-up loop (translating captured space-name text through
 `SpaceNames` before comparing the journal entry) is verified and accepted.
 `movement-space-names` is closed. Asking the user for the next feature to
 specify.
+
+## 2026-08-02T14:00:52Z — specifier sent handoff to coder (card-payment-logging)
+
+Handoff message sent:
+
+```
+id: 20260802T140052Z_000042_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: card-payment-logging
+commit: 3c4c2a75ce
+created_at: 2026-08-02T14:00:52.832611Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3c4c2a75ce
+```
+
+Summary: the user noticed a real report/log trace where a Chance-card draw
+(landing on position 7, "Kans / Chance") was followed only by the next
+player's turn-start balance line, with no sign of the card or its effect.
+Investigated: `ChanceCardDrawn`/`CommunityChestCardDrawn` is logged for
+every card draw, but `Cards.java`'s `transfer()` (used by
+`payEveryOtherPlayer`/`collectFromEveryOtherPlayer`, the "Betaal elke
+speler M50" and "ontvangt M10 van elke speler" card effects) moves money
+directly between accounts with no journal entry at all — unlike every
+other card effect (`payBank`, `paySpecialRent`, `bought`), which does log.
+Added `journal-23`/`journal-24`, `logging-23`/`logging-24`, and
+`report-23`/`report-24`, extending the existing "card drawn before the
+effect it resolves" pattern to these two card types, using the same
+3-player background as `cards-4`/`cards-5`. Each scenario asserts the
+payment to *both* other players (`high hat` and `iron box`), not just one,
+after the user asked whether transfers to and from every other player were
+covered — an implementation that only paid/collected from the first other
+player found would fail these scenarios. Verified with `bb gherkin-parser`
++ `bb gherkin-ir-dry-checker` on all three files; no new duplicate/synonym
+findings beyond the same accepted pattern already used for existing
+same-shape-different-target lines (e.g. rent-for-different-properties).
+This is spec-only: the coder will need a new `Journal.Entry` type and an
+event hook for player-to-player card payments, since nothing currently
+logs `transfer()`.
