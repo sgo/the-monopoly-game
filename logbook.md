@@ -17157,3 +17157,31 @@ the Java differential mutation baseline and DRY analysis passed with no
 new surface or duplicate; soft Gherkin mutation completed with 36/41 killed,
 five documented inert survivors, and zero errors. The coder/refactorer and
 specifier loops are closed, so this task is phase-complete.
+
+## 2026-08-02T21:38:08Z — specifier receives agree-if-affordable-cash-reserve phase-complete sync
+
+Handoff message received from architect:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: agree-if-affordable-cash-reserve
+
+Re-read your role and constitution.
+
+merge_and_process architect d8845a5c25
+```
+
+Action taken: merged (fast-forward, no conflict — the only content change
+was the mutation manifest re-timestamped from the architect's own
+reproduction, confirming the same 36/41-killed, five-inert-survivor result
+I reported). Re-ran the domain/CLI/specs-core Maven suite myself before
+accepting closure; all green.
+
+`agree-if-affordable-cash-reserve` is closed: "Agree if affordable" now
+keeps a configurable cash reserve when buying directly and when bidding at
+auction, with utilities exempt from the reserve whenever a purchase would
+complete the buyer's own utility monopoly or deny another player theirs.
+`buying-land-3` through `buying-land-7` specify it, `SIMULATOR.md` and
+`tasks.md` document it. Asking the user for the next feature to specify.
