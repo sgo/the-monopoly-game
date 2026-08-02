@@ -15946,6 +15946,32 @@ split threshold; manifest refreshed via `--update-manifest`.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T16:43:35Z — refactorer sent card-driven-movement-resolution handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-driven-movement-resolution
+commit: c7d162e896
+```
+
+Summary: reviewed the coder's fix making card-driven movement fire real
+`Moved` events (previously silent) and resolve Rue de Diekirch as a
+normal landing (buy-or-pay-rent via the real `Rent` class). Confirmed no
+duplication against the existing station/utility card patterns
+(dry4java: none — the owned-branch logic is genuinely different, full
+rent-table resolution vs. a flat special amount). Found and closed a
+real coverage gap: `moveToAndResolve` had 0% domain unit-test coverage
+(CRAP 12.0) unlike its siblings; added two focused tests (buy path, rent
+path), bringing it to 98% coverage and CRAP 3.0. Also fixed an
+import-ordering slip. Did not reproduce the coder's noted pre-existing
+flaky CLI-simulation failure across 4 repeated runs. Full unit (266+11)
+and property (22) suites green; acceptance 290/290, repeated 3+ times.
+Handing verified state to architect for independent review.
+
 ## 2026-08-02T16:45:51Z — architect received card-driven-movement-resolution handoff
 
 Handoff message received from refactorer:
@@ -15973,6 +15999,10 @@ has no manifest surface; DRY findings are the established helper catalog.
 Soft Gherkin mutation kills all 5 new card mutations; the journal's three
 remaining survivors are unrelated existing insufficient-balance inputs.
 
+## 2026-08-02T16:45:51Z — architect sent card-driven-movement-resolution phase completion
+
+Handoff message sent to specifier at priority 50 for task
+`card-driven-movement-resolution`, commit `fbbde7ca46`.
 ## 2026-08-02T16:46:00Z — specifier received card-driven-movement-resolution phase-complete sync from architect
 
 Handoff message received:
@@ -16060,3 +16090,118 @@ would be the kind of redundant per-card duplication this project's cards.feature
 already avoids elsewhere (e.g. the single "every chance card resolves
 without error" smoke test covering all 16 texts, rather than one scenario
 per card).
+
+## 2026-08-02T16:50:49Z — coder received card-driven-movement-resolution follow-up
+
+Handoff message received:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: card-driven-movement-resolution
+commit: f4d92e01fc
+
+Re-read your role and constitution.
+
+merge_and_process specifier f4d92e01fc
+```
+
+Action taken: merged the follow-up state at `818fb0525d` and routed the
+Nieuwstraat, Grand Place, and Noord Station named-property cards through the
+shared `moveToAndResolve` path, matching Rue de Diekirch.
+
+## 2026-08-02T16:52:30Z — coder sent card-driven-movement-resolution to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: card-driven-movement-resolution
+commit: 2fdb8d2a5d
+```
+
+Summary: completed named-property card movement resolution for Nieuwstraat,
+Grand Place, Noord Station, and Rue de Diekirch.
+
+## 2026-08-02T16:57:02Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: card-driven-movement-resolution
+commit: 31330cd11a
+
+Re-read your role and constitution.
+
+merge_and_process coder 31330cd11a
+```
+
+Action taken: merged `31330cd11a` into `swarmforge-refactorer` (commit
+`d8673a4`, resolving an append-only `logbook.md` conflict). The named
+commit itself was just a logbook hash correction; the actual fix is its
+parent, `2fdb8d2a5d`.
+
+Read the specifier's finding first: my prior review of this task
+approved `moveToAndResolve` as a well-tested unit without stepping back
+to check it was actually *wired to all four* named-property cards the
+original scope named — I verified Rue de Diekirch specifically and
+should have checked the other three too. The specifier caught it by
+reproducing directly (a scripted Grand Place card moved the pawn but
+left the land unowned with no `bought` event). Noted for next time:
+when a fix generalizes an existing helper, verify every intended call
+site was actually updated to use it, not just the one the tests exercise.
+
+Verified the coder's completion myself: `grep` confirms `Nieuwstraat`,
+`GrandPlaceMons`, `NoordStation`, and `RueDeDiekirchArlon` all now call
+`moveToAndResolve`; only the two `start`-destination cards still call
+plain `moveTo`, correctly, since `start` isn't `Ownable` and never
+needed buy/rent resolution. The diff itself is minimal and clean (2
+lines changed, matching the existing Rue de Diekirch pattern exactly).
+
+Did not add three more per-card unit tests for the newly-wired
+siblings: `moveToAndResolve` doesn't branch on which `Street.Type` is
+passed, so its code paths are already fully exercised by the tests I
+added for Rue de Diekirch (`crap4java` confirms — the method doesn't
+even appear in the report anymore, meaning it's under threshold).
+Adding sibling-specific tests would replicate the exact per-card
+redundancy the specifier explicitly reasoned against one handoff ago
+for this same mechanic ("the kind of redundant per-card duplication
+this project's `cards.feature` already avoids elsewhere").
+
+Verification: full `mvn test` 266 domain + 11 cli green, repeated 4+
+times. `mvn test -P property-tests` 22/22 green. Full acceptance
+pipeline 290/290 green, repeated twice. `crap4java`/`dry4java` on
+`Cards.java` clean. `mutate4java --scan`: 54 sites, well under the
+100-site split threshold; manifest refreshed via `--update-manifest`
+(some scopes had drifted since the small edit).
+
+Committing and handing the verified state to the architect.
+
+## 2026-08-02T16:58:47Z — architect received named-property movement follow-up
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-driven-movement-resolution
+commit: 9450569bc0
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 9450569bc0
+```
+
+Action taken: merged and verified the scope correction. Nieuwstraat, Grand
+Place, Noord Station, and Rue de Diekirch all route through the shared
+named-property movement and resolution path; START cards correctly remain
+plain moves. Full Maven tests pass (266 domain, 11 CLI) and property tests
+pass 22/22. Differential mutation is current; DRY reports only existing test
+parameterization, and soft `cards.feature` mutation has no changed surface.
