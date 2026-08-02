@@ -114,8 +114,18 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.ChanceCardDrawn(idOf(pawnName), card));
   }
 
+  static Claim chanceCardDrawn(String pawnName) {
+    return new Claim(entry -> entry instanceof Entry.ChanceCardDrawn it
+        && it.player().equals(idOf(pawnName)), pawnName + " draws a chance card");
+  }
+
   static Claim communityChestCardDrawn(String pawnName, String card) {
     return Claim.of(new Entry.CommunityChestCardDrawn(idOf(pawnName), card));
+  }
+
+  static Claim communityChestCardDrawn(String pawnName) {
+    return new Claim(entry -> entry instanceof Entry.CommunityChestCardDrawn it
+        && it.player().equals(idOf(pawnName)), pawnName + " draws a community chest card");
   }
 
   static Claim bankPaid(String pawnName, int amount) {
