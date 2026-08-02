@@ -1,6 +1,7 @@
 package the.monopoly.game.rules;
 
 import org.junit.jupiter.api.Test;
+import the.monopoly.game.components.players.Player;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,5 +32,22 @@ class CardsDeckTest {
 
     assertThat(first).isNotNull();
     assertThat(decks.drawCommunityChest()).isEqualTo(first);
+  }
+
+  @Test
+  void anOfficialChanceGetOutOfJailFreeCardStaysOutUntilReleased() {
+    Deeds deeds = new Deeds();
+    Cards.Decks decks = Cards.Decks.official(deeds);
+    String card;
+    do card = decks.drawChance(); while (!card.equals(Cards.CHANCE_GET_OUT_OF_JAIL_FREE_CARD));
+
+    Player dog = Rule.Set.Type.official.create().players().select(1).findFirst().orElseThrow();
+    deeds.hold(Deeds.RetainedCard.CHANCE_GET_OUT_OF_JAIL_FREE, dog);
+    for (int draw = 0; draw < 15; draw++) assertThat(decks.drawChance()).isNotEqualTo(card);
+
+    assertThat(deeds.releaseGetOutOfJailFreeCard(dog)).isTrue();
+    boolean returned = false;
+    for (int draw = 0; draw < 16; draw++) returned |= decks.drawChance().equals(card);
+    assertThat(returned).isTrue();
   }
 }

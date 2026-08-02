@@ -14733,6 +14733,32 @@ after each structural change.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T16:05:28Z — architect received official-card-decks GOJF review
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: official-card-decks
+commit: d435cf057e
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d435cf057e
+```
+
+Action taken: merged the follow-up and reviewed the Get Out of Jail Free deck
+retention boundary. `Game` supplies its own `Deeds` to the default deck;
+`Cards` withholds that physical card while `Deeds` records it as retained and
+returns it only after release. The internal deck remains behind `Cards.Decks`.
+
+Full Maven tests pass (264 domain and 11 CLI); property tests pass 22/22.
+Differential mutation is current for `Game`, `Cards`, and `Deeds`; DRY reports
+only established adapter patterns. Soft `cards.feature` mutation has no
+changed scenario surface and refreshed its manifest timestamp.
+
 ## 2026-08-02T15:36:00Z — architect received official-card-decks handoff
 
 Handoff message received from refactorer:
@@ -14766,6 +14792,11 @@ pipeline 285/285 pass. Differential mutation found no stale Java-manifest
 surface in `Game` or `Cards`; DRY found only accepted adapter/catalog patterns.
 Soft Gherkin mutation for `cards.feature` killed 2/2 mutations and refreshed
 its manifest. No follow-up is required.
+
+## 2026-08-02T15:38:03Z — architect sent official-card-decks phase completion
+
+Handoff message sent to specifier at priority 50 for task
+`official-card-decks`, commit `570d17e151`.
 
 ## 2026-08-02T14:25:35Z — architect received handoff from refactorer
 
@@ -15515,6 +15546,33 @@ property-tests` 22/22 green, repeated 3 times. Full acceptance pipeline
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T15:35:28Z — refactorer sent official-card-decks handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: official-card-decks
+commit: f9885c5c88
+```
+
+Summary: found and fixed a real flakiness regression — `Game`'s convenience
+constructors now default to `Cards.Decks.official()` (shuffled, real
+effects), correct for `Simulator`'s real use, but `GameTest`'s fixed-roll/
+position/journal assertions never accounted for that and became
+nondeterministic. Added `game(...)` test helpers pinning `Cards.Decks.EMPTY`
+explicitly; stable across 8+ repeated runs. Flagged, without fixing, an
+ambiguous duplicate "nearest station" card in the 16-slot chance deck
+(15 unique effects exist) — internally consistent with the coder's own
+test, could be a faithful two-identical-cards echo of real Monopoly or a
+slip; a content question for architect/specifier, not mine to guess at.
+Also fixed broken import ordering and a stray fully-qualified reference.
+Full unit (263+11) and property (22) suites green across repeated runs;
+acceptance 285/285 across repeated runs. Handing verified state to
+architect for independent review.
+
 ## 2026-08-02T15:38:30Z — specifier received official-card-decks phase-complete sync from architect
 
 Handoff message received:
@@ -15601,3 +15659,79 @@ this task originally. Recommend extending the coder's own `CardsDeckTest`
 drawn "Get Out of Jail Free" card is absent from the next N draws while
 held, and reappears once returned — a unit/property-style test, not an
 acceptance scenario.
+
+## 2026-08-02T17:48:04Z — coder completed official-card-decks GOJF follow-up
+
+Merged specifier follow-up commit `2f535ace29`.
+
+Official decks now bind to `Deeds`: a drawn Get-Out-of-Jail-Free card is
+withheld while retained and returns to the deck after release, including
+use or return through bankruptcy; sale and transfer preserve the hold. Added
+a focused deck test. Full Maven tests pass 264 domain tests and 11 CLI tests;
+full acceptance passes 285/285.
+
+## 2026-08-02T16:03:05Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: official-card-decks
+commit: cf8d744743
+
+Re-read your role and constitution.
+
+merge_and_process coder cf8d744743
+```
+
+Action taken: merged `cf8d744743` into `swarmforge-refactorer` (commit
+`7a3a617`, resolving an append-only `logbook.md` conflict). Confirmed via
+that history that the architect already checked my earlier flagged
+duplicate-station-card question against `RULES.md` and closed it as
+intentional (the source lists that card twice) — no follow-up needed
+there, my restraint in not touching it was right. The specifier
+separately found the actual gap: `OfficialDecks.draw` never checked
+whether a drawn Get Out of Jail Free card was currently held, so it could
+re-enter circulation immediately instead of staying out "until used" —
+routed to coder, who just fixed it.
+
+Reviewed the fix: `Cards.Decks.official(Deeds)` now threads the same
+`Deeds` instance the `Game` will use into the deck, so `OfficialDecks` can
+consult `deeds.holds(RetainedCard)` before re-queuing a drawn card — this
+resolves the circular-construction concern I'd noted earlier (`Decks` is
+built before `Cards`/its effects exist) without restructuring anything,
+since `Deeds` was already independently constructible.
+
+Found and fixed two duplication issues in the fix itself: (1) the GOJF
+card text now appeared in up to four independent places (the effects map
+key, the deck's card list, a new pair of constants added for the
+withholding check, and a fourth copy in `CardsDeckTest`'s own test-local
+constant) — three-to-four hand-typed copies of a long string that must
+stay byte-identical or the "retain until used" rule silently stops
+working for that one card. Promoted the two texts to a single
+package-private pair of constants on `Cards`, used everywhere instead of
+retyped, and removed `CardsDeckTest`'s duplicate now that it can
+reference `Cards`'s directly (same package). (2) `dry4java` also flagged
+`drawChance`/`drawCommunityChest` as a 1.00-score duplicate — identical
+withhold-check-then-draw-then-maybe-withhold shape, differing only in
+which deck/`RetainedCard`/card-text they closed over. Extracted a
+`WithholdingDeck` class naming that shape once; `OfficialDecks` now just
+wires up two instances and its own draw methods are one-line
+delegations.
+
+`Deeds.java`'s only change (the new `holds(RetainedCard)` method) was
+clean and well-placed; nothing to fix there beyond a manifest refresh.
+
+Verification: full `mvn test` 264 domain + 11 cli green, repeated 10+
+times total across both my review pass and the coder's own fix (this
+area's shuffle already caused one real flakiness regression earlier this
+session, so repetition here isn't precautionary theater). `mvn test -P
+property-tests` 22/22 green. Full acceptance pipeline 285/285 green,
+repeated twice. `crap4java`/`dry4java` on `Cards.java` clean after the
+extraction — no threshold violations, no remaining duplicates.
+`mutate4java --scan`: `Cards.java` 51 sites, well under the 100-site split
+threshold; manifests refreshed via `--update-manifest`.
+
+Committing and handing the verified state to the architect.
