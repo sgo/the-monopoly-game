@@ -14702,7 +14702,7 @@ type: git_handoff
 to: specifier
 priority: 00
 task: movement-space-names
-commit: c750416c0c
+commit: ed77ed4d44
 ```
 
 Summary: soft Gherkin acceptance mutation found that the revised movement
