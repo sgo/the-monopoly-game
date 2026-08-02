@@ -14771,6 +14771,22 @@ new card mutations and 17/17 journal mutations; logging and report had no
 eligible new soft mutations and completed without errors. Updated mutation
 manifests are committed with this review.
 
+## 2026-08-02T19:36:10Z — architect sent nearest-station-rent-and-jail-narration
+
+Handoff message sent to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: nearest-station-rent-and-jail-narration
+commit: c1c16fd3d7
+```
+
+The coder–refactorer–architect loop is closed. The owner-aware double station
+rent and complete jail-outcome narration are verified through unit, property,
+acceptance, and soft Gherkin mutation checks.
+
 ## 2026-08-02T16:05:28Z — architect received official-card-decks GOJF review
 
 Handoff message received from refactorer:
@@ -16846,3 +16862,61 @@ the six already-known bankruptcy-narration failures plus these two new,
 confirmed-pre-existing `bidFor` failures. Handing the verified-but-not-
 fully-passing state to architect for independent review and to route the
 `bidFor` fix back to the coder.
+
+## 2026-08-02T21:00:28Z — architect received agree-if-affordable-cash-reserve
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 68cd733922
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 68cd733922
+```
+
+Merged and reviewed. The refactor moves the utility-monopoly query to
+`Deeds`, the owner of property ownership information, which removes duplicated
+rule logic from `Cards` and `LandSale`. The reserve and utility-opportunity
+facts travel in `Strategy.Offer`, retaining a small cohesive strategy
+boundary and preserving the default strategy API.
+
+The implementation is not phase-complete: `AgreeIfAffordable.accepts` honors
+the reserve for a direct purchase, but `bidFor` still returns all available
+cash. Consequently, a player that properly declines a purchase can immediately
+win the ensuing auction by spending its protected reserve. The new buying-land
+acceptance scenarios demonstrate this for both a normal property and a utility
+monopoly case. This is a functional implementation omission, not a Gherkin
+content defect, and requires a coder follow-up before architectural closure.
+
+## 2026-08-02T21:03:30Z — coder received architect review follow-up
+
+Handoff message received from architect:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: agree-if-affordable-cash-reserve
+commit: 0c4364cd4c
+
+Re-read your role and constitution.
+
+merge_and_process architect 0c4364cd4c
+```
+
+Merged the architect review commit. Confirmed the reserve leak in
+`AgreeIfAffordable.bidFor`: declining a direct purchase still allowed the
+strategy to bid its entire balance at auction. I am adding the reserve-aware
+bid cap and regression coverage before handing the result to the refactorer.
+
+## 2026-08-02T21:05:10Z — coder sent agree-if-affordable-cash-reserve to refactorer
+
+The reserve-aware auction cap is implemented and covered by unit tests. The
+domain suite passes 268 tests, and the buying-land acceptance scenarios all
+pass. The full acceptance run has only the six previously documented
+bankruptcy narration failures, which are outside this handoff.
