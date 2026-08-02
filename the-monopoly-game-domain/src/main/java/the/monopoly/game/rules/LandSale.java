@@ -34,11 +34,14 @@ public class LandSale implements Landings {
   public void resolve(Player player, Street space, Roll roll) {
     if (!(space instanceof Ownable land) || !deeds.isUnowned(land.type())) return;
 
-    if (strategies.forPlayer(player).accepts(offerTo(player, land))) {
+    Strategy strategy = strategies.forPlayer(player);
+    Strategy.Offer offer = offerTo(player, land);
+    if (strategy.accepts(offer)) {
       deeds.sell(land, player, land.price());
       events.bought(player, land, land.price());
       return;
     }
+    events.declinedToBuy(player, land, land.price(), offer.declineReason(), offer.reserve());
     auction(land);
   }
 
@@ -92,6 +95,10 @@ public class LandSale implements Landings {
     void bought(Player buyer, Ownable land, Money price);
 
     void wonAtAuction(Player winner, Ownable land, Money price);
+
+    default void declinedToBuy(Player player, Ownable land, Money price,
+                               Strategy.DeclineReason reason, Money reserve) {
+    }
 
     default void sold(Player seller, Ownable land, Player buyer, Money price) {
     }

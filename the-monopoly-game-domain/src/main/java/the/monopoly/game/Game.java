@@ -157,8 +157,10 @@ public class Game {
   }
 
   private void takeTurn(Player player, Journal journal, Turn.Events events, Landings landings) {
-    journal.log(new Journal.Entry.TurnStarted(player.id(), player.account().balance().amount()));
-    new Turn(rules, cups.forPlayer(player), events, landings, jail, strategies.forPlayer(player), deeds).take(player);
+    Strategy strategy = strategies.forPlayer(player);
+    journal.log(new Journal.Entry.TurnStarted(
+        player.id(), player.account().balance().amount(), strategy.cashReserve()));
+    new Turn(rules, cups.forPlayer(player), events, landings, jail, strategy, deeds).take(player);
   }
 
   private Landings landingsFor(Player player, List<Player> turnOrder, Journalling journalling) {
@@ -207,6 +209,12 @@ public class Game {
     @Override
     public void wonAtAuction(Player winner, Ownable land, Money price) {
       journal.log(new Journal.Entry.AuctionWon(winner.id(), land.type(), price));
+    }
+
+    @Override
+    public void declinedToBuy(Player player, Ownable land, Money price,
+                              Strategy.DeclineReason reason, Money reserve) {
+      journal.log(new Journal.Entry.PurchaseDeclined(player.id(), land.type(), price, reason, reserve));
     }
 
     @Override
@@ -343,7 +351,10 @@ public class Game {
       }
 
       /** The pawn's account balance is carried at this point so the turn's starting money is on record. */
-      record TurnStarted(Player.ID player, Money balance) implements Entry {
+      record TurnStarted(Player.ID player, Money balance, Money reserve) implements Entry {
+        public TurnStarted(Player.ID player, Money balance) {
+          this(player, balance, Money.ZERO);
+        }
       }
 
       record Rolled(Player.ID player, int total) implements Entry {
@@ -368,6 +379,10 @@ public class Game {
 
       /** Land the table bid for, and what the winner paid for it. */
       record AuctionWon(Player.ID player, Street.Type land, Money price) implements Entry {
+      }
+
+      record PurchaseDeclined(Player.ID player, Street.Type land, Money price,
+                              Strategy.DeclineReason reason, Money reserve) implements Entry {
       }
 
       record RentPaid(Player.ID tenant, Player.ID owner, Street.Type land, Money rent) implements Entry {

@@ -46,7 +46,8 @@ public final class Report {
       case Entry.Start it -> "The game starts with " + names(it.players());
       case Entry.InitiativeRoll it -> name(it.player()) + " rolls " + it.total() + " for initiative";
       case Entry.InitiativeWon it -> name(it.player()) + " wins initiative";
-      case Entry.TurnStarted it -> name(it.player()) + " starts a turn with $" + it.balance().amount();
+      case Entry.TurnStarted it -> name(it.player()) + " starts a turn with $" + it.balance().amount()
+          + " and a $" + it.reserve().amount() + " reserve";
       case Entry.Rolled it -> name(it.player()) + " rolls a total of " + it.total();
       case Entry.Moved it -> name(it.player()) + " moves from position " + it.from() + " ("
           + boardSpaceName(it.fromSpace()) + ") to " + it.to() + " (" + boardSpaceName(it.toSpace()) + ")";
@@ -54,6 +55,7 @@ public final class Report {
       case Entry.Bought it -> name(it.player()) + " buys " + spaceName(it.land()) + " for $" + it.price().amount();
       case Entry.AuctionWon it ->
           name(it.player()) + " wins the auction for " + spaceName(it.land()) + " at $" + it.price().amount();
+      case Entry.PurchaseDeclined it -> declineLine(it);
       case Entry.RentPaid it -> name(it.tenant()) + " pays " + name(it.owner()) + " $"
           + it.rent().amount() + " rent for " + spaceName(it.land());
       case Entry.PlayerPaid it -> name(it.payer()) + " pays " + name(it.payee()) + " $" + it.amount().amount();
@@ -91,6 +93,15 @@ public final class Report {
       case Entry.Bankrupt it -> name(it.player()) + " goes bankrupt to "
           + (it.creditor() == null ? "the bank" : name(it.creditor()));
       case Entry.Won it -> name(it.player()) + " wins the game";
+    };
+  }
+
+  private static String declineLine(Entry.PurchaseDeclined it) {
+    String prefix = name(it.player()) + " declines to buy " + boardSpaceName(it.land());
+    return switch (it.reason()) {
+      case CANNOT_AFFORD -> prefix + " because it cannot afford the $" + it.price().amount() + " price";
+      case CASH_RESERVE -> prefix + " because it would drop the balance below the $"
+          + it.reserve().amount() + " reserve";
     };
   }
 
