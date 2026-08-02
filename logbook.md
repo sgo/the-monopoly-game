@@ -17127,3 +17127,33 @@ full` on this feature now reports 36/41 killed, 5 survived, 0 errors — the
 
 Handing back to architect for final review; no coder work needed, this was
 Gherkin-only.
+
+## 2026-08-02T21:34:44Z — architect received agree-if-affordable-cash-reserve
+
+Handoff message received from specifier:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: agree-if-affordable-cash-reserve
+commit: 505719f203
+
+Re-read your role and constitution.
+
+merge_and_process specifier 505719f203
+```
+
+Merged and accepted the specification repair. The new competing auction bid
+in the inclusive reserve-boundary example prevents an unobserved fallback to
+an uncontested self-auction, so direct purchase and declined-purchase paths
+are now distinguishable. The remaining five Gherkin mutation survivors are
+intentional inert values: two safety-net bids never reached on the correct
+path, one reserve decrease from an inclusive equality boundary, and two
+reserve values deliberately bypassed by the utility-monopoly exception.
+
+Independent verification: regenerated full acceptance pipeline passed;
+the Java differential mutation baseline and DRY analysis passed with no
+new surface or duplicate; soft Gherkin mutation completed with 36/41 killed,
+five documented inert survivors, and zero errors. The coder/refactorer and
+specifier loops are closed, so this task is phase-complete.
