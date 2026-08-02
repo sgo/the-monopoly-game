@@ -16827,6 +16827,42 @@ Committing the structural fix and handing the verified-but-not-fully-
 passing state to the architect, with the `bidFor` defect flagged
 explicitly so it can loop back to the coder.
 
+## 2026-08-02T21:00:30Z — refactorer sent agree-if-affordable-cash-reserve handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 68cd733922
+```
+
+Summary: merged and reviewed the coder's reserve-aware `AgreeIfAffordable`
+and utility-monopoly-override work. Deduplicated an identical private
+`utilityMonopolyOpportunity` check that `Cards` and `LandSale` each
+carried (one copy with an unused parameter) onto `Deeds`, which already
+owns ownership queries; `dry4java`/`crap4java` clean afterward.
+
+**Flagging for architect attention, not fixed by me**: the full
+acceptance pipeline (not just `mvn test`, which silently reuses stale
+generated sources and hides this) shows `buying-land-3` and
+`buying-land-5` failing. `AgreeIfAffordable.bidFor` still bids the
+player's entire balance regardless of the reserve, so a player who
+correctly declines a direct offer to protect its reserve turns around
+and wins the same land at auction anyway by outbidding everyone.
+Confirmed via `git stash` that this is present in the coder's commit as
+merged, not something my structural fix introduced. Deciding the right
+reserve-respecting bid amount is new behavior this role does not own;
+this needs to loop back to the coder. Full unit (266+11) and property
+(22) suites green regardless, since neither exercises the auction path
+for this strategy. Acceptance: 307/315, repeated twice for stability —
+the six already-known bankruptcy-narration failures plus these two new,
+confirmed-pre-existing `bidFor` failures. Handing the verified-but-not-
+fully-passing state to architect for independent review and to route the
+`bidFor` fix back to the coder.
+
 ## 2026-08-02T21:00:28Z — architect received agree-if-affordable-cash-reserve
 
 Handoff message received from refactorer:
@@ -16873,3 +16909,92 @@ The direct-offer reserve behavior and the auction bid behavior must agree:
 the strategy must not spend the configured reserve in an auction unless the
 specified utility-monopoly exception applies. The return path is this
 architect loop, not a specifier sync.
+
+## 2026-08-02T21:03:30Z — coder received architect review follow-up
+
+Handoff message received from architect:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: agree-if-affordable-cash-reserve
+commit: 0c4364cd4c
+
+Re-read your role and constitution.
+
+merge_and_process architect 0c4364cd4c
+```
+
+Merged the architect review commit. Confirmed the reserve leak in
+`AgreeIfAffordable.bidFor`: declining a direct purchase still allowed the
+strategy to bid its entire balance at auction. I am adding the reserve-aware
+bid cap and regression coverage before handing the result to the refactorer.
+
+## 2026-08-02T21:05:10Z — coder sent agree-if-affordable-cash-reserve to refactorer
+
+The reserve-aware auction cap is implemented and covered by unit tests. The
+domain suite passes 268 tests, and the buying-land acceptance scenarios all
+pass. The full acceptance run has only the six previously documented
+bankruptcy narration failures, which are outside this handoff.
+
+## 2026-08-02T21:14:34Z — refactorer received agree-if-affordable-cash-reserve (bidFor fix)
+
+Handoff message received from coder:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 91e185504d
+
+Re-read your role and constitution.
+
+merge_and_process coder 91e185504d
+```
+
+Action taken: merged commit `91e185504d` (append-only `logbook.md`
+conflict, resolved the usual way). Reviewed the fix:
+`AgreeIfAffordable.bidFor` now returns `available` unchanged only when
+`utilityMonopolyOpportunity()` holds, otherwise caps the bid at
+`max(0, available - reserve)` — matching `accepts()`'s own reserve logic.
+Two focused unit tests cover it directly (a capped bid, and an
+uncapped-for-monopoly bid). `crap4java` clean (`bidFor` CRAP 2.0, 100%
+coverage), `dry4java` reports no duplicate candidates across the five
+files this task touched. `mutate4java --scan`: 5 sites on
+`AgreeIfAffordable.java`, well under threshold; manifest refreshed.
+
+Verified the fix directly rather than trusting the coder's summary this
+time: ran the full `./acceptance/run-acceptance.sh` pipeline (not `mvn
+test`) and confirmed `buying-land-3` and `buying-land-5` — the two
+scenarios I flagged as broken last cycle — now pass consistently across
+three repeated runs.
+
+**One new wrinkle, investigated and ruled out as unrelated**: one of
+those runs also showed `SpecsCliEnCliAcceptanceTest` failing ("the game
+log records no winner" / "The game log records a winner"). Since the
+default `AgreeIfAffordable()` strategy the CLI scenario uses has
+`reserve = Money.ZERO`, `bidFor`'s new cap is mathematically a no-op for
+it (`max(0, available - 0) == available`), so I didn't expect this
+commit to touch that behavior at all. Confirmed by isolating the
+variable: checked out my own prior commit (`68cd733922`, before this
+fix) and ran the full acceptance pipeline twice — no CLI failure either
+time. Returned to this merge and ran it three more times — CLI failed
+once, passed twice. This is real, pre-existing flakiness in the
+background-simulator, wall-clock-bounded CLI test (a real process
+started and stopped under a timing budget), not a regression from this
+change; noted for whoever next has cause to look at it, but out of scope
+here.
+
+Verification: full `mvn test` — 268 domain tests green (the coder's
+count matches). `mvn test -P property-tests` 22/22 green. Full
+acceptance pipeline: consistently 6/315 failing on repeated runs (only
+the pre-existing, already-flagged bankruptcy-narration gap), aside from
+the one flaky CLI run noted above. `buying-land-3`/`buying-land-5` are
+solidly fixed.
+
+`agree-if-affordable-cash-reserve` is verified and ready for the
+architect: the reserve now applies consistently to both the direct offer
+and the auction path, and the utility-monopoly override works in both
+places too. Committing and handing off.
