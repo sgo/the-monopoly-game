@@ -15802,6 +15802,63 @@ reshuffle/cycle on exhaustion, and Get-Out-of-Jail-Free retained in the deck
 until released. `official-card-decks` is closed. Asking the user for the
 next feature to specify.
 
+## 2026-08-02T16:21:06Z — specifier sent handoff to coder (card-driven-movement-resolution)
+
+Handoff message sent:
+
+```
+id: 20260802T162106Z_000045_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: card-driven-movement-resolution
+commit: b6e3187dab
+created_at: 2026-08-02T16:21:06.496078Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier b6e3187dab
+```
+
+Summary: the user pasted a real CLI trace showing dog draw a chance card
+that advances to Rue de Diekirch (Arlon), then the trace jumped straight to
+the next player's turn with no sign of the move or anything happening at
+the destination. Reproduced directly against `Cards.resolve()` (bypassing
+the shuffled deck with a scripted card) before writing anything: dog's
+position moved correctly to Rue de Diekirch, but no `bought`/`paid` event
+fired and the balance never changed — `Cards.moveTo()` only updates
+position and handles the pass-Start salary; it never logs a `Moved` journal
+entry and never re-enters landing resolution for the destination. This
+affects the four Chance cards that advance to a *named* property
+(Nieuwstraat, Grand Place, Rue de Diekirch, Noord Station); the "advance to
+nearest station"/"advance to nearest utility" cards already call
+`resolveNearestOwnedLand`/their own buy-or-rent logic after moving, so they
+don't have the second half of this gap, though they share the same missing
+movement-logging call.
+
+Added `cards-17`/`cards-18` to `cards.feature` (mirroring `cards-9`/`cards-10`'s
+buy-if-unowned / pays-owner-rent shape, but for a plain named street rather
+than the "nearest station" card's doubled-rent variant — Rue de Diekirch's
+standard unimproved rent is M10 per `RULES.md`, not doubled), and
+`journal-25`/`logging-25`/`report-25` proving the card-driven move itself is
+logged/reported with the same "moves from position X (space) to Y (space)"
+wording already established for ordinary dice-driven movement. One
+representative property (Rue de Diekirch) is enough to prove the mechanic;
+not adding one scenario per affected card, consistent with this project's
+existing "cover the mechanic once" convention for chance/community chest
+cards. Verified with `bb gherkin-parser` + `bb gherkin-ir-dry-checker` on all
+four touched files; only low-confidence substring-overlap findings, the same
+category already accepted elsewhere in these files.
+
+Left to the coder's judgment: whether `Cards.moveTo()` itself gains the
+movement-logging call (so all six "advance" card types benefit uniformly)
+while only the four named-property cards additionally gain generic
+landing-resolution — doing that resolution generically inside `moveTo()`
+itself would double-resolve the station/utility cards, which already handle
+their own follow-up.
+
 ## 2026-08-02T16:30:00Z — coder completed card-driven movement resolution
 
 Received specifier handoff `card-driven-movement-resolution` at commit
@@ -15889,6 +15946,32 @@ split threshold; manifest refreshed via `--update-manifest`.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T16:43:35Z — refactorer sent card-driven-movement-resolution handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-driven-movement-resolution
+commit: c7d162e896
+```
+
+Summary: reviewed the coder's fix making card-driven movement fire real
+`Moved` events (previously silent) and resolve Rue de Diekirch as a
+normal landing (buy-or-pay-rent via the real `Rent` class). Confirmed no
+duplication against the existing station/utility card patterns
+(dry4java: none — the owned-branch logic is genuinely different, full
+rent-table resolution vs. a flat special amount). Found and closed a
+real coverage gap: `moveToAndResolve` had 0% domain unit-test coverage
+(CRAP 12.0) unlike its siblings; added two focused tests (buy path, rent
+path), bringing it to 98% coverage and CRAP 3.0. Also fixed an
+import-ordering slip. Did not reproduce the coder's noted pre-existing
+flaky CLI-simulation failure across 4 repeated runs. Full unit (266+11)
+and property (22) suites green; acceptance 290/290, repeated 3+ times.
+Handing verified state to architect for independent review.
+
 ## 2026-08-02T16:45:51Z — architect received card-driven-movement-resolution handoff
 
 Handoff message received from refactorer:
@@ -15920,3 +16003,182 @@ remaining survivors are unrelated existing insufficient-balance inputs.
 
 Handoff message sent to specifier at priority 50 for task
 `card-driven-movement-resolution`, commit `fbbde7ca46`.
+## 2026-08-02T16:46:00Z — specifier received card-driven-movement-resolution phase-complete sync from architect
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: card-driven-movement-resolution
+
+Re-read your role and constitution.
+
+merge_and_process architect fbbde7ca46
+```
+
+Action taken: merged architect commit `fbbde7ca46` into `main`, resolving
+the append-only `logbook.md` conflict by placing my own sent-handoff entry
+ahead of the coder/refactorer/architect chain it preceded. Verified the fix
+myself rather than accepting the summaries: `moveTo()` now correctly fires
+`events.moved(...)` for every card-driven move (confirmed directly — a
+scripted "Ga door naar Grand Place" card correctly logged "moved from 7 to
+24"), so the movement-logging half of the gap is genuinely fixed for all six
+"advance" card types, matching the shared helper.
+
+The landing-resolution half is not: only the one card in my Gherkin example
+(Rue de Diekirch, via the new `moveToAndResolve`) got wired to buy/rent
+resolution. Nieuwstraat, Grand Place, and Noord Station — the other three
+named-property cards I explicitly named in my handoff summary as sharing
+this exact defect — still call plain `moveTo` (confirmed by reading
+`Cards.java`'s effect map: lines still read `moveTo(player,
+NieuwstraatBrussel, false)` / `moveTo(player, GrandPlaceMons, true)` /
+`moveTo(player, NoordStation, true)`, not `moveToAndResolve`). Reproduced
+directly: a scripted "Ga door naar Grand Place" card now logs the move
+correctly but still leaves the property unowned with no `bought` event and
+no balance change — identical to the original bug, just for a card I didn't
+happen to put in the Gherkin.
+
+This reads as the fix tracking only what the Gherkin scenario explicitly
+exercised rather than the general defect described in the handoff prose;
+Gherkin can only pin one representative example, but the written scope was
+for all four cards. Not accepting `card-driven-movement-resolution` as
+closed. Sending a same-task follow-up to coder asking for
+`moveToAndResolve` (or equivalent) to cover all four named-property cards,
+not just the one with a scenario.
+
+## 2026-08-02T16:52:00Z — specifier sent card-driven-movement-resolution scope follow-up to coder
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+role: specifier
+task: card-driven-movement-resolution
+commit: f4d92e01fc
+
+Re-read your role and constitution.
+
+merge_and_process specifier f4d92e01fc
+```
+
+Summary: verified the movement-logging half of the fix is genuinely
+complete (`moveTo()` fires `events.moved(...)` for every card-driven move,
+confirmed directly for a non-scripted card). The landing-resolution half
+only covers Rue de Diekirch, via the new `moveToAndResolve`; the other
+three named-property Chance cards named explicitly in the original handoff
+— "Ga door naar Nieuwstraat", "Ga door naar Grand Place", "Ga door naar
+Noord Station" — still call plain `moveTo` and so still skip buy/rent
+resolution entirely at their destination. Reproduced directly against
+`Cards.resolve()` with a scripted Grand Place card: the move is logged, but
+the property stays unowned with no `bought` event and no balance change.
+
+Ask: route these three remaining cards through `moveToAndResolve` (or
+whatever the coder judges the right generalization) the same way Rue de
+Diekirch now is, so all four named-property advance cards behave
+identically — this was the original scope, not a new ask. Not adding
+additional Gherkin scenarios for this follow-up: `cards-17`/`cards-18`
+already establish the required behavior for the mechanic via Rue de
+Diekirch; the fix just needs to actually apply to its siblings the same
+way the mechanic's contract already requires, consistent with the
+"cover the mechanic once in Gherkin" convention already used here — three
+more scenarios that are identical in shape but a different property name
+would be the kind of redundant per-card duplication this project's cards.feature
+already avoids elsewhere (e.g. the single "every chance card resolves
+without error" smoke test covering all 16 texts, rather than one scenario
+per card).
+
+## 2026-08-02T16:50:49Z — coder received card-driven-movement-resolution follow-up
+
+Handoff message received:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: card-driven-movement-resolution
+commit: f4d92e01fc
+
+Re-read your role and constitution.
+
+merge_and_process specifier f4d92e01fc
+```
+
+Action taken: merged the follow-up state at `818fb0525d` and routed the
+Nieuwstraat, Grand Place, and Noord Station named-property cards through the
+shared `moveToAndResolve` path, matching Rue de Diekirch.
+
+## 2026-08-02T16:52:30Z — coder sent card-driven-movement-resolution to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: card-driven-movement-resolution
+commit: 2fdb8d2a5d
+```
+
+Summary: completed named-property card movement resolution for Nieuwstraat,
+Grand Place, Noord Station, and Rue de Diekirch.
+
+## 2026-08-02T16:57:02Z — refactorer received handoff from coder
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: card-driven-movement-resolution
+commit: 31330cd11a
+
+Re-read your role and constitution.
+
+merge_and_process coder 31330cd11a
+```
+
+Action taken: merged `31330cd11a` into `swarmforge-refactorer` (commit
+`d8673a4`, resolving an append-only `logbook.md` conflict). The named
+commit itself was just a logbook hash correction; the actual fix is its
+parent, `2fdb8d2a5d`.
+
+Read the specifier's finding first: my prior review of this task
+approved `moveToAndResolve` as a well-tested unit without stepping back
+to check it was actually *wired to all four* named-property cards the
+original scope named — I verified Rue de Diekirch specifically and
+should have checked the other three too. The specifier caught it by
+reproducing directly (a scripted Grand Place card moved the pawn but
+left the land unowned with no `bought` event). Noted for next time:
+when a fix generalizes an existing helper, verify every intended call
+site was actually updated to use it, not just the one the tests exercise.
+
+Verified the coder's completion myself: `grep` confirms `Nieuwstraat`,
+`GrandPlaceMons`, `NoordStation`, and `RueDeDiekirchArlon` all now call
+`moveToAndResolve`; only the two `start`-destination cards still call
+plain `moveTo`, correctly, since `start` isn't `Ownable` and never
+needed buy/rent resolution. The diff itself is minimal and clean (2
+lines changed, matching the existing Rue de Diekirch pattern exactly).
+
+Did not add three more per-card unit tests for the newly-wired
+siblings: `moveToAndResolve` doesn't branch on which `Street.Type` is
+passed, so its code paths are already fully exercised by the tests I
+added for Rue de Diekirch (`crap4java` confirms — the method doesn't
+even appear in the report anymore, meaning it's under threshold).
+Adding sibling-specific tests would replicate the exact per-card
+redundancy the specifier explicitly reasoned against one handoff ago
+for this same mechanic ("the kind of redundant per-card duplication
+this project's `cards.feature` already avoids elsewhere").
+
+Verification: full `mvn test` 266 domain + 11 cli green, repeated 4+
+times. `mvn test -P property-tests` 22/22 green. Full acceptance
+pipeline 290/290 green, repeated twice. `crap4java`/`dry4java` on
+`Cards.java` clean. `mutate4java --scan`: 54 sites, well under the
+100-site split threshold; manifest refreshed via `--update-manifest`
+(some scopes had drifted since the small edit).
+
+Committing and handing the verified state to the architect.
