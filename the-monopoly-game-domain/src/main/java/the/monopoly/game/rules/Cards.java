@@ -78,7 +78,7 @@ public final class Cards implements Landings {
     this.chanceEffects = Map.ofEntries(
       Map.entry(
           "Ga door naar Nieuwstraat (Brussel) / Rue Neuve (Bruxelles).",
-          (Consumer<Player>) player -> moveTo(player, NieuwstraatBrussel, false)
+          (Consumer<Player>) player -> moveToAndResolve(player, NieuwstraatBrussel, false)
       ),
       Map.entry(
           "Ga door naar START (Ontvang M200).",
@@ -86,7 +86,7 @@ public final class Cards implements Landings {
       ),
       Map.entry(
           "Ga door naar Grand Place (Mons). Als je langs START komt, ontvang je M200.",
-          (Consumer<Player>) player -> moveTo(player, GrandPlaceMons, true)
+          (Consumer<Player>) player -> moveToAndResolve(player, GrandPlaceMons, true)
       ),
       Map.entry(
           "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200.",
@@ -126,7 +126,7 @@ public final class Cards implements Landings {
       ),
       Map.entry(
           "Ga door naar Noord Station / Gare du Nord. If you pass START, collect M200.",
-          (Consumer<Player>) player -> moveTo(player, NoordStation, true)
+          (Consumer<Player>) player -> moveToAndResolve(player, NoordStation, true)
       ),
       Map.entry(
           "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50.",

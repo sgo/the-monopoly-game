@@ -16060,3 +16060,38 @@ would be the kind of redundant per-card duplication this project's cards.feature
 already avoids elsewhere (e.g. the single "every chance card resolves
 without error" smoke test covering all 16 texts, rather than one scenario
 per card).
+
+## 2026-08-02T16:50:49Z — coder received card-driven-movement-resolution follow-up
+
+Handoff message received:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: card-driven-movement-resolution
+commit: f4d92e01fc
+
+Re-read your role and constitution.
+
+merge_and_process specifier f4d92e01fc
+```
+
+Action taken: merged the follow-up state at `818fb0525d` and routed the
+Nieuwstraat, Grand Place, and Noord Station named-property cards through the
+shared `moveToAndResolve` path, matching Rue de Diekirch.
+
+## 2026-08-02T16:52:30Z — coder sent card-driven-movement-resolution to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: card-driven-movement-resolution
+commit: 21d0b3fbc9
+```
+
+Summary: completed named-property card movement resolution for Nieuwstraat,
+Grand Place, Noord Station, and Rue de Diekirch.
