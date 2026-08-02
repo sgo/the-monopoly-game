@@ -16414,3 +16414,18 @@ use the owner's actual station count before doubling it. Added journal, log,
 and report events for remaining in jail, leaving by doubles, and leaving with
 a Get Out of Jail Free card. Focused acceptance confirms the new scenarios;
 two unrelated bankruptcy house-sale/mortgage scenarios remain failing.
+
+## 2026-08-02T19:18:20Z — coder sent nearest-station-rent-and-jail-narration
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: nearest-station-rent-and-jail-narration
+commit: 280e527777
+```
+
+Summary: corrected owned-station rent scaling and added journal/log/report
+narration for jail stays and exits.
