@@ -12,8 +12,8 @@ import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.components.streets.TaxSpace;
-import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Cards;
+import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.strategies.AgreeIfAffordable;
 import the.monopoly.game.strategies.Strategy;
@@ -130,7 +130,7 @@ class GameTest {
 
   @Test
   void aGameThrowsTheDiceTheRulesCallForWhenGivenNoneOfItsOwn() {
-    Game.Result result = new Game(ruleSet, players).play();
+    Game.Result result = game(players, Cup.of(ruleSet.dice().toList())).play();
 
     assertThat(result.turnOrder()).containsExactlyInAnyOrderElementsOf(players);
   }
@@ -146,7 +146,7 @@ class GameTest {
         dog.id(), Cup.of(new Roll(2, 2), new Roll(1, 2)),
         twoPlayers.get(1).id(), Cup.of(new Roll(5, 5), new Roll(4, 6))
     );
-    Game.Result result = new Game(ruleSet, twoPlayers, player -> cups.get(player.id())).playToCompletion();
+    Game.Result result = game(twoPlayers, player -> cups.get(player.id())).playToCompletion();
 
     assertThat(result.journal()).endsWith(
         new Entry.Bankrupt(dog.id(), null), new Entry.Won(twoPlayers.get(1).id())
@@ -178,8 +178,8 @@ class GameTest {
     );
     Strategy.OfPlayers strategies = player ->
         player.id().equals(highHat.id()) ? new AgreeIfAffordable() : Strategy.UNDECIDED;
-    Game.Result result = new Game(
-        ruleSet, twoPlayers, player -> cups.get(player.id()), strategies, deeds
+    Game.Result result = game(
+        twoPlayers, player -> cups.get(player.id()), strategies, deeds
     ).playToCompletion();
 
     assertThat(result.journal()).containsSubsequence(
@@ -195,7 +195,7 @@ class GameTest {
   void aGameStopsBetweenRoundsWhenToldTo() {
     AtomicBoolean stop = new AtomicBoolean();
 
-    Game.Result result = new Game(ruleSet, players, Cup.of(
+    Game.Result result = game(players, Cup.of(
         new Roll(2, 2), new Roll(5, 5), new Roll(3, 3),
         new Roll(1, 2), new Roll(2, 4), new Roll(4, 3)
     )).playUntilStopped(() -> !stop.compareAndSet(false, true));
@@ -227,8 +227,8 @@ class GameTest {
         ironBox.id(), Cup.of(new Roll(3, 3), new Roll(1, 3))
     );
     AtomicInteger additionalRoundsAllowed = new AtomicInteger(1);
-    Game.Result result = new Game(
-        ruleSet, players, player -> cups.get(player.id()), Strategy.OfPlayers.NOBODY_DECIDES
+    Game.Result result = game(
+        players, player -> cups.get(player.id()), Strategy.OfPlayers.NOBODY_DECIDES
     ).playUntilStopped(() -> additionalRoundsAllowed.getAndDecrement() > 0);
 
     assertThat(result.journal()).containsSubsequence(
@@ -242,7 +242,7 @@ class GameTest {
   void aGamePlaysAnotherRoundWhenToldItMay() {
     AtomicInteger additionalRoundsAllowed = new AtomicInteger(1);
 
-    Game.Result result = new Game(ruleSet, players, Cup.of(
+    Game.Result result = game(players, Cup.of(
         new Roll(2, 2), new Roll(5, 5), new Roll(3, 3),
         new Roll(1, 2), new Roll(2, 4), new Roll(4, 3),
         new Roll(1, 3), new Roll(2, 3), new Roll(1, 4)
@@ -278,7 +278,7 @@ class GameTest {
         Pawn.iron_box.id(), Cup.of(new Roll(3, 3), new Roll(4, 3))
     );
 
-    new Game(ruleSet, players, player -> cups.get(player.id())).play();
+    game(players, player -> cups.get(player.id())).play();
 
     assertThat(positionsOf(players)).containsExactly(3, 6, 7);
   }
@@ -965,6 +965,32 @@ class GameTest {
   }
 
   private Game.Result play(Roll... rolls) {
-    return new Game(ruleSet, players, Cup.of(rolls)).play();
+    return game(players, Cup.of(rolls)).play();
+  }
+
+  /**
+   * {@code Game}'s own convenience constructors now default to the shuffled
+   * official decks, correct for real play but wrong for the fixed-roll,
+   * fixed-position assertions most of this class makes: a chance or
+   * community chest landing drawing a real card would move a pawn, or change
+   * a balance, this class never asked for. These helpers keep every other
+   * test in this file deterministic by asking for {@link Cards.Decks#EMPTY}
+   * explicitly, the way the handful of tests that do care about a specific
+   * card already do via {@link #decks}.
+   */
+  private Game game(List<Player> players, Cup cup) {
+    return game(players, player -> cup);
+  }
+
+  private Game game(List<Player> players, Game.Cups cups) {
+    return game(players, cups, Strategy.OfPlayers.NOBODY_DECIDES, new Deeds());
+  }
+
+  private Game game(List<Player> players, Game.Cups cups, Strategy.OfPlayers strategies) {
+    return game(players, cups, strategies, new Deeds());
+  }
+
+  private Game game(List<Player> players, Game.Cups cups, Strategy.OfPlayers strategies, Deeds deeds) {
+    return new Game(ruleSet, players, cups, strategies, deeds, Cards.Decks.EMPTY);
   }
 }

@@ -12,8 +12,8 @@ import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
-import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Cards;
+import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
@@ -326,7 +326,7 @@ public class World {
     Game.Result result = new Game(
         ruleSet, players(), player -> () -> nextQueuedPawnRoll(player), this::strategyOf,
         deeds == null ? deeds = new Deeds() : deeds,
-        new the.monopoly.game.rules.Cards.Decks() {
+        new Cards.Decks() {
           @Override
           public String drawChance() {
             return queuedChanceCards.isEmpty() ? officialDecks.drawChance() : queuedChanceCards.pollFirst();
