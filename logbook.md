@@ -16606,3 +16606,62 @@ stations the owner holds, and all four jail transitions (sent to jail,
 pays the fine, rolls doubles, uses a GOJF card, stays jailed) are now
 narrated in the journal, log, and report. Asking the user for the next
 feature to specify.
+
+## 2026-08-02T20:45:08Z — specifier writes selective-buying refinement to "Agree if affordable"
+
+The user asked to go deeper on "selective buying" (raised while discussing
+under what conditions land can be sold between players, which turned out to
+be a real gap: the mechanism exists in `LandSale.sell` but no strategy ever
+proposes a trade, per `SIMULATOR.md`'s own out-of-scope list — that stays
+future work). Selective buying splits into two very different sizes: a
+cash-reserve or land-type rule is answerable from the `Strategy.Offer` record
+as it exists today (no engine change), while monopoly-awareness needs
+`Offer` to carry ownership context it currently lacks. Started with the free
+one, per the user's choice.
+
+First pass wrote the cash-reserve rule as a new, seemingly-standalone Given
+step ("pawn dog keeps a cash reserve of $X"). User corrected this: since
+everything else about the strategy (claims rent unconditionally, builds and
+pays the jail fine if affordable) is silently inherited from `AgreeIfAffordable`,
+it isn't a universal concept — it's a variant of that one strategy. Given the
+choice between naming it honestly as a variant now versus building a real
+composable decorator with nothing yet to compose it with, the user chose the
+honest-variant route. Reworded the step to
+`pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve>
+reserve`, added `buying-land-3` (declines below reserve) and `buying-land-4`
+(buys at and above reserve, proving the boundary is inclusive) to
+`buying-land.feature`.
+
+User then specified a further rule: utilities should override the reserve
+entirely under certain conditions — buy regardless of the reserve whenever
+doing so denies another player a utility monopoly. This left an unstated
+third case: with only two utilities on the board, if a purchase is
+undecided-unowned there are exactly three ownership states beforehand
+(nobody owns either yet; the other player owns the other one; I own the
+other one myself) — the user's two rules covered the first two but not
+completing my *own* monopoly. Asked via `AskUserQuestion` rather than
+guessing; user chose to override the reserve for the own-monopoly case too,
+same as blocking. Added `buying-land-5` (baseline: reserve still applies
+when nobody owns a utility yet), `buying-land-6` (buys anyway to deny
+another player's monopoly), and `buying-land-7` (buys anyway to complete
+its own monopoly) — all using Elektriciteitscentrale/Watermaatschappij, the
+board's only two utilities, so the three cases are exhaustive as specified.
+
+Updated `SIMULATOR.md` and `tasks.md` per the user's request so the
+documented strategy description doesn't go stale ahead of implementation:
+`SIMULATOR.md` renamed the doc's own inconsistent "Buy All"/"Agree if
+affordable" naming to just "Agree if affordable" throughout and described
+the reserve + utility-monopoly rule in Key Concepts; `tasks.md` left Phase
+4's original historical text untouched (per this file's own established
+convention) and added a "Post-plan refinements" entry marked "specified,
+pending implementation" rather than "(done)", since nothing has been built
+yet — pointing at `buying-land-3` through `buying-land-7` as the spec of
+record.
+
+Verified `buying-land.feature` with `bb gherkin-parser` (clean) and
+`bb gherkin-ir-dry-checker` (only the same class of near-duplicate/
+possible-synonym noise already tolerated elsewhere in this file, arising
+from literal-named scenarios coexisting with parameterized ones — nothing
+new in kind).
+
+Committing and handing off to coder.

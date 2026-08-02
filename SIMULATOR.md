@@ -9,10 +9,14 @@ everything that happened.
 - **Pluggable player strategy.** Computer players decide their actions through
   a strategy abstraction, so the decision logic for any player can be swapped
   independently of the game engine and of other players' strategies.
-- **One strategy for now: "Buy All".** When a player lands on an unowned,
-  purchasable space (street, station, or utility) and can afford the listed
-  price, it buys. Otherwise it declines, and the space goes to auction as
-  normal (per [Buying Land](RULES.md#buying-land)).
+- **One strategy for now: "Agree if affordable".** When a player lands on an
+  unowned, purchasable space (street, station, or utility) and can afford the
+  listed price, it buys — unless buying would leave it below a configured cash
+  reserve, in which case it declines instead (and the space goes to auction as
+  normal, per [Buying Land](RULES.md#buying-land)). Utilities are exempt from
+  the reserve check when buying one would complete the player's own utility
+  monopoly or deny another player theirs; the strategy buys in either of those
+  cases regardless of the reserve.
 - **Journal.** Every game event (dice rolls, moves, purchases, rent payments,
   card draws, jail entry/exit, bankruptcies, the eventual winner, etc.) is
   recorded to a journal.
@@ -21,15 +25,20 @@ everything that happened.
   to read after the fact.
 - **CLI.** An entry point to start a simulated game, letting the user choose:
   - the number of players (2–8, per [Setup](RULES.md#setup));
-  - the strategy used for each player, defaulting to Buy All if not specified.
+  - the strategy used for each player, defaulting to "Agree if affordable" if
+    not specified.
 
   The CLI runs the game and prints the game report.
 
 ## Out of scope for now (future work)
 
-- Additional strategies beyond Buy All (e.g. selective buying, trading,
+- Additional standalone strategies beyond "Agree if affordable" (e.g. trading,
   strategic building) — the strategy abstraction should allow adding these
-  later without changing the CLI, journal, or engine.
+  later without changing the CLI, journal, or engine. Selective buying is no
+  longer entirely future work: "Agree if affordable" itself now carries a cash
+  reserve and utility-monopoly awareness (see Key Concepts) rather than
+  becoming a separate strategy; further selectivity (e.g. colour-group
+  awareness for streets) remains unspecified.
 - Human/interactive players.
 - Persisting, replaying, or comparing results across many simulated games
   (the existing `en/monopoly.feature` 1000-game scenario already exercises
@@ -52,6 +61,13 @@ This strategy will pay to buy, win an auction, build, take out a mortgage if
 funds drop too low, trade, jail exit choice, ...
 
 Provided it has the financial means to do so.
+
+Buying keeps a configured cash reserve: it declines a purchase that would
+leave it below that reserve, same as if it couldn't afford the price at all.
+Utilities carve out an exception — the strategy buys an available utility
+regardless of the reserve whenever doing so completes its own utility
+monopoly or denies another player theirs. Otherwise (nobody yet owns a
+utility) buying one still respects the reserve like any other purchase.
 
 ### Journal and report
 
