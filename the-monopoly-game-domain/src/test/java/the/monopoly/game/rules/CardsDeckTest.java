@@ -9,8 +9,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CardsDeckTest {
-  private static final String CHANCE_GET_OUT_OF_JAIL_FREE = "Verlaat de gevangenis zonder te betalen.";
-
   @Test
   void anOfficialChanceDeckRotatesAllSixteenCards() {
     Cards.Decks decks = Cards.Decks.official();
@@ -41,7 +39,7 @@ class CardsDeckTest {
     Deeds deeds = new Deeds();
     Cards.Decks decks = Cards.Decks.official(deeds);
     String card;
-    do card = decks.drawChance(); while (!card.equals(CHANCE_GET_OUT_OF_JAIL_FREE));
+    do card = decks.drawChance(); while (!card.equals(Cards.CHANCE_GET_OUT_OF_JAIL_FREE_CARD));
 
     Player dog = Rule.Set.Type.official.create().players().select(1).findFirst().orElseThrow();
     deeds.hold(Deeds.RetainedCard.CHANCE_GET_OUT_OF_JAIL_FREE, dog);
