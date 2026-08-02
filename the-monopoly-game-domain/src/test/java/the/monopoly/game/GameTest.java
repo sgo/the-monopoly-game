@@ -744,6 +744,44 @@ class GameTest {
   }
 
   @Test
+  void aChanceCardToRueDeDiekirchArlonBuysItWhenUnownedAndAccepted() {
+    Deeds deeds = new Deeds();
+
+    resolveChanceCardAt(
+        0, deeds, Map.of(Pawn.dog.id(), new AgreeIfAffordable()),
+        "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200.",
+        new Cards.Events() {
+        }
+    );
+
+    assertThat(players.getFirst().position().index())
+        .isEqualTo(ruleSet.gameboard().positionOf(Street.Type.RueDeDiekirchArlon));
+    assertThat(deeds.ownerOf(Street.Type.RueDeDiekirchArlon)).contains(Pawn.dog.id());
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1360));
+  }
+
+  @Test
+  void aChanceCardToRueDeDiekirchArlonChargesTheOwnerVacantRentWhenOwnedByAnotherPlayer() {
+    Deeds deeds = new Deeds();
+    Player highHat = players.get(1);
+    giveStreetTo(deeds, highHat, street(Street.Type.RueDeDiekirchArlon));
+    List<Entry> journal = new ArrayList<>();
+
+    resolveChanceCardAt(
+        0, deeds, Map.of(highHat.id(), biddingAndClaiming(0)),
+        "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200.",
+        rentJournal(journal)
+    );
+
+    assertThat(players.getFirst().position().index())
+        .isEqualTo(ruleSet.gameboard().positionOf(Street.Type.RueDeDiekirchArlon));
+    assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1490));
+    assertThat(journal).containsExactly(
+        new Entry.RentPaid(Pawn.dog.id(), highHat.id(), Street.Type.RueDeDiekirchArlon, new Money(10))
+    );
+  }
+
+  @Test
   void aChanceCardDoesNotChargeSpecialRentWhenTheNearestStationIsOwnedByTheDrawer() {
     Player dog = players.getFirst();
     dog.position().moveTo(15);
