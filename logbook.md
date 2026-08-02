@@ -16178,3 +16178,27 @@ pipeline 290/290 green, repeated twice. `crap4java`/`dry4java` on
 (some scopes had drifted since the small edit).
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T16:57:38Z — refactorer sent card-driven-movement-resolution handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-driven-movement-resolution
+commit: 9450569bc0
+```
+
+Summary: verified the coder's fix now routes all four named-property
+chance cards (Nieuwstraat, Grand Place, Noord Station, Rue de Diekirch)
+through `moveToAndResolve`, closing the scope gap the specifier's review
+caught — my own earlier review had only checked Rue de Diekirch
+specifically. No new tests added for the three newly-wired siblings:
+`moveToAndResolve` doesn't branch on destination, so its paths are
+already fully covered, and adding per-card tests would replicate the
+redundancy the specifier already reasoned against for this mechanic.
+Full unit (266+11) and property (22) suites green; acceptance 290/290,
+repeated twice. Handing verified state to architect for independent
+review.
