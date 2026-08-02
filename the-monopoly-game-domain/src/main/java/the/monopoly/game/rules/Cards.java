@@ -90,7 +90,7 @@ public final class Cards implements Landings {
       ),
       Map.entry(
           "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200.",
-          (Consumer<Player>) player -> moveTo(player, RueDeDiekirchArlon, true)
+          (Consumer<Player>) player -> moveToAndResolve(player, RueDeDiekirchArlon, true)
       ),
       Map.entry(
           "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.",
@@ -242,10 +242,28 @@ public final class Cards implements Landings {
     int from = player.position().index();
     int to = rules.gameboard().positionOf(destination);
     player.position().moveTo(to);
+    events.moved(player, from, to, officialSpaceAt(from), destination);
     if (collectSalaryIfPassing && passesStart(from, to)) {
       Money salary = player.pass(start());
       events.collectedSalary(player, salary);
     }
+  }
+
+  private void moveToAndResolve(Player player, Street.Type destination, boolean collectSalaryIfPassing) {
+    moveTo(player, destination, collectSalaryIfPassing);
+    Street land = rules.create(destination);
+    if (!(land instanceof Ownable ownable)) return;
+    if (deeds.isUnowned(ownable.type())) {
+      buyIfAccepted(player, ownable);
+      return;
+    }
+    new Rent(deeds, rules, players, strategies,
+        (tenant, owner, rentedLand, rent) -> events.paid(tenant, owner, rentedLand, rent))
+        .resolve(player, land, new Roll(0, 0));
+  }
+
+  private Street.Type officialSpaceAt(int position) {
+    return rules.gameboard().layout().get(Math.floorMod(position, rules.gameboard().layout().size()));
   }
 
   private void advanceToNearestStation(Player player) {
@@ -478,6 +496,9 @@ public final class Cards implements Landings {
   }
 
   public interface Events {
+    default void moved(Player player, int from, int to, Street.Type fromSpace, Street.Type toSpace) {
+    }
+
     default void drewChanceCard(Player player, String card) {
     }
 

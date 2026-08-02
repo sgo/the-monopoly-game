@@ -15772,3 +15772,18 @@ genuinely implemented: shuffled official set, deal without replacement,
 reshuffle/cycle on exhaustion, and Get-Out-of-Jail-Free retained in the deck
 until released. `official-card-decks` is closed. Asking the user for the
 next feature to specify.
+
+## 2026-08-02T16:30:00Z — coder completed card-driven movement resolution
+
+Received specifier handoff `card-driven-movement-resolution` at commit
+`b6e3187dab` and implemented it. Card-driven movement now emits movement
+events, collects salary when passing START, and resolves the named Rue de
+Diekirch destination as a normal property landing: it buys the unowned land
+when accepted or charges standard rent when owned. Added acceptance handlers
+for draw-before-movement ordering in the journal, game log, and report.
+
+Verification: focused acceptance passed all 290 scenarios; full Maven test
+passed; the full acceptance run reached the existing nondeterministic CLI
+simulation failure (`the game log records no winner`) while all 290 generated
+acceptance scenarios otherwise executed. The unrelated `.lurus/` directory
+was preserved untracked.
