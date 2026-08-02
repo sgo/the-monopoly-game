@@ -233,3 +233,29 @@ Feature: chance and community chest cards
     Examples:
       | pawn |
       | dog  |
+
+  # cards-17
+  Scenario Outline: a card that advances to a named property lets the pawn buy it if unsold
+    Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
+    And pawn "dog" will buy "Rue de Diekirch Arlon"
+    When pawn "dog" lands on "Kans / Chance"
+    Then pawn "dog" is at position <position>
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "dog"'s account balance is $<expected_balance>
+
+    Examples:
+      | position | expected_balance |
+      | 11       | 1360              |
+
+  # cards-18
+  Scenario Outline: a card that advances to a named property pays the owner standard rent
+    Given pawn "high hat" owns "Rue de Diekirch Arlon"
+    And the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
+    When pawn "dog" lands on "Kans / Chance"
+    Then pawn "dog" is at position <position>
+    And pawn "dog"'s account balance is $<expected_tenant_final_balance>
+    And pawn "high hat"'s account balance is $<expected_owner_final_balance>
+
+    Examples:
+      | position | expected_tenant_final_balance | expected_owner_final_balance |
+      | 11       | 1490                            | 1510                           |
