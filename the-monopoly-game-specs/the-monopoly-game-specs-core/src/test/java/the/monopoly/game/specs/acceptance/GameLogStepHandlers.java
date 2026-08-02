@@ -56,12 +56,16 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moves;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesAnywhere;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesFromPosition;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaid;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.purchaseDeclined;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.purchaseDeclinedForReserveLine;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.purchaseDeclinedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaidLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rolled;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.salaryCollected;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.soldAHouse;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStarted;
+import the.monopoly.game.strategies.Strategy;
 import static the.monopoly.game.specs.acceptance.StepHandler.step;
 import static the.monopoly.game.specs.acceptance.StepHandler.then;
 
@@ -117,6 +121,23 @@ final class GameLogStepHandlers {
                 + "\" for \\$" + VALUE + " because a street in the colour group is mortgaged$",
             (world, arguments) -> records(world, buildingRefused(
                 arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" declines to buy \"" + NAME
+                + "\" because it cannot afford the \\$" + VALUE + " price$",
+            (world, arguments) -> records(world, purchaseDeclined(
+                arguments.text(1), arguments.text(2), arguments.number(3),
+                Strategy.DeclineReason.CANNOT_AFFORD, 0))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" declines to buy \"" + NAME
+                + "\" because it would drop the balance below the \\$" + VALUE + " reserve$",
+            (world, arguments) -> records(world, purchaseDeclined(
+                arguments.text(1), arguments.text(2), 0,
+                Strategy.DeclineReason.CASH_RESERVE, arguments.number(3)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" starts a turn with \\$" + VALUE
+                + " and a \\$" + VALUE + " reserve$",
+            (world, arguments) -> records(world, turnStarted(
+                arguments.text(1), arguments.number(2), arguments.number(3)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" draws the chance card \"" + NAME + "\"$",
             (world, arguments) -> records(world, chanceCardDrawn(arguments.text(1), arguments.text(2)))),
@@ -346,6 +367,23 @@ final class GameLogStepHandlers {
             (world, arguments) -> logRecords(world, buildingRefused(
                 arguments.text(1), arguments.text(2), arguments.number(3)))),
 
+        then("^the game log records that pawn \"" + NAME + "\" declines to buy \"" + NAME
+                + "\" because it cannot afford the \\$" + VALUE + " price$",
+            (world, arguments) -> logRecords(world, purchaseDeclined(
+                arguments.text(1), arguments.text(2), arguments.number(3),
+                Strategy.DeclineReason.CANNOT_AFFORD, 0))),
+
+        then("^the game log records that pawn \"" + NAME + "\" declines to buy \"" + NAME
+                + "\" because it would drop the balance below the \\$" + VALUE + " reserve$",
+            (world, arguments) -> logRecords(world, purchaseDeclined(
+                arguments.text(1), arguments.text(2), 0,
+                Strategy.DeclineReason.CASH_RESERVE, arguments.number(3)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" starts a turn with \\$" + VALUE
+                + " and a \\$" + VALUE + " reserve$",
+            (world, arguments) -> logRecords(world, turnStarted(
+                arguments.text(1), arguments.number(2), arguments.number(3)))),
+
         then("^the game log records that pawn \"" + NAME + "\" draws the chance card \"" + NAME
                 + "\" before it records that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + "$",
             (world, arguments) -> logRecordsInOrder(world,
@@ -480,6 +518,21 @@ final class GameLogStepHandlers {
                 + "\" for \\$" + VALUE + " because a street in the colour group is mortgaged$",
             (world, arguments) -> says(world, buildingRefusedLine(
                 arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" declines to buy \"" + NAME
+                + "\" because it cannot afford the \\$" + VALUE + " price$",
+            (world, arguments) -> says(world, purchaseDeclinedLine(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" declines to buy \"" + NAME
+                + "\" because it would drop the balance below the \\$" + VALUE + " reserve$",
+            (world, arguments) -> says(world, purchaseDeclinedForReserveLine(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" starts a turn with \\$" + VALUE
+                + " and a \\$" + VALUE + " reserve$",
+            (world, arguments) -> says(world, arguments.text(1) + " starts a turn with $"
+                + arguments.number(2) + " and a $" + arguments.number(3) + " reserve")),
 
         then("^the game report says that pawn \"" + NAME + "\" draws the chance card \"" + NAME
                 + "\" before it says that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + "$",

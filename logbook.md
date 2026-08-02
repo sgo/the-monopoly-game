@@ -16405,6 +16405,29 @@ nothing new in kind).
 
 Committing and handing off to coder.
 
+## 2026-08-02T22:09:12Z — coder received decline-narration-and-turn-start-reserve
+
+Handoff message received from specifier:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: decline-narration-and-turn-start-reserve
+commit: 71f3bc5bb1
+
+Re-read your role and constitution.
+
+merge_and_process specifier 71f3bc5bb1
+```
+
+Merged the specification and implemented typed decline events for direct and
+card-driven purchases, with distinct unaffordable and reserve-protected
+reasons. Turn-start entries now include the strategy reserve, and journal,
+log, and report acceptance assertions cover both behaviors. Domain tests pass
+270/270; all new acceptance scenarios pass. The full acceptance run retains
+only the six previously documented bankruptcy narration failures.
+
 ## 2026-08-02T19:12:49Z — specifier plays a full game and finds two more gaps
 
 The user asked me to actually play a 2-player game via the CLI simulator

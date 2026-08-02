@@ -54,6 +54,15 @@ public interface Strategy {
     public boolean isAffordable() {
       return available.covers(land.price());
     }
+
+    public DeclineReason declineReason() {
+      return isAffordable() ? DeclineReason.CASH_RESERVE : DeclineReason.CANNOT_AFFORD;
+    }
+  }
+
+  enum DeclineReason {
+    CANNOT_AFFORD,
+    CASH_RESERVE
   }
 
   default Money cashReserve() {

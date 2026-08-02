@@ -34,7 +34,7 @@ class ReportTest {
         new Entry.Rolled(Pawn.dog.id(), 5),
         new Entry.Moved(Pawn.dog.id(), 0, 5)
     )).isEqualTo("""
-        dog starts a turn with $1500
+        dog starts a turn with $1500 and a $0 reserve
         dog rolls a total of 5
         dog moves from position 0 (Start) to 5 (Noord Station / Gare du Nord)""");
   }
@@ -42,7 +42,7 @@ class ReportTest {
   @Test
   void aReportTellsATurnStartWithThePawnsBalanceAtThatPoint() {
     assertThat(report(new Entry.TurnStarted(Pawn.dog.id(), new Money(1300))))
-        .isEqualTo("dog starts a turn with $1300");
+        .isEqualTo("dog starts a turn with $1300 and a $0 reserve");
   }
 
   @Test
@@ -56,6 +56,22 @@ class ReportTest {
     assertThat(report(new Entry.Bought(
         Pawn.dog.id(), Street.Type.DiestsestraatLeuven, new Money(60)
     ))).isEqualTo("dog buys Diestsestraat Leuven for $60");
+  }
+
+  @Test
+  void aReportExplainsWhyAPlayerDeclinedAnUnaffordablePurchase() {
+    assertThat(report(new Entry.PurchaseDeclined(
+        Pawn.dog.id(), Street.Type.RueDeDiekirchArlon, new Money(140),
+        the.monopoly.game.strategies.Strategy.DeclineReason.CANNOT_AFFORD, Money.ZERO
+    ))).isEqualTo("dog declines to buy Rue de Diekirch Arlon because it cannot afford the $140 price");
+  }
+
+  @Test
+  void aReportExplainsWhyAPlayerProtectedTheirReserve() {
+    assertThat(report(new Entry.PurchaseDeclined(
+        Pawn.dog.id(), Street.Type.DiestsestraatLeuven, new Money(60),
+        the.monopoly.game.strategies.Strategy.DeclineReason.CASH_RESERVE, new Money(96)
+    ))).isEqualTo("dog declines to buy Diestsestraat Leuven because it would drop the balance below the $96 reserve");
   }
 
   @Test

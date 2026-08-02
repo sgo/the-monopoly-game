@@ -304,8 +304,12 @@ public final class Cards implements Landings {
 
   private void buyIfAccepted(Player player, Ownable land) {
     Strategy strategy = strategies.forPlayer(player);
-    if (!strategy.accepts(new Strategy.Offer(land, player.account().balance().amount(), strategy.cashReserve(),
-        deeds.utilityMonopolyOpportunity(rules, land)))) return;
+    Strategy.Offer offer = new Strategy.Offer(land, player.account().balance().amount(), strategy.cashReserve(),
+        deeds.utilityMonopolyOpportunity(rules, land));
+    if (!strategy.accepts(offer)) {
+      events.declinedToBuy(player, land, land.price(), offer.declineReason(), offer.reserve());
+      return;
+    }
     deeds.sell(land, player, land.price());
     events.bought(player, land, land.price());
   }
@@ -523,6 +527,10 @@ public final class Cards implements Landings {
     }
 
     default void bought(Player buyer, Ownable land, Money price) {
+    }
+
+    default void declinedToBuy(Player player, Ownable land, Money price,
+                               Strategy.DeclineReason reason, Money reserve) {
     }
 
     default void paid(Player tenant, Player owner, Ownable land, Money rent) {

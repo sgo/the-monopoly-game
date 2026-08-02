@@ -6,6 +6,7 @@ import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -45,6 +46,24 @@ final class MonopolyStepHelpers {
 
   static Claim turnStarted(String pawnName, int balance) {
     return Claim.of(new Entry.TurnStarted(idOf(pawnName), money(balance)));
+  }
+
+  static Claim turnStarted(String pawnName, int balance, int reserve) {
+    return Claim.of(new Entry.TurnStarted(idOf(pawnName), money(balance), money(reserve)));
+  }
+
+  static Claim purchaseDeclined(String pawnName, String spaceName, int price,
+                                Strategy.DeclineReason reason, int reserve) {
+    if (reason == Strategy.DeclineReason.CASH_RESERVE) {
+      return new Claim(entry -> entry instanceof Entry.PurchaseDeclined it
+          && it.player().equals(idOf(pawnName))
+          && it.land().equals(SpaceNames.of(spaceName))
+          && it.reason() == reason
+          && it.reserve().equals(money(reserve)),
+          pawnName + " declines to buy " + spaceName + " for its reserve");
+    }
+    return Claim.of(new Entry.PurchaseDeclined(
+        idOf(pawnName), SpaceNames.of(spaceName), money(price), reason, money(reserve)));
   }
 
   /** Parses a scenario's "$1500" example value into its numeric amount. */
@@ -212,6 +231,16 @@ final class MonopolyStepHelpers {
   static String buildingRefusedLine(String pawnName, String spaceName, int price) {
     return pawnName + " is refused building a house on " + spaceName
         + " for $" + price + " because a street in the colour group is mortgaged";
+  }
+
+  static String purchaseDeclinedLine(String pawnName, String spaceName, int price) {
+    return pawnName + " declines to buy " + spaceName
+        + " because it cannot afford the $" + price + " price";
+  }
+
+  static String purchaseDeclinedForReserveLine(String pawnName, String spaceName, int reserve) {
+    return pawnName + " declines to buy " + spaceName
+        + " because it would drop the balance below the $" + reserve + " reserve";
   }
 
   static String chanceCardDrawnLine(String pawnName, String card) {
