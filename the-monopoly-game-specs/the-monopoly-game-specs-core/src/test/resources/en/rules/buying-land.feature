@@ -42,3 +42,72 @@ Feature: buying unowned land
     Examples:
       | property            | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
       | Diestsestraat Leuven | 59                    | 60           | 59                         | 1440                            |
+
+  # buying-land-3
+  Scenario Outline: an agreeable player keeping a reserve declines land that would dip below it
+    Given pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
+    When pawn "dog" lands on "<property>"
+    Then pawn "dog" does not own "<property>"
+    And pawn "high hat" owns "<property>"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+    And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
+
+    Examples:
+      | property         | dog_starting_balance | reserve | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
+      | Rue Grande Dinant | 150                  | 100     | 60           | 150                        | 1440                             |
+
+  # buying-land-4
+  Scenario Outline: an agreeable player keeping a reserve buys land that would leave at least the reserve behind
+    Given pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "<property>"
+    Then pawn "dog" owns "<property>"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | property         | dog_starting_balance | reserve | expected_dog_final_balance |
+      | Rue Grande Dinant | 200                  | 100     | 140                         |
+      | Rue Grande Dinant | 160                  | 100     | 100                         |
+
+  # buying-land-5
+  Scenario Outline: an agreeable player keeping a reserve still respects it for a utility nobody owns yet
+    Given pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Watermaatschappij" at auction
+    When pawn "dog" lands on "Watermaatschappij"
+    Then pawn "dog" does not own "Watermaatschappij"
+    And pawn "high hat" owns "Watermaatschappij"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+    And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
+
+    Examples:
+      | reserve | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
+      | 100     | 200                  | 150          | 200                        | 1350                             |
+
+  # buying-land-6
+  Scenario Outline: an agreeable player keeping a reserve buys a utility anyway to deny another player a monopoly on them
+    Given pawn "high hat" owns "Elektriciteitscentrale"
+    And pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Watermaatschappij"
+    Then pawn "dog" owns "Watermaatschappij"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | reserve | dog_starting_balance | expected_dog_final_balance |
+      | 100     | 200                  | 50                          |
+
+  # buying-land-7
+  Scenario Outline: an agreeable player keeping a reserve buys a utility anyway to complete their own monopoly on them
+    Given pawn "dog" owns "Elektriciteitscentrale"
+    And pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Watermaatschappij"
+    Then pawn "dog" owns "Watermaatschappij"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | reserve | dog_starting_balance | expected_dog_final_balance |
+      | 100     | 200                  | 50                          |
