@@ -1,6 +1,7 @@
 package the.monopoly.game.specs.acceptance;
 
 import the.monopoly.game.Game.Journal.Entry;
+import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
 
@@ -56,16 +57,15 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moves;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesAnywhere;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesFromPosition;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaid;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaidLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.purchaseDeclined;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.purchaseDeclinedForReserveLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.purchaseDeclinedLine;
-import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaidLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rolled;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.salaryCollected;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.soldAHouse;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStarted;
-import the.monopoly.game.strategies.Strategy;
 import static the.monopoly.game.specs.acceptance.StepHandler.step;
 import static the.monopoly.game.specs.acceptance.StepHandler.then;
 
