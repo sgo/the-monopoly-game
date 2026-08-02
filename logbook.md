@@ -14733,6 +14733,32 @@ after each structural change.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T16:05:28Z — architect received official-card-decks GOJF review
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: official-card-decks
+commit: d435cf057e
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d435cf057e
+```
+
+Action taken: merged the follow-up and reviewed the Get Out of Jail Free deck
+retention boundary. `Game` supplies its own `Deeds` to the default deck;
+`Cards` withholds that physical card while `Deeds` records it as retained and
+returns it only after release. The internal deck remains behind `Cards.Decks`.
+
+Full Maven tests pass (264 domain and 11 CLI); property tests pass 22/22.
+Differential mutation is current for `Game`, `Cards`, and `Deeds`; DRY reports
+only established adapter patterns. Soft `cards.feature` mutation has no
+changed scenario surface and refreshed its manifest timestamp.
+
 ## 2026-08-02T15:36:00Z — architect received official-card-decks handoff
 
 Handoff message received from refactorer:
