@@ -15388,3 +15388,30 @@ property-tests` 22/22 green, repeated 3 times. Full acceptance pipeline
 285/285 green, repeated 3 times.
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-02T15:35:28Z — refactorer sent official-card-decks handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: official-card-decks
+commit: f9885c5c88
+```
+
+Summary: found and fixed a real flakiness regression — `Game`'s convenience
+constructors now default to `Cards.Decks.official()` (shuffled, real
+effects), correct for `Simulator`'s real use, but `GameTest`'s fixed-roll/
+position/journal assertions never accounted for that and became
+nondeterministic. Added `game(...)` test helpers pinning `Cards.Decks.EMPTY`
+explicitly; stable across 8+ repeated runs. Flagged, without fixing, an
+ambiguous duplicate "nearest station" card in the 16-slot chance deck
+(15 unique effects exist) — internally consistent with the coder's own
+test, could be a faithful two-identical-cards echo of real Monopoly or a
+slip; a content question for architect/specifier, not mine to guess at.
+Also fixed broken import ordering and a stray fully-qualified reference.
+Full unit (263+11) and property (22) suites green across repeated runs;
+acceptance 285/285 across repeated runs. Handing verified state to
+architect for independent review.
