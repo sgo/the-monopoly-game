@@ -14733,6 +14733,44 @@ after each structural change.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T19:27:58Z — architect received nearest-station-rent-and-jail-narration
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: nearest-station-rent-and-jail-narration
+commit: 5ed8253ceb
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 5ed8253ceb
+```
+
+Merged and reviewed. The correction keeps nearest-station card mechanics in
+`Cards`: it obtains the owner from `Deeds`, counts that owner's stations, and
+uses the existing `Station.rentForOwning` schedule before charging double.
+The change continues through the existing owned/unowned landing-resolution
+boundary, so ordinary rent and purchase behavior remain encapsulated there.
+
+The jail narration remains appropriately event based: `Jail` declares the
+outcome, `Game.Journalling` records typed data, and `Report` supplies the
+wording. This covers a failed doubles attempt, a doubles exit, and a Get Out
+of Jail Free exit without leaking presentation concerns into rules.
+
+Verification on the merged state: full `mvn -B -Dmaven.repo.local=tmp/m2
+test` passed (266 domain and 11 CLI tests); explicit property tests passed
+(22/22); differential mutate4java baselines passed for Cards (53 sites),
+Jail (15), Report (2), and Game (30), with no changed surface requiring
+mutants. DRY found only established event-adapter and step-helper boilerplate.
+The complete acceptance pipeline passed, including cards (47), journal (25),
+logging (29), and report (25) scenarios. Soft Gherkin mutation killed 3/3
+new card mutations and 17/17 journal mutations; logging and report had no
+eligible new soft mutations and completed without errors. Updated mutation
+manifests are committed with this review.
+
 ## 2026-08-02T16:05:28Z — architect received official-card-decks GOJF review
 
 Handoff message received from refactorer:
