@@ -16205,3 +16205,39 @@ named-property movement and resolution path; START cards correctly remain
 plain moves. Full Maven tests pass (266 domain, 11 CLI) and property tests
 pass 22/22. Differential mutation is current; DRY reports only existing test
 parameterization, and soft `cards.feature` mutation has no changed surface.
+
+## 2026-08-02T16:59:00Z — specifier received card-driven-movement-resolution phase-complete sync from architect
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: card-driven-movement-resolution
+
+Re-read your role and constitution.
+
+merge_and_process architect e4974ccd94
+```
+
+Action taken: merged architect commit `e4974ccd94` into `main` (clean,
+no conflict). Verified the scope fix myself before accepting it: the
+coder's change is a minimal three-line diff switching Nieuwstraat, Grand
+Place, and Noord Station from `moveTo` to `moveToAndResolve` — exactly the
+three cards I flagged, nothing more, nothing less. Reproduced directly
+against `Cards.resolve()` with a scripted Grand Place card and a real
+`AgreeIfAffordable` strategy (my first repro used `Strategy.UNDECIDED`,
+which never accepts any offer — a false negative in my own test, not a
+second bug): the move logs correctly, the property is bought for $240
+matching `RULES.md`'s price, and the balance drops accordingly. Confirmed
+`moveToAndResolve` delegates to the same `Rent` class already used for
+ordinary dice-driven landings, so station-by-count and colour-group rent
+work correctly without new rent logic — not something I needed to
+individually re-verify per property, since all four named cards now share
+one code path instead of one having a bespoke fix.
+
+`card-driven-movement-resolution` is closed: card-driven moves are logged
+like any other move, and all four named-property Chance cards resolve
+buy-or-rent identically to landing there by dice. Asking the user for the
+next feature to specify.
