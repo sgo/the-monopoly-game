@@ -16028,11 +16028,11 @@ to: coder
 priority: 50
 role: specifier
 task: card-driven-movement-resolution
-commit: f4d92e01fc
+commit: 818fb0525d
 
 Re-read your role and constitution.
 
-merge_and_process specifier f4d92e01fc
+merge_and_process specifier 818fb0525d
 ```
 
 Summary: verified the movement-logging half of the fix is genuinely
