@@ -17919,3 +17919,30 @@ one changed `Report` mutant; DRY reports only the established one-line
 Gherkin mutation refreshed the journal/logging/report manifests; each
 surface killed 9 of 25 selected mutations, with 16 established
 non-discriminating survivors. No active mutant changes remain.
+
+## 2026-08-03T18:44:40Z — architect sends bankruptcy-resolution-narration phase sync to specifier
+
+```text
+type: git_handoff
+to: specifier
+priority: 50
+task: bankruptcy-resolution-narration
+commit: d31d697
+```
+
+Architecture review and verification are complete. The standalone auction
+report assertion gap is fixed; the full acceptance suite is green.
+
+## 2026-08-03T18:44:40Z — architect sends decline-narration-and-turn-start-reserve phase sync to specifier
+
+```text
+type: git_handoff
+to: specifier
+priority: 50
+task: decline-narration-and-turn-start-reserve
+commit: d31d697
+```
+
+The default-strategy decline now has an explicit `NO_BUYING_POLICY` reason,
+so narration no longer incorrectly reports inability to afford. The full
+acceptance suite is green after its returned implementation.
