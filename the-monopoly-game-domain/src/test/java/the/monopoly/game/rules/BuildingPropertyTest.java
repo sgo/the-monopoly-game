@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
-import the.monopoly.game.strategies.AgreeIfAffordable;
+import the.monopoly.game.strategies.Greedo;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +36,7 @@ class BuildingPropertyTest {
       group.forEach(deeds::arrangeHotel);
       Money before = owner.account().balance().amount();
 
-      Building building = new Building(deeds, rules, player -> new AgreeIfAffordable(), new Building.Events() {
+      Building building = new Building(deeds, rules, player -> new Greedo(), new Building.Events() {
       });
       building.develop(owner);
 

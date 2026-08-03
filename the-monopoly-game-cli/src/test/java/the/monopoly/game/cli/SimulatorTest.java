@@ -3,7 +3,7 @@ package the.monopoly.game.cli;
 import org.junit.jupiter.api.Test;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.rules.Rule;
-import the.monopoly.game.strategies.AgreeIfAffordable;
+import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
 
 import java.nio.charset.StandardCharsets;
@@ -46,17 +46,17 @@ class SimulatorTest {
   }
 
   @Test
-  void defaultsEveryPlayerToAgreeIfAffordable() {
+  void defaultsEveryPlayerToGreedo() {
     List<Player> players = Rule.Set.Type.official.create().players().select(2).toList();
     Strategy.OfPlayers strategies = Simulator.strategiesFor(2, List.of());
 
-    assertThat(strategies.forPlayer(players.get(0))).isInstanceOf(AgreeIfAffordable.class);
-    assertThat(strategies.forPlayer(players.get(1))).isInstanceOf(AgreeIfAffordable.class);
+    assertThat(strategies.forPlayer(players.get(0))).isInstanceOf(Greedo.class);
+    assertThat(strategies.forPlayer(players.get(1))).isInstanceOf(Greedo.class);
   }
 
   @Test
   void rejectsPartialStrategySelections() {
-    Simulator.Result result = Simulator.execute("2", "agree-if-affordable");
+    Simulator.Result result = Simulator.execute("2", "greedo");
 
     assertThat(result.exitCode()).isEqualTo(1);
     assertThat(result.output()).contains("Supply one strategy for each player.");

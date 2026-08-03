@@ -169,12 +169,12 @@ about the seams later phases will fill in.
 - Declining triggers an auction (open to all players including the decliner),
   won by the highest bidder, who pays the bank.
 - **Strategy hook:** buy-or-decline, and auction bids, are delegated to the
-  landing player's `Strategy`. "Agree if affordable" buys whenever it can
+  landing player's `Strategy`. "Greedo" buys whenever it can
   afford the price, and (when bidding) bids up to the most it can afford.
 - **Journal:** record purchases and auction outcomes (winner, price) so the
   report can narrate them.
 - Spec: buy on landing, decline → auction → sale to highest bidder, decliner
-  may still win the auction, plus "Agree if affordable" buys when it can
+  may still win the auction, plus "Greedo" buys when it can
   afford to and declines otherwise.
 
 ### BDD/TDD Process (mandatory):
@@ -250,13 +250,13 @@ about the seams later phases will fill in.
   reverse; hotel exchange back to 4 houses + cash when houses are scarce.
 - Bank shortage of houses/hotels: wait, or bank auctions among competing buyers.
 - **Strategy hook:** building (and selling back) is delegated to `Strategy`.
-  "Agree if affordable" builds evenly across a monopoly whenever it can afford
+  "Greedo" builds evenly across a monopoly whenever it can afford
   to, and only sells houses/hotels back when it needs the cash to cover a debt.
 - **Journal:** record house/hotel purchases and sales.
 - Spec: even-build enforcement (both directions), hotel construction/cost,
   monopoly-with-partial-build still allows double rent on unimproved streets in
   that group (ties back into Phase 5), bank shortage/auction behaviour, plus
-  "Agree if affordable" building opportunistically when funds allow.
+  "Greedo" building opportunistically when funds allow.
 
 ### BDD/TDD Process (mandatory):
 
@@ -280,7 +280,7 @@ about the seams later phases will fill in.
 - Selling mortgaged property to another player, who chooses to pay off
   immediately (value + 10%) or just pay the 10% and keep it mortgaged.
 - **Strategy hook:** mortgaging (to cover a shortfall) and lifting a mortgage
-  (once affordable) are delegated to `Strategy`. "Agree if affordable"
+  (once affordable) are delegated to `Strategy`. "Greedo"
   mortgages property only when it can't otherwise cover a debt, and lifts a
   mortgage as soon as it can afford the principal plus 10% interest.
 - **Journal:** record mortgage and lift-mortgage events, including interest
@@ -308,7 +308,7 @@ about the seams later phases will fill in.
   sold back to the bank first.
 - Houses/hotels themselves never trade between players, only back to the bank.
 - **Strategy hook:** accepting a proposed trade is delegated to `Strategy`.
-  "Agree if affordable" accepts any trade it can afford; no strategy proposes
+  "Greedo" accepts any trade it can afford; no strategy proposes
   trades yet, since strategies that initiate trades are future work per
   [`SIMULATOR.md`](SIMULATOR.md)'s out-of-scope list, so this phase's specs
   exercise the trade mechanic directly rather than through a strategy decision.
@@ -497,7 +497,7 @@ can run genuinely complete games rather than partial ones.
   player cash and positions, unowned land, unused houses and hotels, and full
   Chance and Community Chest decks.
 - Accepts the number of players (2–8, per [Setup](RULES.md#setup)) and, per
-  player, a strategy selection — defaulting to "Agree if affordable" when not
+  player, a strategy selection — defaulting to "Greedo" when not
   specified.
 - Accepts command-line arguments, runs one game via the domain module's `Game`,
   prints the rendered game report (Phase 3's renderer) to stdout, and writes
@@ -505,7 +505,7 @@ can run genuinely complete games rather than partial ones.
   in the system temporary directory (per [`SIMULATOR.md`](SIMULATOR.md)).
 - Provides a `-h`/`--h` flag explaining how to use the CLI.
 - Returns a nonzero exit code for invalid input.
-- Since "Agree if affordable" is the only strategy for now, strategy selection
+- Since "Greedo" is the only strategy for now, strategy selection
   is effectively a pass-through, but the plumbing (a strategy registry/lookup
   by name) should already accommodate more strategies being added later
   without changing the CLI's shape (per [`SIMULATOR.md`](SIMULATOR.md)'s
@@ -636,8 +636,8 @@ didn't already call for.
   deals without replacement, cycles when exhausted, and withholds a drawn
   Get-Out-of-Jail-Free card until `Deeds` reports it released — verified with
   `CardsDeckTest` rather than additional Gherkin, per the reasoning above.
-- **Cash reserve and utility-monopoly awareness for "Agree if affordable"**
-  (done) — refines Phase 4's "'Agree if affordable' buys whenever it can
+- **Cash reserve and utility-monopoly awareness for "Greedo"**
+  (done) — refines Phase 4's "'Greedo' buys whenever it can
   afford the price" deliverable rather than introducing a new strategy:
   buying now also declines a purchase that would leave the player below a
   configured cash reserve, and bidding at auction caps the bid the same way.

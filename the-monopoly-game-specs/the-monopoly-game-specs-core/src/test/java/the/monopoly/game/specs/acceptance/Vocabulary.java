@@ -2,7 +2,7 @@ package the.monopoly.game.specs.acceptance;
 
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Rule;
-import the.monopoly.game.strategies.AgreeIfAffordable;
+import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
 
 /**
@@ -29,7 +29,7 @@ final class Vocabulary {
   /** A strategy by the name the features call it, which is the name it is published under. */
   static Strategy strategy(String name) {
     return switch (name) {
-      case "Agree if affordable" -> new AgreeIfAffordable();
+      case "Greedo" -> new Greedo();
       default -> throw new AssertionError("Unknown strategy \"" + name + "\".");
     };
   }

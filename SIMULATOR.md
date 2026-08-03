@@ -9,7 +9,7 @@ everything that happened.
 - **Pluggable player strategy.** Computer players decide their actions through
   a strategy abstraction, so the decision logic for any player can be swapped
   independently of the game engine and of other players' strategies.
-- **One strategy for now: "Agree if affordable".** When a player lands on an
+- **One strategy for now: "Greedo".** When a player lands on an
   unowned, purchasable space (street, station, or utility) and can afford the
   listed price, it buys — unless buying would leave it below a configured cash
   reserve, in which case it declines instead (and the space goes to auction as
@@ -25,17 +25,17 @@ everything that happened.
   to read after the fact.
 - **CLI.** An entry point to start a simulated game, letting the user choose:
   - the number of players (2–8, per [Setup](RULES.md#setup));
-  - the strategy used for each player, defaulting to "Agree if affordable" if
+  - the strategy used for each player, defaulting to "Greedo" if
     not specified.
 
   The CLI runs the game and prints the game report.
 
 ## Out of scope for now (future work)
 
-- Additional standalone strategies beyond "Agree if affordable" (e.g. trading,
+- Additional standalone strategies beyond "Greedo" (e.g. trading,
   strategic building) — the strategy abstraction should allow adding these
   later without changing the CLI, journal, or engine. Selective buying is no
-  longer entirely future work: "Agree if affordable" itself now carries a cash
+  longer entirely future work: "Greedo" itself now carries a cash
   reserve and utility-monopoly awareness (see Key Concepts) rather than
   becoming a separate strategy; further selectivity (e.g. colour-group
   awareness for streets) remains unspecified.
@@ -55,7 +55,7 @@ reshaping the ones already there.
 
 The supported behavioral strategies are...
 
-#### Agree if affordable
+#### Greedo
 
 This strategy will pay to buy, win an auction, build, take out a mortgage if 
 funds drop too low, trade, jail exit choice, ...
@@ -84,7 +84,7 @@ The game result report and journal should have a human-readable format.
   arguments, print the report to stdout, include a `-h`/`--h` flag explaining
   how to use it, and return a nonzero exit code for invalid input.
 - prompts for or accepts the number of players and a strategy per player
-  (defaulting to "Agree if affordable");
+  (defaulting to "Greedo");
 - runs one game
 - prints the rendered game report to console
 - starts from the normal standard game configuration

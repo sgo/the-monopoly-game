@@ -50,7 +50,7 @@ Feature: game report
 
   # report-4
   Scenario Outline: the report narrates an unowned-land purchase after the landing movement
-    And pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" follows the "Greedo" strategy
     When pawn "dog" lands on "<property>"
     Then the game report says that pawn "dog" moves before it says that pawn "dog" buys "<property>" for $<purchase_price>
 
@@ -73,7 +73,7 @@ Feature: game report
   # report-6
   Scenario Outline: the report narrates rent paid after the landing movement
     And pawn "high hat" owns "Diestsestraat Leuven"
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" follows the "Greedo" strategy
     When pawn "dog" lands on "Diestsestraat Leuven"
     Then the game report says that pawn "dog" moves before it says that pawn "dog" pays pawn "high hat" $<rent> rent for "Diestsestraat Leuven"
 
@@ -86,7 +86,7 @@ Feature: game report
     And pawn "dog" starts at position 7
     And pawn "dog" will roll 1 and 4 for their turn
     And pawn "high hat" owns "Elektriciteitscentrale"
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" follows the "Greedo" strategy
     When we play the game
     Then the game report says that pawn "dog" moves before it says that pawn "dog" pays pawn "high hat" $<rent> rent for "Elektriciteitscentrale"
 
@@ -98,7 +98,7 @@ Feature: game report
   Scenario Outline: the report narrates a house built during a player's turn
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" owns "Diestsestraat Leuven"
-    And pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" follows the "Greedo" strategy
     And pawn "dog" has $100 to spend
     When we play the game
     Then the game report says that pawn "dog" builds a house on "Rue Grande Dinant" for $<cost>
@@ -167,7 +167,7 @@ Feature: game report
     Given pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" owns "Diestsestraat Leuven"
     And the land "Rue Grande Dinant" is mortgaged
-    And pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" follows the "Greedo" strategy
     And pawn "dog" will build a house on "Diestsestraat Leuven"
     And pawn "dog" has $100 to spend
     When we play the game
@@ -361,7 +361,7 @@ Feature: game report
 
   # report-31
   Scenario Outline: the report narrates why a player declines to buy land they cannot afford
-    Given pawn "dog" follows the "Agree if affordable" strategy
+    Given pawn "dog" follows the "Greedo" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
     When pawn "dog" lands on "<property>"
@@ -373,7 +373,7 @@ Feature: game report
 
   # report-32
   Scenario Outline: the report narrates why a player keeping a reserve declines a purchase that would dip below it
-    Given pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    Given pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
     When pawn "dog" lands on "<property>"
@@ -385,7 +385,7 @@ Feature: game report
 
   # report-33
   Scenario Outline: the report narrates a player's reserve alongside their balance at the start of a turn
-    Given pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    Given pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "dog" will roll 2 and 3 for their turn
     When we play the game
@@ -399,7 +399,7 @@ Feature: game report
   # report-34
   Scenario Outline: the report narrates why a player declines to buy a card-driven property they cannot afford
     Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
-    And pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" follows the "Greedo" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
     When pawn "dog" lands on "Kans / Chance"
     Then the game report says that pawn "dog" declines to buy "Rue de Diekirch Arlon" because it cannot afford the $<price> price
@@ -411,7 +411,7 @@ Feature: game report
   # report-35
   Scenario Outline: the report narrates why a player keeping a reserve declines a card-driven purchase that would dip below it
     Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
-    And pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    And pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     When pawn "dog" lands on "Kans / Chance"
     Then the game report says that pawn "dog" declines to buy "Rue de Diekirch Arlon" because it would drop the balance below the $<reserve> reserve
@@ -450,7 +450,7 @@ Feature: game report
   Scenario Outline: the report narrates a creditor paying interest to keep an inherited mortgage in place
     Given pawn "high hat" owns "Diestsestraat Leuven"
     And the street "Diestsestraat Leuven" has a hotel built
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" follows the "Greedo" strategy
     And pawn "high hat" has $<owner_starting_balance> to spend
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting_balance> to spend
@@ -465,7 +465,7 @@ Feature: game report
   Scenario Outline: the report narrates a creditor immediately lifting an inherited mortgage
     Given pawn "high hat" owns "Diestsestraat Leuven"
     And the street "Diestsestraat Leuven" has a hotel built
-    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" follows the "Greedo" strategy
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting_balance> to spend
     When pawn "dog" lands on "Diestsestraat Leuven"
