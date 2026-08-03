@@ -101,6 +101,10 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.AuctionWon(idOf(pawnName), SpaceNames.of(spaceName), money(price)));
   }
 
+  static String auctionWonLine(String pawnName, String spaceName, int price) {
+    return pawnName + " wins the auction for " + spaceName + " at $" + price;
+  }
+
   static Claim rentPaid(String tenant, String owner, String spaceName, int rent) {
     return Claim.of(new Entry.RentPaid(idOf(tenant), idOf(owner), SpaceNames.of(spaceName), money(rent)));
   }

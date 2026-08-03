@@ -17492,6 +17492,38 @@ property-tests` 22/22 green.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T22:26:13Z — refactorer sent decline-narration-and-turn-start-reserve handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: decline-narration-and-turn-start-reserve
+commit: c345a973bb
+```
+
+Summary: merged and reviewed the coder's decline-narration and
+turn-start-reserve work. `PurchaseDeclined` now fires from both
+`LandSale.resolve` and `Cards.buyIfAccepted` with a `DeclineReason`
+derived cleanly from the existing `isAffordable()` check; `TurnStarted`
+now carries the strategy's reserve, backward-compatibly. Fixed two
+import-ordering slips in `GameLogStepHandlers.java`; no other structural
+issues. `crap4java`/`dry4java` clean (aside from the pre-existing
+exemptions/precedent). Flagged, but did not fix, a narration-accuracy
+edge case: `Offer.declineReason()` would misreport `UNDECIDED`'s
+declines as reserve-protected, since it infers the reason purely from
+affordability — not reachable by any current specified scenario
+(`UNDECIDED` is a null-strategy stub, not a played strategy), and fixing
+it would mean deciding new behavior (a third decline reason?) outside
+this role's mandate. Full unit and property suites green. Acceptance:
+regenerated pipeline (not `mvn test`, which silently undercounted and
+missed the new scenarios entirely) shows all new scenarios passing;
+only the six already-known bankruptcy-narration failures remain,
+repeated twice for stability. Handing verified state to architect for
+independent review.
+
 ## 2026-08-03T01:49:04Z — specifier receives architect phase-complete sync (decline-narration-and-turn-start-reserve)
 
 Handoff received:
@@ -17792,3 +17824,68 @@ commit: dd38353b55
 
 Implement the specified no-buying-policy decline narration. The current
 offer-derived reason must not label `Strategy.UNDECIDED` as a reserve decline.
+## 2026-08-03T18:37:51Z — refactorer received bankruptcy-resolution-narration
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: bankruptcy-resolution-narration
+commit: b8ba967e33
+```
+
+Merged `b8ba967e33` (merge commit `9d65bc3`), one append-only `logbook.md`
+conflict resolved cleanly by concatenation (my prior sent-handoff entry at
+2026-08-02T22:26:13Z chronologically precedes the incoming branch's earliest
+entry at 2026-08-03T01:49:04Z).
+
+Reviewed the coder's `Bankruptcy.java` wiring: forced house sales/mortgages,
+bank-forced auction wins, creditor inheritance, and inherited-mortgage
+interest/lift settlement now fire events, each purely capturing an
+already-returned `Money`/`Deeds.MortgageCost` value that was previously
+discarded — no `Deeds.java` changes needed, no new domain logic. Clean,
+minimal, exactly matches the task's scope (closes the six previously-known,
+already-flagged bankruptcy-narration gaps).
+
+Found and fixed a real gap during verification: `report.feature`'s
+`report-36` (bank-forced auction win) uses standalone "X wins the auction for
+Y at $Z" wording, since the winning bidder never moves in this scenario
+(only the debtor does) — unlike every prior report auction scenario, which
+only ever needed the compound "moves before it says ... wins" wording
+because the winner had just landed on the auctioned space. The coder added
+the scenario but never added a standalone report step handler for it (only
+journal/log had one); `Report.java` already renders the line correctly, so
+this was pure missing test-glue, not new behavior. Added the missing
+`then(...)` handler and an `auctionWonLine` helper in
+`GameLogStepHandlers.java`/`MonopolyStepHelpers.java`, mirroring the existing
+journal/log pattern exactly. Also fixed two import-ordering slips
+(`inherited`/`inheritedLine` placed before `idOf` instead of after;
+`mortgageKept`/`mortgageKeptLine` placed after `mortgageLifted`/
+`mortgageLiftedLine` instead of before).
+
+`crap4java` on `Bankruptcy.java`/`Game.java`/`Report.java`: clean except the
+pre-approved `Report.line` sealed-switch exemption (2026-07-28). `dry4java`:
+only the already-accepted one-line event-delegation duplicates in `Game.java`
+(each `Journalling` override is a single `journal.log(new Entry(...))` line;
+precedent from earlier cycles). `mutate4java --scan`: 25/30/3 mutation sites
+for the three files, all well under the 100-site split threshold; manifests
+refreshed via `--update-manifest`.
+
+Ran `./acceptance/run-acceptance.sh` (not `mvn test`, which reuses stale
+generated sources) three times for stability: 355 tests, 3 failures every
+time — exactly `journal-40`/`logging-40`/`report-40` ("declines to buy" with
+no reason), which is the already-known, already-flagged gap belonging to the
+separate, not-yet-implemented third `Strategy.DeclineReason` value from the
+`decline-narration-and-turn-start-reserve` priority-00 loop (per the
+specifier's 2026-08-03T05:23:53Z logbook entry) — out of scope for this task,
+unrelated to bankruptcy-resolution-narration, and not something to fix here
+since it requires a new-behavior design decision already routed to the
+coder. One run additionally showed the previously-documented intermittent
+`SpecsCliEnCliAcceptanceTest` timing flake, which did not reproduce on
+either repeat run. All six previously-known bankruptcy-narration gaps are
+now resolved — no longer present in any run. `mvn test` (domain/CLI) and
+`mvn test -P property-tests` both green.
+
+Committed the fix as `2caf17b`. Handing off to architect.
