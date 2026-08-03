@@ -17766,3 +17766,33 @@ now resolved — no longer present in any run. `mvn test` (domain/CLI) and
 `mvn test -P property-tests` both green.
 
 Committed the fix as `2caf17b`. Handing off to architect.
+
+## 2026-08-03T18:38:23Z — refactorer sent bankruptcy-resolution-narration handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: bankruptcy-resolution-narration
+commit: 18f8b92134
+```
+
+Summary: merged and reviewed the coder's bankruptcy-resolution event wiring
+in `Bankruptcy.java` — clean, minimal, purely captures previously-discarded
+return values into events; closes all six previously-known bankruptcy
+narration gaps. Found and fixed one real defect: `report.feature`'s
+`report-36` needed a standalone "wins the auction" report step handler
+(only journal/log had one; the winner never moves in this scenario, so the
+existing compound "moves before it says ... wins" wording doesn't apply) —
+added the missing handler and helper, mirroring the existing pattern
+exactly; `Report.java` already rendered the line correctly, so this was
+test-glue, not new behavior. Also fixed two import-ordering slips.
+`crap4java`/`dry4java`/`mutate4java` all clean (aside from pre-existing
+accepted exemptions/precedent). Full unit and property suites green.
+Acceptance (regenerated pipeline, not `mvn test`): 355 tests, 3 failures
+every run — exactly the already-known, already-flagged `journal-40`/
+`logging-40`/`report-40` gap for the separate, not-yet-implemented third
+`Strategy.DeclineReason` value, out of scope for this task. Handing verified
+state to architect for independent review.
