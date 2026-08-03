@@ -18196,3 +18196,34 @@ is now resolved; nothing outstanding. `mvn test` (domain/CLI) and
 
 Committed the manifest refresh and cleanup as `03184af`. Handing off to
 architect.
+
+## 2026-08-03T19:37:40Z — architect received rename-agree-if-affordable-to-greedo refactorer handoff
+
+```text
+type: git_handoff
+to: architect
+priority: 50
+task: rename-agree-if-affordable-to-greedo
+commit: 249096a2d1
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 249096a2d1
+```
+
+Merged as `ec3c49e5de`, preserving both sides of the append-only audit log.
+Reviewed the global rename: the domain strategy, CLI registry, acceptance
+vocabulary, test helpers, documentation, and feature references consistently
+use `Greedo`; no core module depends on CLI or acceptance infrastructure.
+The deliberate removal of the old public spelling is appropriate for the
+requested rename.
+
+Verification: regenerated acceptance suite green (355 tests). Differential
+mutation found no changed Greedo surface. The mutation tool's CLI default
+baseline is stale after the cross-module rename; its reactor-aware baseline
+is green (270 domain plus 11 CLI tests). DRY found no candidates. Soft
+Gherkin mutation refreshed the touched bankruptcy, building, buying-land,
+cards, jail, and journal manifests; the focused bankruptcy/building/cards/
+jail rename scenarios killed all selected mutants. Broader existing
+buying-land and journal narration surfaces retain non-discriminating
+survivors.
