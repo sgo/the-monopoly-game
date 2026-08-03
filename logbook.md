@@ -17606,6 +17606,31 @@ No parse errors, no unexpected failures elsewhere.
 Added a `bankruptcy-resolution-narration` (specified, pending implementation)
 bullet to `tasks.md`'s Post-plan refinements section.
 
+## 2026-08-03T18:26:31Z — coder received bankruptcy-resolution-narration
+
+Handoff message received from specifier:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: bankruptcy-resolution-narration
+commit: 5a102d612f
+
+Re-read your role and constitution.
+
+merge_and_process specifier 5a102d612f
+```
+
+Merged the specification and implemented bankruptcy-resolution event wiring:
+forced house sales and mortgages, bank auction wins, creditor inheritance,
+inherited-mortgage interest payments, and inherited-mortgage lifts now reach
+the journal/report/log. Domain tests pass 270/270, and all twelve new
+bankruptcy narration scenarios pass. The acceptance run also shows one
+pre-existing unsupported-step failure from the separate decline-narration
+priority-00 loop and one intermittent CLI timing failure; they are unrelated
+to this task.
+
 Reporting to the user for handoff approval before committing.
 
 ## 2026-08-03T05:23:53Z — specifier corrects course: 000092 was a defect-flagging priority-00 follow-up, not a routine phase-complete sync

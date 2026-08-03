@@ -31,6 +31,8 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.communityCh
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.dollars;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.houseBuilt;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.houseSold;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.inherited;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.inheritedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.idOf;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeRoll;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeWon;
@@ -52,6 +54,8 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgaged;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgagedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageLifted;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageLiftedLine;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageKept;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageKeptLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moved;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moves;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesAnywhere;
@@ -105,6 +109,16 @@ final class GameLogStepHandlers {
                 + "\" for \\$" + VALUE + " including \\$" + VALUE + " interest$",
             (world, arguments) -> records(world, mortgageLifted(
                 arguments.text(1), arguments.text(2), arguments.number(3), arguments.number(4)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" inherits \"" + NAME
+                + "\" from pawn \"" + NAME + "\"$",
+            (world, arguments) -> records(world, inherited(
+                arguments.text(1), arguments.text(2), arguments.text(3)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" pays \\$" + VALUE
+                + " interest to keep the mortgage on \"" + NAME + "\"$",
+            (world, arguments) -> records(world, mortgageKept(
+                arguments.text(1), arguments.text(3), arguments.number(2)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" sells \"" + NAME + "\" to pawn \"" + NAME
                 + "\" for \\$" + VALUE + "$",
@@ -351,6 +365,16 @@ final class GameLogStepHandlers {
             (world, arguments) -> logRecords(world, mortgageLifted(
                 arguments.text(1), arguments.text(2), arguments.number(3), arguments.number(4)))),
 
+        then("^the game log records that pawn \"" + NAME + "\" inherits \"" + NAME
+                + "\" from pawn \"" + NAME + "\"$",
+            (world, arguments) -> logRecords(world, inherited(
+                arguments.text(1), arguments.text(2), arguments.text(3)))),
+
+        then("^the game log records that pawn \"" + NAME + "\" pays \\$" + VALUE
+                + " interest to keep the mortgage on \"" + NAME + "\"$",
+            (world, arguments) -> logRecords(world, mortgageKept(
+                arguments.text(1), arguments.text(3), arguments.number(2)))),
+
         then("^the game log records that pawn \"" + NAME + "\" sells \"" + NAME + "\" to pawn \"" + NAME
                 + "\" for \\$" + VALUE + "$",
             (world, arguments) -> logRecords(world, landSold(
@@ -502,6 +526,16 @@ final class GameLogStepHandlers {
                 + "\" for \\$" + VALUE + " including \\$" + VALUE + " interest$",
             (world, arguments) -> says(world, mortgageLiftedLine(
                 arguments.text(1), arguments.text(2), arguments.number(3), arguments.number(4)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" inherits \"" + NAME
+                + "\" from pawn \"" + NAME + "\"$",
+            (world, arguments) -> says(world, inheritedLine(
+                arguments.text(1), arguments.text(2), arguments.text(3)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" pays \\$" + VALUE
+                + " interest to keep the mortgage on \"" + NAME + "\"$",
+            (world, arguments) -> says(world, mortgageKeptLine(
+                arguments.text(1), arguments.text(3), arguments.number(2)))),
 
         then("^the game report says that pawn \"" + NAME + "\" sells \"" + NAME + "\" to pawn \"" + NAME
                 + "\" for \\$" + VALUE + "$",
