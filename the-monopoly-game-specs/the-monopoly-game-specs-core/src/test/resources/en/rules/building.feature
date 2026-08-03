@@ -18,7 +18,7 @@ Feature: houses and hotels
   Scenario Outline: an agreeable player with a full colour group builds evenly across it when affordable
     Given pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" owns "Diestsestraat Leuven"
-    And pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" follows the "Greedo" strategy
     And pawn "dog" has $100 to spend
     When we play the game
     Then the street "Rue Grande Dinant" has <houses> house(s) built
@@ -35,7 +35,7 @@ Feature: houses and hotels
     And pawn "dog" owns "Diestsestraat Leuven"
     And the street "Rue Grande Dinant" has 4 house(s) built
     And the street "Diestsestraat Leuven" has 4 house(s) built
-    And pawn "dog" follows the "Agree if affordable" strategy
+    And pawn "dog" follows the "Greedo" strategy
     And pawn "dog" has $700 to spend
     When we play the game
     Then the street "Rue Grande Dinant" has a hotel built

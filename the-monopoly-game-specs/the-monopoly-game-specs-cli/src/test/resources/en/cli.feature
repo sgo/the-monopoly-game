@@ -23,7 +23,7 @@ Feature: Monopoly command line interface
   # cli-2
   Scenario Outline: the CLI runs a real game with selected player strategies until it is stopped
     Given the simulator is configured for <players> players
-    And every player selects the "Agree if affordable" strategy
+    And every player selects the "Greedo" strategy
     When I start the simulator
     Then the game log records that the game starts
     And the game log records at least <minimum rolls> rolls

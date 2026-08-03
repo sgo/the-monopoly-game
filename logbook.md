@@ -18000,3 +18000,54 @@ pass; no pre-existing failures remain at all.
 
 Both tasks are now fully closed end-to-end. Per specifier handoff rules,
 asking the user for the next feature to add.
+
+## 2026-08-03T19:00:52Z — specifier renames "Agree if affordable" to "Greedo"
+
+User asked to rename the "Agree if affordable" strategy to "Greedo" for
+easier reference, and to reflect the rename in `SIMULATOR.md`/`tasks.md`.
+
+Surveyed every occurrence of the literal string "Agree if affordable" across
+the repo (`grep -rl`, excluding `target/`): 9 `.feature` files
+(`buying-land`, `bankruptcy`, `logging`, `journal`, `jail`, `report`, `cards`,
+`building` in specs-core, plus `cli.feature` in specs-cli), `SIMULATOR.md`,
+`tasks.md`, plus a dozen Java files (production, tests, step handlers, CLI)
+that are coder/refactorer's to update, not specifier's. Left `logbook.md`
+alone — append-only historical record, not a live spec.
+
+Deliberately scoped the rename to the literal quoted strategy identifier
+only, not the informal adjective "agreeable" used in ~11 scenario titles
+("an agreeable player buys..."). The user asked to rename the strategy's
+reference name, not reword every scenario description that alludes to the
+underlying behavior; "agreeable" remains an accurate description of the
+strategy's behavior regardless of its short name, and scenario titles are
+themselves meant to stay stable identifiers.
+
+Replaced `Agree if affordable` → `Greedo` via `sed` across the 11 files (63
+occurrences total, all inside existing double-quoted or single-quoted
+strategy-name references — no prose restructuring needed since the
+substitution is a straight word-for-word swap). Confirmed 0 remaining
+occurrences and correct resulting text in each file, including
+`SIMULATOR.md`'s `#### Greedo` heading (was `#### Agree if affordable`,
+no quotes) and `tasks.md`'s one nested-quote case (`"'Greedo' buys
+whenever it can afford the price"`).
+
+Validated: `bb gherkin-parser` clean on all 9 changed `.feature` files;
+`bb gherkin-ir-dry-checker` `exact-dupes: 0` on all `specs-core` files.
+
+Ran `./acceptance/run-acceptance.sh` to confirm the rename fails for the
+right reason pre-implementation: 355 tests, 57 failures, every one
+"Unknown strategy \"Greedo\"" — the step glue and the CLI's strategy
+registry (`Simulator.java`: `"agree-if-affordable", AgreeIfAffordable::new`)
+still only recognize the old name. Far more failures than a typical task
+here, but expected: this is a global rename touching every scenario that
+declares the strategy, not a new behavior.
+
+Not mandating how the coder implements the rename (matching the
+"without prescribing unnecessary implementation details" principle) —
+noting in the handoff that the CLI registry key, the step-handler's
+strategy-name lookup, and optionally the `AgreeIfAffordable` class name
+itself all need to recognize "Greedo" one way or another, but leaving the
+actual mechanism (rename the class vs. keep it and just remap the lookup
+string) to the coder.
+
+Reporting to the user for handoff approval before committing.

@@ -15,7 +15,7 @@ Feature: buying unowned land
 
   # buying-land-1
   Scenario Outline: an agreeable player buys affordable unowned land at its listed price
-    Given pawn "dog" follows the "Agree if affordable" strategy
+    Given pawn "dog" follows the "Greedo" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
     When pawn "dog" lands on "<property>"
     Then pawn "dog" owns "<property>"
@@ -29,7 +29,7 @@ Feature: buying unowned land
 
   # buying-land-2
   Scenario Outline: an agreeable player declines unowned land they cannot afford
-    Given pawn "dog" follows the "Agree if affordable" strategy
+    Given pawn "dog" follows the "Greedo" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
     When pawn "dog" lands on "<property>"
@@ -44,7 +44,7 @@ Feature: buying unowned land
 
   # buying-land-3
   Scenario Outline: an agreeable player keeping a reserve declines land that would dip below it
-    Given pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    Given pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
     When pawn "dog" lands on "<property>"
@@ -59,7 +59,7 @@ Feature: buying unowned land
 
   # buying-land-4
   Scenario Outline: an agreeable player keeping a reserve buys land that would leave at least the reserve behind
-    Given pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    Given pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
     When pawn "dog" lands on "<property>"
@@ -73,7 +73,7 @@ Feature: buying unowned land
 
   # buying-land-5
   Scenario Outline: an agreeable player keeping a reserve still respects it for a utility nobody owns yet
-    Given pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    Given pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "Watermaatschappij" at auction
     When pawn "dog" lands on "Watermaatschappij"
@@ -89,7 +89,7 @@ Feature: buying unowned land
   # buying-land-6
   Scenario Outline: an agreeable player keeping a reserve buys a utility anyway to deny another player a monopoly on them
     Given pawn "high hat" owns "Elektriciteitscentrale"
-    And pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    And pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     When pawn "dog" lands on "Watermaatschappij"
     Then pawn "dog" owns "Watermaatschappij"
@@ -102,7 +102,7 @@ Feature: buying unowned land
   # buying-land-7
   Scenario Outline: an agreeable player keeping a reserve buys a utility anyway to complete their own monopoly on them
     Given pawn "dog" owns "Elektriciteitscentrale"
-    And pawn "dog" follows the "Agree if affordable" strategy, keeping a $<reserve> reserve
+    And pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     When pawn "dog" lands on "Watermaatschappij"
     Then pawn "dog" owns "Watermaatschappij"
