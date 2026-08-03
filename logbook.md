@@ -17474,3 +17474,50 @@ noted previously did not reproduce this cycle). `mvn test -P
 property-tests` 22/22 green.
 
 Committing and handing the verified state to the architect.
+
+## 2026-08-03T01:49:04Z — specifier receives architect phase-complete sync (decline-narration-and-turn-start-reserve)
+
+Handoff received:
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: 7fb4d4b576
+```
+Body: "Re-read your role and constitution." / "merge_and_process architect 7fb4d4b576"
+
+Re-read `swarmforge/constitution.prompt` and all three articles
+(`engineering.prompt`, `project.prompt`, `workflow.prompt`) plus
+`swarmforge/roles/specifier.prompt` as instructed. This is the
+architect's phase-complete sync for `decline-narration-and-turn-start-
+reserve`, closing out the coder → refactorer → architect loop (including
+the priority-00 architect review of the decline-narration design) that
+followed my `71f3bc5bb1` handoff.
+
+Fast-forward merged `7fb4d4b576` (`main`, was already fast-forwardable
+from `71f3bc5bb1`) — brings in the coder's implementation
+(`Cards.declinedToBuy`/`Strategy.DeclineReason`/`Journal.Entry
+.PurchaseDeclined`/`TurnStarted.reserve`), the refactorer's import-
+ordering fix and manifest refresh, and the architect's review, plus
+their logbook entries. Diff outside `logbook.md` touches `Game.java`,
+`Report.java`, `Cards.java`, `LandSale.java`, `Strategy.java`,
+`ReportTest.java`, `GameLogStepHandlers.java`,
+`MonopolyStepHelpers.java` — matches the spec's scope, no surprises.
+
+Verification: ran `./acceptance/run-acceptance.sh` (not bare `mvn
+test`, per the refactorer's noted pitfall that `mvn test` alone can
+silently reuse stale generated acceptance sources). Result: 340 tests,
+6 failures — all six are the pre-existing, already-flagged bankruptcy
+forced-mortgage/forced-house-sale narration gaps (`journal`/`logging`/
+`report` scenarios 26/27), explicitly out of scope for this task and
+unrelated to the merge. No regressions.
+
+The refactorer's note flagged an open question for `Strategy
+.UNDECIDED`/`NOBODY_DECIDES` (a never-affordable-but-still-CASH_RESERVE-
+labelled decline reason for a strategy with no real reserve concept) as
+a design call for architect/specifier, not a defect in the shipped
+scope — noting it here for future reference but not acting on it
+without a concrete scenario motivating it.
+
+No further specifier-owned changes needed for this task; it is closed.
