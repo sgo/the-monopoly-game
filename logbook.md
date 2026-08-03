@@ -14733,6 +14733,36 @@ after each structural change.
 
 Committing and handing the verified state to the architect.
 
+## 2026-08-02T22:26:10Z — architect received decline-narration-and-turn-start-reserve
+
+Handoff message received from refactorer:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: decline-narration-and-turn-start-reserve
+commit: c345a973bb
+
+Re-read your role and constitution.
+
+merge_and_process refactorer c345a973bb
+```
+
+Merged and reviewed. The new `PurchaseDeclined` journal entry correctly keeps
+reason data separate from report wording, and both direct landings and
+card-driven landings publish the same domain event. Turn-start journal entries
+now carry the strategy reserve as data, keeping logging and reporting outside
+the game rules.
+
+Found an unmodelled decline-reason case: `Offer.declineReason()` derives the
+reason only from affordability. `Strategy.UNDECIDED` declines every offer, so
+an affordable offer is narrated as a cash-reserve decline despite the strategy
+having no reserve policy. More generally, the offer cannot know why a strategy
+declined. The existing acceptance criteria specify only cannot-afford and
+cash-reserve wording, so a third reason or an unreasoned decline needs a
+specifier decision before the implementation can be architecturally complete.
+
 ## 2026-08-02T19:27:58Z — architect received nearest-station-rent-and-jail-narration
 
 Handoff message received from refactorer:
