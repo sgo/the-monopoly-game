@@ -17627,3 +17627,32 @@ Left the actual mechanism (where `declineReason` moves to live — `Strategy` ow
 Validated: `bb gherkin-parser` clean on all three files; `bb gherkin-ir-dry-checker` `exact-dupes: 0` on all three. Ran `./acceptance/run-acceptance.sh`: 355 tests, 21 failures = the same 6 pre-existing (unrelated) + 12 from the not-yet-approved `bankruptcy-resolution-narration` work sitting uncommitted in the working tree + exactly 3 new "Unsupported step" failures for `journal-40`/`logging-40`/`report-40` — no parse errors, no unexpected failures.
 
 This fix belongs to `decline-narration-and-turn-start-reserve` and, once approved, must be committed separately from the unrelated `bankruptcy-resolution-narration` work and handed back to **architect** (same task name, per the priority-00 loop-closing rule), not to coder. `bankruptcy-resolution-narration` remains a separate, brand-new specifier-originated task awaiting its own handoff approval to coder. Reporting both to the user for separate approval before committing either.
+
+## 2026-08-03T18:23:47Z — specifier commits both pieces separately and sends two handoffs
+
+User approved committing both pieces separately and sending both handoffs.
+
+Split the working tree (both pieces had been drafted together) into two clean commits by temporarily removing each piece's content, verifying the reduced state, committing, then restoring the other piece — rather than committing everything as one lump and sorting it out later:
+
+- `b5ad13f` "Specify bankruptcy resolution narration" — `journal-36` through `39` (and `logging`/`report` equivalents) plus the `tasks.md` bullet. Verified in isolation: `bb gherkin-parser` clean, `bb gherkin-ir-dry-checker` `exact-dupes: 0`, `./acceptance/run-acceptance.sh` 352 tests/18 failures (the 6 pre-existing plus exactly these 12, nothing else).
+- `5a102d6` "Specify a third decline reason for strategies with no buying policy" — `journal-40`/`logging-40`/`report-40`, on top of `b5ad13f`. Verified: parser clean, dry-checker `exact-dupes: 0`, acceptance 355 tests/21 failures (18 plus exactly these 3 new "Unsupported step" failures).
+
+Sent two handoffs from the same tip commit (`5a102d612f`), since this pipeline has always synced receivers to "at least this commit" rather than an isolated per-task diff — every architect phase-complete sync this session included whatever else had already accumulated, so there's no isolation precedent to break here; `git_handoff`'s own contract is a commit hash naming a state, not a diff:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: 5a102d612f
+```
+Priority 00, matching every other specifier-to-architect handoff this session, and specifically closing the loop the architect opened with handoff `000092` — architect resumes review of `decline-narration-and-turn-start-reserve` now that the specifier decision it asked for has been made.
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: bankruptcy-resolution-narration
+commit: 5a102d612f
+```
+Priority 50 (normal), a brand-new specifier-originated task entering the pipeline for the first time.
