@@ -17722,6 +17722,39 @@ commit: ce53678413
 The priority-00 review fix is implemented and verified: the no-buying-policy
 strategy now emits a bare decline, while `AgreeIfAffordable` retains the two
 specific affordability reasons.
+
+## 2026-08-03T18:30:38Z — architect received decline-narration-and-turn-start-reserve
+
+Handoff message received from coder:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: e720784b9d
+
+Re-read your role and constitution.
+
+merge_and_process coder e720784b9d
+```
+
+Merged and reviewed. `Strategy` now owns decline reasons: its default is
+`NO_BUYING_POLICY`, while `AgreeIfAffordable` supplies the existing
+cannot-afford and cash-reserve reasons. `LandSale` and `Cards` ask the
+strategy after a decline, so the journal preserves the real decision rather
+than inferring it from an offer. `Report` renders the new reason as a bare
+decline, satisfying the returned specification.
+
+Verification: ordinary tests passed (270 domain, 11 CLI) and property tests
+passed (22/22). The regenerating acceptance pipeline verifies the new decline
+scenarios, but currently fails once on an unrelated
+`bankruptcy-resolution-narration` report scenario: its new auction-winner
+wording has no matching report step handler. Bankruptcy implementation arrived
+as an ancestor of this coder handoff and is already in its separate
+coder-to-refactorer review loop; it is not being closed or forwarded as part
+of this task. Hold the phase-complete sync until that independent branch
+failure is repaired and re-reviewed on this architect branch.
 ## 2026-08-03T18:23:41Z — architect received decline-narration-and-turn-start-reserve
 
 Handoff message received from specifier:
