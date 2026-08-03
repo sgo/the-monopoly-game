@@ -17521,3 +17521,90 @@ scope — noting it here for future reference but not acting on it
 without a concrete scenario motivating it.
 
 No further specifier-owned changes needed for this task; it is closed.
+
+## 2026-08-03T05:08:30Z — specifier drafts bankruptcy-resolution-narration
+
+User asked what "the gaps" were (the six pre-existing bankruptcy-narration
+failures carried since `nearest-station-rent-and-jail-narration`), then asked
+to make it the next feature to specify.
+
+Investigation: `journal-26`/`27` (and `logging`/`report` equivalents) already
+fully specify the two known gaps precisely — `Bankruptcy.sellHousesUntilSolvent`/
+`mortgageUntilSolvent` mutate `Deeds` directly with no event, so a forced house
+sale or mortgage during bankruptcy resolution is silent. No Gherkin change
+needed for those two; the gap is pure unimplemented wiring in `Bankruptcy.java`
+(`Bankruptcy.Events` only has `bankrupt`/`won`, nothing per-property).
+
+While reading `Bankruptcy.java` end to end to confirm that, found two more
+silent spots not covered by any existing spec: (1) `bankruptToBank`'s per-
+property `auction()` never fires an event for the winner, and `bankruptToPlayer`'s
+`inherit()` never fires an event for the land changing hands at all — only the
+top-level `bankrupt`/`won` entries exist; (2) `settleInheritedMortgage`'s
+lift-or-keep decision (auto-lift for an "Agree if affordable" creditor who can
+afford it, else keep and pay only the mandatory 10% interest via
+`Deeds.keepMortgaged`) is entirely unnarrated either way. Asked the user via
+`AskUserQuestion` whether to keep this task to just the two known gaps or fold
+these in; user chose to include both.
+
+Found that `bankruptcy.feature` (a functional-behavior spec, not narration)
+already has fully mutation-verified scenarios for all of this:
+`bankruptcy-3` (bank forfeits already-mortgaged land, high hat wins the
+auction), `bankruptcy-5` (dog forfeits Rue Grande Dinant to high hat as
+creditor, mortgage stays in place since high hat's default strategy isn't
+"Agree if affordable"), `bankruptcy-6` (high hat follows "Agree if affordable"
+and can afford to lift the inherited mortgage immediately), and `bankruptcy-7`
+(high hat follows "Agree if affordable" but can't afford it, keeps the
+mortgage, pays only the $3 interest). So no new numeric scenario design was
+needed — reused each setup exactly (same convention as this session's earlier
+companion journal/logging/report scenarios) rather than inventing new fact
+patterns.
+
+Added `journal-36` through `journal-39` (and `logging-36..39`/`report-36..39`)
+to `journal.feature`/`logging.feature`/`report.feature`:
+- `36`: bank-forced auction win — reuses the existing "wins the auction for X
+  at $Y" wording (`Entry.AuctionWon`), reusing `bankruptcy-3`'s setup.
+- `37`: land inherited by a creditor — new wording, "{creditor} inherits {land}
+  from {debtor}"; no price, since inheritance isn't a sale. Reuses
+  `bankruptcy-5`'s setup.
+- `38`: creditor pays interest to keep an inherited mortgage in place — new
+  wording, "{player} pays $X interest to keep the mortgage on {land}". Reused
+  `bankruptcy-7`'s setup (an actual "Agree if affordable" creditor who
+  genuinely cannot afford to lift it) rather than `bankruptcy-5`'s default/
+  no-strategy creditor, since it's the more meaningful real-gameplay case for
+  this specific wording. No "because" reason clause, unlike the recent
+  decline-narration convention — this is a plain fact ("kept mortgaged, paid
+  interest"), not a decision presented as a refusal needing justification.
+- `39`: creditor immediately lifts an inherited mortgage — reuses the existing
+  "lifts the mortgage on X for $Y including $Z interest" wording
+  (`Entry.MortgageLifted`), reusing `bankruptcy-6`'s setup.
+
+Deliberately left one thing out of scope: `inherit()` deposits the land's full
+mortgage value into the creditor's account before the lift-or-keep decision
+(so lifting nets out to costing only the interest, keeping nets out to a
+mortgage-value-minus-interest gain) — a real, already mutation-tested money
+movement (`bankruptcy-6`/`7`'s `owner final balance` numbers depend on it),
+but RULES.md never describes it as a separate action a player would narrate,
+only the 10%-interest requirement. Treating it as an internal accounting
+detail behind the inheritance/mortgage lines above rather than a fifth
+narrated event; flagging here in case that judgment call needs revisiting.
+
+Validated with `bb gherkin-parser` (clean, all three files) and
+`bb gherkin-ir-dry-checker` (`exact-dupes: 0` for all three; the only findings
+touching the new scenarios are expected medium-confidence near-duplicates —
+parametrized vs. literal auction-winner wording, and "lifts"/"keeps" sharing
+words while being different actions — not real duplication).
+
+Ran `./acceptance/run-acceptance.sh` to confirm the new scenarios fail for the
+right reason pre-implementation: 352 tests, 18 failures = the same six
+pre-existing (unrelated, already-tracked) plus exactly twelve new ones (four
+scenarios × three files) — nine "Unsupported step" (new wording, no step
+handler yet) and three "never recorded"/"never says" for the `lifts the
+mortgage` line (step handler already exists from the earlier direct-action
+scenario; the real gameplay path just doesn't fire it during bankruptcy yet).
+No parse errors, no unexpected failures elsewhere.
+
+Added a `bankruptcy-resolution-narration` (specified, pending implementation)
+bullet to `tasks.md`'s Post-plan refinements section.
+
+Reporting to the user for handoff approval before committing.
+

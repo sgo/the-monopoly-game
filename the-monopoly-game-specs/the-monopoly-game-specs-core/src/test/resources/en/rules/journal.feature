@@ -433,3 +433,58 @@ Feature: game journal
     Examples:
       | dog_starting_balance | reserve |
       | 200                  | 65      |
+
+  # journal-36
+  Scenario Outline: the journal records a bank-forced auction win during another player's bankruptcy
+    Given pawn "dog" owns "Diestsestraat Leuven"
+    And pawn "dog" has $5 to spend
+    And pawn "high hat" will bid $<bid> for "Diestsestraat Leuven" at auction
+    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    Then the game journal records that pawn "high hat" wins the auction for "Diestsestraat Leuven" at $<bid>
+
+    Examples:
+      | bid |
+      | 10  |
+
+  # journal-37
+  Scenario Outline: the journal records land inherited by a creditor when a debtor goes bankrupt to them
+    Given pawn "high hat" owns "Diestsestraat Leuven"
+    And the street "Diestsestraat Leuven" has a hotel built
+    And pawn "high hat" will claim rent for "Diestsestraat Leuven"
+    And pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" has $<starting_balance> to spend
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then the game journal records that pawn "high hat" inherits "Rue Grande Dinant" from pawn "dog"
+
+    Examples:
+      | starting_balance |
+      | 10                |
+
+  # journal-38
+  Scenario Outline: the journal records a creditor paying interest to keep an inherited mortgage in place
+    Given pawn "high hat" owns "Diestsestraat Leuven"
+    And the street "Diestsestraat Leuven" has a hotel built
+    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "high hat" has $<owner_starting_balance> to spend
+    And pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" has $<starting_balance> to spend
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then the game journal records that pawn "high hat" pays $<interest> interest to keep the mortgage on "Rue Grande Dinant"
+
+    Examples:
+      | owner_starting_balance | starting_balance | interest |
+      | 0                       | 2                 | 3        |
+
+  # journal-39
+  Scenario Outline: the journal records a creditor immediately lifting an inherited mortgage
+    Given pawn "high hat" owns "Diestsestraat Leuven"
+    And the street "Diestsestraat Leuven" has a hotel built
+    And pawn "high hat" follows the "Agree if affordable" strategy
+    And pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" has $<starting_balance> to spend
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then the game journal records that pawn "high hat" lifts the mortgage on "Rue Grande Dinant" for $<total> including $<interest> interest
+
+    Examples:
+      | starting_balance | total | interest |
+      | 10                | 33    | 3        |
