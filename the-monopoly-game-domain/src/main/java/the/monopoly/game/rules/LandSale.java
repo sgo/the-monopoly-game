@@ -41,7 +41,7 @@ public class LandSale implements Landings {
       events.bought(player, land, land.price());
       return;
     }
-    events.declinedToBuy(player, land, land.price(), offer.declineReason(), offer.reserve());
+    events.declinedToBuy(player, land, land.price(), strategy.declineReason(offer), offer.reserve());
     auction(land);
   }
 

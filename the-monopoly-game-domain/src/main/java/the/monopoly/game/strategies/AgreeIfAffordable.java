@@ -25,6 +25,11 @@ public final class AgreeIfAffordable implements Strategy {
   }
 
   @Override
+  public DeclineReason declineReason(Offer offer) {
+    return offer.isAffordable() ? DeclineReason.CASH_RESERVE : DeclineReason.CANNOT_AFFORD;
+  }
+
+  @Override
   public Money cashReserve() {
     return reserve;
   }
