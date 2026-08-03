@@ -148,6 +148,11 @@ final class GameLogStepHandlers {
                 arguments.text(1), arguments.text(2), 0,
                 Strategy.DeclineReason.CASH_RESERVE, arguments.number(3)))),
 
+        then("^the game journal records that pawn \"" + NAME + "\" declines to buy \"" + NAME + "\"$",
+            (world, arguments) -> records(world, purchaseDeclined(
+                arguments.text(1), arguments.text(2), 0,
+                Strategy.DeclineReason.NO_BUYING_POLICY, 0))),
+
         then("^the game journal records that pawn \"" + NAME + "\" starts a turn with \\$" + VALUE
                 + " and a \\$" + VALUE + " reserve$",
             (world, arguments) -> records(world, turnStarted(
@@ -403,6 +408,11 @@ final class GameLogStepHandlers {
                 arguments.text(1), arguments.text(2), 0,
                 Strategy.DeclineReason.CASH_RESERVE, arguments.number(3)))),
 
+        then("^the game log records that pawn \"" + NAME + "\" declines to buy \"" + NAME + "\"$",
+            (world, arguments) -> logRecords(world, purchaseDeclined(
+                arguments.text(1), arguments.text(2), 0,
+                Strategy.DeclineReason.NO_BUYING_POLICY, 0))),
+
         then("^the game log records that pawn \"" + NAME + "\" starts a turn with \\$" + VALUE
                 + " and a \\$" + VALUE + " reserve$",
             (world, arguments) -> logRecords(world, turnStarted(
@@ -562,6 +572,10 @@ final class GameLogStepHandlers {
                 + "\" because it would drop the balance below the \\$" + VALUE + " reserve$",
             (world, arguments) -> says(world, purchaseDeclinedForReserveLine(
                 arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" declines to buy \"" + NAME + "\"$",
+            (world, arguments) -> says(world, purchaseDeclinedLine(
+                arguments.text(1), arguments.text(2)))),
 
         then("^the game report says that pawn \"" + NAME + "\" starts a turn with \\$" + VALUE
                 + " and a \\$" + VALUE + " reserve$",

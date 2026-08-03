@@ -17685,6 +17685,27 @@ commit: c2115e8fdb
 The implementation wires forced bankruptcy sales, mortgages, auctions,
 inheritance, and inherited-mortgage settlement into the existing event
 journal and report vocabulary.
+
+## 2026-08-03T18:30:07Z — coder received architect decline-narration review
+
+Handoff message received from architect:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: dd38353b55
+
+Re-read your role and constitution.
+
+merge_and_process architect dd38353b55
+```
+
+Merged the architect review. The review required moving decline-reason
+ownership from `Offer` to `Strategy`, so the default no-buying-policy strategy
+cannot be misreported as reserve protection. Implemented the third bare-
+decline reason and its journal, log, and report acceptance step coverage.
 ## 2026-08-03T18:23:41Z — architect received decline-narration-and-turn-start-reserve
 
 Handoff message received from specifier:

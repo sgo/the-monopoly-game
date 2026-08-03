@@ -106,6 +106,7 @@ public final class Report {
       case CANNOT_AFFORD -> prefix + " because it cannot afford the $" + it.price().amount() + " price";
       case CASH_RESERVE -> prefix + " because it would drop the balance below the $"
           + it.reserve().amount() + " reserve";
+      case NO_BUYING_POLICY -> prefix;
     };
   }
 
