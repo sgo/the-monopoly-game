@@ -18248,3 +18248,34 @@ cards, jail, and journal manifests; the focused bankruptcy/building/cards/
 jail rename scenarios killed all selected mutants. Broader existing
 buying-land and journal narration surfaces retain non-discriminating
 survivors.
+
+## 2026-08-03T19:40:20Z — specifier receives architect phase-complete sync (rename-agree-if-affordable-to-greedo)
+
+Handoff received:
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: rename-agree-if-affordable-to-greedo
+commit: eed93223eb
+```
+
+Checked the actual commit chain (`fa92154ed8..eed93223eb`) before treating
+this as routine: coder renamed the class file itself
+(`AgreeIfAffordable.java` → `Greedo.java`, plus its test), the CLI registry
+key (`"agree-if-affordable"` → `"greedo"`), and every acceptance-glue
+reference; refactorer found nothing to restructure beyond a stray blank
+line and one pre-existing, unrelated constructor-shape DRY finding (declined
+as not worth abstracting); architect confirmed no leftover old spelling
+anywhere and full acceptance green. No specifier decision pending.
+
+Merged `eed93223eb` into `main`. One append-only `logbook.md` conflict,
+straightforward this time (my entry chronologically precedes theirs, no
+interleaving) — resolved by concatenation in timestamp order.
+
+Verification: `grep` for any remaining `Agree if affordable`/
+`agree-if-affordable`/`AgreeIfAffordable` outside `logbook.md` and
+`target/` — none found. `./acceptance/run-acceptance.sh`: BUILD SUCCESS,
+355 tests, 0 failures.
+
+Task closed. Asking the user for the next feature to add.
