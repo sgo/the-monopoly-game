@@ -18051,3 +18051,24 @@ actual mechanism (rename the class vs. keep it and just remap the lookup
 string) to the coder.
 
 Reporting to the user for handoff approval before committing.
+
+## 2026-08-03T19:02:34Z — specifier sends rename-agree-if-affordable-to-greedo to coder
+
+User approved. Committed as `fa92154ed8` "Rename the "Agree if affordable"
+strategy to "Greedo"".
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: rename-agree-if-affordable-to-greedo
+commit: fa92154ed8
+```
+
+Summary: the strategy's reference name is renamed everywhere in Gherkin and
+project docs; every scenario declaring it now expects "Greedo" and fails
+with "Unknown strategy" until the CLI registry and step-handler lookup (and
+optionally the `AgreeIfAffordable` class itself) are updated to recognize
+the new name.
