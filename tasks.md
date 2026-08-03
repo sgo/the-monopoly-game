@@ -646,3 +646,18 @@ didn't already call for.
   utility monopoly or denies another player theirs; with neither player
   owning a utility yet, the reserve still applies normally. See
   `buying-land-3` through `buying-land-7` in `buying-land.feature`.
+- **`bankruptcy-resolution-narration`** (specified, pending implementation) —
+  refines Phase 14's "record bankruptcy events (debtor, creditor, cause)"
+  deliverable: several individual actions `Bankruptcy.java` already performs
+  correctly (verified by `bankruptcy.feature`'s `bankruptcy-1`/`2`/`3`/`5`/
+  `6`/`7`) never produce a journal/log/report line of their own today, only
+  the top-level "goes bankrupt to X"/"wins the game" lines. Covers: a forced
+  house sale or mortgage while trying to stay solvent (already specified as
+  `journal-26`/`27` and their `logging`/`report` equivalents, six known
+  pre-existing failures carried since `nearest-station-rent-and-jail-
+  narration`); the bank auctioning a bankrupt player's land off to another
+  player; a creditor inheriting a bankrupt player's remaining land outright;
+  and a creditor's automatic choice to immediately pay off an inherited
+  mortgage versus keep it in place and pay only the mandatory 10% interest.
+  See `journal-36` through `journal-39` (and `logging`/`report` equivalents)
+  in `journal.feature`.
