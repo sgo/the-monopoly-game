@@ -17950,3 +17950,53 @@ one changed `Report` mutant; DRY reports only the established one-line
 Gherkin mutation refreshed the journal/logging/report manifests; each
 surface killed 9 of 25 selected mutations, with 16 established
 non-discriminating survivors. No active mutant changes remain.
+
+## 2026-08-03T18:50:58Z — specifier receives architect phase-complete syncs for both tasks
+
+Two handoffs received, both pointing at the same tip commit (the architect
+processed both tasks to a shared convergence point):
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: bankruptcy-resolution-narration
+commit: d31d697de3
+```
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: decline-narration-and-turn-start-reserve
+commit: d31d697de3
+```
+
+Both priority 50 (routine phase-complete), but checked the actual commit
+content rather than trusting priority alone this time (per the earlier
+000092 lesson): read through the full `git log 5a102d612f..d31d697de3`
+chain and each commit's logbook diff. Confirmed no further specifier
+decision is pending on either task — the architect accepted the third
+decline reason specification outright ("Merged and accepted... This confirms
+the architecture finding"), and the coder/refactorer/architect loop that
+followed (moving `declineReason` ownership to `Strategy`, adding
+`NO_BUYING_POLICY`, and fixing a missing standalone report step handler for
+bankruptcy's auction-win wording) closed cleanly with no new finding routed
+back to specifier.
+
+Merged `d31d697de3` into `main`. One append-only `logbook.md` conflict,
+caused by both branches independently logging the same handoff exchanges
+from their own side (my "sent" entries vs. their "received" entries for the
+same commits). Resolved by reconstructing chronological order from embedded
+timestamps, preferring logical send-before-receive causality over the
+literal timestamp string where two independent agents' clocks put a
+receive a few seconds ahead of its own send. No content dropped from either
+side.
+
+Verification: ran `./acceptance/run-acceptance.sh` post-merge: 355 tests,
+0 failures — BUILD SUCCESS. All six original bankruptcy-narration gaps and
+the `journal-40`/`logging-40`/`report-40` no-reason-decline scenarios now
+pass; no pre-existing failures remain at all.
+
+Both tasks are now fully closed end-to-end. Per specifier handoff rules,
+asking the user for the next feature to add.
