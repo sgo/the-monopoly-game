@@ -21,6 +21,10 @@ public interface Strategy {
     return false;
   }
 
+  default DeclineReason declineReason(Offer offer) {
+    return DeclineReason.NO_BUYING_POLICY;
+  }
+
   /** What to bid for the land at auction. Nothing is not a bid. */
   default Money bidFor(Offer offer) {
     return Money.ZERO;
@@ -55,14 +59,12 @@ public interface Strategy {
       return available.covers(land.price());
     }
 
-    public DeclineReason declineReason() {
-      return isAffordable() ? DeclineReason.CASH_RESERVE : DeclineReason.CANNOT_AFFORD;
-    }
   }
 
   enum DeclineReason {
     CANNOT_AFFORD,
-    CASH_RESERVE
+    CASH_RESERVE,
+    NO_BUYING_POLICY
   }
 
   default Money cashReserve() {

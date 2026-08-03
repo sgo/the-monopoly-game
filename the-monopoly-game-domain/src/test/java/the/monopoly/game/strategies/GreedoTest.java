@@ -10,10 +10,10 @@ import the.monopoly.game.components.streets.Street;
 import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class AgreeIfAffordableTest {
+class GreedoTest {
   private static final Ownable LAND = ownable(Street.Type.DiestsestraatLeuven);
 
-  private final Strategy strategy = new AgreeIfAffordable();
+  private final Strategy strategy = new Greedo();
 
   @Test
   void landWithinReachIsBought() {
@@ -42,7 +42,7 @@ class AgreeIfAffordableTest {
 
   @Test
   void aReservedPlayerBidsOnlyWhatItCanSpendWithoutUsingItsReserve() {
-    Strategy reserved = new AgreeIfAffordable(new Money(100));
+    Strategy reserved = new Greedo(new Money(100));
 
     assertThat(reserved.bidFor(offerWith(new Money(150)))).isEqualTo(new Money(50));
   }
@@ -50,7 +50,7 @@ class AgreeIfAffordableTest {
   @Test
   void aReservedPlayerMaySpendItsReserveToCompleteAUtilityMonopoly() {
     Ownable utility = ownable(Street.Type.Watermaatschappij);
-    Strategy reserved = new AgreeIfAffordable(new Money(100));
+    Strategy reserved = new Greedo(new Money(100));
     Strategy.Offer offer = new Strategy.Offer(utility, new Money(150), new Money(100), true);
 
     assertThat(reserved.bidFor(offer)).isEqualTo(new Money(150));

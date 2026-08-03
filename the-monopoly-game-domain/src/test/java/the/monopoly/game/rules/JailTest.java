@@ -7,7 +7,7 @@ import the.monopoly.game.components.finance.Bank.Account.Balance;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.Street;
-import the.monopoly.game.strategies.AgreeIfAffordable;
+import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +39,7 @@ class JailTest {
   void anAffordableFineFreesThePawn() {
     jail.imprison(dog);
 
-    assertThat(jail.mayTakeTurn(dog, new AgreeIfAffordable(), new Deeds())).isTrue();
+    assertThat(jail.mayTakeTurn(dog, new Greedo(), new Deeds())).isTrue();
     assertThat(dog.account().balance()).isEqualTo(Balance.of(1450));
     assertThat(jail.holds(dog)).isFalse();
   }
@@ -63,7 +63,7 @@ class JailTest {
     dog.account().withdraw(new Money(1460));
     jail.imprison(dog);
 
-    assertThat(jail.mayTakeTurn(dog, new AgreeIfAffordable(), new Deeds())).isFalse();
+    assertThat(jail.mayTakeTurn(dog, new Greedo(), new Deeds())).isFalse();
     assertThat(jail.leavesOn(new Roll(3, 3), dog)).isTrue();
     assertThat(jail.holds(dog)).isFalse();
   }

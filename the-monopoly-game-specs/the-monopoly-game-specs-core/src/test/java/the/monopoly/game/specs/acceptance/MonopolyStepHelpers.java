@@ -54,6 +54,13 @@ final class MonopolyStepHelpers {
 
   static Claim purchaseDeclined(String pawnName, String spaceName, int price,
                                 Strategy.DeclineReason reason, int reserve) {
+    if (reason == Strategy.DeclineReason.NO_BUYING_POLICY) {
+      return new Claim(entry -> entry instanceof Entry.PurchaseDeclined it
+          && it.player().equals(idOf(pawnName))
+          && it.land().equals(SpaceNames.of(spaceName))
+          && it.reason() == reason,
+          pawnName + " declines to buy " + spaceName);
+    }
     if (reason == Strategy.DeclineReason.CASH_RESERVE) {
       return new Claim(entry -> entry instanceof Entry.PurchaseDeclined it
           && it.player().equals(idOf(pawnName))
@@ -261,6 +268,10 @@ final class MonopolyStepHelpers {
   static String purchaseDeclinedForReserveLine(String pawnName, String spaceName, int reserve) {
     return pawnName + " declines to buy " + spaceName
         + " because it would drop the balance below the $" + reserve + " reserve";
+  }
+
+  static String purchaseDeclinedLine(String pawnName, String spaceName) {
+    return pawnName + " declines to buy " + spaceName;
   }
 
   static String chanceCardDrawnLine(String pawnName, String card) {

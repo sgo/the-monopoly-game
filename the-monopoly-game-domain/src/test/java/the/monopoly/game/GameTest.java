@@ -15,7 +15,7 @@ import the.monopoly.game.components.streets.TaxSpace;
 import the.monopoly.game.rules.Cards;
 import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Rule;
-import the.monopoly.game.strategies.AgreeIfAffordable;
+import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.ArrayList;
@@ -177,7 +177,7 @@ class GameTest {
         highHat.id(), Cup.of(new Roll(5, 5), new Roll(4, 6), new Roll(2, 6))
     );
     Strategy.OfPlayers strategies = player ->
-        player.id().equals(highHat.id()) ? new AgreeIfAffordable() : Strategy.UNDECIDED;
+        player.id().equals(highHat.id()) ? new Greedo() : Strategy.UNDECIDED;
     Game.Result result = game(
         twoPlayers, player -> cups.get(player.id()), strategies, deeds
     ).playToCompletion();
@@ -316,7 +316,7 @@ class GameTest {
 
   @Test
   void aGameSellsUnownedLandToWhoeverStopsOnItAndAgreesToBuyIt() {
-    Game.Result result = playWith(Map.of(Pawn.dog.id(), new AgreeIfAffordable()));
+    Game.Result result = playWith(Map.of(Pawn.dog.id(), new Greedo()));
 
     assertThat(result.deeds().ownerOf(Street.Type.DiestsestraatLeuven)).contains(Pawn.dog.id());
     assertThat(players.getFirst().account().balance()).isEqualTo(Balance.of(1448));
@@ -324,7 +324,7 @@ class GameTest {
 
   @Test
   void aGameAccountsForAPurchaseAfterTheMoveThatReachedIt() {
-    Game.Result result = playWith(Map.of(Pawn.dog.id(), new AgreeIfAffordable()));
+    Game.Result result = playWith(Map.of(Pawn.dog.id(), new Greedo()));
 
     assertThat(result.journal()).containsSubsequence(
         new Entry.Moved(Pawn.dog.id(), 0, 3),
@@ -369,7 +369,7 @@ class GameTest {
     Deeds deeds = monopolyFor(Pawn.dog.id());
     players.getFirst().account().withdraw(new Money(1400));
 
-    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new AgreeIfAffordable()), deeds);
+    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new Greedo()), deeds);
 
     assertThat(result.deeds().housesBuiltOn(street(Street.Type.RueGrandeDinant))).isEqualTo(1);
     assertThat(result.deeds().housesBuiltOn(street(Street.Type.DiestsestraatLeuven))).isEqualTo(1);
@@ -386,7 +386,7 @@ class GameTest {
     deeds.arrangeHouses(street(Street.Type.DiestsestraatLeuven), 4);
     players.getFirst().account().withdraw(new Money(800));
 
-    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new AgreeIfAffordable()), deeds);
+    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new Greedo()), deeds);
 
     assertThat(result.deeds().hasHotelOn(street(Street.Type.RueGrandeDinant))).isTrue();
     assertThat(result.deeds().hasHotelOn(street(Street.Type.DiestsestraatLeuven))).isTrue();
@@ -399,7 +399,7 @@ class GameTest {
     deeds.arrangeMortgaged((ColourStreet) ruleSet.create(Street.Type.RueGrandeDinant));
     players.getFirst().account().withdraw(new Money(1400));
 
-    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new AgreeIfAffordable()), deeds);
+    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new Greedo()), deeds);
 
     assertThat(result.deeds().housesBuiltOn(street(Street.Type.RueGrandeDinant))).isZero();
     assertThat(result.deeds().housesBuiltOn(street(Street.Type.DiestsestraatLeuven))).isZero();
@@ -412,7 +412,7 @@ class GameTest {
     deeds.arrangeMortgaged((ColourStreet) ruleSet.create(Street.Type.RueGrandeDinant));
     players.getFirst().account().withdraw(new Money(1400));
 
-    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new AgreeIfAffordable()), deeds);
+    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new Greedo()), deeds);
 
     assertThat(result.journal()).contains(new Entry.BuildingRefused(
         Pawn.dog.id(), Street.Type.RueGrandeDinant, new Money(50)
@@ -426,7 +426,7 @@ class GameTest {
     deeds.arrangeMortgaged((ColourStreet) ruleSet.create(Street.Type.RueGrandeDinant));
     players.getFirst().account().withdraw(new Money(1100));
 
-    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new AgreeIfAffordable()), deeds);
+    Game.Result result = playWithQuietTurns(Map.of(Pawn.dog.id(), new Greedo()), deeds);
 
     assertThat(result.deeds().housesBuiltOn(street(Street.Type.RueGrandeDinant))).isZero();
     assertThat(result.deeds().housesBuiltOn(street(Street.Type.DiestsestraatLeuven))).isZero();
@@ -500,7 +500,7 @@ class GameTest {
     players.get(1).account().deposit(new Money(200));
 
     playWithCards(
-        Map.of(Pawn.high_hat.id(), new AgreeIfAffordable()),
+        Map.of(Pawn.high_hat.id(), new Greedo()),
         deeds,
         new Roll(3, 4),
         "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.",
@@ -520,7 +520,7 @@ class GameTest {
     players.get(1).account().deposit(new Money(150));
 
     play(
-        Map.of(Pawn.high_hat.id(), new AgreeIfAffordable()),
+        Map.of(Pawn.high_hat.id(), new Greedo()),
         deeds,
         Map.of(
             Pawn.dog.id(), Cup.of(new Roll(5, 5), new Roll(1, 2), new Roll(3, 4)),
@@ -617,7 +617,7 @@ class GameTest {
     Deeds deeds = new Deeds();
 
     playWithCards(
-        Map.of(Pawn.dog.id(), new AgreeIfAffordable()), deeds, new Roll(3, 4),
+        Map.of(Pawn.dog.id(), new Greedo()), deeds, new Roll(3, 4),
         "Ga door naar het dichtsbijzijnde station. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, betaal je de eigenaar dubbel de huurprijs.",
         null
     );
@@ -676,7 +676,7 @@ class GameTest {
     players.get(1).account().deposit(new Money(150));
 
     play(
-        Map.of(Pawn.high_hat.id(), new AgreeIfAffordable()),
+        Map.of(Pawn.high_hat.id(), new Greedo()),
         deeds,
         Map.of(
             Pawn.dog.id(), Cup.of(new Roll(5, 5), new Roll(3, 4), new Roll(3, 4)),
@@ -748,7 +748,7 @@ class GameTest {
     Deeds deeds = new Deeds();
 
     resolveChanceCardAt(
-        0, deeds, Map.of(Pawn.dog.id(), new AgreeIfAffordable()),
+        0, deeds, Map.of(Pawn.dog.id(), new Greedo()),
         "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200.",
         new Cards.Events() {
         }
@@ -913,7 +913,7 @@ class GameTest {
     players.getFirst().position().moveTo(position);
 
     resolveChanceCardAt(
-        position, new Deeds(), Map.of(Pawn.dog.id(), new AgreeIfAffordable()),
+        position, new Deeds(), Map.of(Pawn.dog.id(), new Greedo()),
         "Ga door naar het dichtsbijzijnde nutsbedrijf. Indien nog niet verkocht, mag je het kopen van de Bank. Indien verkocht, rol de dobbelsteen en betaal de eigenaar tien keer de gerolde waarde.",
         new Cards.Events() {
         }

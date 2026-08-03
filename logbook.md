@@ -14763,6 +14763,23 @@ declined. The existing acceptance criteria specify only cannot-afford and
 cash-reserve wording, so a third reason or an unreasoned decline needs a
 specifier decision before the implementation can be architecturally complete.
 
+## 2026-08-02T22:26:10Z — architect sent decline-narration-and-turn-start-reserve
+
+Handoff message sent to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: 7fb4d4b576
+```
+
+The existing two decline reasons cannot correctly narrate an affordable
+decline from `Strategy.UNDECIDED` (or another non-reserve strategy). Decide
+the observable criterion for that case so the model can retain a truthful
+reason rather than inferring one from the offer.
+
 ## 2026-08-02T19:27:58Z — architect received nearest-station-rent-and-jail-narration
 
 Handoff message received from refactorer:
@@ -17665,6 +17682,24 @@ to this task.
 
 Reporting to the user for handoff approval before committing.
 
+## 2026-08-03T19:04:58Z — coder receives specifier handoff for Greedo rename
+
+Complete received handoff message:
+
+    type: git_handoff
+    to: coder
+    priority: 50
+    task: rename-agree-if-affordable-to-greedo
+    commit: fa92154ed8
+
+Merged `fa92154ed8` and implemented the live strategy rename throughout the
+domain, CLI, acceptance step glue, tests, and references. Renamed the
+strategy class and test to `Greedo`, updated the CLI registry and acceptance
+vocabulary, and preserved historical `logbook.md` references. Verification:
+`MAVEN_OPTS=-Dmaven.repo.local=tmp/m2 mvn -B -pl
+the-monopoly-game-domain,the-monopoly-game-cli test` passed (281 tests), and
+`./acceptance/run-acceptance.sh` passed all 355 tests with 0 failures.
+
 ## 2026-08-03T05:23:53Z — specifier corrects course: 000092 was a defect-flagging priority-00 follow-up, not a routine phase-complete sync
 
 User asked "Should it go to coder? Was this not a level 00 from architect?", pointing out that I had merged handoff `00_20260803T014627Z_000092` (task `decline-narration-and-turn-start-reserve`, commit `7fb4d4b576`) and then treated the task as fully closed, asking for the next feature, without addressing whatever the architect actually flagged.
@@ -17685,6 +17720,73 @@ Validated: `bb gherkin-parser` clean on all three files; `bb gherkin-ir-dry-chec
 
 This fix belongs to `decline-narration-and-turn-start-reserve` and, once approved, must be committed separately from the unrelated `bankruptcy-resolution-narration` work and handed back to **architect** (same task name, per the priority-00 loop-closing rule), not to coder. `bankruptcy-resolution-narration` remains a separate, brand-new specifier-originated task awaiting its own handoff approval to coder. Reporting both to the user for separate approval before committing either.
 
+## 2026-08-03T18:23:47Z — specifier commits both pieces separately and sends two handoffs
+
+User approved committing both pieces separately and sending both handoffs.
+
+Split the working tree (both pieces had been drafted together) into two clean commits by temporarily removing each piece's content, verifying the reduced state, committing, then restoring the other piece — rather than committing everything as one lump and sorting it out later:
+
+- `b5ad13f` "Specify bankruptcy resolution narration" — `journal-36` through `39` (and `logging`/`report` equivalents) plus the `tasks.md` bullet. Verified in isolation: `bb gherkin-parser` clean, `bb gherkin-ir-dry-checker` `exact-dupes: 0`, `./acceptance/run-acceptance.sh` 352 tests/18 failures (the 6 pre-existing plus exactly these 12, nothing else).
+- `5a102d6` "Specify a third decline reason for strategies with no buying policy" — `journal-40`/`logging-40`/`report-40`, on top of `b5ad13f`. Verified: parser clean, dry-checker `exact-dupes: 0`, acceptance 355 tests/21 failures (18 plus exactly these 3 new "Unsupported step" failures).
+
+Sent two handoffs from the same tip commit (`5a102d612f`), since this pipeline has always synced receivers to "at least this commit" rather than an isolated per-task diff — every architect phase-complete sync this session included whatever else had already accumulated, so there's no isolation precedent to break here; `git_handoff`'s own contract is a commit hash naming a state, not a diff:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: 5a102d612f
+```
+Priority 00, matching every other specifier-to-architect handoff this session, and specifically closing the loop the architect opened with handoff `000092` — architect resumes review of `decline-narration-and-turn-start-reserve` now that the specifier decision it asked for has been made.
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: bankruptcy-resolution-narration
+commit: 5a102d612f
+```
+Priority 50 (normal), a brand-new specifier-originated task entering the pipeline for the first time.
+
+## 2026-08-03T18:23:41Z — architect received decline-narration-and-turn-start-reserve
+
+Handoff message received from specifier:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: 5a102d612f
+
+Re-read your role and constitution.
+
+merge_and_process specifier 5a102d612f
+```
+
+Merged and accepted. The specification now requires that an affordable land
+decline by the default no-buying-policy strategy be narrated as a bare decline,
+without a fabricated affordability or reserve reason. This confirms the
+architecture finding: the strategy, not `Offer`, must own the reason for its
+decision. Implementation and the new journal/log/report step support belong
+to the coder; the return path remains this architect loop.
+
+## 2026-08-03T18:23:41Z — architect sent decline-narration-and-turn-start-reserve
+
+Handoff message sent to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: dd38353b55
+```
+
+Implement the specified no-buying-policy decline narration. The current
+offer-derived reason must not label `Strategy.UNDECIDED` as a reserve decline.
+
 ## 2026-08-03T18:27:10Z — coder sent bankruptcy-resolution-narration to refactorer
 
 Handoff message sent to refactorer:
@@ -17700,6 +17802,88 @@ commit: c2115e8fdb
 The implementation wires forced bankruptcy sales, mortgages, auctions,
 inheritance, and inherited-mortgage settlement into the existing event
 journal and report vocabulary.
+
+## 2026-08-03T18:30:07Z — coder received architect decline-narration review
+
+Handoff message received from architect:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: dd38353b55
+
+Re-read your role and constitution.
+
+merge_and_process architect dd38353b55
+```
+
+Merged the architect review. The review required moving decline-reason
+ownership from `Offer` to `Strategy`, so the default no-buying-policy strategy
+cannot be misreported as reserve protection. Implemented the third bare-
+decline reason and its journal, log, and report acceptance step coverage.
+
+## 2026-08-03T18:30:45Z — coder sent decline-narration-and-turn-start-reserve to architect
+
+Handoff message sent to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: ce53678413
+```
+
+The priority-00 review fix is implemented and verified: the no-buying-policy
+strategy now emits a bare decline, while `AgreeIfAffordable` retains the two
+specific affordability reasons.
+## 2026-08-03T18:31:10Z — coder processed queued user reminder
+
+Queued message received:
+
+```
+You have new handoff mail. If idle, run ready_for_next.sh.
+```
+
+The message was queued while the bankruptcy implementation was in progress.
+The work is now handed off and the reminder is being cleared before checking
+the next queue item.
+## 2026-08-03T18:23:41Z — architect received decline-narration-and-turn-start-reserve
+
+## 2026-08-03T18:30:38Z — architect received decline-narration-and-turn-start-reserve
+
+Handoff message received from coder:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: e720784b9d
+
+Re-read your role and constitution.
+
+merge_and_process coder e720784b9d
+```
+
+Merged and reviewed. `Strategy` now owns decline reasons: its default is
+`NO_BUYING_POLICY`, while `AgreeIfAffordable` supplies the existing
+cannot-afford and cash-reserve reasons. `LandSale` and `Cards` ask the
+strategy after a decline, so the journal preserves the real decision rather
+than inferring it from an offer. `Report` renders the new reason as a bare
+decline, satisfying the returned specification.
+
+Verification: ordinary tests passed (270 domain, 11 CLI) and property tests
+passed (22/22). The regenerating acceptance pipeline verifies the new decline
+scenarios, but currently fails once on an unrelated
+`bankruptcy-resolution-narration` report scenario: its new auction-winner
+wording has no matching report step handler. Bankruptcy implementation arrived
+as an ancestor of this coder handoff and is already in its separate
+coder-to-refactorer review loop; it is not being closed or forwarded as part
+of this task. Hold the phase-complete sync until that independent branch
+failure is repaired and re-reviewed on this architect branch.
 
 ## 2026-08-03T18:37:51Z — refactorer received bankruptcy-resolution-narration
 
@@ -17796,3 +17980,134 @@ every run — exactly the already-known, already-flagged `journal-40`/
 `logging-40`/`report-40` gap for the separate, not-yet-implemented third
 `Strategy.DeclineReason` value, out of scope for this task. Handing verified
 state to architect for independent review.
+
+## 2026-08-03T18:44:17Z — architect received bankruptcy-resolution-narration refactorer handoff
+
+```text
+type: git_handoff
+to: architect
+priority: 50
+task: bankruptcy-resolution-narration
+commit: 18f8b92134
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 18f8b92134
+```
+
+Merged `18f8b92134` as `ac95363`. Resolved the logbook-only merge conflict
+without dropping either handoff record. Architectural review confirmed that
+`Bankruptcy` owns liquidation, inheritance, auction, and mortgage state
+transitions; its event interface only exposes completed facts, and
+`Game.Journalling` maps those facts to typed journal entries. The refactorer
+also supplied the previously missing standalone report assertion handler for
+an auction winner, matching the existing journal/log assertion pattern.
+
+Verification: full regenerating acceptance suite green (355 tests); Java
+differential mutation found no new `Bankruptcy`/`Game` surface and killed the
+one changed `Report` mutant; DRY reports only the established one-line
+`Journalling` delegation duplicates and existing helper patterns. Soft
+Gherkin mutation refreshed the journal/logging/report manifests; each
+surface killed 9 of 25 selected mutations, with 16 established
+non-discriminating survivors. No active mutant changes remain.
+
+## 2026-08-03T18:50:58Z — specifier receives architect phase-complete syncs for both tasks
+
+Two handoffs received, both pointing at the same tip commit (the architect
+processed both tasks to a shared convergence point):
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: bankruptcy-resolution-narration
+commit: d31d697de3
+```
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: decline-narration-and-turn-start-reserve
+commit: d31d697de3
+```
+
+Both priority 50 (routine phase-complete), but checked the actual commit
+content rather than trusting priority alone this time (per the earlier
+000092 lesson): read through the full `git log 5a102d612f..d31d697de3`
+chain and each commit's logbook diff. Confirmed no further specifier
+decision is pending on either task — the architect accepted the third
+decline reason specification outright ("Merged and accepted... This confirms
+the architecture finding"), and the coder/refactorer/architect loop that
+followed (moving `declineReason` ownership to `Strategy`, adding
+`NO_BUYING_POLICY`, and fixing a missing standalone report step handler for
+bankruptcy's auction-win wording) closed cleanly with no new finding routed
+back to specifier.
+
+Merged `d31d697de3` into `main`. One append-only `logbook.md` conflict,
+caused by both branches independently logging the same handoff exchanges
+from their own side (my "sent" entries vs. their "received" entries for the
+same commits). Resolved by reconstructing chronological order from embedded
+timestamps, preferring logical send-before-receive causality over the
+literal timestamp string where two independent agents' clocks put a
+receive a few seconds ahead of its own send. No content dropped from either
+side.
+
+Verification: ran `./acceptance/run-acceptance.sh` post-merge: 355 tests,
+0 failures — BUILD SUCCESS. All six original bankruptcy-narration gaps and
+the `journal-40`/`logging-40`/`report-40` no-reason-decline scenarios now
+pass; no pre-existing failures remain at all.
+
+Both tasks are now fully closed end-to-end. Per specifier handoff rules,
+asking the user for the next feature to add.
+
+## 2026-08-03T19:00:52Z — specifier renames "Agree if affordable" to "Greedo"
+
+User asked to rename the "Agree if affordable" strategy to "Greedo" for
+easier reference, and to reflect the rename in `SIMULATOR.md`/`tasks.md`.
+
+Surveyed every occurrence of the literal string "Agree if affordable" across
+the repo (`grep -rl`, excluding `target/`): 9 `.feature` files
+(`buying-land`, `bankruptcy`, `logging`, `journal`, `jail`, `report`, `cards`,
+`building` in specs-core, plus `cli.feature` in specs-cli), `SIMULATOR.md`,
+`tasks.md`, plus a dozen Java files (production, tests, step handlers, CLI)
+that are coder/refactorer's to update, not specifier's. Left `logbook.md`
+alone — append-only historical record, not a live spec.
+
+Deliberately scoped the rename to the literal quoted strategy identifier
+only, not the informal adjective "agreeable" used in ~11 scenario titles
+("an agreeable player buys..."). The user asked to rename the strategy's
+reference name, not reword every scenario description that alludes to the
+underlying behavior; "agreeable" remains an accurate description of the
+strategy's behavior regardless of its short name, and scenario titles are
+themselves meant to stay stable identifiers.
+
+Replaced `Agree if affordable` → `Greedo` via `sed` across the 11 files (63
+occurrences total, all inside existing double-quoted or single-quoted
+strategy-name references — no prose restructuring needed since the
+substitution is a straight word-for-word swap). Confirmed 0 remaining
+occurrences and correct resulting text in each file, including
+`SIMULATOR.md`'s `#### Greedo` heading (was `#### Agree if affordable`,
+no quotes) and `tasks.md`'s one nested-quote case (`"'Greedo' buys
+whenever it can afford the price"`).
+
+Validated: `bb gherkin-parser` clean on all 9 changed `.feature` files;
+`bb gherkin-ir-dry-checker` `exact-dupes: 0` on all `specs-core` files.
+
+Ran `./acceptance/run-acceptance.sh` to confirm the rename fails for the
+right reason pre-implementation: 355 tests, 57 failures, every one
+"Unknown strategy \"Greedo\"" — the step glue and the CLI's strategy
+registry (`Simulator.java`: `"agree-if-affordable", AgreeIfAffordable::new`)
+still only recognize the old name. Far more failures than a typical task
+here, but expected: this is a global rename touching every scenario that
+declares the strategy, not a new behavior.
+
+Not mandating how the coder implements the rename (matching the
+"without prescribing unnecessary implementation details" principle) —
+noting in the handoff that the CLI registry key, the step-handler's
+strategy-name lookup, and optionally the `AgreeIfAffordable` class name
+itself all need to recognize "Greedo" one way or another, but leaving the
+actual mechanism (rename the class vs. keep it and just remap the lookup
+string) to the coder.
+
+Reporting to the user for handoff approval before committing.
