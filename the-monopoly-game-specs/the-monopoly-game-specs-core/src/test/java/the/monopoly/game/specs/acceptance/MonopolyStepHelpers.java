@@ -54,6 +54,13 @@ final class MonopolyStepHelpers {
 
   static Claim purchaseDeclined(String pawnName, String spaceName, int price,
                                 Strategy.DeclineReason reason, int reserve) {
+    if (reason == Strategy.DeclineReason.NO_BUYING_POLICY) {
+      return new Claim(entry -> entry instanceof Entry.PurchaseDeclined it
+          && it.player().equals(idOf(pawnName))
+          && it.land().equals(SpaceNames.of(spaceName))
+          && it.reason() == reason,
+          pawnName + " declines to buy " + spaceName);
+    }
     if (reason == Strategy.DeclineReason.CASH_RESERVE) {
       return new Claim(entry -> entry instanceof Entry.PurchaseDeclined it
           && it.player().equals(idOf(pawnName))
@@ -113,6 +120,14 @@ final class MonopolyStepHelpers {
   static Claim mortgageLifted(String pawnName, String spaceName, int total, int interest) {
     return Claim.of(new Entry.MortgageLifted(
         idOf(pawnName), SpaceNames.of(spaceName), money(total), money(interest)));
+  }
+
+  static Claim inherited(String creditor, String spaceName, String debtor) {
+    return Claim.of(new Entry.Inherited(idOf(creditor), SpaceNames.of(spaceName), idOf(debtor)));
+  }
+
+  static Claim mortgageKept(String pawnName, String spaceName, int interest) {
+    return Claim.of(new Entry.MortgageKept(idOf(pawnName), SpaceNames.of(spaceName), money(interest)));
   }
 
   static Claim landSold(String seller, String spaceName, String buyer, int price) {
@@ -219,6 +234,14 @@ final class MonopolyStepHelpers {
         + " including $" + interest + " interest";
   }
 
+  static String inheritedLine(String creditor, String spaceName, String debtor) {
+    return creditor + " inherits " + spaceName + " from " + debtor;
+  }
+
+  static String mortgageKeptLine(String pawnName, String spaceName, int interest) {
+    return pawnName + " pays $" + interest + " interest to keep the mortgage on " + spaceName;
+  }
+
   static String landSoldLine(String seller, String spaceName, String buyer, int price) {
     return seller + " sells " + spaceName + " to " + buyer + " for $" + price;
   }
@@ -241,6 +264,10 @@ final class MonopolyStepHelpers {
   static String purchaseDeclinedForReserveLine(String pawnName, String spaceName, int reserve) {
     return pawnName + " declines to buy " + spaceName
         + " because it would drop the balance below the $" + reserve + " reserve";
+  }
+
+  static String purchaseDeclinedLine(String pawnName, String spaceName) {
+    return pawnName + " declines to buy " + spaceName;
   }
 
   static String chanceCardDrawnLine(String pawnName, String card) {

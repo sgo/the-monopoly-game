@@ -68,6 +68,10 @@ public final class Report {
       case Entry.MortgageLifted it ->
           name(it.player()) + " lifts the mortgage on " + spaceName(it.land()) + " for $"
               + it.total().amount() + " including $" + it.interest().amount() + " interest";
+      case Entry.Inherited it -> name(it.player()) + " inherits " + spaceName(it.land())
+          + " from " + name(it.debtor());
+      case Entry.MortgageKept it -> name(it.player()) + " pays $" + it.interest().amount()
+          + " interest to keep the mortgage on " + spaceName(it.land());
       case Entry.LandSold it ->
           name(it.seller()) + " sells " + spaceName(it.land()) + " to " + name(it.buyer())
               + " for $" + it.price().amount();
@@ -102,6 +106,7 @@ public final class Report {
       case CANNOT_AFFORD -> prefix + " because it cannot afford the $" + it.price().amount() + " price";
       case CASH_RESERVE -> prefix + " because it would drop the balance below the $"
           + it.reserve().amount() + " reserve";
+      case NO_BUYING_POLICY -> prefix;
     };
   }
 

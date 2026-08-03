@@ -307,7 +307,7 @@ public final class Cards implements Landings {
     Strategy.Offer offer = new Strategy.Offer(land, player.account().balance().amount(), strategy.cashReserve(),
         deeds.utilityMonopolyOpportunity(rules, land));
     if (!strategy.accepts(offer)) {
-      events.declinedToBuy(player, land, land.price(), offer.declineReason(), offer.reserve());
+      events.declinedToBuy(player, land, land.price(), strategy.declineReason(offer), offer.reserve());
       return;
     }
     deeds.sell(land, player, land.price());

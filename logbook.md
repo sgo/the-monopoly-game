@@ -17623,6 +17623,31 @@ No parse errors, no unexpected failures elsewhere.
 Added a `bankruptcy-resolution-narration` (specified, pending implementation)
 bullet to `tasks.md`'s Post-plan refinements section.
 
+## 2026-08-03T18:26:31Z — coder received bankruptcy-resolution-narration
+
+Handoff message received from specifier:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: bankruptcy-resolution-narration
+commit: 5a102d612f
+
+Re-read your role and constitution.
+
+merge_and_process specifier 5a102d612f
+```
+
+Merged the specification and implemented bankruptcy-resolution event wiring:
+forced house sales and mortgages, bank auction wins, creditor inheritance,
+inherited-mortgage interest payments, and inherited-mortgage lifts now reach
+the journal/report/log. Domain tests pass 270/270, and all twelve new
+bankruptcy narration scenarios pass. The acceptance run also shows one
+pre-existing unsupported-step failure from the separate decline-narration
+priority-00 loop and one intermittent CLI timing failure; they are unrelated
+to this task.
+
 Reporting to the user for handoff approval before committing.
 
 ## 2026-08-03T05:23:53Z — specifier corrects course: 000092 was a defect-flagging priority-00 follow-up, not a routine phase-complete sync
@@ -17645,6 +17670,58 @@ Validated: `bb gherkin-parser` clean on all three files; `bb gherkin-ir-dry-chec
 
 This fix belongs to `decline-narration-and-turn-start-reserve` and, once approved, must be committed separately from the unrelated `bankruptcy-resolution-narration` work and handed back to **architect** (same task name, per the priority-00 loop-closing rule), not to coder. `bankruptcy-resolution-narration` remains a separate, brand-new specifier-originated task awaiting its own handoff approval to coder. Reporting both to the user for separate approval before committing either.
 
+## 2026-08-03T18:27:10Z — coder sent bankruptcy-resolution-narration to refactorer
+
+Handoff message sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: bankruptcy-resolution-narration
+commit: c2115e8fdb
+```
+
+The implementation wires forced bankruptcy sales, mortgages, auctions,
+inheritance, and inherited-mortgage settlement into the existing event
+journal and report vocabulary.
+
+## 2026-08-03T18:30:07Z — coder received architect decline-narration review
+
+Handoff message received from architect:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: dd38353b55
+
+Re-read your role and constitution.
+
+merge_and_process architect dd38353b55
+```
+
+Merged the architect review. The review required moving decline-reason
+ownership from `Offer` to `Strategy`, so the default no-buying-policy strategy
+cannot be misreported as reserve protection. Implemented the third bare-
+decline reason and its journal, log, and report acceptance step coverage.
+
+## 2026-08-03T18:30:45Z — coder sent decline-narration-and-turn-start-reserve to architect
+
+Handoff message sent to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: ce53678413
+```
+
+The priority-00 review fix is implemented and verified: the no-buying-policy
+strategy now emits a bare decline, while `AgreeIfAffordable` retains the two
+specific affordability reasons.
 ## 2026-08-03T18:23:41Z — architect received decline-narration-and-turn-start-reserve
 
 Handoff message received from specifier:
