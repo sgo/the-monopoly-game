@@ -18227,3 +18227,16 @@ cards, jail, and journal manifests; the focused bankruptcy/building/cards/
 jail rename scenarios killed all selected mutants. Broader existing
 buying-land and journal narration surfaces retain non-discriminating
 survivors.
+
+## 2026-08-03T19:38:01Z — architect sends rename-agree-if-affordable-to-greedo phase sync to specifier
+
+```text
+type: git_handoff
+to: specifier
+priority: 50
+task: rename-agree-if-affordable-to-greedo
+commit: eed93223eb
+```
+
+Architecture review is complete: `Greedo` is the consistent strategy name
+at all public selection boundaries, and regenerated acceptance is green.
