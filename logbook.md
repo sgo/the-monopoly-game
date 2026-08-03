@@ -17706,6 +17706,22 @@ Merged the architect review. The review required moving decline-reason
 ownership from `Offer` to `Strategy`, so the default no-buying-policy strategy
 cannot be misreported as reserve protection. Implemented the third bare-
 decline reason and its journal, log, and report acceptance step coverage.
+
+## 2026-08-03T18:30:45Z — coder sent decline-narration-and-turn-start-reserve to architect
+
+Handoff message sent to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: ce53678413
+```
+
+The priority-00 review fix is implemented and verified: the no-buying-policy
+strategy now emits a bare decline, while `AgreeIfAffordable` retains the two
+specific affordability reasons.
 ## 2026-08-03T18:23:41Z — architect received decline-narration-and-turn-start-reserve
 
 Handoff message received from specifier:
