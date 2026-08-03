@@ -17889,3 +17889,33 @@ now resolved — no longer present in any run. `mvn test` (domain/CLI) and
 `mvn test -P property-tests` both green.
 
 Committed the fix as `2caf17b`. Handing off to architect.
+
+## 2026-08-03T18:44:17Z — architect received bankruptcy-resolution-narration refactorer handoff
+
+```text
+type: git_handoff
+to: architect
+priority: 50
+task: bankruptcy-resolution-narration
+commit: 18f8b92134
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 18f8b92134
+```
+
+Merged `18f8b92134` as `ac95363`. Resolved the logbook-only merge conflict
+without dropping either handoff record. Architectural review confirmed that
+`Bankruptcy` owns liquidation, inheritance, auction, and mortgage state
+transitions; its event interface only exposes completed facts, and
+`Game.Journalling` maps those facts to typed journal entries. The refactorer
+also supplied the previously missing standalone report assertion handler for
+an auction winner, matching the existing journal/log assertion pattern.
+
+Verification: full regenerating acceptance suite green (355 tests); Java
+differential mutation found no new `Bankruptcy`/`Game` surface and killed the
+one changed `Report` mutant; DRY reports only the established one-line
+`Journalling` delegation duplicates and existing helper patterns. Soft
+Gherkin mutation refreshed the journal/logging/report manifests; each
+surface killed 9 of 25 selected mutations, with 16 established
+non-discriminating survivors. No active mutant changes remain.
