@@ -17927,7 +17927,7 @@ type: git_handoff
 to: specifier
 priority: 50
 task: bankruptcy-resolution-narration
-commit: d31d697
+commit: d31d697de3
 ```
 
 Architecture review and verification are complete. The standalone auction
@@ -17940,7 +17940,7 @@ type: git_handoff
 to: specifier
 priority: 50
 task: decline-narration-and-turn-start-reserve
-commit: d31d697
+commit: d31d697de3
 ```
 
 The default-strategy decline now has an explicit `NO_BUYING_POLICY` reason,
