@@ -14763,6 +14763,23 @@ declined. The existing acceptance criteria specify only cannot-afford and
 cash-reserve wording, so a third reason or an unreasoned decline needs a
 specifier decision before the implementation can be architecturally complete.
 
+## 2026-08-02T22:26:10Z — architect sent decline-narration-and-turn-start-reserve
+
+Handoff message sent to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: 7fb4d4b576
+```
+
+The existing two decline reasons cannot correctly narrate an affordable
+decline from `Strategy.UNDECIDED` (or another non-reserve strategy). Decide
+the observable criterion for that case so the model can retain a truthful
+reason rather than inferring one from the offer.
+
 ## 2026-08-02T19:27:58Z — architect received nearest-station-rent-and-jail-narration
 
 Handoff message received from refactorer:
