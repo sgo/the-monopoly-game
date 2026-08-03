@@ -475,3 +475,13 @@ Feature: game report
     Examples:
       | starting_balance | total | interest |
       | 10                | 33    | 3        |
+
+  # report-40
+  Scenario Outline: the report narrates a decline with no reason when the strategy has no buying policy
+    Given pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then the game report says that pawn "dog" declines to buy "Diestsestraat Leuven"
+
+    Examples:
+      | dog_starting_balance |
+      | 100                   |

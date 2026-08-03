@@ -17608,3 +17608,22 @@ bullet to `tasks.md`'s Post-plan refinements section.
 
 Reporting to the user for handoff approval before committing.
 
+## 2026-08-03T05:23:53Z — specifier corrects course: 000092 was a defect-flagging priority-00 follow-up, not a routine phase-complete sync
+
+User asked "Should it go to coder? Was this not a level 00 from architect?", pointing out that I had merged handoff `00_20260803T014627Z_000092` (task `decline-narration-and-turn-start-reserve`, commit `7fb4d4b576`) and then treated the task as fully closed, asking for the next feature, without addressing whatever the architect actually flagged.
+
+Re-checked the raw handoff files rather than trusting my own prior summary: every earlier architect-to-specifier phase-complete sync in `.swarmforge/handoffs/inbox/completed/` used `priority: 50` (`000091`, `000088`, `000087`, ...). `000092` was the only one at `priority: 00`. Per `workflow.prompt`: "If the architect's review finds a defect in Gherkin scenario content ... send a priority 00 follow-up to the specifier ... and treat the task as not yet advanceable until that loop returns." I had missed this distinction and processed it identically to a routine sync.
+
+Read the actual diff of commit `7fb4d4b576` (not just its header): the architect's own logbook entry describes the finding precisely — `Offer.declineReason()` infers the reason purely from `isAffordable()`, so `Strategy.UNDECIDED` (declines every offer unconditionally, no reserve concept at all) would be mislabeled `CASH_RESERVE` if it ever declined something it could actually afford. The architect explicitly asked for "a specifier decision before the implementation can be architecturally complete" — i.e. this task was still open, not closed.
+
+Checked reachability before deciding: `Strategy.UNDECIDED`/`Strategy.OfPlayers.NOBODY_DECIDES` is the default for any pawn not given an explicit strategy in a Gherkin scenario (`World.java:390`) and `Game`'s own hardcoded default, but the actual CLI (`Simulator.java`) always assigns "Agree if affordable" explicitly and never leaves a real game on `NOBODY_DECIDES`. So the mislabeling is reachable only inside the test harness's own default, never via real gameplay, and no existing scenario currently exercises it.
+
+Presented this to the user as a choice: accept as a documented, out-of-scope limitation of a test-only default, or add a third decline reason. User chose to add the third reason.
+
+Added `journal-40`/`logging-40`/`report-40` (a single new companion scenario each, since only the wording changes, not the underlying buy/decline mechanics — no new `buying-land.feature` scenario needed, matching the precedent set by `movement-space-names`/`logging-output`, which only touched narration files): a pawn with no declared strategy (default `UNDECIDED`) lands on affordable unowned land and the journal/log/report record a bare "{pawn} declines to buy {land}" with no "because" clause at all. Confirmed via `GameLogStepHandlers.java` that `journal.feature`'s existing two decline-reason step patterns both require a "because ..." clause and that `journal`'s assertion does exact structural equality on the whole `PurchaseDeclined` entry (unlike `report`/`logging`'s substring check), so a third step pattern is genuinely required, not reachable via the existing two.
+
+Left the actual mechanism (where `declineReason` moves to live — `Strategy` owning it rather than `Offer` inferring it, per the architect's own framing) to the coder; specified only the observable text, not the Java signature.
+
+Validated: `bb gherkin-parser` clean on all three files; `bb gherkin-ir-dry-checker` `exact-dupes: 0` on all three. Ran `./acceptance/run-acceptance.sh`: 355 tests, 21 failures = the same 6 pre-existing (unrelated) + 12 from the not-yet-approved `bankruptcy-resolution-narration` work sitting uncommitted in the working tree + exactly 3 new "Unsupported step" failures for `journal-40`/`logging-40`/`report-40` — no parse errors, no unexpected failures.
+
+This fix belongs to `decline-narration-and-turn-start-reserve` and, once approved, must be committed separately from the unrelated `bankruptcy-resolution-narration` work and handed back to **architect** (same task name, per the priority-00 loop-closing rule), not to coder. `bankruptcy-resolution-narration` remains a separate, brand-new specifier-originated task awaiting its own handoff approval to coder. Reporting both to the user for separate approval before committing either.
