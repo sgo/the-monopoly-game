@@ -68,6 +68,10 @@ public final class Report {
       case Entry.MortgageLifted it ->
           name(it.player()) + " lifts the mortgage on " + spaceName(it.land()) + " for $"
               + it.total().amount() + " including $" + it.interest().amount() + " interest";
+      case Entry.Inherited it -> name(it.player()) + " inherits " + spaceName(it.land())
+          + " from " + name(it.debtor());
+      case Entry.MortgageKept it -> name(it.player()) + " pays $" + it.interest().amount()
+          + " interest to keep the mortgage on " + spaceName(it.land());
       case Entry.LandSold it ->
           name(it.seller()) + " sells " + spaceName(it.land()) + " to " + name(it.buyer())
               + " for $" + it.price().amount();

@@ -212,6 +212,31 @@ public class Game {
     }
 
     @Override
+    public void soldHouse(Player player, ColourStreet street, Money price) {
+      journal.log(new Journal.Entry.HouseSold(player.id(), street.type(), price));
+    }
+
+    @Override
+    public void mortgaged(Player player, Ownable land, Money value) {
+      journal.log(new Journal.Entry.Mortgaged(player.id(), land.type(), value));
+    }
+
+    @Override
+    public void inherited(Player creditor, Ownable land, Player debtor) {
+      journal.log(new Journal.Entry.Inherited(creditor.id(), land.type(), debtor.id()));
+    }
+
+    @Override
+    public void keptMortgage(Player player, Ownable land, Money interest) {
+      journal.log(new Journal.Entry.MortgageKept(player.id(), land.type(), interest));
+    }
+
+    @Override
+    public void liftedMortgage(Player player, Ownable land, Deeds.MortgageCost cost) {
+      journal.log(new Journal.Entry.MortgageLifted(player.id(), land.type(), cost.total(), cost.interest()));
+    }
+
+    @Override
     public void declinedToBuy(Player player, Ownable land, Money price,
                               Strategy.DeclineReason reason, Money reserve) {
       journal.log(new Journal.Entry.PurchaseDeclined(player.id(), land.type(), price, reason, reserve));
@@ -401,6 +426,12 @@ public class Game {
       }
 
       record MortgageLifted(Player.ID player, Street.Type land, Money total, Money interest) implements Entry {
+      }
+
+      record Inherited(Player.ID player, Street.Type land, Player.ID debtor) implements Entry {
+      }
+
+      record MortgageKept(Player.ID player, Street.Type land, Money interest) implements Entry {
       }
 
       record LandSold(Player.ID seller, Street.Type land, Player.ID buyer, Money price) implements Entry {

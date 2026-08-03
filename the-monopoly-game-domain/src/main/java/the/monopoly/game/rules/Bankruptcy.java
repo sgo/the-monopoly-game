@@ -58,15 +58,20 @@ public final class Bankruptcy {
   private void sellImprovementsIfNeeded(Street street, Player debtor) {
     if (!(street instanceof ColourStreet colour)) return;
     if (deeds.hasHotelOn(colour)) deeds.exchangeHotelForHouses(colour, debtor);
-    while (debtor.account().balance().amount().amount() < 0 && deeds.housesBuiltOn(colour) > 0)
-      deeds.sellHouse(colour, debtor);
+    while (debtor.account().balance().amount().amount() < 0 && deeds.housesBuiltOn(colour) > 0) {
+      Money price = deeds.sellHouse(colour, debtor);
+      events.soldHouse(debtor, colour, price);
+    }
   }
 
   private void mortgageUntilSolvent(Player debtor) {
     for (Street.Type type : ownedLandInBoardOrder(debtor)) {
       if (!Money.ZERO.exceeds(debtor.account().balance().amount())) return;
       Ownable land = (Ownable) rules.create(type);
-      if (!deeds.isMortgaged(land)) deeds.mortgage(land, debtor);
+      if (!deeds.isMortgaged(land)) {
+        Money value = deeds.mortgage(land, debtor);
+        events.mortgaged(debtor, land, value);
+      }
     }
   }
 
@@ -103,11 +108,13 @@ public final class Bankruptcy {
     }
     if (winner == null) return;
     deeds.sell(land, winner, bid);
+    events.wonAtAuction(winner, land, bid);
     settleInheritedMortgage(land, winner);
   }
 
   private void inherit(Ownable land, Player debtor, Player creditor) {
     deeds.transferWithoutPayment(land, debtor, creditor);
+    events.inherited(creditor, land, debtor);
     if (deeds.isMortgaged(land)) creditor.account().deposit(land.landMortgageValue());
     settleInheritedMortgage(land, creditor);
   }
@@ -116,13 +123,31 @@ public final class Bankruptcy {
     if (!deeds.isMortgaged(land)) return;
     if (strategies.forPlayer(owner) instanceof AgreeIfAffordable
         && owner.account().balance().amount().covers(land.landMortgageValue().plus(new Money((land.landMortgageValue().amount() + 9) / 10))))
-      deeds.liftMortgage(land, owner);
-    else deeds.keepMortgaged(land, owner);
+      events.liftedMortgage(owner, land, deeds.liftMortgage(land, owner));
+    else events.keptMortgage(owner, land, deeds.keepMortgaged(land, owner));
   }
 
   public interface Events {
     void bankrupt(Player debtor, Player creditor);
     void won(Player player);
+
+    default void soldHouse(Player player, ColourStreet street, Money price) {
+    }
+
+    default void mortgaged(Player player, Ownable land, Money value) {
+    }
+
+    default void wonAtAuction(Player winner, Ownable land, Money price) {
+    }
+
+    default void inherited(Player creditor, Ownable land, Player debtor) {
+    }
+
+    default void keptMortgage(Player player, Ownable land, Money interest) {
+    }
+
+    default void liftedMortgage(Player player, Ownable land, Deeds.MortgageCost cost) {
+    }
   }
 }
 
