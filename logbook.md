@@ -18111,3 +18111,69 @@ actual mechanism (rename the class vs. keep it and just remap the lookup
 string) to the coder.
 
 Reporting to the user for handoff approval before committing.
+
+## 2026-08-03T19:10:45Z — refactorer received rename-agree-if-affordable-to-greedo
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: rename-agree-if-affordable-to-greedo
+commit: 337a325126
+```
+
+Merged `337a325126` (merge commit `c9db0ab`). The tangled append-only
+`logbook.md` conflict was again a cross-matched-boilerplate case (my
+"sent handoff" entry and the architect's "received handoff" entry share
+the same quoted handoff-field block, and git's diff matched across them);
+resolved surgically by cross-checking `git show HEAD:logbook.md` and
+`git show 337a325126:logbook.md` for the exact text of each side and
+reconstructing send-then-receive order, verifying the reconstruction was
+purely additive against both parents via `diff <(git show <rev>:logbook.md) logbook.md`
+before committing.
+
+This commit brought in more than just the rename: the whole
+`decline-narration-and-turn-start-reserve` priority-00 loop closed out in
+the meantime — `Strategy.declineReason(Offer)` moved from `Offer` (which
+inferred it purely from affordability) to a default method on `Strategy`
+overridden by `Greedo`, with a new `DeclineReason.NO_BUYING_POLICY` used by
+`Strategy.UNDECIDED`'s default. This is exactly the fix that resolves the
+narration-accuracy edge case flagged repeatedly since
+`decline-narration-and-turn-start-reserve`: `UNDECIDED` declining an
+affordable offer now correctly reports a bare "declines to buy X" instead
+of a misleading reserve-protected message. Verified `Cards.java`/
+`LandSale.java` now call `strategy.declineReason(offer)` instead of
+`offer.declineReason()`, and `Report.declineLine` has a matching
+`NO_BUYING_POLICY -> prefix` case (no "because" clause, matching
+`journal-40`/`logging-40`/`report-40`'s wording exactly).
+
+The rename itself (`AgreeIfAffordable` → `Greedo`) is clean and complete:
+class/file rename, CLI registry key (`"agree-if-affordable"` →
+`"greedo"`), all production/test/acceptance-glue/feature-file references
+updated consistently. Grepped the whole repo (excluding `target/` and
+`logbook.md`, which is an append-only historical record) for any leftover
+`AgreeIfAffordable`/"Agree if affordable"/`agree-if-affordable` — none
+found.
+
+`crap4java` on `Strategy.java`/`Greedo.java`/`Report.java`/
+`Bankruptcy.java`/`Cards.java`/`LandSale.java`: clean except the
+pre-approved `Report.line` exemption. `dry4java`: one new finding —
+`Bankruptcy`'s and `LandSale`'s constructors score 1.00 (identical
+five-field assignment shape, different field types) — pre-existing
+boilerplate untouched by this diff, not something to abstract across two
+otherwise-unrelated resolver classes. `mutate4java --scan`: 8/5/3/25/53/11
+sites across the six domain files, 59 for `Simulator.java`, all well under
+the 100-site split threshold; manifests refreshed. Fixed one cosmetic nit:
+a stray blank line left in `Strategy.Offer` after `declineReason()` moved
+out of it.
+
+Ran `./acceptance/run-acceptance.sh` (regenerated pipeline): 355 tests, 0
+failures — every previously-known gap (the six bankruptcy-narration gaps
+and the `journal-40`/`logging-40`/`report-40` no-reason-decline scenarios)
+is now resolved; nothing outstanding. `mvn test` (domain/CLI) and
+`mvn test -P property-tests` both green.
+
+Committed the manifest refresh and cleanup as `03184af`. Handing off to
+architect.
