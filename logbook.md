@@ -17722,6 +17722,18 @@ commit: ce53678413
 The priority-00 review fix is implemented and verified: the no-buying-policy
 strategy now emits a bare decline, while `AgreeIfAffordable` retains the two
 specific affordability reasons.
+
+## 2026-08-03T18:31:10Z — coder processed queued user reminder
+
+Queued message received:
+
+```
+You have new handoff mail. If idle, run ready_for_next.sh.
+```
+
+The message was queued while the bankruptcy implementation was in progress.
+The work is now handed off and the reminder is being cleared before checking
+the next queue item.
 ## 2026-08-03T18:23:41Z — architect received decline-narration-and-turn-start-reserve
 
 Handoff message received from specifier:
