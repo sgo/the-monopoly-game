@@ -206,9 +206,9 @@ final class JournalStepHandlers {
         given("^pawn \"" + NAME + "\" follows the \"" + NAME + "\" strategy$",
             (world, arguments) -> world.pawnFollows(arguments.text(1), Vocabulary.strategy(arguments.text(2)))),
 
-        given("^pawn \"" + NAME + "\" follows the \"Agree if affordable\" strategy, keeping a \\$"
+        given("^pawn \"" + NAME + "\" follows the \"Greedo\" strategy, keeping a \\$"
                 + VALUE + " reserve$",
-            (world, arguments) -> world.pawnFollowsAgreeIfAffordableWithReserve(
+            (world, arguments) -> world.pawnFollowsGreedoWithReserve(
                 arguments.text(1), money(arguments.number(2)))),
 
         given("^pawn \"" + NAME + "\" starts in jail$",

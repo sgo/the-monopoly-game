@@ -171,8 +171,8 @@ public final class MonopolyStepHandlers {
         step("^the simulator is configured for (.+) players$",
             (world, arguments) -> world.configureSimulator(arguments.number(1), false)),
 
-        step("^every player selects the \"Agree if affordable\" strategy$",
-            (world, arguments) -> world.configureSimulatorWithAgreeIfAffordable()),
+        step("^every player selects the \"Greedo\" strategy$",
+            (world, arguments) -> world.configureSimulatorWithGreedo()),
 
         step("^I run the simulator$", (world, arguments) -> world.runSimulator()),
 

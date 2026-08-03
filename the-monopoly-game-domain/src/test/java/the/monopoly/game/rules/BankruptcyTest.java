@@ -119,7 +119,7 @@ class BankruptcyTest {
     give(deeds, land, dog);
     dog.account().withdraw(new Money(2600));
     Strategy.OfPlayers strategies = player -> player.equals(highHat)
-        ? new the.monopoly.game.strategies.AgreeIfAffordable()
+        ? new the.monopoly.game.strategies.Greedo()
         : Strategy.UNDECIDED;
 
     new Bankruptcy(deeds, rules, players, strategies, new Events()).resolve(dog, highHat);
@@ -144,7 +144,7 @@ class BankruptcyTest {
     dog.account().withdraw(new Money(2600));
     highHat.account().withdraw(highHat.account().balance().amount().minus(new Money(1100 + 33)));
     Strategy.OfPlayers strategies = player -> player.equals(highHat)
-        ? new the.monopoly.game.strategies.AgreeIfAffordable()
+        ? new the.monopoly.game.strategies.Greedo()
         : Strategy.UNDECIDED;
 
     new Bankruptcy(deeds, rules, players, strategies, new Events()).resolve(dog, highHat);
