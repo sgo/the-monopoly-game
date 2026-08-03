@@ -17644,3 +17644,26 @@ Left the actual mechanism (where `declineReason` moves to live — `Strategy` ow
 Validated: `bb gherkin-parser` clean on all three files; `bb gherkin-ir-dry-checker` `exact-dupes: 0` on all three. Ran `./acceptance/run-acceptance.sh`: 355 tests, 21 failures = the same 6 pre-existing (unrelated) + 12 from the not-yet-approved `bankruptcy-resolution-narration` work sitting uncommitted in the working tree + exactly 3 new "Unsupported step" failures for `journal-40`/`logging-40`/`report-40` — no parse errors, no unexpected failures.
 
 This fix belongs to `decline-narration-and-turn-start-reserve` and, once approved, must be committed separately from the unrelated `bankruptcy-resolution-narration` work and handed back to **architect** (same task name, per the priority-00 loop-closing rule), not to coder. `bankruptcy-resolution-narration` remains a separate, brand-new specifier-originated task awaiting its own handoff approval to coder. Reporting both to the user for separate approval before committing either.
+
+## 2026-08-03T18:23:41Z — architect received decline-narration-and-turn-start-reserve
+
+Handoff message received from specifier:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: 5a102d612f
+
+Re-read your role and constitution.
+
+merge_and_process specifier 5a102d612f
+```
+
+Merged and accepted. The specification now requires that an affordable land
+decline by the default no-buying-policy strategy be narrated as a bare decline,
+without a fabricated affordability or reserve reason. This confirms the
+architecture finding: the strategy, not `Offer`, must own the reason for its
+decision. Implementation and the new journal/log/report step support belong
+to the coder; the return path remains this architect loop.
