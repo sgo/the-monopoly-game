@@ -17667,3 +17667,18 @@ without a fabricated affordability or reserve reason. This confirms the
 architecture finding: the strategy, not `Offer`, must own the reason for its
 decision. Implementation and the new journal/log/report step support belong
 to the coder; the return path remains this architect loop.
+
+## 2026-08-03T18:23:41Z — architect sent decline-narration-and-turn-start-reserve
+
+Handoff message sent to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: decline-narration-and-turn-start-reserve
+commit: dd38353b55
+```
+
+Implement the specified no-buying-policy decline narration. The current
+offer-derived reason must not label `Strategy.UNDECIDED` as a reserve decline.
