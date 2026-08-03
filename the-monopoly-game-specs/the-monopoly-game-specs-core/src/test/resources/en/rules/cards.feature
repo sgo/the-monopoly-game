@@ -278,7 +278,7 @@ Feature: chance and community chest cards
 
   # cards-20
   Scenario Outline: a card that advances to a named property leaves it unowned when the pawn declines to buy
-    Given pawn "dog" follows the "Agree if affordable" strategy
+    Given pawn "dog" follows the "Greedo" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
     And the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
     When pawn "dog" lands on "Kans / Chance"

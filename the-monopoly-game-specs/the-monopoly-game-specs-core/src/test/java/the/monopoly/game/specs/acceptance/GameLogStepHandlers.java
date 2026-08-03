@@ -18,6 +18,7 @@ import static the.monopoly.game.specs.acceptance.GameAccount.saysInOrder;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.NAME;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.VALUE;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.auctionWon;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.auctionWonLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bankPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bankPaidLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bought;
@@ -31,9 +32,9 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.communityCh
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.dollars;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.houseBuilt;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.houseSold;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.idOf;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.inherited;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.inheritedLine;
-import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.idOf;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeRoll;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered;
@@ -52,10 +53,10 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.landSold;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.landSoldLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgaged;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgagedLine;
-import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageLifted;
-import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageLiftedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageKept;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageKeptLine;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageLifted;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.mortgageLiftedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moved;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moves;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesAnywhere;
@@ -497,6 +498,11 @@ final class GameLogStepHandlers {
             (world, arguments) -> logRecordsInOrder(world,
                 moves(arguments.text(1)),
                 rentPaid(arguments.text(2), arguments.text(3), arguments.text(5), arguments.number(4)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" wins the auction for \""
+                + NAME + "\" at \\$" + VALUE + "$",
+            (world, arguments) -> says(world, auctionWonLine(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
 
         then("^the game report says that pawn \"" + NAME + "\" moves before it says that pawn \""
                 + NAME + "\" buys \"" + NAME + "\" for \\$" + VALUE + "$",
