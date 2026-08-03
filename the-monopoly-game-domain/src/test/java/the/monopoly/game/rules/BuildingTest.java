@@ -5,7 +5,7 @@ import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Street;
-import the.monopoly.game.strategies.AgreeIfAffordable;
+import the.monopoly.game.strategies.Greedo;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,7 +31,7 @@ class BuildingTest {
     deeds.arrangeHotel(second);
     Money before = owner.account().balance().amount();
 
-    Building building = new Building(deeds, rules, player -> new AgreeIfAffordable(), new Building.Events() {
+    Building building = new Building(deeds, rules, player -> new Greedo(), new Building.Events() {
     });
 
     building.develop(owner);

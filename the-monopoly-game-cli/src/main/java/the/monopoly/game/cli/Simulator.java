@@ -6,7 +6,7 @@ import the.monopoly.game.components.dice.Cup;
 import the.monopoly.game.components.players.Pawn;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.rules.Rule;
-import the.monopoly.game.strategies.AgreeIfAffordable;
+import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 /** Thin command boundary for running a configured Monopoly simulation. */
 public final class Simulator {
   private static final Map<String, Supplier<Strategy>> STRATEGIES = Map.of(
-      "agree-if-affordable", AgreeIfAffordable::new
+      "greedo", Greedo::new
   );
 
   private Simulator() {
@@ -59,7 +59,7 @@ public final class Simulator {
 
   static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames) {
     List<String> names = strategyNames.isEmpty()
-        ? java.util.Collections.nCopies(playerCount, "agree-if-affordable")
+        ? java.util.Collections.nCopies(playerCount, "greedo")
         : strategyNames;
     Map<Player.ID, Strategy> selections = new HashMap<>();
     for (int index = 0; index < playerCount; index++) {

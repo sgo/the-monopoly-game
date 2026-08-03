@@ -173,12 +173,12 @@ public class World {
 
   public void configureSimulator(int players, boolean withChoices) {
     simulatorPlayers = players;
-    simulatorStrategies = player -> new the.monopoly.game.strategies.AgreeIfAffordable();
+    simulatorStrategies = player -> new the.monopoly.game.strategies.Greedo();
   }
 
-  public void configureSimulatorWithAgreeIfAffordable() {
+  public void configureSimulatorWithGreedo() {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
-    simulatorStrategies = player -> new the.monopoly.game.strategies.AgreeIfAffordable();
+    simulatorStrategies = player -> new the.monopoly.game.strategies.Greedo();
   }
 
   public void runSimulator() {
@@ -483,8 +483,8 @@ public class World {
     pawnStrategies.put(pawnName, strategy);
   }
 
-  public void pawnFollowsAgreeIfAffordableWithReserve(String pawnName, Money reserve) {
-    pawnStrategies.put(pawnName, new the.monopoly.game.strategies.AgreeIfAffordable(reserve));
+  public void pawnFollowsGreedoWithReserve(String pawnName, Money reserve) {
+    pawnStrategies.put(pawnName, new the.monopoly.game.strategies.Greedo(reserve));
   }
 
   public void queueChanceCard(String card) {

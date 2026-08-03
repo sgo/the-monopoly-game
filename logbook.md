@@ -17682,6 +17682,24 @@ to this task.
 
 Reporting to the user for handoff approval before committing.
 
+## 2026-08-03T19:04:58Z — coder receives specifier handoff for Greedo rename
+
+Complete received handoff message:
+
+    type: git_handoff
+    to: coder
+    priority: 50
+    task: rename-agree-if-affordable-to-greedo
+    commit: fa92154ed8
+
+Merged `fa92154ed8` and implemented the live strategy rename throughout the
+domain, CLI, acceptance step glue, tests, and references. Renamed the
+strategy class and test to `Greedo`, updated the CLI registry and acceptance
+vocabulary, and preserved historical `logbook.md` references. Verification:
+`MAVEN_OPTS=-Dmaven.repo.local=tmp/m2 mvn -B -pl
+the-monopoly-game-domain,the-monopoly-game-cli test` passed (281 tests), and
+`./acceptance/run-acceptance.sh` passed all 355 tests with 0 failures.
+
 ## 2026-08-03T05:23:53Z — specifier corrects course: 000092 was a defect-flagging priority-00 follow-up, not a routine phase-complete sync
 
 User asked "Should it go to coder? Was this not a level 00 from architect?", pointing out that I had merged handoff `00_20260803T014627Z_000092` (task `decline-narration-and-turn-start-reserve`, commit `7fb4d4b576`) and then treated the task as fully closed, asking for the next feature, without addressing whatever the architect actually flagged.

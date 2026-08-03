@@ -9,7 +9,7 @@ import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
-import the.monopoly.game.strategies.AgreeIfAffordable;
+import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ class LandSaleTest {
 
   @Test
   void whoeverLandsOnUnownedLandIsAskedFirstAndBuysAtThePriceOnTheBoard() {
-    plays(dog, new AgreeIfAffordable());
+    plays(dog, new Greedo());
 
     landOn(dog, LAND);
 
@@ -42,7 +42,7 @@ class LandSaleTest {
 
   @Test
   void aPurchaseIsReportedForWhatItCost() {
-    plays(dog, new AgreeIfAffordable());
+    plays(dog, new Greedo());
 
     landOn(dog, LAND);
 
@@ -52,7 +52,7 @@ class LandSaleTest {
   @Test
   void landAlreadySoldIsNotSoldAgain() {
     deeds.sell(land(LAND), highHat, PRICE);
-    plays(dog, new AgreeIfAffordable());
+    plays(dog, new Greedo());
 
     landOn(dog, LAND);
 
@@ -63,7 +63,7 @@ class LandSaleTest {
   /** Nobody can buy the tax office, so nobody is asked to. */
   @Test
   void aSpaceNobodyCanOwnIsNotForSale() {
-    plays(dog, new AgreeIfAffordable());
+    plays(dog, new Greedo());
 
     landOn(dog, Street.Type.InkomstenBelasting);
 

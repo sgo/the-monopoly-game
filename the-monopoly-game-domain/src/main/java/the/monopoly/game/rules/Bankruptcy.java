@@ -5,7 +5,7 @@ import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
-import the.monopoly.game.strategies.AgreeIfAffordable;
+import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
@@ -121,7 +121,7 @@ public final class Bankruptcy {
 
   private void settleInheritedMortgage(Ownable land, Player owner) {
     if (!deeds.isMortgaged(land)) return;
-    if (strategies.forPlayer(owner) instanceof AgreeIfAffordable
+    if (strategies.forPlayer(owner) instanceof Greedo
         && owner.account().balance().amount().covers(land.landMortgageValue().plus(new Money((land.landMortgageValue().amount() + 9) / 10))))
       events.liftedMortgage(owner, land, deeds.liftMortgage(land, owner));
     else events.keptMortgage(owner, land, deeds.keepMortgaged(land, owner));

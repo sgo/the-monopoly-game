@@ -6,14 +6,14 @@ import the.monopoly.game.components.finance.Money;
  * Agrees to whatever it has the means to pay for: it buys land it can afford,
  * and at auction it bids the most it can afford rather than lose the land.
  */
-public final class AgreeIfAffordable implements Strategy {
+public final class Greedo implements Strategy {
   private final Money reserve;
 
-  public AgreeIfAffordable() {
+  public Greedo() {
     this(Money.ZERO);
   }
 
-  public AgreeIfAffordable(Money reserve) {
+  public Greedo(Money reserve) {
     this.reserve = reserve;
   }
 
