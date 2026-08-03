@@ -18177,3 +18177,32 @@ is now resolved; nothing outstanding. `mvn test` (domain/CLI) and
 
 Committed the manifest refresh and cleanup as `03184af`. Handing off to
 architect.
+
+## 2026-08-03T19:11:15Z — refactorer sent rename-agree-if-affordable-to-greedo handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: rename-agree-if-affordable-to-greedo
+commit: 249096a2d1
+```
+
+Summary: merged and reviewed the coder's rename of `AgreeIfAffordable` to
+`Greedo` — clean and complete across production code, the CLI strategy
+registry, tests, acceptance step glue, and feature files; no leftover
+references anywhere. This same commit chain also closed the long-running
+`decline-narration-and-turn-start-reserve` priority-00 loop: `declineReason`
+moved from `Offer` (inferred purely from affordability) to a `Strategy`
+default method overridden by `Greedo`, with a new `NO_BUYING_POLICY` reason
+for `Strategy.UNDECIDED` — exactly resolving the narration-accuracy edge
+case flagged repeatedly in earlier cycles. `crap4java`/`dry4java` clean
+(aside from the pre-approved `Report.line` exemption and pre-existing,
+non-actionable constructor-shape duplication between `Bankruptcy` and
+`LandSale`). `mutate4java` scan counts all well under the split threshold;
+manifests refreshed. Fixed one cosmetic nit (a stray blank line). Full
+regenerated acceptance pipeline: 355 tests, 0 failures — every previously
+tracked gap is now resolved. Unit and property suites both green. Handing
+verified state to architect for independent review.
