@@ -16405,6 +16405,44 @@ nothing new in kind).
 
 Committing and handing off to coder.
 
+## 2026-08-02T22:09:12Z — coder received decline-narration-and-turn-start-reserve
+
+Handoff message received from specifier:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: decline-narration-and-turn-start-reserve
+commit: 71f3bc5bb1
+
+Re-read your role and constitution.
+
+merge_and_process specifier 71f3bc5bb1
+```
+
+Merged the specification and implemented typed decline events for direct and
+card-driven purchases, with distinct unaffordable and reserve-protected
+reasons. Turn-start entries now include the strategy reserve, and journal,
+log, and report acceptance assertions cover both behaviors. Domain tests pass
+270/270; all new acceptance scenarios pass. The full acceptance run retains
+only the six previously documented bankruptcy narration failures.
+
+## 2026-08-02T22:10:00Z — coder sent decline-narration-and-turn-start-reserve to refactorer
+
+Handoff message sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: decline-narration-and-turn-start-reserve
+commit: 6c14f5da59
+```
+
+The implementation adds the two decline reasons and reserve-bearing turn
+entries, with acceptance coverage for direct and card-driven purchases.
+
 ## 2026-08-02T19:12:49Z — specifier plays a full game and finds two more gaps
 
 The user asked me to actually play a 2-player game via the CLI simulator
@@ -16938,6 +16976,16 @@ domain suite passes 268 tests, and the buying-land acceptance scenarios all
 pass. The full acceptance run has only the six previously documented
 bankruptcy narration failures, which are outside this handoff.
 
+Handoff message sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 91e185504d
+```
+
 ## 2026-08-02T21:14:34Z — refactorer received agree-if-affordable-cash-reserve (bidFor fix)
 
 Handoff message received from coder:
@@ -16998,6 +17046,57 @@ solidly fixed.
 architect: the reserve now applies consistently to both the direct offer
 and the auction path, and the utility-monopoly override works in both
 places too. Committing and handing off.
+
+## 2026-08-02T21:15:08Z — refactorer sent agree-if-affordable-cash-reserve handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: 81d8079a15
+```
+
+Summary: verified the coder's `bidFor` fix closes the reserve leak I
+flagged last cycle — `buying-land-3`/`buying-land-5` now pass
+consistently across repeated acceptance runs. `crap4java`/`dry4java`
+clean; mutation manifest refreshed (5 sites, well under threshold).
+Investigated and ruled out a one-off `SpecsCliEnCliAcceptanceTest`
+failure as pre-existing timing flakiness unrelated to this change
+(confirmed by isolating the fix commit: no CLI failure before it across
+two runs, intermittent after it across three runs, and the default
+zero-reserve strategy makes the new `bidFor` cap a mathematical no-op
+for that scenario anyway). Full unit (268) and property (22) suites
+green. Acceptance consistently 309/315 on repeated runs — only the
+already-known, already-flagged bankruptcy-narration gap remains.
+Handing verified state to architect for independent review.
+
+## 2026-08-02T21:17:16Z — refactorer received agree-if-affordable-cash-reserve (logbook completion)
+
+Handoff message received from coder:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: agree-if-affordable-cash-reserve
+
+Re-read your role and constitution.
+
+merge_and_process coder f9a4f2c700
+```
+
+Action taken: merged commit `f9a4f2c700` — a `logbook.md`-only commit
+("Complete reserve bidding handoff record") filling in the coder's own
+"sent" entry with the handoff message text it was missing. No source
+changed (`git diff 91e185504d..f9a4f2c700 --stat` shows only
+`logbook.md`); confirmed the domain module still compiles. No new
+functional review needed: this is the same `bidFor` fix already merged,
+verified, and handed off to the architect as commit `81d8079a15` last
+cycle. Not sending a second handoff for this — the verified state is
+already in flight to the architect for this task.
 
 ## 2026-08-02T21:15:05Z — architect received agree-if-affordable-cash-reserve
 
@@ -17173,3 +17272,175 @@ commit: d8845a5c25
 Phase closure: reserve-aware direct purchases and auctions are verified, the
 utility-monopoly exception is preserved, and the boundary scenarios now
 distinguish the previously hidden self-auction path.
+
+## 2026-08-02T21:38:08Z — specifier receives agree-if-affordable-cash-reserve phase-complete sync
+
+Handoff message received from architect:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: agree-if-affordable-cash-reserve
+commit: d8845a5c25
+
+Re-read your role and constitution.
+
+merge_and_process architect d8845a5c25
+```
+
+Action taken: merged (fast-forward, no conflict — the only content change
+was the mutation manifest re-timestamped from the architect's own
+reproduction, confirming the same 36/41-killed, five-inert-survivor result
+I reported). Re-ran the domain/CLI/specs-core Maven suite myself before
+accepting closure; all green.
+
+`agree-if-affordable-cash-reserve` is closed: "Agree if affordable" now
+keeps a configurable cash reserve when buying directly and when bidding at
+auction, with utilities exempt from the reserve whenever a purchase would
+complete the buyer's own utility monopoly or deny another player theirs.
+`buying-land-3` through `buying-land-7` specify it, `SIMULATOR.md` and
+`tasks.md` document it. Asking the user for the next feature to specify.
+
+## 2026-08-02T22:00:37Z — specifier writes decline-narration and turn-start-reserve specs
+
+The user asked for two more observability gaps to be closed, both a
+consequence of the reserve strategy just shipped:
+
+1. Declines should be logged with a reason, not silent. Currently, when a
+   strategy declines a purchase (either the plain `!isAffordable()` case or
+   the new reserve case), `LandSale.resolve` and `Cards.buyIfAccepted` both
+   just fall through with no event at all.
+2. The reserve should render alongside the balance on every "starts a turn"
+   line, not just be a hidden strategy parameter.
+
+Added `journal-31`/`32`, `logging-31`/`32`, `report-31`/`32` for decline
+narration via the direct-landing path (`LandSale`), reusing `buying-land-2`'s
+and `buying-land-3`'s exact setups: "declines to buy X because it cannot
+afford the $Y price" and "... because it would drop the balance below the
+$Y reserve".
+
+User then asked to also cover `Cards.buyIfAccepted` — the card-driven
+"advance to X, buy if unowned" path used by the nearest-station,
+nearest-utility, and named-property cards, which shares the identical
+`accepts()` call but is a structurally separate call site (no auction
+fallback on decline, unlike `LandSale`). Added `journal-34`/`35`,
+`logging-34`/`35`, `report-34`/`35` mirroring the same two reasons via a
+card-driven landing (`cards-17`/`18`'s Rue de Diekirch setup). Also added
+`cards-20`: nothing in `cards.feature` had ever proven a card-driven decline
+leaves the land unowned with the balance untouched (no auction exists on
+this path, so this needed its own functional proof) — a genuine gap
+independent of the narration request, since the underlying decision logic
+was already proven via `LandSale`'s tests but this specific call site's
+"then what" was never asserted anywhere.
+
+Didn't duplicate the functional proof per decline reason on the card path
+(unlike `buying-land-2` vs `-3`, which differ in outcome because of the
+auction): with no auction involved, both reasons produce the identical
+observable state (unowned, balance unchanged), so one functional scenario
+covers both; only the wording scenarios need two variants.
+
+For the turn-start reserve, added `journal-33`/`logging-33`/`report-33`:
+"pawn dog starts a turn with $1500 and a $100 reserve", appended as a
+suffix so existing "starts a turn" assertions (confirmed via the step glue
+to be substring checks, not exact-line matches) keep passing unmodified.
+Included a `reserve: 0` example row per the user's "every turn" phrasing,
+so non-reserve-keeping players still render "a $0 reserve" rather than
+omitting the clause conditionally.
+
+Verified all four changed files with `bb gherkin-parser` (clean) and
+`bb gherkin-ir-dry-checker` (zero exact-duplicates in any file; only the
+same class of near-duplicate/possible-synonym noise already established
+this session). Full `mvn test` across domain/CLI/specs-core green — these
+scenarios aren't wired to any implementation yet, so they're expected to
+fail once the coder generates and runs the acceptance pipeline, per the
+usual red-before-green process.
+
+Committing and handing off to coder.
+
+## 2026-08-02T22:25:16Z — refactorer received decline-narration-and-turn-start-reserve
+
+Handoff message received from coder:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: decline-narration-and-turn-start-reserve
+commit: 8ad7c66938
+
+Re-read your role and constitution.
+
+merge_and_process coder 8ad7c66938
+```
+
+Action taken: merged commit `8ad7c66938` (append-only `logbook.md`
+conflict — four hunks this time, tangled the same way earlier cycles
+were: git's diff matched independent entries' shared boilerplate
+against each other. Resolved by hand, entry by entry, verifying each
+against `git show <commit>:logbook.md` rather than trusting the raw
+hunk grouping — a mechanical splice from the two branches' tails broke
+the reconstruction the first time through, so I reverted with `git
+merge --abort` and redid it surgically, one hunk at a time).
+
+Reviewed the diff: `Journal.Entry.TurnStarted` gained a `reserve` field
+(with a compatibility 2-arg constructor defaulting it to `Money.ZERO`,
+so existing call sites and `ReportTest`'s 2-arg construction stayed
+valid). New `Journal.Entry.PurchaseDeclined` fires from both
+`LandSale.resolve` and `Cards.buyIfAccepted` on decline, carrying a new
+`Strategy.DeclineReason` enum (`CANNOT_AFFORD`/`CASH_RESERVE`) derived
+from `Offer.declineReason()` — a clean design choice: it re-derives the
+reason from the existing public `isAffordable()` check already used by
+`accepts()`, rather than duplicating that logic. `Report.declineLine`
+is a small standalone 2-branch switch, kept separate from `Report.line`
+so it doesn't inflate the documented CRAP-exempt sealed switch beyond
+its one new case.
+
+Found and fixed two import-ordering slips in `GameLogStepHandlers.java`:
+`playerPaidLine` sorted after `purchaseDeclined*` (should precede them
+alphabetically), and a non-static `Strategy` import placed in the
+middle of the static-import block instead of grouped with the other
+type imports at the top. Structure-only; no behavior change.
+
+**Noted, not fixed — a narration-accuracy edge case outside this task's
+tested scope**: `Offer.declineReason()` infers the reason purely from
+`isAffordable()` — affordable-but-declined is always reported as
+`CASH_RESERVE`, unaffordable as `CANNOT_AFFORD`. That's correct for
+every strategy this project actually plays with (`AgreeIfAffordable`,
+with or without a reserve), but `Strategy.UNDECIDED` (the "leaves every
+choice alone" default, e.g. `NOBODY_DECIDES`) declines every offer
+unconditionally regardless of affordability; if it ever declined an
+affordable offer, this would report "would drop the balance below the
+$0 reserve" — technically true (its default reserve is $0) but
+misleading, since `UNDECIDED` has no reserve concept at all and simply
+never buys. No specified or acceptance-tested scenario exercises this
+(`buying-land-*` all use `AgreeIfAffordable`), and `UNDECIDED` is a
+test/null-strategy stub rather than a real playable strategy today, so
+I did not treat this as blocking. Deciding whether it needs a third
+`DeclineReason` (or some other resolution) is a design call outside
+this role's "no new behavior" mandate — flagging for the architect/
+specifier rather than guessing.
+
+Verification: `crap4java` clean except the already-exempted
+`Report.line` (31 branches now, one more than before, per the
+documented sealed-switch decision). `dry4java` across `Game.java`/
+`Report.java`/`Cards.java`/`LandSale.java`/`Strategy.java`: only the
+pre-existing `Journalling` one-line event-delegation boilerplate,
+already established precedent, nothing new. `mutate4java --scan`:
+30/3/53/11/8 sites, all well under the split threshold; manifests
+refreshed.
+
+Ran the full `./acceptance/run-acceptance.sh` pipeline (not `mvn test`,
+which again silently reused stale generated sources and undercounted —
+`mvn test` showed 33/33/37 tests for journal/report/logging, unchanged
+from before this task, while the regenerated pipeline correctly showed
+39/39/43, proving the new scenarios weren't even running under `mvn
+test` alone). All new decline-narration and turn-start-reserve
+scenarios pass; the only failures are the same six already-known,
+already-flagged bankruptcy forced-mortgage/house-sale narration gaps,
+out of scope for this task. Repeated twice for stability, including a
+`SpecsCliEnCliAcceptanceTest` pass both times (the flaky CLI timing test
+noted previously did not reproduce this cycle). `mvn test -P
+property-tests` 22/22 green.
+
+Committing and handing the verified state to the architect.
