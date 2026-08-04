@@ -20623,3 +20623,46 @@ scenarios (`journal-45`, `logging-45`, `report-45`) all pass per the
 coder's reported 439/439 acceptance and 279+11 unit tests. Matches the
 specifier's spec exactly; a small, well-scoped change. Proceeding with
 CRAP/DRY/mutation analysis before verification and handoff.
+
+## 2026-08-05T00:23:00Z — refactorer reviews card-bank-payout-narration
+
+`crap4java` on the three changed files (`Cards.java`, `Game.java`,
+`Report.java`): only one threshold-exceeded line, `Report.line`
+(CC=37, 74.4% coverage, CRAP=60.0) — the sealed-`Entry`-switch exempt
+from the CRAP threshold by the 2026-07-28 decision (`Report.line` was
+reverted three times when replaced by a map). The new `BankReceived`
+case follows the exact same one-branch-per-case shape as every other
+entry, so the exemption still applies as-is; recording the new CRAP
+figure per the exemption rule. Every other changed method (`resolve`,
+`receiveBank`, `receivedBank`, etc.) is CRAP <= 6.
+
+`dry4java` on the domain module: no new duplication from this change.
+The flagged pairs are all pre-existing (the `Game.java` `Journal.Events`
+boilerplate at lines ~204-293, generic test-helper shapes) already
+documented in earlier cycles. `receiveBank`/`receivedBank` mirror the
+existing `payBank`/`paidBank` pair exactly but are too short (3 lines)
+to register as a new duplicate under dry4java's min-lines=4 threshold —
+same shape as the other ~30 one-line event-dispatch methods already in
+that class, not new duplication worth extracting on its own.
+
+`mutate4java --scan` on the three changed files: Cards.java 53 sites,
+Game.java 30 sites, Report.java 3 sites — all well under the 100-site
+split threshold, no split needed. All three embedded manifests were
+stale against the coder's edits; refreshed with `--update-manifest`
+(manifest-only diff, no behavior change).
+
+No property-test gap: this is a narrow additive change (one new
+symmetric journal-entry/report-line pair mirroring `BankPaid`/
+`paidBank`) already covered by a new unit test and three new acceptance
+scenarios; no existing property test targets journal/report narration
+broadly enough that this would need a new property, and inventing one
+for a single mirrored case would be artificial.
+
+Ran `mvn test` (all modules, clean) and `mvn test -P property-tests`
+(clean). Ran `./acceptance/run-acceptance.sh` twice: 439 tests, 0
+failures both times.
+
+No structural refactor needed — the coder's implementation was already
+within CRAP/DRY bounds. Committed the manifest refresh as `6548aa7`
+"Refresh mutation manifests for card-bank-payout-narration" (3 files,
+manifest blocks only). Handing off to architect.
