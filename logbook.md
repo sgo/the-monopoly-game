@@ -19454,5 +19454,30 @@ setup-then-assert step repeats, same shape already present in scenarios
 the two new scenarios, nothing else moved.
 
 User approved writing these and handing off as a defect report (not a new
-feature). Committing and notifying coder next, task name
-`distressed-sale-liquidation-defects`.
+feature). Committed as `92fcd6a93f` "Add reproduction scenarios for two
+distressed-sale defects found in live play" (2 files, 137 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-liquidation-defects
+commit: 92fcd6a93f
+```
+
+Summary: two defects found by running a real 2-player game and reading
+its log, both reproduced as Gherkin scenarios in `distressed-sale.feature`
+rather than fixed here (out of specifier's remit). `distressed-sale-15`
+reproduces a crash — `DistressedSale.mortgageRemainingCandidates` tries to
+re-mortgage a property already sold to a peer earlier in the same
+resolution, since the candidate list it walks was never updated to
+exclude settled sales; currently fails with the exact
+`IllegalStateException` seen in live play. `distressed-sale-16` reproduces
+a correctness gap — the debtor defers to house-selling whenever it has
+*any* house anywhere, instead of only when the specific sale would
+complete the *buyer's* monopoly; currently fails because the sale never
+happens. `distressed-sale-4` still passes but only because its one
+example conflates the two conditions. Full detail and root-cause tracing
+in the prior logbook entry this cycle.
