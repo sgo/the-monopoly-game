@@ -171,6 +171,22 @@ class BankruptcyTest {
   }
 
   @Test
+  void aDistressedOfferBelowTheMortgageValueIsRejected() {
+    Deeds deeds = new Deeds();
+    Ownable land = (Ownable) rules.create(Street.Type.LippenslaanKnokke);
+    give(deeds, land, dog);
+    dog.account().withdraw(new Money(1514));
+    Strategy.OfPlayers strategies = player -> player.equals(highHat) ? distressedBidder(40) : Strategy.UNDECIDED;
+
+    new Bankruptcy(deeds, rules, players, strategies, new Events()).resolve(dog, null);
+
+    assertThat(deeds.ownerOf(land.type())).contains(dog.id());
+    assertThat(deeds.isMortgaged(land)).isTrue();
+    assertThat(dog.account().balance().amount().amount()).isEqualTo(76);
+    assertThat(deeds.isBankrupt(dog)).isFalse();
+  }
+
+  @Test
   void aDistressedSaleAscendsInFiveDollarStepsUntilOnlyOneBidderCanStillRaise() {
     Deeds deeds = new Deeds();
     Player ironBox = player("iron box");
