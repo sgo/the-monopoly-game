@@ -19986,3 +19986,79 @@ Merged `e0cb12bedc`. Full acceptance passed (433 tests), and the exact-floor
 scenario is fully killed by soft Gherkin mutation (4/4). The one-dollar-below
 scenario remains unmanifested because all six of its example mutations survive;
 returning that specification gap to the specifier.
+
+## 2026-08-05T21:58:00Z — specifier investigates the second mortgage-floor mutation finding
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: distressed-sale-mortgage-floor
+commit: 085215bf66
+
+Re-read your role and constitution.
+
+merge_and_process architect 085215bf66
+```
+
+Merged `085215bf66` into `main` as `ee2722c`. Only `logbook.md` conflicted
+(same cross-matched append-only shape); my first splice attempt
+accidentally duplicated a paragraph by grabbing an oversized, overlapping
+tail slice — caught it on re-read before committing and fixed it by
+deleting the duplicate block directly rather than re-splicing, then
+verified header uniqueness before moving on.
+
+Investigated *why* `distressed-sale-17` is still insensitive, since I'm
+not allowed to run `gherkin-mutator` myself (verification restricts me to
+tests). Traced the actual mechanism with a throwaway package-private
+reproduction: `belowMortgageFloor` rejects *any* bid under $90 unconditionally,
+and a rejected bid is never paid — so the observable outcome (land stays
+with dog, gets mortgaged, dog's balance = mortgage value minus shortfall)
+is byte-identical for *every* `high_hat_starting_balance` value from the
+smallest that still produces a nonzero deny-motive bid all the way up to
+$257. Only crossing to $258 (where the 35%-of-balance bid finally reaches
+$90) changes anything. This isn't a narrow rounding artifact — it's the
+entire sub-floor range, because a bid that's rejected has zero effect on
+state regardless of its exact size. No choice of number can make that
+column properly mutation-sensitive against a small perturbation in the
+"stays below the floor" direction; only a perturbation large enough to
+cross $258 will ever get killed, and the mutator's delta isn't guaranteed
+to reach that far. This is the same shape of problem as the accepted
+`en/components/dice.feature !no-mutation` precedent (a scenario whose
+correctness is "which side of a threshold," not an exact value) — except
+here it's one cell of one scenario, not a whole feature file, and I don't
+know whether the tooling supports excluding a single scenario's mutation
+that way.
+
+Verified `dog_starting_balance` and `expected_dog_final_balance` are
+*not* part of the problem: temporarily mutated `dog_starting_balance`
+by +1 in the tracked feature file and re-ran `./acceptance/run-acceptance
+.sh` (not the mutator — the ordinary suite) to check without guessing;
+it failed exactly as expected (`expected: 1, but was: 2`), then reverted
+with `git checkout --` before making any real edit. Also confirmed
+`high_hat_starting_balance` mutated by +1 (255→256) leaves the suite
+green, directly confirming the insensitivity in the field the architect's
+tool flagged.
+
+Improved what's actually improvable: moved from `high_hat_starting_balance
+=255` (an edge of a width-3 rounding run, `{255,256,257}` all map to the
+same $89 bid) to `239` (an edge of a width-2 run, `{238,239}`), narrowing
+the unavoidable one-directional dead zone from two neighboring values to
+one (`238` alone still survives; `237` and `240` both cross correctly).
+Retuned `dog_starting_balance` to `17` and the expected balance to `7` to
+match (shortfall $83, mortgage $90, final balance $7). This is the best
+achievable via numeric choice alone, not a full fix — the underlying
+one-directional insensitivity is structural, not a tuning mistake, given a
+rejected bid is a no-op regardless of size.
+
+Validated with `bb gherkin-parser` (clean) and
+`./acceptance/run-acceptance.sh` (433 tests, 0 failures). Handing this
+back to architect with the analysis above rather than guessing at further
+numeric tweaks, so they can judge with mutation-tool access in hand
+whether the residual one-directional gap is acceptable (matching the
+dice-fairness precedent) or whether it needs a structural fix instead
+(e.g. new step vocabulary to script an exact distressed-sale bid,
+bypassing Greedo's percentage rounding entirely — which would be a coder
+change, not something to guess into the Gherkin blind).

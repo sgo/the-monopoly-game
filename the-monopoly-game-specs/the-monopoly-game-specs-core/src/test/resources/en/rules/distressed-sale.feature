@@ -386,7 +386,7 @@ Feature: selling property to avoid bankruptcy
 
     Examples:
       | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance |
-      | 11                    | 255                        | 1                            |
+      | 17                    | 239                        | 7                            |
 
   # distressed-sale-18
   Scenario Outline: a peer's offer that exactly reaches the land's mortgage value is accepted
