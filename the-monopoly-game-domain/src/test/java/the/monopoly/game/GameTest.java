@@ -552,6 +552,22 @@ class GameTest {
   }
 
   @Test
+  void aChanceCardIsRecordedBeforeItsDirectBankPayout() {
+    Game.Result result = playWithCards(
+        Map.of(),
+        new Deeds(),
+        new Roll(3, 4),
+        "De bank betaald je een dividend van M50.",
+        null
+    );
+
+    assertThat(result.journal()).containsSubsequence(
+        new Entry.ChanceCardDrawn(Pawn.dog.id(), "De bank betaald je een dividend van M50."),
+        new Entry.BankReceived(Pawn.dog.id(), new Money(50))
+    );
+  }
+
+  @Test
   void aChanceCardChargesRepairCostsForEveryHouseAndHotelOwned() {
     Deeds deeds = new Deeds();
     Player dog = players.getFirst();

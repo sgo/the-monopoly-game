@@ -102,7 +102,7 @@ public final class Cards implements Landings {
       ),
       Map.entry(
           "De bank betaald je een dividend van M50.",
-          (Consumer<Player>) player -> player.account().deposit(new Money(50))
+          (Consumer<Player>) player -> receiveBank(player, new Money(50))
       ),
       Map.entry(
           CHANCE_GET_OUT_OF_JAIL_FREE_CARD,
@@ -134,21 +134,21 @@ public final class Cards implements Landings {
       ),
       Map.entry(
           "Je lening is afbetaald. Je ontvangt M150.",
-          (Consumer<Player>) player -> player.account().deposit(new Money(150))
+          (Consumer<Player>) player -> receiveBank(player, new Money(150))
       )
     );
     this.communityChestEffects = Map.ofEntries(
       Map.entry(
           "Je maakt elke week tijd vrij voor je bejaarde buurman — Je hebt geweldige verhalen gehoord! Je ontvant M100.",
-          (Consumer<Player>) player -> player.account().deposit(new Money(100))
+          (Consumer<Player>) player -> receiveBank(player, new Money(100))
       ),
       Map.entry(
           "Je organiseert een groep om de voetpaden op te ruimen. Je ontvangt M50.",
-          (Consumer<Player>) player -> player.account().deposit(new Money(50))
+          (Consumer<Player>) player -> receiveBank(player, new Money(50))
       ),
       Map.entry(
           "Je bent vrijwilliger bij het rode kruis. Er waren gratis koekjes! Je ontvangt M10.",
-          (Consumer<Player>) player -> player.account().deposit(new Money(10))
+          (Consumer<Player>) player -> receiveBank(player, new Money(10))
       ),
       Map.entry(
           "Je koopt wat koekjes op het schoolfestival. Lekker! Je betaald M50.",
@@ -168,15 +168,15 @@ public final class Cards implements Landings {
       ),
       Map.entry(
           "Je helpt jouw buur met haar boodschappen. Ze bedankt je met een lekkere lunch! Je ontvangt M20.",
-          (Consumer<Player>) player -> player.account().deposit(new Money(20))
+          (Consumer<Player>) player -> receiveBank(player, new Money(20))
       ),
       Map.entry(
           "Je helpt met het bouwen van een nieuwe speelplaats! Je ontvangt M100.",
-          (Consumer<Player>) player -> player.account().deposit(new Money(100))
+          (Consumer<Player>) player -> receiveBank(player, new Money(100))
       ),
       Map.entry(
           "Je speelt de hele dag met de kinderen in het kinderhospitaal. Je ontvangt M100.",
-          (Consumer<Player>) player -> player.account().deposit(new Money(100))
+          (Consumer<Player>) player -> receiveBank(player, new Money(100))
       ),
       Map.entry(
           "Je ging naar de car wash inzamelactie van de school — Maar je vergat de ramen te sluiten! je betaald M100.",
@@ -188,7 +188,7 @@ public final class Cards implements Landings {
       ),
       Map.entry(
           "Je helpt je buren hun tuin opruimen na het onweer. Je ontvangt M200.",
-          (Consumer<Player>) player -> player.account().deposit(new Money(200))
+          (Consumer<Player>) player -> receiveBank(player, new Money(200))
       ),
       Map.entry(
           "Je vrienden in het dierenasiel zijn je dankbaar voor je gulheid. je betaald M50.",
@@ -200,7 +200,7 @@ public final class Cards implements Landings {
       ),
       Map.entry(
           "je organiseert een wafelbak voor de plaatstelijke school. Je ontvangt M25.",
-          (Consumer<Player>) player -> player.account().deposit(new Money(25))
+          (Consumer<Player>) player -> receiveBank(player, new Money(25))
       )
     );
   }
@@ -236,6 +236,11 @@ public final class Cards implements Landings {
   private void applyEffect(Map<String, Consumer<Player>> effects, String card, Player player) {
     Consumer<Player> effect = effects.get(card);
     if (effect != null) effect.accept(player);
+  }
+
+  private void receiveBank(Player player, Money amount) {
+    player.account().deposit(amount);
+    events.receivedBank(player, amount);
   }
 
   private void moveTo(Player player, Street.Type destination, boolean collectSalaryIfPassing) {
@@ -521,6 +526,9 @@ public final class Cards implements Landings {
     }
 
     default void paidBank(Player player, Money amount) {
+    }
+
+    default void receivedBank(Player player, Money amount) {
     }
 
     default void collectedSalary(Player player, Money salary) {

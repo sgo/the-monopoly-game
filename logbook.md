@@ -17682,6 +17682,15 @@ to this task.
 
 Reporting to the user for handoff approval before committing.
 
+2026-08-05T00:13:05+02:00 — received specifier handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: card-bank-payout-narration
+payload: Re-read your role and constitution.
+merge_and_process specifier 2123881e3c
+Merged specifier commit 2123881e3c. Added a bank-received journal event for direct card payouts, report rendering, focused unit coverage, and acceptance handlers for journal/log/report ordering. Unit tests: 279 domain and 11 CLI tests green. Acceptance: 439 tests green.
+
 ## 2026-08-03T19:04:58Z — coder receives specifier handoff for Greedo rename
 
 Complete received handoff message:
@@ -20149,6 +20158,15 @@ changed domain surface, DRY found no duplicates, and the property suite passed
 one-dollar-below boundary scenario; the remaining 14 survivors are pre-existing
 unmanifested scenarios outside this correction.
 
+2026-08-04T20:00:34Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: 97d1a3099b
+
+Phase-complete sync: the mortgage-floor boundary correction is accepted.
+
 ## 2026-08-05T22:03:00Z — specifier received distressed-sale-mortgage-floor phase-complete sync
 
 Handoff message received:
@@ -20282,8 +20300,45 @@ pattern, nothing new).
 Given how tightly the four fixes are coupled — the floor-exemption fix is
 subsumed by the pricing fix, and the auto-credit fix changes what number
 several already-existing scenarios expect — recommended bundling them as
-one handoff rather than four sequential ones. User agreed. Committing and
-handing off as a single task next.
+one handoff rather than four sequential ones. User agreed.
+
+Committed as `61a45551e3` "Specify needs-based distressed-sale pricing
+and the auto-credit defect" (5 files, 184 insertions, 23 deletions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-needs-based-pricing
+commit: 61a45551e3
+```
+
+Summary: two more defects found while fixing the mortgage-floor
+exemption, both stemming from the same root cause —
+`DistressedSale.auction()`'s single-bidder branch pays the bidder's raw
+ceiling directly instead of negotiating a price, so (1) buyers overpay
+whenever their ceiling exceeds what the debtor needs, and (2) the floor
+exemption for monopoly-completing bids exists only to compensate for
+that overpay, and (3) `settle()` separately auto-credits a debtor with
+another property's mortgage value without actually mortgaging it,
+whenever a sale covers at least half the shortfall — neither behavior
+was ever specified. Proposed fix (verified via a temporary end-to-end
+patch, reverted before committing): replace the raw-ceiling price with
+`max(mortgageFloor, shortfall − otherCollateral)`, clamped to the
+bidder's ceiling as a cap rather than an automatic payment; this
+subsumes the floor-exemption fix and removes the need for the auto-credit
+shortcut entirely. Retuned `distressed-sale-2/-5/-8/-12/-16` and the
+`journal`/`logging`/`report` narration scenarios reusing `-2`'s numbers;
+reworked `-9` and `-15`, whose old numbers depended on the bugs being
+fixed; added `-20` (proves needs-based pricing directly) and `-21`
+(isolates the auto-credit defect alone). All ten `distressed-sale`
+scenarios plus the three narration scenarios verified both ways: fail
+today, pass clean (436/436) against the temporary combined patch. Full
+root-cause tracing and the two mistakes I caught in my own numbers before
+they reached the user are in the prior logbook entry this cycle.
+
 
 2026-08-04T21:19:32Z — received specifier handoff:
 type: git_handoff
@@ -20420,3 +20475,123 @@ method in the file to CRAP <= 6. dry4java clean, mutate4java well under
 threshold with manifest refreshed. Acceptance green twice (436 tests),
 unit and property suites both green. Handing verified state to
 architect for independent review.
+
+2026-08-04T21:37:53Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-needs-based-pricing
+commit: a9bae0487e
+
+Re-read your role and constitution.
+merge_and_process refactorer a9bae0487e
+
+Merged `a9bae0487e`. The extraction keeps auction rounds and candidate sale
+attempts as cohesive domain operations. Acceptance passed (436 tests),
+differential Java mutation had no changed surface, and DRY found no duplicates.
+Soft mutation manifests were refreshed for the changed distressed-sale and
+narration features.
+
+## 2026-08-05T23:42:00Z — specifier received distressed-sale-needs-based-pricing phase-complete sync
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-needs-based-pricing
+commit: c98f1bbd02
+
+Re-read your role and constitution.
+
+merge_and_process architect c98f1bbd02
+```
+
+Merged `c98f1bbd02` into `main` as `0bff3e3`. Only `logbook.md`
+conflicted; caught the same splice mistake I made two cycles ago before
+committing this time (a duplicated paragraph from grabbing an oversized
+tail slice) — fixed by deleting the duplicate directly and grepping every
+distinctive marker line to confirm each appears exactly once before
+moving on.
+
+Read the merged `DistressedSale.java`: the coder's `minimumBid` method
+matches my proposed formula exactly —
+`max(landMortgageValue, shortfall - otherCollateral)`, computed from the
+same filtered `candidates` list I had to correct my own throwaway patch
+to use. The floor exemption and the free-collateral-credit branch are
+both gone, subsumed by the one change, as predicted.
+
+The refactorer caught something worth noting: an existing `BankruptcyTest`
+(`aDistressedSaleAscendsInFiveDollarStepsUntilOnlyOneBidderCanStillRaise`)
+kept passing under the new pricing but silently stopped exercising the
+multi-bidder ascending auction it was named for, because the new pricing
+formula raised the computed minimum bid above one bidder's ceiling,
+collapsing it to the single-bidder path. Retuned the test's numbers to
+restore genuine multi-bidder coverage rather than leaving a
+correctly-passing but misleadingly-named test in place.
+
+Verified independently: `./acceptance/run-acceptance.sh` (436 tests, 0
+failures), and re-ran a fresh live 2-player game via the CLI — completed
+normally, 0 exceptions, declared winner.
+
+This closes the loop on everything found by running the live 2-player
+game this session: the `mortgageRemainingCandidates` crash, the
+house-deferral overbreadth, the mortgage-floor gap, the whole-balance
+overpay, and the free-collateral-credit shortcut are now all genuinely
+specified, implemented, reviewed, and verified. Per role rules, asking
+the user for the next feature to add.
+
+## 2026-08-05T00:06:00Z — specifier specifies journal coverage for direct bank-to-player card payments
+
+At the user's request, ran a 3-player game this time. It never
+terminated: killed it after 2 minutes at roughly 2.25 million turns per
+player, a 1.3GB log, and one player's balance at $56 million, with zero
+bankruptcies across the whole run. All three players' balances climbed
+*monotonically* — no dips, no volatility — which ruled out "just an
+unlucky/boring game" before I'd even finished reading the log; a real
+economy driven by rent and taxes would show variance over millions of
+turns even without anyone going bankrupt.
+
+Traced the cause by reading `Cards.java` end to end rather than
+guessing from the log. Every cash-affecting mechanic in the game reports
+itself through `Cards.Events`: `paidBank` (player pays bank),
+`collectedSalary` (passing/landing on Start), `paid(tenant, owner, land,
+rent)`, `paid(payer, payee, amount)` (used by the "pay/collect from
+every other player" cards). Ten specific Chance/Community Chest cards —
+the ones that pay the player directly ("the bank pays you a dividend of
+$50", "your loan is paid off, you receive $150", and eight more, $805
+combined face value across the two 15/16-card decks) — call
+`player.account().deposit(new Money(X))` directly, with no `Events`
+method for "bank pays player" existing at all. The deposit itself is
+correct — confirmed by the existing `cards-3` scenario, which already
+checks the resulting balance — this is purely an observability gap: real
+money enters the game with nothing recorded in the journal, log, or
+report. Drawn repeatedly as the deck cycles over millions of turns, that
+steady, invisible income is what let three players' balances climb
+forever without the real economy (rent, tax) ever getting a chance to
+bankrupt anyone.
+
+**New scenarios**: `journal-45`, `logging-45`, `report-45`, one per file,
+modeled directly on the existing `journal-23`/`-24` pattern (a card
+drawn, ordered before the payment event it causes) — reusing the same
+`"the next chance card will be ..."` step and the same dividend card
+`cards-3` already exercises for its balance effect. Asserts the journal
+records `pawn "dog" draws the chance card "..." before it records that
+pawn "dog" receives $50 from the bank`, mirroring the wording of the
+existing `pays the bank $X` step exactly, just in the other direction.
+This introduces new step vocabulary (`receives $X from the bank`) that
+doesn't exist in any step handler yet, matching a new `Journal.Entry`
+and `Cards.Events` method the coder will need to add — same shape as
+introducing `belowMortgageFloor` earlier this session, but for a case
+that currently has no representation in the event model at all rather
+than a Gherkin gap.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` (no new duplicate-in-scenario findings touching any of
+the three new scenarios). Ran `./acceptance/run-acceptance.sh`: 439
+tests, 3 failures — all three new scenarios, each failing with
+`Unsupported step: ... receives $<amount> from the bank`, i.e. failing
+because the step doesn't exist yet, not because of a wrong assertion —
+exactly the right failure mode for a genuinely new capability gap.
+Reporting to the user for handoff approval before committing.
