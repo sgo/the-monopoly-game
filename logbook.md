@@ -20164,3 +20164,98 @@ found by running the live 2-player game this session (the
 the mortgage-floor gap) are now genuinely specified, implemented, and
 verified down to mutation-testing rigor. Per role rules, asking the user
 for the next feature to add.
+
+## 2026-08-04T23:15:00Z — specifier specifies whole-balance overpay and auto-credit defects, hands off as one task
+
+At the user's request, ran another real 2-player game and read the log.
+It completed cleanly (fix from the prior task holds), but the user
+pushed back on something I'd waved off too quickly: a monopoly-completing
+buyer paying $9 for a property with an $80 mortgage isn't "working as
+designed" just because it's exempt from the floor — that exemption was
+never actually specified, and the user separately questioned why any
+buyer, monopoly-completing or not, should hand over its *entire* bank
+balance when nobody's bidding against it.
+
+Both concerns turned out to be the same root cause, and pulling on that
+thread surfaced two more defects than either of us expected.
+
+**Root cause.** `DistressedSale.auction()`'s single-bidder branch uses
+`bid = maximums.getFirst()` directly — the bidder's *ceiling* (raw 35%
+deny-cap, or full balance for monopoly-completion) becomes the *price*,
+with no negotiation at all, unlike the real multi-bidder path which
+genuinely ascends from the mortgage floor. Two things follow from this
+one shortcut: (1) `belowMortgageFloor`'s `!completesBuyersGroup`
+exemption was patched in specifically to stop this from rejecting
+legitimate monopoly-completing ceilings — removing the shortcut removes
+the need for the exemption; (2) every buyer overpays whenever their
+ceiling exceeds what the debtor actually needs.
+
+**The fix I'm proposing** (verified by temporarily patching
+`DistressedSale.java` end-to-end, then reverting — not implemented here,
+out of specifier's remit): replace the raw-ceiling price with
+`max(landMortgageValue, shortfall − otherCollateral)`, clamped to the
+bidder's ceiling as a maximum, not an automatic payment. A bidder whose
+ceiling can't reach that price simply isn't a valid bidder (same
+rejection outcome the floor-exemption fix needed, subsumed for free).
+
+**A third, unrelated defect surfaced while chasing this**, verified by
+directly patching and reverting: `DistressedSale.settle()` credits a
+debtor with another property's mortgage value *without mortgaging it*,
+whenever a sale's price is at least half the shortfall — free money, no
+real transaction, the property stays unmortgaged. Never something I
+specified; looks like a shortcut to make `distressed-sale-9`'s original
+numbers work. New `distressed-sale-21` isolates it cleanly (chose
+`Steenstraat Brugge` + `Noord Station` and `high_hat_starting_balance=286`
+specifically so the raw-ceiling and needs-based prices coincide at
+exactly $100 — meaning the *only* thing that differs between buggy and
+fixed code is whether `Noord Station` ends up actually mortgaged, not the
+final balance).
+
+**Scenarios retuned to reflect needs-based pricing** (buyer pays only
+what's needed, not their ceiling): `distressed-sale-2`, `-5`, `-8`, `-12`,
+`-16`, `-20` (new, proves a buyer with $185 in hand pays only the $90
+floor a $10 debt requires), plus the `journal`/`logging`/`report`
+narration scenarios that reused `-2`'s old assert-the-arranging-column
+pattern (gave them their own `expected_bid` column instead, since the bid
+no longer equals the starting balance).
+
+**Two scenarios needed real rework, not just retuning:**
+- `distressed-sale-15` (this session's earlier crash-fix scenario): its
+  numbers relied on a sub-floor monopoly-completing sale the floor fix
+  forbids outright. Rebuilt with a genuinely larger debt so the sale
+  still legitimately happens and a second property still needs
+  mortgaging afterward — the crash-fix's own premise, preserved on solid
+  ground this time.
+- `distressed-sale-9`: its title ("pre-empts the debtor needing to sell
+  anything else") was only true because of the auto-credit bug. Retitled
+  to "the rest is mortgaged separately" and flipped its
+  `Boulevard Tirou Charleroi is not mortgaged` assertion to `is
+  mortgaged` — the numbers themselves were untouched and still hold.
+
+**Two mistakes caught before they reached the user**, both by actually
+running the numbers instead of trusting the arithmetic: my first
+`distressed-sale-12`/`-13` redesigns accidentally chose values where the
+raw ceiling and the needs-based price coincide, silently testing nothing
+— caught because `-12` didn't fail when it should have. My first
+attempt at the pricing patch computed "other collateral" from
+`Liquidation.order` directly instead of the filtered `candidates(debtor)`
+list, so it double-counted a still-developed monopoly's protected
+streets as spendable collateral, mispricing `distressed-sale-16` — caught
+by tracing exactly why a house sold that shouldn't have.
+
+**Verification.** Every retuned/new scenario confirmed two ways: fails
+correctly against today's code (`./acceptance/run-acceptance.sh`: 436
+tests, 13 failures, all in the 10 touched `distressed-sale` scenarios
+plus the 3 narration scenarios, nothing else moved), and passes clean
+(436/436) against a temporary, complete patch implementing all four
+fixes together — applied, tested, then fully reverted via `git checkout
+--`, confirmed by a clean `git diff` before rebuilding. `bb gherkin-parser`
+and `bb gherkin-ir-dry-checker --include-exact` clean on all four touched
+files (only the familiar, already-accepted setup-then-assert step-repeat
+pattern, nothing new).
+
+Given how tightly the four fixes are coupled — the floor-exemption fix is
+subsumed by the pricing fix, and the auto-credit fix changes what number
+several already-existing scenarios expect — recommended bundling them as
+one handoff rather than four sequential ones. User agreed. Committing and
+handing off as a single task next.

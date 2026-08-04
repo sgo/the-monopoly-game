@@ -535,12 +535,12 @@ Feature: game logging
     And pawn "dog" has $<dog_starting_balance> to spend
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
     Then the game log records that pawn "dog" puts "Lippenslaan Knokke" up for sale to avoid bankruptcy
-    And the game log records that pawn "high hat" offers $<high_hat_starting_balance> for "Lippenslaan Knokke"
-    And the game log records that pawn "high hat" wins the distressed sale for "Lippenslaan Knokke" at $<high_hat_starting_balance>
+    And the game log records that pawn "high hat" offers $<expected_bid> for "Lippenslaan Knokke"
+    And the game log records that pawn "high hat" wins the distressed sale for "Lippenslaan Knokke" at $<expected_bid>
 
     Examples:
-      | dog_starting_balance | high_hat_starting_balance |
-      | 0                     | 200                        |
+      | dog_starting_balance | high_hat_starting_balance | expected_bid |
+      | 0                     | 200                        | 100           |
 
   # logging-43
   Scenario Outline: the log records every $5 raise in a bidding war before the winning offer
