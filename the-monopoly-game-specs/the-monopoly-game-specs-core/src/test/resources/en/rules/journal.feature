@@ -571,3 +571,13 @@ Feature: game journal
       | dog_starting_balance | reserve |
       | 200                   | 160     |
       | 100                   | 0       |
+
+  # journal-45
+  Scenario Outline: the journal records a card drawn before the bank pays the player directly
+    Given the next chance card will be "De bank betaald je een dividend van M50."
+    When pawn "dog" lands on "Kans / Chance"
+    Then the game journal records that pawn "dog" draws the chance card "De bank betaald je een dividend van M50." before it records that pawn "dog" receives $<amount> from the bank
+
+    Examples:
+      | amount |
+      | 50     |

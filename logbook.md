@@ -20506,3 +20506,57 @@ house-deferral overbreadth, the mortgage-floor gap, the whole-balance
 overpay, and the free-collateral-credit shortcut are now all genuinely
 specified, implemented, reviewed, and verified. Per role rules, asking
 the user for the next feature to add.
+
+## 2026-08-05T00:06:00Z — specifier specifies journal coverage for direct bank-to-player card payments
+
+At the user's request, ran a 3-player game this time. It never
+terminated: killed it after 2 minutes at roughly 2.25 million turns per
+player, a 1.3GB log, and one player's balance at $56 million, with zero
+bankruptcies across the whole run. All three players' balances climbed
+*monotonically* — no dips, no volatility — which ruled out "just an
+unlucky/boring game" before I'd even finished reading the log; a real
+economy driven by rent and taxes would show variance over millions of
+turns even without anyone going bankrupt.
+
+Traced the cause by reading `Cards.java` end to end rather than
+guessing from the log. Every cash-affecting mechanic in the game reports
+itself through `Cards.Events`: `paidBank` (player pays bank),
+`collectedSalary` (passing/landing on Start), `paid(tenant, owner, land,
+rent)`, `paid(payer, payee, amount)` (used by the "pay/collect from
+every other player" cards). Ten specific Chance/Community Chest cards —
+the ones that pay the player directly ("the bank pays you a dividend of
+$50", "your loan is paid off, you receive $150", and eight more, $805
+combined face value across the two 15/16-card decks) — call
+`player.account().deposit(new Money(X))` directly, with no `Events`
+method for "bank pays player" existing at all. The deposit itself is
+correct — confirmed by the existing `cards-3` scenario, which already
+checks the resulting balance — this is purely an observability gap: real
+money enters the game with nothing recorded in the journal, log, or
+report. Drawn repeatedly as the deck cycles over millions of turns, that
+steady, invisible income is what let three players' balances climb
+forever without the real economy (rent, tax) ever getting a chance to
+bankrupt anyone.
+
+**New scenarios**: `journal-45`, `logging-45`, `report-45`, one per file,
+modeled directly on the existing `journal-23`/`-24` pattern (a card
+drawn, ordered before the payment event it causes) — reusing the same
+`"the next chance card will be ..."` step and the same dividend card
+`cards-3` already exercises for its balance effect. Asserts the journal
+records `pawn "dog" draws the chance card "..." before it records that
+pawn "dog" receives $50 from the bank`, mirroring the wording of the
+existing `pays the bank $X` step exactly, just in the other direction.
+This introduces new step vocabulary (`receives $X from the bank`) that
+doesn't exist in any step handler yet, matching a new `Journal.Entry`
+and `Cards.Events` method the coder will need to add — same shape as
+introducing `belowMortgageFloor` earlier this session, but for a case
+that currently has no representation in the event model at all rather
+than a Gherkin gap.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` (no new duplicate-in-scenario findings touching any of
+the three new scenarios). Ran `./acceptance/run-acceptance.sh`: 439
+tests, 3 failures — all three new scenarios, each failing with
+`Unsupported step: ... receives $<amount> from the bank`, i.e. failing
+because the step doesn't exist yet, not because of a wrong assertion —
+exactly the right failure mode for a genuinely new capability gap.
+Reporting to the user for handoff approval before committing.
