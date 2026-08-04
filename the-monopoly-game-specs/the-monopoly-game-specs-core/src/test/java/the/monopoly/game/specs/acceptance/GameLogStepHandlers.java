@@ -29,10 +29,10 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.chanceCardD
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.chanceCardDrawnLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.communityChestCardDrawn;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.communityChestCardDrawnLine;
-import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.dollars;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.distressedOffer;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.distressedStarted;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.distressedWon;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.dollars;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.houseBuilt;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.houseSold;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.idOf;
@@ -139,14 +139,14 @@ final class GameLogStepHandlers {
                 arguments.text(1), arguments.text(2), arguments.number(3)))),
         then("^the game log records that pawn \"" + NAME + "\" puts \"" + NAME
                 + "\" up for sale to avoid bankruptcy$",
-            (world, arguments) -> records(world, distressedStarted(arguments.text(1), arguments.text(2)))),
+            (world, arguments) -> logRecords(world, distressedStarted(arguments.text(1), arguments.text(2)))),
         then("^the game log records that pawn \"" + NAME + "\" offers \\$" + VALUE
                 + " for \"" + NAME + "\"$",
-            (world, arguments) -> records(world, distressedOffer(
+            (world, arguments) -> logRecords(world, distressedOffer(
                 arguments.text(1), arguments.text(3), arguments.number(2)))),
         then("^the game log records that pawn \"" + NAME + "\" wins the distressed sale for \""
                 + NAME + "\" at \\$" + VALUE + "$",
-            (world, arguments) -> records(world, distressedWon(
+            (world, arguments) -> logRecords(world, distressedWon(
                 arguments.text(1), arguments.text(2), arguments.number(3)))),
         then("^the game report says that pawn \"" + NAME + "\" puts \"" + NAME
                 + "\" up for sale to avoid bankruptcy$",
