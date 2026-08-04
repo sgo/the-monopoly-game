@@ -144,6 +144,18 @@ final class MonopolyStepHelpers {
         idOf(seller), SpaceNames.of(spaceName), idOf(buyer), money(price)));
   }
 
+  static Claim distressedStarted(String seller, String spaceName) {
+    return Claim.of(new Entry.DistressedSaleStarted(idOf(seller), SpaceNames.of(spaceName)));
+  }
+
+  static Claim distressedOffer(String bidder, String spaceName, int price) {
+    return Claim.of(new Entry.DistressedOffer(idOf(bidder), SpaceNames.of(spaceName), money(price)));
+  }
+
+  static Claim distressedWon(String bidder, String spaceName, int price) {
+    return Claim.of(new Entry.DistressedSaleWon(idOf(bidder), SpaceNames.of(spaceName), money(price)));
+  }
+
   static Claim buildingRefused(String pawnName, String spaceName, int price) {
     return Claim.of(new Entry.BuildingRefused(idOf(pawnName), SpaceNames.of(spaceName), money(price)));
   }

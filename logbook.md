@@ -18657,6 +18657,24 @@ the earlier reserve work. No parse errors, no unexpected failures.
 This is easily the largest single specification in this project to date.
 Reporting to the user for review and handoff approval before committing.
 
+## 2026-08-04T08:06:02Z — coder receives strategic buying and distressed-sale handoff
+
+Complete received handoff message:
+
+    type: git_handoff
+    to: coder
+    priority: 50
+    task: greedo-strategic-buying-and-distressed-sale
+    commit: e7f7f7538d
+
+Merged `e7f7f7538d` and implemented the first coder pass: dynamic Greedo
+reserves by priority tier, the explicit priority table, distressed-sale
+offers and selection, bankruptcy fallback ordering, and journal/report/log
+entries plus acceptance handlers. Domain tests passed before the latest
+reserve compatibility correction; the full acceptance suite reached 424/429
+passing, with five remaining failures under investigation. No outgoing
+handoff has been sent yet.
+
 ## 2026-08-04T07:39:14Z — specifier adds narration for the distressed-sale negotiation
 
 User asked for journal/log/report scenarios narrating the debtor's property

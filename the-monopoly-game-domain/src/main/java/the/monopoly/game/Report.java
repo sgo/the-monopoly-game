@@ -78,6 +78,13 @@ public final class Report {
       case Entry.LandSaleRefused it ->
           name(it.seller()) + " is refused selling " + spaceName(it.land()) + " to " + name(it.buyer())
               + " for $" + it.price().amount() + " because the colour group has houses built";
+      case Entry.DistressedSaleStarted it ->
+          name(it.seller()) + " puts " + spaceName(it.land()) + " up for sale to avoid bankruptcy";
+      case Entry.DistressedOffer it ->
+          name(it.bidder()) + " offers $" + it.price().amount() + " for " + spaceName(it.land());
+      case Entry.DistressedSaleWon it ->
+          name(it.bidder()) + " wins the distressed sale for " + spaceName(it.land())
+              + " at $" + it.price().amount();
       case Entry.BuildingRefused it ->
           name(it.player()) + " is refused building a house on " + spaceName(it.land())
               + " for $" + it.price().amount() + " because a street in the colour group is mortgaged";

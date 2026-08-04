@@ -530,6 +530,7 @@ Feature: game journal
 
   # journal-43
   Scenario Outline: the journal records every $5 raise in a bidding war before the winning offer
+    Given we select 3 players
     Given pawn "dog" follows the "Greedo" strategy
     And pawn "dog" owns "Boulevard Tirou Charleroi"
     And pawn "dog" owns "Lippenslaan Knokke"
