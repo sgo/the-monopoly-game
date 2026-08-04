@@ -20419,3 +20419,12 @@ attempts as cohesive domain operations. Acceptance passed (436 tests),
 differential Java mutation had no changed surface, and DRY found no duplicates.
 Soft mutation manifests were refreshed for the changed distressed-sale and
 narration features.
+
+2026-08-04T21:37:53Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-needs-based-pricing
+commit: c98f1bbd02
+
+Phase-complete sync: needs-based pricing extraction accepted.
