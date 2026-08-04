@@ -19760,8 +19760,31 @@ step-repeat shape, nothing new). Ran `./acceptance/run-acceptance.sh`:
 432 tests, 1 failure (`distressed-sale-17`, exactly as expected) — nothing
 else moved.
 
-User approved writing this and handing off as a defect report. Committing
-and notifying coder next, task name `distressed-sale-mortgage-floor`.
+as `eaba2d0ca6` "Add reproduction scenario for distressed-sale
+mortgage-floor defect" (2 files, 70 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: eaba2d0ca6
+```
+
+Summary: a third defect found by running a real 2-player game and reading
+its log, reproduced as a Gherkin scenario rather than fixed here (out of
+specifier's remit). `distressed-sale-17` reproduces winning distressed-sale
+prices landing below the land's own mortgage value —
+`Greedo.bidForDistressed`'s deny-motive branch caps the bid at 35% of the
+bidder's balance with no floor tied to the land's mortgage value, and
+`DistressedSale` never rejects a sale that doesn't clear it. Every
+existing scenario only ever exercised the buyer-declines-entirely edge
+(bid = $0); this one exercises a small nonzero bid that still undercuts
+the floor. Currently fails because the sub-floor offer is wrongly
+accepted (`pawn "dog" owns "Lippenslaan Knokke"` is false). Full detail
+and root-cause tracing in the prior logbook entry this cycle.
 
 2026-08-04T18:46:18Z — received specifier handoff:
 type: git_handoff
@@ -19862,3 +19885,65 @@ commit: e31c9867d1
 
 The mortgage-floor scenario's example mutations all survived the required
 soft Gherkin mutation check; requested a specification review.
+
+## 2026-08-04T21:40:00Z — specifier corrects distressed-sale-17 per architect's priority-00 mutation finding
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: distressed-sale-mortgage-floor
+commit: e31c9867d1
+
+Re-read your role and constitution.
+
+merge_and_process architect e31c9867d1
+```
+
+Merged `e31c9867d1` into `main` as `6d4124f`. Only `logbook.md` conflicted
+(same cross-matched append-only shape as every prior cycle); resolved by
+diffing both sides against the shared ancestor (`eaba2d0ca6`) and
+concatenating additively.
+
+The coder's fix (confirmed by reading the merged `DistressedSale.java`)
+rejects any winning bid below `land.landMortgageValue()` unless the sale
+completes the buyer's own colour group, via two small extracted
+predicates (`belowMortgageFloor`, `shouldDeferToHouseSale`) computing
+`completesColourGroup` once instead of twice — a clean, minimal fix.
+
+Architect's soft Gherkin mutation run found `distressed-sale-17` itself
+too loose: all four mutations of its example values survived, meaning the
+scenario's assertions don't actually depend on the exact numbers chosen —
+`dog_starting_balance=86, high_hat_starting_balance=40,
+expected_dog_final_balance=76` sat so far below the $90 mortgage floor
+that nudging any of them by a small amount still landed on the same side
+of the floor, so the outcome (and thus every assertion) stayed identical.
+
+Fixed by moving the numbers to sit exactly on the boundary, confirmed
+against the real merged implementation with a throwaway package-private
+reproduction before touching the Gherkin (habit from the last two
+cycles' mistakes paying off — both boundary cases matched on the first
+try this time): `belowMortgageFloor` uses strict `<`, so a bid of $89
+against Lippenslaan Knokke's $90 mortgage is rejected and a bid of $90
+exactly is accepted. Retuned `distressed-sale-17` to
+`dog_starting_balance=11, high_hat_starting_balance=255` (bid lands at
+exactly $89, one dollar under the floor, rejected, dog ends at $1 after
+mortgaging) and added a companion `distressed-sale-18`
+("a peer's offer that exactly reaches the land's mortgage value is
+accepted") at `dog_starting_balance=10, high_hat_starting_balance=258`
+(bid lands at exactly $90, accepted, dog ends at $0, high hat at $168).
+Sitting the accept/reject pair one dollar apart on either side of the
+real threshold means a mutation to any of the six example values now
+crosses the boundary and flips which side's assertions apply — this
+should give the mutation tool something to actually kill.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` (only the same pre-existing/accepted setup-then-assert
+repeat shape). Ran `./acceptance/run-acceptance.sh`: 433 tests, 0
+failures — both scenarios pass against the already-merged, already-fixed
+implementation.
+
+Committing and handing this correction back to architect under the same
+task name, per the priority-00 loop rule.
