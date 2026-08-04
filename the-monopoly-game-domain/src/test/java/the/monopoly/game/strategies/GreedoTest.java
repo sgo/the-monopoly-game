@@ -76,6 +76,55 @@ class GreedoTest {
     assertThat(bid).isEqualTo(new Money(210));
   }
 
+  @Test
+  void aBidThatCompletesTheBiddersOwnMonopolyIsNotCappedAndSpendsWhateverIsAvailable() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player debtor = player(bank, "debtor", 0);
+    Player bidder = player(bank, "bidder", 400);
+    Player other = player(bank, "other", 400);
+    Deeds deeds = new Deeds();
+    deeds.sell(ownable(Street.Type.RueRoyaleTournai), bidder, Money.ZERO);
+    deeds.sell(ownable(Street.Type.GroenplaatsAntwerpen), bidder, Money.ZERO);
+    Ownable land = ownable(Street.Type.LippenslaanKnokke);
+
+    Money bid = strategy.bidForDistressed(
+        new Strategy.Offer(land, new Money(400)), bidder, debtor,
+        List.of(debtor, bidder, other), rules, deeds);
+
+    assertThat(bid).isEqualTo(new Money(400));
+  }
+
+  @Test
+  void aBidderWhoWouldWinTheGameByTheDebtorsBankruptcyDeclinesRegardlessOfTheLand() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player debtor = player(bank, "debtor", 0);
+    debtor.account().withdraw(new Money(50));
+    Player bidder = player(bank, "bidder", 1000);
+    Ownable land = ownable(Street.Type.LippenslaanKnokke);
+
+    Money bid = strategy.bidForDistressed(
+        new Strategy.Offer(land, new Money(1000)), bidder, debtor,
+        List.of(debtor, bidder), rules, new Deeds());
+
+    assertThat(bid).isEqualTo(Money.ZERO);
+  }
+
+  @Test
+  void cashReserveSizesToAnAffordableMissingStreetInAnAlmostCompleteGroup() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player player = player(bank, "player", 500);
+    Deeds deeds = new Deeds();
+    deeds.sell(ownable(Street.Type.RueRoyaleTournai), player, Money.ZERO);
+    deeds.sell(ownable(Street.Type.GroenplaatsAntwerpen), player, Money.ZERO);
+
+    Money reserve = strategy.cashReserve(player, rules, deeds);
+
+    assertThat(reserve).isEqualTo(new Money(180));
+  }
+
   /** A strategy that has an opinion about nothing leaves the land alone. */
   @Test
   void aStrategyThatAnswersNothingBuysNothingAndBidsNothing() {
