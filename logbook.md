@@ -20072,3 +20072,19 @@ dice-fairness precedent) or whether it needs a structural fix instead
 (e.g. new step vocabulary to script an exact distressed-sale bid,
 bypassing Greedo's percentage rounding entirely — which would be a coder
 change, not something to guess into the Gherkin blind).
+
+2026-08-04T20:00:34Z — received specifier handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: 34964c136e
+
+Re-read your role and constitution.
+merge_and_process specifier 34964c136e
+
+Merged `34964c136e`. Full acceptance passed (433 tests), Java mutation had no
+changed domain surface, DRY found no duplicates, and the property suite passed
+(22 tests). Soft Gherkin mutation killed all six mutations for the revised
+one-dollar-below boundary scenario; the remaining 14 survivors are pre-existing
+unmanifested scenarios outside this correction.
