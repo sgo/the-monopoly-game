@@ -94,6 +94,8 @@ public final class Report {
           name(it.player()) + " draws the community chest card \"" + it.card() + "\"";
       case Entry.BankPaid it ->
           name(it.player()) + " pays the bank $" + it.amount().amount();
+      case Entry.BankReceived it ->
+          name(it.player()) + " receives $" + it.amount().amount() + " from the bank";
       case Entry.JailEntered it ->
           name(it.player()) + " is sent to jail from landing on " + boardSpaceName(it.cause());
       case Entry.JailFinePaid it ->

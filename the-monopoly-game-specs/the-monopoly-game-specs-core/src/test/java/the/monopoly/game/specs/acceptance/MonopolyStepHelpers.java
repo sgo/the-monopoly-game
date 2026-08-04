@@ -182,6 +182,10 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.BankPaid(idOf(pawnName), money(amount)));
   }
 
+  static Claim bankReceived(String pawnName, int amount) {
+    return Claim.of(new Entry.BankReceived(idOf(pawnName), money(amount)));
+  }
+
   static Claim playerPaid(String payer, String payee, int amount) {
     return Claim.of(new Entry.PlayerPaid(idOf(payer), idOf(payee), money(amount)));
   }
@@ -296,6 +300,10 @@ final class MonopolyStepHelpers {
 
   static String bankPaidLine(String pawnName, int amount) {
     return pawnName + " pays the bank $" + amount;
+  }
+
+  static String bankReceivedLine(String pawnName, int amount) {
+    return pawnName + " receives $" + amount + " from the bank";
   }
 
   static String playerPaidLine(String payer, String payee, int amount) {

@@ -308,6 +308,11 @@ public class Game {
     }
 
     @Override
+    public void receivedBank(Player player, Money amount) {
+      journal.log(new Journal.Entry.BankReceived(player.id(), amount));
+    }
+
+    @Override
     public void sentToJail(Player player, Street.Type cause) {
       journal.log(new Journal.Entry.JailEntered(player.id(), cause));
     }
@@ -479,6 +484,9 @@ public class Game {
       }
 
       record BankPaid(Player.ID player, Money amount) implements Entry {
+      }
+
+      record BankReceived(Player.ID player, Money amount) implements Entry {
       }
 
       record JailEntered(Player.ID player, Street.Type cause) implements Entry {

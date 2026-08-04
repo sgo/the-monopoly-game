@@ -17682,6 +17682,15 @@ to this task.
 
 Reporting to the user for handoff approval before committing.
 
+2026-08-05T00:13:05+02:00 — received specifier handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: card-bank-payout-narration
+payload: Re-read your role and constitution.
+merge_and_process specifier 2123881e3c
+Merged specifier commit 2123881e3c. Added a bank-received journal event for direct card payouts, report rendering, focused unit coverage, and acceptance handlers for journal/log/report ordering. Unit tests: 279 domain and 11 CLI tests green. Acceptance: 439 tests green.
+
 ## 2026-08-03T19:04:58Z — coder receives specifier handoff for Greedo rename
 
 Complete received handoff message:

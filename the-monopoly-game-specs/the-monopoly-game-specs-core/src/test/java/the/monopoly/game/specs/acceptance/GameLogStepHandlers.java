@@ -21,6 +21,8 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.auctionWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.auctionWonLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bankPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bankPaidLine;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bankReceived;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bankReceivedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bought;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.buildingRefused;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.buildingRefusedLine;
@@ -719,6 +721,18 @@ final class GameLogStepHandlers {
 
         then("^the game report says that pawn \"" + NAME + "\" wins the game$",
             (world, arguments) -> says(world, arguments.text(1) + " wins the game")),
+
+        then("^the game log records that pawn \"" + NAME + "\" draws the chance card \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" receives \\$" + VALUE + " from the bank$",
+            (world, arguments) -> logRecordsInOrder(world,
+                chanceCardDrawn(arguments.text(1), arguments.text(2)),
+                bankReceived(arguments.text(3), arguments.number(4)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" draws the chance card \"" + NAME
+                + "\" before it says that pawn \"" + NAME + "\" receives \\$" + VALUE + " from the bank$",
+            (world, arguments) -> saysInOrder(world,
+                chanceCardDrawnLine(arguments.text(1), arguments.text(2)),
+                bankReceivedLine(arguments.text(3), arguments.number(4)))),
 
         step("^each face was rolled about " + VALUE + " times within a " + VALUE + "% margin$",
             (world, arguments) -> {
