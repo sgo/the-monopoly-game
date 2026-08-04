@@ -19876,6 +19876,16 @@ found a specification gap: all four mutations of the mortgage-floor scenario's
 example values survived, so the task is returning to the specifier for that
 scenario's correction.
 
+2026-08-04T19:34:40Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: distressed-sale-mortgage-floor
+commit: e31c9867d1
+
+The mortgage-floor scenario's example mutations all survived the required
+soft Gherkin mutation check; requested a specification review.
+
 ## 2026-08-04T21:40:00Z — specifier corrects distressed-sale-17 per architect's priority-00 mutation finding
 
 Handoff message received:
@@ -19961,3 +19971,18 @@ throwaway direct reproduction before touching the Gherkin. Validated with
 and `./acceptance/run-acceptance.sh` (433 tests, 0 failures). Per the
 priority-00 loop rule, handing back to architect using the same task
 name.
+
+2026-08-04T19:42:28Z — received specifier handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: e0cb12bedc
+
+Re-read your role and constitution.
+merge_and_process specifier e0cb12bedc
+
+Merged `e0cb12bedc`. Full acceptance passed (433 tests), and the exact-floor
+scenario is fully killed by soft Gherkin mutation (4/4). The one-dollar-below
+scenario remains unmanifested because all six of its example mutations survive;
+returning that specification gap to the specifier.
