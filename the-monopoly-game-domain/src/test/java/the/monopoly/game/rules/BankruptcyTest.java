@@ -209,7 +209,7 @@ class BankruptcyTest {
     List<Player> table = List.of(dog, highHat, ironBox);
     Ownable land = (Ownable) rules.create(Street.Type.RueGrandeDinant);
     give(deeds, land, dog);
-    dog.account().withdraw(new Money(1555));
+    dog.account().withdraw(new Money(1525));
     Strategy.OfPlayers strategies = player -> {
       if (player.equals(highHat)) return distressedBidder(50);
       if (player.equals(ironBox)) return distressedBidder(70);
@@ -221,7 +221,7 @@ class BankruptcyTest {
 
     assertThat(deeds.ownerOf(land.type())).contains(ironBox.id());
     assertThat(ironBox.account().balance().amount().amount()).isEqualTo(1445);
-    assertThat(dog.account().balance().amount().amount()).isZero();
+    assertThat(dog.account().balance().amount().amount()).isEqualTo(30);
     assertThat(deeds.isBankrupt(dog)).isFalse();
   }
 
