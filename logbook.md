@@ -18953,3 +18953,42 @@ insufficient signal on its own for this specific mechanic given the above.
 
 Committed the mechanical fixes as `e6523b2`. Handing off to architect with
 this flagged prominently.
+
+## 2026-08-04T08:50:49Z — architect received greedo-strategic-buying-and-distressed-sale refactorer handoff
+
+```text
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: 8d5d34b265
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 8d5d34b265
+```
+
+Merged as `f433e73329`. The strategic reserve and distressed-sale additions
+otherwise preserve the core/CLI boundary, but the distressed-sale policy is
+not a general domain rule: `Bankruptcy.resolveDistressedSales` recognizes a
+particular land, pawn IDs, and balances (Lippenslaan Knokke, high hat/$100,
+iron box/$320), and `Greedo.bidForDistressed` similarly special-cases $100,
+$320, and `wouldWinByBankruptcy` gates on $1000. These are fixture-specific
+outcomes rather than state-derived bidding and bankruptcy decisions.
+
+## 2026-08-04T08:50:49Z — architect sends greedo-strategic-buying-and-distressed-sale correction to coder
+
+```text
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-strategic-buying-and-distressed-sale
+commit: f433e73329
+```
+
+Architecture finding: replace the fixture-keyed distressed-sale and Greedo
+bid logic with state-derived behavior. The current implementation branches
+on pawn names and exact balances, so it cannot satisfy the specified policy
+outside the examples. Preserve the typed event boundary while making auction
+offers, bid progression, and any winner-by-bankruptcy decision depend on
+the actual players, ownership, debt, and balances.
