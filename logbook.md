@@ -18700,6 +18700,15 @@ the earlier reserve work. No parse errors, no unexpected failures.
 This is easily the largest single specification in this project to date.
 Reporting to the user for review and handoff approval before committing.
 
+2026-08-04T14:43:00+02:00 — received specifier handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-liquidation-defects
+payload: Re-read your role and constitution.
+merge_and_process specifier 92fcd6a93f
+Merged specifier commit 92fcd6a93f. It adds distressed-sale liquidation defect scenarios, focused tests, and extracts `DistressedSale`/`Liquidation`; reviewing and verifying under coder rules.
+
 2026-08-04T12:41:51+02:00 — processed architect correction for `greedo-strategic-buying-and-distressed-sale`.
 Replaced fixture-keyed distressed-sale behavior with state-derived Greedo bankruptcy decisions and a generic mortgage-value/$5 distressed auction progression. Added focused Greedo unit coverage. Maven unit reactor passes; regenerated acceptance passes 429/429 with zero failures. Sending implementation to refactorer for structural review.
 
@@ -19456,3 +19465,11 @@ the two new scenarios, nothing else moved.
 User approved writing these and handing off as a defect report (not a new
 feature). Committing and notifying coder next, task name
 `distressed-sale-liquidation-defects`.
+
+2026-08-04T15:46:00+02:00 — completed coder handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-liquidation-defects
+payload: Re-read your role and constitution.
+Fixed distressed-sale liquidation so house-sale deferral occurs only when the buyer completes the sold color group, and mortgage fallback skips properties no longer owned after an earlier sale. Unit tests: 276 domain and 11 CLI tests green. Acceptance: 431 tests green.
