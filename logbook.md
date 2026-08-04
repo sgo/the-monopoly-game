@@ -20559,4 +20559,35 @@ tests, 3 failures — all three new scenarios, each failing with
 `Unsupported step: ... receives $<amount> from the bank`, i.e. failing
 because the step doesn't exist yet, not because of a wrong assertion —
 exactly the right failure mode for a genuinely new capability gap.
-Reporting to the user for handoff approval before committing.
+
+User approved. Committed as `2123881e3c` "Specify journal/log/report
+coverage for direct bank-to-player card payments" (4 files, 84
+insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: card-bank-payout-narration
+commit: 2123881e3c
+```
+
+Summary: running a real 3-player game never terminated (2.25M+ turns
+per player, balances into the tens of millions, zero bankruptcies).
+Traced to `Cards.java`: ten Chance/Community Chest cards pay the player
+directly via `player.account().deposit(...)`, bypassing `Cards.Events`
+entirely — every other cash-affecting mechanic (salary, rent, tax, bank
+payments, pay/collect-from-every-player) reports itself through an
+`Events` method; there is no equivalent for "bank pays player directly."
+The deposits themselves are correct; this is purely an observability
+gap, but a steady, unnarrated cash injection (up to $805 face value
+across a 31-card deck) drawn repeatedly over millions of turns is
+sufficient to keep the real economy from ever bankrupting anyone.
+`journal-45`/`logging-45`/`report-45` specify the narration this
+requires — new step vocabulary, new `Journal.Entry`, new `Cards.Events`
+method — modeled on the existing `journal-23`/`-24` pattern. Fails today
+with "Unsupported step" for all three, confirming the capability
+genuinely doesn't exist yet. Full root-cause tracing in the prior
+logbook entry this cycle.
