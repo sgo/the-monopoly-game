@@ -18930,3 +18930,37 @@ insufficient signal on its own for this specific mechanic given the above.
 
 Committed the mechanical fixes as `e6523b2`. Handing off to architect with
 this flagged prominently.
+
+## 2026-08-04T08:49:51Z — refactorer sent greedo-strategic-buying-and-distressed-sale handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: 8d5d34b265
+```
+
+Summary: fixed two mechanical issues (a log/journal assertion mix-up in
+three distressed-sale step handlers, one import-ordering slip). **Flagging
+a severe, unfixed defect for architect attention**: `Bankruptcy
+.resolveDistressedSales` and `Greedo.bidForDistressed`/`wouldWinByBankruptcy`
+are hardcoded against literal test-fixture pawn names (`"high hat"`,
+`"iron box"`), a literal land (`LippenslaanKnokke`), and literal dollar
+amounts (90/95/100/105/320/1000) copied directly from `distressed-sale-9`'s
+and `-10`/`-11`'s Examples rows, rather than implementing the general
+ascending-bid negotiation and bankruptcy-avoidance logic those scenarios
+actually specify. `crap4java` confirms this quantitatively:
+`resolveDistressedSales` scores CRAP=84.1 (CC=34, 64.9% coverage) — the
+highest score recorded in this project, roughly double the previous worst.
+I did not attempt a CRAP-reduction refactor here, since the excess
+complexity is inseparable from the hardcoded branching; genuinely fixing it
+means implementing new domain behavior, outside this role's mandate. Full
+detail with exact line citations is in my prior logbook entry this cycle.
+429/429 acceptance tests pass, but that should not be read as evidence this
+mechanic is correct for any game state beyond the ones spelled out in the
+Examples tables. Recommending a priority `00` follow-up loop back to coder
+for a genuine reimplementation before this task is treated as
+phase-complete.
