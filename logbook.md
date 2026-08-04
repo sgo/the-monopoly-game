@@ -20403,3 +20403,19 @@ failures both times.
 Committed as `be13493` "Extract auction round and per-candidate sale
 attempt from DistressedSale" (2 files, 198 insertions, 127 deletions —
 mostly the regenerated mutation manifest). Handing off to architect.
+
+2026-08-04T21:37:53Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-needs-based-pricing
+commit: a9bae0487e
+
+Re-read your role and constitution.
+merge_and_process refactorer a9bae0487e
+
+Merged `a9bae0487e`. The extraction keeps auction rounds and candidate sale
+attempts as cohesive domain operations. Acceptance passed (436 tests),
+differential Java mutation had no changed surface, and DRY found no duplicates.
+Soft mutation manifests were refreshed for the changed distressed-sale and
+narration features.
