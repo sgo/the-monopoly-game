@@ -42,6 +42,8 @@ final class DistressedSale {
       AuctionResult result = auction(land, debtor);
       Player winner = result.winner();
       Money bid = result.bid();
+      if (winner != null && bid.amount() < land.landMortgageValue().amount()
+          && !deeds.completesColourGroup(rules, land, winner)) continue;
       if (winner != null && bid.amount() > 0 && hasSellableHouse(debtor)
           && deeds.completesColourGroup(rules, land, winner)) {
         deferredToHouseSales.add(type);
