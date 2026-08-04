@@ -27,9 +27,11 @@ en/rules/initiative.feature
 en/rules/jail.feature
 en/rules/free-parking.feature
 en/rules/bankruptcy.feature
+en/rules/distressed-sale.feature
 en/rules/tax.feature
 en/rules/turn-loop.feature
 en/rules/buying-land.feature
+en/rules/greedo-priority.feature
 en/rules/auctions.feature
 en/rules/building.feature
 en/rules/land-sale.feature

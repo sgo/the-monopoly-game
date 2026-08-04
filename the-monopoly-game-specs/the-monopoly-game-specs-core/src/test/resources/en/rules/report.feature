@@ -484,3 +484,75 @@ Feature: game report
     Examples:
       | dog_starting_balance |
       | 100                   |
+
+  # report-41
+  Scenario Outline: the report narrates the reserve dynamically sized for a near-complete colour monopoly at the start of a turn
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "dog" will roll 2 and 3 for their turn
+    When we play the game
+    Then the game report says that pawn "dog" starts a turn with $<dog_starting_balance> and a $<reserve> reserve
+
+    Examples:
+      | dog_starting_balance | reserve |
+      | 1500                  | 60      |
+
+  # report-42
+  Scenario Outline: the report narrates a debtor putting a property up for sale and the sole buyer's winning offer
+    Given pawn "high hat" owns "Rue Royale Tournai"
+    And pawn "high hat" owns "Groenplaats Antwerpen"
+    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" has $<high_hat_starting_balance> to spend
+    And pawn "dog" owns "Lippenslaan Knokke"
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then the game report says that pawn "dog" puts "Lippenslaan Knokke" up for sale to avoid bankruptcy
+    And the game report says that pawn "high hat" offers $<high_hat_starting_balance> for "Lippenslaan Knokke"
+    And the game report says that pawn "high hat" wins the distressed sale for "Lippenslaan Knokke" at $<high_hat_starting_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_starting_balance |
+      | 0                     | 200                        |
+
+  # report-43
+  Scenario Outline: the report narrates every $5 raise in a bidding war before the winning offer
+    Given pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" owns "Boulevard Tirou Charleroi"
+    And pawn "dog" owns "Lippenslaan Knokke"
+    And pawn "high hat" owns "Rue Royale Tournai"
+    And pawn "high hat" owns "Groenplaats Antwerpen"
+    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" has $<high_hat_starting_balance> to spend
+    And pawn "iron box" follows the "Greedo" strategy
+    And pawn "iron box" has $<iron_box_starting_balance> to spend
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    Then the game report says that pawn "high hat" offers $90 for "Lippenslaan Knokke"
+    And the game report says that pawn "iron box" offers $95 for "Lippenslaan Knokke"
+    And the game report says that pawn "high hat" offers $100 for "Lippenslaan Knokke"
+    And the game report says that pawn "iron box" offers $105 for "Lippenslaan Knokke"
+    And the game report says that pawn "high hat" offers $90 for "Lippenslaan Knokke" before it says that pawn "iron box" offers $95 for "Lippenslaan Knokke"
+    And the game report says that pawn "iron box" offers $95 for "Lippenslaan Knokke" before it says that pawn "high hat" offers $100 for "Lippenslaan Knokke"
+    And the game report says that pawn "high hat" offers $100 for "Lippenslaan Knokke" before it says that pawn "iron box" offers $105 for "Lippenslaan Knokke"
+    And the game report says that pawn "iron box" offers $105 for "Lippenslaan Knokke" before it says that pawn "iron box" wins the distressed sale for "Lippenslaan Knokke" at $105
+    And the game report says that pawn "iron box" wins the distressed sale for "Lippenslaan Knokke" at $105
+
+    Examples:
+      | dog_starting_balance | high_hat_starting_balance | iron_box_starting_balance |
+      | 0                     | 100                        | 320                        |
+
+  # report-44
+  Scenario Outline: the report narrates a near-complete colour group's reserve only while its missing street remains affordable
+    Given pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "dog" owns "Bruul Mechelen"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "dog" will roll 2 and 3 for their turn
+    When we play the game
+    Then the game report says that pawn "dog" starts a turn with $<dog_starting_balance> and a $<reserve> reserve
+
+    Examples:
+      | dog_starting_balance | reserve |
+      | 200                   | 160     |
+      | 100                   | 0       |

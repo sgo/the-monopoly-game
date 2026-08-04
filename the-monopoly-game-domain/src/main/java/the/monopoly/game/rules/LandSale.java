@@ -110,12 +110,12 @@ public class LandSale implements Landings {
 
 /* mutate4java-manifest
 version=1
-moduleHash=f3048006c9c8d03f02e3d956c863d98c72803cd4673f29532579122a84f63ef9
+moduleHash=9640a90a3c9162d52a7af1bc76bddfc14634403500f3dde1d463153e58b57ddb
 scope.0.id=Y2xhc3M6TGFuZFNhbGUjTGFuZFNhbGU6MTg
 scope.0.kind=class
 scope.0.startLine=18
 scope.0.endLine=109
-scope.0.semanticHash=70f29fca4e7845d26828adc19979a2e9e3a7a0c808025d3d4684084279086fe4
+scope.0.semanticHash=9912e3bfa05b94e2f45c3d6fe87369a56bf81512b3d7903052ca431b333c2f40
 scope.1.id=Y2xhc3M6TGFuZFNhbGUuRXZlbnRzI0V2ZW50czo5NA
 scope.1.kind=class
 scope.1.startLine=94
@@ -165,7 +165,7 @@ scope.10.id=bWV0aG9kOkxhbmRTYWxlI3Jlc29sdmUoMyk6MzM
 scope.10.kind=method
 scope.10.startLine=33
 scope.10.endLine=46
-scope.10.semanticHash=51cce51c67fa0522d7ff295134224965cd9cf11efb16e50018cc65ed5ca430a1
+scope.10.semanticHash=1cbd33e23cc2c227ee20ce5a6a5a37608b679b498654df369f9887c571c3f01d
 scope.11.id=bWV0aG9kOkxhbmRTYWxlI3NhbGVJc1JlZnVzZWQoMSk6ODQ
 scope.11.kind=method
 scope.11.startLine=84

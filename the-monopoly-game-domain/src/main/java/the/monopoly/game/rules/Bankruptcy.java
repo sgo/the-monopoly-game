@@ -153,12 +153,12 @@ public final class Bankruptcy {
 
 /* mutate4java-manifest
 version=1
-moduleHash=067953178ca3fd0473b7122013415af013ddbfce94b31bc741e956dd559e0daf
+moduleHash=e1dd39467dc0c12a407a3110af4e55da68d4c3fd70ffd7ad3f3e179d1be2a2c6
 scope.0.id=Y2xhc3M6QmFua3J1cHRjeSNCYW5rcnVwdGN5OjE0
 scope.0.kind=class
 scope.0.startLine=14
 scope.0.endLine=152
-scope.0.semanticHash=5e8ddc1de59a9bdb74c9b2db29194c6b653e09e7f5526348facb554e4388acee
+scope.0.semanticHash=678e1705da83cc4b9bb815410d31fdd92a70dd6364140bfccffba4a63fed48e1
 scope.1.id=Y2xhc3M6QmFua3J1cHRjeS5FdmVudHMjRXZlbnRzOjEzMA
 scope.1.kind=class
 scope.1.startLine=130
@@ -248,7 +248,7 @@ scope.18.id=bWV0aG9kOkJhbmtydXB0Y3kjc2V0dGxlSW5oZXJpdGVkTW9ydGdhZ2UoMik6MTIy
 scope.18.kind=method
 scope.18.startLine=122
 scope.18.endLine=128
-scope.18.semanticHash=7283a7adc4b82d4b98e6751cc24e2dd9a6c2fb9fb0c7e033ad779525a1d82c07
+scope.18.semanticHash=6cf12a1d47550fc0be0245613176b9d8119a4f0e5daf9b80dafe0be03d190abf
 scope.19.id=bWV0aG9kOkJhbmtydXB0Y3kuRXZlbnRzI2JhbmtydXB0KDIpOjEzMQ
 scope.19.kind=method
 scope.19.startLine=131

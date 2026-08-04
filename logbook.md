@@ -17965,6 +17965,36 @@ now resolved — no longer present in any run. `mvn test` (domain/CLI) and
 
 Committed the fix as `2caf17b`. Handing off to architect.
 
+## 2026-08-03T18:38:23Z — refactorer sent bankruptcy-resolution-narration handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: bankruptcy-resolution-narration
+commit: 18f8b92134
+```
+
+Summary: merged and reviewed the coder's bankruptcy-resolution event wiring
+in `Bankruptcy.java` — clean, minimal, purely captures previously-discarded
+return values into events; closes all six previously-known bankruptcy
+narration gaps. Found and fixed one real defect: `report.feature`'s
+`report-36` needed a standalone "wins the auction" report step handler
+(only journal/log had one; the winner never moves in this scenario, so the
+existing compound "moves before it says ... wins" wording doesn't apply) —
+added the missing handler and helper, mirroring the existing pattern
+exactly; `Report.java` already rendered the line correctly, so this was
+test-glue, not new behavior. Also fixed two import-ordering slips.
+`crap4java`/`dry4java`/`mutate4java` all clean (aside from pre-existing
+accepted exemptions/precedent). Full unit and property suites green.
+Acceptance (regenerated pipeline, not `mvn test`): 355 tests, 3 failures
+every run — exactly the already-known, already-flagged `journal-40`/
+`logging-40`/`report-40` gap for the separate, not-yet-implemented third
+`Strategy.DeclineReason` value, out of scope for this task. Handing verified
+state to architect for independent review.
+
 ## 2026-08-03T18:44:17Z — architect received bankruptcy-resolution-narration refactorer handoff
 
 ```text
@@ -17995,12 +18025,9 @@ Gherkin mutation refreshed the journal/logging/report manifests; each
 surface killed 9 of 25 selected mutations, with 16 established
 non-discriminating survivors. No active mutant changes remain.
 
-## 2026-08-03T18:50:58Z — specifier receives architect phase-complete syncs for both tasks
+## 2026-08-03T18:44:40Z — architect sends bankruptcy-resolution-narration phase sync to specifier
 
-Two handoffs received, both pointing at the same tip commit (the architect
-processed both tasks to a shared convergence point):
-
-```
+```text
 type: git_handoff
 to: specifier
 priority: 50
@@ -18008,11 +18035,33 @@ task: bankruptcy-resolution-narration
 commit: d31d697de3
 ```
 
-```
+Architecture review and verification are complete. The standalone auction
+report assertion gap is fixed; the full acceptance suite is green.
+
+## 2026-08-03T18:44:40Z — architect sends decline-narration-and-turn-start-reserve phase sync to specifier
+
+```text
 type: git_handoff
 to: specifier
 priority: 50
 task: decline-narration-and-turn-start-reserve
+commit: d31d697de3
+```
+
+The default-strategy decline now has an explicit `NO_BUYING_POLICY` reason,
+so narration no longer incorrectly reports inability to afford. The full
+acceptance suite is green after its returned implementation.
+
+## 2026-08-03T18:50:58Z — specifier receives architect phase-complete syncs for both tasks
+
+Two handoffs received, both pointing at the same tip commit (the architect
+processed both tasks to a shared convergence point):
+
+```text
+type: git_handoff
+to: specifier
+priority: 50
+task: bankruptcy-resolution-narration
 commit: d31d697de3
 ```
 
@@ -18095,3 +18144,614 @@ actual mechanism (rename the class vs. keep it and just remap the lookup
 string) to the coder.
 
 Reporting to the user for handoff approval before committing.
+
+## 2026-08-03T19:02:34Z — specifier sends rename-agree-if-affordable-to-greedo to coder
+
+User approved. Committed as `fa92154ed8` "Rename the "Agree if affordable"
+strategy to "Greedo"".
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: rename-agree-if-affordable-to-greedo
+commit: fa92154ed8
+```
+
+Summary: the strategy's reference name is renamed everywhere in Gherkin and
+project docs; every scenario declaring it now expects "Greedo" and fails
+with "Unknown strategy" until the CLI registry and step-handler lookup (and
+optionally the `AgreeIfAffordable` class itself) are updated to recognize
+the new name.
+
+## 2026-08-03T19:10:45Z — refactorer received rename-agree-if-affordable-to-greedo
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: rename-agree-if-affordable-to-greedo
+commit: 337a325126
+```
+
+Merged `337a325126` (merge commit `c9db0ab`). The tangled append-only
+`logbook.md` conflict was again a cross-matched-boilerplate case (my
+"sent handoff" entry and the architect's "received handoff" entry share
+the same quoted handoff-field block, and git's diff matched across them);
+resolved surgically by cross-checking `git show HEAD:logbook.md` and
+`git show 337a325126:logbook.md` for the exact text of each side and
+reconstructing send-then-receive order, verifying the reconstruction was
+purely additive against both parents via `diff <(git show <rev>:logbook.md) logbook.md`
+before committing.
+
+This commit brought in more than just the rename: the whole
+`decline-narration-and-turn-start-reserve` priority-00 loop closed out in
+the meantime — `Strategy.declineReason(Offer)` moved from `Offer` (which
+inferred it purely from affordability) to a default method on `Strategy`
+overridden by `Greedo`, with a new `DeclineReason.NO_BUYING_POLICY` used by
+`Strategy.UNDECIDED`'s default. This is exactly the fix that resolves the
+narration-accuracy edge case flagged repeatedly since
+`decline-narration-and-turn-start-reserve`: `UNDECIDED` declining an
+affordable offer now correctly reports a bare "declines to buy X" instead
+of a misleading reserve-protected message. Verified `Cards.java`/
+`LandSale.java` now call `strategy.declineReason(offer)` instead of
+`offer.declineReason()`, and `Report.declineLine` has a matching
+`NO_BUYING_POLICY -> prefix` case (no "because" clause, matching
+`journal-40`/`logging-40`/`report-40`'s wording exactly).
+
+The rename itself (`AgreeIfAffordable` → `Greedo`) is clean and complete:
+class/file rename, CLI registry key (`"agree-if-affordable"` →
+`"greedo"`), all production/test/acceptance-glue/feature-file references
+updated consistently. Grepped the whole repo (excluding `target/` and
+`logbook.md`, which is an append-only historical record) for any leftover
+`AgreeIfAffordable`/"Agree if affordable"/`agree-if-affordable` — none
+found.
+
+`crap4java` on `Strategy.java`/`Greedo.java`/`Report.java`/
+`Bankruptcy.java`/`Cards.java`/`LandSale.java`: clean except the
+pre-approved `Report.line` exemption. `dry4java`: one new finding —
+`Bankruptcy`'s and `LandSale`'s constructors score 1.00 (identical
+five-field assignment shape, different field types) — pre-existing
+boilerplate untouched by this diff, not something to abstract across two
+otherwise-unrelated resolver classes. `mutate4java --scan`: 8/5/3/25/53/11
+sites across the six domain files, 59 for `Simulator.java`, all well under
+the 100-site split threshold; manifests refreshed. Fixed one cosmetic nit:
+a stray blank line left in `Strategy.Offer` after `declineReason()` moved
+out of it.
+
+Ran `./acceptance/run-acceptance.sh` (regenerated pipeline): 355 tests, 0
+failures — every previously-known gap (the six bankruptcy-narration gaps
+and the `journal-40`/`logging-40`/`report-40` no-reason-decline scenarios)
+is now resolved; nothing outstanding. `mvn test` (domain/CLI) and
+`mvn test -P property-tests` both green.
+
+Committed the manifest refresh and cleanup as `03184af`. Handing off to
+architect.
+
+## 2026-08-03T19:37:40Z — architect received rename-agree-if-affordable-to-greedo refactorer handoff
+
+```text
+type: git_handoff
+to: architect
+priority: 50
+task: rename-agree-if-affordable-to-greedo
+commit: 249096a2d1
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 249096a2d1
+```
+
+Merged as `ec3c49e5de`, preserving both sides of the append-only audit log.
+Reviewed the global rename: the domain strategy, CLI registry, acceptance
+vocabulary, test helpers, documentation, and feature references consistently
+use `Greedo`; no core module depends on CLI or acceptance infrastructure.
+The deliberate removal of the old public spelling is appropriate for the
+requested rename.
+
+Verification: regenerated acceptance suite green (355 tests). Differential
+mutation found no changed Greedo surface. The mutation tool's CLI default
+baseline is stale after the cross-module rename; its reactor-aware baseline
+is green (270 domain plus 11 CLI tests). DRY found no candidates. Soft
+Gherkin mutation refreshed the touched bankruptcy, building, buying-land,
+cards, jail, and journal manifests; the focused bankruptcy/building/cards/
+jail rename scenarios killed all selected mutants. Broader existing
+buying-land and journal narration surfaces retain non-discriminating
+survivors.
+
+## 2026-08-03T19:40:20Z — specifier receives architect phase-complete sync (rename-agree-if-affordable-to-greedo)
+
+Handoff received:
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: rename-agree-if-affordable-to-greedo
+commit: eed93223eb
+```
+
+Checked the actual commit chain (`fa92154ed8..eed93223eb`) before treating
+this as routine: coder renamed the class file itself
+(`AgreeIfAffordable.java` → `Greedo.java`, plus its test), the CLI registry
+key (`"agree-if-affordable"` → `"greedo"`), and every acceptance-glue
+reference; refactorer found nothing to restructure beyond a stray blank
+line and one pre-existing, unrelated constructor-shape DRY finding (declined
+as not worth abstracting); architect confirmed no leftover old spelling
+anywhere and full acceptance green. No specifier decision pending.
+
+Merged `eed93223eb` into `main`. One append-only `logbook.md` conflict,
+straightforward this time (my entry chronologically precedes theirs, no
+interleaving) — resolved by concatenation in timestamp order.
+
+Verification: `grep` for any remaining `Agree if affordable`/
+`agree-if-affordable`/`AgreeIfAffordable` outside `logbook.md` and
+`target/` — none found. `./acceptance/run-acceptance.sh`: BUILD SUCCESS,
+355 tests, 0 failures.
+
+Task closed. Asking the user for the next feature to add.
+
+## 2026-08-03T20:04:26Z — specifier drafts dynamic monopoly-completion reserve for Greedo
+
+User wants "strategic buying" for Greedo. Discussed generalizing the existing
+utility-monopoly override to colour groups; user proposed a dynamic reserve:
+when 1 street away from completing a colour group, reserve that street's
+price; with 2+ such groups, reserve only the pricier missing street (not the
+sum, to avoid an unrealistically large reserve); if that pricier street is
+unaffordable but a cheaper one from a different near-complete group is
+affordable, use that instead.
+
+Asked three clarifying questions before designing: (1) does dynamic sizing
+replace the fixed configured reserve or combine with it — user chose
+combine via `max(fixed, dynamic)`; (2) should stations get the same
+treatment as colour groups — user chose yes, competing on equal footing for
+the single largest missing-piece price; (3) if no 1-away group has an
+affordable missing piece at all, what should the dynamic component be — user
+chose $0 (falls back to whatever the fixed reserve alone specifies).
+
+Restated the full combined rule back to the user for confirmation before
+writing Gherkin, including an architecture note (not a design question):
+`cashReserve()` today is a fixed value baked in at construction; making it
+dynamic means it needs `Deeds`/ownership and current balance at decision
+time, at both the turn-start narration call site and the buy/bid call sites
+— a real interface-shape change, left to the coder to solve.
+
+Confirmed board data before writing scenarios: 8 colour groups (`brown`,
+`light_blue`, `pink`, `orange`, `red`, `yellow`, `green`, `dark_blue`) of 2
+or 3 streets each (`Street.Colour` enum), 4 stations all priced $200. No
+existing domain helper for "how many of a group does a player own" beyond
+`Building.monopoliesOwnedBy` (fully-owned groups only, used for building
+eligibility) — this is genuinely new domain logic, confirmed by grep.
+
+Made one interpretation call without a dedicated question, flagging it here
+for review rather than blocking: a near-complete group's missing piece only
+counts toward the dynamic reserve if it is currently **unowned** — i.e.
+actually reachable via a future purchase or auction. If another player
+already owns it, that group contributes nothing, since peer-to-peer trading
+is dormant (no strategy proposes trades, per earlier investigation this
+session) and there is no other path to acquiring an already-owned street.
+None of the new scenarios needed to exercise the alternative (owned-by-
+another-player) case to be written, since every missing piece in every
+scenario is naturally left unowned by default, but the rule as specified is
+silent on this and I did not want to guess wrong silently.
+
+Wrote `buying-land-8` through `buying-land-17` in `buying-land.feature`:
+- `8`/`9`: single 1-away colour group (own 1 of `brown`'s 2 streets) sets the
+  reserve to the missing street's price — decline-below and accept-boundary
+  pair, mirroring `buying-land-3`/`4`'s shape exactly, reusing the same
+  masked-auction-win safety-net convention (a competing bid sized above
+  dog's entire starting balance for accept scenarios, so a self-won auction
+  can never accidentally validate a broken accept decision).
+- `10`/`11`: 1-away in two colour groups (`brown` and `pink`) at once —
+  reserve is the pricier missing street ($160, `pink`), not the sum ($220).
+  The accept scenario's balance is chosen strictly between the correct
+  (max) and wrong (sum) thresholds, so it only passes under the intended
+  behavior.
+- `12`/`13`: 1-away in an unaffordably expensive group (`dark_blue`, missing
+  street $400) and a cheap one (`brown`, missing street $60) at once — falls
+  back to the cheap, actually-reachable one rather than the unaffordable
+  target or $0.
+- `14`/`15`: no reachable near-complete group at all (dynamic component is
+  $0) still respects a separately configured fixed reserve, proving the
+  `max(fixed, dynamic)` combination holds at both ends. (`14` happens to
+  already pass under today's static-only implementation, since dynamic=0
+  makes this scenario a no-op relative to existing behavior — expected, not
+  a gap.)
+- `16`: stations get the identical treatment (own 3 of 4, reserve = the
+  missing station's $200 price).
+- `17`: a near-complete station set and a near-complete colour group at the
+  same time — reserve is the pricier of the two ($200, station) regardless
+  of type, proving the comparison isn't siloed by group kind.
+
+Added `journal-41`/`logging-41`/`report-41`: the turn-start reserve
+narration (already carrying the reserve since `logging-output`/
+`decline-narration-and-turn-start-reserve`) reflects the dynamically
+computed value, not just the static one.
+
+Validated: `bb gherkin-parser` clean on `buying-land`/`journal`/`logging`/
+`report`; `bb gherkin-ir-dry-checker` `exact-dupes: 0` on all four. Ran
+`./acceptance/run-acceptance.sh`: 369 tests, 8 new failures — the 5 decline
+scenarios that require the new behavior to exist (`8`, `11`, `12`, `16`,
+`17`) plus the 3 narration scenarios; the other 6 new example rows already
+pass today because they only assert permissive (accept) behavior or a
+dynamic-component-is-zero no-op, which today's static-only reserve already
+satisfies trivially. No parse errors, no unexpected failures elsewhere.
+
+Reporting to the user for review (especially the unowned-missing-piece
+interpretation) and handoff approval before committing.
+
+## 2026-08-03T20:26:11Z — specifier adds "still buys into a blocked colour group" scenarios
+
+User confirmed the interpretation from the prior entry and clarified this is
+purely about willingness to buy (reserve-gated, not an override), not
+reserve sizing: "Sounds about right. Buy it provided your reserve is
+maintained."
+
+Confirmed via `Greedo.accepts()` that no code change is needed — it has no
+colour-group awareness at all today, so this already happens by default;
+nothing currently reachable could cause a decline in this situation. Wrote
+two scenarios anyway to lock the guarantee in for the future: `buying-land-
+18` (still buys an available street in a colour group another player
+already has a foothold in, reserve permitting) and `buying-land-19`
+(declines when it would dip below the reserve — proving this is genuinely
+gated, not an unconditional override like the utility-monopoly case).
+Deliberately used the "own zero streets in the group" case only (the user's
+own second, more general illustration) rather than also writing a near-
+duplicate for "own some but still blocked" — both reduce to the identical
+code path (the dynamic-reserve calculation only ever engages at "own
+exactly one-away-from-all with the missing piece unowned," which neither
+case reaches), so a second scenario would add no mutation-testing value.
+
+Found and fixed a real scenario-design bug while verifying with a
+standalone diagnostic (added a throwaway scratch scenario to confirm step-
+order balance math, then removed it): `World.givePawnOwnership` (the "owns"
+step) assigns a default claims-rent-only strategy via `pawnStrategies
+.putIfAbsent`, which is not a `Scripted` instance. My first draft of
+`buying-land-19` had "high hat owns Grote Markt Hasselt" followed by "high
+hat will bid $X ... at auction" — the latter calls `scriptFor`, which
+throws "already follows a strategy of its own" against the non-`Scripted`
+default the `owns` step had installed. Fixed by giving high hat a real
+`Greedo` strategy (with its own configured reserve, sized so its bid
+reliably beats dog's) instead of a scripted fixed bid — matching the same
+pattern already used for auction winners in the bankruptcy/inheritance
+scenarios (`bankruptcy-6`/`7`, `journal-38`/`39`), not a new convention.
+
+Also empirically confirmed (via the same diagnostic) that `givePawnOwnership`
+is balance-neutral by design (sells then immediately deposits the same
+price back, per its own doc comment "without changing the scenario's stated
+starting money") — so combining "owns X" with a later "has $Y to spend" for
+the same pawn nets to exactly Y, validating the balance arithmetic used
+throughout `buying-land-8` to `17` was correct all along.
+
+Validated: `bb gherkin-parser` clean, `bb gherkin-ir-dry-checker`
+`exact-dupes: 0`. Ran `./acceptance/run-acceptance.sh`: 371 tests, 8
+failures — unchanged from before adding these two scenarios (both pass
+immediately, as expected, since no code change is needed). Confirmed the
+same 8 failures reproduce identically across two more repeat runs; the
+previously-documented intermittent `SpecsCliEnCliAcceptanceTest` timing
+flake did not reproduce in either repeat.
+
+Reporting to the user for handoff approval before committing.
+
+## 2026-08-03T20:40:03Z — specifier adds a priority-tier system to the dynamic reserve
+
+User asked for a 3-tier priority system: highest = orange/red/light_blue,
+lowest = green/dark_blue/utilities/stations, middle = everything else
+(brown/pink/yellow). Asked one clarifying question first, since this is
+consequential: does tier become the primary sort key (highest reachable
+tier wins regardless of price), or does price still win with tier only as
+a tiebreaker? User confirmed tier-first, price only breaks ties within a
+tier — this reverses the prior pure-price rule whenever the winning targets
+differ across tiers.
+
+Utilities keep their existing separate override (buy/bid past the reserve
+entirely to complete/deny a utility monopoly, from `buying-land-6`/`7`) —
+their "lowest tier" classification is conceptual only; nothing about their
+behavior changes, since they never participate in reserve *sizing* at all,
+only in overriding it.
+
+Re-audited every existing dynamic-reserve scenario (`buying-land-8`
+through `-19`) against the new tier-first rule to see which still held:
+- `8`–`11`: unaffected — single or double *middle*-tier groups (`brown`,
+  `pink`), no cross-tier conflict, so price still applies as before.
+- `12`/`13`: their premise broke. They used `dark_blue` (low tier, priced
+  too high to afford) falling back to `brown` (middle tier, affordable) —
+  under tier-first rules, `brown` would now win purely on tier grounds
+  regardless of affordability, so the scenario stopped isolating
+  "affordability fallback" as its own fact. Replaced the ownership with two
+  *same-tier* (`red` + `light_blue`, both highest) near-complete groups
+  instead, so the fallback-to-affordable behavior is proven within a single
+  tier, uncontaminated by tier selection.
+- `14`–`16`: unaffected — no cross-tier competition present.
+- `17`: its entire premise reversed. It proved `brown` (then unclassified)
+  lost to a station set on price ($60 vs $200); under the new system
+  `brown` is *middle* tier and stations are *lowest*, so `brown` now wins
+  regardless of price. Rewrote it to land on a differently-priced property
+  (`Rue de Diekirch Arlon`, $140, unrelated to either group) so the decline
+  math works out correctly against the new $60 (not $200) reserve.
+- `18`/`19` (the blocked-group scenarios from the prior round): unaffected,
+  no near-complete-group reserve interaction at all.
+
+Added `buying-land-20` through `-23` to prove tier dominance directly,
+choosing balances that land strictly between the two competing prices so
+only the correctly-selected tier's target explains an accept (the
+decisive, discriminating case — a decline in this situation can't tell tier-
+correct from price-only-wrong, since both reserves would still exceed a
+low-enough remaining balance; noted this reasoning rather than padding with
+non-discriminating decline pairs for every combination):
+- `20`: middle beats low (accept companion to the revised `17`) — `brown`'s
+  $60 applies even though the near-complete station set's $200 is pricier.
+- `21`/`22`: high beats middle — a near-complete `light_blue` ($120 missing)
+  and near-complete `yellow` ($280 missing) at once; `21` declines (reserve
+  is nonzero), `22` proves it's specifically $120 not $280 by accepting at
+  a balance only the cheaper, correct value permits.
+- `23`: high beats low directly — near-complete `light_blue` ($120) against
+  near-complete `green` ($320); accepts at a balance only $120 permits.
+
+Validated: `bb gherkin-parser` clean, `bb gherkin-ir-dry-checker`
+`exact-dupes: 0`. Ran `./acceptance/run-acceptance.sh`: 375 tests, 9
+failures — the same 3 narration scenarios plus 6 buying-land scenarios
+(`8`, `11`, revised `12`, `16`, revised `17`, new `21`) that require the
+tier-aware reserve to actually exist; the three new accept-only proofs
+(`20`, `22`, `23`) already pass today since accepting is the permissive
+default. No parse errors, no unexpected failures, nothing regressed from
+the prior round.
+
+Reporting to the user for handoff approval before committing.
+
+## 2026-08-03T20:46:37Z — specifier adds the Greedo priority table as its own directly-observable fact
+
+User pointed out a real gap: every scenario so far only *observes* the
+priority system through its effects (accept/decline outcomes), never states
+the table itself directly. Asked for scenario(s) enumerating the priority
+value of every purchaseable space, explicitly noting this table belongs to
+Greedo specifically — another strategy could use a different one.
+
+This is a fundamentally different kind of fact than every other scenario in
+this feature: a static lookup on the strategy's own configuration, with no
+game state, players, turns, or board interaction involved at all. Rather
+than force it into `buying-land.feature`'s Background (which sets up
+players, initiative rolls, etc. that this fact doesn't need), gave it its
+own new feature file, `greedo-priority.feature`, with no Background at all —
+matching the specifier rule to separate feature files by behavior.
+
+New step: `Then the "Greedo" strategy's priority for "<space>" is
+"<priority>"` — names the strategy explicitly in the step text itself (not
+just the feature title), so the fact reads correctly as strategy-specific
+even in isolation. Used the literal words `highest`/`middle`/`lowest` for
+the priority values, matching the user's own phrasing.
+
+Enumerated all 28 purchaseable spaces on the board (22 colour streets, 4
+stations, 2 utilities) in one `Scenario Outline` with a 28-row `Examples`
+table, cross-checked against the classification agreed over the last two
+rounds: 9 `highest` (`orange`, `red`, `light_blue`), 8 `middle` (`brown`,
+`pink`, `yellow`), 11 `lowest` (`green`, `dark_blue`, both utilities, all
+four stations).
+
+New feature files aren't auto-discovered — `acceptance/run-acceptance.sh`
+and `run-acceptance-mutation.sh` both read the same explicit
+`acceptance/pipeline-features.txt` list. Added `en/rules/greedo-
+priority.feature` to it (mechanical pipeline registration, not scenario
+content, per the constitution's own distinction between the two) so the
+new file actually runs and can be verified at all; without this the
+acceptance pipeline would silently skip it.
+
+Validated: `bb gherkin-parser` clean, `bb gherkin-ir-dry-checker`
+`exact-dupes: 0`, `summary.findings: 0` (only one step pattern in the whole
+file, nothing to compare against). Ran `./acceptance/run-acceptance.sh`:
+403 tests, 37 failures — the same 9 as before plus all 28 new rows failing
+with "Unsupported step" (no step handler exists yet, exactly as expected
+pre-implementation).
+
+Reporting to the user for handoff approval before committing.
+
+## 2026-08-03T22:07:40Z — specifier designs and specs distressed-property-sale negotiation
+
+User requested a large new mechanic: when a player needs cash to avoid
+bankruptcy, sell property to another player rather than only mortgaging to
+the bank, with a full negotiation/auction among all other players. Given the
+density of the initial request, worked through it as a structured Q&A
+(user's request: one question at a time, reach consensus, then proceed)
+rather than guessing and writing Gherkin against assumptions. Investigated
+the codebase first via a research agent to ground the questions: confirmed
+RULES.md's "settle debt with property" rule was never implemented, the
+existing peer-to-peer `LandSale.sell()` is unconditional and dormant (only
+test code calls it), and `Strategy` has no priority or distressed-purchase
+concept at all yet — this is genuinely new ground, not an extension of
+something half-built.
+
+Full agreed design, after ~14 rounds of clarification:
+
+1. **Ordering**: prefer mortgaging or peer-selling over selling houses
+   (protects rental income) — except avoid a peer-sale that would complete
+   an opponent's colour group, in which case sell houses instead, *unless*
+   that still isn't enough, in which case sell to the opponent anyway
+   (surviving beats denying).
+2. **Debtor's priority table** (from `greedo-priority.feature`, already
+   specified) picks which spare property goes up first: least-valuable-tier
+   first, regardless of raw price.
+3. **Price floor**: any peer offer must strictly exceed the property's
+   mortgage value, else the debtor just mortgages to the bank. If it's the
+   debtor's *only* sellable property, the offer must cover the *whole*
+   shortfall. If the debtor has *several* sellable properties, a single
+   offer only needs to beat that property's own mortgage value — other
+   properties can make up the rest (the "pressure"/fire-sale dynamic).
+4. **Value-gate**: a buyer can still decline an affordable, sufficient
+   offer unless the property completes their own colour group, denies a
+   competing player's, or ranks high-priority for them — otherwise they let
+   the debtor go bankrupt (removes a competitor; presumably cheaper to
+   acquire later via the ordinary bankruptcy auction anyway).
+5. **Two-player endgame override**: if the debtor is the last remaining
+   opponent, always decline regardless of the property's value — winning
+   outright beats acquiring anything.
+6. **Auction structure**: every one of the debtor's remaining sellable
+   properties is evaluated against every other player simultaneously, with
+   offers revised iteratively (stability-based: a buyer stops revising once
+   they hit their bid ceiling, their reserve floor, or have nothing left
+   worth bidding on).
+7. **Bidding ceiling**: capped at 35% of the bidder's own balance for a
+   purely defensive (deny-an-opponent) bid; uncapped (full balance, matching
+   the existing utility-monopoly-override precedent) for a bid that
+   completes the bidder's own colour group.
+8. **Tie-break**: the debtor sells to whichever tied competing buyer has the
+   *lower* net worth (reusing RULES.md's existing, not-yet-implemented
+   Short/Timed-Game net-worth formula: cash + board price of owned
+   streets/utilities/stations + half-price of anything mortgaged + house/
+   hotel purchase price).
+9. **Strategy scope**: the debtor-side ordering mechanism is generic — it
+   applies to any debtor regardless of strategy, consulting whichever
+   strategy's own priority table (if any) they follow. Any strategy can be
+   a buyer too, but the actual decision rules specified here (value-gate,
+   35%/uncapped caps, price floors) are Greedo's specific implementation of
+   a generic "how do I want to run this" hook; a non-Greedo buyer simply
+   never clears the value-gate today, same as `UNDECIDED` never buying
+   anything.
+
+Flagged one unresolved gap rather than silently guessing: the 35%-cap and
+uncapped rules were only specified for "denies an opponent" and "completes
+my own monopoly" motives. A third value-gate reason exists ("ranks high
+priority" with no monopoly stakes either way) with no stated cap. Defaulted
+this case to the pre-existing, already-specified reserve-based `bidFor`
+behavior (bid up to `available - reserve`, no special cap or override),
+since that is the established default for non-monopoly purchases
+throughout this session. Noting this for the user's review rather than
+silently deciding it was unimportant.
+
+Wrote a new feature file, `distressed-sale.feature` (14 scenarios, one
+`Scenario Outline` each, matching the rule enumeration above 1:1). Reused
+existing step vocabulary throughout (ownership, balance, mortgage status,
+house counts, bankruptcy, "wins the game") — no new Gherkin steps were
+needed, since every observable outcome this mechanic produces is already
+expressible; the entirely new part is the underlying game logic that
+decides those outcomes. Registered the new file in `acceptance/pipeline-
+features.txt` (mechanical pipeline registration, not scenario content).
+
+Caught and fixed one real scenario-design bug during verification:
+`distressed-sale-10` originally asserted "the buyer does not own the
+property" after the debtor's bankruptcy, but that conflates with the
+*already-existing*, unrelated post-bankruptcy auction (today's `Greedo
+.bidFor` already bids its full balance for anything there, with no value-
+gate at all) — meaning that assertion would fail for the wrong reason, not
+because the new pre-bankruptcy value-gate was missing. Removed it; "the
+debtor is bankrupt" alone is the correct, sufficient assertion for that
+scenario (if the value-gate wrongly cleared and the buyer bought it
+pre-bankruptcy, the debtor would not be bankrupt at all, and this
+assertion would already fail for the right reason).
+
+Validated: `bb gherkin-parser` clean, `bb gherkin-ir-dry-checker`
+`exact-dupes: 0` (44 near-duplicate/placeholder findings, all expected from
+the repeated ownership-setup phrasing across scenarios sharing the same
+board data). Ran `./acceptance/run-acceptance.sh`: 417 tests, 46 failures —
+37 pre-existing (unrelated) plus 9 of the 14 new scenarios failing for the
+right reason (expecting a peer-sale or preserved houses that can't happen
+without the new mechanic). The other 5 new scenarios (`3`, `4`, `7`, `10`,
+`11`) pass today already, vacuously: each expects an outcome (mortgage-
+only, sell-houses, or bankruptcy) that today's existing bank-only
+resolution already happens to produce by coincidence, without any of the
+new reasoning behind it — same accepted category as `buying-land-14` from
+the earlier reserve work. No parse errors, no unexpected failures.
+
+This is easily the largest single specification in this project to date.
+Reporting to the user for review and handoff approval before committing.
+
+## 2026-08-04T07:39:14Z — specifier adds narration for the distressed-sale negotiation
+
+User asked for journal/log/report scenarios narrating the debtor's property
+selection and every buyer's offer up through the winning auction.
+
+Read "reservation" as the debtor's property-selection decision (which
+spare property gets put up, per the priority table), not the unrelated
+cash-reserve concept — the phrasing was ambiguous enough to note here in
+case that reading is wrong.
+
+For "auction offers ... until a winning auction is achieved": every other
+auction in this codebase (`LandSale.auction`, `Bankruptcy.auction`) is
+sealed-bid — each interested player states one ceiling, highest wins, with
+no literal step-by-step incrementing ever simulated in code. Rather than
+invent a new gradual-raise mechanic (which the original design conversation
+never actually specified — no increment size, no round limit), narrated one
+offer per interested buyer plus the final winner, consistent with how every
+existing auction already works. Flagging this reading rather than silently
+assuming it matches "incrementally" from the earlier conversation.
+
+Added `journal-42`/`43` (and `logging`/`report` equivalents), reusing
+`distressed-sale-2` and `distressed-sale-9`'s exact setups:
+- `42`: a lone interested buyer — "puts X up for sale to avoid bankruptcy",
+  "offers $Y for X", "wins the distressed sale for X at $Y".
+- `43`: two competing buyers — both offers recorded, the losing one
+  ordered before the winning one, then the win itself. Caught and fixed a
+  wording slip while writing `report-43`: `report.feature`'s ordering
+  assertions use "before it says", not "before it records" (`journal`/
+  `logging` do use "records") — confirmed by grepping the existing
+  initiative-ordering scenarios in each file rather than assuming a shared
+  phrase across all three.
+
+Validated: `bb gherkin-parser` clean on all three files, `bb gherkin-ir-
+dry-checker` `exact-dupes: 0`. Ran `./acceptance/run-acceptance.sh`: 423
+tests, 52 failures — the prior 46 plus exactly these 6 new scenarios,
+each failing with "Unsupported step" for the new narration text (confirmed
+via `journal`/`logging`/`report` test-class failure counts individually:
+each gained exactly 2 new failures, one per new scenario, since a scenario
+stops at its first failing step rather than reporting every `Then` clause
+separately).
+
+Reporting to the user for review and handoff approval before committing.
+
+## 2026-08-04T08:03:16Z — specifier reworks bidding to genuine $5 increments and adds reserve-change narration
+
+User corrected two things from the prior narration entry: (1) "reservation"
+did mean the cash-reserve concept after all, not property selection — asked
+to log reserve changes too; (2) wanted the literal gradual raise-by-raise
+sequence logged, with a $5 increment size, not one offer per buyer.
+
+**Increment rework**: redesigned `distressed-sale-9`'s numbers so a genuine
+$5-step bidding war is possible and short. `high hat` (completes own orange
+monopoly, uncapped) balance $100; `iron box` (denies high hat, 35% cap)
+balance $320 (35% = $112, giving headroom). Sequence: high hat opens at the
+$90 mortgage floor, iron box raises to $95, high hat to $100 (their ceiling,
+full balance — can't go further), iron box to $105 (within their $112 cap,
+high hat can't respond) — stable, iron box wins at $105, three raises short
+of their own $112 ceiling. Updated `distressed-sale-9`'s expected balances
+to match ($55 debtor, $215 winning buyer) and rewrote `journal-43`/
+`logging-43`/`report-43` to assert all four offers in order plus the win,
+instead of one offer per buyer.
+
+Confirmed via `Bankruptcy` reasoning that a *bidder's* own reserve can never
+be broken by their own winning bid — the "provided this does not drop you
+below your reserve" cap makes that outcome mechanically impossible in the
+rules as specified. So a bidder-side "reserve changes after I win" scenario
+can't exist; the debtor's side can, since a debtor is forced to sell/mortgage
+regardless of their own reserve. Confirmed this reading with the user via
+`AskUserQuestion` before writing anything, since I'd hit an actual
+contradiction, not just an open design choice.
+
+Hit a second, harder constraint while building the debtor-side scenario:
+`we play the game` (`World.playGame` → `Game.play()`) always calls
+`play(false, () -> true)`, which — per the `while (untilComplete && ...)`
+loop condition — runs exactly **one round** and stops; there is no existing
+Gherkin step for playing multiple rounds or to game completion. This rules
+out showing one continuous game where the debtor's reserve is narrated at
+turn 1, a forced mortgage happens, and it's narrated differently at turn 2.
+Used two independent Examples rows instead (same near-complete `pink` group,
+two starting balances — $200 affording the $160 missing street, $100 not)
+to prove the reserve responds correctly to balance, standing in for what a
+forced mortgage would leave behind, without literally re-simulating the
+crisis. Flagged this substitution to the user rather than silently treating
+it as equivalent to a live before/after.
+
+Added `journal-44`/`logging-44`/`report-44` (one `Scenario Outline`, two
+rows, extending `journal-41`'s existing "starts a turn with reserve" pattern
+to a different colour group specifically to get a clean $160→$0 contrast).
+
+Validated: `bb gherkin-parser` clean, `bb gherkin-ir-dry-checker`
+`exact-dupes: 0` on `journal`/`logging`/`report`. Ran `./acceptance/run-
+acceptance.sh`: 429 tests, 55 failures — the prior 52 plus exactly 3 new
+(one per file: the `reserve: 160` row, since the dynamic priority-based
+reserve was only ever specified this session, never implemented — the
+`reserve: 0` row already passes today, vacuously, since $0 is still the
+default static reserve). No parse errors, no unexpected failures.
+
+Reporting to the user for review and handoff approval before committing.
