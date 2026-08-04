@@ -19805,3 +19805,28 @@ times. `mvn test` (domain/CLI) and `mvn test -P property-tests` both
 green.
 
 Committed as `f6f6e88`. Handing off to architect.
+
+## 2026-08-04T18:56:52Z — refactorer sent distressed-sale-mortgage-floor handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: cba11ca52b
+```
+
+Summary: verified the coder's fix for the third live-play defect —
+distressed-sale bids landing below the land's mortgage value. The fix
+correctly rejects a winning bid under the mortgage floor unless it
+completes the buyer's own monopoly, matching the dictated rule and
+`Greedo`'s existing monopoly-completion exemption elsewhere. Confirmed
+against the new `distressed-sale-17` scenario and a unit test. Extracted
+two guard conditions out of `resolve()` (pure code movement) after the
+fix pushed its CRAP to 15.2 — back to 10.0, matching the pre-fix
+baseline. `dry4java` clean, `mutate4java` well under threshold.
+Regenerated acceptance suite green twice (432 tests), unit and property
+suites both green. Handing verified state to architect for independent
+review.
