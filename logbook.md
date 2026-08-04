@@ -19987,6 +19987,16 @@ scenario is fully killed by soft Gherkin mutation (4/4). The one-dollar-below
 scenario remains unmanifested because all six of its example mutations survive;
 returning that specification gap to the specifier.
 
+2026-08-04T19:42:28Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: distressed-sale-mortgage-floor
+commit: 085215bf66
+
+The one-dollar-below mortgage-floor scenario's six soft Gherkin mutations
+survive; requested a further specification correction.
+
 ## 2026-08-05T21:58:00Z — specifier investigates the second mortgage-floor mutation finding
 
 Handoff message received:
@@ -20063,6 +20073,10 @@ dice-fairness precedent) or whether it needs a structural fix instead
 bypassing Greedo's percentage rounding entirely — which would be a coder
 change, not something to guess into the Gherkin blind).
 
+(e.g. new step vocabulary to script an exact distressed-sale bid,
+bypassing Greedo's percentage rounding entirely — which would be a coder
+change, not something to guess into the Gherkin blind).
+
 Committed as `34964c136e` "Narrow distressed-sale-17's mutation dead
 zone, document the residual limit" (2 files, 77 insertions).
 
@@ -20093,3 +20107,19 @@ to judge with mutation-tool access whether it's acceptable or needs a
 structural fix (new step vocabulary to script an exact distressed-sale
 bid). Full reasoning and verification steps in the prior logbook entry
 this cycle.
+
+2026-08-04T20:00:34Z — received specifier handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: 34964c136e
+
+Re-read your role and constitution.
+merge_and_process specifier 34964c136e
+
+Merged `34964c136e`. Full acceptance passed (433 tests), Java mutation had no
+changed domain surface, DRY found no duplicates, and the property suite passed
+(22 tests). Soft Gherkin mutation killed all six mutations for the revised
+one-dollar-below boundary scenario; the remaining 14 survivors are pre-existing
+unmanifested scenarios outside this correction.
