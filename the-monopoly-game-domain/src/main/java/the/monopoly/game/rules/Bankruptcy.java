@@ -9,7 +9,6 @@ import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
-import java.util.Comparator;
 
 /** Resolves an unpaid debt after the ordinary landing rule has charged it. */
 public final class Bankruptcy {
@@ -69,7 +68,7 @@ public final class Bankruptcy {
   }
 
   private void mortgageUntilSolvent(Player debtor) {
-    for (Street.Type type : liquidationOrder(debtor)) {
+    for (Street.Type type : Liquidation.order(deeds, rules, strategies, debtor)) {
       if (!Money.ZERO.exceeds(debtor.account().balance().amount())) return;
       Ownable land = (Ownable) rules.create(type);
       if (!deeds.isMortgaged(land)) {
@@ -77,16 +76,6 @@ public final class Bankruptcy {
         events.mortgaged(debtor, land, value);
       }
     }
-  }
-
-  private List<Street.Type> liquidationOrder(Player owner) {
-    Strategy strategy = strategies.forPlayer(owner);
-    return ownedLandInBoardOrder(owner).stream().sorted(Comparator.comparingInt(type ->
-        switch (strategy.priority((Ownable) rules.create(type))) {
-          case LOWEST -> 0;
-          case MIDDLE -> 1;
-          case HIGHEST -> 2;
-        })).toList();
   }
 
   private void bankruptToBank(Player debtor) {
