@@ -154,7 +154,7 @@ class BankruptcyTest {
   }
 
   @Test
-  void aDistressedSaleGoesToItsOnlyBidderAtTheirOfferedMaximum() {
+  void aDistressedSaleGoesToItsOnlyBidderAtTheNeededAmount() {
     Deeds deeds = new Deeds();
     Ownable land = (Ownable) rules.create(Street.Type.RueGrandeDinant);
     give(deeds, land, dog);
@@ -184,6 +184,22 @@ class BankruptcyTest {
     assertThat(deeds.isMortgaged(land)).isTrue();
     assertThat(dog.account().balance().amount().amount()).isEqualTo(76);
     assertThat(deeds.isBankrupt(dog)).isFalse();
+  }
+
+  @Test
+  void aDistressedSaleDoesNotMakeItsOnlyBidderOverpay() {
+    Deeds deeds = new Deeds();
+    Ownable land = (Ownable) rules.create(Street.Type.LippenslaanKnokke);
+    give(deeds, land, dog);
+    dog.account().withdraw(new Money(1510));
+    highHat.account().withdraw(new Money(1315));
+    Strategy.OfPlayers strategies = player -> player.equals(highHat) ? distressedBidder(185) : Strategy.UNDECIDED;
+
+    new Bankruptcy(deeds, rules, players, strategies, new Events()).resolve(dog, null);
+
+    assertThat(deeds.ownerOf(land.type())).contains(highHat.id());
+    assertThat(dog.account().balance().amount().amount()).isEqualTo(80);
+    assertThat(highHat.account().balance().amount().amount()).isEqualTo(95);
   }
 
   @Test
