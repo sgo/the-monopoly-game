@@ -154,7 +154,7 @@ class BankruptcyTest {
   }
 
   @Test
-  void aDistressedSaleGoesToItsOnlyBidderAtTheirOfferedMaximum() {
+  void aDistressedSaleGoesToItsOnlyBidderAtTheNeededAmount() {
     Deeds deeds = new Deeds();
     Ownable land = (Ownable) rules.create(Street.Type.RueGrandeDinant);
     give(deeds, land, dog);
@@ -187,13 +187,29 @@ class BankruptcyTest {
   }
 
   @Test
+  void aDistressedSaleDoesNotMakeItsOnlyBidderOverpay() {
+    Deeds deeds = new Deeds();
+    Ownable land = (Ownable) rules.create(Street.Type.LippenslaanKnokke);
+    give(deeds, land, dog);
+    dog.account().withdraw(new Money(1510));
+    highHat.account().withdraw(new Money(1315));
+    Strategy.OfPlayers strategies = player -> player.equals(highHat) ? distressedBidder(185) : Strategy.UNDECIDED;
+
+    new Bankruptcy(deeds, rules, players, strategies, new Events()).resolve(dog, null);
+
+    assertThat(deeds.ownerOf(land.type())).contains(highHat.id());
+    assertThat(dog.account().balance().amount().amount()).isEqualTo(80);
+    assertThat(highHat.account().balance().amount().amount()).isEqualTo(95);
+  }
+
+  @Test
   void aDistressedSaleAscendsInFiveDollarStepsUntilOnlyOneBidderCanStillRaise() {
     Deeds deeds = new Deeds();
     Player ironBox = player("iron box");
     List<Player> table = List.of(dog, highHat, ironBox);
     Ownable land = (Ownable) rules.create(Street.Type.RueGrandeDinant);
     give(deeds, land, dog);
-    dog.account().withdraw(new Money(1555));
+    dog.account().withdraw(new Money(1525));
     Strategy.OfPlayers strategies = player -> {
       if (player.equals(highHat)) return distressedBidder(50);
       if (player.equals(ironBox)) return distressedBidder(70);
@@ -205,7 +221,7 @@ class BankruptcyTest {
 
     assertThat(deeds.ownerOf(land.type())).contains(ironBox.id());
     assertThat(ironBox.account().balance().amount().amount()).isEqualTo(1445);
-    assertThat(dog.account().balance().amount().amount()).isZero();
+    assertThat(dog.account().balance().amount().amount()).isEqualTo(30);
     assertThat(deeds.isBankrupt(dog)).isFalse();
   }
 
