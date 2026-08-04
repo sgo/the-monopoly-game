@@ -19852,3 +19852,13 @@ changed surface, and DRY found no duplicate candidates. Soft Gherkin mutation
 found a specification gap: all four mutations of the mortgage-floor scenario's
 example values survived, so the task is returning to the specifier for that
 scenario's correction.
+
+2026-08-04T19:34:40Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: distressed-sale-mortgage-floor
+commit: e31c9867d1
+
+The mortgage-floor scenario's example mutations all survived the required
+soft Gherkin mutation check; requested a specification review.
