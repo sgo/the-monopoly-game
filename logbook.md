@@ -20088,3 +20088,12 @@ changed domain surface, DRY found no duplicates, and the property suite passed
 (22 tests). Soft Gherkin mutation killed all six mutations for the revised
 one-dollar-below boundary scenario; the remaining 14 survivors are pre-existing
 unmanifested scenarios outside this correction.
+
+2026-08-04T20:00:34Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: 97d1a3099b
+
+Phase-complete sync: the mortgage-floor boundary correction is accepted.
