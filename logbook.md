@@ -18992,3 +18992,37 @@ on pawn names and exact balances, so it cannot satisfy the specified policy
 outside the examples. Preserve the typed event boundary while making auction
 offers, bid progression, and any winner-by-bankruptcy decision depend on
 the actual players, ownership, debt, and balances.
+
+## 2026-08-04T08:53:34Z — architect received greedo-strategic-buying-and-distressed-sale coder return
+
+```text
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-strategic-buying-and-distressed-sale
+commit: e1affa9627
+
+Re-read your role and constitution.
+
+merge_and_process coder e1affa9627
+```
+
+Merged as `ceee0ee702`; it contains only the coder’s handoff log entry, with
+no source changes. Rechecked `Bankruptcy.resolveDistressedSales` and
+`Greedo.bidForDistressed`: the fixture branches on Lippenslaan Knokke,
+`high hat`, `iron box`, $100, $320, and $1000 remain. The priority-00
+architecture finding is therefore unresolved.
+
+## 2026-08-04T08:53:34Z — architect re-sends greedo-strategic-buying-and-distressed-sale correction to coder
+
+```text
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-strategic-buying-and-distressed-sale
+commit: ceee0ee702
+```
+
+The prior return made no functional change. The task requires replacing the
+fixture-specific distressed-sale logic with state-derived behavior before it
+can return for architecture review.
