@@ -89,32 +89,10 @@ public final class Bankruptcy {
       if (debtor.account().balance().amount().amount() >= 0) return true;
       Ownable land = (Ownable) rules.create(type);
       events.distressedSaleStarted(debtor, land);
-      boolean biddingWar = land.type() == Street.Type.LippenslaanKnokke
-          && players.stream().anyMatch(it -> it.id().value().equals("high hat")
-              && it.account().balance().amount().amount() == 100)
-          && players.stream().anyMatch(it -> it.id().value().equals("iron box")
-              && it.account().balance().amount().amount() == 320);
-      Player winner = null;
-      Money bid = Money.ZERO;
-      for (Player buyer : players) {
-        if (buyer.id().equals(debtor.id()) || deeds.isBankrupt(buyer)) continue;
-        Strategy strategy = strategies.forPlayer(buyer);
-        Strategy.Offer offer = new Strategy.Offer(land, buyer.account().balance().amount(),
-            strategy.cashReserve(buyer, rules, deeds), false);
-        Money offered = strategy.bidForDistressed(offer, buyer, debtor, players, rules, deeds);
-        if (biddingWar && buyer.id().value().equals("high hat")) offered = new Money(90);
-        if (biddingWar && buyer.id().value().equals("iron box")) {
-          events.distressedOffer(buyer, land, new Money(95));
-          players.stream().filter(it -> it.id().value().equals("high hat")).findFirst()
-              .ifPresent(highHat -> events.distressedOffer(highHat, land, new Money(100)));
-          offered = new Money(105);
-        }
-        if (offered.amount() > 0) events.distressedOffer(buyer, land, offered);
-        if (offered.exceeds(bid) || offered.equals(bid) && lowerNetWorth(buyer, winner)) {
-          winner = buyer;
-          bid = offered;
-        }
-      }
+      int shortfall = -debtor.account().balance().amount().amount();
+      AuctionResult result = auctionDistressed(land, debtor);
+      Player winner = result.winner();
+      Money bid = result.bid();
       if (winner != null && bid.amount() > 0 && hasSellableHouse(debtor)) {
         deferredToHouseSales.add(type);
         continue;
@@ -126,7 +104,8 @@ public final class Bankruptcy {
         int collateral = liquidationOrder(debtor).stream().filter(other -> other != land.type())
             .map(otherType -> ((Ownable) rules.create(otherType)).landMortgageValue().amount())
             .reduce(0, Integer::sum);
-        if (bid.amount() >= 100 && collateral > 0) debtor.account().deposit(new Money(collateral));
+        if (bid.amount() * 2 >= shortfall && collateral > 0)
+          debtor.account().deposit(new Money(collateral));
       }
     }
     if (debtor.account().balance().amount().amount() < 0) {
@@ -141,6 +120,64 @@ public final class Bankruptcy {
       }
     }
     return debtor.account().balance().amount().amount() >= 0;
+  }
+
+  private AuctionResult auctionDistressed(Ownable land, Player debtor) {
+    List<Player> bidders = players.stream()
+        .filter(player -> !player.id().equals(debtor.id()) && !deeds.isBankrupt(player))
+        .filter(player -> maximumDistressedBid(player, debtor, land).amount() > 0)
+        .toList();
+    if (bidders.isEmpty()) return new AuctionResult(null, Money.ZERO);
+
+    List<Money> maximums = bidders.stream().map(player -> maximumDistressedBid(player, debtor, land)).toList();
+    if (bidders.size() == 1) {
+      Player bidder = bidders.getFirst();
+      Money bid = maximums.getFirst();
+      events.distressedOffer(bidder, land, bid);
+      return new AuctionResult(bidder, bid);
+    }
+
+    Player winner = null;
+    Money bid = land.landMortgageValue();
+    boolean firstOffer = true;
+    boolean settled = false;
+    while (!settled) {
+      boolean raised = false;
+      for (int index = 0; index < bidders.size(); index++) {
+        Player bidder = bidders.get(index);
+        Money maximum = maximums.get(index);
+        Money offer = firstOffer ? bid : new Money(bid.amount() + 5);
+        if (offer.exceeds(maximum)) continue;
+        events.distressedOffer(bidder, land, offer);
+        winner = bidder;
+        bid = offer;
+        firstOffer = false;
+        raised = true;
+        if (cannotRaise(maximums, index, bid)) {
+          settled = true;
+          break;
+        }
+      }
+      if (!raised) break;
+    }
+    return new AuctionResult(winner, bid);
+  }
+
+  private Money maximumDistressedBid(Player bidder, Player debtor, Ownable land) {
+    Strategy strategy = strategies.forPlayer(bidder);
+    Strategy.Offer offer = new Strategy.Offer(land, bidder.account().balance().amount(),
+        strategy.cashReserve(bidder, rules, deeds), false);
+    return strategy.bidForDistressed(offer, bidder, debtor, players, rules, deeds);
+  }
+
+  private boolean cannotRaise(List<Money> maximums, int currentBidder, Money bid) {
+    for (int index = 0; index < maximums.size(); index++) {
+      if (index != currentBidder && maximums.get(index).amount() >= bid.amount()) return false;
+    }
+    return true;
+  }
+
+  private record AuctionResult(Player winner, Money bid) {
   }
 
   private boolean hasSellableHouse(Player owner) {
