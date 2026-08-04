@@ -19125,3 +19125,36 @@ stability: 429 tests, 0 failures both times. `mvn test` (domain/CLI) and
 Committed as `4a2d548`. Handing off to architect — this task should now
 be genuinely phase-complete from a correctness standpoint, not just a
 green build.
+
+## 2026-08-04T11:02:43Z — refactorer sent greedo-strategic-buying-and-distressed-sale priority-00 follow-up handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: ad9ccf5c27
+```
+
+Summary: verified the coder's priority-00 fix genuinely replaces the
+fixture-keyed distressed-sale/bidding logic I flagged last cycle with
+state-derived behavior — confirmed no literal pawn names, lands, or
+magic thresholds remain anywhere outside the legitimate, explicitly-
+specified priority table. Added unit coverage that was withheld last
+cycle (since the algorithm was a hack then, not worth locking in with
+tests): a single-bidder and a multi-bidder ascending-auction test in
+`BankruptcyTest`, plus `completesOwnGroup`/`wouldWinByBankruptcy`/
+`cashReserve` cross-tier cases in `GreedoTest`. This dropped
+`resolveDistressedSales`/`bidForDistressed`/`wouldWinByBankruptcy`'s CRAP
+scores from a peak of 84.1 to at most 10.0. Removed one piece of dead
+code (`lowerNetWorth`, orphaned by the rewrite). Extracted helper methods
+inside the distressed-sale resolution, then split it into a new
+`DistressedSale` class once that extraction pushed `Bankruptcy.java`
+over the 100-mutation-site threshold; `liquidationOrder`/
+`ownedLandInBoardOrder` are deliberately duplicated between the two
+classes rather than introducing a shared-utility abstraction, matching
+existing precedent. Regenerated acceptance suite green twice (429/429),
+unit and property suites green. This task should now be genuinely
+phase-complete on correctness, not just on a passing build.
