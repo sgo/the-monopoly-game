@@ -30,6 +30,9 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.chanceCardD
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.communityChestCardDrawn;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.communityChestCardDrawnLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.dollars;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.distressedOffer;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.distressedStarted;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.distressedWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.houseBuilt;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.houseSold;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.idOf;
@@ -86,6 +89,77 @@ final class GameLogStepHandlers {
 
   static List<StepHandler> handlers() {
     return List.of(
+        then("^the game journal records that pawn \"" + NAME + "\" offers \\$" + VALUE
+                + " for \"" + NAME + "\" before it records that pawn \"" + NAME
+                + "\" offers \\$" + VALUE + " for \"" + NAME + "\"$",
+            (world, arguments) -> recordsInOrder(world,
+                distressedOffer(arguments.text(1), arguments.text(3), arguments.number(2)),
+                distressedOffer(arguments.text(4), arguments.text(6), arguments.number(5)))),
+        then("^the game log records that pawn \"" + NAME + "\" offers \\$" + VALUE
+                + " for \"" + NAME + "\" before it records that pawn \"" + NAME
+                + "\" offers \\$" + VALUE + " for \"" + NAME + "\"$",
+            (world, arguments) -> logRecordsInOrder(world,
+                distressedOffer(arguments.text(1), arguments.text(3), arguments.number(2)),
+                distressedOffer(arguments.text(4), arguments.text(6), arguments.number(5)))),
+        then("^the game report says that pawn \"" + NAME + "\" offers \\$" + VALUE
+                + " for \"" + NAME + "\" before it says that pawn \"" + NAME
+                + "\" offers \\$" + VALUE + " for \"" + NAME + "\"$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + " offers $" + arguments.number(2) + " for " + arguments.text(3),
+                arguments.text(4) + " offers $" + arguments.number(5) + " for " + arguments.text(6))),
+        then("^the game journal records that pawn \"" + NAME + "\" offers \\$" + VALUE
+                + " for \"" + NAME + "\" before it records that pawn \"" + NAME
+                + "\" wins the distressed sale for \"" + NAME + "\" at \\$" + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                distressedOffer(arguments.text(1), arguments.text(3), arguments.number(2)),
+                distressedWon(arguments.text(4), arguments.text(5), arguments.number(6)))),
+        then("^the game log records that pawn \"" + NAME + "\" offers \\$" + VALUE
+                + " for \"" + NAME + "\" before it records that pawn \"" + NAME
+                + "\" wins the distressed sale for \"" + NAME + "\" at \\$" + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                distressedOffer(arguments.text(1), arguments.text(3), arguments.number(2)),
+                distressedWon(arguments.text(4), arguments.text(5), arguments.number(6)))),
+        then("^the game report says that pawn \"" + NAME + "\" offers \\$" + VALUE
+                + " for \"" + NAME + "\" before it says that pawn \"" + NAME
+                + "\" wins the distressed sale for \"" + NAME + "\" at \\$" + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + " offers $" + arguments.number(2) + " for " + arguments.text(3),
+                arguments.text(4) + " wins the distressed sale for " + arguments.text(5)
+                    + " at $" + arguments.number(6))),
+        then("^the game journal records that pawn \"" + NAME + "\" puts \"" + NAME
+                + "\" up for sale to avoid bankruptcy$",
+            (world, arguments) -> records(world, distressedStarted(arguments.text(1), arguments.text(2)))),
+        then("^the game journal records that pawn \"" + NAME + "\" offers \\$" + VALUE
+                + " for \"" + NAME + "\"$",
+            (world, arguments) -> records(world, distressedOffer(
+                arguments.text(1), arguments.text(3), arguments.number(2)))),
+        then("^the game journal records that pawn \"" + NAME + "\" wins the distressed sale for \""
+                + NAME + "\" at \\$" + VALUE + "$",
+            (world, arguments) -> records(world, distressedWon(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+        then("^the game log records that pawn \"" + NAME + "\" puts \"" + NAME
+                + "\" up for sale to avoid bankruptcy$",
+            (world, arguments) -> records(world, distressedStarted(arguments.text(1), arguments.text(2)))),
+        then("^the game log records that pawn \"" + NAME + "\" offers \\$" + VALUE
+                + " for \"" + NAME + "\"$",
+            (world, arguments) -> records(world, distressedOffer(
+                arguments.text(1), arguments.text(3), arguments.number(2)))),
+        then("^the game log records that pawn \"" + NAME + "\" wins the distressed sale for \""
+                + NAME + "\" at \\$" + VALUE + "$",
+            (world, arguments) -> records(world, distressedWon(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+        then("^the game report says that pawn \"" + NAME + "\" puts \"" + NAME
+                + "\" up for sale to avoid bankruptcy$",
+            (world, arguments) -> says(world, arguments.text(1) + " puts " + arguments.text(2)
+                + " up for sale to avoid bankruptcy")),
+        then("^the game report says that pawn \"" + NAME + "\" offers \\$" + VALUE
+                + " for \"" + NAME + "\"$",
+            (world, arguments) -> says(world, arguments.text(1) + " offers $" + arguments.number(2)
+                + " for " + arguments.text(3))),
+        then("^the game report says that pawn \"" + NAME + "\" wins the distressed sale for \""
+                + NAME + "\" at \\$" + VALUE + "$",
+            (world, arguments) -> says(world, arguments.text(1) + " wins the distressed sale for "
+                + arguments.text(2) + " at $" + arguments.number(3))),
         then("^the game journal records that pawn \"" + NAME + "\" pays pawn \"" + NAME
                 + "\" \\$" + VALUE + " rent for \"" + NAME + "\"$",
             (world, arguments) -> records(world, rentPaid(

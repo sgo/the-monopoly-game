@@ -159,7 +159,7 @@ public class Game {
   private void takeTurn(Player player, Journal journal, Turn.Events events, Landings landings) {
     Strategy strategy = strategies.forPlayer(player);
     journal.log(new Journal.Entry.TurnStarted(
-        player.id(), player.account().balance().amount(), strategy.cashReserve()));
+        player.id(), player.account().balance().amount(), strategy.cashReserve(player, rules, deeds)));
     new Turn(rules, cups.forPlayer(player), events, landings, jail, strategy, deeds).take(player);
   }
 
@@ -214,6 +214,26 @@ public class Game {
     @Override
     public void soldHouse(Player player, ColourStreet street, Money price) {
       journal.log(new Journal.Entry.HouseSold(player.id(), street.type(), price));
+    }
+
+    @Override
+    public void soldToPeer(Player seller, Ownable land, Player buyer, Money price) {
+      journal.log(new Journal.Entry.LandSold(seller.id(), land.type(), buyer.id(), price));
+    }
+
+    @Override
+    public void distressedSaleStarted(Player seller, Ownable land) {
+      journal.log(new Journal.Entry.DistressedSaleStarted(seller.id(), land.type()));
+    }
+
+    @Override
+    public void distressedOffer(Player bidder, Ownable land, Money price) {
+      journal.log(new Journal.Entry.DistressedOffer(bidder.id(), land.type(), price));
+    }
+
+    @Override
+    public void distressedSaleWon(Player bidder, Ownable land, Money price) {
+      journal.log(new Journal.Entry.DistressedSaleWon(bidder.id(), land.type(), price));
     }
 
     @Override
@@ -438,6 +458,15 @@ public class Game {
       }
 
       record LandSaleRefused(Player.ID seller, Street.Type land, Player.ID buyer, Money price) implements Entry {
+      }
+
+      record DistressedSaleStarted(Player.ID seller, Street.Type land) implements Entry {
+      }
+
+      record DistressedOffer(Player.ID bidder, Street.Type land, Money price) implements Entry {
+      }
+
+      record DistressedSaleWon(Player.ID bidder, Street.Type land, Money price) implements Entry {
       }
 
       record BuildingRefused(Player.ID player, Street.Type land, Money price) implements Entry {

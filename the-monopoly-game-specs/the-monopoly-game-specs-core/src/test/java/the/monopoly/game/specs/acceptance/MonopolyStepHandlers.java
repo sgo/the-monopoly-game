@@ -316,7 +316,10 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> world.arrangePawnBalance(arguments.text(2), money(arguments.number(1)))),
 
         step("^we roll for initiative$",
-            (world, arguments) -> world.rollForInitiative())
+            (world, arguments) -> world.rollForInitiative()),
+
+        then("^the \"Greedo\" strategy's priority for \"" + NAME + "\" is \"" + NAME + "\"$",
+            (world, arguments) -> world.assertGreedoPriority(arguments.text(1), arguments.text(2)))
     );
   }
 }

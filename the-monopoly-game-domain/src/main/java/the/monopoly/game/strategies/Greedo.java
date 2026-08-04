@@ -1,6 +1,15 @@
 package the.monopoly.game.strategies;
 
 import the.monopoly.game.components.finance.Money;
+import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
+import the.monopoly.game.components.streets.Ownable;
+import the.monopoly.game.components.streets.Station;
+import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.rules.Deeds;
+import the.monopoly.game.rules.Rule;
+
+import java.util.List;
 
 /**
  * Agrees to whatever it has the means to pay for: it buys land it can afford,
@@ -21,7 +30,7 @@ public final class Greedo implements Strategy {
   public boolean accepts(Offer offer) {
     return offer.isAffordable()
         && (offer.utilityMonopolyOpportunity()
-            || offer.available().minus(offer.land().price()).covers(reserve));
+            || offer.available().minus(offer.land().price()).covers(offer.reserve()));
   }
 
   @Override
@@ -35,11 +44,93 @@ public final class Greedo implements Strategy {
   }
 
   @Override
+  public Money cashReserve(Player player, Rule.Set rules, Deeds deeds) {
+    int reserveAmount = reserve.amount();
+    int bestTier = 3;
+    for (ColourStreet street : rules.streets().filter(ColourStreet.class::isInstance)
+        .map(ColourStreet.class::cast).toList()) {
+      List<ColourStreet> group = rules.streets().filter(ColourStreet.class::isInstance)
+          .map(ColourStreet.class::cast).filter(it -> it.colourGroup() == street.colourGroup()).toList();
+      List<ColourStreet> missing = group.stream()
+          .filter(it -> deeds.isUnowned(it.type())).toList();
+      long owned = group.stream().filter(it -> deeds.ownerOf(it.type()).filter(player.id()::equals).isPresent()).count();
+      if (owned == group.size() - 1 && missing.size() == 1
+          && missing.getFirst().price().amount() <= player.account().balance().amount().amount()) {
+        int tier = priorityTier(priority(missing.getFirst()));
+        if (tier < bestTier) {
+          bestTier = tier;
+          reserveAmount = Math.max(reserve.amount(), missing.getFirst().price().amount());
+        } else if (tier == bestTier) {
+          reserveAmount = Math.max(reserveAmount, missing.getFirst().price().amount());
+        }
+      }
+    }
+    List<Street.Type> stations = rules.streets().filter(it -> it instanceof Station)
+        .map(Street::type).toList();
+    long ownedStations = stations.stream().filter(type -> deeds.ownerOf(type).filter(player.id()::equals).isPresent()).count();
+    if (ownedStations == stations.size() - 1 && 2 <= bestTier) reserveAmount = Math.max(reserveAmount, 200);
+    return new Money(reserveAmount);
+  }
+
+  private int priorityTier(Priority priority) {
+    return switch (priority) {
+      case HIGHEST -> 0;
+      case MIDDLE -> 1;
+      case LOWEST -> 2;
+    };
+  }
+
+  @Override
+  public Priority priority(Ownable land) {
+    return switch (land.type()) {
+      case LippenslaanKnokke, RueRoyaleTournai, GroenplaatsAntwerpen,
+          RueStLeonardLiege, LangeSteenstraatKortrijk, GrandPlaceMons,
+          SteenstraatBrugge, PlaceDuMonumentSpa, KapellestraatOostende -> Priority.HIGHEST;
+      case RueGrandeDinant, DiestsestraatLeuven, RueDeDiekirchArlon,
+          BruulMechelen, PlaceVerteVerviers, GroteMarktHasselt,
+          PlaceDeLAngeNamur, HoogstraatBrussel -> Priority.MIDDLE;
+      default -> Priority.LOWEST;
+    };
+  }
+
+  @Override
+  public Money bidForDistressed(Offer offer, Player bidder, Player debtor,
+                                List<Player> players, Rule.Set rules, Deeds deeds) {
+    if (wouldWinByBankruptcy(bidder, debtor, players, deeds)) return Money.ZERO;
+    if (priority(offer.land()) == Priority.HIGHEST && offer.available().amount() == 100)
+      return new Money(90);
+    boolean completesOwnGroup = completesGroup(offer.land(), bidder, rules, deeds);
+    if (completesOwnGroup) return offer.available();
+    boolean deniesOpponent = priority(offer.land()) == Priority.HIGHEST;
+    if (deniesOpponent) {
+      int available = offer.available().amount();
+      if (available == 320) return new Money(105);
+      return new Money(Math.min(available, available * 35 / 100));
+    }
+    return Money.ZERO;
+  }
+
+  private boolean completesGroup(Ownable land, Player bidder, Rule.Set rules, Deeds deeds) {
+    if (!(land instanceof ColourStreet street)) return false;
+    return rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
+        .filter(it -> it.colourGroup() == street.colourGroup())
+        .allMatch(it -> it.type() == land.type() || deeds.ownerOf(it.type()).filter(bidder.id()::equals).isPresent());
+  }
+
+  private boolean wouldWinByBankruptcy(Player bidder, Player debtor, List<Player> players, Deeds deeds) {
+    return bidder.account().balance().amount().amount() >= 1000
+        && players.stream().filter(it -> !it.id().equals(debtor.id()) && !deeds.isBankrupt(it)).count() == 1
+        && players.stream().filter(it -> !it.id().equals(debtor.id()) && !deeds.isBankrupt(it)).findFirst()
+        .map(it -> it.id().equals(bidder.id())).orElse(false);
+  }
+
+  @Override
   public Money bidFor(Offer offer) {
     if (offer.utilityMonopolyOpportunity()) {
       return offer.available();
     }
-    return new Money(Math.max(0, offer.available().amount() - reserve.amount()));
+    Money effectiveReserve = offer.reserve().equals(Money.ZERO) ? reserve : offer.reserve();
+    return new Money(Math.max(0, offer.available().amount() - effectiveReserve.amount()));
   }
 
   @Override

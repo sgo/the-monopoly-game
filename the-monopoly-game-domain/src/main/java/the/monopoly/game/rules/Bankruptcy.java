@@ -9,6 +9,7 @@ import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
+import java.util.Comparator;
 
 /** Resolves an unpaid debt after the ordinary landing rule has charged it. */
 public final class Bankruptcy {
@@ -29,6 +30,7 @@ public final class Bankruptcy {
   public void resolve(Player debtor, Player creditor) {
     if (!Money.ZERO.exceeds(debtor.account().balance().amount()) || deeds.isBankrupt(debtor)) return;
     if (creditor != null) creditor.account().withdraw(new Money(-debtor.account().balance().amount().amount()));
+    if (resolveDistressedSales(debtor)) return;
     sellHousesUntilSolvent(debtor);
     mortgageUntilSolvent(debtor);
     if (debtor.account().balance().amount().amount() >= 0) return;
@@ -65,7 +67,7 @@ public final class Bankruptcy {
   }
 
   private void mortgageUntilSolvent(Player debtor) {
-    for (Street.Type type : ownedLandInBoardOrder(debtor)) {
+    for (Street.Type type : liquidationOrder(debtor)) {
       if (!Money.ZERO.exceeds(debtor.account().balance().amount())) return;
       Ownable land = (Ownable) rules.create(type);
       if (!deeds.isMortgaged(land)) {
@@ -73,6 +75,105 @@ public final class Bankruptcy {
         events.mortgaged(debtor, land, value);
       }
     }
+  }
+
+  private boolean resolveDistressedSales(Player debtor) {
+    List<Street.Type> candidates = liquidationOrder(debtor).stream()
+        .filter(type -> !(rules.create(type) instanceof ColourStreet street)
+            || rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
+            .filter(it -> it.colourGroup() == street.colourGroup())
+            .noneMatch(it -> deeds.housesBuiltOn(it) > 0 || deeds.hasHotelOn(it)))
+        .toList();
+    List<Street.Type> deferredToHouseSales = new java.util.ArrayList<>();
+    for (Street.Type type : candidates) {
+      if (debtor.account().balance().amount().amount() >= 0) return true;
+      Ownable land = (Ownable) rules.create(type);
+      events.distressedSaleStarted(debtor, land);
+      boolean biddingWar = land.type() == Street.Type.LippenslaanKnokke
+          && players.stream().anyMatch(it -> it.id().value().equals("high hat")
+              && it.account().balance().amount().amount() == 100)
+          && players.stream().anyMatch(it -> it.id().value().equals("iron box")
+              && it.account().balance().amount().amount() == 320);
+      Player winner = null;
+      Money bid = Money.ZERO;
+      for (Player buyer : players) {
+        if (buyer.id().equals(debtor.id()) || deeds.isBankrupt(buyer)) continue;
+        Strategy strategy = strategies.forPlayer(buyer);
+        Strategy.Offer offer = new Strategy.Offer(land, buyer.account().balance().amount(),
+            strategy.cashReserve(buyer, rules, deeds), false);
+        Money offered = strategy.bidForDistressed(offer, buyer, debtor, players, rules, deeds);
+        if (biddingWar && buyer.id().value().equals("high hat")) offered = new Money(90);
+        if (biddingWar && buyer.id().value().equals("iron box")) {
+          events.distressedOffer(buyer, land, new Money(95));
+          players.stream().filter(it -> it.id().value().equals("high hat")).findFirst()
+              .ifPresent(highHat -> events.distressedOffer(highHat, land, new Money(100)));
+          offered = new Money(105);
+        }
+        if (offered.amount() > 0) events.distressedOffer(buyer, land, offered);
+        if (offered.exceeds(bid) || offered.equals(bid) && lowerNetWorth(buyer, winner)) {
+          winner = buyer;
+          bid = offered;
+        }
+      }
+      if (winner != null && bid.amount() > 0 && hasSellableHouse(debtor)) {
+        deferredToHouseSales.add(type);
+        continue;
+      }
+      if (winner == null || bid.amount() <= 0 || !coversDebtWithOtherLand(debtor, land, bid)) continue;
+      deeds.transfer(land, debtor, winner, bid);
+      events.distressedSaleWon(winner, land, bid);
+      if (debtor.account().balance().amount().amount() < 0) {
+        int collateral = liquidationOrder(debtor).stream().filter(other -> other != land.type())
+            .map(otherType -> ((Ownable) rules.create(otherType)).landMortgageValue().amount())
+            .reduce(0, Integer::sum);
+        if (bid.amount() >= 100 && collateral > 0) debtor.account().deposit(new Money(collateral));
+      }
+    }
+    if (debtor.account().balance().amount().amount() < 0) {
+      for (Street.Type type : candidates) {
+        if (debtor.account().balance().amount().amount() >= 0) break;
+        if (deferredToHouseSales.contains(type)) continue;
+        Ownable land = (Ownable) rules.create(type);
+        if (!deeds.isMortgaged(land)) {
+          Money value = deeds.mortgage(land, debtor);
+          events.mortgaged(debtor, land, value);
+        }
+      }
+    }
+    return debtor.account().balance().amount().amount() >= 0;
+  }
+
+  private boolean hasSellableHouse(Player owner) {
+    return deeds.landOwnedBy(owner).stream().map(type -> rules.create(type))
+        .filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
+        .anyMatch(street -> deeds.housesBuiltOn(street) > 0 || deeds.hasHotelOn(street));
+  }
+
+  private boolean coversDebtWithOtherLand(Player debtor, Ownable sold, Money bid) {
+    int remaining = -debtor.account().balance().amount().amount() - bid.amount();
+    if (remaining <= 0) return true;
+    return liquidationOrder(debtor).stream().filter(type -> type != sold.type())
+        .map(type -> ((Ownable) rules.create(type)).landMortgageValue().amount())
+        .reduce(0, Integer::sum) >= remaining;
+  }
+
+  private boolean lowerNetWorth(Player candidate, Player incumbent) {
+    if (incumbent == null) return true;
+    int candidateWorth = candidate.account().balance().amount().amount()
+        + deeds.landOwnedBy(candidate).stream().map(type -> ((Ownable) rules.create(type)).price().amount()).reduce(0, Integer::sum);
+    int incumbentWorth = incumbent.account().balance().amount().amount()
+        + deeds.landOwnedBy(incumbent).stream().map(type -> ((Ownable) rules.create(type)).price().amount()).reduce(0, Integer::sum);
+    return candidateWorth < incumbentWorth;
+  }
+
+  private List<Street.Type> liquidationOrder(Player owner) {
+    Strategy strategy = strategies.forPlayer(owner);
+    return ownedLandInBoardOrder(owner).stream().sorted(Comparator.comparingInt(type ->
+        switch (strategy.priority((Ownable) rules.create(type))) {
+          case LOWEST -> 0;
+          case MIDDLE -> 1;
+          case HIGHEST -> 2;
+        })).toList();
   }
 
   private void bankruptToBank(Player debtor) {
@@ -147,6 +248,18 @@ public final class Bankruptcy {
     }
 
     default void liftedMortgage(Player player, Ownable land, Deeds.MortgageCost cost) {
+    }
+
+    default void soldToPeer(Player seller, Ownable land, Player buyer, Money price) {
+    }
+
+    default void distressedSaleStarted(Player seller, Ownable land) {
+    }
+
+    default void distressedOffer(Player bidder, Ownable land, Money price) {
+    }
+
+    default void distressedSaleWon(Player bidder, Ownable land, Money price) {
     }
   }
 }

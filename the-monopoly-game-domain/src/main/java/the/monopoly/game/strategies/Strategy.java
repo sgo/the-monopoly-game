@@ -4,6 +4,10 @@ import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
+import the.monopoly.game.rules.Deeds;
+import the.monopoly.game.rules.Rule;
+
+import java.util.List;
 
 /**
  * How a player decides. The game asks a strategy wherever a player has a
@@ -68,6 +72,25 @@ public interface Strategy {
 
   default Money cashReserve() {
     return Money.ZERO;
+  }
+
+  /** Reserve calculated with the player's current holdings, when a strategy has one. */
+  default Money cashReserve(Player player, Rule.Set rules, Deeds deeds) {
+    return cashReserve();
+  }
+
+  enum Priority {
+    HIGHEST, MIDDLE, LOWEST
+  }
+
+  default Priority priority(Ownable land) {
+    return Priority.LOWEST;
+  }
+
+  /** Maximum offer for a property sold by a debtor trying to avoid bankruptcy. */
+  default Money bidForDistressed(Offer offer, Player bidder, Player debtor,
+                                 List<Player> players, Rule.Set rules, Deeds deeds) {
+    return bidFor(offer);
   }
 
   /** The improvement a player is being asked to buy for a street they already own. */

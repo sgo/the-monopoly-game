@@ -68,7 +68,8 @@ public class LandSale implements Landings {
 
   private Strategy.Offer offerTo(Player player, Ownable land) {
     Strategy strategy = strategies.forPlayer(player);
-    return new Strategy.Offer(land, player.account().balance().amount(), strategy.cashReserve(),
+    return new Strategy.Offer(land, player.account().balance().amount(),
+        strategy.cashReserve(player, rules, deeds),
         deeds.utilityMonopolyOpportunity(rules, land));
   }
 
