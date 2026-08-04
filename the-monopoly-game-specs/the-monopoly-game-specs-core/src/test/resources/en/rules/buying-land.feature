@@ -111,3 +111,271 @@ Feature: buying unowned land
     Examples:
       | reserve | dog_starting_balance | expected_dog_final_balance |
       | 100     | 200                  | 50                          |
+
+  # buying-land-8
+  Scenario Outline: an agreeable player one street away from a colour monopoly reserves that street's price
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Steenstraat Brugge" at auction
+    When pawn "dog" lands on "Steenstraat Brugge"
+    Then pawn "dog" does not own "Steenstraat Brugge"
+    And pawn "high hat" owns "Steenstraat Brugge"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+    And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
+      | 150                   | 100          | 150                         | 1400                             |
+
+  # buying-land-9
+  Scenario Outline: an agreeable player one street away from a colour monopoly still buys land that would leave at least that street's price behind
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Steenstraat Brugge" at auction
+    When pawn "dog" lands on "Steenstraat Brugge"
+    Then pawn "dog" owns "Steenstraat Brugge"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_bid | expected_dog_final_balance |
+      | 161                   | 200          | 61                          |
+      | 160                   | 200          | 60                          |
+
+  # buying-land-10
+  Scenario Outline: an agreeable player one street away from completing two colour groups reserves only the pricier missing street
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "dog" owns "Bruul Mechelen"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Steenstraat Brugge" at auction
+    When pawn "dog" lands on "Steenstraat Brugge"
+    Then pawn "dog" owns "Steenstraat Brugge"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_bid | expected_dog_final_balance |
+      | 280                   | 330          | 180                         |
+
+  # buying-land-11
+  Scenario Outline: an agreeable player one street away from completing two colour groups still declines land that would dip below the pricier missing street
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "dog" owns "Bruul Mechelen"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Steenstraat Brugge" at auction
+    When pawn "dog" lands on "Steenstraat Brugge"
+    Then pawn "dog" does not own "Steenstraat Brugge"
+    And pawn "high hat" owns "Steenstraat Brugge"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+    And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
+      | 250                   | 100          | 250                         | 1400                             |
+
+  # buying-land-12
+  Scenario Outline: an agreeable player falls back to a cheaper reachable missing street within the same priority tier when the pricier one is unaffordable
+    Given pawn "dog" owns "Rue St-Léonard Liège"
+    And pawn "dog" owns "Lange Steenstraat Kortrijk"
+    And pawn "dog" owns "Steenstraat Brugge"
+    And pawn "dog" owns "Place du Monument Spa"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Diestsestraat Leuven" at auction
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then pawn "dog" does not own "Diestsestraat Leuven"
+    And pawn "high hat" owns "Diestsestraat Leuven"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+    And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
+      | 150                   | 60           | 150                         | 1440                             |
+
+  # buying-land-13
+  Scenario Outline: an agreeable player is not blocked by an unaffordable missing street once a cheaper reachable street in the same priority tier sets the reserve instead
+    Given pawn "dog" owns "Rue St-Léonard Liège"
+    And pawn "dog" owns "Lange Steenstraat Kortrijk"
+    And pawn "dog" owns "Steenstraat Brugge"
+    And pawn "dog" owns "Place du Monument Spa"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Diestsestraat Leuven" at auction
+    When pawn "dog" lands on "Diestsestraat Leuven"
+    Then pawn "dog" owns "Diestsestraat Leuven"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_bid | expected_dog_final_balance |
+      | 200                   | 250          | 140                         |
+
+  # buying-land-14
+  Scenario Outline: an agreeable player with no reachable near-complete monopoly still respects their configured reserve
+    Given pawn "dog" owns "Meir Antwerpen"
+    And pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Steenstraat Brugge" at auction
+    When pawn "dog" lands on "Steenstraat Brugge"
+    Then pawn "dog" does not own "Steenstraat Brugge"
+    And pawn "high hat" owns "Steenstraat Brugge"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+    And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
+
+    Examples:
+      | reserve | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
+      | 30      | 120                   | 100          | 120                         | 1400                             |
+
+  # buying-land-15
+  Scenario Outline: an agreeable player with no reachable near-complete monopoly is not blocked by an unaffordable missing street once the configured reserve is small enough
+    Given pawn "dog" owns "Meir Antwerpen"
+    And pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Steenstraat Brugge" at auction
+    When pawn "dog" lands on "Steenstraat Brugge"
+    Then pawn "dog" owns "Steenstraat Brugge"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | reserve | dog_starting_balance | high_hat_bid | expected_dog_final_balance |
+      | 30      | 150                   | 200          | 50                          |
+
+  # buying-land-16
+  Scenario Outline: an agreeable player one station away from completing the set reserves that station's price
+    Given pawn "dog" owns "Noord Station"
+    And pawn "dog" owns "Centraal Station"
+    And pawn "dog" owns "Buurtspoorwegen"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Steenstraat Brugge" at auction
+    When pawn "dog" lands on "Steenstraat Brugge"
+    Then pawn "dog" does not own "Steenstraat Brugge"
+    And pawn "high hat" owns "Steenstraat Brugge"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+    And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
+      | 250                   | 100          | 250                         | 1400                             |
+
+  # buying-land-17
+  Scenario Outline: an agreeable player reserves a middle-priority colour group's missing street over a pricier missing station in the lowest tier
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "Noord Station"
+    And pawn "dog" owns "Centraal Station"
+    And pawn "dog" owns "Buurtspoorwegen"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Rue de Diekirch Arlon" at auction
+    When pawn "dog" lands on "Rue de Diekirch Arlon"
+    Then pawn "dog" does not own "Rue de Diekirch Arlon"
+    And pawn "high hat" owns "Rue de Diekirch Arlon"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+    And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
+      | 150                   | 100          | 150                         | 1400                             |
+
+  # buying-land-18
+  Scenario Outline: an agreeable player still buys into a colour group another player already blocks, provided the reserve is maintained
+    Given pawn "high hat" owns "Grote Markt Hasselt"
+    And pawn "high hat" follows the "Greedo" strategy, keeping a $1100 reserve
+    And pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Place de l'Ange Namur"
+    Then pawn "dog" owns "Place de l'Ange Namur"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | reserve | dog_starting_balance | expected_dog_final_balance |
+      | 40      | 300                  | 40                          |
+
+  # buying-land-19
+  Scenario Outline: an agreeable player does not buy into a colour group another player already blocks if doing so would dip below the reserve
+    Given pawn "high hat" owns "Grote Markt Hasselt"
+    And pawn "high hat" follows the "Greedo" strategy, keeping a $1000 reserve
+    And pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Place de l'Ange Namur"
+    Then pawn "dog" does not own "Place de l'Ange Namur"
+    And pawn "high hat" owns "Place de l'Ange Namur"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+    And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
+
+    Examples:
+      | reserve | dog_starting_balance | expected_dog_final_balance | expected_high_hat_final_balance |
+      | 40      | 290                   | 290                         | 1000                             |
+
+  # buying-land-20
+  Scenario Outline: an agreeable player is not limited to a pricier missing station's reserve when a middle-priority colour group's cheaper missing street applies instead
+    Given pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "Noord Station"
+    And pawn "dog" owns "Centraal Station"
+    And pawn "dog" owns "Buurtspoorwegen"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Rue de Diekirch Arlon" at auction
+    When pawn "dog" lands on "Rue de Diekirch Arlon"
+    Then pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_bid | expected_dog_final_balance |
+      | 200                   | 250          | 60                          |
+
+  # buying-land-21
+  Scenario Outline: an agreeable player reserves a highest-priority colour group's missing street over a pricier missing street in a middle-priority group
+    Given pawn "dog" owns "Steenstraat Brugge"
+    And pawn "dog" owns "Place du Monument Spa"
+    And pawn "dog" owns "Grote Markt Hasselt"
+    And pawn "dog" owns "Place de l'Ange Namur"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Rue de Diekirch Arlon" at auction
+    When pawn "dog" lands on "Rue de Diekirch Arlon"
+    Then pawn "dog" does not own "Rue de Diekirch Arlon"
+    And pawn "high hat" owns "Rue de Diekirch Arlon"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+    And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
+      | 150                   | 50           | 150                         | 1450                             |
+
+  # buying-land-22
+  Scenario Outline: an agreeable player is not limited to a pricier middle-priority group's reserve when a highest-priority group's cheaper missing street applies instead
+    Given pawn "dog" owns "Steenstraat Brugge"
+    And pawn "dog" owns "Place du Monument Spa"
+    And pawn "dog" owns "Grote Markt Hasselt"
+    And pawn "dog" owns "Place de l'Ange Namur"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Rue de Diekirch Arlon" at auction
+    When pawn "dog" lands on "Rue de Diekirch Arlon"
+    Then pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_bid | expected_dog_final_balance |
+      | 270                   | 320          | 130                         |
+
+  # buying-land-23
+  Scenario Outline: an agreeable player reserves a highest-priority colour group's missing street over a pricier missing street in the lowest tier
+    Given pawn "dog" owns "Steenstraat Brugge"
+    And pawn "dog" owns "Place du Monument Spa"
+    And pawn "dog" owns "Boulevard Tirou Charleroi"
+    And pawn "dog" owns "Veldstraat Gent"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<dog_starting_balance> to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Rue de Diekirch Arlon" at auction
+    When pawn "dog" lands on "Rue de Diekirch Arlon"
+    Then pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_bid | expected_dog_final_balance |
+      | 270                   | 320          | 130                         |

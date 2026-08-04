@@ -487,6 +487,12 @@ public class World {
     pawnStrategies.put(pawnName, new the.monopoly.game.strategies.Greedo(reserve));
   }
 
+  public void assertGreedoPriority(String spaceName, String expected) {
+    the.monopoly.game.strategies.Strategy.Priority actual =
+        new the.monopoly.game.strategies.Greedo().priority(ownable(SpaceNames.of(spaceName)));
+    org.assertj.core.api.Assertions.assertThat(actual.name().toLowerCase()).isEqualTo(expected);
+  }
+
   public void queueChanceCard(String card) {
     queuedChanceCards.add(card);
   }
