@@ -39,17 +39,17 @@ final class DistressedSale {
       Ownable land = (Ownable) rules.create(type);
       events.distressedSaleStarted(debtor, land);
       int shortfall = -debtor.account().balance().amount().amount();
-      AuctionResult result = auction(land, debtor);
+      int minimumBid = minimumBid(debtor, land, candidates, shortfall);
+      AuctionResult result = auction(land, debtor, minimumBid);
       Player winner = result.winner();
       Money bid = result.bid();
       boolean completesBuyersGroup = winner != null && deeds.completesColourGroup(rules, land, winner);
-      if (belowMortgageFloor(land, winner, bid, completesBuyersGroup)) continue;
       if (shouldDeferToHouseSale(debtor, winner, bid, completesBuyersGroup)) {
         deferredToHouseSales.add(type);
         continue;
       }
-      if (winner == null || bid.amount() <= 0 || !coversDebtWithOtherLand(debtor, land, bid)) continue;
-      settle(debtor, land, winner, bid, shortfall);
+      if (winner == null || bid.amount() <= 0 || !coversDebtWithOtherLand(debtor, land, bid, candidates)) continue;
+      settle(debtor, land, winner, bid);
     }
     if (debtor.account().balance().amount().amount() < 0)
       mortgageRemainingCandidates(debtor, candidates, deferredToHouseSales);
@@ -65,16 +65,9 @@ final class DistressedSale {
         .toList();
   }
 
-  private void settle(Player debtor, Ownable land, Player winner, Money bid, int shortfall) {
+  private void settle(Player debtor, Ownable land, Player winner, Money bid) {
     deeds.transfer(land, debtor, winner, bid);
     events.distressedSaleWon(winner, land, bid);
-    if (debtor.account().balance().amount().amount() < 0) {
-      int collateral = Liquidation.order(deeds, rules, strategies, debtor).stream().filter(other -> other != land.type())
-          .map(otherType -> ((Ownable) rules.create(otherType)).landMortgageValue().amount())
-          .reduce(0, Integer::sum);
-      if (bid.amount() * 2 >= shortfall && collateral > 0)
-        debtor.account().deposit(new Money(collateral));
-    }
   }
 
   private void mortgageRemainingCandidates(Player debtor, List<Street.Type> candidates,
@@ -91,23 +84,23 @@ final class DistressedSale {
     }
   }
 
-  private AuctionResult auction(Ownable land, Player debtor) {
+  private AuctionResult auction(Ownable land, Player debtor, int minimumBid) {
     List<Player> bidders = players.stream()
         .filter(player -> !player.id().equals(debtor.id()) && !deeds.isBankrupt(player))
-        .filter(player -> maximumBid(player, debtor, land).amount() > 0)
+        .filter(player -> maximumBid(player, debtor, land).amount() >= minimumBid)
         .toList();
     if (bidders.isEmpty()) return new AuctionResult(null, Money.ZERO);
 
     List<Money> maximums = bidders.stream().map(player -> maximumBid(player, debtor, land)).toList();
     if (bidders.size() == 1) {
       Player bidder = bidders.getFirst();
-      Money bid = maximums.getFirst();
+      Money bid = new Money(minimumBid);
       events.distressedOffer(bidder, land, bid);
       return new AuctionResult(bidder, bid);
     }
 
     Player winner = null;
-    Money bid = land.landMortgageValue();
+    Money bid = new Money(minimumBid);
     boolean firstOffer = true;
     boolean settled = false;
     while (!settled) {
@@ -155,19 +148,21 @@ final class DistressedSale {
         .anyMatch(street -> deeds.housesBuiltOn(street) > 0 || deeds.hasHotelOn(street));
   }
 
-  /** A peer's offer must at least match what mortgaging to the bank would raise, unless it completes their monopoly. */
-  private boolean belowMortgageFloor(Ownable land, Player winner, Money bid, boolean completesBuyersGroup) {
-    return winner != null && bid.amount() < land.landMortgageValue().amount() && !completesBuyersGroup;
+  private int minimumBid(Player debtor, Ownable land, List<Street.Type> candidates, int shortfall) {
+    int otherCollateral = candidates.stream().filter(type -> type != land.type())
+        .map(type -> ((Ownable) rules.create(type)).landMortgageValue().amount())
+        .reduce(0, Integer::sum);
+    return Math.max(land.landMortgageValue().amount(), shortfall - otherCollateral);
   }
 
   private boolean shouldDeferToHouseSale(Player debtor, Player winner, Money bid, boolean completesBuyersGroup) {
     return winner != null && bid.amount() > 0 && hasSellableHouse(debtor) && completesBuyersGroup;
   }
 
-  private boolean coversDebtWithOtherLand(Player debtor, Ownable sold, Money bid) {
+  private boolean coversDebtWithOtherLand(Player debtor, Ownable sold, Money bid, List<Street.Type> candidates) {
     int remaining = -debtor.account().balance().amount().amount() - bid.amount();
     if (remaining <= 0) return true;
-    return Liquidation.order(deeds, rules, strategies, debtor).stream().filter(type -> type != sold.type())
+    return candidates.stream().filter(type -> type != sold.type())
         .map(type -> ((Ownable) rules.create(type)).landMortgageValue().amount())
         .reduce(0, Integer::sum) >= remaining;
   }

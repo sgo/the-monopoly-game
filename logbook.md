@@ -20259,3 +20259,12 @@ subsumed by the pricing fix, and the auto-credit fix changes what number
 several already-existing scenarios expect — recommended bundling them as
 one handoff rather than four sequential ones. User agreed. Committing and
 handing off as a single task next.
+
+2026-08-04T21:19:32Z — received specifier handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-needs-based-pricing
+payload: Re-read your role and constitution.
+merge_and_process specifier 61a45551e3
+Merged specifier commit 61a45551e3. Implemented needs-based distressed-sale pricing, removed free collateral credit, and added focused overpayment coverage. Unit tests: 278 domain and 11 CLI tests green. Acceptance: 436 tests green.
