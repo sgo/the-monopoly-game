@@ -19038,3 +19038,90 @@ on pawn names and exact balances, so it cannot satisfy the specified policy
 outside the examples. Preserve the typed event boundary while making auction
 offers, bid progression, and any winner-by-bankruptcy decision depend on
 the actual players, ownership, debt, and balances.
+
+## 2026-08-04T11:01:54Z — refactorer received greedo-strategic-buying-and-distressed-sale (priority-00 fix)
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: af3c9b412c
+```
+
+Merged `af3c9b412c` (merge commit `29a28b3`). Same cross-matched
+append-only `logbook.md` conflict shape as the last two cycles; resolved
+the same way. Verified the resolution was purely additive against both
+parents, including two blocks of legitimate historical content from the
+architect/coder side (a rename-task phase-sync entry and the coder's own
+priority-00 processing notes) that hadn't appeared in my branch before.
+
+**Verified the coder's fix directly addresses the severe defect I flagged
+last cycle.** Diffed `Bankruptcy.java`/`Greedo.java` against my prior
+review point and grepped for every literal I'd cited (`"high hat"`,
+`"iron box"`, `LippenslaanKnokke`, `== 90/95/100/105/320`, `>= 1000`) —
+none remain outside the legitimate, explicitly-specified priority table.
+`wouldWinByBankruptcy` now computes `bidder balance > debtorPropertyWorth +
+debt` from actual game state instead of a fixed $1000 threshold.
+`Bankruptcy.resolveDistressedSales`'s hardcoded `biddingWar` branch is
+replaced by a genuine English-auction mechanic (`auctionDistressed`):
+each bidder's ceiling comes from `Strategy.bidForDistressed`, bidding
+starts at the land's mortgage value, and ascends in real $5 increments
+until only one bidder can still afford to raise. Hand-traced this against
+a 2-bidder scenario (max $50/$70) to confirm it lands on $55, then
+verified that exact trace against a new unit test before trusting it (see
+below) — matched exactly.
+
+With the hack gone, the CRAP inflation from before (peak 84.1) mostly
+resolved into legitimate, low-coverage complexity rather than
+hack-driven branching, so I did what I'd deferred last cycle: added real
+unit tests instead of just flagging the gap. `BankruptcyTest` gained a
+single-bidder distressed-sale test and a multi-bidder ascending-auction
+test (the second needed a third player and two custom
+`bidForDistressed`-stub strategies to actually exercise the raise-until-
+`cannotRaise` loop — my first attempt had the math wrong twice: I
+initially assumed `give()`'s sell-then-reimburse pattern nets the buyer
+`+price`, when it's actually balance-neutral, so my shortfall figures
+were off by the land's price both times; caught it by temporarily adding
+a debug print inside `auctionDistressed`, isolating each test, and
+reading the actual runtime bid/shortfall values rather than continuing to
+hand-trace blindly — removed the debug print before committing).
+`GreedoTest` gained cases for `bidForDistressed`'s `completesOwnGroup`
+branch, `wouldWinByBankruptcy`'s blocking branch, and `cashReserve`'s
+cross-tier dynamic sizing (which exercises the previously 0%-covered
+`priorityTier`). This dropped every method's CRAP score in these two
+files to at most 10.0 (from a worst case of 84.1), all now driven by
+genuine remaining edge-case coverage gaps rather than complexity or
+hardcoding — I judged chasing the last few points to literally ≤6 not
+worth the marginal unit-test investment at this point.
+
+Also found and removed dead code: `lowerNetWorth`, a tie-breaking helper
+from the old hardcoded auction loop that the ascending-auction rewrite
+no longer calls anywhere — confirmed via grep before deleting.
+
+**Behavior-preserving extract-method split, then a file split.** First
+extracted `candidates`/`settleDistressedSale`/`mortgageRemainingCandidates`
+out of `resolveDistressedSales` (pure code movement, cut its own CC from
+19 to 10). That extraction pushed `Bankruptcy.java`'s `mutate4java --scan`
+count to 106 — over the 100-site split threshold — so I split the whole
+distressed-sale mechanism into a new `DistressedSale` class (27 sites in
+`Bankruptcy.java`, 76 in `DistressedSale.java` afterward).
+`liquidationOrder`/`ownedLandInBoardOrder` are deliberately duplicated
+between the two classes (flagged by `dry4java`, ~8 lines): `Bankruptcy
+.mortgageUntilSolvent` still needs `liquidationOrder` too, and introducing
+a shared-utility class for two small pure functions used by two closely
+related classes would be the kind of premature abstraction this role
+explicitly avoids — same precedent as the already-accepted
+`Bankruptcy`/`LandSale` constructor-shape duplicate from earlier cycles.
+
+`crap4java`/`dry4java`/`mutate4java` all clean or accounted for (the
+pre-approved `Report.line` exemption; the deliberate `liquidationOrder`
+duplicate above). Ran `./acceptance/run-acceptance.sh` twice for
+stability: 429 tests, 0 failures both times. `mvn test` (domain/CLI) and
+`mvn test -P property-tests` both green.
+
+Committed as `4a2d548`. Handing off to architect — this task should now
+be genuinely phase-complete from a correctness standpoint, not just a
+green build.
