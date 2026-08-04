@@ -18741,3 +18741,36 @@ reserve was only ever specified this session, never implemented — the
 default static reserve). No parse errors, no unexpected failures.
 
 Reporting to the user for review and handoff approval before committing.
+
+## 2026-08-04T08:06:08Z — specifier sends greedo-strategic-buying-and-distressed-sale to coder
+
+User approved. Committed as `e7f7f7538d` "Specify Greedo's priority-driven
+strategic buying and distressed-sale negotiation" — 8 files, 1301
+insertions: `buying-land-8` through `23` (dynamic reserve + 3-tier
+priority), new `greedo-priority.feature` (28-space priority table),
+new `distressed-sale.feature` (14 scenarios), `journal`/`logging`/
+`report-41` through `44`, and `acceptance/pipeline-features.txt`
+registration for both new feature files.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: e7f7f7538d
+```
+
+Summary: this is the largest single specification handoff of the project
+to date, covering the full "strategic buying" design conversation —
+dynamic monopoly-completion reserve sizing, the priority-tier system on
+top of it, Greedo's priority table as directly observable data, the entire
+distressed-property-sale negotiation mechanic (ordering, price floors,
+value-gate, endgame override, capped/uncapped bidding, net-worth tie-
+break), and narration for all of it including a genuine $5-increment
+bidding sequence. Full acceptance suite currently 429 tests, 55 failures,
+all expected pre-implementation (parser/dry-checker clean on every touched
+file; every failure traced to specific new or changed behavior, no
+unexpected failures, confirmed in the specifier's own logbook entries
+across this whole design arc).
