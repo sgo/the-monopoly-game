@@ -19859,6 +19859,31 @@ green.
 
 Committed as `f6f6e88`. Handing off to architect.
 
+## 2026-08-04T18:56:52Z — refactorer sent distressed-sale-mortgage-floor handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: cba11ca52b
+```
+
+Summary: verified the coder's fix for the third live-play defect —
+distressed-sale bids landing below the land's mortgage value. The fix
+correctly rejects a winning bid under the mortgage floor unless it
+completes the buyer's own monopoly, matching the dictated rule and
+`Greedo`'s existing monopoly-completion exemption elsewhere. Confirmed
+against the new `distressed-sale-17` scenario and a unit test. Extracted
+two guard conditions out of `resolve()` (pure code movement) after the
+fix pushed its CRAP to 15.2 — back to 10.0, matching the pre-fix
+baseline. `dry4java` clean, `mutate4java` well under threshold.
+Regenerated acceptance suite green twice (432 tests), unit and property
+suites both green. Handing verified state to architect for independent
+review.
+
 2026-08-04T19:34:40Z — received refactorer handoff:
 type: git_handoff
 to: architect
@@ -20073,6 +20098,41 @@ dice-fairness precedent) or whether it needs a structural fix instead
 bypassing Greedo's percentage rounding entirely — which would be a coder
 change, not something to guess into the Gherkin blind).
 
+(e.g. new step vocabulary to script an exact distressed-sale bid,
+bypassing Greedo's percentage rounding entirely — which would be a coder
+change, not something to guess into the Gherkin blind).
+
+Committed as `34964c136e` "Narrow distressed-sale-17's mutation dead
+zone, document the residual limit" (2 files, 77 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: 34964c136e
+```
+
+Summary: root-caused why `distressed-sale-17` survived all six
+mutations — `belowMortgageFloor` rejects any bid under $90
+unconditionally, and a rejected bid is never paid, so every
+`high_hat_starting_balance` from the smallest nonzero deny-motive bid up
+to $257 produces identical observable output; only crossing to $258
+changes anything. Confirmed `dog_starting_balance`/
+`expected_dog_final_balance` are properly sensitive via the ordinary
+acceptance suite (not the mutator). Narrowed the unavoidable
+one-directional dead zone from a width-3 rounding run to a width-2 one
+(`high_hat_starting_balance=239`, `dog_starting_balance=17`, expected
+balance `$7`) — the best achievable via numeric choice alone. Documented
+the residual, structural one-directional gap and drew the parallel to
+the accepted `dice.feature !no-mutation` precedent, asking the architect
+to judge with mutation-tool access whether it's acceptable or needs a
+structural fix (new step vocabulary to script an exact distressed-sale
+bid). Full reasoning and verification steps in the prior logbook entry
+this cycle.
+
 2026-08-04T20:00:34Z — received specifier handoff:
 type: git_handoff
 to: architect
@@ -20097,3 +20157,249 @@ task: distressed-sale-mortgage-floor
 commit: 97d1a3099b
 
 Phase-complete sync: the mortgage-floor boundary correction is accepted.
+
+## 2026-08-05T22:03:00Z — specifier received distressed-sale-mortgage-floor phase-complete sync
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: 97d1a3099b
+
+Re-read your role and constitution.
+
+merge_and_process architect 97d1a3099b
+```
+
+Merged `97d1a3099b` into `main` as `f8547e0`. Only `logbook.md`
+conflicted (same cross-matched append-only shape); resolved carefully
+this time — diffed both sides against the shared ancestor
+(`34964c136e`), spliced additively, and grepped every distinctive marker
+line (`Committed as`, `Handoff message sent:`, `received specifier
+handoff:`, `Summary: root-caused`) before committing to confirm each
+appears exactly once, after last cycle's splice mistake.
+
+The narrowed boundary (`high_hat_starting_balance=239`,
+`dog_starting_balance=17`) genuinely worked: the architect's mutation run
+killed all six of `distressed-sale-17`'s mutations, confirming the
+width-2-run edge placement was the right fix for the structural
+insensitivity traced last cycle. Re-ran `./acceptance/run-acceptance.sh`
+myself: 433 tests, 0 failures.
+
+The 14 other survivors the architect mentions are pre-existing, outside
+this task — not something this correction needs to address.
+
+This closes the `distressed-sale-mortgage-floor` task: all three defects
+found by running the live 2-player game this session (the
+`mortgageRemainingCandidates` crash, the house-deferral overbreadth, and
+the mortgage-floor gap) are now genuinely specified, implemented, and
+verified down to mutation-testing rigor. Per role rules, asking the user
+for the next feature to add.
+
+## 2026-08-04T23:15:00Z — specifier specifies whole-balance overpay and auto-credit defects, hands off as one task
+
+At the user's request, ran another real 2-player game and read the log.
+It completed cleanly (fix from the prior task holds), but the user
+pushed back on something I'd waved off too quickly: a monopoly-completing
+buyer paying $9 for a property with an $80 mortgage isn't "working as
+designed" just because it's exempt from the floor — that exemption was
+never actually specified, and the user separately questioned why any
+buyer, monopoly-completing or not, should hand over its *entire* bank
+balance when nobody's bidding against it.
+
+Both concerns turned out to be the same root cause, and pulling on that
+thread surfaced two more defects than either of us expected.
+
+**Root cause.** `DistressedSale.auction()`'s single-bidder branch uses
+`bid = maximums.getFirst()` directly — the bidder's *ceiling* (raw 35%
+deny-cap, or full balance for monopoly-completion) becomes the *price*,
+with no negotiation at all, unlike the real multi-bidder path which
+genuinely ascends from the mortgage floor. Two things follow from this
+one shortcut: (1) `belowMortgageFloor`'s `!completesBuyersGroup`
+exemption was patched in specifically to stop this from rejecting
+legitimate monopoly-completing ceilings — removing the shortcut removes
+the need for the exemption; (2) every buyer overpays whenever their
+ceiling exceeds what the debtor actually needs.
+
+**The fix I'm proposing** (verified by temporarily patching
+`DistressedSale.java` end-to-end, then reverting — not implemented here,
+out of specifier's remit): replace the raw-ceiling price with
+`max(landMortgageValue, shortfall − otherCollateral)`, clamped to the
+bidder's ceiling as a maximum, not an automatic payment. A bidder whose
+ceiling can't reach that price simply isn't a valid bidder (same
+rejection outcome the floor-exemption fix needed, subsumed for free).
+
+**A third, unrelated defect surfaced while chasing this**, verified by
+directly patching and reverting: `DistressedSale.settle()` credits a
+debtor with another property's mortgage value *without mortgaging it*,
+whenever a sale's price is at least half the shortfall — free money, no
+real transaction, the property stays unmortgaged. Never something I
+specified; looks like a shortcut to make `distressed-sale-9`'s original
+numbers work. New `distressed-sale-21` isolates it cleanly (chose
+`Steenstraat Brugge` + `Noord Station` and `high_hat_starting_balance=286`
+specifically so the raw-ceiling and needs-based prices coincide at
+exactly $100 — meaning the *only* thing that differs between buggy and
+fixed code is whether `Noord Station` ends up actually mortgaged, not the
+final balance).
+
+**Scenarios retuned to reflect needs-based pricing** (buyer pays only
+what's needed, not their ceiling): `distressed-sale-2`, `-5`, `-8`, `-12`,
+`-16`, `-20` (new, proves a buyer with $185 in hand pays only the $90
+floor a $10 debt requires), plus the `journal`/`logging`/`report`
+narration scenarios that reused `-2`'s old assert-the-arranging-column
+pattern (gave them their own `expected_bid` column instead, since the bid
+no longer equals the starting balance).
+
+**Two scenarios needed real rework, not just retuning:**
+- `distressed-sale-15` (this session's earlier crash-fix scenario): its
+  numbers relied on a sub-floor monopoly-completing sale the floor fix
+  forbids outright. Rebuilt with a genuinely larger debt so the sale
+  still legitimately happens and a second property still needs
+  mortgaging afterward — the crash-fix's own premise, preserved on solid
+  ground this time.
+- `distressed-sale-9`: its title ("pre-empts the debtor needing to sell
+  anything else") was only true because of the auto-credit bug. Retitled
+  to "the rest is mortgaged separately" and flipped its
+  `Boulevard Tirou Charleroi is not mortgaged` assertion to `is
+  mortgaged` — the numbers themselves were untouched and still hold.
+
+**Two mistakes caught before they reached the user**, both by actually
+running the numbers instead of trusting the arithmetic: my first
+`distressed-sale-12`/`-13` redesigns accidentally chose values where the
+raw ceiling and the needs-based price coincide, silently testing nothing
+— caught because `-12` didn't fail when it should have. My first
+attempt at the pricing patch computed "other collateral" from
+`Liquidation.order` directly instead of the filtered `candidates(debtor)`
+list, so it double-counted a still-developed monopoly's protected
+streets as spendable collateral, mispricing `distressed-sale-16` — caught
+by tracing exactly why a house sold that shouldn't have.
+
+**Verification.** Every retuned/new scenario confirmed two ways: fails
+correctly against today's code (`./acceptance/run-acceptance.sh`: 436
+tests, 13 failures, all in the 10 touched `distressed-sale` scenarios
+plus the 3 narration scenarios, nothing else moved), and passes clean
+(436/436) against a temporary, complete patch implementing all four
+fixes together — applied, tested, then fully reverted via `git checkout
+--`, confirmed by a clean `git diff` before rebuilding. `bb gherkin-parser`
+and `bb gherkin-ir-dry-checker --include-exact` clean on all four touched
+files (only the familiar, already-accepted setup-then-assert step-repeat
+pattern, nothing new).
+
+Given how tightly the four fixes are coupled — the floor-exemption fix is
+subsumed by the pricing fix, and the auto-credit fix changes what number
+several already-existing scenarios expect — recommended bundling them as
+one handoff rather than four sequential ones. User agreed. Committing and
+handing off as a single task next.
+
+2026-08-04T21:19:32Z — received specifier handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-needs-based-pricing
+payload: Re-read your role and constitution.
+merge_and_process specifier 61a45551e3
+Merged specifier commit 61a45551e3. Implemented needs-based distressed-sale pricing, removed free collateral credit, and added focused overpayment coverage. Unit tests: 278 domain and 11 CLI tests green. Acceptance: 436 tests green.
+
+2026-08-04T23:33:00Z — refactorer reviews distressed-sale-needs-based-pricing
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: distressed-sale-needs-based-pricing
+
+Re-read your role and constitution.
+
+merge_and_process coder 64f3c76fc1
+```
+
+Merged `64f3c76fc1` (merge commit `11d1a93`). Only `logbook.md`
+conflicted (same cross-matched append-only shape as every prior cycle,
+this time spanning a much longer stretch of upstream history the
+architect/specifier/coder had already advanced through while this
+branch sat on its last commit); resolved by reading both sides in full,
+reconstructing chronological send-then-receive order, and verifying
+`diff <(git show <rev>:logbook.md) logbook.md` was purely additive
+against both parents before committing.
+
+The coder's fix (confirmed by reading `DistressedSale.java`) replaces
+the old raw-ceiling-as-price shortcut with needs-based pricing: the
+auction's minimum/starting bid is now
+`max(landMortgageValue, shortfall − otherCollateral)` instead of
+`land.landMortgageValue()`, and the single-bidder branch charges that
+computed minimum instead of handing the bidder's full ceiling to the
+debtor for free. This subsumes the old `belowMortgageFloor` exemption
+(a bid below the floor is no longer reachable at all, since the
+auction's own floor is the mortgage value) and removes the separate
+free-collateral-credit branch in `settle()` that used to deposit
+another property's mortgage value into the debtor's account without
+actually mortgaging it. Matches the specifier's root-cause writeup
+exactly. Verified with a focused unit test
+(`aDistressedSaleDoesNotMakeItsOnlyBidderOverpay`, unchanged from the
+coder's commit) and the new `distressed-sale-20`/other retuned
+acceptance scenarios.
+
+Ran CRAP first, as required before DRY. Coverage data was stale
+(`target/jacoco.exec` predated the merge); regenerated it with a plain
+`mvn test` — `crap4java` reruns tests internally regardless, but
+running it once cold showed why: `auction` was 30.4 (CC=10, 41.1%
+coverage) and `cannotRaise` was 20.0 (CC=4, 0% coverage) on a stale
+snapshot, then unchanged after a fresh `mvn test`, which confirmed the
+low coverage was real, not stale data.
+
+Traced why: the existing `aDistressedSaleAscendsInFiveDollarStepsUntil
+OnlyOneBidderCanStillRaise` test withdrew dog down to a $55 shortfall,
+which is now also the computed minimum bid — above `highHat`'s $50
+ceiling, so it's silently excluded as a bidder and the auction
+collapses to the single-bidder branch. The test kept passing (its
+assertions still held under the new pricing) but no longer exercised
+the ascending multi-bidder loop it's named for, and `cannotRaise` had
+gone completely dark. This is a coverage regression coupled with a
+misleading test name — squarely refactorer's coverage remit, not a
+production defect. Fixed by lowering dog's withdrawal to a $25
+shortfall (under the $30 mortgage floor, so the floor — not the
+shortfall — sets the minimum bid at $30, keeping both bidders
+qualified) and updating the expected final balances accordingly. Traced
+the full multi-round ascent by hand (3 rounds, ending at $55, same
+final price as before by coincidence) before changing the numbers, to
+avoid the kind of arithmetic mistake `give()`'s balance-neutrality
+caused twice earlier this session. Reran with `-Dtest=BankruptcyTest`
+to confirm before touching anything else.
+
+With coverage restored, `auction` (CRAP=10.0, CC=10) and `resolve`
+(CRAP=9.0, CC=9) were still over the CC=6 target on their own
+complexity, not coverage. Extracted `attemptSale` out of `resolve`'s
+loop body (pure code movement — the original `continue`s become plain
+returns from the extracted method, since the caller's `for` loop
+already advances on return) and split `auction` into `auction` /
+`ascend` / `bidRound`, moving the per-round bidding pass into its own
+method returning a small `Round` record so the outer ascent loop
+becomes a `do { round = bidRound(...); ... } while (round.raised() &&
+!round.settled())`. Verified this condition is exactly equivalent to
+the original `while(!settled) { ...; if (!raised) break; }` structure
+by enumerating the three reachable (raised, settled) states by hand
+before extracting. Final CRAP, all methods in the file: attemptSale 6.0,
+mortgageRemainingCandidates 6.0, bidRound 5.0, resolve 4.0, auction 4.0,
+cannotRaise 4.0, ascend 3.0, everything else lower — no threshold-
+exceeded line from the tool.
+
+`dry4java` clean — no new duplication from this change (only pre-
+existing, already-known patterns in `Game.java`, `GreedoTest.java`, and
+the recurring `player()` test-helper shape across several test files).
+`mutate4java --scan` on the changed file: 71 sites, well under the
+100-site split threshold; refreshed the embedded manifest with
+`--update-manifest` since the coder's commit had left it stale against
+the new method shapes.
+
+Ran `mvn test` (domain/CLI, clean) and `mvn test -P property-tests`
+(clean). Ran `./acceptance/run-acceptance.sh` twice: 436 tests, 0
+failures both times.
+
+Committed as `be13493` "Extract auction round and per-candidate sale
+attempt from DistressedSale" (2 files, 198 insertions, 127 deletions —
+mostly the regenerated mutation manifest). Handing off to architect.

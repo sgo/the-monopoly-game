@@ -51,7 +51,7 @@ Feature: selling property to avoid bankruptcy
 
     Examples:
       | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance | expected_high_hat_final_balance |
-      | 0                     | 200                        | 100                         | 0                                 |
+      | 0                     | 200                        | 0                           | 100                               |
 
   # distressed-sale-3
   Scenario Outline: a debtor mortgages to the bank instead when a peer's offer does not beat the mortgage value
@@ -120,7 +120,7 @@ Feature: selling property to avoid bankruptcy
 
     Examples:
       | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance |
-      | 0                     | 200                        | 100                         |
+      | 0                     | 200                        | 0                           |
 
   # distressed-sale-6
   Scenario Outline: a debtor's priority table sells the lowest-priority spare property first, regardless of price
@@ -182,10 +182,10 @@ Feature: selling property to avoid bankruptcy
 
     Examples:
       | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance |
-      | 0                     | 92                         | 42                          |
+      | 0                     | 92                         | 40                          |
 
   # distressed-sale-9
-  Scenario Outline: a second buyer's offer to cover the whole debt pre-empts the debtor needing to sell anything else
+  Scenario Outline: an ascending auction's winning bid does not need to cover the whole debt alone; the rest is mortgaged separately
     And we select 3 players
     And pawn "dog" will roll 10 for initiative
     And pawn "high hat" will roll 4 for initiative
@@ -203,7 +203,7 @@ Feature: selling property to avoid bankruptcy
     And pawn "dog" has $<dog_starting_balance> to spend
     When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
     Then pawn "iron box" owns "Lippenslaan Knokke"
-    And the land "Boulevard Tirou Charleroi" is not mortgaged
+    And the land "Boulevard Tirou Charleroi" is mortgaged
     And pawn "dog" owns "Boulevard Tirou Charleroi"
     And pawn "dog" is not bankrupt
     And pawn "dog"'s account balance is $<expected_dog_final_balance>
@@ -270,10 +270,10 @@ Feature: selling property to avoid bankruptcy
 
     Examples:
       | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance | expected_high_hat_final_balance |
-      | 0                     | 600                        | 10                          | 390                               |
+      | 0                     | 600                        | 0                            | 400                               |
 
   # distressed-sale-13
-  Scenario Outline: a bid that completes the bidder's own monopoly is not capped at 35% and can spend the bidder's whole balance
+  Scenario Outline: a bid that completes the bidder's own monopoly is not capped at 35% and can spend the bidder's whole balance when that much is genuinely needed
     And we select 3 players
     And pawn "dog" will roll 10 for initiative
     And pawn "high hat" will roll 4 for initiative
@@ -292,7 +292,7 @@ Feature: selling property to avoid bankruptcy
 
     Examples:
       | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance | expected_high_hat_final_balance |
-      | 50                    | 300                        | 250                         | 0                                 |
+      | 0                     | 100                        | 0                            | 0                                 |
 
   # distressed-sale-14
   Scenario Outline: the debtor breaks a tied offer by selling to whichever competing buyer has the lower net worth
@@ -332,7 +332,7 @@ Feature: selling property to avoid bankruptcy
     And pawn "dog" owns "Boulevard d'Avroy Liège"
     And pawn "dog" owns "Grote Markt Hasselt"
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
     Then pawn "high hat" owns "Boulevard d'Avroy Liège"
     And the land "Grote Markt Hasselt" is mortgaged
     And pawn "dog" owns "Grote Markt Hasselt"
@@ -341,7 +341,7 @@ Feature: selling property to avoid bankruptcy
 
     Examples:
       | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance |
-      | 0                     | 20                         | 50                          |
+      | 0                     | 200                        | 90                          |
 
   # distressed-sale-16
   Scenario Outline: a debtor sells a spare property to a peer despite holding an unrelated developed monopoly, when the sale does not complete the buyer's group
@@ -366,7 +366,7 @@ Feature: selling property to avoid bankruptcy
 
     Examples:
       | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance |
-      | 0                     | 300                        | 5                           |
+      | 0                     | 300                        | 0                           |
 
   # distressed-sale-17
   Scenario Outline: a peer's offer one dollar below the land's mortgage value is declined in favor of mortgaging to the bank
@@ -408,3 +408,69 @@ Feature: selling property to avoid bankruptcy
     Examples:
       | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance | expected_high_hat_final_balance |
       | 10                    | 258                        | 0                           | 168                              |
+
+  # distressed-sale-19
+  Scenario Outline: a monopoly-completing offer below the land's mortgage value is still declined in favor of mortgaging to the bank
+    And we select 2 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "high hat" owns "Rue de Diekirch Arlon"
+    And pawn "high hat" owns "Bruul Mechelen"
+    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" has $<high_hat_starting_balance> to spend
+    And pawn "dog" owns "Place Verte Verviers"
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then pawn "dog" owns "Place Verte Verviers"
+    And the land "Place Verte Verviers" is mortgaged
+    And pawn "dog" is not bankrupt
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance |
+      | 95                    | 9                          | 75                          |
+
+  # distressed-sale-20
+  Scenario Outline: a monopoly-completing buyer with ample funds still pays only what the debtor needs, not their whole balance
+    And we select 2 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "high hat" owns "Rue Royale Tournai"
+    And pawn "high hat" owns "Groenplaats Antwerpen"
+    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" has $<high_hat_starting_balance> to spend
+    And pawn "dog" owns "Lippenslaan Knokke"
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then pawn "high hat" owns "Lippenslaan Knokke"
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+    And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance | expected_high_hat_final_balance |
+      | 90                    | 185                        | 80                          | 95                                |
+
+  # distressed-sale-21
+  Scenario Outline: settling a partial-coverage sale actually mortgages the debtor's other collateral instead of crediting its value for free
+    And we select 2 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" owns "Steenstraat Brugge"
+    And pawn "dog" owns "Noord Station"
+    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" has $<high_hat_starting_balance> to spend
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    Then pawn "high hat" owns "Steenstraat Brugge"
+    And pawn "dog" owns "Noord Station"
+    And the land "Noord Station" is mortgaged
+    And pawn "dog" is not bankrupt
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance |
+      | 0                     | 286                        | 0                           |
