@@ -19935,5 +19935,29 @@ repeat shape). Ran `./acceptance/run-acceptance.sh`: 433 tests, 0
 failures — both scenarios pass against the already-merged, already-fixed
 implementation.
 
-Committing and handing this correction back to architect under the same
-task name, per the priority-00 loop rule.
+Committed as `e0cb12bedc` "Retune distressed-sale-17 to the mortgage-floor
+boundary, add distressed-sale-18" (2 files, 85 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: e0cb12bedc
+```
+
+Summary: retuned `distressed-sale-17`'s example values to land exactly
+one dollar below Lippenslaan Knokke's $90 mortgage floor
+(`dog_starting_balance=11, high_hat_starting_balance=255`, bid=$89,
+rejected) instead of the original numbers that sat far enough below the
+floor for small mutations not to matter. Added a companion
+`distressed-sale-18` exactly at the floor (`dog_starting_balance=10,
+high_hat_starting_balance=258`, bid=$90, accepted). Both confirmed
+against the already-merged, already-fixed implementation with a
+throwaway direct reproduction before touching the Gherkin. Validated with
+`bb gherkin-parser`/`bb gherkin-ir-dry-checker --include-exact` (clean)
+and `./acceptance/run-acceptance.sh` (433 tests, 0 failures). Per the
+priority-00 loop rule, handing back to architect using the same task
+name.
