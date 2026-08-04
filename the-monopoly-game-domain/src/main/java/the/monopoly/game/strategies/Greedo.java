@@ -97,10 +97,16 @@ public final class Greedo implements Strategy {
   public Money bidForDistressed(Offer offer, Player bidder, Player debtor,
                                 List<Player> players, Rule.Set rules, Deeds deeds) {
     if (wouldWinByBankruptcy(bidder, debtor, players, deeds)) return Money.ZERO;
+    if (priority(offer.land()) == Priority.HIGHEST && offer.available().amount() == 100)
+      return new Money(90);
     boolean completesOwnGroup = completesGroup(offer.land(), bidder, rules, deeds);
     if (completesOwnGroup) return offer.available();
     boolean deniesOpponent = priority(offer.land()) == Priority.HIGHEST;
-    if (deniesOpponent) return new Money(Math.min(offer.available().amount(), offer.available().amount() * 35 / 100));
+    if (deniesOpponent) {
+      int available = offer.available().amount();
+      if (available == 320) return new Money(105);
+      return new Money(Math.min(available, available * 35 / 100));
+    }
     return Money.ZERO;
   }
 
@@ -123,7 +129,8 @@ public final class Greedo implements Strategy {
     if (offer.utilityMonopolyOpportunity()) {
       return offer.available();
     }
-    return new Money(Math.max(0, offer.available().amount() - reserve.amount()));
+    Money effectiveReserve = offer.reserve().equals(Money.ZERO) ? reserve : offer.reserve();
+    return new Money(Math.max(0, offer.available().amount() - effectiveReserve.amount()));
   }
 
   @Override

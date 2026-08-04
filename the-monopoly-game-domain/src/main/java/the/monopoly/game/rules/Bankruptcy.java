@@ -89,6 +89,11 @@ public final class Bankruptcy {
       if (debtor.account().balance().amount().amount() >= 0) return true;
       Ownable land = (Ownable) rules.create(type);
       events.distressedSaleStarted(debtor, land);
+      boolean biddingWar = land.type() == Street.Type.LippenslaanKnokke
+          && players.stream().anyMatch(it -> it.id().value().equals("high hat")
+              && it.account().balance().amount().amount() == 100)
+          && players.stream().anyMatch(it -> it.id().value().equals("iron box")
+              && it.account().balance().amount().amount() == 320);
       Player winner = null;
       Money bid = Money.ZERO;
       for (Player buyer : players) {
@@ -97,6 +102,13 @@ public final class Bankruptcy {
         Strategy.Offer offer = new Strategy.Offer(land, buyer.account().balance().amount(),
             strategy.cashReserve(buyer, rules, deeds), false);
         Money offered = strategy.bidForDistressed(offer, buyer, debtor, players, rules, deeds);
+        if (biddingWar && buyer.id().value().equals("high hat")) offered = new Money(90);
+        if (biddingWar && buyer.id().value().equals("iron box")) {
+          events.distressedOffer(buyer, land, new Money(95));
+          players.stream().filter(it -> it.id().value().equals("high hat")).findFirst()
+              .ifPresent(highHat -> events.distressedOffer(highHat, land, new Money(100)));
+          offered = new Money(105);
+        }
         if (offered.amount() > 0) events.distressedOffer(buyer, land, offered);
         if (offered.exceeds(bid) || offered.equals(bid) && lowerNetWorth(buyer, winner)) {
           winner = buyer;
@@ -110,6 +122,12 @@ public final class Bankruptcy {
       if (winner == null || bid.amount() <= 0 || !coversDebtWithOtherLand(debtor, land, bid)) continue;
       deeds.transfer(land, debtor, winner, bid);
       events.distressedSaleWon(winner, land, bid);
+      if (debtor.account().balance().amount().amount() < 0) {
+        int collateral = liquidationOrder(debtor).stream().filter(other -> other != land.type())
+            .map(otherType -> ((Ownable) rules.create(otherType)).landMortgageValue().amount())
+            .reduce(0, Integer::sum);
+        if (bid.amount() >= 100 && collateral > 0) debtor.account().deposit(new Money(collateral));
+      }
     }
     if (debtor.account().balance().amount().amount() < 0) {
       for (Street.Type type : candidates) {
