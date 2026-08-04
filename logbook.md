@@ -19551,8 +19551,33 @@ setup-then-assert step repeats, same shape already present in scenarios
 the two new scenarios, nothing else moved.
 
 User approved writing these and handing off as a defect report (not a new
-feature). Committing and notifying coder next, task name
-`distressed-sale-liquidation-defects`.
+feature). Committed as `92fcd6a93f` "Add reproduction scenarios for two
+distressed-sale defects found in live play" (2 files, 137 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-liquidation-defects
+commit: 92fcd6a93f
+```
+
+Summary: two defects found by running a real 2-player game and reading
+its log, both reproduced as Gherkin scenarios in `distressed-sale.feature`
+rather than fixed here (out of specifier's remit). `distressed-sale-15`
+reproduces a crash — `DistressedSale.mortgageRemainingCandidates` tries to
+re-mortgage a property already sold to a peer earlier in the same
+resolution, since the candidate list it walks was never updated to
+exclude settled sales; currently fails with the exact
+`IllegalStateException` seen in live play. `distressed-sale-16` reproduces
+a correctness gap — the debtor defers to house-selling whenever it has
+*any* house anywhere, instead of only when the specific sale would
+complete the *buyer's* monopoly; currently fails because the sale never
+happens. `distressed-sale-4` still passes but only because its one
+example conflates the two conditions. Full detail and root-cause tracing
+in the prior logbook entry this cycle.
 
 2026-08-04T15:46:00+02:00 — completed coder handoff:
 type: git_handoff
@@ -19619,3 +19644,194 @@ tests, 0 failures both times. `mvn test` (domain/CLI) and
 `mvn test -P property-tests` both green.
 
 Committed as `a401f68`. Handing off to architect.
+
+## 2026-08-04T13:54:06Z — refactorer sent distressed-sale-liquidation-defects handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-liquidation-defects
+commit: 28bb4e38a7
+```
+
+Summary: verified the coder's fix for both defects the specifier found
+via a real, unseeded live-play run — a crash in
+`DistressedSale.mortgageRemainingCandidates` mortgaging land the debtor
+no longer owned after an earlier mid-loop sale, and over-broad house-sale
+deferral that ignored whether the sale actually completed the buyer's
+colour group. Both fixes are correct and minimal. Found and fixed one
+DRY issue in the new code: the fix's `completesGroup` duplicated
+`Greedo`'s existing private method almost exactly; moved it to
+`Deeds.completesColourGroup`, matching the existing
+`utilityMonopolyOpportunity` precedent, with both call sites now
+delegating to it. `dry4java` clean, `crap4java`/`mutate4java` stable
+(one method ticked up slightly from the unavoidable new condition).
+Regenerated acceptance suite green twice (431 tests), unit and property
+suites both green. Handing verified state to architect for independent
+review.
+
+## 2026-08-04T16:00:00Z — specifier received distressed-sale-liquidation-defects phase-complete sync
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-liquidation-defects
+commit: a3cb575530
+
+Re-read your role and constitution.
+
+merge_and_process architect a3cb575530
+```
+
+Merged `a3cb575530` into `main` as `f2ecfcd`. Only `logbook.md` conflicted
+(same cross-matched append-only shape as every prior cycle); resolved by
+diffing both sides against the shared ancestor (`92fcd6a93f`) and
+concatenating additively — nothing lost, nothing duplicated.
+
+Both defects found while running a live 2-player game are genuinely
+fixed, not just patched to pass: `mortgageRemainingCandidates` now skips
+any candidate the debtor no longer owns, and the house-sale deferral
+gates on a new `Deeds.completesColourGroup(rules, land, winner)` check in
+addition to "debtor has a sellable house" — read the merged
+`DistressedSale.resolve` directly to confirm both conditions are present
+together, not just one. Re-ran `./acceptance/run-acceptance.sh`: 431
+tests, 0 failures. Rebuilt the CLI jar and re-ran a real, unseeded
+2-player game via `Simulator` end to end: completed normally with a
+declared winner, 0 exceptions, 3874 log lines — the exact crash from
+earlier this session no longer reproduces in live play, not just in the
+two new Gherkin scenarios.
+
+The refactorer also deduplicated `completesGroup` into
+`Deeds.completesColourGroup`, shared between `DistressedSale` and
+`Greedo` — a sensible, minimal DRY fix, not a design concern.
+
+Per role rules, asking the user for the next feature to add.
+
+## 2026-08-04T20:45:00Z — specifier writes a reproduction scenario for a third distressed-sale defect and hands off as a defect report
+
+At the user's request, ran another real 2-player game (unseeded dice) and
+read the log. This one completed cleanly (0 exceptions, declared winner —
+confirming the previous fix holds in live play), but surfaced a new
+defect: several winning distressed-sale prices landed well below the
+land's own mortgage value, e.g. Rue Royale Tournai (mortgage $90) sold for
+$28, $18, $2, $5, $8; Lippenslaan Knokke (mortgage $90) for $3, $7, $13,
+$8; Kapellestraat Oostende (mortgage $60) for $4, $11, $20, $12, $23;
+Groenplaats Antwerpen (mortgage $100) for $5, $10, $17, $11; Grand Place
+Mons (mortgage $120) for $11.
+
+This violates the dictated rule directly: "The buyer would have to offer
+at least the mortgage price as you would simply mortgage to the bank if
+they'd offer the same or less." `Greedo.bidForDistressed`'s deny-motive
+branch caps the bid at 35% of the *bidder's* balance with no floor tied to
+the *land's* mortgage value, and nothing in `DistressedSale` rejects a
+sale that doesn't clear it. Every existing scenario only exercised the
+"buyer declines entirely" edge (bid = $0, via the value-gate); none
+exercised "buyer bids something small but still below the mortgage
+floor," which is exactly the gap.
+
+Traced and pinned the numbers with a throwaway package-private
+reproduction against `Bankruptcy` directly (scratch-only, not committed)
+before writing Gherkin, learning from last cycle's mistake: dog only owns
+one candidate property here, so no explicit strategy is needed for the
+ordering to matter, and the repro reproduced first try — high hat wins
+Lippenslaan Knokke for $14 against a $90 mortgage floor, confirmed via a
+direct `Bankruptcy.resolve` call before trusting the scenario.
+
+**New scenario added to `distressed-sale.feature`:**
+- `distressed-sale-17` ("a peer's nonzero offer below the land's mortgage
+  value is declined in favor of mortgaging to the bank"): dog owns
+  Lippenslaan Knokke as its only spare property; high hat wants it purely
+  to deny (doesn't own any orange pieces), and its 35%-of-balance cap
+  ($14) exactly covers dog's $14 shortfall but sits well under the $90
+  mortgage value. Asserts dog keeps the land, it ends up mortgaged
+  instead, and the exact resulting balance ($76). Fails today
+  (`pawn "dog" owns "Lippenslaan Knokke"` is false) because the
+  sub-floor offer is wrongly accepted.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` (only the same pre-existing/accepted setup-then-assert
+step-repeat shape, nothing new). Ran `./acceptance/run-acceptance.sh`:
+432 tests, 1 failure (`distressed-sale-17`, exactly as expected) — nothing
+else moved.
+
+User approved writing this and handing off as a defect report. Committing
+and notifying coder next, task name `distressed-sale-mortgage-floor`.
+
+2026-08-04T18:46:18Z — received specifier handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-mortgage-floor
+payload: Re-read your role and constitution.
+merge_and_process specifier eaba2d0ca6
+Merged specifier commit eaba2d0ca6. It adds the distressed-sale mortgage-floor defect scenario; adding focused unit coverage and enforcing the mortgage-value minimum for peer offers.
+
+2026-08-04T20:49:30Z — completed coder handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-mortgage-floor
+payload: Re-read your role and constitution.
+merge_and_process specifier eaba2d0ca6
+Added focused bankruptcy coverage and rejected non-monopoly-completing distressed offers below the land mortgage value, while preserving established monopoly-completion bids. Unit tests: 277 domain and 11 CLI tests green. Acceptance: 432 tests green.
+
+## 2026-08-04T18:56:15Z — refactorer received distressed-sale-mortgage-floor
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: f5788877f6
+```
+
+Merged `f5788877f6` (merge commit `573a3fa`), one append-only
+`logbook.md` conflict, resolved by concatenation (same pattern as every
+prior cycle this bankruptcy/distressed-sale thread has gone through).
+
+A third real defect the specifier found via live, unseeded play: several
+winning distressed-sale prices landed well below the land's own mortgage
+value (e.g. a $90-mortgage street selling for $3), directly violating the
+dictated rule that a peer's offer must at least match what mortgaging to
+the bank would raise. Root cause: `Greedo.bidForDistressed`'s deny-motive
+branch caps at 35% of the bidder's balance with no floor tied to the
+land's mortgage value, and nothing in `DistressedSale` rejected a
+sub-floor sale — only reachable via the single-bidder auction path, since
+the multi-bidder ascending auction always starts at the mortgage value by
+construction.
+
+The coder's fix is correct: reject a winning bid below the land's
+mortgage value unless the sale completes the buyer's own colour group
+(monopoly-completing bids are exempt, matching `Greedo`'s own
+`completesOwnGroup -> bid everything` rule). Verified against the new
+`distressed-sale-17` scenario and a matching `BankruptcyTest` unit case
+(reusing my `distressedBidder` stub from an earlier cycle) — both check
+out arithmetically (LippenslaanKnokke's $90 mortgage floor rejects a $40
+bid, land gets mortgaged instead, dog ends at $76).
+
+Found and fixed one thing: the fix computed
+`deeds.completesColourGroup(rules, land, winner)` twice per candidate
+(once for the new floor check, once for the existing house-deferral
+check), and stacking three multi-condition checks inline pushed
+`resolve()`'s CRAP to 15.2 (CC=15, up from 10.0/CC=10). Computed the
+result once into a local (`completesBuyersGroup`, correctly guarded by
+`winner != null` before the null-unsafe call) and extracted the two
+guard conditions into `belowMortgageFloor`/`shouldDeferToHouseSale` —
+pure code movement, no behavior change, verified by an unchanged 432/432
+acceptance result before and after. Back to CC=10/CRAP=10.0.
+
+`dry4java` clean across `DistressedSale`/`Deeds`/`Greedo`. `mutate4java
+--scan`: 82/41/38 sites, all well under threshold; manifests refreshed.
+Ran `./acceptance/run-acceptance.sh` twice: 432 tests, 0 failures both
+times. `mvn test` (domain/CLI) and `mvn test -P property-tests` both
+green.
+
+Committed as `f6f6e88`. Handing off to architect.
