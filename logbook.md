@@ -19702,5 +19702,29 @@ step-repeat shape, nothing new). Ran `./acceptance/run-acceptance.sh`:
 432 tests, 1 failure (`distressed-sale-17`, exactly as expected) — nothing
 else moved.
 
-User approved writing this and handing off as a defect report. Committing
-and notifying coder next, task name `distressed-sale-mortgage-floor`.
+User approved writing this and handing off as a defect report. Committed
+as `eaba2d0ca6` "Add reproduction scenario for distressed-sale
+mortgage-floor defect" (2 files, 70 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: eaba2d0ca6
+```
+
+Summary: a third defect found by running a real 2-player game and reading
+its log, reproduced as a Gherkin scenario rather than fixed here (out of
+specifier's remit). `distressed-sale-17` reproduces winning distressed-sale
+prices landing below the land's own mortgage value —
+`Greedo.bidForDistressed`'s deny-motive branch caps the bid at 35% of the
+bidder's balance with no floor tied to the land's mortgage value, and
+`DistressedSale` never rejects a sale that doesn't clear it. Every
+existing scenario only ever exercised the buyer-declines-entirely edge
+(bid = $0); this one exercises a small nonzero bid that still undercuts
+the floor. Currently fails because the sub-floor offer is wrongly
+accepted (`pawn "dog" owns "Lippenslaan Knokke"` is false). Full detail
+and root-cause tracing in the prior logbook entry this cycle.
