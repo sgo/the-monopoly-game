@@ -18700,6 +18700,15 @@ the earlier reserve work. No parse errors, no unexpected failures.
 This is easily the largest single specification in this project to date.
 Reporting to the user for review and handoff approval before committing.
 
+2026-08-04T10:53:00+02:00 — received architect priority-00 handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-strategic-buying-and-distressed-sale
+payload: Re-read your role and constitution.
+merge_and_process architect ceee0ee702
+Merged architect commit ceee0ee702. It contains architect review-log updates only; no coder implementation changes are required. Re-verifying the accepted state and returning it to architect.
+
 2026-08-04T10:38:00+02:00 — received architect priority-00 handoff:
 type: git_handoff
 to: coder
