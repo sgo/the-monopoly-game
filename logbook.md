@@ -19498,3 +19498,61 @@ priority: 50
 task: distressed-sale-liquidation-defects
 payload: Re-read your role and constitution.
 Fixed distressed-sale liquidation so house-sale deferral occurs only when the buyer completes the sold color group, and mortgage fallback skips properties no longer owned after an earlier sale. Unit tests: 276 domain and 11 CLI tests green. Acceptance: 431 tests green.
+
+## 2026-08-04T13:53:22Z — refactorer received distressed-sale-liquidation-defects
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: distressed-sale-liquidation-defects
+commit: a2820c0dac
+```
+
+Merged `a2820c0dac` (merge commit `0c5fcfe`), one append-only `logbook.md`
+conflict, resolved by straight concatenation (my prior sent-handoff entry
+chronologically precedes the incoming branch's next entry).
+
+This handoff carries a genuinely serious find: the specifier ran a real,
+unseeded 2-player game via the CLI simulator and hit a live crash —
+`IllegalStateException: dog does not own GroenplaatsAntwerpen` inside
+`DistressedSale.mortgageRemainingCandidates`. Root cause: `resolve()`
+computes its `candidates` list once, and when a property is actually sold
+mid-loop the list is never updated, so the fallback mortgage loop later
+tries to mortgage land the debtor no longer owns. A second, non-crashing
+defect: house-sale deferral triggered on *any* house the debtor owned
+anywhere, not specifically whether *this* sale would complete the
+*buyer's* colour group — over-broad versus what was actually specified.
+
+The coder's fix is correct and minimal: `mortgageRemainingCandidates` now
+skips any candidate the debtor no longer owns (`deeds.ownerOf(type)
+.filter(debtor.id()::equals).isEmpty()`), and house-sale deferral gates on
+a new `completesGroup(land, winner)` check in addition to the existing
+"debtor has a sellable house" check. Verified both against the two new
+Gherkin scenarios (`distressed-sale-15`/`16`) and the described live-play
+repro — 431 tests, 0 failures, twice for stability.
+
+Found one DRY issue in the fix: `DistressedSale.completesGroup` is
+byte-for-byte identical (confirmed via `dry4java`, score 0.90) to
+`Greedo`'s existing private `completesGroup`, just with `rules`/`deeds`
+passed as parameters instead of held as instance fields. Moved it to
+`Deeds.completesColourGroup(Rule.Set, Ownable, Player)`, matching the
+existing `Deeds.utilityMonopolyOpportunity` precedent for exactly this
+kind of domain-level monopoly-completion query, and had both call sites
+(`DistressedSale`, `Greedo`) delegate to it instead. `dry4java` now
+reports zero duplicates across `Deeds`/`DistressedSale`/`Bankruptcy`/
+`LandSale`/`Cards`/`Greedo`.
+
+`crap4java`: `DistressedSale.resolve` ticked up slightly (CC 10→11,
+CRAP 10.0→11.2) from the new required condition — expected and
+unavoidable, since the condition is genuinely part of the fix, not
+avoidable complexity. Everything else unchanged from my last review
+(worst case still ~10). `mutate4java --scan`: 41/75/38 sites for
+`Deeds`/`DistressedSale`/`Greedo`, all well under the split threshold;
+manifests refreshed. Ran `./acceptance/run-acceptance.sh` twice: 431
+tests, 0 failures both times. `mvn test` (domain/CLI) and
+`mvn test -P property-tests` both green.
+
+Committed as `a401f68`. Handing off to architect.
