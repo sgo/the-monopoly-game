@@ -19556,3 +19556,31 @@ tests, 0 failures both times. `mvn test` (domain/CLI) and
 `mvn test -P property-tests` both green.
 
 Committed as `a401f68`. Handing off to architect.
+
+## 2026-08-04T13:54:06Z — refactorer sent distressed-sale-liquidation-defects handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-liquidation-defects
+commit: 28bb4e38a7
+```
+
+Summary: verified the coder's fix for both defects the specifier found
+via a real, unseeded live-play run — a crash in
+`DistressedSale.mortgageRemainingCandidates` mortgaging land the debtor
+no longer owned after an earlier mid-loop sale, and over-broad house-sale
+deferral that ignored whether the sale actually completed the buyer's
+colour group. Both fixes are correct and minimal. Found and fixed one
+DRY issue in the new code: the fix's `completesGroup` duplicated
+`Greedo`'s existing private method almost exactly; moved it to
+`Deeds.completesColourGroup`, matching the existing
+`utilityMonopolyOpportunity` precedent, with both call sites now
+delegating to it. `dry4java` clean, `crap4java`/`mutate4java` stable
+(one method ticked up slightly from the unavoidable new condition).
+Regenerated acceptance suite green twice (431 tests), unit and property
+suites both green. Handing verified state to architect for independent
+review.
