@@ -68,7 +68,8 @@ public class LandSale implements Landings {
 
   private Strategy.Offer offerTo(Player player, Ownable land) {
     Strategy strategy = strategies.forPlayer(player);
-    return new Strategy.Offer(land, player.account().balance().amount(), strategy.cashReserve(),
+    return new Strategy.Offer(land, player.account().balance().amount(),
+        strategy.cashReserve(player, rules, deeds),
         deeds.utilityMonopolyOpportunity(rules, land));
   }
 
@@ -110,16 +111,16 @@ public class LandSale implements Landings {
 
 /* mutate4java-manifest
 version=1
-moduleHash=9640a90a3c9162d52a7af1bc76bddfc14634403500f3dde1d463153e58b57ddb
+moduleHash=6a3e3dc999238fd0c0a6ee190cc840bf95665056b9b3a8878facb441d421ffca
 scope.0.id=Y2xhc3M6TGFuZFNhbGUjTGFuZFNhbGU6MTg
 scope.0.kind=class
 scope.0.startLine=18
-scope.0.endLine=109
-scope.0.semanticHash=9912e3bfa05b94e2f45c3d6fe87369a56bf81512b3d7903052ca431b333c2f40
-scope.1.id=Y2xhc3M6TGFuZFNhbGUuRXZlbnRzI0V2ZW50czo5NA
+scope.0.endLine=110
+scope.0.semanticHash=50064cc942ab32dfe2de4a53acf73746d78d164a06b4703e404217511a3c9cde
+scope.1.id=Y2xhc3M6TGFuZFNhbGUuRXZlbnRzI0V2ZW50czo5NQ
 scope.1.kind=class
-scope.1.startLine=94
-scope.1.endLine=108
+scope.1.startLine=95
+scope.1.endLine=109
 scope.1.semanticHash=fc4feb0dea41d1542091a6ebb598064a49d641219bb8caffbccbb8dfaba42041
 scope.2.id=ZmllbGQ6TGFuZFNhbGUjZGVlZHM6MTk
 scope.2.kind=field
@@ -159,46 +160,46 @@ scope.8.semanticHash=1075dbd9e06d685d2ca99595811be9d53d2c7143cc98da14af56c3d34de
 scope.9.id=bWV0aG9kOkxhbmRTYWxlI29mZmVyVG8oMik6Njk
 scope.9.kind=method
 scope.9.startLine=69
-scope.9.endLine=73
-scope.9.semanticHash=17eeef9c7d83c2da51bd57c3c0ab09e5e9640ec2548f38b31d28797547b7d62c
+scope.9.endLine=74
+scope.9.semanticHash=b10eacd203f79ae94a10d5eb7262e98b8f9548057e82cb086275a292deae89e7
 scope.10.id=bWV0aG9kOkxhbmRTYWxlI3Jlc29sdmUoMyk6MzM
 scope.10.kind=method
 scope.10.startLine=33
 scope.10.endLine=46
 scope.10.semanticHash=1cbd33e23cc2c227ee20ce5a6a5a37608b679b498654df369f9887c571c3f01d
-scope.11.id=bWV0aG9kOkxhbmRTYWxlI3NhbGVJc1JlZnVzZWQoMSk6ODQ
+scope.11.id=bWV0aG9kOkxhbmRTYWxlI3NhbGVJc1JlZnVzZWQoMSk6ODU
 scope.11.kind=method
-scope.11.startLine=84
-scope.11.endLine=91
+scope.11.startLine=85
+scope.11.endLine=92
 scope.11.semanticHash=a4925299c685a29b2c550c3bca51ca39435e2b63fc2f0633bec52e4f21cfbc6e
-scope.12.id=bWV0aG9kOkxhbmRTYWxlI3NlbGwoNCk6NzU
+scope.12.id=bWV0aG9kOkxhbmRTYWxlI3NlbGwoNCk6NzY
 scope.12.kind=method
-scope.12.startLine=75
-scope.12.endLine=82
+scope.12.startLine=76
+scope.12.endLine=83
 scope.12.semanticHash=00fbe19ffe6662a6feca30b2b4b2860aa00a49df46d1a3883e3f21e0c7801eae
-scope.13.id=bWV0aG9kOkxhbmRTYWxlLkV2ZW50cyNib3VnaHQoMyk6OTU
+scope.13.id=bWV0aG9kOkxhbmRTYWxlLkV2ZW50cyNib3VnaHQoMyk6OTY
 scope.13.kind=method
-scope.13.startLine=95
-scope.13.endLine=95
+scope.13.startLine=96
+scope.13.endLine=96
 scope.13.semanticHash=dd17383fd825e39dfa7a9ebd759a59553e677c9f5485a2caff87685ab750485a
-scope.14.id=bWV0aG9kOkxhbmRTYWxlLkV2ZW50cyNkZWNsaW5lZFRvQnV5KDUpOjk5
+scope.14.id=bWV0aG9kOkxhbmRTYWxlLkV2ZW50cyNkZWNsaW5lZFRvQnV5KDUpOjEwMA
 scope.14.kind=method
-scope.14.startLine=99
-scope.14.endLine=101
+scope.14.startLine=100
+scope.14.endLine=102
 scope.14.semanticHash=b1cefa03d5082fd2a376d8e48ca3bca37814ba8598c922cb1eccbe4d405f1cef
-scope.15.id=bWV0aG9kOkxhbmRTYWxlLkV2ZW50cyNzYWxlUmVmdXNlZCg0KToxMDY
+scope.15.id=bWV0aG9kOkxhbmRTYWxlLkV2ZW50cyNzYWxlUmVmdXNlZCg0KToxMDc
 scope.15.kind=method
-scope.15.startLine=106
-scope.15.endLine=107
+scope.15.startLine=107
+scope.15.endLine=108
 scope.15.semanticHash=9e4ac71777b2a74a2b221e445d318fdf729d2763d20b39fd474ce2bfc79ea50f
-scope.16.id=bWV0aG9kOkxhbmRTYWxlLkV2ZW50cyNzb2xkKDQpOjEwMw
+scope.16.id=bWV0aG9kOkxhbmRTYWxlLkV2ZW50cyNzb2xkKDQpOjEwNA
 scope.16.kind=method
-scope.16.startLine=103
-scope.16.endLine=104
+scope.16.startLine=104
+scope.16.endLine=105
 scope.16.semanticHash=81155de16a5b4f1ecbc6fd66671a05a05740cb9874b82417eb5b7baef8054c87
-scope.17.id=bWV0aG9kOkxhbmRTYWxlLkV2ZW50cyN3b25BdEF1Y3Rpb24oMyk6OTc
+scope.17.id=bWV0aG9kOkxhbmRTYWxlLkV2ZW50cyN3b25BdEF1Y3Rpb24oMyk6OTg
 scope.17.kind=method
-scope.17.startLine=97
-scope.17.endLine=97
+scope.17.startLine=98
+scope.17.endLine=98
 scope.17.semanticHash=2fedea6d0f37cb8261582b65a40ff24a537f46f8bfca22da42212a5e514662d7
 */

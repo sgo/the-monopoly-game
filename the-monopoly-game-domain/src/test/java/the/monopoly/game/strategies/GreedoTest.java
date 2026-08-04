@@ -1,12 +1,16 @@
 package the.monopoly.game.strategies;
 
 import org.junit.jupiter.api.Test;
+import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.rules.Deeds;
+import the.monopoly.game.rules.Rule;
 
+import java.util.List;
 import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,6 +60,71 @@ class GreedoTest {
     assertThat(reserved.bidFor(offer)).isEqualTo(new Money(150));
   }
 
+  @Test
+  void aDistressedBidToDenyAHighestPriorityMonopolyIsCappedByTheAvailableCash() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player debtor = player(bank, "debtor", 0);
+    Player bidder = player(bank, "bidder", 600);
+    Player other = player(bank, "other", 600);
+    Ownable land = ownable(Street.Type.LippenslaanKnokke);
+
+    Money bid = strategy.bidForDistressed(
+        new Strategy.Offer(land, new Money(600)), bidder, debtor,
+        List.of(debtor, bidder, other), rules, new Deeds());
+
+    assertThat(bid).isEqualTo(new Money(210));
+  }
+
+  @Test
+  void aBidThatCompletesTheBiddersOwnMonopolyIsNotCappedAndSpendsWhateverIsAvailable() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player debtor = player(bank, "debtor", 0);
+    Player bidder = player(bank, "bidder", 400);
+    Player other = player(bank, "other", 400);
+    Deeds deeds = new Deeds();
+    deeds.sell(ownable(Street.Type.RueRoyaleTournai), bidder, Money.ZERO);
+    deeds.sell(ownable(Street.Type.GroenplaatsAntwerpen), bidder, Money.ZERO);
+    Ownable land = ownable(Street.Type.LippenslaanKnokke);
+
+    Money bid = strategy.bidForDistressed(
+        new Strategy.Offer(land, new Money(400)), bidder, debtor,
+        List.of(debtor, bidder, other), rules, deeds);
+
+    assertThat(bid).isEqualTo(new Money(400));
+  }
+
+  @Test
+  void aBidderWhoWouldWinTheGameByTheDebtorsBankruptcyDeclinesRegardlessOfTheLand() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player debtor = player(bank, "debtor", 0);
+    debtor.account().withdraw(new Money(50));
+    Player bidder = player(bank, "bidder", 1000);
+    Ownable land = ownable(Street.Type.LippenslaanKnokke);
+
+    Money bid = strategy.bidForDistressed(
+        new Strategy.Offer(land, new Money(1000)), bidder, debtor,
+        List.of(debtor, bidder), rules, new Deeds());
+
+    assertThat(bid).isEqualTo(Money.ZERO);
+  }
+
+  @Test
+  void cashReserveSizesToAnAffordableMissingStreetInAnAlmostCompleteGroup() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player player = player(bank, "player", 500);
+    Deeds deeds = new Deeds();
+    deeds.sell(ownable(Street.Type.RueRoyaleTournai), player, Money.ZERO);
+    deeds.sell(ownable(Street.Type.GroenplaatsAntwerpen), player, Money.ZERO);
+
+    Money reserve = strategy.cashReserve(player, rules, deeds);
+
+    assertThat(reserve).isEqualTo(new Money(180));
+  }
+
   /** A strategy that has an opinion about nothing leaves the land alone. */
   @Test
   void aStrategyThatAnswersNothingBuysNothingAndBidsNothing() {
@@ -78,5 +147,13 @@ class GreedoTest {
 
   private static Ownable ownable(Street.Type type) {
     return (Ownable) type.create(emptySet());
+  }
+
+  private static Player player(Bank bank, String name, int balance) {
+    Player.ID id = new Player.ID(name);
+    bank.createAccountFor(id);
+    Player player = new Player(id, bank.accountOf(id));
+    player.account().deposit(new Money(balance));
+    return player;
   }
 }

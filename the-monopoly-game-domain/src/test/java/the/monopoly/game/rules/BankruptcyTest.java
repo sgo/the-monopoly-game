@@ -154,6 +154,46 @@ class BankruptcyTest {
   }
 
   @Test
+  void aDistressedSaleGoesToItsOnlyBidderAtTheirOfferedMaximum() {
+    Deeds deeds = new Deeds();
+    Ownable land = (Ownable) rules.create(Street.Type.RueGrandeDinant);
+    give(deeds, land, dog);
+    dog.account().withdraw(new Money(1540));
+    Strategy.OfPlayers strategies = player -> player.equals(highHat) ? distressedBidder(40) : Strategy.UNDECIDED;
+    Events events = new Events();
+
+    new Bankruptcy(deeds, rules, players, strategies, events).resolve(dog, null);
+
+    assertThat(deeds.ownerOf(land.type())).contains(highHat.id());
+    assertThat(dog.account().balance().amount().amount()).isZero();
+    assertThat(highHat.account().balance().amount().amount()).isEqualTo(1460);
+    assertThat(deeds.isBankrupt(dog)).isFalse();
+  }
+
+  @Test
+  void aDistressedSaleAscendsInFiveDollarStepsUntilOnlyOneBidderCanStillRaise() {
+    Deeds deeds = new Deeds();
+    Player ironBox = player("iron box");
+    List<Player> table = List.of(dog, highHat, ironBox);
+    Ownable land = (Ownable) rules.create(Street.Type.RueGrandeDinant);
+    give(deeds, land, dog);
+    dog.account().withdraw(new Money(1555));
+    Strategy.OfPlayers strategies = player -> {
+      if (player.equals(highHat)) return distressedBidder(50);
+      if (player.equals(ironBox)) return distressedBidder(70);
+      return Strategy.UNDECIDED;
+    };
+    Events events = new Events();
+
+    new Bankruptcy(deeds, rules, table, strategies, events).resolve(dog, null);
+
+    assertThat(deeds.ownerOf(land.type())).contains(ironBox.id());
+    assertThat(ironBox.account().balance().amount().amount()).isEqualTo(1445);
+    assertThat(dog.account().balance().amount().amount()).isZero();
+    assertThat(deeds.isBankrupt(dog)).isFalse();
+  }
+
+  @Test
   void aCreditorInheritsTheBankruptPlayersGetOutOfJailFreeCard() {
     Deeds deeds = new Deeds();
     deeds.hold(Deeds.RetainedCard.CHANCE_GET_OUT_OF_JAIL_FREE, dog);
@@ -185,6 +225,16 @@ class BankruptcyTest {
       @Override
       public Money bidFor(Offer offer) {
         return new Money(amount);
+      }
+    };
+  }
+
+  private Strategy distressedBidder(int maximum) {
+    return new Strategy() {
+      @Override
+      public Money bidForDistressed(Offer offer, Player bidder, Player debtor,
+                                    List<Player> players, Rule.Set rules, Deeds deeds) {
+        return new Money(maximum);
       }
     };
   }
