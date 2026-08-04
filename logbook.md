@@ -19947,3 +19947,18 @@ implementation.
 
 Committing and handing this correction back to architect under the same
 task name, per the priority-00 loop rule.
+
+2026-08-04T19:42:28Z — received specifier handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: e0cb12bedc
+
+Re-read your role and constitution.
+merge_and_process specifier e0cb12bedc
+
+Merged `e0cb12bedc`. Full acceptance passed (433 tests), and the exact-floor
+scenario is fully killed by soft Gherkin mutation (4/4). The one-dollar-below
+scenario remains unmanifested because all six of its example mutations survive;
+returning that specification gap to the specifier.
