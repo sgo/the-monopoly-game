@@ -18700,6 +18700,15 @@ the earlier reserve work. No parse errors, no unexpected failures.
 This is easily the largest single specification in this project to date.
 Reporting to the user for review and handoff approval before committing.
 
+2026-08-04T14:43:00+02:00 — received specifier handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-liquidation-defects
+payload: Re-read your role and constitution.
+merge_and_process specifier 92fcd6a93f
+Merged specifier commit 92fcd6a93f. It adds distressed-sale liquidation defect scenarios, focused tests, and extracts `DistressedSale`/`Liquidation`; reviewing and verifying under coder rules.
+
 2026-08-04T12:41:51+02:00 — processed architect correction for `greedo-strategic-buying-and-distressed-sale`.
 Replaced fixture-keyed distressed-sale behavior with state-derived Greedo bankruptcy decisions and a generic mortgage-value/$5 distressed auction progression. Added focused Greedo unit coverage. Maven unit reactor passes; regenerated acceptance passes 429/429 with zero failures. Sending implementation to refactorer for structural review.
 
@@ -18840,6 +18849,40 @@ reserve was only ever specified this session, never implemented — the
 default static reserve). No parse errors, no unexpected failures.
 
 Reporting to the user for review and handoff approval before committing.
+
+
+## 2026-08-04T08:06:08Z — specifier sends greedo-strategic-buying-and-distressed-sale to coder
+
+User approved. Committed as `e7f7f7538d` "Specify Greedo's priority-driven
+strategic buying and distressed-sale negotiation" — 8 files, 1301
+insertions: `buying-land-8` through `23` (dynamic reserve + 3-tier
+priority), new `greedo-priority.feature` (28-space priority table),
+new `distressed-sale.feature` (14 scenarios), `journal`/`logging`/
+`report-41` through `44`, and `acceptance/pipeline-features.txt`
+registration for both new feature files.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: e7f7f7538d
+```
+
+Summary: this is the largest single specification handoff of the project
+to date, covering the full "strategic buying" design conversation —
+dynamic monopoly-completion reserve sizing, the priority-tier system on
+top of it, Greedo's priority table as directly observable data, the entire
+distressed-property-sale negotiation mechanic (ordering, price floors,
+value-gate, endgame override, capped/uncapped bidding, net-worth tie-
+break), and narration for all of it including a genuine $5-increment
+bidding sequence. Full acceptance suite currently 429 tests, 55 failures,
+all expected pre-implementation (parser/dry-checker clean on every touched
+file; every failure traced to specific new or changed behavior, no
+unexpected failures, confirmed in the specifier's own logbook entries
+across this whole design arc).
 
 ## 2026-08-04T08:48:59Z — refactorer received greedo-strategic-buying-and-distressed-sale
 
@@ -19101,7 +19144,7 @@ type: git_handoff
 to: refactorer
 priority: 00
 task: greedo-strategic-buying-and-distressed-sale
-commit: ec5a7965f1
+commit: 970e85a434
 ```
 
 The current working tree adds the package-private liquidation-order helper;
@@ -19314,3 +19357,144 @@ review (worst CRAP 10.0, all files well under the mutation-site
 threshold). Regenerated acceptance suite green (429 tests), unit and
 property suites both green. Handing the verified state back to architect
 per the priority-00 loop-closing rule.
+
+## 2026-08-04T13:17:47Z — specifier received greedo-strategic-buying-and-distressed-sale phase-complete sync
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: b6f7b30972
+
+Re-read your role and constitution.
+
+merge_and_process architect b6f7b30972
+```
+
+Merged `b6f7b30972` into `main` as `efcbb2b`. Only `logbook.md` conflicted
+(the familiar cross-matched append-only shape from every prior cycle this
+task went through: both sides had appended new entries directly after the
+same anchor line, and git aligned my one entry against the incoming
+branch's first two entries because both open with an identical "Handoff
+message sent:\n\n```\ntype: git_handoff\n" fence). Resolved by diffing each
+side against the shared ancestor (`e7f7f7538d`), confirming both sides'
+changes were pure appends with no overlapping edits, and concatenating
+mine (specifier→coder, 08:06:08Z) followed by the incoming branch's full,
+already-chronological pipeline history (refactorer→architect→coder→
+architect→refactorer→architect→refactorer, 08:48:59Z through 11:16:22Z) —
+purely additive, nothing dropped or duplicated, verified by comparing
+`## ` header counts against both parents.
+
+This closes out the priority-00 loop the refactorer opened after finding
+`Bankruptcy.resolveDistressedSales`/`Greedo.bidForDistressed` hardcoded
+against `distressed-sale-9`'s literal fixture values (pawn names, land,
+exact balances) instead of implementing the actual specified negotiation.
+The coder's fix and the refactorer's follow-up replaced it with genuine
+state-derived behavior — an ascending real-money auction via
+`DistressedSale`/`Liquidation`, `wouldWinByBankruptcy` computed from actual
+debtor property worth and debt rather than a fixed threshold — confirmed
+by both refactorer review cycles and now by my own run: `./acceptance/run-
+acceptance.sh` 429 tests, 0 failures.
+
+The full "strategic buying" specification (dynamic reserve, 3-tier
+priority, Greedo priority table, distressed-sale negotiation, all
+narration) is now genuinely implemented, not just specified. Per role
+rules, asking the user for the next feature to add.
+
+## 2026-08-04T15:45:00Z — specifier writes reproduction scenarios for two live-play defects and hands off as a defect report
+
+At the user's request, ran a real 2-player game via `Simulator.run(2, ...)`
+with unseeded dice (`java ... the.monopoly.game.cli.Simulator 2`), reading
+the resulting slf4j log for anything abnormal. The background simulator
+thread crashed partway through:
+
+```
+java.lang.IllegalStateException: dog does not own GroenplaatsAntwerpen.
+	at the.monopoly.game.rules.Deeds.verifyOwner
+	at the.monopoly.game.rules.Deeds.mortgage
+	at the.monopoly.game.rules.DistressedSale.mortgageRemainingCandidates(DistressedSale.java:85)
+	at the.monopoly.game.rules.DistressedSale.resolve(DistressedSale.java:53)
+```
+
+**Root cause 1 (severe, crashes the game).** `DistressedSale.resolve`
+computes its `candidates` list once at the top, then loops over it selling
+whatever it can to a peer. Whenever a property is actually sold mid-loop
+(`settle`), it's transferred away but never removed from `candidates`. If
+the debtor is still short afterward, `mortgageRemainingCandidates(debtor,
+candidates, deferredToHouseSales)` walks that same original list again,
+excluding only `deferredToHouseSales` — not the property just sold — and
+tries to mortgage land the debtor no longer owns, which
+`Deeds.verifyOwner` correctly rejects. Nothing catches it: the daemon
+thread dies silently and `Simulator.main` then NPEs on the null result.
+
+Traced this precisely with a throwaway package-private JUnit-style
+reproduction against `Bankruptcy`/`DistressedSale` directly (not
+committed, scratch-only) before trusting a Gherkin design: a fixed-bid
+stub strategy confirmed the crash mechanism in isolation, then a second
+throwaway repro using the real `Greedo` strategy pinned down the exact
+numbers. First attempt at the Gherkin scenario (below) didn't reproduce
+the crash at all — turned out `dog` (the debtor) had no explicit strategy,
+so `Liquidation.order` fell back to `Strategy.UNDECIDED`'s constant-LOWEST
+priority instead of Greedo's real tiers, which put the wrong property
+first and let a single mortgage cover the shortfall before the loop ever
+reached the already-sold one. Adding `pawn "dog" follows the "Greedo"
+strategy` fixed the reproduction — the exact stack trace above now
+reproduces through the full acceptance pipeline. This is the second time
+this session an implicit `Strategy.UNDECIDED` fallback has silently
+changed liquidation/bidding order in a way that masked the thing being
+tested (see the `givePawnOwnership`/`scriptFor` conflict earlier); worth
+remembering that any distressed-sale scenario needs the debtor's strategy
+stated explicitly whenever liquidation order is load-bearing.
+
+**Root cause 2 (correctness, doesn't crash but violates the spec).**
+`resolve()` defers *any* winning peer-bid to house-selling whenever
+`hasSellableHouse(debtor)` is true — i.e., whenever the debtor has a house
+built *anywhere* on the board — rather than only when *this specific sale*
+would complete the *buyer's* monopoly, which is what was actually
+specified ("I would sell houses rather than allow an opponent to complete
+a colour group"). `distressed-sale-4` passes today only because its one
+example conflates the two conditions (the debtor's houses happen to sit
+on the same sale that also completes the buyer's group). Confirmed via
+the live run: `high hat` held an unrelated developed pink monopoly and, as
+a result, never sold `dog` any of several properties `dog` bid on, none
+of which had anything to do with completing `dog`'s monopoly.
+
+**New scenarios added to `distressed-sale.feature`:**
+- `distressed-sale-15` ("mortgaging the debtor's other spare properties
+  does not re-attempt a property already sold to a peer"): dog owns a
+  green street (sold to high hat, who owns the other two, completing
+  their monopoly) and a spare yellow street. Asserts high hat ends up
+  owning the green street, the yellow one ends up mortgaged (not
+  re-attempted), dog is solvent, and the exact final balance. Fails today
+  with the `IllegalStateException` above.
+- `distressed-sale-16` ("a debtor sells a spare property to a peer despite
+  holding an unrelated developed monopoly, when the sale does not
+  complete the buyer's group"): dog holds a developed, houses-built pink
+  monopoly (untouched, irrelevant to the sale) plus a spare light_blue
+  street that high hat wants purely to deny (not to complete anything).
+  Asserts the sale goes through and the house count is unchanged. Fails
+  today (`high hat owns "Steenstraat Brugge"` is false) because the
+  current code defers to house-selling anyway.
+
+Validated both with `bb gherkin-parser` (clean) and
+`bb gherkin-ir-dry-checker --include-exact` (only pre-existing/accepted
+setup-then-assert step repeats, same shape already present in scenarios
+0/2/3 of this file; nothing new). Ran `./acceptance/run-acceptance.sh`:
+431 tests, 1 failure (`distressed-sale-16`, as expected) + 1 error
+(`distressed-sale-15`'s `IllegalStateException`, as expected) — exactly
+the two new scenarios, nothing else moved.
+
+User approved writing these and handing off as a defect report (not a new
+feature). Committing and notifying coder next, task name
+`distressed-sale-liquidation-defects`.
+
+2026-08-04T15:46:00+02:00 — completed coder handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-liquidation-defects
+payload: Re-read your role and constitution.
+Fixed distressed-sale liquidation so house-sale deferral occurs only when the buyer completes the sold color group, and mortgage fallback skips properties no longer owned after an earlier sale. Unit tests: 276 domain and 11 CLI tests green. Acceptance: 431 tests green.

@@ -42,7 +42,8 @@ final class DistressedSale {
       AuctionResult result = auction(land, debtor);
       Player winner = result.winner();
       Money bid = result.bid();
-      if (winner != null && bid.amount() > 0 && hasSellableHouse(debtor)) {
+      if (winner != null && bid.amount() > 0 && hasSellableHouse(debtor)
+          && completesGroup(land, winner)) {
         deferredToHouseSales.add(type);
         continue;
       }
@@ -81,6 +82,7 @@ final class DistressedSale {
       if (debtor.account().balance().amount().amount() >= 0) break;
       if (deferredToHouseSales.contains(type)) continue;
       Ownable land = (Ownable) rules.create(type);
+      if (deeds.ownerOf(type).filter(debtor.id()::equals).isEmpty()) continue;
       if (!deeds.isMortgaged(land)) {
         Money value = deeds.mortgage(land, debtor);
         events.mortgaged(debtor, land, value);
@@ -150,6 +152,14 @@ final class DistressedSale {
     return deeds.landOwnedBy(owner).stream().map(type -> rules.create(type))
         .filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
         .anyMatch(street -> deeds.housesBuiltOn(street) > 0 || deeds.hasHotelOn(street));
+  }
+
+  private boolean completesGroup(Ownable land, Player buyer) {
+    if (!(land instanceof ColourStreet street)) return false;
+    return rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
+        .filter(it -> it.colourGroup() == street.colourGroup())
+        .allMatch(it -> it.type() == land.type()
+            || deeds.ownerOf(it.type()).filter(buyer.id()::equals).isPresent());
   }
 
   private boolean coversDebtWithOtherLand(Player debtor, Ownable sold, Money bid) {
