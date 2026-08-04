@@ -20394,3 +20394,29 @@ failures both times.
 Committed as `be13493` "Extract auction round and per-candidate sale
 attempt from DistressedSale" (2 files, 198 insertions, 127 deletions —
 mostly the regenerated mutation manifest). Handing off to architect.
+
+2026-08-04T21:33:46Z — refactorer sent distressed-sale-needs-based-pricing handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-needs-based-pricing
+commit: a9bae0487e
+```
+
+Summary: verified the coder's needs-based pricing fix, confirmed it
+matches the specifier's root-cause writeup and correctly subsumes the
+old mortgage-floor exemption and removes the free-collateral-credit
+shortcut. Found and fixed a coverage regression the pricing change
+caused (cannotRaise dropped to 0% coverage because the existing
+ascending-auction test's shortfall now exceeded one bidder's ceiling,
+collapsing it into the single-bidder path) by retuning the test's
+numbers to stay under the mortgage floor. Extracted attemptSale from
+resolve and split auction into auction/ascend/bidRound to bring every
+method in the file to CRAP <= 6. dry4java clean, mutate4java well under
+threshold with manifest refreshed. Acceptance green twice (436 tests),
+unit and property suites both green. Handing verified state to
+architect for independent review.
