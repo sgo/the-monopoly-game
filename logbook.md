@@ -19704,3 +19704,21 @@ else moved.
 
 User approved writing this and handing off as a defect report. Committing
 and notifying coder next, task name `distressed-sale-mortgage-floor`.
+
+2026-08-04T18:46:18Z — received specifier handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-mortgage-floor
+payload: Re-read your role and constitution.
+merge_and_process specifier eaba2d0ca6
+Merged specifier commit eaba2d0ca6. It adds the distressed-sale mortgage-floor defect scenario; adding focused unit coverage and enforcing the mortgage-value minimum for peer offers.
+
+2026-08-04T20:49:30Z — completed coder handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-mortgage-floor
+payload: Re-read your role and constitution.
+merge_and_process specifier eaba2d0ca6
+Added focused bankruptcy coverage and rejected non-monopoly-completing distressed offers below the land mortgage value, while preserving established monopoly-completion bids. Unit tests: 277 domain and 11 CLI tests green. Acceptance: 432 tests green.
