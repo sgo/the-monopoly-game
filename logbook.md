@@ -20595,3 +20595,31 @@ tests, 3 failures — all three new scenarios, each failing with
 because the step doesn't exist yet, not because of a wrong assertion —
 exactly the right failure mode for a genuinely new capability gap.
 Reporting to the user for handoff approval before committing.
+
+2026-08-05T00:14:00Z — refactorer received card-bank-payout-narration handoff:
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: card-bank-payout-narration
+commit: 9363e3279e
+
+Re-read your role and constitution.
+merge_and_process coder 9363e3279e
+```
+
+Merged `9363e3279e`. Reviewed the diff: adds `Cards.receiveBank(player,
+amount)` alongside the existing `paidBank`/direct-deduction pattern,
+wired through a new `Cards.Events.receivedBank`, `Journal.Entry.
+BankReceived` record, and a `Report` case rendering "X receives $Y from
+the bank" — mirrors the existing `BankPaid`/`paidBank` shape exactly.
+Ten direct-payout card effects switched from `player.account().deposit(...)`
+to `receiveBank(player, ...)`. New unit test
+`aChanceCardIsRecordedBeforeItsDirectBankPayout` and three new acceptance
+scenarios (`journal-45`, `logging-45`, `report-45`) all pass per the
+coder's reported 439/439 acceptance and 279+11 unit tests. Matches the
+specifier's spec exactly; a small, well-scoped change. Proceeding with
+CRAP/DRY/mutation analysis before verification and handoff.
