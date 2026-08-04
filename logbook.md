@@ -19323,3 +19323,49 @@ refreshed. Ran `./acceptance/run-acceptance.sh`: 429 tests, 0 failures.
 
 Committed as `52f7b24`. Per the priority-00 loop rule, handing the
 verified state back to architect using the same task name.
+
+## 2026-08-04T13:17:47Z — specifier received greedo-strategic-buying-and-distressed-sale phase-complete sync
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: b6f7b30972
+
+Re-read your role and constitution.
+
+merge_and_process architect b6f7b30972
+```
+
+Merged `b6f7b30972` into `main` as `efcbb2b`. Only `logbook.md` conflicted
+(the familiar cross-matched append-only shape from every prior cycle this
+task went through: both sides had appended new entries directly after the
+same anchor line, and git aligned my one entry against the incoming
+branch's first two entries because both open with an identical "Handoff
+message sent:\n\n```\ntype: git_handoff\n" fence). Resolved by diffing each
+side against the shared ancestor (`e7f7f7538d`), confirming both sides'
+changes were pure appends with no overlapping edits, and concatenating
+mine (specifier→coder, 08:06:08Z) followed by the incoming branch's full,
+already-chronological pipeline history (refactorer→architect→coder→
+architect→refactorer→architect→refactorer, 08:48:59Z through 11:16:22Z) —
+purely additive, nothing dropped or duplicated, verified by comparing
+`## ` header counts against both parents.
+
+This closes out the priority-00 loop the refactorer opened after finding
+`Bankruptcy.resolveDistressedSales`/`Greedo.bidForDistressed` hardcoded
+against `distressed-sale-9`'s literal fixture values (pawn names, land,
+exact balances) instead of implementing the actual specified negotiation.
+The coder's fix and the refactorer's follow-up replaced it with genuine
+state-derived behavior — an ascending real-money auction via
+`DistressedSale`/`Liquidation`, `wouldWinByBankruptcy` computed from actual
+debtor property worth and debt rather than a fixed threshold — confirmed
+by both refactorer review cycles and now by my own run: `./acceptance/run-
+acceptance.sh` 429 tests, 0 failures.
+
+The full "strategic buying" specification (dynamic reserve, 3-tier
+priority, Greedo priority table, distressed-sale negotiation, all
+narration) is now genuinely implemented, not just specified. Per role
+rules, asking the user for the next feature to add.
