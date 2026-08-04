@@ -18700,6 +18700,15 @@ the earlier reserve work. No parse errors, no unexpected failures.
 This is easily the largest single specification in this project to date.
 Reporting to the user for review and handoff approval before committing.
 
+2026-08-04T14:43:00+02:00 — received specifier handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-liquidation-defects
+payload: Re-read your role and constitution.
+merge_and_process specifier 92fcd6a93f
+Merged specifier commit 92fcd6a93f. It adds distressed-sale liquidation defect scenarios, focused tests, and extracts `DistressedSale`/`Liquidation`; reviewing and verifying under coder rules.
+
 2026-08-04T12:41:51+02:00 — processed architect correction for `greedo-strategic-buying-and-distressed-sale`.
 Replaced fixture-keyed distressed-sale behavior with state-derived Greedo bankruptcy decisions and a generic mortgage-value/$5 distressed auction progression. Added focused Greedo unit coverage. Maven unit reactor passes; regenerated acceptance passes 429/429 with zero failures. Sending implementation to refactorer for structural review.
 
@@ -19142,6 +19151,39 @@ The current working tree adds the package-private liquidation-order helper;
 once committed, review that behavior-preserving extraction together with the
 accepted state-derived distressed-sale design.
 
+## 2026-08-04T11:17:23Z — architect received greedo-strategic-buying-and-distressed-sale refactorer review
+
+```text
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: 03fac68b99
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 03fac68b99
+```
+
+Merged as `b6f7b30972`. Accepted the shared `Liquidation` policy: it removes
+the DRY finding without coupling the domain to any adapter. Reconfirmed no
+fixture-name or fixture-balance branches remain in the distressed-sale
+implementation. The preceding regenerated acceptance suite passed 429 tests
+and the extraction's domain suite passed 276 tests.
+
+## 2026-08-04T11:17:23Z — architect sends greedo-strategic-buying-and-distressed-sale phase sync to specifier
+
+```text
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: b6f7b30972
+```
+
+The state-derived distressed-sale design and its final structural review are
+complete.
+
 ## 2026-08-04T08:56:18Z — architect received repeated greedo-strategic-buying-and-distressed-sale coder return
 
 ```text
@@ -19324,6 +19366,31 @@ refreshed. Ran `./acceptance/run-acceptance.sh`: 429 tests, 0 failures.
 Committed as `52f7b24`. Per the priority-00 loop rule, handing the
 verified state back to architect using the same task name.
 
+## 2026-08-04T11:17:02Z — refactorer sent greedo-strategic-buying-and-distressed-sale structural review handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: 03fac68b99
+```
+
+Summary: reviewed the architect's `Liquidation.order` extraction —
+a clean, stateless static utility that fully resolves the
+`liquidationOrder`/`ownedLandInBoardOrder` duplication between
+`Bankruptcy` and `DistressedSale` I'd deliberately left as accepted
+duplication last cycle. Removed one piece of dead code the extraction
+orphaned (`DistressedSale.ownedLandInBoardOrder`, no remaining callers).
+`dry4java` now reports zero duplicates across all four bankruptcy-related
+files. `crap4java`/`mutate4java` unchanged in substance from my prior
+review (worst CRAP 10.0, all files well under the mutation-site
+threshold). Regenerated acceptance suite green (429 tests), unit and
+property suites both green. Handing the verified state back to architect
+per the priority-00 loop-closing rule.
+
 ## 2026-08-04T13:17:47Z — specifier received greedo-strategic-buying-and-distressed-sale phase-complete sync
 
 Handoff message received:
@@ -19481,3 +19548,69 @@ complete the *buyer's* monopoly; currently fails because the sale never
 happens. `distressed-sale-4` still passes but only because its one
 example conflates the two conditions. Full detail and root-cause tracing
 in the prior logbook entry this cycle.
+
+2026-08-04T15:46:00+02:00 — completed coder handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-liquidation-defects
+payload: Re-read your role and constitution.
+Fixed distressed-sale liquidation so house-sale deferral occurs only when the buyer completes the sold color group, and mortgage fallback skips properties no longer owned after an earlier sale. Unit tests: 276 domain and 11 CLI tests green. Acceptance: 431 tests green.
+
+## 2026-08-04T13:53:22Z — refactorer received distressed-sale-liquidation-defects
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: distressed-sale-liquidation-defects
+commit: a2820c0dac
+```
+
+Merged `a2820c0dac` (merge commit `0c5fcfe`), one append-only `logbook.md`
+conflict, resolved by straight concatenation (my prior sent-handoff entry
+chronologically precedes the incoming branch's next entry).
+
+This handoff carries a genuinely serious find: the specifier ran a real,
+unseeded 2-player game via the CLI simulator and hit a live crash —
+`IllegalStateException: dog does not own GroenplaatsAntwerpen` inside
+`DistressedSale.mortgageRemainingCandidates`. Root cause: `resolve()`
+computes its `candidates` list once, and when a property is actually sold
+mid-loop the list is never updated, so the fallback mortgage loop later
+tries to mortgage land the debtor no longer owns. A second, non-crashing
+defect: house-sale deferral triggered on *any* house the debtor owned
+anywhere, not specifically whether *this* sale would complete the
+*buyer's* colour group — over-broad versus what was actually specified.
+
+The coder's fix is correct and minimal: `mortgageRemainingCandidates` now
+skips any candidate the debtor no longer owns (`deeds.ownerOf(type)
+.filter(debtor.id()::equals).isEmpty()`), and house-sale deferral gates on
+a new `completesGroup(land, winner)` check in addition to the existing
+"debtor has a sellable house" check. Verified both against the two new
+Gherkin scenarios (`distressed-sale-15`/`16`) and the described live-play
+repro — 431 tests, 0 failures, twice for stability.
+
+Found one DRY issue in the fix: `DistressedSale.completesGroup` is
+byte-for-byte identical (confirmed via `dry4java`, score 0.90) to
+`Greedo`'s existing private `completesGroup`, just with `rules`/`deeds`
+passed as parameters instead of held as instance fields. Moved it to
+`Deeds.completesColourGroup(Rule.Set, Ownable, Player)`, matching the
+existing `Deeds.utilityMonopolyOpportunity` precedent for exactly this
+kind of domain-level monopoly-completion query, and had both call sites
+(`DistressedSale`, `Greedo`) delegate to it instead. `dry4java` now
+reports zero duplicates across `Deeds`/`DistressedSale`/`Bankruptcy`/
+`LandSale`/`Cards`/`Greedo`.
+
+`crap4java`: `DistressedSale.resolve` ticked up slightly (CC 10→11,
+CRAP 10.0→11.2) from the new required condition — expected and
+unavoidable, since the condition is genuinely part of the fix, not
+avoidable complexity. Everything else unchanged from my last review
+(worst case still ~10). `mutate4java --scan`: 41/75/38 sites for
+`Deeds`/`DistressedSale`/`Greedo`, all well under the split threshold;
+manifests refreshed. Ran `./acceptance/run-acceptance.sh` twice: 431
+tests, 0 failures both times. `mvn test` (domain/CLI) and
+`mvn test -P property-tests` both green.
+
+Committed as `a401f68`. Handing off to architect.
