@@ -19101,7 +19101,7 @@ type: git_handoff
 to: refactorer
 priority: 00
 task: greedo-strategic-buying-and-distressed-sale
-commit: ec5a7965f1
+commit: 970e85a434
 ```
 
 The current working tree adds the package-private liquidation-order helper;
