@@ -19835,3 +19835,20 @@ times. `mvn test` (domain/CLI) and `mvn test -P property-tests` both
 green.
 
 Committed as `f6f6e88`. Handing off to architect.
+
+2026-08-04T19:34:40Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: cba11ca52b
+
+Re-read your role and constitution.
+merge_and_process refactorer cba11ca52b
+
+Merged `cba11ca52b`. The mortgage-floor policy is correctly enforced in
+`DistressedSale`, and full acceptance passed. Targeted Java mutation had no
+changed surface, and DRY found no duplicate candidates. Soft Gherkin mutation
+found a specification gap: all four mutations of the mortgage-floor scenario's
+example values survived, so the task is returning to the specifier for that
+scenario's correction.
