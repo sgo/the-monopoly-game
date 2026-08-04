@@ -19614,3 +19614,43 @@ tests, 0 failures both times. `mvn test` (domain/CLI) and
 `mvn test -P property-tests` both green.
 
 Committed as `a401f68`. Handing off to architect.
+
+## 2026-08-04T16:00:00Z — specifier received distressed-sale-liquidation-defects phase-complete sync
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-liquidation-defects
+commit: a3cb575530
+
+Re-read your role and constitution.
+
+merge_and_process architect a3cb575530
+```
+
+Merged `a3cb575530` into `main` as `f2ecfcd`. Only `logbook.md` conflicted
+(same cross-matched append-only shape as every prior cycle); resolved by
+diffing both sides against the shared ancestor (`92fcd6a93f`) and
+concatenating additively — nothing lost, nothing duplicated.
+
+Both defects found while running a live 2-player game are genuinely
+fixed, not just patched to pass: `mortgageRemainingCandidates` now skips
+any candidate the debtor no longer owns, and the house-sale deferral
+gates on a new `Deeds.completesColourGroup(rules, land, winner)` check in
+addition to "debtor has a sellable house" — read the merged
+`DistressedSale.resolve` directly to confirm both conditions are present
+together, not just one. Re-ran `./acceptance/run-acceptance.sh`: 431
+tests, 0 failures. Rebuilt the CLI jar and re-ran a real, unseeded
+2-player game via `Simulator` end to end: completed normally with a
+declared winner, 0 exceptions, 3874 log lines — the exact crash from
+earlier this session no longer reproduces in live play, not just in the
+two new Gherkin scenarios.
+
+The refactorer also deduplicated `completesGroup` into
+`Deeds.completesColourGroup`, shared between `DistressedSale` and
+`Greedo` — a sensible, minimal DRY fix, not a design concern.
+
+Per role rules, asking the user for the next feature to add.
