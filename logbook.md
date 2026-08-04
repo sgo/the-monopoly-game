@@ -19184,6 +19184,36 @@ commit: b6f7b30972
 The state-derived distressed-sale design and its final structural review are
 complete.
 
+## 2026-08-04T13:56:09Z — architect received distressed-sale-liquidation-defects refactorer handoff
+
+```text
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-liquidation-defects
+commit: 28bb4e38a7
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 28bb4e38a7
+```
+
+Merged as `a3cb575530`. Reviewed the liquidation correction: no fixture
+identity branches remain, and the domain rules retain a clean separation
+from adapters. Regenerated acceptance is green: 431 tests.
+
+## 2026-08-04T13:56:09Z — architect sends distressed-sale-liquidation-defects phase sync to specifier
+
+```text
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-liquidation-defects
+commit: a3cb575530
+```
+
+Architecture review is complete.
+
 ## 2026-08-04T08:56:18Z — architect received repeated greedo-strategic-buying-and-distressed-sale coder return
 
 ```text
