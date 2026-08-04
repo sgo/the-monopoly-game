@@ -20666,3 +20666,25 @@ No structural refactor needed — the coder's implementation was already
 within CRAP/DRY bounds. Committed the manifest refresh as `6548aa7`
 "Refresh mutation manifests for card-bank-payout-narration" (3 files,
 manifest blocks only). Handing off to architect.
+
+2026-08-05T00:23:21Z — refactorer sent card-bank-payout-narration handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-bank-payout-narration
+commit: bc5bbdeb26
+```
+
+Summary: reviewed the coder's `receiveBank`/`Cards.Events.receivedBank`/
+`Journal.Entry.BankReceived`/`Report` addition — mirrors the existing
+`payBank`/`paidBank` pattern exactly, small and well-scoped. No CRAP
+threshold exceeded except the already-exempted `Report.line` sealed
+switch (new CRAP=60.0 recorded). No new duplication. Mutation scan well
+under the 100-site split threshold on all three changed files; stale
+manifests refreshed. No property-test gap. Unit, property, and
+acceptance suites (439 tests twice) all green. No structural refactor
+needed. Handing verified state to architect for independent review.
