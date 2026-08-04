@@ -20257,5 +20257,41 @@ pattern, nothing new).
 Given how tightly the four fixes are coupled — the floor-exemption fix is
 subsumed by the pricing fix, and the auto-credit fix changes what number
 several already-existing scenarios expect — recommended bundling them as
-one handoff rather than four sequential ones. User agreed. Committing and
-handing off as a single task next.
+one handoff rather than four sequential ones. User agreed.
+
+Committed as `61a45551e3` "Specify needs-based distressed-sale pricing
+and the auto-credit defect" (5 files, 184 insertions, 23 deletions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-needs-based-pricing
+commit: 61a45551e3
+```
+
+Summary: two more defects found while fixing the mortgage-floor
+exemption, both stemming from the same root cause —
+`DistressedSale.auction()`'s single-bidder branch pays the bidder's raw
+ceiling directly instead of negotiating a price, so (1) buyers overpay
+whenever their ceiling exceeds what the debtor needs, and (2) the floor
+exemption for monopoly-completing bids exists only to compensate for
+that overpay, and (3) `settle()` separately auto-credits a debtor with
+another property's mortgage value without actually mortgaging it,
+whenever a sale covers at least half the shortfall — neither behavior
+was ever specified. Proposed fix (verified via a temporary end-to-end
+patch, reverted before committing): replace the raw-ceiling price with
+`max(mortgageFloor, shortfall − otherCollateral)`, clamped to the
+bidder's ceiling as a cap rather than an automatic payment; this
+subsumes the floor-exemption fix and removes the need for the auto-credit
+shortcut entirely. Retuned `distressed-sale-2/-5/-8/-12/-16` and the
+`journal`/`logging`/`report` narration scenarios reusing `-2`'s numbers;
+reworked `-9` and `-15`, whose old numbers depended on the bugs being
+fixed; added `-20` (proves needs-based pricing directly) and `-21`
+(isolates the auto-credit defect alone). All ten `distressed-sale`
+scenarios plus the three narration scenarios verified both ways: fail
+today, pass clean (436/436) against the temporary combined patch. Full
+root-cause tracing and the two mistakes I caught in my own numbers before
+they reached the user are in the prior logbook entry this cycle.
