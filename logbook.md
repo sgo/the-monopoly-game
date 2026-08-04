@@ -19962,3 +19962,13 @@ Merged `e0cb12bedc`. Full acceptance passed (433 tests), and the exact-floor
 scenario is fully killed by soft Gherkin mutation (4/4). The one-dollar-below
 scenario remains unmanifested because all six of its example mutations survive;
 returning that specification gap to the specifier.
+
+2026-08-04T19:42:28Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: distressed-sale-mortgage-floor
+commit: 085215bf66
+
+The one-dollar-below mortgage-floor scenario's six soft Gherkin mutations
+survive; requested a further specification correction.
