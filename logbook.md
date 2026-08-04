@@ -20456,3 +20456,53 @@ attempts as cohesive domain operations. Acceptance passed (436 tests),
 differential Java mutation had no changed surface, and DRY found no duplicates.
 Soft mutation manifests were refreshed for the changed distressed-sale and
 narration features.
+
+## 2026-08-05T23:42:00Z — specifier received distressed-sale-needs-based-pricing phase-complete sync
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-needs-based-pricing
+commit: c98f1bbd02
+
+Re-read your role and constitution.
+
+merge_and_process architect c98f1bbd02
+```
+
+Merged `c98f1bbd02` into `main` as `0bff3e3`. Only `logbook.md`
+conflicted; caught the same splice mistake I made two cycles ago before
+committing this time (a duplicated paragraph from grabbing an oversized
+tail slice) — fixed by deleting the duplicate directly and grepping every
+distinctive marker line to confirm each appears exactly once before
+moving on.
+
+Read the merged `DistressedSale.java`: the coder's `minimumBid` method
+matches my proposed formula exactly —
+`max(landMortgageValue, shortfall - otherCollateral)`, computed from the
+same filtered `candidates` list I had to correct my own throwaway patch
+to use. The floor exemption and the free-collateral-credit branch are
+both gone, subsumed by the one change, as predicted.
+
+The refactorer caught something worth noting: an existing `BankruptcyTest`
+(`aDistressedSaleAscendsInFiveDollarStepsUntilOnlyOneBidderCanStillRaise`)
+kept passing under the new pricing but silently stopped exercising the
+multi-bidder ascending auction it was named for, because the new pricing
+formula raised the computed minimum bid above one bidder's ceiling,
+collapsing it to the single-bidder path. Retuned the test's numbers to
+restore genuine multi-bidder coverage rather than leaving a
+correctly-passing but misleadingly-named test in place.
+
+Verified independently: `./acceptance/run-acceptance.sh` (436 tests, 0
+failures), and re-ran a fresh live 2-player game via the CLI — completed
+normally, 0 exceptions, declared winner.
+
+This closes the loop on everything found by running the live 2-player
+game this session: the `mortgageRemainingCandidates` crash, the
+house-deferral overbreadth, the mortgage-floor gap, the whole-balance
+overpay, and the free-collateral-credit shortcut are now all genuinely
+specified, implemented, reviewed, and verified. Per role rules, asking
+the user for the next feature to add.
