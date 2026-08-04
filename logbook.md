@@ -20123,3 +20123,44 @@ changed domain surface, DRY found no duplicates, and the property suite passed
 (22 tests). Soft Gherkin mutation killed all six mutations for the revised
 one-dollar-below boundary scenario; the remaining 14 survivors are pre-existing
 unmanifested scenarios outside this correction.
+
+## 2026-08-05T22:03:00Z — specifier received distressed-sale-mortgage-floor phase-complete sync
+
+Handoff message received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: 97d1a3099b
+
+Re-read your role and constitution.
+
+merge_and_process architect 97d1a3099b
+```
+
+Merged `97d1a3099b` into `main` as `f8547e0`. Only `logbook.md`
+conflicted (same cross-matched append-only shape); resolved carefully
+this time — diffed both sides against the shared ancestor
+(`34964c136e`), spliced additively, and grepped every distinctive marker
+line (`Committed as`, `Handoff message sent:`, `received specifier
+handoff:`, `Summary: root-caused`) before committing to confirm each
+appears exactly once, after last cycle's splice mistake.
+
+The narrowed boundary (`high_hat_starting_balance=239`,
+`dog_starting_balance=17`) genuinely worked: the architect's mutation run
+killed all six of `distressed-sale-17`'s mutations, confirming the
+width-2-run edge placement was the right fix for the structural
+insensitivity traced last cycle. Re-ran `./acceptance/run-acceptance.sh`
+myself: 433 tests, 0 failures.
+
+The 14 other survivors the architect mentions are pre-existing, outside
+this task — not something this correction needs to address.
+
+This closes the `distressed-sale-mortgage-floor` task: all three defects
+found by running the live 2-player game this session (the
+`mortgageRemainingCandidates` crash, the house-deferral overbreadth, and
+the mortgage-floor gap) are now genuinely specified, implemented, and
+verified down to mutation-testing rigor. Per role rules, asking the user
+for the next feature to add.
