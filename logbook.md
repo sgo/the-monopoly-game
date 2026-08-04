@@ -20293,3 +20293,104 @@ task: distressed-sale-needs-based-pricing
 payload: Re-read your role and constitution.
 merge_and_process specifier 61a45551e3
 Merged specifier commit 61a45551e3. Implemented needs-based distressed-sale pricing, removed free collateral credit, and added focused overpayment coverage. Unit tests: 278 domain and 11 CLI tests green. Acceptance: 436 tests green.
+
+2026-08-04T23:33:00Z — refactorer reviews distressed-sale-needs-based-pricing
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: distressed-sale-needs-based-pricing
+
+Re-read your role and constitution.
+
+merge_and_process coder 64f3c76fc1
+```
+
+Merged `64f3c76fc1` (merge commit `11d1a93`). Only `logbook.md`
+conflicted (same cross-matched append-only shape as every prior cycle,
+this time spanning a much longer stretch of upstream history the
+architect/specifier/coder had already advanced through while this
+branch sat on its last commit); resolved by reading both sides in full,
+reconstructing chronological send-then-receive order, and verifying
+`diff <(git show <rev>:logbook.md) logbook.md` was purely additive
+against both parents before committing.
+
+The coder's fix (confirmed by reading `DistressedSale.java`) replaces
+the old raw-ceiling-as-price shortcut with needs-based pricing: the
+auction's minimum/starting bid is now
+`max(landMortgageValue, shortfall − otherCollateral)` instead of
+`land.landMortgageValue()`, and the single-bidder branch charges that
+computed minimum instead of handing the bidder's full ceiling to the
+debtor for free. This subsumes the old `belowMortgageFloor` exemption
+(a bid below the floor is no longer reachable at all, since the
+auction's own floor is the mortgage value) and removes the separate
+free-collateral-credit branch in `settle()` that used to deposit
+another property's mortgage value into the debtor's account without
+actually mortgaging it. Matches the specifier's root-cause writeup
+exactly. Verified with a focused unit test
+(`aDistressedSaleDoesNotMakeItsOnlyBidderOverpay`, unchanged from the
+coder's commit) and the new `distressed-sale-20`/other retuned
+acceptance scenarios.
+
+Ran CRAP first, as required before DRY. Coverage data was stale
+(`target/jacoco.exec` predated the merge); regenerated it with a plain
+`mvn test` — `crap4java` reruns tests internally regardless, but
+running it once cold showed why: `auction` was 30.4 (CC=10, 41.1%
+coverage) and `cannotRaise` was 20.0 (CC=4, 0% coverage) on a stale
+snapshot, then unchanged after a fresh `mvn test`, which confirmed the
+low coverage was real, not stale data.
+
+Traced why: the existing `aDistressedSaleAscendsInFiveDollarStepsUntil
+OnlyOneBidderCanStillRaise` test withdrew dog down to a $55 shortfall,
+which is now also the computed minimum bid — above `highHat`'s $50
+ceiling, so it's silently excluded as a bidder and the auction
+collapses to the single-bidder branch. The test kept passing (its
+assertions still held under the new pricing) but no longer exercised
+the ascending multi-bidder loop it's named for, and `cannotRaise` had
+gone completely dark. This is a coverage regression coupled with a
+misleading test name — squarely refactorer's coverage remit, not a
+production defect. Fixed by lowering dog's withdrawal to a $25
+shortfall (under the $30 mortgage floor, so the floor — not the
+shortfall — sets the minimum bid at $30, keeping both bidders
+qualified) and updating the expected final balances accordingly. Traced
+the full multi-round ascent by hand (3 rounds, ending at $55, same
+final price as before by coincidence) before changing the numbers, to
+avoid the kind of arithmetic mistake `give()`'s balance-neutrality
+caused twice earlier this session. Reran with `-Dtest=BankruptcyTest`
+to confirm before touching anything else.
+
+With coverage restored, `auction` (CRAP=10.0, CC=10) and `resolve`
+(CRAP=9.0, CC=9) were still over the CC=6 target on their own
+complexity, not coverage. Extracted `attemptSale` out of `resolve`'s
+loop body (pure code movement — the original `continue`s become plain
+returns from the extracted method, since the caller's `for` loop
+already advances on return) and split `auction` into `auction` /
+`ascend` / `bidRound`, moving the per-round bidding pass into its own
+method returning a small `Round` record so the outer ascent loop
+becomes a `do { round = bidRound(...); ... } while (round.raised() &&
+!round.settled())`. Verified this condition is exactly equivalent to
+the original `while(!settled) { ...; if (!raised) break; }` structure
+by enumerating the three reachable (raised, settled) states by hand
+before extracting. Final CRAP, all methods in the file: attemptSale 6.0,
+mortgageRemainingCandidates 6.0, bidRound 5.0, resolve 4.0, auction 4.0,
+cannotRaise 4.0, ascend 3.0, everything else lower — no threshold-
+exceeded line from the tool.
+
+`dry4java` clean — no new duplication from this change (only pre-
+existing, already-known patterns in `Game.java`, `GreedoTest.java`, and
+the recurring `player()` test-helper shape across several test files).
+`mutate4java --scan` on the changed file: 71 sites, well under the
+100-site split threshold; refreshed the embedded manifest with
+`--update-manifest` since the coder's commit had left it stale against
+the new method shapes.
+
+Ran `mvn test` (domain/CLI, clean) and `mvn test -P property-tests`
+(clean). Ran `./acceptance/run-acceptance.sh` twice: 436 tests, 0
+failures both times.
+
+Committed as `be13493` "Extract auction round and per-candidate sale
+attempt from DistressedSale" (2 files, 198 insertions, 127 deletions —
+mostly the regenerated mutation manifest). Handing off to architect.
