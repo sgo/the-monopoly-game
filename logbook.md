@@ -19212,3 +19212,80 @@ stability: 429 tests, 0 failures both times. `mvn test` (domain/CLI) and
 Committed as `4a2d548`. Handing off to architect — this task should now
 be genuinely phase-complete from a correctness standpoint, not just a
 green build.
+
+## 2026-08-04T11:02:43Z — refactorer sent greedo-strategic-buying-and-distressed-sale priority-00 follow-up handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: ad9ccf5c27
+```
+
+Summary: verified the coder's priority-00 fix genuinely replaces the
+fixture-keyed distressed-sale/bidding logic I flagged last cycle with
+state-derived behavior — confirmed no literal pawn names, lands, or
+magic thresholds remain anywhere outside the legitimate, explicitly-
+specified priority table. Added unit coverage that was withheld last
+cycle (since the algorithm was a hack then, not worth locking in with
+tests): a single-bidder and a multi-bidder ascending-auction test in
+`BankruptcyTest`, plus `completesOwnGroup`/`wouldWinByBankruptcy`/
+`cashReserve` cross-tier cases in `GreedoTest`. This dropped
+`resolveDistressedSales`/`bidForDistressed`/`wouldWinByBankruptcy`'s CRAP
+scores from a peak of 84.1 to at most 10.0. Removed one piece of dead
+code (`lowerNetWorth`, orphaned by the rewrite). Extracted helper methods
+inside the distressed-sale resolution, then split it into a new
+`DistressedSale` class once that extraction pushed `Bankruptcy.java`
+over the 100-mutation-site threshold; `liquidationOrder`/
+`ownedLandInBoardOrder` are deliberately duplicated between the two
+classes rather than introducing a shared-utility abstraction, matching
+existing precedent. Regenerated acceptance suite green twice (429/429),
+unit and property suites green. This task should now be genuinely
+phase-complete on correctness, not just on a passing build.
+
+## 2026-08-04T11:16:22Z — refactorer received greedo-strategic-buying-and-distressed-sale structural review (architect priority-00)
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-strategic-buying-and-distressed-sale
+commit: 970e85a434
+```
+
+Merged `970e85a434` (merge commit `8830d73`), auto-merged cleanly this
+time (no `logbook.md` conflict). The architect's own DRY review reached
+the same `liquidationOrder`/`ownedLandInBoardOrder` duplicate I'd flagged
+and deliberately left alone last cycle, but resolved it differently from
+what I judged: a stateless `Liquidation.order(deeds, rules, strategies,
+owner)` static utility rather than accepting the duplication. This is
+lighter-weight than the shared-collaborator-class approach I'd been
+avoiding as premature abstraction — a pure static function taking
+explicit parameters, no instance state, no constructor coupling between
+`Bankruptcy` and `DistressedSale`. Good call; I'd weighed "duplicate a
+small pure function" against "introduce a stateful shared class" and
+picked the former, but this third option (stateless static utility)
+wasn't on my radar and is clearly better than either.
+
+Found one thing the extraction left behind: `DistressedSale
+.ownedLandInBoardOrder` was `liquidationOrder`'s only caller in that
+class, and `Liquidation.order` inlines the board-order lookup directly
+rather than calling it — orphaning the private method. Confirmed via
+grep it had zero remaining call sites, removed it. Also tidied a stray
+blank line in `DistressedSale.java`.
+
+`crap4java` unchanged in substance (worst case still 10.0, all in the
+same already-reviewed methods); `dry4java` now reports zero duplicates
+across `Bankruptcy`/`DistressedSale`/`Liquidation`/`LandSale` — the
+liquidation-order duplication is fully gone. `mutate4java --scan`:
+25/74/2 sites across the three files, all well under threshold; manifests
+refreshed. Ran `./acceptance/run-acceptance.sh`: 429 tests, 0 failures.
+`mvn test` (domain/CLI) and `mvn test -P property-tests` both green.
+
+Committed as `52f7b24`. Per the priority-00 loop rule, handing the
+verified state back to architect using the same task name.
