@@ -369,7 +369,7 @@ Feature: selling property to avoid bankruptcy
       | 0                     | 300                        | 5                           |
 
   # distressed-sale-17
-  Scenario Outline: a peer's nonzero offer below the land's mortgage value is declined in favor of mortgaging to the bank
+  Scenario Outline: a peer's offer one dollar below the land's mortgage value is declined in favor of mortgaging to the bank
     And we select 2 players
     And pawn "dog" will roll 10 for initiative
     And pawn "high hat" will roll 4 for initiative
@@ -386,4 +386,25 @@ Feature: selling property to avoid bankruptcy
 
     Examples:
       | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance |
-      | 86                    | 40                         | 76                          |
+      | 11                    | 255                        | 1                            |
+
+  # distressed-sale-18
+  Scenario Outline: a peer's offer that exactly reaches the land's mortgage value is accepted
+    And we select 2 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" has $<high_hat_starting_balance> to spend
+    And pawn "dog" owns "Lippenslaan Knokke"
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then pawn "high hat" owns "Lippenslaan Knokke"
+    And the land "Lippenslaan Knokke" is not mortgaged
+    And pawn "dog" is not bankrupt
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+    And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance | expected_high_hat_final_balance |
+      | 10                    | 258                        | 0                           | 168                              |
