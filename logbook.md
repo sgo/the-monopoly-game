@@ -19289,3 +19289,28 @@ refreshed. Ran `./acceptance/run-acceptance.sh`: 429 tests, 0 failures.
 
 Committed as `52f7b24`. Per the priority-00 loop rule, handing the
 verified state back to architect using the same task name.
+
+## 2026-08-04T11:17:02Z — refactorer sent greedo-strategic-buying-and-distressed-sale structural review handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: 03fac68b99
+```
+
+Summary: reviewed the architect's `Liquidation.order` extraction —
+a clean, stateless static utility that fully resolves the
+`liquidationOrder`/`ownedLandInBoardOrder` duplication between
+`Bankruptcy` and `DistressedSale` I'd deliberately left as accepted
+duplication last cycle. Removed one piece of dead code the extraction
+orphaned (`DistressedSale.ownedLandInBoardOrder`, no remaining callers).
+`dry4java` now reports zero duplicates across all four bankruptcy-related
+files. `crap4java`/`mutate4java` unchanged in substance from my prior
+review (worst CRAP 10.0, all files well under the mutation-site
+threshold). Regenerated acceptance suite green (429 tests), unit and
+property suites both green. Handing the verified state back to architect
+per the priority-00 loop-closing rule.
