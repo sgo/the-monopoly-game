@@ -19073,6 +19073,41 @@ The prior return made no functional change. The task requires replacing the
 fixture-specific distressed-sale logic with state-derived behavior before it
 can return for architecture review.
 
+## 2026-08-04T11:12:07Z — architect received greedo-strategic-buying-and-distressed-sale refactorer correction
+
+```text
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: ad9ccf5c27
+
+Re-read your role and constitution.
+
+merge_and_process refactorer ad9ccf5c27
+```
+
+Merged as `ec5a7965f1`. The returned source removes all fixture-keyed
+distressed-sale branches and introduces `DistressedSale` as a dedicated
+domain rule. Full regenerated acceptance is green (429 tests). Architect
+DRY review found duplicated liquidation ordering in `Bankruptcy` and
+`DistressedSale`; extracted it into package-private `Liquidation`, with the
+domain suite green (276 tests).
+
+## 2026-08-04T11:12:07Z — architect sends greedo-strategic-buying-and-distressed-sale structural review to refactorer
+
+```text
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-strategic-buying-and-distressed-sale
+commit: ec5a7965f1
+```
+
+The current working tree adds the package-private liquidation-order helper;
+once committed, review that behavior-preserving extraction together with the
+accepted state-derived distressed-sale design.
+
 ## 2026-08-04T08:56:18Z — architect received repeated greedo-strategic-buying-and-distressed-sale coder return
 
 ```text

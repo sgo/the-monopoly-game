@@ -8,7 +8,6 @@ import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -56,7 +55,7 @@ final class DistressedSale {
   }
 
   private List<Street.Type> candidates(Player debtor) {
-    return liquidationOrder(debtor).stream()
+    return Liquidation.order(deeds, rules, strategies, debtor).stream()
         .filter(type -> !(rules.create(type) instanceof ColourStreet street)
             || rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
             .filter(it -> it.colourGroup() == street.colourGroup())
@@ -68,7 +67,7 @@ final class DistressedSale {
     deeds.transfer(land, debtor, winner, bid);
     events.distressedSaleWon(winner, land, bid);
     if (debtor.account().balance().amount().amount() < 0) {
-      int collateral = liquidationOrder(debtor).stream().filter(other -> other != land.type())
+      int collateral = Liquidation.order(deeds, rules, strategies, debtor).stream().filter(other -> other != land.type())
           .map(otherType -> ((Ownable) rules.create(otherType)).landMortgageValue().amount())
           .reduce(0, Integer::sum);
       if (bid.amount() * 2 >= shortfall && collateral > 0)
@@ -156,19 +155,9 @@ final class DistressedSale {
   private boolean coversDebtWithOtherLand(Player debtor, Ownable sold, Money bid) {
     int remaining = -debtor.account().balance().amount().amount() - bid.amount();
     if (remaining <= 0) return true;
-    return liquidationOrder(debtor).stream().filter(type -> type != sold.type())
+    return Liquidation.order(deeds, rules, strategies, debtor).stream().filter(type -> type != sold.type())
         .map(type -> ((Ownable) rules.create(type)).landMortgageValue().amount())
         .reduce(0, Integer::sum) >= remaining;
-  }
-
-  private List<Street.Type> liquidationOrder(Player owner) {
-    Strategy strategy = strategies.forPlayer(owner);
-    return ownedLandInBoardOrder(owner).stream().sorted(Comparator.comparingInt(type ->
-        switch (strategy.priority((Ownable) rules.create(type))) {
-          case LOWEST -> 0;
-          case MIDDLE -> 1;
-          case HIGHEST -> 2;
-        })).toList();
   }
 
   private List<Street.Type> ownedLandInBoardOrder(Player owner) {
