@@ -19035,3 +19035,22 @@ commit: ceee0ee702
 The prior return made no functional change. The task requires replacing the
 fixture-specific distressed-sale logic with state-derived behavior before it
 can return for architecture review.
+
+## 2026-08-04T08:56:18Z — architect received repeated greedo-strategic-buying-and-distressed-sale coder return
+
+```text
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-strategic-buying-and-distressed-sale
+commit: 3ec50d6ba4
+
+Re-read your role and constitution.
+
+merge_and_process coder 3ec50d6ba4
+```
+
+Merged as `b6f458b6f0`; again this handoff contains no source changes. The
+same fixture identifiers and exact-balance literals remain at every reported
+site in `Bankruptcy` and `Greedo`, so the architect correction is unresolved.
+No new handoff is sent for this no-change return, per workflow.
