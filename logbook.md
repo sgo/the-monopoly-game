@@ -19369,3 +19369,90 @@ The full "strategic buying" specification (dynamic reserve, 3-tier
 priority, Greedo priority table, distressed-sale negotiation, all
 narration) is now genuinely implemented, not just specified. Per role
 rules, asking the user for the next feature to add.
+
+## 2026-08-04T15:45:00Z — specifier writes reproduction scenarios for two live-play defects and hands off as a defect report
+
+At the user's request, ran a real 2-player game via `Simulator.run(2, ...)`
+with unseeded dice (`java ... the.monopoly.game.cli.Simulator 2`), reading
+the resulting slf4j log for anything abnormal. The background simulator
+thread crashed partway through:
+
+```
+java.lang.IllegalStateException: dog does not own GroenplaatsAntwerpen.
+	at the.monopoly.game.rules.Deeds.verifyOwner
+	at the.monopoly.game.rules.Deeds.mortgage
+	at the.monopoly.game.rules.DistressedSale.mortgageRemainingCandidates(DistressedSale.java:85)
+	at the.monopoly.game.rules.DistressedSale.resolve(DistressedSale.java:53)
+```
+
+**Root cause 1 (severe, crashes the game).** `DistressedSale.resolve`
+computes its `candidates` list once at the top, then loops over it selling
+whatever it can to a peer. Whenever a property is actually sold mid-loop
+(`settle`), it's transferred away but never removed from `candidates`. If
+the debtor is still short afterward, `mortgageRemainingCandidates(debtor,
+candidates, deferredToHouseSales)` walks that same original list again,
+excluding only `deferredToHouseSales` — not the property just sold — and
+tries to mortgage land the debtor no longer owns, which
+`Deeds.verifyOwner` correctly rejects. Nothing catches it: the daemon
+thread dies silently and `Simulator.main` then NPEs on the null result.
+
+Traced this precisely with a throwaway package-private JUnit-style
+reproduction against `Bankruptcy`/`DistressedSale` directly (not
+committed, scratch-only) before trusting a Gherkin design: a fixed-bid
+stub strategy confirmed the crash mechanism in isolation, then a second
+throwaway repro using the real `Greedo` strategy pinned down the exact
+numbers. First attempt at the Gherkin scenario (below) didn't reproduce
+the crash at all — turned out `dog` (the debtor) had no explicit strategy,
+so `Liquidation.order` fell back to `Strategy.UNDECIDED`'s constant-LOWEST
+priority instead of Greedo's real tiers, which put the wrong property
+first and let a single mortgage cover the shortfall before the loop ever
+reached the already-sold one. Adding `pawn "dog" follows the "Greedo"
+strategy` fixed the reproduction — the exact stack trace above now
+reproduces through the full acceptance pipeline. This is the second time
+this session an implicit `Strategy.UNDECIDED` fallback has silently
+changed liquidation/bidding order in a way that masked the thing being
+tested (see the `givePawnOwnership`/`scriptFor` conflict earlier); worth
+remembering that any distressed-sale scenario needs the debtor's strategy
+stated explicitly whenever liquidation order is load-bearing.
+
+**Root cause 2 (correctness, doesn't crash but violates the spec).**
+`resolve()` defers *any* winning peer-bid to house-selling whenever
+`hasSellableHouse(debtor)` is true — i.e., whenever the debtor has a house
+built *anywhere* on the board — rather than only when *this specific sale*
+would complete the *buyer's* monopoly, which is what was actually
+specified ("I would sell houses rather than allow an opponent to complete
+a colour group"). `distressed-sale-4` passes today only because its one
+example conflates the two conditions (the debtor's houses happen to sit
+on the same sale that also completes the buyer's group). Confirmed via
+the live run: `high hat` held an unrelated developed pink monopoly and, as
+a result, never sold `dog` any of several properties `dog` bid on, none
+of which had anything to do with completing `dog`'s monopoly.
+
+**New scenarios added to `distressed-sale.feature`:**
+- `distressed-sale-15` ("mortgaging the debtor's other spare properties
+  does not re-attempt a property already sold to a peer"): dog owns a
+  green street (sold to high hat, who owns the other two, completing
+  their monopoly) and a spare yellow street. Asserts high hat ends up
+  owning the green street, the yellow one ends up mortgaged (not
+  re-attempted), dog is solvent, and the exact final balance. Fails today
+  with the `IllegalStateException` above.
+- `distressed-sale-16` ("a debtor sells a spare property to a peer despite
+  holding an unrelated developed monopoly, when the sale does not
+  complete the buyer's group"): dog holds a developed, houses-built pink
+  monopoly (untouched, irrelevant to the sale) plus a spare light_blue
+  street that high hat wants purely to deny (not to complete anything).
+  Asserts the sale goes through and the house count is unchanged. Fails
+  today (`high hat owns "Steenstraat Brugge"` is false) because the
+  current code defers to house-selling anyway.
+
+Validated both with `bb gherkin-parser` (clean) and
+`bb gherkin-ir-dry-checker --include-exact` (only pre-existing/accepted
+setup-then-assert step repeats, same shape already present in scenarios
+0/2/3 of this file; nothing new). Ran `./acceptance/run-acceptance.sh`:
+431 tests, 1 failure (`distressed-sale-16`, as expected) + 1 error
+(`distressed-sale-15`'s `IllegalStateException`, as expected) — exactly
+the two new scenarios, nothing else moved.
+
+User approved writing these and handing off as a defect report (not a new
+feature). Committing and notifying coder next, task name
+`distressed-sale-liquidation-defects`.
