@@ -313,3 +313,53 @@ Feature: selling property to avoid bankruptcy
     Examples:
       | dog_starting_balance | high_hat_starting_balance | iron_box_starting_balance |
       | 0                     | 600                        | 600                        |
+
+  # distressed-sale-15
+  Scenario Outline: mortgaging the debtor's other spare properties does not re-attempt a property already sold to a peer
+    And we select 2 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "high hat" owns "Boulevard Tirou Charleroi"
+    And pawn "high hat" owns "Veldstraat Gent"
+    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" has $<high_hat_starting_balance> to spend
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" owns "Boulevard d'Avroy Liège"
+    And pawn "dog" owns "Grote Markt Hasselt"
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then pawn "high hat" owns "Boulevard d'Avroy Liège"
+    And the land "Grote Markt Hasselt" is mortgaged
+    And pawn "dog" owns "Grote Markt Hasselt"
+    And pawn "dog" is not bankrupt
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance |
+      | 0                     | 20                         | 50                          |
+
+  # distressed-sale-16
+  Scenario Outline: a debtor sells a spare property to a peer despite holding an unrelated developed monopoly, when the sale does not complete the buyer's group
+    And we select 2 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "dog" owns "Bruul Mechelen"
+    And pawn "dog" owns "Place Verte Verviers"
+    And the street "Rue de Diekirch Arlon" has 1 house(s) built
+    And pawn "dog" owns "Steenstraat Brugge"
+    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" has $<high_hat_starting_balance> to spend
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then pawn "high hat" owns "Steenstraat Brugge"
+    And the street "Rue de Diekirch Arlon" has 1 house(s) built
+    And pawn "dog" is not bankrupt
+    And pawn "dog"'s account balance is $<expected_dog_final_balance>
+
+    Examples:
+      | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance |
+      | 0                     | 300                        | 5                           |
