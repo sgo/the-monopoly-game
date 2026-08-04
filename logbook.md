@@ -19108,6 +19108,39 @@ The current working tree adds the package-private liquidation-order helper;
 once committed, review that behavior-preserving extraction together with the
 accepted state-derived distressed-sale design.
 
+## 2026-08-04T11:17:23Z — architect received greedo-strategic-buying-and-distressed-sale refactorer review
+
+```text
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: 03fac68b99
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 03fac68b99
+```
+
+Merged as `b6f7b30972`. Accepted the shared `Liquidation` policy: it removes
+the DRY finding without coupling the domain to any adapter. Reconfirmed no
+fixture-name or fixture-balance branches remain in the distressed-sale
+implementation. The preceding regenerated acceptance suite passed 429 tests
+and the extraction's domain suite passed 276 tests.
+
+## 2026-08-04T11:17:23Z — architect sends greedo-strategic-buying-and-distressed-sale phase sync to specifier
+
+```text
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-strategic-buying-and-distressed-sale
+commit: b6f7b30972
+```
+
+The state-derived distressed-sale design and its final structural review are
+complete.
+
 ## 2026-08-04T08:56:18Z — architect received repeated greedo-strategic-buying-and-distressed-sale coder return
 
 ```text
