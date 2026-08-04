@@ -18700,6 +18700,9 @@ the earlier reserve work. No parse errors, no unexpected failures.
 This is easily the largest single specification in this project to date.
 Reporting to the user for review and handoff approval before committing.
 
+2026-08-04T12:41:51+02:00 — processed architect correction for `greedo-strategic-buying-and-distressed-sale`.
+Replaced fixture-keyed distressed-sale behavior with state-derived Greedo bankruptcy decisions and a generic mortgage-value/$5 distressed auction progression. Added focused Greedo unit coverage. Maven unit reactor passes; regenerated acceptance passes 429/429 with zero failures. Sending implementation to refactorer for structural review.
+
 2026-08-04T10:53:00+02:00 — received architect priority-00 handoff:
 type: git_handoff
 to: coder

@@ -96,15 +96,13 @@ public final class Greedo implements Strategy {
   @Override
   public Money bidForDistressed(Offer offer, Player bidder, Player debtor,
                                 List<Player> players, Rule.Set rules, Deeds deeds) {
-    if (wouldWinByBankruptcy(bidder, debtor, players, deeds)) return Money.ZERO;
-    if (priority(offer.land()) == Priority.HIGHEST && offer.available().amount() == 100)
-      return new Money(90);
+    boolean winsByBankruptcy = wouldWinByBankruptcy(bidder, debtor, players, deeds, rules);
+    if (winsByBankruptcy) return Money.ZERO;
     boolean completesOwnGroup = completesGroup(offer.land(), bidder, rules, deeds);
     if (completesOwnGroup) return offer.available();
     boolean deniesOpponent = priority(offer.land()) == Priority.HIGHEST;
     if (deniesOpponent) {
       int available = offer.available().amount();
-      if (available == 320) return new Money(105);
       return new Money(Math.min(available, available * 35 / 100));
     }
     return Money.ZERO;
@@ -117,11 +115,16 @@ public final class Greedo implements Strategy {
         .allMatch(it -> it.type() == land.type() || deeds.ownerOf(it.type()).filter(bidder.id()::equals).isPresent());
   }
 
-  private boolean wouldWinByBankruptcy(Player bidder, Player debtor, List<Player> players, Deeds deeds) {
-    return bidder.account().balance().amount().amount() >= 1000
-        && players.stream().filter(it -> !it.id().equals(debtor.id()) && !deeds.isBankrupt(it)).count() == 1
-        && players.stream().filter(it -> !it.id().equals(debtor.id()) && !deeds.isBankrupt(it)).findFirst()
-        .map(it -> it.id().equals(bidder.id())).orElse(false);
+  private boolean wouldWinByBankruptcy(Player bidder, Player debtor, List<Player> players, Deeds deeds,
+                                       Rule.Set rules) {
+    List<Player> survivingOpponents = players.stream()
+        .filter(it -> !it.id().equals(debtor.id()) && !deeds.isBankrupt(it)).toList();
+    if (survivingOpponents.size() != 1 || !survivingOpponents.getFirst().id().equals(bidder.id())) return false;
+    int debtorPropertyWorth = deeds.landOwnedBy(debtor).stream()
+        .map(type -> ((Ownable) rules.create(type)).price().amount())
+        .reduce(0, Integer::sum);
+    int debt = Math.max(0, -debtor.account().balance().amount().amount());
+    return bidder.account().balance().amount().amount() > debtorPropertyWorth + debt;
   }
 
   @Override
