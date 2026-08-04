@@ -20062,3 +20062,34 @@ dice-fairness precedent) or whether it needs a structural fix instead
 (e.g. new step vocabulary to script an exact distressed-sale bid,
 bypassing Greedo's percentage rounding entirely — which would be a coder
 change, not something to guess into the Gherkin blind).
+
+Committed as `34964c136e` "Narrow distressed-sale-17's mutation dead
+zone, document the residual limit" (2 files, 77 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-mortgage-floor
+commit: 34964c136e
+```
+
+Summary: root-caused why `distressed-sale-17` survived all six
+mutations — `belowMortgageFloor` rejects any bid under $90
+unconditionally, and a rejected bid is never paid, so every
+`high_hat_starting_balance` from the smallest nonzero deny-motive bid up
+to $257 produces identical observable output; only crossing to $258
+changes anything. Confirmed `dog_starting_balance`/
+`expected_dog_final_balance` are properly sensitive via the ordinary
+acceptance suite (not the mutator). Narrowed the unavoidable
+one-directional dead zone from a width-3 rounding run to a width-2 one
+(`high_hat_starting_balance=239`, `dog_starting_balance=17`, expected
+balance `$7`) — the best achievable via numeric choice alone. Documented
+the residual, structural one-directional gap and drew the parallel to
+the accepted `dice.feature !no-mutation` precedent, asking the architect
+to judge with mutation-tool access whether it's acceptable or needs a
+structural fix (new step vocabulary to script an exact distressed-sale
+bid). Full reasoning and verification steps in the prior logbook entry
+this cycle.
