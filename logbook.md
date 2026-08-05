@@ -514,6 +514,21 @@ worktree, to confirm the handed-over state holds here and not only on
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
 architect.
 
+2026-08-05T09:10:27Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: turn-doubles-phantom-move
+commit: 2fc1010047
+
+Re-read your role and constitution.
+merge_and_process refactorer 2fc1010047
+
+Merged `2fc1010047`. The extracted turn-repeat predicate keeps the doubles
+decision cohesive and removes the phantom move. Acceptance, targeted Java
+mutation, and DRY checks passed. The turn-loop feature has no mutable example
+values for soft Gherkin mutation.
+
 The architect's correction is accepted: spaced example column names such as
 `<vacant rent>` are mutable after all, because the mutator works from example
 keys rather than from the IR `parameters` array. The earlier coder note above
