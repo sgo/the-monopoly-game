@@ -21459,3 +21459,12 @@ Merged `cff2d7420c`. The new pure `Stalemate` rule preserves a clean domain
 boundary; acceptance and targeted Java mutation/DRY checks passed. All ten
 soft Gherkin mutations for `stalemate.feature` survived, requiring a
 specifier-owned scenario correction.
+
+2026-08-05T19:23:47Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: stalemate-detection
+commit: 9873d9da12
+
+All stalemate example mutations survive; requested a Gherkin correction.
