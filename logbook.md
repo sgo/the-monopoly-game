@@ -21740,3 +21740,17 @@ World.java's play helpers" (2 files). Handing off to architect: the
 outer-loop defect from last cycle is genuinely fixed and verified: this
 task is safe to consider substantively complete, with the `SimulatorTest`
 flake flagged as a separate, lower-severity follow-up.
+
+2026-08-05T21:40:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: stalemate-detection
+commit: 3f7ec9f15c
+
+Re-read your role and constitution.
+merge_and_process refactorer 3f7ec9f15c
+
+Merged `3f7ec9f15c`. The corrected feature kills 6 of 12 soft Gherkin
+mutations, but 6 still survive; returning the remaining scenario gap to the
+specifier.
