@@ -70,8 +70,12 @@ public class Turn {
 
       move(player, roll);
 
-      if (!roll.isDouble() || deeds.isBankrupt(player) || jail.holds(player)) return;
+      if (!rollsAgain(roll, player)) return;
     }
+  }
+
+  private boolean rollsAgain(Roll roll, Player player) {
+    return roll.isDouble() && !deeds.isBankrupt(player) && !jail.holds(player);
   }
 
   private void takeFromJail(Player player) {
@@ -142,21 +146,21 @@ public class Turn {
 
 /* mutate4java-manifest
 version=1
-moduleHash=eef20288f99b3e51884485913bd8e8795510fcec2aaa02574df11b6dfd2cb9e6
+moduleHash=89f02ff8aa8c582bafae2e5136fe417718f0ec4c8dc9bb139f7d56ad1eae71e9
 scope.0.id=Y2xhc3M6VHVybiNUdXJuOjE1
 scope.0.kind=class
 scope.0.startLine=15
-scope.0.endLine=141
-scope.0.semanticHash=b6e1871fac98a8da680d84a36a330c1a53f65a98cd3eb6880d67142dc369064e
+scope.0.endLine=145
+scope.0.semanticHash=5eadf704f3901582380dbd64fb5eddaf866536542bed905a6119a458048c7d54
 scope.1.id=Y2xhc3M6VHVybi4jOjUx
 scope.1.kind=class
 scope.1.startLine=51
 scope.1.endLine=52
 scope.1.semanticHash=9265619237dc049c9efd5c01a5c74a7e99db1a67aa7ef3e2e396e54563e1bc57
-scope.2.id=Y2xhc3M6VHVybi5FdmVudHMjRXZlbnRzOjEyNw
+scope.2.id=Y2xhc3M6VHVybi5FdmVudHMjRXZlbnRzOjEzMQ
 scope.2.kind=class
-scope.2.startLine=127
-scope.2.endLine=140
+scope.2.startLine=131
+scope.2.endLine=144
 scope.2.semanticHash=dceab9db4538473f7e5e6acb63bef5dbaa99633eda7d4d0c2b2cb8113c187e86
 scope.3.id=ZmllbGQ6VHVybiNET1VCTEVTX0FMTE9XRUQ6MTc
 scope.3.kind=field
@@ -218,59 +222,64 @@ scope.14.kind=method
 scope.14.startLine=31
 scope.14.endLine=42
 scope.14.semanticHash=bde66b0c3d8e0798cc57d2080d30bc695bc63bff72ea3f40e0b07780628cefb3
-scope.15.id=bWV0aG9kOlR1cm4jbW92ZSgyKTo4OA
+scope.15.id=bWV0aG9kOlR1cm4jbW92ZSgyKTo5Mg
 scope.15.kind=method
-scope.15.startLine=88
-scope.15.endLine=105
+scope.15.startLine=92
+scope.15.endLine=109
 scope.15.semanticHash=7240e476827818c6980d36511df4fb5ee0f54417e7ba0bc8e42f1bffcfdd8061
-scope.16.id=bWV0aG9kOlR1cm4jc2VuZFRvSmFpbCgxKToxMTU
+scope.16.id=bWV0aG9kOlR1cm4jcm9sbHNBZ2FpbigyKTo3Nw
 scope.16.kind=method
-scope.16.startLine=115
-scope.16.endLine=117
-scope.16.semanticHash=39a3e841bb1f3cd10a3592cb66a28f9fa9ad07c5bef4936520812727aaa7f7a0
-scope.17.id=bWV0aG9kOlR1cm4jc3BhY2VBdCgxKToxMDc
+scope.16.startLine=77
+scope.16.endLine=79
+scope.16.semanticHash=a4832d98bf15c0f6248e51e714ccddf5f692a1d83d2a98e06e084376c6a2e598
+scope.17.id=bWV0aG9kOlR1cm4jc2VuZFRvSmFpbCgxKToxMTk
 scope.17.kind=method
-scope.17.startLine=107
-scope.17.endLine=109
-scope.17.semanticHash=3cf1682b5d12e12710c2220fe7a9b80855f69e8cb475fb7e7b6715a1407f7a5b
-scope.18.id=bWV0aG9kOlR1cm4jc3RhcnQoMCk6MTE5
+scope.17.startLine=119
+scope.17.endLine=121
+scope.17.semanticHash=39a3e841bb1f3cd10a3592cb66a28f9fa9ad07c5bef4936520812727aaa7f7a0
+scope.18.id=bWV0aG9kOlR1cm4jc3BhY2VBdCgxKToxMTE
 scope.18.kind=method
-scope.18.startLine=119
-scope.18.endLine=121
-scope.18.semanticHash=afb3b0a57fbbaa1251328756f79d64399df7945610a5fc68fb8115e48ef2233e
-scope.19.id=bWV0aG9kOlR1cm4jdGFrZSgxKTo1NQ
+scope.18.startLine=111
+scope.18.endLine=113
+scope.18.semanticHash=3cf1682b5d12e12710c2220fe7a9b80855f69e8cb475fb7e7b6715a1407f7a5b
+scope.19.id=bWV0aG9kOlR1cm4jc3RhcnQoMCk6MTIz
 scope.19.kind=method
-scope.19.startLine=55
-scope.19.endLine=75
-scope.19.semanticHash=bf25db68ca6199d2907937a883caddfccd19a2e7aa4dddd90117afbb47275503
-scope.20.id=bWV0aG9kOlR1cm4jdGFrZUZyb21KYWlsKDEpOjc3
+scope.19.startLine=123
+scope.19.endLine=125
+scope.19.semanticHash=afb3b0a57fbbaa1251328756f79d64399df7945610a5fc68fb8115e48ef2233e
+scope.20.id=bWV0aG9kOlR1cm4jdGFrZSgxKTo1NQ
 scope.20.kind=method
-scope.20.startLine=77
-scope.20.endLine=81
-scope.20.semanticHash=3151fff8cefa5ccdec58e2031c542ff15679994e904903aa0e02fabef4c5e487
-scope.21.id=bWV0aG9kOlR1cm4uI2N0b3IoMCk6NTE
+scope.20.startLine=55
+scope.20.endLine=75
+scope.20.semanticHash=e764bc50d7f56f8638d28be5e930f183b3717e5d62a808a99c21b0e149623f67
+scope.21.id=bWV0aG9kOlR1cm4jdGFrZUZyb21KYWlsKDEpOjgx
 scope.21.kind=method
-scope.21.startLine=1
-scope.21.endLine=141
-scope.21.semanticHash=cadedcac4e3b33cb32b6aa83120e8fa8fc0da5cba6c0c7bf396172cfbf48f7c2
-scope.22.id=bWV0aG9kOlR1cm4uRXZlbnRzI2NvbGxlY3RlZFNhbGFyeSgyKToxMzg
+scope.21.startLine=81
+scope.21.endLine=85
+scope.21.semanticHash=3151fff8cefa5ccdec58e2031c542ff15679994e904903aa0e02fabef4c5e487
+scope.22.id=bWV0aG9kOlR1cm4uI2N0b3IoMCk6NTE
 scope.22.kind=method
-scope.22.startLine=138
-scope.22.endLine=139
-scope.22.semanticHash=6cd1f36caef5236a7b98bb77c90da39864e729d6d252fdc58b623f587a32a1b6
-scope.23.id=bWV0aG9kOlR1cm4uRXZlbnRzI21vdmVkKDMpOjEzMQ
+scope.22.startLine=1
+scope.22.endLine=145
+scope.22.semanticHash=ba7e01814984304cdd022af16b8f676a2445230ab2c517ffa66caea36bd65aaf
+scope.23.id=bWV0aG9kOlR1cm4uRXZlbnRzI2NvbGxlY3RlZFNhbGFyeSgyKToxNDI
 scope.23.kind=method
-scope.23.startLine=131
-scope.23.endLine=132
-scope.23.semanticHash=bf8ac6aae9c2fb39caa0da86e8d10d9a39d0fd199deb60d2ed3d2dd4326881f4
-scope.24.id=bWV0aG9kOlR1cm4uRXZlbnRzI21vdmVkKDUpOjEzNA
+scope.23.startLine=142
+scope.23.endLine=143
+scope.23.semanticHash=6cd1f36caef5236a7b98bb77c90da39864e729d6d252fdc58b623f587a32a1b6
+scope.24.id=bWV0aG9kOlR1cm4uRXZlbnRzI21vdmVkKDMpOjEzNQ
 scope.24.kind=method
-scope.24.startLine=134
+scope.24.startLine=135
 scope.24.endLine=136
-scope.24.semanticHash=f78334ec4c5d85d6640f97f0bba73d9168e90040274ed466fa5208ca8d5b8744
-scope.25.id=bWV0aG9kOlR1cm4uRXZlbnRzI3JvbGxlZCgyKToxMjg
+scope.24.semanticHash=bf8ac6aae9c2fb39caa0da86e8d10d9a39d0fd199deb60d2ed3d2dd4326881f4
+scope.25.id=bWV0aG9kOlR1cm4uRXZlbnRzI21vdmVkKDUpOjEzOA
 scope.25.kind=method
-scope.25.startLine=128
-scope.25.endLine=129
-scope.25.semanticHash=d337b62683e09a112c3bba9b808a8165b26be5a0102e64fcddc9210746e7975c
+scope.25.startLine=138
+scope.25.endLine=140
+scope.25.semanticHash=f78334ec4c5d85d6640f97f0bba73d9168e90040274ed466fa5208ca8d5b8744
+scope.26.id=bWV0aG9kOlR1cm4uRXZlbnRzI3JvbGxlZCgyKToxMzI
+scope.26.kind=method
+scope.26.startLine=132
+scope.26.endLine=133
+scope.26.semanticHash=d337b62683e09a112c3bba9b808a8165b26be5a0102e64fcddc9210746e7975c
 */
