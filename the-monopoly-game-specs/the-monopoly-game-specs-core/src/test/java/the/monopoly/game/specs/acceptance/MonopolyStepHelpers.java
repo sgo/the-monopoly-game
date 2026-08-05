@@ -52,6 +52,10 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.TurnStarted(idOf(pawnName), money(balance), money(reserve)));
   }
 
+  static Claim finalBalance(String pawnName, int balance) {
+    return Claim.of(new Entry.FinalBalance(idOf(pawnName), money(balance)));
+  }
+
   static Claim purchaseDeclined(String pawnName, String spaceName, int price,
                                 Strategy.DeclineReason reason, int reserve) {
     if (reason == Strategy.DeclineReason.NO_BUYING_POLICY) {

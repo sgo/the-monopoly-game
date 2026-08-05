@@ -595,3 +595,19 @@ Feature: game logging
     Examples:
       | amount |
       | 50     |
+
+  # logging-46
+  Scenario Outline: the log records that the game ends in a stalemate once every remaining player clears the threshold
+    Given we select 2 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "dog"'s account holds $<dog_balance>
+    And pawn "high hat"'s account holds $<high_hat_balance>
+    When we play the game
+    Then the game log records that the game ends in a stalemate before it records that pawn "dog"'s final balance is $<dog_balance>
+    And the game log records that pawn "dog"'s final balance is $<dog_balance> before it records that pawn "high hat"'s final balance is $<high_hat_balance>
+
+    Examples:
+      | dog_balance | high_hat_balance |
+      | 25000       | 26000             |
