@@ -20450,6 +20450,32 @@ Committed as `be13493` "Extract auction round and per-candidate sale
 attempt from DistressedSale" (2 files, 198 insertions, 127 deletions —
 mostly the regenerated mutation manifest). Handing off to architect.
 
+2026-08-04T21:33:46Z — refactorer sent distressed-sale-needs-based-pricing handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-needs-based-pricing
+commit: a9bae0487e
+```
+
+Summary: verified the coder's needs-based pricing fix, confirmed it
+matches the specifier's root-cause writeup and correctly subsumes the
+old mortgage-floor exemption and removes the free-collateral-credit
+shortcut. Found and fixed a coverage regression the pricing change
+caused (cannotRaise dropped to 0% coverage because the existing
+ascending-auction test's shortfall now exceeded one bidder's ceiling,
+collapsing it into the single-bidder path) by retuning the test's
+numbers to stay under the mortgage floor. Extracted attemptSale from
+resolve and split auction into auction/ascend/bidRound to bring every
+method in the file to CRAP <= 6. dry4java clean, mutate4java well under
+threshold with manifest refreshed. Acceptance green twice (436 tests),
+unit and property suites both green. Handing verified state to
+architect for independent review.
+
 2026-08-04T21:37:53Z — received refactorer handoff:
 type: git_handoff
 to: architect
@@ -20465,6 +20491,15 @@ attempts as cohesive domain operations. Acceptance passed (436 tests),
 differential Java mutation had no changed surface, and DRY found no duplicates.
 Soft mutation manifests were refreshed for the changed distressed-sale and
 narration features.
+
+2026-08-04T21:37:53Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-needs-based-pricing
+commit: c98f1bbd02
+
+Phase-complete sync: needs-based pricing extraction accepted.
 
 ## 2026-08-05T23:42:00Z — specifier received distressed-sale-needs-based-pricing phase-complete sync
 
@@ -20568,4 +20603,257 @@ tests, 3 failures — all three new scenarios, each failing with
 `Unsupported step: ... receives $<amount> from the bank`, i.e. failing
 because the step doesn't exist yet, not because of a wrong assertion —
 exactly the right failure mode for a genuinely new capability gap.
+User approved. Committed as `2123881e3c` "Specify journal/log/report
+coverage for direct bank-to-player card payments" (4 files, 84
+insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: card-bank-payout-narration
+commit: 2123881e3c
+```
+
+Summary: running a real 3-player game never terminated (2.25M+ turns
+per player, balances into the tens of millions, zero bankruptcies).
+Traced to `Cards.java`: ten Chance/Community Chest cards pay the player
+directly via `player.account().deposit(...)`, bypassing `Cards.Events`
+entirely — every other cash-affecting mechanic (salary, rent, tax, bank
+payments, pay/collect-from-every-player) reports itself through an
+`Events` method; there is no equivalent for "bank pays player directly."
+The deposits themselves are correct; this is purely an observability
+gap, but a steady, unnarrated cash injection (up to $805 face value
+across a 31-card deck) drawn repeatedly over millions of turns is
+sufficient to keep the real economy from ever bankrupting anyone.
+`journal-45`/`logging-45`/`report-45` specify the narration this
+requires — new step vocabulary, new `Journal.Entry`, new `Cards.Events`
+method — modeled on the existing `journal-23`/`-24` pattern. Fails today
+with "Unsupported step" for all three, confirming the capability
+genuinely doesn't exist yet. Full root-cause tracing in the prior
+logbook entry this cycle.
+
 Reporting to the user for handoff approval before committing.
+
+2026-08-05T00:14:00Z — refactorer received card-bank-payout-narration handoff:
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: card-bank-payout-narration
+commit: 9363e3279e
+
+Re-read your role and constitution.
+merge_and_process coder 9363e3279e
+```
+
+Merged `9363e3279e`. Reviewed the diff: adds `Cards.receiveBank(player,
+amount)` alongside the existing `paidBank`/direct-deduction pattern,
+wired through a new `Cards.Events.receivedBank`, `Journal.Entry.
+BankReceived` record, and a `Report` case rendering "X receives $Y from
+the bank" — mirrors the existing `BankPaid`/`paidBank` shape exactly.
+Ten direct-payout card effects switched from `player.account().deposit(...)`
+to `receiveBank(player, ...)`. New unit test
+`aChanceCardIsRecordedBeforeItsDirectBankPayout` and three new acceptance
+scenarios (`journal-45`, `logging-45`, `report-45`) all pass per the
+coder's reported 439/439 acceptance and 279+11 unit tests. Matches the
+specifier's spec exactly; a small, well-scoped change. Proceeding with
+CRAP/DRY/mutation analysis before verification and handoff.
+
+## 2026-08-05T00:23:00Z — refactorer reviews card-bank-payout-narration
+
+`crap4java` on the three changed files (`Cards.java`, `Game.java`,
+`Report.java`): only one threshold-exceeded line, `Report.line`
+(CC=37, 74.4% coverage, CRAP=60.0) — the sealed-`Entry`-switch exempt
+from the CRAP threshold by the 2026-07-28 decision (`Report.line` was
+reverted three times when replaced by a map). The new `BankReceived`
+case follows the exact same one-branch-per-case shape as every other
+entry, so the exemption still applies as-is; recording the new CRAP
+figure per the exemption rule. Every other changed method (`resolve`,
+`receiveBank`, `receivedBank`, etc.) is CRAP <= 6.
+
+`dry4java` on the domain module: no new duplication from this change.
+The flagged pairs are all pre-existing (the `Game.java` `Journal.Events`
+boilerplate at lines ~204-293, generic test-helper shapes) already
+documented in earlier cycles. `receiveBank`/`receivedBank` mirror the
+existing `payBank`/`paidBank` pair exactly but are too short (3 lines)
+to register as a new duplicate under dry4java's min-lines=4 threshold —
+same shape as the other ~30 one-line event-dispatch methods already in
+that class, not new duplication worth extracting on its own.
+
+`mutate4java --scan` on the three changed files: Cards.java 53 sites,
+Game.java 30 sites, Report.java 3 sites — all well under the 100-site
+split threshold, no split needed. All three embedded manifests were
+stale against the coder's edits; refreshed with `--update-manifest`
+(manifest-only diff, no behavior change).
+
+No property-test gap: this is a narrow additive change (one new
+symmetric journal-entry/report-line pair mirroring `BankPaid`/
+`paidBank`) already covered by a new unit test and three new acceptance
+scenarios; no existing property test targets journal/report narration
+broadly enough that this would need a new property, and inventing one
+for a single mirrored case would be artificial.
+
+Ran `mvn test` (all modules, clean) and `mvn test -P property-tests`
+(clean). Ran `./acceptance/run-acceptance.sh` twice: 439 tests, 0
+failures both times.
+
+No structural refactor needed — the coder's implementation was already
+within CRAP/DRY bounds. Committed the manifest refresh as `6548aa7`
+"Refresh mutation manifests for card-bank-payout-narration" (3 files,
+manifest blocks only). Handing off to architect.
+
+2026-08-05T00:00:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: card-bank-payout-narration
+commit: bc5bbdeb26
+
+Re-read your role and constitution.
+merge_and_process refactorer bc5bbdeb26
+
+Merged `bc5bbdeb26`. Acceptance is green; targeted Cards mutation found no
+changed surface and DRY found no duplicates. Soft narration mutation completed
+without errors and refreshed the generated manifests.
+
+2026-08-05T07:37:00Z — received architect handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: card-bank-payout-narration
+commit: 8f2936e42d
+
+Re-read your role and constitution.
+merge_and_process architect 8f2936e42d
+```
+
+Merged `8f2936e42d` as `56e5303` (one append-only conflict in
+`logbook.md`, resolved by keeping both sides' continuations in commit
+order; verified no duplicate marker text afterward). Reviewed the full
+pipeline diff independently:
+
+- `Cards.java`: all ten direct-payout card effects now call a new
+  `receiveBank(player, amount)` helper instead of
+  `player.account().deposit(...)` directly; the helper deposits and then
+  calls `events.receivedBank(player, amount)`.
+- `Cards.Events` gained a default `receivedBank(Player, Money)` method,
+  mirroring the existing `paidBank`.
+- `Game.java`'s `Events` implementation logs a new
+  `Journal.Entry.BankReceived(player.id(), amount)`.
+- `Report.java` renders it as `"<name> receives $<amount> from the
+  bank"`, mirroring the existing `BankPaid` case exactly.
+- New step handlers for all three "draws the chance card ... before it
+  [records/says] that pawn ... receives $X from the bank" step patterns
+  added to `GameLogStepHandlers`/`JournalStepHandlers` plus a
+  `bankReceivedLine` helper in `MonopolyStepHelpers`.
+- Refactorer found no CRAP/DRY issues and no structural refactor needed;
+  architect's mutation pass found no changed surface beyond manifest
+  refreshes, and confirmed no scenario-content changes of its own (its
+  commit touched only mutation-manifest metadata lines).
+
+Independently re-verified after merging: `mvn test` (all modules, clean,
+exit 0) and `./acceptance/run-acceptance.sh` both green — 439/439
+acceptance tests pass, including `journal-45`, `logging-45`, and
+`report-45` (the three scenarios that previously failed with
+"Unsupported step", confirming the capability gap), now genuinely
+passing rather than merely not-erroring.
+
+This closes the `card-bank-payout-narration` task: the ten Chance/
+Community Chest cards that pay the player directly now narrate through
+the journal, log, and report exactly like every other cash-affecting
+mechanic, closing the observability gap that let unbounded, un-narrated
+cash drift keep 3-player games from ever producing a bankruptcy.
+
+## 2026-08-05T09:00:00Z — specifier finds a doubles-continuation defect
+
+User asked to run a fresh 2-player game and check the log. This run
+terminated normally (no repeat of the 3-player infinite-drift bug), but
+its tail showed something new:
+
+```
+dog goes bankrupt to high hat
+high hat wins the game
+dog rolls a total of 8
+dog moves from position 23 (Lange Steenstraat Kortrijk) to 31 (Boulevard
+Tirou Charleroi)
+dog pays high hat $52 rent for Boulevard Tirou Charleroi
+```
+
+After the game already declared `high hat` the winner, the now-bankrupt
+`dog` takes another mini-turn: rolls again, moves again, and pays rent
+on a property it had just forfeited in the bankruptcy. Traced to
+`Turn.take()` (`the-monopoly-game-domain/.../rules/Turn.java:55-75`):
+the roll that triggered the bankruptcy was a double (`total of 2` is
+only reachable as 1+1), and the turn's `for (;;)` loop grants another
+roll whenever `roll.isDouble()`, with no check of whether the player's
+state changed (bankrupt, or — per the user's own observation — sent to
+jail) while resolving the landing that just happened. `Turn` even has
+an unused `deeds` field already injected in its constructor, looking
+exactly like a hook for this check that was never wired up.
+`Bankruptcy.resolve()` (`Bankruptcy.java:32`) then short-circuits for a
+player already marked bankrupt, so the phantom rent charge is never
+corrected — the debtor is left with a permanently negative balance
+baked into the final journal/report.
+
+The user separately confirmed having seen the same root cause manifest
+at the "Go To Jail" space: a doubles roll that lands a pawn on "Naar de
+Gevangenis / Allez en Prison" imprisons it (`Jail.resolve`), but the
+same unconditional `roll.isDouble()` check lets the turn continue,
+handing the (nominally jailed) pawn another roll and letting it move
+away from the jail cell in the same turn — instead of the turn ending
+immediately, as landing in jail always should.
+
+Reproduced both symptoms with two new scenarios, using the existing
+"pawn X starts at position N" / "pawn X will roll A and B for their
+turn" / "we play the game" vocabulary (already established by
+`cards-11`) rather than the "lands on" step, since "lands on" bypasses
+`Turn.take()`'s dice loop entirely and can't exercise this bug:
+
+- `bankruptcy-8`, "a doubles roll that causes bankruptcy does not grant
+  a phantom extra move afterward": `dog` starts at position 19
+  (Groenplaats Antwerpen) with $10, rolls "1 and 1" (double, total 2)
+  onto "Rue St-Léonard Liège" (high hat's, vacant rent $18) and goes
+  bankrupt; the queued follow-up roll "3 and 5" (total 8) then lands on
+  "Hoogstraat (Brussel) / Rue Haute (Bruxelles)" (also high hat's,
+  vacant rent $24). Asserts `pawn "dog"'s account balance is $0`.
+- `jail-9`, "landing on Go To Jail on a doubles roll ends the turn
+  immediately, without a phantom extra move": `dog` starts at position
+  28 (Watermaatschappij), rolls "1 and 1" onto "Naar de Gevangenis /
+  Allez en Prison" (imprisoned, moved to position 10 / Op Bezoek), then
+  the queued "3 and 5" carries the phantom continuation from position
+  10 to position 18 (Rue Royale Tournai). Asserts `pawn "dog" is at
+  position 10`.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` on both files (only pre-existing/expected
+near-duplicate and possible-synonym vocabulary-reuse findings, nothing
+of kind exact-duplicate within either new scenario). Ran
+`./acceptance/run-acceptance.sh`: 441 tests, 2 failures — exactly the
+two new scenarios, both failing with the right failure mode (assertion
+mismatch, not "Unsupported step"):
+
+```
+EnRulesBankruptcyAcceptanceTest.acceptance()[8] And pawn "dog"'s account balance is $<expected final balance>
+expected: Balance[amount=Money[amount=0]]
+ but was: Balance[amount=Money[amount=-24]]
+
+EnRulesJailAcceptanceTest.acceptance()[9] And pawn "dog" is at position <expected position>
+expected: 10
+ but was: 18
+```
+
+Both actual values match hand-computed predictions exactly (dog's
+balance after two real rent charges of $18 then $24 nets to -24; the
+phantom move from position 10 by a further 8 lands at 18), confirming
+the root-cause diagnosis rather than a coincidental failure.
+
+Reporting to the user for approval before committing/handing off.
+Not yet committed.
