@@ -21018,3 +21018,49 @@ mismatch before this fix, now genuinely passing.
 Committed the extraction as `bd5226f` "Extract rollsAgain from
 Turn.take to bring CRAP within threshold" (1 file). Handing off to
 architect.
+
+2026-08-05T11:11:02Z — received architect handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: turn-doubles-phantom-move
+commit: 05e47ba5cb
+
+Re-read your role and constitution.
+merge_and_process architect 05e47ba5cb
+```
+
+Merged `05e47ba5cb` as `f8ad454` (one append-only conflict in
+`logbook.md`, resolved by keeping both sides' continuations in commit
+order; verified no duplicate marker text afterward). Reviewed the full
+pipeline diff: coder's fix is exactly the specifier's diagnosis —
+`if (!roll.isDouble() || deeds.isBankrupt(player) || jail.holds(player))
+return;`, using the previously-unused `deeds`/`jail` fields already
+injected into `Turn`'s constructor. Refactorer extracted the condition
+into `rollsAgain(Roll, Player)` to bring `Turn.take`'s CRAP back under
+threshold, verified equivalent by De Morgan's law before extracting.
+Architect's own commit touched only mutation-manifest metadata, no
+scenario-content changes.
+
+Independently re-verified after merging: `mvn test` (all modules,
+clean, exit 0) and `./acceptance/run-acceptance.sh` both green —
+441/441, including `bankruptcy-8` and `jail-9` now genuinely passing.
+Rebuilt the CLI and ran three fresh live 2-player games directly: two
+terminated cleanly with the phantom-move symptom gone (the log now ends
+right at "X wins the game", nothing rolls/moves/pays after it, unlike
+before this fix).
+
+The third run did not terminate within a 3-minute cap — both players'
+balances climbed into the tens of millions (turns still ongoing, no
+bankruptcy) before being killed. This is a different, previously
+unobserved failure mode: no phantom move (the card-payout narration is
+present and correct throughout — `Cards.Events.receivedBank` fires as
+expected), and no doubles-turn irregularity either; it looks like a
+genuine, if probabilistic (1 of 3 runs), economic non-termination in a
+plain 2-player game — both balances grow from salary/rent/card income
+with neither side ever going bankrupt. This closes
+`turn-doubles-phantom-move` (its own fix is verified solid); the
+runaway third run is a new, separate observation to raise with the user
+rather than something in scope for this task.
