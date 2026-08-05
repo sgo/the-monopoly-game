@@ -514,6 +514,21 @@ worktree, to confirm the handed-over state holds here and not only on
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
 architect.
 
+2026-08-05T09:10:27Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: turn-doubles-phantom-move
+commit: 2fc1010047
+
+Re-read your role and constitution.
+merge_and_process refactorer 2fc1010047
+
+Merged `2fc1010047`. The extracted turn-repeat predicate keeps the doubles
+decision cohesive and removes the phantom move. Acceptance, targeted Java
+mutation, and DRY checks passed. The turn-loop feature has no mutable example
+values for soft Gherkin mutation.
+
 The architect's correction is accepted: spaced example column names such as
 `<vacant rent>` are mutable after all, because the mutator works from example
 keys rather than from the IR `parameters` array. The earlier coder note above
@@ -20708,6 +20723,28 @@ within CRAP/DRY bounds. Committed the manifest refresh as `6548aa7`
 "Refresh mutation manifests for card-bank-payout-narration" (3 files,
 manifest blocks only). Handing off to architect.
 
+2026-08-05T00:23:21Z — refactorer sent card-bank-payout-narration handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-bank-payout-narration
+commit: bc5bbdeb26
+```
+
+Summary: reviewed the coder's `receiveBank`/`Cards.Events.receivedBank`/
+`Journal.Entry.BankReceived`/`Report` addition — mirrors the existing
+`payBank`/`paidBank` pattern exactly, small and well-scoped. No CRAP
+threshold exceeded except the already-exempted `Report.line` sealed
+switch (new CRAP=60.0 recorded). No new duplication. Mutation scan well
+under the 100-site split threshold on all three changed files; stale
+manifests refreshed. No property-test gap. Unit, property, and
+acceptance suites (439 tests twice) all green. No structural refactor
+needed. Handing verified state to architect for independent review.
+
 2026-08-05T00:00:00Z — received refactorer handoff:
 type: git_handoff
 to: architect
@@ -20721,6 +20758,15 @@ merge_and_process refactorer bc5bbdeb26
 Merged `bc5bbdeb26`. Acceptance is green; targeted Cards mutation found no
 changed surface and DRY found no duplicates. Soft narration mutation completed
 without errors and refreshed the generated manifests.
+
+2026-08-05T00:00:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: card-bank-payout-narration
+commit: 8f2936e42d
+
+Phase-complete sync: card bank-payout narration accepted.
 
 2026-08-05T07:37:00Z — received architect handoff:
 
@@ -20858,6 +20904,40 @@ the root-cause diagnosis rather than a coincidental failure.
 Reporting to the user for approval before committing/handing off.
 Not yet committed.
 
+User approved. Committed as `de9d5f8f99` "Specify that a doubles roll
+must not grant a phantom extra move after bankruptcy or jail" (3 files,
+118 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-doubles-phantom-move
+commit: de9d5f8f99
+```
+
+Summary: `Turn.take()`'s doubles-roll loop (`Turn.java:55-75`) grants
+another roll whenever `roll.isDouble()` without re-checking the
+player's state after resolving the landing that roll just produced.
+Two symptoms, one shared cause: (1) a player who goes bankrupt on a
+double keeps rolling/moving/paying rent after the game has already
+declared a winner, leaving a permanently negative balance because
+`Bankruptcy.resolve()` no-ops once a player is already marked bankrupt;
+(2) a player who lands on "Go To Jail" on a double gets an illegitimate
+extra roll and moves away from the jail cell in the same turn, instead
+of the turn ending immediately. `Turn` already has an unused `deeds`
+field injected in its constructor, suggesting the hook for this check
+was anticipated but never wired up. New scenarios `bankruptcy-8` and
+`jail-9` reproduce each symptom via the existing "starts at position" /
+"will roll A and B for their turn" / "we play the game" vocabulary
+(`cards-11`'s pattern), since the "lands on" shortcut bypasses the real
+dice loop. Both currently fail with assertion mismatches (not
+"Unsupported step"): dog's balance $0 expected vs $-24 actual;
+dog's position 10 expected vs 18 actual. Full root-cause tracing in the
+prior logbook entry this cycle.
+
 ## 2026-08-05T06:30:28Z — coder received handoff from specifier
 
 Handoff message received:
@@ -20874,3 +20954,280 @@ merge_and_process specifier de9d5f8f99
 Action taken: merged specifier commit `de9d5f8f99`, added focused unit coverage,
 and fixed the turn loop so a doubles landing that bankrupts or imprisons the
 player ends the turn immediately.
+
+2026-08-05T06:33:12Z — refactorer received turn-doubles-phantom-move handoff:
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: turn-doubles-phantom-move
+commit: 84853ac9b6
+
+Re-read your role and constitution.
+merge_and_process coder 84853ac9b6
+```
+
+Merged `84853ac9b6`. Reviewed the diff: a one-line change to
+`Turn.take()`'s doubles-continuation condition —
+`if (!roll.isDouble() || deeds.isBankrupt(player) || jail.holds(player)) return;`
+— using the `deeds`/`jail` fields already injected into `Turn`'s
+constructor but previously unused for this check, exactly matching the
+specifier's root-cause diagnosis (no new fields, no new dependencies).
+Two new focused unit tests (`bankruptcyOnADoublesLandingEndsTheTurn`,
+`imprisonmentOnADoublesLandingEndsTheTurn`) exercise both branches
+directly at the `Turn` level with a stub `Landings` that bankrupts or
+imprisons the player mid-turn. Matches the specifier's spec exactly; a
+small, well-scoped change. Proceeding with CRAP/DRY/mutation analysis
+before verification and handoff.
+
+## 2026-08-05T08:38:00Z — refactorer reviews turn-doubles-phantom-move
+
+`crap4java` on the changed file: `Turn.take` came in at CC=8, 100%
+coverage, CRAP=8.0 — over the 6 threshold on complexity alone, so (per
+the CRAP formula, which reduces to CC at full coverage) genuine
+extraction was required. This is not the sealed-switch exemption case;
+it's an ordinary boolean condition. Extracted the continuation check
+into a new `rollsAgain(Roll, Player)` method:
+`roll.isDouble() && !deeds.isBankrupt(player) && !jail.holds(player)`,
+replacing `if (!roll.isDouble() || deeds.isBankrupt(player) ||
+jail.holds(player)) return;` with `if (!rollsAgain(roll, player))
+return;`. Verified the rewrite is exactly equivalent by De Morgan's
+law before extracting (`¬A ∨ B ∨ C ≡ ¬(A ∧ ¬B ∧ ¬C)`). Result:
+`take` CC=6/CRAP=6.0, `rollsAgain` CC=3/CRAP=3.0 — both existing
+`TurnTest` cases (including the coder's two new ones) still give both
+methods 100% coverage since the extraction moved code, not behavior.
+Ran `-Dtest=TurnTest` to confirm before touching anything else.
+
+`dry4java`: the only Turn.java line flagged is the pre-existing
+constructor-shape overlap with `Game.java:65-76` already known from
+earlier cycles — nothing new from this change.
+
+`mutate4java --scan` on `Turn.java`: 15 sites, well under the 100-site
+split threshold. The embedded manifest was stale against the
+extraction; refreshed with `--update-manifest`.
+
+Ran `mvn test` (all modules, clean) and `mvn test -P property-tests`
+(clean). Ran `./acceptance/run-acceptance.sh` twice: 441 tests, 0
+failures both times — including `bankruptcy-8` and `jail-9`, the two
+scenarios the specifier reported failing on the correct assertion
+mismatch before this fix, now genuinely passing.
+
+Committed the extraction as `bd5226f` "Extract rollsAgain from
+Turn.take to bring CRAP within threshold" (1 file). Handing off to
+architect.
+
+2026-08-05T11:11:02Z — received architect handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: turn-doubles-phantom-move
+commit: 05e47ba5cb
+
+Re-read your role and constitution.
+merge_and_process architect 05e47ba5cb
+```
+
+Merged `05e47ba5cb` as `f8ad454` (one append-only conflict in
+`logbook.md`, resolved by keeping both sides' continuations in commit
+order; verified no duplicate marker text afterward). Reviewed the full
+pipeline diff: coder's fix is exactly the specifier's diagnosis —
+`if (!roll.isDouble() || deeds.isBankrupt(player) || jail.holds(player))
+return;`, using the previously-unused `deeds`/`jail` fields already
+injected into `Turn`'s constructor. Refactorer extracted the condition
+into `rollsAgain(Roll, Player)` to bring `Turn.take`'s CRAP back under
+threshold, verified equivalent by De Morgan's law before extracting.
+Architect's own commit touched only mutation-manifest metadata, no
+scenario-content changes.
+
+Independently re-verified after merging: `mvn test` (all modules,
+clean, exit 0) and `./acceptance/run-acceptance.sh` both green —
+441/441, including `bankruptcy-8` and `jail-9` now genuinely passing.
+Rebuilt the CLI and ran three fresh live 2-player games directly: two
+terminated cleanly with the phantom-move symptom gone (the log now ends
+right at "X wins the game", nothing rolls/moves/pays after it, unlike
+before this fix).
+
+The third run did not terminate within a 3-minute cap — both players'
+balances climbed into the tens of millions (turns still ongoing, no
+bankruptcy) before being killed. This is a different, previously
+unobserved failure mode: no phantom move (the card-payout narration is
+present and correct throughout — `Cards.Events.receivedBank` fires as
+expected), and no doubles-turn irregularity either; it looks like a
+genuine, if probabilistic (1 of 3 runs), economic non-termination in a
+plain 2-player game — both balances grow from salary/rent/card income
+with neither side ever going bankrupt. This closes
+`turn-doubles-phantom-move` (its own fix is verified solid); the
+runaway third run is a new, separate observation to raise with the user
+rather than something in scope for this task.
+
+## 2026-08-05T12:00:00Z — documentation catch-up: tasks.md and SIMULATOR.md
+
+The user separately confirmed the runaway third run above is a known
+characteristic of two identical "Greedo" strategies playing each other
+(no monopoly-denial logic outside of auctions/distressed sales, so most
+colour groups end up split, rent stays low relative to ever-growing
+bank-fed balances, and a wealthy-enough player becomes effectively
+unbankruptable) — no code or spec action wanted for it, saved to
+personal memory instead of the repo.
+
+Separately, the user noticed `tasks.md`/`SIMULATOR.md` never caught up
+with several things specified this session, plus one long-standing gap:
+the "distressed sale" mechanic itself (an ascending auction offering a
+debtor's land to solvent opponents before falling back to selling
+houses/mortgaging/forfeiting) has existed since Phase 14 shipped but was
+never named in either doc. Updated both:
+
+- `tasks.md`: added a "Distressed sale" bullet to Phase 14's Key
+  Deliverables documenting the mechanic itself, plus three new
+  Post-plan refinements entries — `distressed-sale-needs-based-pricing`
+  (the needs-based pricing formula, whole-balance-overpay fix, and
+  auto-credit-heuristic removal), `card-bank-payout-narration` (the ten
+  windfall cards now narrate via `BankReceived`), and
+  `turn-doubles-phantom-move` (the doubles-loop fix for bankruptcy/jail).
+- `SIMULATOR.md`: expanded the `#### Greedo` subsection to cover every
+  decision point it actually answers (buying/reserve, dynamic reserve
+  sizing, rent-claiming, building, jail fine, inherited-mortgage
+  lifting, distressed-sale bidding), sourced directly from `Greedo.java`
+  and `Bankruptcy.java`'s `settleInheritedMortgage`. Added a new
+  "Distressed sale" subsection describing the mechanic itself
+  (candidate ordering, needs-based pricing, the ascending auction, the
+  monopoly-completion house-sale deferral, and the fallback to the
+  ordinary bankruptcy sequence), sourced from `DistressedSale.java` and
+  `Bankruptcy.resolve()`.
+
+Drafted both for the user's review before writing; approved verbatim.
+No handoff needed — documentation-only, no Gherkin/implementation
+change, so this stays within the specifier's own remit.
+
+## 2026-08-05T13:00:00Z — Greedo-vs-Greedo stalemate added to SIMULATOR.md
+
+Following on from the runaway-game finding above: the user walked through
+whether peer-to-peer trading could resolve the Greedo-vs-Greedo stalemate
+(Phase 9's trade mechanic exists but nothing proposes trades yet). Traced
+through why it wouldn't: a one-sided trade never gets accepted by a
+self-interested identical opponent; a mutually fair swap of orphaned
+pieces is positive-sum but only exists when the board split happens to
+offer one; and even conditioning trade-willingness on relative position
+(the leader has no incentive to raise variance since the stalemate locks
+in their lead — confirmed by the previously-observed ~1.46x/~2.7x stable
+balance ratios — while the trailing player would benefit from escalating)
+doesn't resolve it, since a rational leader would only ever offer a
+lopsided trade, which a rational trailing player would correctly decline
+as worse than the stalemate. Net conclusion: no reasonably-scoped trading
+strategy eliminates the deadlock in general, only narrows how often it
+happens.
+
+User asked where this was recorded; it was only in personal memory and a
+brief logbook pointer, not in `SIMULATOR.md`. User asked for it to be
+added there too. Added a new "Known limitation: Greedo vs. Greedo can
+stalemate" subsection under Key Concepts (after Distressed sale, before
+Journal and report), condensing the root cause, the observed balance-ratio
+evidence, and the full trading analysis above into a few paragraphs.
+Committed together with this logbook entry. No handoff — documentation
+only.
+
+## 2026-08-05T14:00:00Z — specifying stalemate detection
+
+Following the Greedo-vs-Greedo stalemate finding, the user asked how to
+actually detect it and end the game as a distinct outcome rather than
+running forever. Explored the design in conversation first: a fixed
+turn-count cutoff would contradict `SIMULATOR.md`/Phase 15's explicit "no
+turn limit" requirement, so the detector instead needs to be a
+one-time-computed economic threshold. Landed on "total board value by
+rental value" (sum of `rentForOneHotel()` across all 22 streets, plus
+stations/utilities at full-ownership rent) = $22,790 in the official
+ruleset — the trigger is "every remaining (non-bankrupt) player's balance
+exceeds this figure".
+
+Validated the threshold empirically before writing any spec, across 2, 3,
+and 8 player counts (10 fresh capped runs each): in every quickly-
+terminating game sampled, every player's balance stayed far below the
+threshold right up to the moment of the first real bankruptcy (peaks of
+$7–$8,249 across all samples, several of them clustered — two players
+often go bankrupt almost simultaneously once a hotel-rent hit lands); in
+every runaway sample checked, all remaining players independently
+crossed the threshold early (as little as ~1.6% into the eventual run
+length at 3 players) and the game then continued indefinitely with no
+resolution afterward. No false positives, no false negatives, across 30
+sampled games. This is the evidence behind the design in `SIMULATOR.md`'s
+"Known limitation" section and behind proceeding with a single-shot
+("first turn it's true, call it") detector rather than a trailing-window
+one, per the design conversation.
+
+Wrote up the spec as a new `stalemate.feature`
+(`en/rules/stalemate.feature`, 5 scenarios: the threshold constant itself,
+a 2-player positive case, a 2-player negative case, and two 3+-player
+boundary cases proving "every remaining player" — not "any" or "most" —
+is required), plus one narration scenario each in `journal.feature`
+(`journal-46`), `logging.feature` (`logging-46`), and `report.feature`
+(`report-46`).
+
+Two problems found and fixed before these were usable:
+
+1. The existing "pawn X has $Y to spend" step (`arrangePawnBalance`) is
+   deliberately capped at the $1500 starting capital — "no rule pays
+   anyone before the game starts" — so it cannot arrange the tens-of-
+   thousands-dollar balances a stalemate scenario needs. This needed a
+   genuinely new, uncapped setup step, distinct from the existing one:
+   `pawn "X"'s account holds $Y`, representing wealth accumulated through
+   play rather than pre-game dealing.
+2. My first attempt at that new step's wording — `pawn "X"'s account
+   balance is $Y` — collided with an *already-existing* step of the exact
+   same text (`MonopolyStepHandlers.java:251`, a read-only balance
+   *assertion* used throughout many other scenarios). Since step matching
+   is on text alone regardless of Given/And/Then keyword, my new "setup"
+   step was silently interpreted as the old assertion instead, so the
+   very first acceptance run showed a real-looking failure
+   ("expected: Balance 25000, but was: Balance 1500") that was actually a
+   naming collision, not the expected "Unsupported step" for new
+   capability. Caught by checking *why* it failed rather than assuming
+   the failure mode was right; fixed by renaming to `account holds $Y`
+   (confirmed via `grep` that no existing step uses that exact phrase for
+   money) and re-running to see the correct "Unsupported step" failure.
+3. Separately, the new `stalemate.feature` file did not run at all on the
+   first acceptance pass despite parsing cleanly — `run-acceptance.sh`
+   only exercises files listed in `acceptance/pipeline-features.txt`, and
+   a wholly new feature file is invisible to the pipeline until added
+   there. Added `en/rules/stalemate.feature` to that list (after
+   `distressed-sale.feature`, before `tax.feature`), after which
+   `EnRulesStalemateAcceptanceTest` appeared and all 5 of its scenarios
+   ran and failed for the right reason.
+
+Validated with `bb gherkin-parser` (all four files clean) and
+`bb gherkin-ir-dry-checker --include-exact` (only cross-scenario
+vocabulary-reuse findings — same step text reused once per scenario
+across different scenarios — no duplicate-in-scenario issues). Ran
+`./acceptance/run-acceptance.sh`: 449 tests, 8 failures — exactly the 5
+new `stalemate.feature` scenarios plus `journal-46`/`logging-46`/
+`report-46`, every one failing with "Unsupported step" for the new
+`account holds $Y` / `the stalemate detection threshold is $Y` / `the
+game ends in a stalemate` vocabulary, confirming these specify a genuine
+new capability rather than a wrong assertion. `mvn test` still clean
+(unaffected — spec-only change plus one pipeline-config line).
+
+Reporting to the user before committing/handing off.
+
+User asked for the final stalemate narration to include each player's
+balance, not just the bare "ends in a stalemate" fact. Extended
+`journal-46`/`logging-46`/`report-46` to assert a full ordering chain —
+the stalemate line, before dog's final balance, before high hat's final
+balance — using new `pawn "X"'s final balance is $Y` narration vocabulary
+(distinct text from the existing `pawn "X"'s account balance is $Y`
+assertion, so no collision this time) and two different balances
+($25000/$26000) so the assertion can't pass by coincidence if the
+implementation reported the same figure for both players. Left
+`stalemate.feature` itself unchanged, since it specifies detection, not
+narration content. Re-validated: `bb gherkin-parser` clean,
+`bb gherkin-ir-dry-checker --include-exact` clean (no duplicate-in-
+scenario findings on the new lines), `./acceptance/run-acceptance.sh`
+still 449 tests / 8 failures (same 8 scenarios, still failing on the
+same earliest unsupported step in each chain — expected, since the new
+final-balance step is later in each scenario and wasn't reached), `mvn
+test` still clean.
+
+Reporting to the user before committing/handing off.

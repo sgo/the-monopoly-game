@@ -463,6 +463,18 @@ full-game-play Gherkin style).
   then the creditor receives remaining money, deeds, and cards (mortgaged
   property transferred per Phase 8's mortgage-transfer rules, with immediate
   10% interest due).
+- **Distressed sale** (implemented as part of this phase but never named in
+  this plan until now): before falling back to selling the debtor's own
+  houses/hotels or mortgaging their own land, a debtor who owes another
+  player first gets a chance to raise the shortfall by selling off some of
+  their own land to a solvent opponent. Candidate land is offered
+  cheapest-priority-first (any street whose colour group has houses or a
+  hotel built anywhere is excluded, so a developed monopoly is never forced
+  into this path), one property at a time, stopping as soon as the debtor is
+  solvent again. Eligible opponents ascend a $5-increment auction; a lone
+  eligible bidder simply pays the minimum required. See the post-plan
+  `distressed-sale-needs-based-pricing` entry below for how that minimum is
+  computed and other refinements made to this mechanic since.
 - Last player standing wins; `Game.Result` should carry the winner and enough
   journal detail to answer "did the game end in a monopoly" for the existing
   `en/monopoly.feature` scenario (1000-game simulation).
@@ -661,3 +673,52 @@ didn't already call for.
   mortgage versus keep it in place and pay only the mandatory 10% interest.
   See `journal-36` through `journal-39` (and `logging`/`report` equivalents)
   in `journal.feature`.
+- **`distressed-sale-needs-based-pricing`** (done) — refines the distressed-
+  sale mechanic above with three fixes bundled as one task, found by tracing
+  a real $9 sale against an $80 mortgage value in a live game log:
+  - **Needs-based pricing.** The minimum bid for a distressed-sale candidate
+    is now `max(that land's mortgage value, remaining shortfall − mortgage
+    value of the debtor's other still-available candidates)`, replacing an
+    exemption that let a monopoly-completing bid ignore the land's
+    mortgage-value floor entirely (a vendor would never rationally accept
+    less than what the bank would pay to mortgage the same land).
+  - **No whole-balance overpay.** A monopoly-completing or denial-motivated
+    buyer now pays only the needs-based minimum, not their entire available
+    balance — they still try to get the property as cheaply as the auction
+    allows, same as any other bidder.
+  - **Auto-credit heuristic removed.** `DistressedSale.settle()` used to
+    credit a debtor with another property's mortgage value without actually
+    mortgaging it, whenever the winning bid covered at least half the
+    shortfall; needs-based pricing makes this redundant, so it was removed —
+    any remaining shortfall is now covered by a real mortgage of the
+    debtor's other land, exactly as narrated.
+
+  See `distressed-sale-2`, `-5`, `-8`, `-9`, `-12`, `-13`, `-15`, `-16`
+  (retuned) and new scenarios `distressed-sale-19`, `-20`, `-21` in
+  `distressed-sale.feature`.
+- **`card-bank-payout-narration`** (done) — closes a sibling gap to
+  `card-payment-logging` above: ten Chance/Community Chest cards pay the
+  drawing player directly from the bank without going through any
+  `Cards.Events` method, so — unlike every other cash-affecting mechanic —
+  this movement of money never appeared in the journal, log, or report.
+  Found from a real 3-player CLI run that never terminated (2.25M+ turns,
+  balances into the tens of millions, zero bankruptcies): this silent,
+  repeated income alone was enough to keep the real economy (rent, tax)
+  from ever producing a bankruptcy. Added `Cards.Events.receivedBank`, a new
+  `Journal.Entry.BankReceived`, and a `Report` case rendering `"<name>
+  receives $<amount> from the bank"`, mirroring the existing
+  `BankPaid`/`paidBank` shape. See `journal-45`, `logging-45`, `report-45`.
+- **`turn-doubles-phantom-move`** (done) — refines Phase 2's doubles-roll-
+  again rule and Phase 12/14's jail/bankruptcy handling: `Turn.take()`'s
+  doubles loop granted another roll whenever the dice came up doubles,
+  without checking whether the player's state changed while resolving the
+  landing that roll just produced. Two symptoms of the same cause, found
+  from real 2-player CLI runs: (1) a player who goes bankrupt on a doubles
+  roll kept rolling, moving, and paying rent after the game had already
+  declared a winner, leaving a permanently negative balance since
+  `Bankruptcy.resolve()` no-ops for an already-bankrupt player; (2) a player
+  who lands on "Go To Jail" on a doubles roll got an illegitimate extra roll
+  and moved away from the jail cell in the same turn, instead of the turn
+  ending immediately as it should. Fixed by stopping the loop once
+  `deeds.isBankrupt(player)` or `jail.holds(player)` becomes true. See
+  `bankruptcy-8` and `jail-9`.
