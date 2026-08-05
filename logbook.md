@@ -20689,3 +20689,12 @@ merge_and_process refactorer bc5bbdeb26
 Merged `bc5bbdeb26`. Acceptance is green; targeted Cards mutation found no
 changed surface and DRY found no duplicates. Soft narration mutation completed
 without errors and refreshed the generated manifests.
+
+2026-08-05T00:00:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: card-bank-payout-narration
+commit: 8f2936e42d
+
+Phase-complete sync: card bank-payout narration accepted.
