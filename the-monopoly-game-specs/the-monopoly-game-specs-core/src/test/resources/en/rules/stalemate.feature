@@ -1,4 +1,5 @@
 # acceptance-mutation-manifest-begin
+# {"version":1,"tested_at":"2026-08-05T19:23:43.232727Z","feature_name":"stalemate","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/stalemate.feature","background_hash":"e15f13aafcac0600c3aaaaf97d370d153eb29c5c34b3d00e93ab47602feefe9c","implementation_hash":"unknown","scenarios":[]}
 # acceptance-mutation-manifest-end
 
 # language: en
