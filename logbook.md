@@ -21130,3 +21130,104 @@ Journal and report), condensing the root cause, the observed balance-ratio
 evidence, and the full trading analysis above into a few paragraphs.
 Committed together with this logbook entry. No handoff — documentation
 only.
+
+## 2026-08-05T14:00:00Z — specifying stalemate detection
+
+Following the Greedo-vs-Greedo stalemate finding, the user asked how to
+actually detect it and end the game as a distinct outcome rather than
+running forever. Explored the design in conversation first: a fixed
+turn-count cutoff would contradict `SIMULATOR.md`/Phase 15's explicit "no
+turn limit" requirement, so the detector instead needs to be a
+one-time-computed economic threshold. Landed on "total board value by
+rental value" (sum of `rentForOneHotel()` across all 22 streets, plus
+stations/utilities at full-ownership rent) = $22,790 in the official
+ruleset — the trigger is "every remaining (non-bankrupt) player's balance
+exceeds this figure".
+
+Validated the threshold empirically before writing any spec, across 2, 3,
+and 8 player counts (10 fresh capped runs each): in every quickly-
+terminating game sampled, every player's balance stayed far below the
+threshold right up to the moment of the first real bankruptcy (peaks of
+$7–$8,249 across all samples, several of them clustered — two players
+often go bankrupt almost simultaneously once a hotel-rent hit lands); in
+every runaway sample checked, all remaining players independently
+crossed the threshold early (as little as ~1.6% into the eventual run
+length at 3 players) and the game then continued indefinitely with no
+resolution afterward. No false positives, no false negatives, across 30
+sampled games. This is the evidence behind the design in `SIMULATOR.md`'s
+"Known limitation" section and behind proceeding with a single-shot
+("first turn it's true, call it") detector rather than a trailing-window
+one, per the design conversation.
+
+Wrote up the spec as a new `stalemate.feature`
+(`en/rules/stalemate.feature`, 5 scenarios: the threshold constant itself,
+a 2-player positive case, a 2-player negative case, and two 3+-player
+boundary cases proving "every remaining player" — not "any" or "most" —
+is required), plus one narration scenario each in `journal.feature`
+(`journal-46`), `logging.feature` (`logging-46`), and `report.feature`
+(`report-46`).
+
+Two problems found and fixed before these were usable:
+
+1. The existing "pawn X has $Y to spend" step (`arrangePawnBalance`) is
+   deliberately capped at the $1500 starting capital — "no rule pays
+   anyone before the game starts" — so it cannot arrange the tens-of-
+   thousands-dollar balances a stalemate scenario needs. This needed a
+   genuinely new, uncapped setup step, distinct from the existing one:
+   `pawn "X"'s account holds $Y`, representing wealth accumulated through
+   play rather than pre-game dealing.
+2. My first attempt at that new step's wording — `pawn "X"'s account
+   balance is $Y` — collided with an *already-existing* step of the exact
+   same text (`MonopolyStepHandlers.java:251`, a read-only balance
+   *assertion* used throughout many other scenarios). Since step matching
+   is on text alone regardless of Given/And/Then keyword, my new "setup"
+   step was silently interpreted as the old assertion instead, so the
+   very first acceptance run showed a real-looking failure
+   ("expected: Balance 25000, but was: Balance 1500") that was actually a
+   naming collision, not the expected "Unsupported step" for new
+   capability. Caught by checking *why* it failed rather than assuming
+   the failure mode was right; fixed by renaming to `account holds $Y`
+   (confirmed via `grep` that no existing step uses that exact phrase for
+   money) and re-running to see the correct "Unsupported step" failure.
+3. Separately, the new `stalemate.feature` file did not run at all on the
+   first acceptance pass despite parsing cleanly — `run-acceptance.sh`
+   only exercises files listed in `acceptance/pipeline-features.txt`, and
+   a wholly new feature file is invisible to the pipeline until added
+   there. Added `en/rules/stalemate.feature` to that list (after
+   `distressed-sale.feature`, before `tax.feature`), after which
+   `EnRulesStalemateAcceptanceTest` appeared and all 5 of its scenarios
+   ran and failed for the right reason.
+
+Validated with `bb gherkin-parser` (all four files clean) and
+`bb gherkin-ir-dry-checker --include-exact` (only cross-scenario
+vocabulary-reuse findings — same step text reused once per scenario
+across different scenarios — no duplicate-in-scenario issues). Ran
+`./acceptance/run-acceptance.sh`: 449 tests, 8 failures — exactly the 5
+new `stalemate.feature` scenarios plus `journal-46`/`logging-46`/
+`report-46`, every one failing with "Unsupported step" for the new
+`account holds $Y` / `the stalemate detection threshold is $Y` / `the
+game ends in a stalemate` vocabulary, confirming these specify a genuine
+new capability rather than a wrong assertion. `mvn test` still clean
+(unaffected — spec-only change plus one pipeline-config line).
+
+Reporting to the user before committing/handing off.
+
+User asked for the final stalemate narration to include each player's
+balance, not just the bare "ends in a stalemate" fact. Extended
+`journal-46`/`logging-46`/`report-46` to assert a full ordering chain —
+the stalemate line, before dog's final balance, before high hat's final
+balance — using new `pawn "X"'s final balance is $Y` narration vocabulary
+(distinct text from the existing `pawn "X"'s account balance is $Y`
+assertion, so no collision this time) and two different balances
+($25000/$26000) so the assertion can't pass by coincidence if the
+implementation reported the same figure for both players. Left
+`stalemate.feature` itself unchanged, since it specifies detection, not
+narration content. Re-validated: `bb gherkin-parser` clean,
+`bb gherkin-ir-dry-checker --include-exact` clean (no duplicate-in-
+scenario findings on the new lines), `./acceptance/run-acceptance.sh`
+still 449 tests / 8 failures (same 8 scenarios, still failing on the
+same earliest unsupported step in each chain — expected, since the new
+final-balance step is later in each scenario and wasn't reached), `mvn
+test` still clean.
+
+Reporting to the user before committing/handing off.
