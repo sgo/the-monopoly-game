@@ -20896,3 +20896,31 @@ merge_and_process specifier de9d5f8f99
 Action taken: merged specifier commit `de9d5f8f99`, added focused unit coverage,
 and fixed the turn loop so a doubles landing that bankrupts or imprisons the
 player ends the turn immediately.
+
+2026-08-05T06:33:12Z — refactorer received turn-doubles-phantom-move handoff:
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: turn-doubles-phantom-move
+commit: 84853ac9b6
+
+Re-read your role and constitution.
+merge_and_process coder 84853ac9b6
+```
+
+Merged `84853ac9b6`. Reviewed the diff: a one-line change to
+`Turn.take()`'s doubles-continuation condition —
+`if (!roll.isDouble() || deeds.isBankrupt(player) || jail.holds(player)) return;`
+— using the `deeds`/`jail` fields already injected into `Turn`'s
+constructor but previously unused for this check, exactly matching the
+specifier's root-cause diagnosis (no new fields, no new dependencies).
+Two new focused unit tests (`bankruptcyOnADoublesLandingEndsTheTurn`,
+`imprisonmentOnADoublesLandingEndsTheTurn`) exercise both branches
+directly at the `Turn` level with a stub `Landings` that bankrupts or
+imprisons the player mid-turn. Matches the specifier's spec exactly; a
+small, well-scoped change. Proceeding with CRAP/DRY/mutation analysis
+before verification and handoff.
