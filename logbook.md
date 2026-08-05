@@ -20721,3 +20721,53 @@ merge_and_process refactorer bc5bbdeb26
 Merged `bc5bbdeb26`. Acceptance is green; targeted Cards mutation found no
 changed surface and DRY found no duplicates. Soft narration mutation completed
 without errors and refreshed the generated manifests.
+
+2026-08-05T07:37:00Z — received architect handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: card-bank-payout-narration
+commit: 8f2936e42d
+
+Re-read your role and constitution.
+merge_and_process architect 8f2936e42d
+```
+
+Merged `8f2936e42d` as `56e5303` (one append-only conflict in
+`logbook.md`, resolved by keeping both sides' continuations in commit
+order; verified no duplicate marker text afterward). Reviewed the full
+pipeline diff independently:
+
+- `Cards.java`: all ten direct-payout card effects now call a new
+  `receiveBank(player, amount)` helper instead of
+  `player.account().deposit(...)` directly; the helper deposits and then
+  calls `events.receivedBank(player, amount)`.
+- `Cards.Events` gained a default `receivedBank(Player, Money)` method,
+  mirroring the existing `paidBank`.
+- `Game.java`'s `Events` implementation logs a new
+  `Journal.Entry.BankReceived(player.id(), amount)`.
+- `Report.java` renders it as `"<name> receives $<amount> from the
+  bank"`, mirroring the existing `BankPaid` case exactly.
+- New step handlers for all three "draws the chance card ... before it
+  [records/says] that pawn ... receives $X from the bank" step patterns
+  added to `GameLogStepHandlers`/`JournalStepHandlers` plus a
+  `bankReceivedLine` helper in `MonopolyStepHelpers`.
+- Refactorer found no CRAP/DRY issues and no structural refactor needed;
+  architect's mutation pass found no changed surface beyond manifest
+  refreshes, and confirmed no scenario-content changes of its own (its
+  commit touched only mutation-manifest metadata lines).
+
+Independently re-verified after merging: `mvn test` (all modules, clean,
+exit 0) and `./acceptance/run-acceptance.sh` both green — 439/439
+acceptance tests pass, including `journal-45`, `logging-45`, and
+`report-45` (the three scenarios that previously failed with
+"Unsupported step", confirming the capability gap), now genuinely
+passing rather than merely not-erroring.
+
+This closes the `card-bank-payout-narration` task: the ten Chance/
+Community Chest cards that pay the player directly now narrate through
+the journal, log, and report exactly like every other cash-affecting
+mechanic, closing the observability gap that let unbounded, un-narrated
+cash drift keep 3-player games from ever producing a bankruptcy.
