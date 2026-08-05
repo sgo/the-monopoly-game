@@ -48,6 +48,9 @@ final class JournalStepHandlers {
         step("^every other player can complete their turn$",
             (world, arguments) -> world.letTheOthersRollWhatTheyLike()),
 
+        step("^we play up to " + VALUE + " rounds$",
+            (world, arguments) -> world.playUpToRounds(arguments.number(1))),
+
         given("^pawn \"" + NAME + "\"'s account holds \\$" + VALUE + "$",
             (world, arguments) -> world.holdPawnBalance(arguments.text(1), money(arguments.number(2)))),
 
@@ -59,6 +62,10 @@ final class JournalStepHandlers {
 
         then("^the game does not end in a stalemate$",
             (world, arguments) -> assertThat(world.endedInStalemate()).isFalse()),
+
+        then("^the game journal records that the game ends in a stalemate only once$",
+            (world, arguments) -> assertThat(world.journal().stream()
+                .filter(Entry.Stalemate.class::isInstance).count()).isOne()),
 
         given("^pawn \"" + NAME + "\" starts at position " + VALUE + "$",
             (world, arguments) -> world.placePawn(arguments.text(1), arguments.number(2))),

@@ -21559,3 +21559,45 @@ remaining gap is precisely the outer-loop fix itself. `mvn test` clean.
 
 Reporting to the user before committing/handing back to the coder at
 priority 50.
+
+## 2026-08-05T19:38:05Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260805T193618Z_000063_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 3c269013aa
+created_at: 2026-08-05T19:36:18.574241Z
+enqueued_at: 2026-08-05T19:36:18.927253Z
+task: stalemate-detection
+dequeued_at: 2026-08-05T19:36:25.744221Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3c269013aa
+```
+
+Action taken: merged specifier commit `3c269013aa`, fixed stalemate termination
+across multiple rounds, added bounded round-play support and focused coverage,
+and verified 286 domain tests plus 450 acceptance tests.
+
+## 2026-08-05T19:38:05Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: stalemate-detection
+commit: 4720d506c1
+```
+
+Summary: the commit makes stalemate termination exit the outer game loop,
+adds bounded round-play support, and verifies the new multi-round scenario.
