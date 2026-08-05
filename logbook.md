@@ -20675,3 +20675,17 @@ No structural refactor needed — the coder's implementation was already
 within CRAP/DRY bounds. Committed the manifest refresh as `6548aa7`
 "Refresh mutation manifests for card-bank-payout-narration" (3 files,
 manifest blocks only). Handing off to architect.
+
+2026-08-05T00:00:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: card-bank-payout-narration
+commit: bc5bbdeb26
+
+Re-read your role and constitution.
+merge_and_process refactorer bc5bbdeb26
+
+Merged `bc5bbdeb26`. Acceptance is green; targeted Cards mutation found no
+changed surface and DRY found no duplicates. Soft narration mutation completed
+without errors and refreshed the generated manifests.
