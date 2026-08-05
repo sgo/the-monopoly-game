@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.LockSupport;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.joining;
@@ -323,8 +324,16 @@ public class World {
   }
 
   public void playGame() {
+    playAndCapture(Game::play);
+  }
+
+  public void playUpToRounds(int rounds) {
+    playAndCapture(game -> game.playUpToRounds(rounds));
+  }
+
+  private void playAndCapture(Function<Game, Game.Result> play) {
     Cards.Decks officialDecks = Cards.Decks.official(deeds == null ? deeds = new Deeds() : deeds);
-    Game.Result result = new Game(
+    Game game = new Game(
         ruleSet, players(), player -> () -> nextQueuedPawnRoll(player), this::strategyOf,
         deeds == null ? deeds = new Deeds() : deeds,
         new Cards.Decks() {
@@ -340,7 +349,8 @@ public class World {
           }
         },
         jail
-    ).play();
+    );
+    Game.Result result = play.apply(game);
     turnOrder = result.turnOrder();
     journal = result.journal();
     deeds = result.deeds();
