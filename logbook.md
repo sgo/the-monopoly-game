@@ -514,6 +514,21 @@ worktree, to confirm the handed-over state holds here and not only on
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
 architect.
 
+2026-08-05T09:10:27Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: turn-doubles-phantom-move
+commit: 2fc1010047
+
+Re-read your role and constitution.
+merge_and_process refactorer 2fc1010047
+
+Merged `2fc1010047`. The extracted turn-repeat predicate keeps the doubles
+decision cohesive and removes the phantom move. Acceptance, targeted Java
+mutation, and DRY checks passed. The turn-loop feature has no mutable example
+values for soft Gherkin mutation.
+
 The architect's correction is accepted: spaced example column names such as
 `<vacant rent>` are mutable after all, because the mutator works from example
 keys rather than from the IR `parameters` array. The earlier coder note above
@@ -20708,6 +20723,28 @@ within CRAP/DRY bounds. Committed the manifest refresh as `6548aa7`
 "Refresh mutation manifests for card-bank-payout-narration" (3 files,
 manifest blocks only). Handing off to architect.
 
+2026-08-05T00:23:21Z — refactorer sent card-bank-payout-narration handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-bank-payout-narration
+commit: bc5bbdeb26
+```
+
+Summary: reviewed the coder's `receiveBank`/`Cards.Events.receivedBank`/
+`Journal.Entry.BankReceived`/`Report` addition — mirrors the existing
+`payBank`/`paidBank` pattern exactly, small and well-scoped. No CRAP
+threshold exceeded except the already-exempted `Report.line` sealed
+switch (new CRAP=60.0 recorded). No new duplication. Mutation scan well
+under the 100-site split threshold on all three changed files; stale
+manifests refreshed. No property-test gap. Unit, property, and
+acceptance suites (439 tests twice) all green. No structural refactor
+needed. Handing verified state to architect for independent review.
+
 2026-08-05T00:00:00Z — received refactorer handoff:
 type: git_handoff
 to: architect
@@ -20721,6 +20758,15 @@ merge_and_process refactorer bc5bbdeb26
 Merged `bc5bbdeb26`. Acceptance is green; targeted Cards mutation found no
 changed surface and DRY found no duplicates. Soft narration mutation completed
 without errors and refreshed the generated manifests.
+
+2026-08-05T00:00:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: card-bank-payout-narration
+commit: 8f2936e42d
+
+Phase-complete sync: card bank-payout narration accepted.
 
 2026-08-05T07:37:00Z — received architect handoff:
 
@@ -20891,3 +20937,84 @@ dice loop. Both currently fail with assertion mismatches (not
 "Unsupported step"): dog's balance $0 expected vs $-24 actual;
 dog's position 10 expected vs 18 actual. Full root-cause tracing in the
 prior logbook entry this cycle.
+
+## 2026-08-05T06:30:28Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-doubles-phantom-move
+payload: Re-read your role and constitution.
+merge_and_process specifier de9d5f8f99
+```
+
+Action taken: merged specifier commit `de9d5f8f99`, added focused unit coverage,
+and fixed the turn loop so a doubles landing that bankrupts or imprisons the
+player ends the turn immediately.
+
+2026-08-05T06:33:12Z — refactorer received turn-doubles-phantom-move handoff:
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: turn-doubles-phantom-move
+commit: 84853ac9b6
+
+Re-read your role and constitution.
+merge_and_process coder 84853ac9b6
+```
+
+Merged `84853ac9b6`. Reviewed the diff: a one-line change to
+`Turn.take()`'s doubles-continuation condition —
+`if (!roll.isDouble() || deeds.isBankrupt(player) || jail.holds(player)) return;`
+— using the `deeds`/`jail` fields already injected into `Turn`'s
+constructor but previously unused for this check, exactly matching the
+specifier's root-cause diagnosis (no new fields, no new dependencies).
+Two new focused unit tests (`bankruptcyOnADoublesLandingEndsTheTurn`,
+`imprisonmentOnADoublesLandingEndsTheTurn`) exercise both branches
+directly at the `Turn` level with a stub `Landings` that bankrupts or
+imprisons the player mid-turn. Matches the specifier's spec exactly; a
+small, well-scoped change. Proceeding with CRAP/DRY/mutation analysis
+before verification and handoff.
+
+## 2026-08-05T08:38:00Z — refactorer reviews turn-doubles-phantom-move
+
+`crap4java` on the changed file: `Turn.take` came in at CC=8, 100%
+coverage, CRAP=8.0 — over the 6 threshold on complexity alone, so (per
+the CRAP formula, which reduces to CC at full coverage) genuine
+extraction was required. This is not the sealed-switch exemption case;
+it's an ordinary boolean condition. Extracted the continuation check
+into a new `rollsAgain(Roll, Player)` method:
+`roll.isDouble() && !deeds.isBankrupt(player) && !jail.holds(player)`,
+replacing `if (!roll.isDouble() || deeds.isBankrupt(player) ||
+jail.holds(player)) return;` with `if (!rollsAgain(roll, player))
+return;`. Verified the rewrite is exactly equivalent by De Morgan's
+law before extracting (`¬A ∨ B ∨ C ≡ ¬(A ∧ ¬B ∧ ¬C)`). Result:
+`take` CC=6/CRAP=6.0, `rollsAgain` CC=3/CRAP=3.0 — both existing
+`TurnTest` cases (including the coder's two new ones) still give both
+methods 100% coverage since the extraction moved code, not behavior.
+Ran `-Dtest=TurnTest` to confirm before touching anything else.
+
+`dry4java`: the only Turn.java line flagged is the pre-existing
+constructor-shape overlap with `Game.java:65-76` already known from
+earlier cycles — nothing new from this change.
+
+`mutate4java --scan` on `Turn.java`: 15 sites, well under the 100-site
+split threshold. The embedded manifest was stale against the
+extraction; refreshed with `--update-manifest`.
+
+Ran `mvn test` (all modules, clean) and `mvn test -P property-tests`
+(clean). Ran `./acceptance/run-acceptance.sh` twice: 441 tests, 0
+failures both times — including `bankruptcy-8` and `jail-9`, the two
+scenarios the specifier reported failing on the correct assertion
+mismatch before this fix, now genuinely passing.
+
+Committed the extraction as `bd5226f` "Extract rollsAgain from
+Turn.take to bring CRAP within threshold" (1 file). Handing off to
+architect.

@@ -241,6 +241,30 @@ class TurnTest {
         .containsExactly(Street.Type.AlgemeenFonds, Street.Type.NoordStation);
   }
 
+  @Test
+  void bankruptcyOnADoublesLandingEndsTheTurn() {
+    Player player = playerAt(0, 1500);
+    Deeds deeds = new Deeds();
+    Landings bankruptcy = (landed, space, roll) -> deeds.bankrupt(landed);
+
+    new Turn(ruleSet, Cup.of(new Roll(1, 1), new Roll(2, 3)), new Turn.Events() {
+    }, bankruptcy, new Jail(ruleSet), Strategy.UNDECIDED, deeds).take(player);
+
+    assertThat(player.position().index()).isEqualTo(2);
+  }
+
+  @Test
+  void imprisonmentOnADoublesLandingEndsTheTurn() {
+    Player player = playerAt(0, 1500);
+    Jail jail = new Jail(ruleSet);
+    Landings imprisonment = (landed, space, roll) -> jail.imprison(landed);
+
+    new Turn(ruleSet, Cup.of(new Roll(1, 1), new Roll(2, 3)), new Turn.Events() {
+    }, imprisonment, jail, Strategy.UNDECIDED, new Deeds()).take(player);
+
+    assertThat(player.position().index()).isEqualTo(JAIL);
+  }
+
   /** The third double takes the move away, so there is nowhere to arrive at. */
   @Test
   void aPawnSentToJailForCheatingArrivesNowhere() {
