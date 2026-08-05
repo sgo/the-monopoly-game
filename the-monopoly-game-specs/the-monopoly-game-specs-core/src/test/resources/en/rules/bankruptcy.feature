@@ -129,3 +129,22 @@ Feature: bankruptcy
     Examples:
       | owner starting balance | starting balance | owner final balance |
       | 0                       | 2                 | 29                   |
+
+  # bankruptcy-8
+  Scenario Outline: a doubles roll that causes bankruptcy does not grant a phantom extra move afterward
+    Given pawn "high hat" owns "Rue St-Léonard Liège"
+    And pawn "high hat" will claim rent for "Rue St-Léonard Liège"
+    And pawn "high hat" owns "Hoogstraat (Brussel) / Rue Haute (Bruxelles)"
+    And pawn "high hat" will claim rent for "Hoogstraat (Brussel) / Rue Haute (Bruxelles)"
+    And pawn "dog" starts at position 19
+    And pawn "dog" has $<starting balance> to spend
+    And pawn "dog" will roll 1 and 1 for their turn
+    And pawn "dog" will roll 3 and 5 for their turn
+    When we play the game
+    Then pawn "dog" is bankrupt
+    And pawn "high hat" wins the game
+    And pawn "dog"'s account balance is $<expected final balance>
+
+    Examples:
+      | starting balance | expected final balance |
+      | 10                | 0                       |

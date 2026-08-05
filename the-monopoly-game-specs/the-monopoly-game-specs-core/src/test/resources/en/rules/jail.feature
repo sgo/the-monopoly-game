@@ -118,3 +118,16 @@ Feature: jail
     Examples:
       | tenant balance | owner balance |
       | 1496           | 1504          |
+
+  # jail-9
+  Scenario Outline: landing on Go To Jail on a doubles roll ends the turn immediately, without a phantom extra move
+    Given pawn "dog" starts at position 28
+    And pawn "dog" will roll 1 and 1 for their turn
+    And pawn "dog" will roll 3 and 5 for their turn
+    When we play the game
+    Then pawn "dog" is in jail
+    And pawn "dog" is at position <expected position>
+
+    Examples:
+      | expected position |
+      | 10                 |

@@ -20771,3 +20771,89 @@ Community Chest cards that pay the player directly now narrate through
 the journal, log, and report exactly like every other cash-affecting
 mechanic, closing the observability gap that let unbounded, un-narrated
 cash drift keep 3-player games from ever producing a bankruptcy.
+
+## 2026-08-05T09:00:00Z — specifier finds a doubles-continuation defect
+
+User asked to run a fresh 2-player game and check the log. This run
+terminated normally (no repeat of the 3-player infinite-drift bug), but
+its tail showed something new:
+
+```
+dog goes bankrupt to high hat
+high hat wins the game
+dog rolls a total of 8
+dog moves from position 23 (Lange Steenstraat Kortrijk) to 31 (Boulevard
+Tirou Charleroi)
+dog pays high hat $52 rent for Boulevard Tirou Charleroi
+```
+
+After the game already declared `high hat` the winner, the now-bankrupt
+`dog` takes another mini-turn: rolls again, moves again, and pays rent
+on a property it had just forfeited in the bankruptcy. Traced to
+`Turn.take()` (`the-monopoly-game-domain/.../rules/Turn.java:55-75`):
+the roll that triggered the bankruptcy was a double (`total of 2` is
+only reachable as 1+1), and the turn's `for (;;)` loop grants another
+roll whenever `roll.isDouble()`, with no check of whether the player's
+state changed (bankrupt, or — per the user's own observation — sent to
+jail) while resolving the landing that just happened. `Turn` even has
+an unused `deeds` field already injected in its constructor, looking
+exactly like a hook for this check that was never wired up.
+`Bankruptcy.resolve()` (`Bankruptcy.java:32`) then short-circuits for a
+player already marked bankrupt, so the phantom rent charge is never
+corrected — the debtor is left with a permanently negative balance
+baked into the final journal/report.
+
+The user separately confirmed having seen the same root cause manifest
+at the "Go To Jail" space: a doubles roll that lands a pawn on "Naar de
+Gevangenis / Allez en Prison" imprisons it (`Jail.resolve`), but the
+same unconditional `roll.isDouble()` check lets the turn continue,
+handing the (nominally jailed) pawn another roll and letting it move
+away from the jail cell in the same turn — instead of the turn ending
+immediately, as landing in jail always should.
+
+Reproduced both symptoms with two new scenarios, using the existing
+"pawn X starts at position N" / "pawn X will roll A and B for their
+turn" / "we play the game" vocabulary (already established by
+`cards-11`) rather than the "lands on" step, since "lands on" bypasses
+`Turn.take()`'s dice loop entirely and can't exercise this bug:
+
+- `bankruptcy-8`, "a doubles roll that causes bankruptcy does not grant
+  a phantom extra move afterward": `dog` starts at position 19
+  (Groenplaats Antwerpen) with $10, rolls "1 and 1" (double, total 2)
+  onto "Rue St-Léonard Liège" (high hat's, vacant rent $18) and goes
+  bankrupt; the queued follow-up roll "3 and 5" (total 8) then lands on
+  "Hoogstraat (Brussel) / Rue Haute (Bruxelles)" (also high hat's,
+  vacant rent $24). Asserts `pawn "dog"'s account balance is $0`.
+- `jail-9`, "landing on Go To Jail on a doubles roll ends the turn
+  immediately, without a phantom extra move": `dog` starts at position
+  28 (Watermaatschappij), rolls "1 and 1" onto "Naar de Gevangenis /
+  Allez en Prison" (imprisoned, moved to position 10 / Op Bezoek), then
+  the queued "3 and 5" carries the phantom continuation from position
+  10 to position 18 (Rue Royale Tournai). Asserts `pawn "dog" is at
+  position 10`.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` on both files (only pre-existing/expected
+near-duplicate and possible-synonym vocabulary-reuse findings, nothing
+of kind exact-duplicate within either new scenario). Ran
+`./acceptance/run-acceptance.sh`: 441 tests, 2 failures — exactly the
+two new scenarios, both failing with the right failure mode (assertion
+mismatch, not "Unsupported step"):
+
+```
+EnRulesBankruptcyAcceptanceTest.acceptance()[8] And pawn "dog"'s account balance is $<expected final balance>
+expected: Balance[amount=Money[amount=0]]
+ but was: Balance[amount=Money[amount=-24]]
+
+EnRulesJailAcceptanceTest.acceptance()[9] And pawn "dog" is at position <expected position>
+expected: 10
+ but was: 18
+```
+
+Both actual values match hand-computed predictions exactly (dog's
+balance after two real rent charges of $18 then $24 nets to -24; the
+phantom move from position 10 by a further 8 lands at 18), confirming
+the root-cause diagnosis rather than a coincidental failure.
+
+Reporting to the user for approval before committing/handing off.
+Not yet committed.
