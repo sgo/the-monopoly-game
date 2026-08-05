@@ -20857,3 +20857,37 @@ the root-cause diagnosis rather than a coincidental failure.
 
 Reporting to the user for approval before committing/handing off.
 Not yet committed.
+
+User approved. Committed as `de9d5f8f99` "Specify that a doubles roll
+must not grant a phantom extra move after bankruptcy or jail" (3 files,
+118 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-doubles-phantom-move
+commit: de9d5f8f99
+```
+
+Summary: `Turn.take()`'s doubles-roll loop (`Turn.java:55-75`) grants
+another roll whenever `roll.isDouble()` without re-checking the
+player's state after resolving the landing that roll just produced.
+Two symptoms, one shared cause: (1) a player who goes bankrupt on a
+double keeps rolling/moving/paying rent after the game has already
+declared a winner, leaving a permanently negative balance because
+`Bankruptcy.resolve()` no-ops once a player is already marked bankrupt;
+(2) a player who lands on "Go To Jail" on a double gets an illegitimate
+extra roll and moves away from the jail cell in the same turn, instead
+of the turn ending immediately. `Turn` already has an unused `deeds`
+field injected in its constructor, suggesting the hook for this check
+was anticipated but never wired up. New scenarios `bankruptcy-8` and
+`jail-9` reproduce each symptom via the existing "starts at position" /
+"will roll A and B for their turn" / "we play the game" vocabulary
+(`cards-11`'s pattern), since the "lands on" shortcut bypasses the real
+dice loop. Both currently fail with assertion mismatches (not
+"Unsupported step"): dog's balance $0 expected vs $-24 actual;
+dog's position 10 expected vs 18 actual. Full root-cause tracing in the
+prior logbook entry this cycle.
