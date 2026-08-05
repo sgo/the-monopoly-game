@@ -21732,3 +21732,32 @@ World.java's play helpers" (2 files). Handing off to architect: the
 outer-loop defect from last cycle is genuinely fixed and verified: this
 task is safe to consider substantively complete, with the `SimulatorTest`
 flake flagged as a separate, lower-severity follow-up.
+
+2026-08-05T19:52:05Z — refactorer sent stalemate-detection handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: stalemate-detection
+commit: 3f7ec9f15c
+```
+
+Summary: the outer-loop defect from last cycle is genuinely fixed —
+`playTurns` now returns immediately when `playTurn` signals bankruptcy-
+down-to-one or a reached stalemate, verified via the specifier's bounded
+`stalemate-6` scenario and a matching `GameTest` case, both of which
+count exactly one `Stalemate` entry rather than a repeat-per-round.
+Found and removed a dead branch the fix left behind (proved unreachable
+both by case analysis and by JaCoCo branch coverage) and a DRY violation
+in `World.java`'s two now near-identical play helpers (extracted a
+shared `playAndCapture`). CRAP/DRY/mutation clean otherwise, manifest
+refreshed. Separately investigated a reproducible (6/6) full-reactor-only
+failure in `SimulatorTest.keepsPlayingUntilToldToStop` — ruled out a
+deterministic cause, isolated it to full multi-module build context, and
+am flagging it as a pre-existing CLI test-infrastructure fragility rather
+than a domain defect; did not touch that test. Unit suite and acceptance
+(450 tests twice) both green. This task is safe to consider substantively
+complete on the domain side.
