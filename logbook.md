@@ -21435,3 +21435,38 @@ Committed the coverage addition as `f51ea37` "Cover Game.playTurn's
 stalemate branch; refresh mutation manifests" (4 files). Handing off to
 architect with the outer-loop defect flagged as the primary finding —
 this task is not safe to consider closed.
+
+2026-08-05T19:21:32Z — refactorer sent stalemate-detection handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: stalemate-detection
+commit: cff2d7420c
+```
+
+Summary: **unresolved defect, do not close this task on this handoff.**
+`Stalemate.threshold`/`.reached` and the single-round detection/narration
+wiring are correct and match the spec (verified via the coder's five
+`stalemate.feature` scenarios plus three narration scenarios, all
+passing). But `Game.playTurns`'s outer `do-while` loop never actually
+stops on a stalemate — `playTurn` returning `true` only breaks the
+current round's inner `for` loop, while the outer loop's own
+continuation condition (`remainingPlayers().size() > 1`) stays true
+forever in a stalemate by definition. In real usage
+(`Simulator.playUntilStopped`), a stalemate never ends the game; it
+re-declares itself every round, forever. Verified empirically with a
+throwaway test that burned 18+ minutes of CPU before I killed it (not
+committed). The acceptance suite structurally cannot catch this since
+"we play the game" only calls single-round `.play()`. Closed a genuine,
+separate unit-coverage gap on the (correct) single-round branch myself
+(CRAP 6.3 to 6.0); did not touch the outer-loop bug itself since fixing
+it is new behavior, outside refactorer's remit. Recommending a
+priority-00 follow-up to the coder for the loop fix, and a new specifier
+scenario asserting multi-round termination. Full trace, evidence, and
+reasoning in the two logbook entries above this one. CRAP/DRY/mutation
+otherwise clean; unit, property, and acceptance suites all green
+(449 acceptance tests twice) aside from the flagged gap.
