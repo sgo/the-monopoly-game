@@ -19,6 +19,7 @@ import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
 import the.monopoly.game.rules.Rule;
+import the.monopoly.game.rules.Stalemate;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
 
@@ -365,6 +366,10 @@ public class World {
     return journal != null && journal.contains(new Entry.Won(pawn(pawnName).id()));
   }
 
+  public boolean endedInStalemate() {
+    return journal != null && journal.stream().anyMatch(Entry.Stalemate.class::isInstance);
+  }
+
   public void givePawnGetOutOfJailFreeCard(String pawnName) {
     if (deeds == null) deeds = new Deeds();
     deeds.hold(Deeds.RetainedCard.CHANCE_GET_OUT_OF_JAIL_FREE, pawn(pawnName));
@@ -709,6 +714,17 @@ public class World {
               + amount.amount() + "."
       );
     pawn(pawnName).account().withdraw(startingCapital.minus(amount));
+  }
+
+  /** Sets a balance representing wealth accumulated during the game. */
+  public void holdPawnBalance(String pawnName, Money amount) {
+    Money current = pawn(pawnName).account().balance().amount();
+    if (amount.exceeds(current)) pawn(pawnName).account().deposit(amount.minus(current));
+    else if (current.exceeds(amount)) pawn(pawnName).account().withdraw(current.minus(amount));
+  }
+
+  public Money stalemateThreshold() {
+    return Stalemate.threshold(ruleSet);
   }
 
   /**

@@ -18,6 +18,7 @@ import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
 import the.monopoly.game.rules.Rent;
 import the.monopoly.game.rules.Rule;
+import the.monopoly.game.rules.Stalemate;
 import the.monopoly.game.rules.Taxes;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
@@ -138,7 +139,12 @@ public class Game {
     if (deeds.isBankrupt(player)) return false;
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
     if (player.id().equals(builder.id()) && !deeds.isBankrupt(player)) building.develop(player);
-    return remainingPlayers().size() <= 1;
+    if (remainingPlayers().size() <= 1) return true;
+    if (!Stalemate.reached(rules, players, deeds)) return false;
+    journal.log(new Journal.Entry.Stalemate());
+    remainingPlayers().forEach(it -> journal.log(new Journal.Entry.FinalBalance(
+        it.id(), it.account().balance().amount())));
+    return true;
   }
 
   private List<Player> remainingPlayers() {
@@ -505,6 +511,12 @@ public class Game {
       }
 
       record Bankrupt(Player.ID player, Player.ID creditor) implements Entry {
+      }
+
+      record Stalemate() implements Entry {
+      }
+
+      record FinalBalance(Player.ID player, Money balance) implements Entry {
       }
 
       record Won(Player.ID player) implements Entry {

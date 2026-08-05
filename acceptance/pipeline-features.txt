@@ -28,6 +28,7 @@ en/rules/jail.feature
 en/rules/free-parking.feature
 en/rules/bankruptcy.feature
 en/rules/distressed-sale.feature
+en/rules/stalemate.feature
 en/rules/tax.feature
 en/rules/turn-loop.feature
 en/rules/buying-land.feature

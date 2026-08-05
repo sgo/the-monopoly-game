@@ -42,6 +42,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.inherited;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.inheritedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeRoll;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeWon;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalBalance;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEnteredLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailCardUsed;
@@ -91,6 +92,35 @@ final class GameLogStepHandlers {
 
   static List<StepHandler> handlers() {
     return List.of(
+        then("^the game log records that the game ends in a stalemate before it records that pawn \""
+                + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                new Claim(entry -> entry instanceof Entry.Stalemate, "game ends in a stalemate"),
+                finalBalance(arguments.text(1), arguments.number(2)))),
+
+        then("^the game log records that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> logRecords(world, finalBalance(arguments.text(1), arguments.number(2)))),
+
+        then("^the game log records that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE
+                + " before it records that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                finalBalance(arguments.text(1), arguments.number(2)),
+                finalBalance(arguments.text(3), arguments.number(4)))),
+
+        then("^the game report says that the game ends in a stalemate before it says that pawn \""
+                + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> saysInOrder(world, "The game ends in a stalemate",
+                arguments.text(1) + "'s final balance is $" + arguments.number(2))),
+
+        then("^the game report says that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> says(world, arguments.text(1) + "'s final balance is $" + arguments.number(2))),
+
+        then("^the game report says that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE
+                + " before it says that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + "'s final balance is $" + arguments.number(2),
+                arguments.text(3) + "'s final balance is $" + arguments.number(4))),
+
         then("^the game journal records that pawn \"" + NAME + "\" offers \\$" + VALUE
                 + " for \"" + NAME + "\" before it records that pawn \"" + NAME
                 + "\" offers \\$" + VALUE + " for \"" + NAME + "\"$",

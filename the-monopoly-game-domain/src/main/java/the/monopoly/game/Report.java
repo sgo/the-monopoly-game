@@ -105,6 +105,8 @@ public final class Report {
       case Entry.JailStayed it -> name(it.player()) + " stays in jail";
       case Entry.Bankrupt it -> name(it.player()) + " goes bankrupt to "
           + (it.creditor() == null ? "the bank" : name(it.creditor()));
+      case Entry.Stalemate it -> "The game ends in a stalemate";
+      case Entry.FinalBalance it -> name(it.player()) + "'s final balance is $" + it.balance().amount();
       case Entry.Won it -> name(it.player()) + " wins the game";
     };
   }

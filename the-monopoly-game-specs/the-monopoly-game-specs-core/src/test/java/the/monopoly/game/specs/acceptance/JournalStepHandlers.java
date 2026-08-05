@@ -20,6 +20,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bankReceive
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bankReceivedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeRoll;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeWon;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalBalance;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.money;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moved;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesFromPosition;
@@ -46,6 +47,18 @@ final class JournalStepHandlers {
     return List.of(
         step("^every other player can complete their turn$",
             (world, arguments) -> world.letTheOthersRollWhatTheyLike()),
+
+        given("^pawn \"" + NAME + "\"'s account holds \\$" + VALUE + "$",
+            (world, arguments) -> world.holdPawnBalance(arguments.text(1), money(arguments.number(2)))),
+
+        then("^the stalemate detection threshold is \\$" + VALUE + "$",
+            (world, arguments) -> assertThat(world.stalemateThreshold()).isEqualTo(money(arguments.number(1)))),
+
+        then("^the game ends in a stalemate$",
+            (world, arguments) -> assertThat(world.endedInStalemate()).isTrue()),
+
+        then("^the game does not end in a stalemate$",
+            (world, arguments) -> assertThat(world.endedInStalemate()).isFalse()),
 
         given("^pawn \"" + NAME + "\" starts at position " + VALUE + "$",
             (world, arguments) -> world.placePawn(arguments.text(1), arguments.number(2))),
@@ -225,6 +238,21 @@ final class JournalStepHandlers {
 
         then("^pawn \"" + NAME + "\" wins the game$",
             (world, arguments) -> assertThat(world.hasWon(arguments.text(1))).isTrue()),
+
+        then("^the game journal records that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> records(world, finalBalance(arguments.text(1), arguments.number(2)))),
+
+        then("^the game journal records that the game ends in a stalemate before it records that pawn \""
+                + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                new Claim(entry -> entry instanceof Entry.Stalemate, "game ends in a stalemate"),
+                finalBalance(arguments.text(1), arguments.number(2)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE
+                + " before it records that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                finalBalance(arguments.text(1), arguments.number(2)),
+                finalBalance(arguments.text(3), arguments.number(4)))),
 
         given("^pawn \"" + NAME + "\" already holds a Get Out of Jail Free card$",
             (world, arguments) -> world.givePawnGetOutOfJailFreeCard(arguments.text(1))),
