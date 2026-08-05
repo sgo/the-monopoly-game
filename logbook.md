@@ -20603,6 +20603,38 @@ tests, 3 failures — all three new scenarios, each failing with
 `Unsupported step: ... receives $<amount> from the bank`, i.e. failing
 because the step doesn't exist yet, not because of a wrong assertion —
 exactly the right failure mode for a genuinely new capability gap.
+User approved. Committed as `2123881e3c` "Specify journal/log/report
+coverage for direct bank-to-player card payments" (4 files, 84
+insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: card-bank-payout-narration
+commit: 2123881e3c
+```
+
+Summary: running a real 3-player game never terminated (2.25M+ turns
+per player, balances into the tens of millions, zero bankruptcies).
+Traced to `Cards.java`: ten Chance/Community Chest cards pay the player
+directly via `player.account().deposit(...)`, bypassing `Cards.Events`
+entirely — every other cash-affecting mechanic (salary, rent, tax, bank
+payments, pay/collect-from-every-player) reports itself through an
+`Events` method; there is no equivalent for "bank pays player directly."
+The deposits themselves are correct; this is purely an observability
+gap, but a steady, unnarrated cash injection (up to $805 face value
+across a 31-card deck) drawn repeatedly over millions of turns is
+sufficient to keep the real economy from ever bankrupting anyone.
+`journal-45`/`logging-45`/`report-45` specify the narration this
+requires — new step vocabulary, new `Journal.Entry`, new `Cards.Events`
+method — modeled on the existing `journal-23`/`-24` pattern. Fails today
+with "Unsupported step" for all three, confirming the capability
+genuinely doesn't exist yet. Full root-cause tracing in the prior
+logbook entry this cycle.
+
 Reporting to the user for handoff approval before committing.
 
 2026-08-05T00:14:00Z — refactorer received card-bank-payout-narration handoff:
@@ -20676,6 +20708,28 @@ within CRAP/DRY bounds. Committed the manifest refresh as `6548aa7`
 "Refresh mutation manifests for card-bank-payout-narration" (3 files,
 manifest blocks only). Handing off to architect.
 
+2026-08-05T00:23:21Z — refactorer sent card-bank-payout-narration handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: card-bank-payout-narration
+commit: bc5bbdeb26
+```
+
+Summary: reviewed the coder's `receiveBank`/`Cards.Events.receivedBank`/
+`Journal.Entry.BankReceived`/`Report` addition — mirrors the existing
+`payBank`/`paidBank` pattern exactly, small and well-scoped. No CRAP
+threshold exceeded except the already-exempted `Report.line` sealed
+switch (new CRAP=60.0 recorded). No new duplication. Mutation scan well
+under the 100-site split threshold on all three changed files; stale
+manifests refreshed. No property-test gap. Unit, property, and
+acceptance suites (439 tests twice) all green. No structural refactor
+needed. Handing verified state to architect for independent review.
+
 2026-08-05T00:00:00Z — received refactorer handoff:
 type: git_handoff
 to: architect
@@ -20698,3 +20752,220 @@ task: card-bank-payout-narration
 commit: 8f2936e42d
 
 Phase-complete sync: card bank-payout narration accepted.
+
+2026-08-05T07:37:00Z — received architect handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: card-bank-payout-narration
+commit: 8f2936e42d
+
+Re-read your role and constitution.
+merge_and_process architect 8f2936e42d
+```
+
+Merged `8f2936e42d` as `56e5303` (one append-only conflict in
+`logbook.md`, resolved by keeping both sides' continuations in commit
+order; verified no duplicate marker text afterward). Reviewed the full
+pipeline diff independently:
+
+- `Cards.java`: all ten direct-payout card effects now call a new
+  `receiveBank(player, amount)` helper instead of
+  `player.account().deposit(...)` directly; the helper deposits and then
+  calls `events.receivedBank(player, amount)`.
+- `Cards.Events` gained a default `receivedBank(Player, Money)` method,
+  mirroring the existing `paidBank`.
+- `Game.java`'s `Events` implementation logs a new
+  `Journal.Entry.BankReceived(player.id(), amount)`.
+- `Report.java` renders it as `"<name> receives $<amount> from the
+  bank"`, mirroring the existing `BankPaid` case exactly.
+- New step handlers for all three "draws the chance card ... before it
+  [records/says] that pawn ... receives $X from the bank" step patterns
+  added to `GameLogStepHandlers`/`JournalStepHandlers` plus a
+  `bankReceivedLine` helper in `MonopolyStepHelpers`.
+- Refactorer found no CRAP/DRY issues and no structural refactor needed;
+  architect's mutation pass found no changed surface beyond manifest
+  refreshes, and confirmed no scenario-content changes of its own (its
+  commit touched only mutation-manifest metadata lines).
+
+Independently re-verified after merging: `mvn test` (all modules, clean,
+exit 0) and `./acceptance/run-acceptance.sh` both green — 439/439
+acceptance tests pass, including `journal-45`, `logging-45`, and
+`report-45` (the three scenarios that previously failed with
+"Unsupported step", confirming the capability gap), now genuinely
+passing rather than merely not-erroring.
+
+This closes the `card-bank-payout-narration` task: the ten Chance/
+Community Chest cards that pay the player directly now narrate through
+the journal, log, and report exactly like every other cash-affecting
+mechanic, closing the observability gap that let unbounded, un-narrated
+cash drift keep 3-player games from ever producing a bankruptcy.
+
+## 2026-08-05T09:00:00Z — specifier finds a doubles-continuation defect
+
+User asked to run a fresh 2-player game and check the log. This run
+terminated normally (no repeat of the 3-player infinite-drift bug), but
+its tail showed something new:
+
+```
+dog goes bankrupt to high hat
+high hat wins the game
+dog rolls a total of 8
+dog moves from position 23 (Lange Steenstraat Kortrijk) to 31 (Boulevard
+Tirou Charleroi)
+dog pays high hat $52 rent for Boulevard Tirou Charleroi
+```
+
+After the game already declared `high hat` the winner, the now-bankrupt
+`dog` takes another mini-turn: rolls again, moves again, and pays rent
+on a property it had just forfeited in the bankruptcy. Traced to
+`Turn.take()` (`the-monopoly-game-domain/.../rules/Turn.java:55-75`):
+the roll that triggered the bankruptcy was a double (`total of 2` is
+only reachable as 1+1), and the turn's `for (;;)` loop grants another
+roll whenever `roll.isDouble()`, with no check of whether the player's
+state changed (bankrupt, or — per the user's own observation — sent to
+jail) while resolving the landing that just happened. `Turn` even has
+an unused `deeds` field already injected in its constructor, looking
+exactly like a hook for this check that was never wired up.
+`Bankruptcy.resolve()` (`Bankruptcy.java:32`) then short-circuits for a
+player already marked bankrupt, so the phantom rent charge is never
+corrected — the debtor is left with a permanently negative balance
+baked into the final journal/report.
+
+The user separately confirmed having seen the same root cause manifest
+at the "Go To Jail" space: a doubles roll that lands a pawn on "Naar de
+Gevangenis / Allez en Prison" imprisons it (`Jail.resolve`), but the
+same unconditional `roll.isDouble()` check lets the turn continue,
+handing the (nominally jailed) pawn another roll and letting it move
+away from the jail cell in the same turn — instead of the turn ending
+immediately, as landing in jail always should.
+
+Reproduced both symptoms with two new scenarios, using the existing
+"pawn X starts at position N" / "pawn X will roll A and B for their
+turn" / "we play the game" vocabulary (already established by
+`cards-11`) rather than the "lands on" step, since "lands on" bypasses
+`Turn.take()`'s dice loop entirely and can't exercise this bug:
+
+- `bankruptcy-8`, "a doubles roll that causes bankruptcy does not grant
+  a phantom extra move afterward": `dog` starts at position 19
+  (Groenplaats Antwerpen) with $10, rolls "1 and 1" (double, total 2)
+  onto "Rue St-Léonard Liège" (high hat's, vacant rent $18) and goes
+  bankrupt; the queued follow-up roll "3 and 5" (total 8) then lands on
+  "Hoogstraat (Brussel) / Rue Haute (Bruxelles)" (also high hat's,
+  vacant rent $24). Asserts `pawn "dog"'s account balance is $0`.
+- `jail-9`, "landing on Go To Jail on a doubles roll ends the turn
+  immediately, without a phantom extra move": `dog` starts at position
+  28 (Watermaatschappij), rolls "1 and 1" onto "Naar de Gevangenis /
+  Allez en Prison" (imprisoned, moved to position 10 / Op Bezoek), then
+  the queued "3 and 5" carries the phantom continuation from position
+  10 to position 18 (Rue Royale Tournai). Asserts `pawn "dog" is at
+  position 10`.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` on both files (only pre-existing/expected
+near-duplicate and possible-synonym vocabulary-reuse findings, nothing
+of kind exact-duplicate within either new scenario). Ran
+`./acceptance/run-acceptance.sh`: 441 tests, 2 failures — exactly the
+two new scenarios, both failing with the right failure mode (assertion
+mismatch, not "Unsupported step"):
+
+```
+EnRulesBankruptcyAcceptanceTest.acceptance()[8] And pawn "dog"'s account balance is $<expected final balance>
+expected: Balance[amount=Money[amount=0]]
+ but was: Balance[amount=Money[amount=-24]]
+
+EnRulesJailAcceptanceTest.acceptance()[9] And pawn "dog" is at position <expected position>
+expected: 10
+ but was: 18
+```
+
+Both actual values match hand-computed predictions exactly (dog's
+balance after two real rent charges of $18 then $24 nets to -24; the
+phantom move from position 10 by a further 8 lands at 18), confirming
+the root-cause diagnosis rather than a coincidental failure.
+
+Reporting to the user for approval before committing/handing off.
+Not yet committed.
+
+## 2026-08-05T06:30:28Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-doubles-phantom-move
+payload: Re-read your role and constitution.
+merge_and_process specifier de9d5f8f99
+```
+
+Action taken: merged specifier commit `de9d5f8f99`, added focused unit coverage,
+and fixed the turn loop so a doubles landing that bankrupts or imprisons the
+player ends the turn immediately.
+
+2026-08-05T06:33:12Z — refactorer received turn-doubles-phantom-move handoff:
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: turn-doubles-phantom-move
+commit: 84853ac9b6
+
+Re-read your role and constitution.
+merge_and_process coder 84853ac9b6
+```
+
+Merged `84853ac9b6`. Reviewed the diff: a one-line change to
+`Turn.take()`'s doubles-continuation condition —
+`if (!roll.isDouble() || deeds.isBankrupt(player) || jail.holds(player)) return;`
+— using the `deeds`/`jail` fields already injected into `Turn`'s
+constructor but previously unused for this check, exactly matching the
+specifier's root-cause diagnosis (no new fields, no new dependencies).
+Two new focused unit tests (`bankruptcyOnADoublesLandingEndsTheTurn`,
+`imprisonmentOnADoublesLandingEndsTheTurn`) exercise both branches
+directly at the `Turn` level with a stub `Landings` that bankrupts or
+imprisons the player mid-turn. Matches the specifier's spec exactly; a
+small, well-scoped change. Proceeding with CRAP/DRY/mutation analysis
+before verification and handoff.
+
+## 2026-08-05T08:38:00Z — refactorer reviews turn-doubles-phantom-move
+
+`crap4java` on the changed file: `Turn.take` came in at CC=8, 100%
+coverage, CRAP=8.0 — over the 6 threshold on complexity alone, so (per
+the CRAP formula, which reduces to CC at full coverage) genuine
+extraction was required. This is not the sealed-switch exemption case;
+it's an ordinary boolean condition. Extracted the continuation check
+into a new `rollsAgain(Roll, Player)` method:
+`roll.isDouble() && !deeds.isBankrupt(player) && !jail.holds(player)`,
+replacing `if (!roll.isDouble() || deeds.isBankrupt(player) ||
+jail.holds(player)) return;` with `if (!rollsAgain(roll, player))
+return;`. Verified the rewrite is exactly equivalent by De Morgan's
+law before extracting (`¬A ∨ B ∨ C ≡ ¬(A ∧ ¬B ∧ ¬C)`). Result:
+`take` CC=6/CRAP=6.0, `rollsAgain` CC=3/CRAP=3.0 — both existing
+`TurnTest` cases (including the coder's two new ones) still give both
+methods 100% coverage since the extraction moved code, not behavior.
+Ran `-Dtest=TurnTest` to confirm before touching anything else.
+
+`dry4java`: the only Turn.java line flagged is the pre-existing
+constructor-shape overlap with `Game.java:65-76` already known from
+earlier cycles — nothing new from this change.
+
+`mutate4java --scan` on `Turn.java`: 15 sites, well under the 100-site
+split threshold. The embedded manifest was stale against the
+extraction; refreshed with `--update-manifest`.
+
+Ran `mvn test` (all modules, clean) and `mvn test -P property-tests`
+(clean). Ran `./acceptance/run-acceptance.sh` twice: 441 tests, 0
+failures both times — including `bankruptcy-8` and `jail-9`, the two
+scenarios the specifier reported failing on the correct assertion
+mismatch before this fix, now genuinely passing.
+
+Committed the extraction as `bd5226f` "Extract rollsAgain from
+Turn.take to bring CRAP within threshold" (1 file). Handing off to
+architect.
