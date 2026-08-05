@@ -21103,3 +21103,30 @@ never named in either doc. Updated both:
 Drafted both for the user's review before writing; approved verbatim.
 No handoff needed — documentation-only, no Gherkin/implementation
 change, so this stays within the specifier's own remit.
+
+## 2026-08-05T13:00:00Z — Greedo-vs-Greedo stalemate added to SIMULATOR.md
+
+Following on from the runaway-game finding above: the user walked through
+whether peer-to-peer trading could resolve the Greedo-vs-Greedo stalemate
+(Phase 9's trade mechanic exists but nothing proposes trades yet). Traced
+through why it wouldn't: a one-sided trade never gets accepted by a
+self-interested identical opponent; a mutually fair swap of orphaned
+pieces is positive-sum but only exists when the board split happens to
+offer one; and even conditioning trade-willingness on relative position
+(the leader has no incentive to raise variance since the stalemate locks
+in their lead — confirmed by the previously-observed ~1.46x/~2.7x stable
+balance ratios — while the trailing player would benefit from escalating)
+doesn't resolve it, since a rational leader would only ever offer a
+lopsided trade, which a rational trailing player would correctly decline
+as worse than the stalemate. Net conclusion: no reasonably-scoped trading
+strategy eliminates the deadlock in general, only narrows how often it
+happens.
+
+User asked where this was recorded; it was only in personal memory and a
+brief logbook pointer, not in `SIMULATOR.md`. User asked for it to be
+added there too. Added a new "Known limitation: Greedo vs. Greedo can
+stalemate" subsection under Key Concepts (after Distressed sale, before
+Journal and report), condensing the root cause, the observed balance-ratio
+evidence, and the full trading analysis above into a few paragraphs.
+Committed together with this logbook entry. No handoff — documentation
+only.

@@ -106,6 +106,36 @@ pay. Anything still unsold once the debtor remains insolvent falls through
 to the ordinary bankruptcy sequence (sell houses, mortgage remaining land,
 then forfeit).
 
+### Known limitation: Greedo vs. Greedo can stalemate
+
+Two players both using "Greedo" (the CLI's default) can produce a game that
+runs for millions of turns without a bankruptcy. Cause: ordinary buying has
+no monopoly-denial logic (only distressed-sale bidding does), so against a
+symmetric copy of itself, colour groups end up split roughly 50/50 by
+chance and rarely complete. Once no more monopolies can form, rent stays
+capped at low/vacant rates while salary and card income keep both balances
+growing; once a balance clears the largest remaining single-turn liability
+on the board, that player is effectively unbankruptable. Observed directly:
+one player's balance staying a stable ~1.5–2.7x the other's over many
+thousands of turns, neither closing nor widening.
+
+This isn't fixable by adding trading between two identical Greedos, even
+though that was the obvious next idea: a one-sided trade never gets
+accepted by a self-interested opponent, and a mutually fair swap (each
+giving up a piece of a group they can never complete anyway) only helps
+when the board split happens to offer one. Whether trading even away a
+"dead" piece is rational depends on relative position, not just fairness —
+the currently-leading player has no incentive to raise the stakes (the
+stalemate already locks in their lead), while the trailing player would
+benefit from escalating since the status quo guarantees they never catch
+up. But a rational leader would then only ever offer a lopsided trade (a
+high-value monopoly for itself, a low-value one for the opponent), which a
+rational trailing player — correctly weighing the offer rather than just
+wanting *a* monopoly — would decline as worse than the safety of the
+stalemate. No reasonably-scoped trading strategy eliminates the deadlock in
+general; at best it narrows how often it happens. Treated as a known
+characteristic, not a defect — no fix planned.
+
 ### Journal and report
 
 As the game is played, game events should be written to a journal and included
