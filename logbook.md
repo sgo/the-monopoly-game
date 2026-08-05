@@ -8470,6 +8470,15 @@ and regression hardening. Coder must validate and return this priority-`00`
 architect review loop to architect before Phase 12 can be synced to
 specifier.
 
+2026-08-05T21:40:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: stalemate-detection
+commit: 823c455916
+
+Six stalemate example mutations still survive; requested a further Gherkin correction.
+
 ## 2026-07-29T09:34:41Z — architect received phase 12 coder follow-up
 
 Handoff message received:
