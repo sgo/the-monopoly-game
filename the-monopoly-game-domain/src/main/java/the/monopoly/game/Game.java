@@ -109,6 +109,13 @@ public class Game {
     return play(true, keepPlaying);
   }
 
+  /** Plays no more than the requested number of rounds, even if nobody wins. */
+  public Result playUpToRounds(int rounds) {
+    if (rounds <= 0) throw new IllegalArgumentException("A game needs at least one round.");
+    java.util.concurrent.atomic.AtomicInteger remaining = new java.util.concurrent.atomic.AtomicInteger(rounds);
+    return playUntilStopped(() -> remaining.getAndDecrement() > 1);
+  }
+
   private Result play(boolean untilComplete, BooleanSupplier keepPlaying) {
     var journal = new Journal();
     journal.log(new Journal.Entry.Start(ids(players)));
@@ -129,7 +136,10 @@ public class Game {
                          BooleanSupplier keepPlaying) {
     do {
       for (Player player : turnOrder) {
-        if (playTurn(player, builder, turnOrder, journal, journalling, building)) break;
+        if (playTurn(player, builder, turnOrder, journal, journalling, building)) {
+          if (remainingPlayers().size() <= 1 || Stalemate.reached(rules, players, deeds)) return;
+          break;
+        }
       }
     } while (untilComplete && keepPlaying.getAsBoolean() && remainingPlayers().size() > 1);
   }

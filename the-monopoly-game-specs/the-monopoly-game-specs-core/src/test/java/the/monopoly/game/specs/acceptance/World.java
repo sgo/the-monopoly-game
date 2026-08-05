@@ -346,6 +346,30 @@ public class World {
     deeds = result.deeds();
   }
 
+  public void playUpToRounds(int rounds) {
+    Cards.Decks officialDecks = Cards.Decks.official(deeds == null ? deeds = new Deeds() : deeds);
+    Game.Result result = new Game(
+        ruleSet, players(), player -> () -> nextQueuedPawnRoll(player), this::strategyOf,
+        deeds == null ? deeds = new Deeds() : deeds,
+        new Cards.Decks() {
+          @Override
+          public String drawChance() {
+            return queuedChanceCards.isEmpty() ? officialDecks.drawChance() : queuedChanceCards.pollFirst();
+          }
+
+          @Override
+          public String drawCommunityChest() {
+            return queuedCommunityChestCards.isEmpty()
+                ? officialDecks.drawCommunityChest() : queuedCommunityChestCards.pollFirst();
+          }
+        },
+        jail
+    ).playUpToRounds(rounds);
+    turnOrder = result.turnOrder();
+    journal = result.journal();
+    deeds = result.deeds();
+  }
+
   public void placePawn(String pawnName, int position) {
     pawn(pawnName).position().moveTo(position);
   }
