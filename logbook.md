@@ -21212,6 +21212,48 @@ new capability rather than a wrong assertion. `mvn test` still clean
 
 Reporting to the user before committing/handing off.
 
+## 2026-08-05T19:02:41Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260805T185532Z_000062_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: d9d7ff8ee7
+created_at: 2026-08-05T18:55:32.355733Z
+enqueued_at: 2026-08-05T18:55:32.443769Z
+task: stalemate-detection
+dequeued_at: 2026-08-05T18:55:57.822076Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d9d7ff8ee7
+```
+
+Action taken: merged specifier commit `d9d7ff8ee7`, implemented threshold-based
+stalemate detection and final-balance narration, added focused unit coverage,
+and verified 284 unit tests plus 449 acceptance tests.
+
+## 2026-08-05T19:02:41Z — coder sent handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: stalemate-detection
+commit: 1a903e3404
+```
+
+Summary: the commit adds the economic stalemate threshold, stops games once
+all remaining players clear it, and records the stalemate and final balances.
+
 User asked for the final stalemate narration to include each player's
 balance, not just the bare "ends in a stalemate" fact. Extended
 `journal-46`/`logging-46`/`report-46` to assert a full ordering chain —
