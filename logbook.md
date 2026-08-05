@@ -529,6 +529,15 @@ decision cohesive and removes the phantom move. Acceptance, targeted Java
 mutation, and DRY checks passed. The turn-loop feature has no mutable example
 values for soft Gherkin mutation.
 
+2026-08-05T09:10:27Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: turn-doubles-phantom-move
+commit: 05e47ba5cb
+
+Phase-complete sync: turn-doubles phantom-move fix accepted.
+
 The architect's correction is accepted: spaced example column names such as
 `<vacant rent>` are mutable after all, because the mutator works from example
 keys rather than from the IR `parameters` array. The earlier coder note above
