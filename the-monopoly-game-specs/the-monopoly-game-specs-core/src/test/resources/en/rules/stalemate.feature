@@ -27,10 +27,10 @@ Feature: stalemate
 
     Examples:
       | dog_balance | high_hat_balance |
-      | 25000       | 25000             |
+      | 22791       | 22791             |
 
   # stalemate-3
-  Scenario Outline: the game does not end in a stalemate while any remaining player is still below the threshold
+  Scenario Outline: the game does not end in a stalemate while any remaining player is still at or below the threshold
     Given pawn "dog" will roll 10 for initiative
     And pawn "high hat" will roll 4 for initiative
     And every other player can complete their turn
@@ -41,10 +41,10 @@ Feature: stalemate
 
     Examples:
       | dog_balance | high_hat_balance |
-      | 25000       | 1500              |
+      | 22791       | 22790             |
 
   # stalemate-4
-  Scenario Outline: a lone remaining player still below the threshold blocks a stalemate call with more than two players
+  Scenario Outline: a lone remaining player still at or below the threshold blocks a stalemate call with more than two players
     Given we select 3 players
     And pawn "dog" will roll 10 for initiative
     And pawn "high hat" will roll 4 for initiative
@@ -58,7 +58,7 @@ Feature: stalemate
 
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance |
-      | 25000       | 25000             | 1500              |
+      | 22791       | 22791             | 22790             |
 
   # stalemate-5
   Scenario Outline: a stalemate is called once every one of more than two remaining players clears the threshold
@@ -75,4 +75,18 @@ Feature: stalemate
 
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance |
-      | 25000       | 25000             | 25000             |
+      | 22791       | 22791             | 22791             |
+
+  # stalemate-6
+  Scenario Outline: a stalemate stops the game outright, not just the round it was first detected in
+    Given pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "dog"'s account holds $<dog_balance>
+    And pawn "high hat"'s account holds $<high_hat_balance>
+    When we play up to 3 rounds
+    Then the game journal records that the game ends in a stalemate only once
+
+    Examples:
+      | dog_balance | high_hat_balance |
+      | 22791       | 22791             |
