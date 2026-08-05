@@ -21231,3 +21231,41 @@ final-balance step is later in each scenario and wasn't reached), `mvn
 test` still clean.
 
 Reporting to the user before committing/handing off.
+
+User approved. Committed as `d9d7ff8ee7` "Specify stalemate detection: a
+fixed board-rental-value threshold instead of a turn limit" (6 files,
+228 insertions: new `stalemate.feature`, one narration scenario each in
+`journal.feature`/`logging.feature`/`report.feature`, the
+`pipeline-features.txt` registration, and this logbook entry).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: stalemate-detection
+commit: d9d7ff8ee7
+```
+
+Summary: specifies a new game-ending outcome — a stalemate — alongside
+the existing bankruptcy-to-one-winner ending, without a turn limit or a
+synthetic winner (per `SIMULATOR.md`/Phase 15's explicit constraint).
+Detection: a fixed constant computed once from the rule set (sum of
+`rentForOneHotel()` across all 22 streets, plus stations/utilities at
+full-ownership rent = $22,790 in the official ruleset); the game ends in
+a stalemate the moment every remaining (non-bankrupt) player's balance
+clears that figure. `Turn`/`Game`'s existing per-turn break condition
+(already used for the bankruptcy-leaves-one-player case) is the natural
+place to add this check. Needs: a new `Journal.Entry.Stalemate`, a new
+`Journal.Entry` (or reuse of a per-player shape) for each surviving
+player's final balance, a `Report.java` case for each, and a new,
+uncapped `World` test-setup method backing the `pawn "X"'s account
+holds $Y` step (distinct from the existing capped `arrangePawnBalance`,
+which deliberately cannot exceed the $1500 starting capital). Root cause
+and threshold validated empirically across 30 real CLI runs (2, 3, and 8
+players) before writing any spec — see the two logbook entries above for
+the full reasoning and data. 5 new scenarios in `stalemate.feature`
+(`stalemate-1` through `-5`) plus `journal-46`/`logging-46`/`report-46`,
+all failing today with "Unsupported step" for the new vocabulary,
+confirming the capability genuinely doesn't exist yet.
