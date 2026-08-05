@@ -21064,3 +21064,42 @@ with neither side ever going bankrupt. This closes
 `turn-doubles-phantom-move` (its own fix is verified solid); the
 runaway third run is a new, separate observation to raise with the user
 rather than something in scope for this task.
+
+## 2026-08-05T12:00:00Z — documentation catch-up: tasks.md and SIMULATOR.md
+
+The user separately confirmed the runaway third run above is a known
+characteristic of two identical "Greedo" strategies playing each other
+(no monopoly-denial logic outside of auctions/distressed sales, so most
+colour groups end up split, rent stays low relative to ever-growing
+bank-fed balances, and a wealthy-enough player becomes effectively
+unbankruptable) — no code or spec action wanted for it, saved to
+personal memory instead of the repo.
+
+Separately, the user noticed `tasks.md`/`SIMULATOR.md` never caught up
+with several things specified this session, plus one long-standing gap:
+the "distressed sale" mechanic itself (an ascending auction offering a
+debtor's land to solvent opponents before falling back to selling
+houses/mortgaging/forfeiting) has existed since Phase 14 shipped but was
+never named in either doc. Updated both:
+
+- `tasks.md`: added a "Distressed sale" bullet to Phase 14's Key
+  Deliverables documenting the mechanic itself, plus three new
+  Post-plan refinements entries — `distressed-sale-needs-based-pricing`
+  (the needs-based pricing formula, whole-balance-overpay fix, and
+  auto-credit-heuristic removal), `card-bank-payout-narration` (the ten
+  windfall cards now narrate via `BankReceived`), and
+  `turn-doubles-phantom-move` (the doubles-loop fix for bankruptcy/jail).
+- `SIMULATOR.md`: expanded the `#### Greedo` subsection to cover every
+  decision point it actually answers (buying/reserve, dynamic reserve
+  sizing, rent-claiming, building, jail fine, inherited-mortgage
+  lifting, distressed-sale bidding), sourced directly from `Greedo.java`
+  and `Bankruptcy.java`'s `settleInheritedMortgage`. Added a new
+  "Distressed sale" subsection describing the mechanic itself
+  (candidate ordering, needs-based pricing, the ascending auction, the
+  monopoly-completion house-sale deferral, and the fallback to the
+  ordinary bankruptcy sequence), sourced from `DistressedSale.java` and
+  `Bankruptcy.resolve()`.
+
+Drafted both for the user's review before writing; approved verbatim.
+No handoff needed — documentation-only, no Gherkin/implementation
+change, so this stays within the specifier's own remit.

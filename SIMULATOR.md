@@ -57,17 +57,54 @@ The supported behavioral strategies are...
 
 #### Greedo
 
-This strategy will pay to buy, win an auction, build, take out a mortgage if 
-funds drop too low, trade, jail exit choice, ...
+Provided it has the financial means to do so, this strategy always tries to
+get ahead, but never overpays when it doesn't have to.
 
-Provided it has the financial means to do so.
+- **Buying** (landing on unowned land, or bidding at an ordinary auction):
+  buys/bids up to its full available balance above a configured cash
+  reserve; below that it declines/stops bidding, same as if it couldn't
+  afford the price at all. Utilities are exempt from the reserve whenever
+  buying completes its own utility monopoly or denies another player theirs.
+- **Cash reserve** is not fixed: it grows to protect the price of a street
+  the player is one purchase away from turning into a monopoly (picking the
+  tightest such opportunity if more than one exists), and similarly protects
+  $200 when the player is one station away from owning all four.
+- **Rent**: always claims rent it's owed.
+- **Building**: builds a house or hotel whenever it can afford to.
+- **Jail fine**: pays the M50 fine immediately whenever it can afford to
+  (never chooses to attempt doubles instead if paying is an option).
+- **Inherited mortgages** (after a bankruptcy transfer): lifts an inherited
+  mortgage immediately if it can afford the principal plus 10% interest,
+  otherwise keeps it mortgaged and pays only the interest.
+- **Distressed-sale bidding** (see [Distressed sale](#distressed-sale)
+  below): declines outright if winning would let the debtor go fully
+  bankrupt into it for free instead (i.e. it's the debtor's last solvent
+  opponent and already has more cash than the debtor's total remaining
+  property and debt combined); otherwise bids its full available balance if
+  the purchase completes its own colour-group monopoly; otherwise bids up to
+  35% of its available balance if the land is one it considers
+  highest-priority to deny an opponent; otherwise declines.
 
-Buying keeps a configured cash reserve: it declines a purchase that would
-leave it below that reserve, same as if it couldn't afford the price at all.
-Utilities carve out an exception — the strategy buys an available utility
-regardless of the reserve whenever doing so completes its own utility
-monopoly or denies another player theirs. Otherwise (nobody yet owns a
-utility) buying one still respects the reserve like any other purchase.
+### Distressed sale
+
+When a player owes a debt to another player (not the bank) that they can't
+cover outright, before their own houses are sold or their own land
+mortgaged, they get one attempt to raise the shortfall by selling land to a
+solvent opponent instead. Candidate land is offered cheapest-priority-first,
+one property at a time, stopping as soon as the debtor is solvent again; any
+street whose colour group has houses or a hotel built anywhere is excluded,
+so a developed monopoly can never be forced into this path. The price is
+needs-based: never less than that land's own mortgage value, and never more
+than covering the actual remaining shortfall (after crediting the mortgage
+value of whatever other candidate land the debtor still has left). Eligible
+opponents ascend a $5-increment auction; a lone eligible bidder simply pays
+the minimum. If a sale would complete the buyer's own monopoly while the
+debtor still has a house or hotel they could sell instead, that property is
+skipped in favor of forcing the house sale first, so a buyer can't pick up a
+monopoly-completing property on the cheap when the debtor had another way to
+pay. Anything still unsold once the debtor remains insolvent falls through
+to the ordinary bankruptcy sequence (sell houses, mortgage remaining land,
+then forfeit).
 
 ### Journal and report
 
