@@ -20924,3 +20924,39 @@ directly at the `Turn` level with a stub `Landings` that bankrupts or
 imprisons the player mid-turn. Matches the specifier's spec exactly; a
 small, well-scoped change. Proceeding with CRAP/DRY/mutation analysis
 before verification and handoff.
+
+## 2026-08-05T08:38:00Z — refactorer reviews turn-doubles-phantom-move
+
+`crap4java` on the changed file: `Turn.take` came in at CC=8, 100%
+coverage, CRAP=8.0 — over the 6 threshold on complexity alone, so (per
+the CRAP formula, which reduces to CC at full coverage) genuine
+extraction was required. This is not the sealed-switch exemption case;
+it's an ordinary boolean condition. Extracted the continuation check
+into a new `rollsAgain(Roll, Player)` method:
+`roll.isDouble() && !deeds.isBankrupt(player) && !jail.holds(player)`,
+replacing `if (!roll.isDouble() || deeds.isBankrupt(player) ||
+jail.holds(player)) return;` with `if (!rollsAgain(roll, player))
+return;`. Verified the rewrite is exactly equivalent by De Morgan's
+law before extracting (`¬A ∨ B ∨ C ≡ ¬(A ∧ ¬B ∧ ¬C)`). Result:
+`take` CC=6/CRAP=6.0, `rollsAgain` CC=3/CRAP=3.0 — both existing
+`TurnTest` cases (including the coder's two new ones) still give both
+methods 100% coverage since the extraction moved code, not behavior.
+Ran `-Dtest=TurnTest` to confirm before touching anything else.
+
+`dry4java`: the only Turn.java line flagged is the pre-existing
+constructor-shape overlap with `Game.java:65-76` already known from
+earlier cycles — nothing new from this change.
+
+`mutate4java --scan` on `Turn.java`: 15 sites, well under the 100-site
+split threshold. The embedded manifest was stale against the
+extraction; refreshed with `--update-manifest`.
+
+Ran `mvn test` (all modules, clean) and `mvn test -P property-tests`
+(clean). Ran `./acceptance/run-acceptance.sh` twice: 441 tests, 0
+failures both times — including `bankruptcy-8` and `jail-9`, the two
+scenarios the specifier reported failing on the correct assertion
+mismatch before this fix, now genuinely passing.
+
+Committed the extraction as `bd5226f` "Extract rollsAgain from
+Turn.take to bring CRAP within threshold" (1 file). Handing off to
+architect.
