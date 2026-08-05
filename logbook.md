@@ -20960,3 +20960,28 @@ mismatch before this fix, now genuinely passing.
 Committed the extraction as `bd5226f` "Extract rollsAgain from
 Turn.take to bring CRAP within threshold" (1 file). Handing off to
 architect.
+
+2026-08-05T06:38:53Z — refactorer sent turn-doubles-phantom-move handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-doubles-phantom-move
+commit: 2fc1010047
+```
+
+Summary: reviewed the coder's one-line fix to `Turn.take()`'s
+doubles-continuation condition (bankrupt/jailed players no longer get a
+phantom extra roll), matching the specifier's root-cause diagnosis
+exactly, with two focused new unit tests. `Turn.take` was over the CRAP
+threshold (CC=8, 100% coverage) after the fix; extracted a
+`rollsAgain(Roll, Player)` predicate (verified equivalent by De Morgan's
+law before extracting), bringing `take` to CC=6/CRAP=6.0 and `rollsAgain`
+to CC=3/CRAP=3.0. No new duplication. 15 mutation sites, well under the
+100-site split threshold; stale manifest refreshed. Unit, property, and
+acceptance suites (441 tests twice, including the two previously-failing
+scenarios now genuinely passing) all green. Handing verified state to
+architect for independent review.
