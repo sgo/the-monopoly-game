@@ -21497,3 +21497,65 @@ Merged `cff2d7420c`. The new pure `Stalemate` rule preserves a clean domain
 boundary; acceptance and targeted Java mutation/DRY checks passed. All ten
 soft Gherkin mutations for `stalemate.feature` survived, requiring a
 specifier-owned scenario correction.
+
+## 2026-08-05T21:35:00Z — specifier corrects the stalemate spec
+
+Received the architect's priority-00 handoff (`9873d9da12`), merged as
+`ed9ae8c` (one append-only conflict in `logbook.md`, resolved as usual).
+Two issues to fix, both flagged by the refactorer's review above:
+
+1. **All ten Examples-table columns across `stalemate-2` through `-5`
+   survived soft mutation** — every example used a comfortable buffer
+   ($25000/$1500/$26000) far from the $22790 threshold, so a
+   boundary-condition bug (off-by-one, `>=` vs `>`) would pass undetected.
+   Retuned every example to sit directly on the boundary. First attempt
+   used $22791 ("above") vs $22790 ("at, does not count") — running this
+   against the real merged implementation immediately surfaced two
+   genuine-looking failures (`stalemate-3`/`-4` both expected "does not
+   end in a stalemate" but got `true`). Before treating this as a coder
+   defect, checked why: `Stalemate.reached()` uses
+   `balance.covers(threshold)`, and `Money.covers()` is `amount >=
+   price.amount` — inclusive. On reflection this is actually the
+   *correct* semantic, not a bug: a balance exactly equal to the largest
+   possible single-turn liability genuinely cannot be bankrupted by one
+   hit (it lands at exactly $0, not negative), so `>=` is the right
+   boundary, not the `>` ("exceeds") I'd loosely assumed during the
+   design conversation. Corrected my own examples instead of the
+   implementation — bumped every "clears" value down to exactly $22790
+   and every "does not clear" value to $22789 — which is both the
+   mathematically correct test and the tightest possible one. Re-ran
+   against the real implementation: `stalemate-1` through `-5` and
+   `journal-46`/`logging-46`/`report-46` all now genuinely pass.
+
+2. **The outer-loop defect** (the headline finding — `playTurn` returning
+   `true` only breaks the inner per-round loop; the outer `do-while`
+   never checks the stalemate result, so `playToCompletion()`/
+   `playUntilStopped(...)` never actually stops on a stalemate in a real
+   game). The existing five scenarios all use "we play the game"
+   (`.play()`, always single-round) and structurally cannot express
+   this. Added `stalemate-6`, using two *new* pieces of vocabulary
+   designed specifically to be safe to execute against the still-buggy
+   implementation: `When we play up to 3 rounds` (a round-capped
+   multi-round play, so it is guaranteed to return quickly whether the
+   bug is present or fixed — never an unbounded `playUntilStopped(() ->
+   true)`, precisely because the refactorer's own diagnostic already
+   showed that hangs for 18+ minutes of real CPU time) and `Then the
+   game journal records that the game ends in a stalemate only once`
+   (new counting-style assertion — if the outer loop doesn't stop, the
+   stalemate keeps re-declaring itself once per allowed round, so this
+   fails at "found 3, not 1" rather than hanging). Verified this is
+   actually safe before running anything: neither new step exists yet,
+   so it fails immediately with "Unsupported step" today, and once the
+   coder implements the round cap it is bounded at 3 rounds regardless
+   of whether the underlying fix works.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` (only cross-scenario vocabulary-reuse findings, no
+duplicate-in-scenario issues). Ran `./acceptance/run-acceptance.sh`
+against the real merged implementation: 450 tests, exactly 1 failure —
+`stalemate-6`'s new "Unsupported step: When we play up to 3 rounds" —
+confirming every other correction is now genuinely passing and the sole
+remaining gap is precisely the outer-loop fix itself. `mvn test` clean.
+
+Reporting to the user before committing/handing back to the coder at
+priority 50.

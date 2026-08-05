@@ -28,10 +28,10 @@ Feature: stalemate
 
     Examples:
       | dog_balance | high_hat_balance |
-      | 22791       | 22791             |
+      | 22790       | 22790             |
 
   # stalemate-3
-  Scenario Outline: the game does not end in a stalemate while any remaining player is still at or below the threshold
+  Scenario Outline: the game does not end in a stalemate while any remaining player is still below the threshold
     Given pawn "dog" will roll 10 for initiative
     And pawn "high hat" will roll 4 for initiative
     And every other player can complete their turn
@@ -42,10 +42,10 @@ Feature: stalemate
 
     Examples:
       | dog_balance | high_hat_balance |
-      | 22791       | 22790             |
+      | 22790       | 22789             |
 
   # stalemate-4
-  Scenario Outline: a lone remaining player still at or below the threshold blocks a stalemate call with more than two players
+  Scenario Outline: a lone remaining player still below the threshold blocks a stalemate call with more than two players
     Given we select 3 players
     And pawn "dog" will roll 10 for initiative
     And pawn "high hat" will roll 4 for initiative
@@ -59,7 +59,7 @@ Feature: stalemate
 
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance |
-      | 22791       | 22791             | 22790             |
+      | 22790       | 22790             | 22789             |
 
   # stalemate-5
   Scenario Outline: a stalemate is called once every one of more than two remaining players clears the threshold
@@ -76,7 +76,7 @@ Feature: stalemate
 
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance |
-      | 22791       | 22791             | 22791             |
+      | 22790       | 22790             | 22790             |
 
   # stalemate-6
   Scenario Outline: a stalemate stops the game outright, not just the round it was first detected in
