@@ -94,6 +94,8 @@ public final class Report {
           name(it.player()) + " draws the community chest card \"" + it.card() + "\"";
       case Entry.BankPaid it ->
           name(it.player()) + " pays the bank $" + it.amount().amount();
+      case Entry.BankReceived it ->
+          name(it.player()) + " receives $" + it.amount().amount() + " from the bank";
       case Entry.JailEntered it ->
           name(it.player()) + " is sent to jail from landing on " + boardSpaceName(it.cause());
       case Entry.JailFinePaid it ->
@@ -173,55 +175,55 @@ public final class Report {
 
 /* mutate4java-manifest
 version=1
-moduleHash=545cc2c1a3604e32da67707c380afc3f11ace0bdba9bac840e30adc62768e956
+moduleHash=ac8ecf47013ae016c6ef8a1e391586a6d494bf25ea917e1126734870ea494f21
 scope.0.id=Y2xhc3M6UmVwb3J0I1JlcG9ydDoxOQ
 scope.0.kind=class
 scope.0.startLine=19
-scope.0.endLine=172
-scope.0.semanticHash=3d9ce27bd9ee5b70928b13e28e55dfea5e1fbc891757f82a11208114ccbad90c
-scope.1.id=ZmllbGQ6UmVwb3J0I0JPQVJEX1NQQUNFX05BTUVfT1ZFUlJJREVTOjEzNw
+scope.0.endLine=174
+scope.0.semanticHash=b28fc2afd575b3ae180dc18c3cd42d39e0cb860a4b90bf0e34657bd2b03a5883
+scope.1.id=ZmllbGQ6UmVwb3J0I0JPQVJEX1NQQUNFX05BTUVfT1ZFUlJJREVTOjEzOQ
 scope.1.kind=field
-scope.1.startLine=137
-scope.1.endLine=159
+scope.1.startLine=139
+scope.1.endLine=161
 scope.1.semanticHash=6eb67eaa69a04e25ac5429d119e7ade52b31b349bfbef41507f8ce1692daff1b
-scope.2.id=bWV0aG9kOlJlcG9ydCNib2FyZFNwYWNlTmFtZSgxKToxNjE
+scope.2.id=bWV0aG9kOlJlcG9ydCNib2FyZFNwYWNlTmFtZSgxKToxNjM
 scope.2.kind=method
-scope.2.startLine=161
-scope.2.endLine=163
+scope.2.startLine=163
+scope.2.endLine=165
 scope.2.semanticHash=7dcc143fee9458236e6143cec91f4c98d4b78c3de1afb24170abc26433f492c9
 scope.3.id=bWV0aG9kOlJlcG9ydCNjdG9yKDApOjIw
 scope.3.kind=method
 scope.3.startLine=20
 scope.3.endLine=21
 scope.3.semanticHash=fa4ab1d8c774b5a49e26e7b36ba0ec25ba0d7069b207d38eb37beccb7d02dc9c
-scope.4.id=bWV0aG9kOlJlcG9ydCNkZWNsaW5lTGluZSgxKToxMTA
+scope.4.id=bWV0aG9kOlJlcG9ydCNkZWNsaW5lTGluZSgxKToxMTI
 scope.4.kind=method
-scope.4.startLine=110
-scope.4.endLine=118
+scope.4.startLine=112
+scope.4.endLine=120
 scope.4.semanticHash=f8e93f31787af3801c915ba44f5de44f38ccb43e2a127b1f3987d720e4722a8c
 scope.5.id=bWV0aG9kOlJlcG9ydCNsaW5lKDEpOjQ0
 scope.5.kind=method
 scope.5.startLine=44
-scope.5.endLine=108
-scope.5.semanticHash=756259581b44e4302f54caf87c76d43e93739305355f6f1a552c9c252ca034de
-scope.6.id=bWV0aG9kOlJlcG9ydCNuYW1lKDEpOjE2OQ
+scope.5.endLine=110
+scope.5.semanticHash=072a2ae97a422f61cd1773c93936192a25725557b24a0c4591aa486298073043
+scope.6.id=bWV0aG9kOlJlcG9ydCNuYW1lKDEpOjE3MQ
 scope.6.kind=method
-scope.6.startLine=169
-scope.6.endLine=171
+scope.6.startLine=171
+scope.6.endLine=173
 scope.6.semanticHash=cd39b08d1576cbc2e9d2ae25bb54b6b608f1219509ee3d03086e8f3ab4c238fa
-scope.7.id=bWV0aG9kOlJlcG9ydCNuYW1lcygxKToxNjU
+scope.7.id=bWV0aG9kOlJlcG9ydCNuYW1lcygxKToxNjc
 scope.7.kind=method
-scope.7.startLine=165
-scope.7.endLine=167
+scope.7.startLine=167
+scope.7.endLine=169
 scope.7.semanticHash=7baca973d9baa23bf1205536bbfd229d494b1e2c863e02f6e50c5ce7dcb42959
 scope.8.id=bWV0aG9kOlJlcG9ydCNvZigxKToyMw
 scope.8.kind=method
 scope.8.startLine=23
 scope.8.endLine=25
 scope.8.semanticHash=3bddf559e6362200e39e3d2024808e23da1e3da3deb262e8b89f1402e9edd25e
-scope.9.id=bWV0aG9kOlJlcG9ydCNzcGFjZU5hbWUoMSk6MTI2
+scope.9.id=bWV0aG9kOlJlcG9ydCNzcGFjZU5hbWUoMSk6MTI4
 scope.9.kind=method
-scope.9.startLine=126
-scope.9.endLine=128
+scope.9.startLine=128
+scope.9.endLine=130
 scope.9.semanticHash=56eb8b748063de6798efd6f1a96d5a30f07cf019c0478f7f004006d2fe61eaf8
 */

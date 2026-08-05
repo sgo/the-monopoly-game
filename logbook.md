@@ -17682,6 +17682,15 @@ to this task.
 
 Reporting to the user for handoff approval before committing.
 
+2026-08-05T00:13:05+02:00 — received specifier handoff:
+type: git_handoff
+to: coder
+priority: 50
+task: card-bank-payout-narration
+payload: Re-read your role and constitution.
+merge_and_process specifier 2123881e3c
+Merged specifier commit 2123881e3c. Added a bank-received journal event for direct card payouts, report rendering, focused unit coverage, and acceptance handlers for journal/log/report ordering. Unit tests: 279 domain and 11 CLI tests green. Acceptance: 439 tests green.
+
 ## 2026-08-03T19:04:58Z — coder receives specifier handoff for Greedo rename
 
 Complete received handoff message:
@@ -20441,6 +20450,32 @@ Committed as `be13493` "Extract auction round and per-candidate sale
 attempt from DistressedSale" (2 files, 198 insertions, 127 deletions —
 mostly the regenerated mutation manifest). Handing off to architect.
 
+2026-08-04T21:33:46Z — refactorer sent distressed-sale-needs-based-pricing handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-needs-based-pricing
+commit: a9bae0487e
+```
+
+Summary: verified the coder's needs-based pricing fix, confirmed it
+matches the specifier's root-cause writeup and correctly subsumes the
+old mortgage-floor exemption and removes the free-collateral-credit
+shortcut. Found and fixed a coverage regression the pricing change
+caused (cannotRaise dropped to 0% coverage because the existing
+ascending-auction test's shortfall now exceeded one bidder's ceiling,
+collapsing it into the single-bidder path) by retuning the test's
+numbers to stay under the mortgage floor. Extracted attemptSale from
+resolve and split auction into auction/ascend/bidRound to bring every
+method in the file to CRAP <= 6. dry4java clean, mutate4java well under
+threshold with manifest refreshed. Acceptance green twice (436 tests),
+unit and property suites both green. Handing verified state to
+architect for independent review.
+
 2026-08-04T21:37:53Z — received refactorer handoff:
 type: git_handoff
 to: architect
@@ -20456,6 +20491,15 @@ attempts as cohesive domain operations. Acceptance passed (436 tests),
 differential Java mutation had no changed surface, and DRY found no duplicates.
 Soft mutation manifests were refreshed for the changed distressed-sale and
 narration features.
+
+2026-08-04T21:37:53Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-needs-based-pricing
+commit: c98f1bbd02
+
+Phase-complete sync: needs-based pricing extraction accepted.
 
 ## 2026-08-05T23:42:00Z — specifier received distressed-sale-needs-based-pricing phase-complete sync
 
@@ -20559,7 +20603,6 @@ tests, 3 failures — all three new scenarios, each failing with
 `Unsupported step: ... receives $<amount> from the bank`, i.e. failing
 because the step doesn't exist yet, not because of a wrong assertion —
 exactly the right failure mode for a genuinely new capability gap.
-
 User approved. Committed as `2123881e3c` "Specify journal/log/report
 coverage for direct bank-to-player card payments" (4 files, 84
 insertions).
@@ -20591,3 +20634,90 @@ method — modeled on the existing `journal-23`/`-24` pattern. Fails today
 with "Unsupported step" for all three, confirming the capability
 genuinely doesn't exist yet. Full root-cause tracing in the prior
 logbook entry this cycle.
+
+Reporting to the user for handoff approval before committing.
+
+2026-08-05T00:14:00Z — refactorer received card-bank-payout-narration handoff:
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: card-bank-payout-narration
+commit: 9363e3279e
+
+Re-read your role and constitution.
+merge_and_process coder 9363e3279e
+```
+
+Merged `9363e3279e`. Reviewed the diff: adds `Cards.receiveBank(player,
+amount)` alongside the existing `paidBank`/direct-deduction pattern,
+wired through a new `Cards.Events.receivedBank`, `Journal.Entry.
+BankReceived` record, and a `Report` case rendering "X receives $Y from
+the bank" — mirrors the existing `BankPaid`/`paidBank` shape exactly.
+Ten direct-payout card effects switched from `player.account().deposit(...)`
+to `receiveBank(player, ...)`. New unit test
+`aChanceCardIsRecordedBeforeItsDirectBankPayout` and three new acceptance
+scenarios (`journal-45`, `logging-45`, `report-45`) all pass per the
+coder's reported 439/439 acceptance and 279+11 unit tests. Matches the
+specifier's spec exactly; a small, well-scoped change. Proceeding with
+CRAP/DRY/mutation analysis before verification and handoff.
+
+## 2026-08-05T00:23:00Z — refactorer reviews card-bank-payout-narration
+
+`crap4java` on the three changed files (`Cards.java`, `Game.java`,
+`Report.java`): only one threshold-exceeded line, `Report.line`
+(CC=37, 74.4% coverage, CRAP=60.0) — the sealed-`Entry`-switch exempt
+from the CRAP threshold by the 2026-07-28 decision (`Report.line` was
+reverted three times when replaced by a map). The new `BankReceived`
+case follows the exact same one-branch-per-case shape as every other
+entry, so the exemption still applies as-is; recording the new CRAP
+figure per the exemption rule. Every other changed method (`resolve`,
+`receiveBank`, `receivedBank`, etc.) is CRAP <= 6.
+
+`dry4java` on the domain module: no new duplication from this change.
+The flagged pairs are all pre-existing (the `Game.java` `Journal.Events`
+boilerplate at lines ~204-293, generic test-helper shapes) already
+documented in earlier cycles. `receiveBank`/`receivedBank` mirror the
+existing `payBank`/`paidBank` pair exactly but are too short (3 lines)
+to register as a new duplicate under dry4java's min-lines=4 threshold —
+same shape as the other ~30 one-line event-dispatch methods already in
+that class, not new duplication worth extracting on its own.
+
+`mutate4java --scan` on the three changed files: Cards.java 53 sites,
+Game.java 30 sites, Report.java 3 sites — all well under the 100-site
+split threshold, no split needed. All three embedded manifests were
+stale against the coder's edits; refreshed with `--update-manifest`
+(manifest-only diff, no behavior change).
+
+No property-test gap: this is a narrow additive change (one new
+symmetric journal-entry/report-line pair mirroring `BankPaid`/
+`paidBank`) already covered by a new unit test and three new acceptance
+scenarios; no existing property test targets journal/report narration
+broadly enough that this would need a new property, and inventing one
+for a single mirrored case would be artificial.
+
+Ran `mvn test` (all modules, clean) and `mvn test -P property-tests`
+(clean). Ran `./acceptance/run-acceptance.sh` twice: 439 tests, 0
+failures both times.
+
+No structural refactor needed — the coder's implementation was already
+within CRAP/DRY bounds. Committed the manifest refresh as `6548aa7`
+"Refresh mutation manifests for card-bank-payout-narration" (3 files,
+manifest blocks only). Handing off to architect.
+
+2026-08-05T00:00:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: card-bank-payout-narration
+commit: bc5bbdeb26
+
+Re-read your role and constitution.
+merge_and_process refactorer bc5bbdeb26
+
+Merged `bc5bbdeb26`. Acceptance is green; targeted Cards mutation found no
+changed surface and DRY found no duplicates. Soft narration mutation completed
+without errors and refreshed the generated manifests.

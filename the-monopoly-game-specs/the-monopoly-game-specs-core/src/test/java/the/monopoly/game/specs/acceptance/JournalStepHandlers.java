@@ -15,6 +15,9 @@ import static the.monopoly.game.specs.acceptance.GameAccount.saysStartWith;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.NAME;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.VALUE;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.chanceCardDrawn;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.chanceCardDrawnLine;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bankReceived;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bankReceivedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeRoll;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.money;
@@ -333,7 +336,13 @@ final class JournalStepHandlers {
             (world, arguments) -> assertThat(world.isMortgaged(SpaceNames.of(arguments.text(1)))).isTrue()),
 
         then("^the land \"" + NAME + "\" is not mortgaged$",
-            (world, arguments) -> assertThat(world.isMortgaged(SpaceNames.of(arguments.text(1)))).isFalse())
+            (world, arguments) -> assertThat(world.isMortgaged(SpaceNames.of(arguments.text(1)))).isFalse()),
+
+        then("^the game journal records that pawn \"" + NAME + "\" draws the chance card \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" receives \\$" + VALUE + " from the bank$",
+            (world, arguments) -> recordsInOrder(world,
+                chanceCardDrawn(arguments.text(1), arguments.text(2)),
+                bankReceived(arguments.text(3), arguments.number(4))))
     );
   }
 }
