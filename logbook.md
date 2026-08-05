@@ -21559,3 +21559,37 @@ remaining gap is precisely the outer-loop fix itself. `mvn test` clean.
 
 Reporting to the user before committing/handing back to the coder at
 priority 50.
+
+User approved. Committed as `3c269013aa` "Correct stalemate example
+boundaries to the real >= semantic; add outer-loop termination scenario"
+(2 files, 68 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: stalemate-detection
+commit: 3c269013aa
+```
+
+Summary: two corrections to the stalemate spec. (1) Retuned every
+Examples-table value in `stalemate-2` through `-5` to sit exactly on the
+$22790 threshold ("clears" = $22790, "does not clear" = $22789),
+matching the real, correct `Money.covers()` (`>=`) semantic rather than
+the `>` ("exceeds") I'd loosely assumed earlier — verified these now
+pass cleanly against the real merged implementation. (2) Added
+`stalemate-6`, using two new pieces of vocabulary — `we play up to 3
+rounds` (a round-capped multi-round play, safe to run regardless of
+whether the outer-loop bug is fixed) and `the game journal records that
+the game ends in a stalemate only once` (a counting assertion) — to
+specify that a stalemate must stop the game outright, not just the
+round it's first detected in, per the refactorer's headline finding
+that `playTurns`'s outer `do-while` never checks the stalemate result.
+Ran the full suite against the real merged implementation: 450 tests,
+exactly 1 failure (`stalemate-6`'s "Unsupported step", since the round
+cap and the outer-loop fix don't exist yet) — confirming every other
+correction now genuinely passes and the sole remaining gap is precisely
+the fix the coder needs to make. Full reasoning and verification detail
+in the logbook entry above.
