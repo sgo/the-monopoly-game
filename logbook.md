@@ -21444,3 +21444,18 @@ Committed the coverage addition as `f51ea37` "Cover Game.playTurn's
 stalemate branch; refresh mutation manifests" (4 files). Handing off to
 architect with the outer-loop defect flagged as the primary finding —
 this task is not safe to consider closed.
+
+2026-08-05T19:23:47Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: stalemate-detection
+commit: cff2d7420c
+
+Re-read your role and constitution.
+merge_and_process refactorer cff2d7420c
+
+Merged `cff2d7420c`. The new pure `Stalemate` rule preserves a clean domain
+boundary; acceptance and targeted Java mutation/DRY checks passed. All ten
+soft Gherkin mutations for `stalemate.feature` survived, requiring a
+specifier-owned scenario correction.
