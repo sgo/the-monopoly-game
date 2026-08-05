@@ -70,7 +70,7 @@ public class Turn {
 
       move(player, roll);
 
-      if (!roll.isDouble()) return;
+      if (!roll.isDouble() || deeds.isBankrupt(player) || jail.holds(player)) return;
     }
   }
 

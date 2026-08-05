@@ -20857,3 +20857,20 @@ the root-cause diagnosis rather than a coincidental failure.
 
 Reporting to the user for approval before committing/handing off.
 Not yet committed.
+
+## 2026-08-05T06:30:28Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-doubles-phantom-move
+payload: Re-read your role and constitution.
+merge_and_process specifier de9d5f8f99
+```
+
+Action taken: merged specifier commit `de9d5f8f99`, added focused unit coverage,
+and fixed the turn loop so a doubles landing that bankrupts or imprisons the
+player ends the turn immediately.
