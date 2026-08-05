@@ -1,4 +1,5 @@
 # acceptance-mutation-manifest-begin
+# {"version":1,"tested_at":"2026-08-05T19:23:43.232727Z","feature_name":"stalemate","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/stalemate.feature","background_hash":"e15f13aafcac0600c3aaaaf97d370d153eb29c5c34b3d00e93ab47602feefe9c","implementation_hash":"unknown","scenarios":[]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -27,7 +28,7 @@ Feature: stalemate
 
     Examples:
       | dog_balance | high_hat_balance |
-      | 25000       | 25000             |
+      | 22790       | 22790             |
 
   # stalemate-3
   Scenario Outline: the game does not end in a stalemate while any remaining player is still below the threshold
@@ -41,7 +42,7 @@ Feature: stalemate
 
     Examples:
       | dog_balance | high_hat_balance |
-      | 25000       | 1500              |
+      | 22790       | 22789             |
 
   # stalemate-4
   Scenario Outline: a lone remaining player still below the threshold blocks a stalemate call with more than two players
@@ -58,7 +59,7 @@ Feature: stalemate
 
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance |
-      | 25000       | 25000             | 1500              |
+      | 22790       | 22790             | 22789             |
 
   # stalemate-5
   Scenario Outline: a stalemate is called once every one of more than two remaining players clears the threshold
@@ -75,4 +76,18 @@ Feature: stalemate
 
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance |
-      | 25000       | 25000             | 25000             |
+      | 22790       | 22790             | 22790             |
+
+  # stalemate-6
+  Scenario Outline: a stalemate stops the game outright, not just the round it was first detected in
+    Given pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "dog"'s account holds $<dog_balance>
+    And pawn "high hat"'s account holds $<high_hat_balance>
+    When we play up to 3 rounds
+    Then the game journal records that the game ends in a stalemate only once
+
+    Examples:
+      | dog_balance | high_hat_balance |
+      | 22791       | 22791             |
