@@ -22127,3 +22127,35 @@ handlers" (5 files). Handing off to architect: production code is
 correct and verified; the three new acceptance scenarios need a
 Gherkin-content fix from the specifier before they can pass, full
 diagnosis included above.
+
+2026-08-06T19:38:27Z — refactorer sent distressed-sale-no-bidder-narration handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: c0d755f4ee
+```
+
+Summary: the production narration feature (`distressedSaleNoBidder`
+event, `Journal.Entry.DistressedSaleNoBidder`, `Report` line) is correct
+and verified — CRAP/DRY/mutation clean, 450 pre-existing acceptance
+scenarios still pass. The three new scenarios (`journal-47`,
+`logging-47`, `report-47`) fail for a Gherkin-content reason, not a
+production defect: each redundantly repeats four steps already supplied
+by its feature file's own `Background:`, double-queuing dog's initiative
+roll and shifting the roll-consumption order so dog's real movement roll
+draws the duplicate instead of the intended one, landing it on the wrong
+space entirely. Confirmed via two independent checks (an existing
+byte-identical scenario in a file without the Background duplication
+passes; grepped for every scenario combining both patterns — only these
+three do). Fix is deleting the four redundant lines per scenario;
+recommending routing to the specifier. Separately found and fixed (own
+remit, mechanical Java code not Gherkin content) a stray-quote regex bug
+in the three new "mortgages" combined step patterns that would have
+caused a second failure right after the scenario fix; verified correct
+via isolated regex testing. `SimulatorTest` full-reactor-only flake
+recurred, same as the last two cycles, not re-investigated further.
