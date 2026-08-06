@@ -22558,3 +22558,30 @@ as delivered; my role here was independent verification, not further
 change. Handing off to architect: both the scenario-content defect and
 the regex-ambiguity defect from the last two cycles are now genuinely
 closed, confirmed by a fully green acceptance suite.
+
+2026-08-06T20:22:55Z — refactorer sent distressed-sale-no-bidder-narration handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: 343ccbf5e9
+```
+
+Summary: both defects flagged over the last two cycles are now genuinely
+fixed and independently verified. The specifier's removal of the
+redundant `Background:`-duplicating lines in `journal-47`/`logging-47`/
+`report-47` is confirmed still present. The coder's new
+`UNQUOTED_NAME_WITHOUT_ORDERING` pattern (a per-character negative
+lookahead blocking the lazy match from consuming through either ordering
+conjunction) genuinely disambiguates the standalone "finds no bidder"
+step from the compound "before it records/says" ones — verified with an
+independent Python reimplementation of both patterns against all three
+relevant inputs, not just by trusting the acceptance run. No production
+code touched, so no CRAP/mutation scope applies; `dry4java` clean of
+anything new. `./acceptance/run-acceptance.sh` twice: 455/455, 0
+failures both times — genuinely all green, no caveats. Nothing for me to
+commit this cycle; pure verification.
