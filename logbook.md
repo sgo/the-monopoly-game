@@ -22016,3 +22016,114 @@ yet. `mvn test` at the full-reactor level hit the same pre-existing
 isolation again); unrelated to this change.
 
 Reporting to the user before committing/handing off.
+
+## 2026-08-06T21:25:00Z — refactorer receives and reviews distressed-sale-no-bidder-narration
+
+Merged `a604440788`. Reviewed the production diff: `DistressedSale.auction()`
+now fires `events.distressedSaleNoBidder(debtor, land)` right before the
+existing early `return` when `bidders.isEmpty()`, wired through a new
+`Bankruptcy.Events.distressedSaleNoBidder` default method, a new
+`Journal.Entry.DistressedSaleNoBidder` record, and a `Report` case
+rendering `"<seller> finds no bidder for <land>"` — mirrors
+`distressedSaleStarted`'s exact shape. New `BankruptcyTest.
+aDistressedSaleReportsWhenNobodyCanBid` reuses the existing
+`aDistressedOfferBelowTheMortgageValueIsRejected` setup (price under the
+mortgage floor excludes the only bidder) and asserts the event fires. All
+correct, small, well-scoped — matches the specifier's spec exactly.
+
+**Confirmed the coder's own diagnosis of the 3 new acceptance failures,
+then found the actual root cause.** The coder's handoff (in the
+already-auto-merged region of this file) correctly identified the
+symptom: `journal-47`/`logging-47`/`report-47` fail because "their
+scripted movement lands dog at Noord Station rather than Extra
+Belasting" — verified this myself by re-running acceptance and reading
+the actual journal output, not just trusting the note. Traced why, since
+"scripted movement goes wrong" needed a real explanation before I could
+be sure this wasn't a production defect:
+
+`journal.feature`/`logging.feature`/`report.feature` each have a shared
+`Background:` that already applies `we select 2 players`, `pawn "dog"
+will roll 10 for initiative`, `pawn "high hat" will roll 4 for
+initiative`, and `every other player can complete their turn` to every
+scenario in the file. `journal-47`'s own scenario body redundantly
+repeats all four of those exact steps again before adding its
+scenario-specific ones. Each repeat of `will roll 10 for initiative`
+queues *another* roll onto dog's per-pawn roll queue
+(`World.queueInitiativeRoll` is a thin wrapper over `queuePawnRoll`,
+sharing one FIFO deque with every other queued roll for that pawn) — so
+dog's queue holds `[10, 10, 3]` instead of the intended `[10, 3]` by the
+time `pawn "dog" lands on "Extra Belasting / Taxe de Luxe"` runs
+(`World.landPawnOn` places dog 3 spaces short and queues exactly one
+more roll of 3, expecting to be the *next* draw). The real initiative
+draw correctly consumes the first `10`; dog's actual turn then draws the
+*duplicate* `10` instead of the `3`, moving it 10 spaces instead of 3 and
+landing it on Noord Station instead of Extra Belasting — which is
+exactly what the failing test's own journal output shows.
+
+Confirmed this diagnosis two ways, not just by reasoning about it:
+(1) `distressed-sale-3` uses the byte-identical Given/When steps and the
+byte-identical Examples values (`dog_starting_balance=10,
+high_hat_starting_balance=95, high_hat_reserve=85`) as `journal-47`, and
+it passes (`EnRulesDistressedSaleAcceptanceTest`: 21/21) — because
+`distressed-sale.feature`'s own `Background:` is just `Given the
+official rule set`, so its scenario's steps aren't duplicated and dog's
+queue is the intended `[10, 3]`. (2) Grepped for every scenario in
+`journal.feature` that both redundantly repeats the Background steps
+*and* uses `lands on` — `journal-47` is the only one; every other
+scenario in the file does one or the other, never both, which is why
+this exact combination has never broken anything before.
+
+**This is a Gherkin scenario-content defect, not a production or
+test-harness code defect** — the fix is deleting the four redundant
+lines from each of `journal-47`/`logging-47`/`report-47`'s scenario
+bodies (leaving the Background to supply them, the way every other
+scenario in these three files already does). Did not touch the `.feature`
+files myself: this is squarely Gherkin content, the specifier's remit,
+same as every prior scenario-content finding this session routes through
+architect → specifier. Flagging with the full trace above so whichever
+role picks it up doesn't have to re-derive it.
+
+**Found and fixed, within remit — mechanical Java regex bug, not Gherkin
+content.** The new combined `"... finds no bidder for X before it
+records that pawn Y mortgages X for $Z"` step patterns (all three of
+journal/log/report in `GameLogStepHandlers.java`) contain a stray
+literal `\"` immediately after the `UNQUOTED_NAME` capture and before
+`" for \\$"`, with no matching opening quote anywhere in the
+"mortgages" clause. Verified with an isolated Python regex check (since
+the acceptance suite can't reach this assertion until the scenario
+defect above is fixed — the first assertion in each scenario fails
+first): the broken pattern does not match the actual scenario text
+(`mortgages Lippenslaan Knokke for $90`, no quotes) but does match a
+text with a spurious quote character that will never occur. Removed the
+stray `\"` in all three occurrences; re-verified the corrected pattern
+matches the real text with the right five capture groups. This would
+have been a second, harder-to-diagnose failure right after the scenario
+fix landed, so worth catching now.
+
+`crap4java` on the four changed production files: only `Report.line`
+exceeds threshold (the exempted sealed switch, CRAP now 69.8 with the
+new `DistressedSaleNoBidder` case, CC=40). Everything else changed is
+CRAP <= 7.0. `dry4java`: no new duplication. `mutate4java --scan`:
+`DistressedSale.java` 71 sites, `Bankruptcy.java` 25, `Game.java` 40,
+`Report.java` 3 — all well under the 100-site split threshold; all four
+manifests were stale, refreshed with `--update-manifest`.
+
+`mvn test -P property-tests` at the full-reactor level hit the same
+pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` flake flagged
+twice already this session (confirmed clean again in CLI-module
+isolation and single-test isolation); unrelated to this change, not
+re-investigated further since the root cause is already on record.
+
+Ran `./acceptance/run-acceptance.sh` twice: 453 tests, exactly 3
+failures both times — the same three scenarios, same root cause,
+confirming nothing else regressed and the production narration feature
+itself is genuinely correct (every other new-narration scenario using
+`distressedSaleNoBidder` indirectly, and all 450 pre-existing scenarios,
+pass clean).
+
+Committed the manifest refresh and regex fix as `129afca` "Refresh
+mutation manifests; fix stray-quote regex bug in mortgages step
+handlers" (5 files). Handing off to architect: production code is
+correct and verified; the three new acceptance scenarios need a
+Gherkin-content fix from the specifier before they can pass, full
+diagnosis included above.
