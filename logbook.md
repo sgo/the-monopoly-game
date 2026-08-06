@@ -22508,3 +22508,53 @@ commit: 7432779f0a
 
 The three new no-bidder narration scenarios pass; the full acceptance suite
 has one unrelated packaged-CLI setup failure on this branch.
+
+## 2026-08-06T20:16:00Z — refactorer receives and reviews the disambiguation fix
+
+Merged `48b95e3886`. This closes the loop on both findings from the
+previous two cycles: the specifier's Background-duplication fix (already
+merged, confirmed still present — `journal-47`/`logging-47`/`report-47`
+no longer redundantly repeat their feature file's own `Background:`
+steps) and the coder's fix for the second, deeper bug the specifier
+found underneath it: the standalone `"...finds no bidder for " +
+UNQUOTED_NAME + "$"` step and the compound `"...finds no bidder for " +
+UNQUOTED_NAME + " before it records..."` step were ambiguous — lazy
+`.+?` immediately before a bare `$` end-anchor has nothing to stop it
+from consuming into text meant for a more specific pattern, so both
+matched the same compound-assertion input.
+
+Fix: a new `UNQUOTED_NAME_WITHOUT_ORDERING` pattern
+(`(?:(?! before it records that pawn | before it says that pawn ).)+?`)
+used only by the three standalone "finds no bidder" step patterns — a
+negative lookahead applied per character blocks the lazy match from ever
+consuming through either ordering conjunction, so the standalone pattern
+now structurally cannot match compound-assertion text, regardless of
+step registration order.
+
+Verified this independently, not just by trusting the scenario went
+green: reimplemented both patterns in Python and checked all three
+cases — the "puts...before...finds" line matches only the puts-compound
+pattern, the "finds...before...mortgages" line matches only the
+finds-compound pattern, and neither matches the (currently unused, but
+now safe for future use) standalone pattern; a hypothetical standalone
+line matches only the standalone pattern, with correct captures. Genuine
+disambiguation, not an accidental pass.
+
+No `src/main` production code touched, so no CRAP/mutation scope
+applies. `dry4java`: the only flagged `MonopolyStepHelpers.java` ranges
+are the pre-existing `Claim`/`...Line` helper-method-shape pattern
+already present throughout that file, unrelated to the new constant.
+
+Ran `./acceptance/run-acceptance.sh` twice: 455 tests, 0 failures both
+times — the packaged-CLI setup failure the coder's own note mentions was
+specific to their branch state before this merge; already resolved by my
+`cli-packaged-jar` working-directory fix from two cycles ago, confirmed
+still combined correctly here. `mvn test` and `mvn test -P
+property-tests` both hit the already-diagnosed `SimulatorTest`
+full-reactor flake, not re-investigated again.
+
+Nothing to commit this cycle — the coder's fix was correct and complete
+as delivered; my role here was independent verification, not further
+change. Handing off to architect: both the scenario-content defect and
+the regex-ambiguity defect from the last two cycles are now genuinely
+closed, confirmed by a fully green acceptance suite.
