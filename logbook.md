@@ -22029,3 +22029,30 @@ flake (confirmed clean 3/3 running the CLI module alone); unrelated to
 this change.
 
 Reporting to the user before committing/handing off.
+
+User approved. Committed as `829d8c701d` "Specify a packaged, standalone
+CLI jar" (3 files, 78 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: cli-packaged-jar
+commit: 829d8c701d
+```
+
+Summary: `SIMULATOR.md`/`tasks.md`'s Phase 15 describe the CLI as "a
+standalone executable process," but no packaging was ever actually
+built — it currently only runs via manual classpath assembly. Needs a
+shade or assembly plugin added to `the-monopoly-game-cli/pom.xml`
+producing an executable, dependency-inclusive jar with main class
+`the.monopoly.game.cli.Simulator`, plus new step-handler support for
+`cli-jar-1` (extends the existing `PomStepHandlers`/`PomInspector`
+pom.xml-inspection pattern already used by `cli-slf4j-config.feature`
+to check for the packaging plugin and its main class) and `cli-jar-2`
+(a new subprocess-invocation capability: build/locate the packaged jar,
+run it with `-h`, assert successful exit and usage output). Both new
+scenarios in `cli-packaged-jar.feature` fail today with "Unsupported
+step," confirming genuinely new capability.
