@@ -8479,6 +8479,20 @@ commit: 823c455916
 
 Six stalemate example mutations still survive; requested a further Gherkin correction.
 
+2026-08-06T19:04:10Z — received specifier handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: stalemate-detection
+commit: 6256dd981c
+
+Re-read your role and constitution.
+merge_and_process specifier 6256dd981c
+
+Merged `6256dd981c`. Acceptance passed (450 tests); all generated stalemate
+mutation-manifest entries are killed with zero survivors. The specification
+gap is closed.
+
 ## 2026-07-29T09:34:41Z — architect received phase 12 coder follow-up
 
 Handoff message received:
