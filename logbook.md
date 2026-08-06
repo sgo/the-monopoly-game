@@ -21896,3 +21896,59 @@ left as-is (both genuinely load-bearing; no structural fix available,
 only the mutator's own delta direction determines whether a given trial
 catches it). Verified against the real merged implementation: 450/450,
 zero failures.
+
+## 2026-08-05T22:45:00Z — specifies the missing no-bidder narration
+
+The user, reviewing a real 3-player game log while I was mid-review of
+the stalemate mutation gap above, flagged a separate observation: `iron
+box puts Elektriciteitscentrale up for sale to avoid bankruptcy` never
+gets a closing line — no offer, no sale, no mortgage, nothing says what
+became of it. (Separately, the user also asked about the chronology of
+`iron box pays the bank $50` appearing *before* the distressed sale that
+was meant to cover it; traced this and confirmed it's intentional, not a
+bug — `Cards.payBank()` withdraws the full nominal amount unconditionally
+(no overdraft protection, already true per `tasks.md`'s documented
+current state), matching `RULES.md`'s own framing that the debt is
+already owed before it gets resolved. Left alone per the user's
+agreement.)
+
+Root cause of the narration gap: `DistressedSale.auction()` fires
+`events.distressedSaleStarted(debtor, land)` unconditionally for every
+candidate property, but if the auction finds zero eligible bidders
+(`bidders.isEmpty()`), it returns silently — no `distressedOffer`, no
+`distressedSaleWon`, nothing. This is very likely what happened to
+Elektriciteitscentrale specifically: it's a utility, and
+`Greedo.bidForDistressed()` only bids on a utility when it completes the
+bidder's own utility monopoly, otherwise always declining (utilities are
+always `Priority.LOWEST`, never eligible for the "deny an opponent"
+`HIGHEST` bid streets get) — so a spare utility in a distressed sale
+will almost always draw zero bidders under this strategy, and every
+time that happens the log narrates the *attempt* but never the
+*outcome*.
+
+Confirmed this state-level mechanic (zero bidders → falls through to
+mortgaging the property directly) is already covered by
+`distressed-sale-3` ("a debtor mortgages to the bank instead when a
+peer's offer does not beat the mortgage value" — high hat's
+reserve-capped bid excludes it from the auction entirely, same
+`bidders.isEmpty()` path, just via the reserve cap rather than a
+utility's lack of appeal). Reused that scenario's exact setup rather
+than inventing a new one, since only the *narration* is missing, not
+the mechanic. Added `journal-47`, `logging-47`, `report-47` — one per
+file, ordering-chained the same way `card-bank-payout-narration`
+established: `puts Lippenslaan Knokke up for sale to avoid bankruptcy`
+before the new `finds no bidder for Lippenslaan Knokke` before the
+existing `mortgages Lippenslaan Knokke for $90`. New narration wording
+(`"<seller> finds no bidder for <land>"`) matches the existing
+subject-verb-object style every other `Report` line already uses.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` (no duplicate-in-scenario findings on the new lines).
+Ran `./acceptance/run-acceptance.sh`: 453 tests, exactly 3 failures — the
+three new scenarios, each failing with "Unsupported step" on the new
+ordering assertion, confirming the capability genuinely doesn't exist
+yet. `mvn test` at the full-reactor level hit the same pre-existing
+`SimulatorTest` flake as before (confirmed clean in CLI-module
+isolation again); unrelated to this change.
+
+Reporting to the user before committing/handing off.
