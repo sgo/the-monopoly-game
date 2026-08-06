@@ -8470,6 +8470,29 @@ and regression hardening. Coder must validate and return this priority-`00`
 architect review loop to architect before Phase 12 can be synced to
 specifier.
 
+2026-08-05T21:40:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: stalemate-detection
+commit: 823c455916
+
+Six stalemate example mutations still survive; requested a further Gherkin correction.
+
+2026-08-06T19:04:10Z — received specifier handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: stalemate-detection
+commit: 6256dd981c
+
+Re-read your role and constitution.
+merge_and_process specifier 6256dd981c
+
+Merged `6256dd981c`. Acceptance passed (450 tests); all generated stalemate
+mutation-manifest entries are killed with zero survivors. The specification
+gap is closed.
+
 ## 2026-07-29T09:34:41Z — architect received phase 12 coder follow-up
 
 Handoff message received:
@@ -21246,6 +21269,41 @@ new capability rather than a wrong assertion. `mvn test` still clean
 
 Reporting to the user before committing/handing off.
 
+2026-08-06T21:23:45Z RECEIVED handoff:
+id: 20260806T191326Z_000065_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: a00761a2b9
+created_at: 2026-08-06T19:13:26.190475Z
+enqueued_at: 2026-08-06T19:13:26.414226Z
+task: distressed-sale-no-bidder-narration
+dequeued_at: 2026-08-06T19:13:34.366912Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier a00761a2b9
+
+Merged the handoff, added no-bidder domain events and journal/log/report
+narration, and added acceptance handlers plus a focused bankruptcy unit test.
+Acceptance handlers now match the unquoted multi-word land wording. The
+three new acceptance scenarios still fail because their scripted movement
+lands dog at Noord Station rather than Extra Belasting; full unit testing
+also retains the existing flaky SimulatorTest failure.
+
+2026-08-06T21:24:20Z SENT handoff draft:
+type: git_handoff
+to: refactorer
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: f80b91e4c0
+
+Committed implementation and tests; acceptance and full-unit caveats above
+are included for refactorer follow-up.
+
 ## 2026-08-05T19:02:41Z — coder received handoff from specifier
 
 Handoff message received:
@@ -21533,6 +21591,14 @@ boundary; acceptance and targeted Java mutation/DRY checks passed. All ten
 soft Gherkin mutations for `stalemate.feature` survived, requiring a
 specifier-owned scenario correction.
 
+2026-08-05T19:23:47Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: stalemate-detection
+commit: 9873d9da12
+
+All stalemate example mutations survive; requested a Gherkin correction.
 ## 2026-08-05T21:35:00Z — specifier corrects the stalemate spec
 
 Received the architect's priority-00 handoff (`9873d9da12`), merged as
@@ -21594,6 +21660,40 @@ remaining gap is precisely the outer-loop fix itself. `mvn test` clean.
 
 Reporting to the user before committing/handing back to the coder at
 priority 50.
+
+User approved. Committed as `3c269013aa` "Correct stalemate example
+boundaries to the real >= semantic; add outer-loop termination scenario"
+(2 files, 68 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: stalemate-detection
+commit: 3c269013aa
+```
+
+Summary: two corrections to the stalemate spec. (1) Retuned every
+Examples-table value in `stalemate-2` through `-5` to sit exactly on the
+$22790 threshold ("clears" = $22790, "does not clear" = $22789),
+matching the real, correct `Money.covers()` (`>=`) semantic rather than
+the `>` ("exceeds") I'd loosely assumed earlier — verified these now
+pass cleanly against the real merged implementation. (2) Added
+`stalemate-6`, using two new pieces of vocabulary — `we play up to 3
+rounds` (a round-capped multi-round play, safe to run regardless of
+whether the outer-loop bug is fixed) and `the game journal records that
+the game ends in a stalemate only once` (a counting assertion) — to
+specify that a stalemate must stop the game outright, not just the
+round it's first detected in, per the refactorer's headline finding
+that `playTurns`'s outer `do-while` never checks the stalemate result.
+Ran the full suite against the real merged implementation: 450 tests,
+exactly 1 failure (`stalemate-6`'s "Unsupported step", since the round
+cap and the outer-loop fix don't exist yet) — confirming every other
+correction now genuinely passes and the sole remaining gap is precisely
+the fix the coder needs to make. Full reasoning and verification detail
+in the logbook entry above.
 
 ## 2026-08-05T19:38:05Z — coder received handoff from specifier
 
@@ -21761,3 +21861,158 @@ am flagging it as a pre-existing CLI test-infrastructure fragility rather
 than a domain defect; did not touch that test. Unit suite and acceptance
 (450 tests twice) both green. This task is safe to consider substantively
 complete on the domain side.
+
+2026-08-05T21:40:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: stalemate-detection
+commit: 3f7ec9f15c
+
+Re-read your role and constitution.
+merge_and_process refactorer 3f7ec9f15c
+
+Merged `3f7ec9f15c`. The corrected feature kills 6 of 12 soft Gherkin
+mutations, but 6 still survive; returning the remaining scenario gap to the
+specifier.
+
+## 2026-08-05T22:00:00Z — specifier removes the remaining non-discriminating example columns
+
+Received the architect's second priority-00 handoff (`823c455916`),
+merged as `349943a` (two append-only conflicts in `logbook.md`; the
+second required a manual re-splice after an initial attempt
+accidentally interleaved two independent per-role entries — my own
+"sent to coder" entry and the coder's own separate "received/sent to
+refactorer" entry — into one instead of concatenating them in
+chronological order; caught by re-reading the result before committing
+and fixed with a clean rewrite of that stretch).
+
+The merged manifest header on `stalemate.feature` itself was revealing:
+it lists per-scenario mutation results for only `stalemate-5` (3/3
+killed) and `stalemate-6` (2/2 killed) — the other two positive-boundary
+scenarios I retuned last cycle came through clean. That leaves all 6
+survivors concentrated in `stalemate-2`, `-3`, and `-4`'s 7 remaining
+columns (only 1 of 7 killed).
+
+Root cause, worked out by hand (mutator is off-limits to run directly):
+`stalemate-3` and `-4` test "one player below the threshold blocks a
+stalemate," but only the *one* blocking player's exact value actually
+determines the boolean outcome — `stalemate-3`'s `dog_balance` and
+`stalemate-4`'s `dog_balance`/`high_hat_balance` can be mutated to
+*any* other value and the scenario's fixed assertion ("does not end in
+a stalemate") stays correct regardless, since the other player already
+forces that outcome. These columns were never actually testing
+anything — they were mutation-proof by construction, independent of
+whatever value they held. Fixed by removing them from the Examples
+table entirely and hardcoding them as literal `$22790` (comfortably
+clearing, not the point under test) directly in the `Given` steps,
+leaving only the one genuinely load-bearing value
+(`high_hat_balance`/`iron_box_balance`) parameterized — a value no
+longer in an Examples table can never be a mutation target at all,
+which is a certain fix, not a probabilistic one.
+
+`stalemate-2`'s two columns are different: both players' balances are
+genuinely load-bearing (either one going below $22790 flips the
+outcome), so unlike `-3`/`-4` there's no structural fix available —
+whether a specific mutation trial catches it depends on the mutator's
+pseudo-random-but-deterministic delta direction for that exact value,
+which I have no visibility into without running the tool myself. Left
+`stalemate-2` as-is (already at the tightest meaningful boundary);
+noted this as a known limit of single-example-row boundary testing
+rather than something to keep chasing blind.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` (no duplicate-in-scenario findings). Ran
+`./acceptance/run-acceptance.sh` against the real merged implementation:
+450/450, zero failures — every scenario, including the restructured
+`stalemate-3`/`-4`, now genuinely passes. `mvn test` at the full-reactor
+level hit the pre-existing `SimulatorTest.keepsPlayingUntilToldToStop`
+flake the refactorer already diagnosed last cycle (full-reactor-only,
+CLI-module-standalone always clean) — reran the CLI module alone 3/3
+clean, confirming this is that same known, already-flagged issue and
+not something this Gherkin-only change caused.
+
+Reporting to the user before committing/handing back to the architect.
+
+User approved (separately from the two newer items below, which the user
+asked to keep as their own commits/handoffs). Committed as `6256dd981c`
+"Remove non-discriminating example columns from stalemate-3/4 to close
+the mutation gap" (2 files, 65 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: stalemate-detection
+commit: 6256dd981c
+```
+
+Summary: closes the mutation gap the architect flagged. `stalemate-3`
+and `-4`'s non-discriminating columns (`dog_balance` in `-3`;
+`dog_balance`/`high_hat_balance` in `-4`) are now hardcoded literals in
+the `Given` steps rather than Examples-table values, since they were
+structurally incapable of ever failing the scenario's assertion no
+matter what value they held — only the one genuinely load-bearing value
+in each scenario remains parameterized. `stalemate-2`'s two columns are
+left as-is (both genuinely load-bearing; no structural fix available,
+only the mutator's own delta direction determines whether a given trial
+catches it). Verified against the real merged implementation: 450/450,
+zero failures.
+
+## 2026-08-05T22:45:00Z — specifies the missing no-bidder narration
+
+The user, reviewing a real 3-player game log while I was mid-review of
+the stalemate mutation gap above, flagged a separate observation: `iron
+box puts Elektriciteitscentrale up for sale to avoid bankruptcy` never
+gets a closing line — no offer, no sale, no mortgage, nothing says what
+became of it. (Separately, the user also asked about the chronology of
+`iron box pays the bank $50` appearing *before* the distressed sale that
+was meant to cover it; traced this and confirmed it's intentional, not a
+bug — `Cards.payBank()` withdraws the full nominal amount unconditionally
+(no overdraft protection, already true per `tasks.md`'s documented
+current state), matching `RULES.md`'s own framing that the debt is
+already owed before it gets resolved. Left alone per the user's
+agreement.)
+
+Root cause of the narration gap: `DistressedSale.auction()` fires
+`events.distressedSaleStarted(debtor, land)` unconditionally for every
+candidate property, but if the auction finds zero eligible bidders
+(`bidders.isEmpty()`), it returns silently — no `distressedOffer`, no
+`distressedSaleWon`, nothing. This is very likely what happened to
+Elektriciteitscentrale specifically: it's a utility, and
+`Greedo.bidForDistressed()` only bids on a utility when it completes the
+bidder's own utility monopoly, otherwise always declining (utilities are
+always `Priority.LOWEST`, never eligible for the "deny an opponent"
+`HIGHEST` bid streets get) — so a spare utility in a distressed sale
+will almost always draw zero bidders under this strategy, and every
+time that happens the log narrates the *attempt* but never the
+*outcome*.
+
+Confirmed this state-level mechanic (zero bidders → falls through to
+mortgaging the property directly) is already covered by
+`distressed-sale-3` ("a debtor mortgages to the bank instead when a
+peer's offer does not beat the mortgage value" — high hat's
+reserve-capped bid excludes it from the auction entirely, same
+`bidders.isEmpty()` path, just via the reserve cap rather than a
+utility's lack of appeal). Reused that scenario's exact setup rather
+than inventing a new one, since only the *narration* is missing, not
+the mechanic. Added `journal-47`, `logging-47`, `report-47` — one per
+file, ordering-chained the same way `card-bank-payout-narration`
+established: `puts Lippenslaan Knokke up for sale to avoid bankruptcy`
+before the new `finds no bidder for Lippenslaan Knokke` before the
+existing `mortgages Lippenslaan Knokke for $90`. New narration wording
+(`"<seller> finds no bidder for <land>"`) matches the existing
+subject-verb-object style every other `Report` line already uses.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` (no duplicate-in-scenario findings on the new lines).
+Ran `./acceptance/run-acceptance.sh`: 453 tests, exactly 3 failures — the
+three new scenarios, each failing with "Unsupported step" on the new
+ordering assertion, confirming the capability genuinely doesn't exist
+yet. `mvn test` at the full-reactor level hit the same pre-existing
+`SimulatorTest` flake as before (confirmed clean in CLI-module
+isolation again); unrelated to this change.
+
+Reporting to the user before committing/handing off.

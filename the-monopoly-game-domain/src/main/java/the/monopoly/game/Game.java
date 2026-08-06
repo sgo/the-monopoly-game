@@ -240,6 +240,11 @@ public class Game {
     }
 
     @Override
+    public void distressedSaleNoBidder(Player seller, Ownable land) {
+      journal.log(new Journal.Entry.DistressedSaleNoBidder(seller.id(), land.type()));
+    }
+
+    @Override
     public void distressedOffer(Player bidder, Ownable land, Money price) {
       journal.log(new Journal.Entry.DistressedOffer(bidder.id(), land.type(), price));
     }
@@ -479,6 +484,9 @@ public class Game {
       }
 
       record DistressedSaleStarted(Player.ID seller, Street.Type land) implements Entry {
+      }
+
+      record DistressedSaleNoBidder(Player.ID seller, Street.Type land) implements Entry {
       }
 
       record DistressedOffer(Player.ID bidder, Street.Type land, Money price) implements Entry {

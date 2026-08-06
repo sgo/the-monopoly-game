@@ -80,6 +80,8 @@ public final class Report {
               + " for $" + it.price().amount() + " because the colour group has houses built";
       case Entry.DistressedSaleStarted it ->
           name(it.seller()) + " puts " + spaceName(it.land()) + " up for sale to avoid bankruptcy";
+      case Entry.DistressedSaleNoBidder it ->
+          name(it.seller()) + " finds no bidder for " + spaceName(it.land());
       case Entry.DistressedOffer it ->
           name(it.bidder()) + " offers $" + it.price().amount() + " for " + spaceName(it.land());
       case Entry.DistressedSaleWon it ->
