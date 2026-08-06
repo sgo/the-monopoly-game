@@ -35,14 +35,14 @@ Feature: stalemate
     Given pawn "dog" will roll 10 for initiative
     And pawn "high hat" will roll 4 for initiative
     And every other player can complete their turn
-    And pawn "dog"'s account holds $<dog_balance>
+    And pawn "dog"'s account holds $22790
     And pawn "high hat"'s account holds $<high_hat_balance>
     When we play the game
     Then the game does not end in a stalemate
 
     Examples:
-      | dog_balance | high_hat_balance |
-      | 22790       | 22789             |
+      | high_hat_balance |
+      | 22789             |
 
   # stalemate-4
   Scenario Outline: a lone remaining player still below the threshold blocks a stalemate call with more than two players
@@ -51,15 +51,15 @@ Feature: stalemate
     And pawn "high hat" will roll 4 for initiative
     And pawn "iron box" will roll 2 for initiative
     And every other player can complete their turn
-    And pawn "dog"'s account holds $<dog_balance>
-    And pawn "high hat"'s account holds $<high_hat_balance>
+    And pawn "dog"'s account holds $22790
+    And pawn "high hat"'s account holds $22790
     And pawn "iron box"'s account holds $<iron_box_balance>
     When we play the game
     Then the game does not end in a stalemate
 
     Examples:
-      | dog_balance | high_hat_balance | iron_box_balance |
-      | 22790       | 22790             | 22789             |
+      | iron_box_balance |
+      | 22789             |
 
   # stalemate-5
   Scenario Outline: a stalemate is called once every one of more than two remaining players clears the threshold
