@@ -22598,3 +22598,12 @@ merge_and_process refactorer 343ccbf5e9
 Merged `343ccbf5e9`. The previously failing journal, logging, and report
 narration scenarios now pass in the full acceptance suite; the correction is
 accepted.
+
+2026-08-06T22:25:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: 478eb0147f
+
+Phase-complete sync: no-bidder narration accepted.
