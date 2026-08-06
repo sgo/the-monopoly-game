@@ -22150,3 +22150,12 @@ merge_and_process refactorer c0d755f4ee
 Merged `c0d755f4ee`. Domain mutation and DRY checks passed; focused journal
 mutation killed 41/41. The remaining acceptance-scenario content issue is
 specifier-owned, so the task is returning for correction.
+
+2026-08-06T21:10:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: distressed-sale-no-bidder-narration
+commit: 5ee6ea5900
+
+Requested correction of the remaining Gherkin scenario-content issue.
