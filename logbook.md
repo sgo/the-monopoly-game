@@ -21846,3 +21846,30 @@ clean, confirming this is that same known, already-flagged issue and
 not something this Gherkin-only change caused.
 
 Reporting to the user before committing/handing back to the architect.
+
+User approved (separately from the two newer items below, which the user
+asked to keep as their own commits/handoffs). Committed as `6256dd981c`
+"Remove non-discriminating example columns from stalemate-3/4 to close
+the mutation gap" (2 files, 65 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: stalemate-detection
+commit: 6256dd981c
+```
+
+Summary: closes the mutation gap the architect flagged. `stalemate-3`
+and `-4`'s non-discriminating columns (`dog_balance` in `-3`;
+`dog_balance`/`high_hat_balance` in `-4`) are now hardcoded literals in
+the `Given` steps rather than Examples-table values, since they were
+structurally incapable of ever failing the scenario's assertion no
+matter what value they held — only the one genuinely load-bearing value
+in each scenario remains parameterized. `stalemate-2`'s two columns are
+left as-is (both genuinely load-bearing; no structural fix available,
+only the mutator's own delta direction determines whether a given trial
+catches it). Verified against the real merged implementation: 450/450,
+zero failures.
