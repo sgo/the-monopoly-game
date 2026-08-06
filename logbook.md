@@ -22060,7 +22060,6 @@ isolation again); unrelated to this change.
 
 Reporting to the user before committing/handing off.
 
-
 User approved. Committed as `a00761a2b9` "Specify the missing narration
 when a distressed-sale auction finds no bidder" (4 files, 110
 insertions).
@@ -22138,6 +22137,32 @@ this change.
 
 Reporting to the user before committing/handing off.
 
+User approved. Committed as `829d8c701d` "Specify a packaged, standalone
+CLI jar" (3 files, 78 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: cli-packaged-jar
+commit: 829d8c701d
+```
+
+Summary: `SIMULATOR.md`/`tasks.md`'s Phase 15 describe the CLI as "a
+standalone executable process," but no packaging was ever actually
+built — it currently only runs via manual classpath assembly. Needs a
+shade or assembly plugin added to `the-monopoly-game-cli/pom.xml`
+producing an executable, dependency-inclusive jar with main class
+`the.monopoly.game.cli.Simulator`, plus new step-handler support for
+`cli-jar-1` (extends the existing `PomStepHandlers`/`PomInspector`
+pom.xml-inspection pattern already used by `cli-slf4j-config.feature`
+to check for the packaging plugin and its main class) and `cli-jar-2`
+(a new subprocess-invocation capability: build/locate the packaged jar,
+run it with `-h`, assert successful exit and usage output). Both new
+scenarios in `cli-packaged-jar.feature` fail today with "Unsupported
+step," confirming genuinely new capability.
 ## 2026-08-06T21:25:00Z — refactorer receives and reviews distressed-sale-no-bidder-narration
 
 Merged `a604440788`. Reviewed the production diff: `DistressedSale.auction()`
@@ -22377,3 +22402,185 @@ commit: a9942fa362
 
 Full acceptance found missing no-bidder distressed-sale narration in logging,
 journal, and report scenarios; requested a functional correction.
+2026-08-06T19:48:36Z — refactorer sent cli-packaged-jar handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: cli-packaged-jar
+commit: f5b47897fd
+```
+
+Summary: the `maven-shade-plugin` binding and pom-inspection scenario
+(`cli-jar-1`) are correct as delivered. `cli-jar-2` (the real end-to-end
+proof: package the CLI, run the jar, check it exits 0 with usage output)
+failed outright before my fix — `World.packageCli()`/`runPackagedCli()`
+both assumed the test process's working directory is the repo root, but
+Surefire runs each module's tests from that module's own directory,
+so the `mvn -pl the-monopoly-game-cli` subprocess and the relative jar
+path both resolved wrong, deterministically (not the known
+`SimulatorTest` flake — this one fails every time). Fixed by reusing
+the existing `PomInspector.repoRoot()` helper (already solves this for
+the pom-inspection scenarios) rather than duplicating the logic, and
+running the subprocess with the correct `ProcessBuilder.directory(...)`.
+Verified by actually running the suite before and after: 1/2 failing to
+2/2 passing, acceptance total 455 with only the 3 already-flagged,
+unrelated `journal-47`/`logging-47`/`report-47` failures remaining
+(twice, for stability, given the new scenario spawns a real subprocess).
+No production code touched; no CRAP/mutation scope applies. The
+packaging capability is now genuinely proven end-to-end.
+2026-08-06T21:10:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: c0d755f4ee
+
+Re-read your role and constitution.
+merge_and_process refactorer c0d755f4ee
+
+Merged `c0d755f4ee`. Domain mutation and DRY checks passed; focused journal
+mutation killed 41/41. The remaining acceptance-scenario content issue is
+specifier-owned, so the task is returning for correction.
+
+## 2026-08-06T21:40:00Z — specifier fixes the scenario defect, finds a second one underneath
+
+Merged the architect's priority-00 handoff (`5ee6ea5900`) as `05ee145`
+(one append-only conflict in `logbook.md`, resolved the usual way).
+Applied the refactorer's precise diagnosis: deleted the four lines
+`journal-47`/`logging-47`/`report-47` redundantly repeated from each
+file's own `Background:` (`we select 2 players`, both initiative rolls,
+`every other player can complete their turn`) — those steps double-
+queued dog's initiative roll, so dog's actual turn drew the duplicate
+`10` instead of the intended `3` and landed on Noord Station instead of
+Extra Belasting. Verified the fix directly: the first assertion in all
+three scenarios ("puts up for sale... before it records... finds no
+bidder") now passes cleanly — confirmed by re-running the acceptance
+suite and checking the failure output no longer mentions it at all.
+
+That exposed a second, different problem underneath, previously masked
+because the scenario never got past the first assertion to reach it:
+the second assertion line now fails with "Ambiguous step" instead of
+"Unsupported step". Traced to `GameLogStepHandlers.java`: the bare
+`"...finds no bidder for " + UNQUOTED_NAME + "$"` pattern (used
+standalone) and the compound `"...finds no bidder for " + UNQUOTED_NAME
++ " before it records that pawn... mortgages... for \$" + VALUE + "$"`
+pattern (used for the ordering assertion) both match the same input
+text. Root cause: `UNQUOTED_NAME = "(<[^<>]+>|.+?)"` — when this sits as
+the last capture immediately before a bare `$` end-anchor with nothing
+else following, the lazy `.+?` still has to expand however far needed
+to satisfy that anchor, so it silently swallows the *entire rest of the
+line*, including a much longer compound step meant for a different,
+more specific pattern. This is why "finds no bidder for Lippenslaan
+Knokke before it records that pawn dog mortgages Lippenslaan Knokke for
+$90" satisfies both regexes at once.
+
+This is a production step-handler defect, not a Gherkin content issue —
+my scenario wording matches the established "X before it records that
+Y" convention used successfully everywhere else in this file (e.g.
+`card-bank-payout-narration`'s chains); there's nothing to change
+Gherkin-side. Not something for the specifier to fix directly (Java
+regex in the acceptance step handlers is implementation, same
+boundary as every other production-code finding this session). Routing
+back to the coder to fix the pattern (e.g. giving the bare "finds no
+bidder" pattern a tighter, non-greedy-to-end-of-string boundary, or
+ensuring the more specific compound pattern is tried first) — this is
+the same class of regex fragility the refactorer already found and
+fixed once in this exact file (the stray-quote bug in the "mortgages"
+clause), just a second instance of it.
+
+Validated with `bb gherkin-parser` (clean) on all three corrected files.
+Ran `./acceptance/run-acceptance.sh`: 455 tests, 5 failures — the three
+no-bidder scenarios now failing one assertion later than before
+("Ambiguous step" instead of "Unsupported step", confirming the
+Background fix genuinely worked), plus the 2 pre-existing, unrelated
+`cli-packaged-jar` failures still awaiting coder implementation. `mvn
+test` unaffected (Gherkin-only change).
+
+Reporting to the user before committing/handing back to the coder.
+
+2026-08-06T22:15:30Z RECEIVED handoff:
+id: 20260806T201350Z_000067_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: d7bc0b39ac
+created_at: 2026-08-06T20:13:50.337857Z
+enqueued_at: 2026-08-06T20:13:50.434429Z
+task: distressed-sale-no-bidder-narration
+dequeued_at: 2026-08-06T20:13:55.702168Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d7bc0b39ac
+
+Merged the scenario-background correction and fixed the standalone no-bidder
+step regex so it cannot also match the compound ordering step. Acceptance
+now passes all three no-bidder narration scenarios; the only remaining full
+suite failure is the unrelated packaged-CLI setup on this branch.
+
+2026-08-06T22:16:00Z SENT handoff draft:
+type: git_handoff
+to: refactorer
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: 7432779f0a
+
+The three new no-bidder narration scenarios pass; the full acceptance suite
+has one unrelated packaged-CLI setup failure on this branch.
+
+## 2026-08-06T20:16:00Z — refactorer receives and reviews the disambiguation fix
+
+Merged `48b95e3886`. This closes the loop on both findings from the
+previous two cycles: the specifier's Background-duplication fix (already
+merged, confirmed still present — `journal-47`/`logging-47`/`report-47`
+no longer redundantly repeat their feature file's own `Background:`
+steps) and the coder's fix for the second, deeper bug the specifier
+found underneath it: the standalone `"...finds no bidder for " +
+UNQUOTED_NAME + "$"` step and the compound `"...finds no bidder for " +
+UNQUOTED_NAME + " before it records..."` step were ambiguous — lazy
+`.+?` immediately before a bare `$` end-anchor has nothing to stop it
+from consuming into text meant for a more specific pattern, so both
+matched the same compound-assertion input.
+
+Fix: a new `UNQUOTED_NAME_WITHOUT_ORDERING` pattern
+(`(?:(?! before it records that pawn | before it says that pawn ).)+?`)
+used only by the three standalone "finds no bidder" step patterns — a
+negative lookahead applied per character blocks the lazy match from ever
+consuming through either ordering conjunction, so the standalone pattern
+now structurally cannot match compound-assertion text, regardless of
+step registration order.
+
+Verified this independently, not just by trusting the scenario went
+green: reimplemented both patterns in Python and checked all three
+cases — the "puts...before...finds" line matches only the puts-compound
+pattern, the "finds...before...mortgages" line matches only the
+finds-compound pattern, and neither matches the (currently unused, but
+now safe for future use) standalone pattern; a hypothetical standalone
+line matches only the standalone pattern, with correct captures. Genuine
+disambiguation, not an accidental pass.
+
+No `src/main` production code touched, so no CRAP/mutation scope
+applies. `dry4java`: the only flagged `MonopolyStepHelpers.java` ranges
+are the pre-existing `Claim`/`...Line` helper-method-shape pattern
+already present throughout that file, unrelated to the new constant.
+
+Ran `./acceptance/run-acceptance.sh` twice: 455 tests, 0 failures both
+times — the packaged-CLI setup failure the coder's own note mentions was
+specific to their branch state before this merge; already resolved by my
+`cli-packaged-jar` working-directory fix from two cycles ago, confirmed
+still combined correctly here. `mvn test` and `mvn test -P
+property-tests` both hit the already-diagnosed `SimulatorTest`
+full-reactor flake, not re-investigated again.
+
+Nothing to commit this cycle — the coder's fix was correct and complete
+as delivered; my role here was independent verification, not further
+change. Handing off to architect: both the scenario-content defect and
+the regex-ambiguity defect from the last two cycles are now genuinely
+closed, confirmed by a fully green acceptance suite.

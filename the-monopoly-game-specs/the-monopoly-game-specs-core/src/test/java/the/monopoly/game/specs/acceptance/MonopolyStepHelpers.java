@@ -24,6 +24,8 @@ final class MonopolyStepHelpers {
   static final String VALUE = "(<[^<>]+>|-?[0-9,]+)";
   static final String NAME = "(<[^<>]+>|[^\"]+)";
   static final String UNQUOTED_NAME = "(<[^<>]+>|.+?)";
+  static final String UNQUOTED_NAME_WITHOUT_ORDERING =
+      "(<[^<>]+>|(?:(?! before it records that pawn | before it says that pawn ).)+?)";
   static final Pattern DICE_DESCRIPTION = Pattern.compile("([0-9]+) faced");
 
   private MonopolyStepHelpers() {

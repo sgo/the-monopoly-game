@@ -601,11 +601,7 @@ Feature: game journal
 
   # journal-47
   Scenario Outline: the journal records that no one bids before it records the resulting mortgage
-    Given we select 2 players
-    And pawn "dog" will roll 10 for initiative
-    And pawn "high hat" will roll 4 for initiative
-    And every other player can complete their turn
-    And pawn "high hat" follows the "Greedo" strategy, keeping a $<high_hat_reserve> reserve
+    Given pawn "high hat" follows the "Greedo" strategy, keeping a $<high_hat_reserve> reserve
     And pawn "high hat" has $<high_hat_starting_balance> to spend
     And pawn "dog" owns "Lippenslaan Knokke"
     And pawn "dog" has $<dog_starting_balance> to spend
