@@ -22136,3 +22136,17 @@ handlers" (5 files). Handing off to architect: production code is
 correct and verified; the three new acceptance scenarios need a
 Gherkin-content fix from the specifier before they can pass, full
 diagnosis included above.
+
+2026-08-06T21:10:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: c0d755f4ee
+
+Re-read your role and constitution.
+merge_and_process refactorer c0d755f4ee
+
+Merged `c0d755f4ee`. Domain mutation and DRY checks passed; focused journal
+mutation killed 41/41. The remaining acceptance-scenario content issue is
+specifier-owned, so the task is returning for correction.
