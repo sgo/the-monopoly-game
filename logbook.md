@@ -21952,3 +21952,34 @@ yet. `mvn test` at the full-reactor level hit the same pre-existing
 isolation again); unrelated to this change.
 
 Reporting to the user before committing/handing off.
+
+User approved. Committed as `a00761a2b9` "Specify the missing narration
+when a distressed-sale auction finds no bidder" (4 files, 110
+insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: a00761a2b9
+```
+
+Summary: `DistressedSale.auction()` fires `distressedSaleStarted` for
+every candidate property unconditionally, but returns silently with no
+event at all when the auction finds zero eligible bidders — no
+`distressedOffer`, no `distressedSaleWon`, nothing closes the "X puts Y
+up for sale to avoid bankruptcy" narration thread. Most likely to bite
+on spare utilities specifically, since `Greedo.bidForDistressed()` only
+ever bids on a utility when it completes the bidder's own utility
+monopoly (utilities are always `Priority.LOWEST`, never eligible for
+the "deny an opponent" bid streets get). New `Journal.Entry` needed
+(narrated as `"<seller> finds no bidder for <land>"`, matching the
+existing subject-verb-object style) firing exactly where
+`bidders.isEmpty()` currently returns silently. New scenarios
+`journal-47`/`logging-47`/`report-47`, reusing `distressed-sale-3`'s
+existing setup (already proves the zero-bidder → falls-through-to-
+mortgage mechanic; only the narration was missing). Fails today with
+"Unsupported step," confirming genuinely new capability.
