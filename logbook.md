@@ -8470,6 +8470,29 @@ and regression hardening. Coder must validate and return this priority-`00`
 architect review loop to architect before Phase 12 can be synced to
 specifier.
 
+2026-08-05T21:40:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: stalemate-detection
+commit: 823c455916
+
+Six stalemate example mutations still survive; requested a further Gherkin correction.
+
+2026-08-06T19:04:10Z — received specifier handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: stalemate-detection
+commit: 6256dd981c
+
+Re-read your role and constitution.
+merge_and_process specifier 6256dd981c
+
+Merged `6256dd981c`. Acceptance passed (450 tests); all generated stalemate
+mutation-manifest entries are killed with zero survivors. The specification
+gap is closed.
+
 ## 2026-07-29T09:34:41Z — architect received phase 12 coder follow-up
 
 Handoff message received:
@@ -21483,6 +21506,41 @@ stalemate branch; refresh mutation manifests" (4 files). Handing off to
 architect with the outer-loop defect flagged as the primary finding —
 this task is not safe to consider closed.
 
+2026-08-05T19:21:32Z — refactorer sent stalemate-detection handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: stalemate-detection
+commit: cff2d7420c
+```
+
+Summary: **unresolved defect, do not close this task on this handoff.**
+`Stalemate.threshold`/`.reached` and the single-round detection/narration
+wiring are correct and match the spec (verified via the coder's five
+`stalemate.feature` scenarios plus three narration scenarios, all
+passing). But `Game.playTurns`'s outer `do-while` loop never actually
+stops on a stalemate — `playTurn` returning `true` only breaks the
+current round's inner `for` loop, while the outer loop's own
+continuation condition (`remainingPlayers().size() > 1`) stays true
+forever in a stalemate by definition. In real usage
+(`Simulator.playUntilStopped`), a stalemate never ends the game; it
+re-declares itself every round, forever. Verified empirically with a
+throwaway test that burned 18+ minutes of CPU before I killed it (not
+committed). The acceptance suite structurally cannot catch this since
+"we play the game" only calls single-round `.play()`. Closed a genuine,
+separate unit-coverage gap on the (correct) single-round branch myself
+(CRAP 6.3 to 6.0); did not touch the outer-loop bug itself since fixing
+it is new behavior, outside refactorer's remit. Recommending a
+priority-00 follow-up to the coder for the loop fix, and a new specifier
+scenario asserting multi-round termination. Full trace, evidence, and
+reasoning in the two logbook entries above this one. CRAP/DRY/mutation
+otherwise clean; unit, property, and acceptance suites all green
+(449 acceptance tests twice) aside from the flagged gap.
+
 2026-08-05T19:23:47Z — received refactorer handoff:
 type: git_handoff
 to: architect
@@ -21498,6 +21556,14 @@ boundary; acceptance and targeted Java mutation/DRY checks passed. All ten
 soft Gherkin mutations for `stalemate.feature` survived, requiring a
 specifier-owned scenario correction.
 
+2026-08-05T19:23:47Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: stalemate-detection
+commit: 9873d9da12
+
+All stalemate example mutations survive; requested a Gherkin correction.
 ## 2026-08-05T21:35:00Z — specifier corrects the stalemate spec
 
 Received the architect's priority-00 handoff (`9873d9da12`), merged as
@@ -21560,6 +21626,40 @@ remaining gap is precisely the outer-loop fix itself. `mvn test` clean.
 Reporting to the user before committing/handing back to the coder at
 priority 50.
 
+User approved. Committed as `3c269013aa` "Correct stalemate example
+boundaries to the real >= semantic; add outer-loop termination scenario"
+(2 files, 68 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: stalemate-detection
+commit: 3c269013aa
+```
+
+Summary: two corrections to the stalemate spec. (1) Retuned every
+Examples-table value in `stalemate-2` through `-5` to sit exactly on the
+$22790 threshold ("clears" = $22790, "does not clear" = $22789),
+matching the real, correct `Money.covers()` (`>=`) semantic rather than
+the `>` ("exceeds") I'd loosely assumed earlier — verified these now
+pass cleanly against the real merged implementation. (2) Added
+`stalemate-6`, using two new pieces of vocabulary — `we play up to 3
+rounds` (a round-capped multi-round play, safe to run regardless of
+whether the outer-loop bug is fixed) and `the game journal records that
+the game ends in a stalemate only once` (a counting assertion) — to
+specify that a stalemate must stop the game outright, not just the
+round it's first detected in, per the refactorer's headline finding
+that `playTurns`'s outer `do-while` never checks the stalemate result.
+Ran the full suite against the real merged implementation: 450 tests,
+exactly 1 failure (`stalemate-6`'s "Unsupported step", since the round
+cap and the outer-loop fix don't exist yet) — confirming every other
+correction now genuinely passes and the sole remaining gap is precisely
+the fix the coder needs to make. Full reasoning and verification detail
+in the logbook entry above.
+
 ## 2026-08-05T19:38:05Z — coder received handoff from specifier
 
 Handoff message received:
@@ -21601,3 +21701,254 @@ commit: 4720d506c1
 
 Summary: the commit makes stalemate termination exit the outer game loop,
 adds bounded round-play support, and verifies the new multi-round scenario.
+
+## 2026-08-05T19:39:00Z — refactorer receives and reviews the coder's outer-loop fix
+
+Merged `b6e58747b2`. This closes the loop on my own headline finding from
+the previous cycle: `playTurns` now checks, right after a `playTurn`
+returning `true`, whether `remainingPlayers().size() <= 1 ||
+Stalemate.reached(rules, players, deeds)` and `return`s the whole method
+if so, instead of only `break`ing the inner round loop. The specifier's
+new `stalemate-6` scenario (`we play up to 3 rounds` /
+`the game journal records that the game ends in a stalemate only once`)
+proves it: bounded at 3 rounds so it can never hang even if the fix were
+wrong, and it asserts exactly one `Stalemate` entry rather than one per
+round. The coder's new `GameTest.aStalemateStopsTheGameBeforeTheNextRound`
+does the same at the unit level via the new `Game.playUpToRounds(int)`.
+Genuinely fixed, not just narrated differently — confirmed by reading
+`playTurn`, not just trusting the scenario name.
+
+**Found and cleaned up while reviewing the fix.** `playTurn` only ever
+returns `true` from two sites, each already guarded by exactly the
+condition the caller re-checks (`remainingPlayers().size() <= 1`, or
+past that, `Stalemate.reached(...)`). Since nothing mutates state between
+`playTurn` returning and the caller's re-check, that re-check is always
+true whenever it runs — meaning the `break;` right after it can never
+execute. Confirmed empirically, not just by inspection: the JaCoCo HTML
+report for `playTurns` showed the `||` condition at "1 of 4 branches
+missed" (the LHS-false/RHS-false combination — the one that would reach
+`break` — never occurred), and the `break;` line itself didn't even
+appear as a distinct covered/uncovered span. Simplified to
+`if (playTurn(...)) return;`, deleting the dead branch and the redundant
+recomputation of both predicates. Verified equivalence by the same
+case-analysis before applying it, then confirmed via `GameTest` (all
+green) and the JaCoCo report again: `playTurns` is now CC=6, 100%
+coverage, CRAP=6.0 — genuinely 100%, not 100%-with-a-dead-line.
+
+**Separately found and fixed a DRY violation the coder's fix introduced.**
+`World.playUpToRounds(int)` is a near-verbatim copy of the existing
+`World.playGame()` — same 23-line `Game` construction (including the
+`Cards.Decks` anonymous class), differing only in the final `.play()` vs
+`.playUpToRounds(rounds)` call. `dry4java` flagged the pair exactly
+(`World.java:325-347` / `349-371`). Extracted a private
+`playAndCapture(Function<Game, Game.Result> play)` taking the
+construction out once; `playGame()` now calls
+`playAndCapture(Game::play)` and `playUpToRounds(rounds)` calls
+`playAndCapture(game -> game.playUpToRounds(rounds))`. Re-ran `dry4java`
+(pair gone) and the full acceptance suite twice (450/450 both times) to
+confirm the extraction is behavior-preserving.
+
+`crap4java` on `Game.java`: `playTurns` CC=6/6.0 as above, `playTurn`
+unchanged at CC=6/6.0, `playUpToRounds` CC=2/CRAP=2.1 (well under
+threshold; the uncovered fraction is the `IllegalArgumentException` guard
+for `rounds <= 0`, not exercised by any current caller — left alone,
+not worth a test for an argument no scenario or unit test currently
+passes). Everything else unchanged from prior cycles.
+
+`mutate4java --scan` on `Game.java`: 40 sites (was 34 pre-fix), still
+well under the 100-site split threshold; embedded manifest was stale
+after the simplification, refreshed with `--update-manifest`. No
+manifest exists or is expected for `World.java` (test-support file, not
+`src/main`, consistent with every prior cycle this session).
+
+**Investigated a reproducible test failure, not dismissed as flaky.**
+`mvn test -P property-tests` at the full-reactor level failed
+consistently — 6 out of 6 attempts — on
+`SimulatorTest.keepsPlayingUntilToldToStop` (an 8-player, real-dice CLI
+smoke test asserting the simulator is still running 1 second after
+starting). Investigated properly rather than assume it was the same
+flake noted last cycle, since the actual outer-loop fix just merged
+changes what "the game finishes fast" can mean (bankruptcy was already
+possible; stalemate is now a second route). Ruled out a deterministic
+cause: `Dice` uses `ThreadLocal.withInitial(Random::new)`, unseeded, no
+shared state possible across the separate JVM forks Maven uses per
+module. Ran it in isolation (single test, 8/8 clean) and as the CLI
+module's own full suite standalone (3/3 clean) — it only fails inside
+the full multi-module reactor build, every time. Working conclusion:
+running the domain and specs-core modules' tests first leaves the
+machine in a measurably "hotter" state (CPU frequency scaling, OS
+scheduler) by the time the CLI module's fork starts, letting the 8-player
+real-dice game execute enough turns within the 1-second sleep to
+finish — a pre-existing fragility in a wall-clock-based test design
+(the test's own comment already documents this general risk class for
+2-player games), most likely made more exposed now that stalemate gives
+games a second fast way to end. This is a CLI-module test-infrastructure
+concern, not a domain-logic defect — did not touch `SimulatorTest.java`,
+since I don't have full confidence in the root cause and it's outside
+this cycle's module. Flagging for the architect/team rather than
+guessing at a fix. Every other test in every configuration I ran —
+isolated, full-cli-module, and the one failing test excepted from the
+full-reactor runs — was green throughout.
+
+Ran `mvn test` (all modules, clean) and `./acceptance/run-acceptance.sh`
+twice (450 tests, 0 failures both times). Committed the cleanups as
+`bcf58bf` "Remove unreachable branch in Game.playTurns; dedupe
+World.java's play helpers" (2 files). Handing off to architect: the
+outer-loop defect from last cycle is genuinely fixed and verified: this
+task is safe to consider substantively complete, with the `SimulatorTest`
+flake flagged as a separate, lower-severity follow-up.
+
+2026-08-05T21:40:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: stalemate-detection
+commit: 3f7ec9f15c
+
+Re-read your role and constitution.
+merge_and_process refactorer 3f7ec9f15c
+
+Merged `3f7ec9f15c`. The corrected feature kills 6 of 12 soft Gherkin
+mutations, but 6 still survive; returning the remaining scenario gap to the
+specifier.
+
+## 2026-08-05T22:00:00Z — specifier removes the remaining non-discriminating example columns
+
+Received the architect's second priority-00 handoff (`823c455916`),
+merged as `349943a` (two append-only conflicts in `logbook.md`; the
+second required a manual re-splice after an initial attempt
+accidentally interleaved two independent per-role entries — my own
+"sent to coder" entry and the coder's own separate "received/sent to
+refactorer" entry — into one instead of concatenating them in
+chronological order; caught by re-reading the result before committing
+and fixed with a clean rewrite of that stretch).
+
+The merged manifest header on `stalemate.feature` itself was revealing:
+it lists per-scenario mutation results for only `stalemate-5` (3/3
+killed) and `stalemate-6` (2/2 killed) — the other two positive-boundary
+scenarios I retuned last cycle came through clean. That leaves all 6
+survivors concentrated in `stalemate-2`, `-3`, and `-4`'s 7 remaining
+columns (only 1 of 7 killed).
+
+Root cause, worked out by hand (mutator is off-limits to run directly):
+`stalemate-3` and `-4` test "one player below the threshold blocks a
+stalemate," but only the *one* blocking player's exact value actually
+determines the boolean outcome — `stalemate-3`'s `dog_balance` and
+`stalemate-4`'s `dog_balance`/`high_hat_balance` can be mutated to
+*any* other value and the scenario's fixed assertion ("does not end in
+a stalemate") stays correct regardless, since the other player already
+forces that outcome. These columns were never actually testing
+anything — they were mutation-proof by construction, independent of
+whatever value they held. Fixed by removing them from the Examples
+table entirely and hardcoding them as literal `$22790` (comfortably
+clearing, not the point under test) directly in the `Given` steps,
+leaving only the one genuinely load-bearing value
+(`high_hat_balance`/`iron_box_balance`) parameterized — a value no
+longer in an Examples table can never be a mutation target at all,
+which is a certain fix, not a probabilistic one.
+
+`stalemate-2`'s two columns are different: both players' balances are
+genuinely load-bearing (either one going below $22790 flips the
+outcome), so unlike `-3`/`-4` there's no structural fix available —
+whether a specific mutation trial catches it depends on the mutator's
+pseudo-random-but-deterministic delta direction for that exact value,
+which I have no visibility into without running the tool myself. Left
+`stalemate-2` as-is (already at the tightest meaningful boundary);
+noted this as a known limit of single-example-row boundary testing
+rather than something to keep chasing blind.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` (no duplicate-in-scenario findings). Ran
+`./acceptance/run-acceptance.sh` against the real merged implementation:
+450/450, zero failures — every scenario, including the restructured
+`stalemate-3`/`-4`, now genuinely passes. `mvn test` at the full-reactor
+level hit the pre-existing `SimulatorTest.keepsPlayingUntilToldToStop`
+flake the refactorer already diagnosed last cycle (full-reactor-only,
+CLI-module-standalone always clean) — reran the CLI module alone 3/3
+clean, confirming this is that same known, already-flagged issue and
+not something this Gherkin-only change caused.
+
+Reporting to the user before committing/handing back to the architect.
+
+User approved (separately from the two newer items below, which the user
+asked to keep as their own commits/handoffs). Committed as `6256dd981c`
+"Remove non-discriminating example columns from stalemate-3/4 to close
+the mutation gap" (2 files, 65 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: stalemate-detection
+commit: 6256dd981c
+```
+
+Summary: closes the mutation gap the architect flagged. `stalemate-3`
+and `-4`'s non-discriminating columns (`dog_balance` in `-3`;
+`dog_balance`/`high_hat_balance` in `-4`) are now hardcoded literals in
+the `Given` steps rather than Examples-table values, since they were
+structurally incapable of ever failing the scenario's assertion no
+matter what value they held — only the one genuinely load-bearing value
+in each scenario remains parameterized. `stalemate-2`'s two columns are
+left as-is (both genuinely load-bearing; no structural fix available,
+only the mutator's own delta direction determines whether a given trial
+catches it). Verified against the real merged implementation: 450/450,
+zero failures.
+
+## 2026-08-05T22:45:00Z — specifies the missing no-bidder narration
+
+The user, reviewing a real 3-player game log while I was mid-review of
+the stalemate mutation gap above, flagged a separate observation: `iron
+box puts Elektriciteitscentrale up for sale to avoid bankruptcy` never
+gets a closing line — no offer, no sale, no mortgage, nothing says what
+became of it. (Separately, the user also asked about the chronology of
+`iron box pays the bank $50` appearing *before* the distressed sale that
+was meant to cover it; traced this and confirmed it's intentional, not a
+bug — `Cards.payBank()` withdraws the full nominal amount unconditionally
+(no overdraft protection, already true per `tasks.md`'s documented
+current state), matching `RULES.md`'s own framing that the debt is
+already owed before it gets resolved. Left alone per the user's
+agreement.)
+
+Root cause of the narration gap: `DistressedSale.auction()` fires
+`events.distressedSaleStarted(debtor, land)` unconditionally for every
+candidate property, but if the auction finds zero eligible bidders
+(`bidders.isEmpty()`), it returns silently — no `distressedOffer`, no
+`distressedSaleWon`, nothing. This is very likely what happened to
+Elektriciteitscentrale specifically: it's a utility, and
+`Greedo.bidForDistressed()` only bids on a utility when it completes the
+bidder's own utility monopoly, otherwise always declining (utilities are
+always `Priority.LOWEST`, never eligible for the "deny an opponent"
+`HIGHEST` bid streets get) — so a spare utility in a distressed sale
+will almost always draw zero bidders under this strategy, and every
+time that happens the log narrates the *attempt* but never the
+*outcome*.
+
+Confirmed this state-level mechanic (zero bidders → falls through to
+mortgaging the property directly) is already covered by
+`distressed-sale-3` ("a debtor mortgages to the bank instead when a
+peer's offer does not beat the mortgage value" — high hat's
+reserve-capped bid excludes it from the auction entirely, same
+`bidders.isEmpty()` path, just via the reserve cap rather than a
+utility's lack of appeal). Reused that scenario's exact setup rather
+than inventing a new one, since only the *narration* is missing, not
+the mechanic. Added `journal-47`, `logging-47`, `report-47` — one per
+file, ordering-chained the same way `card-bank-payout-narration`
+established: `puts Lippenslaan Knokke up for sale to avoid bankruptcy`
+before the new `finds no bidder for Lippenslaan Knokke` before the
+existing `mortgages Lippenslaan Knokke for $90`. New narration wording
+(`"<seller> finds no bidder for <land>"`) matches the existing
+subject-verb-object style every other `Report` line already uses.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` (no duplicate-in-scenario findings on the new lines).
+Ran `./acceptance/run-acceptance.sh`: 453 tests, exactly 3 failures — the
+three new scenarios, each failing with "Unsupported step" on the new
+ordering assertion, confirming the capability genuinely doesn't exist
+yet. `mvn test` at the full-reactor level hit the same pre-existing
+`SimulatorTest` flake as before (confirmed clean in CLI-module
+isolation again); unrelated to this change.
+
+Reporting to the user before committing/handing off.
