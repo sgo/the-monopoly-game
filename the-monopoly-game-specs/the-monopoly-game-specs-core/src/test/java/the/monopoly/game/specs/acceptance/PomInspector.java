@@ -47,7 +47,7 @@ final class PomInspector {
   }
 
   /** Walks up from the current working directory to find the checkout containing {@code moduleDirectory}. */
-  private static Path repoRoot(String moduleDirectory) {
+  static Path repoRoot(String moduleDirectory) {
     Path directory = Path.of("").toAbsolutePath();
     while (directory != null) {
       if (Files.isDirectory(directory.resolve(moduleDirectory)))
