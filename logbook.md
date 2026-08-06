@@ -22309,3 +22309,37 @@ Background fix genuinely worked), plus the 2 pre-existing, unrelated
 test` unaffected (Gherkin-only change).
 
 Reporting to the user before committing/handing back to the coder.
+
+User approved. Committed as `d7bc0b39ac` "Fix redundant Background
+duplication in no-bidder-narration scenarios; expose an ambiguous-step
+regex bug underneath" (4 files, 59 insertions, 15 deletions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: d7bc0b39ac
+```
+
+Summary: the refactorer's scenario-content diagnosis is fixed —
+`journal-47`/`logging-47`/`report-47` no longer redundantly repeat
+their own `Background:` steps, so dog's initiative-roll queue is no
+longer double-queued and the first assertion in each scenario now
+passes. That surfaced a second, previously-masked bug: the second
+assertion now fails with "Ambiguous step" rather than "Unsupported
+step". Root cause in `GameLogStepHandlers.java`, not Gherkin:
+`UNQUOTED_NAME = "(<[^<>]+>|.+?)"`, when it's the last capture
+immediately before a bare `$` end-anchor with nothing following, has to
+expand however far needed to satisfy that anchor — so the bare "X finds
+no bidder for Y" pattern also matches the much longer compound "X finds
+no bidder for Y before it records that... mortgages... for $Z" pattern
+meant for the ordering assertion. Same class of regex fragility the
+refactorer already found and fixed once in this exact file (the
+stray-quote bug in the "mortgages" clause); needs a tighter boundary on
+the bare pattern (or pattern-specificity ordering) to disambiguate.
+Verified my fix directly: reran the acceptance suite and confirmed the
+failure output no longer mentions the first assertion at all, only the
+new ambiguity on the second line.
