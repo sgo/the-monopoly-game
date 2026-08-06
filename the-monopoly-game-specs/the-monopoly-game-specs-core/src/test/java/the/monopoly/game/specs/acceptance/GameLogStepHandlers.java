@@ -16,6 +16,7 @@ import static the.monopoly.game.specs.acceptance.GameAccount.recordsInOrder;
 import static the.monopoly.game.specs.acceptance.GameAccount.says;
 import static the.monopoly.game.specs.acceptance.GameAccount.saysInOrder;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.NAME;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.UNQUOTED_NAME;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.VALUE;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.auctionWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.auctionWonLine;
@@ -32,6 +33,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.chanceCardD
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.communityChestCardDrawn;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.communityChestCardDrawnLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.distressedOffer;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.distressedNoBidder;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.distressedStarted;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.distressedWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.dollars;
@@ -161,6 +163,20 @@ final class GameLogStepHandlers {
         then("^the game journal records that pawn \"" + NAME + "\" puts \"" + NAME
                 + "\" up for sale to avoid bankruptcy$",
             (world, arguments) -> records(world, distressedStarted(arguments.text(1), arguments.text(2)))),
+        then("^the game journal records that pawn \"" + NAME + "\" finds no bidder for " + UNQUOTED_NAME + "$",
+            (world, arguments) -> records(world, distressedNoBidder(arguments.text(1), arguments.text(2)))),
+        then("^the game journal records that pawn \"" + NAME + "\" puts " + UNQUOTED_NAME
+                + " up for sale to avoid bankruptcy before it records that pawn \"" + NAME
+                + "\" finds no bidder for " + UNQUOTED_NAME + "$",
+            (world, arguments) -> recordsInOrder(world,
+                distressedStarted(arguments.text(1), arguments.text(2)),
+                distressedNoBidder(arguments.text(3), arguments.text(4)))),
+        then("^the game journal records that pawn \"" + NAME + "\" finds no bidder for " + UNQUOTED_NAME
+                + " before it records that pawn \"" + NAME + "\" mortgages " + UNQUOTED_NAME
+                + " for \\$" + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                distressedNoBidder(arguments.text(1), arguments.text(2)),
+                mortgaged(arguments.text(3), arguments.text(4), arguments.number(5)))),
         then("^the game journal records that pawn \"" + NAME + "\" offers \\$" + VALUE
                 + " for \"" + NAME + "\"$",
             (world, arguments) -> records(world, distressedOffer(
@@ -172,6 +188,20 @@ final class GameLogStepHandlers {
         then("^the game log records that pawn \"" + NAME + "\" puts \"" + NAME
                 + "\" up for sale to avoid bankruptcy$",
             (world, arguments) -> logRecords(world, distressedStarted(arguments.text(1), arguments.text(2)))),
+        then("^the game log records that pawn \"" + NAME + "\" finds no bidder for " + UNQUOTED_NAME + "$",
+            (world, arguments) -> logRecords(world, distressedNoBidder(arguments.text(1), arguments.text(2)))),
+        then("^the game log records that pawn \"" + NAME + "\" puts " + UNQUOTED_NAME
+                + " up for sale to avoid bankruptcy before it records that pawn \"" + NAME
+                + "\" finds no bidder for " + UNQUOTED_NAME + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                distressedStarted(arguments.text(1), arguments.text(2)),
+                distressedNoBidder(arguments.text(3), arguments.text(4)))),
+        then("^the game log records that pawn \"" + NAME + "\" finds no bidder for " + UNQUOTED_NAME
+                + " before it records that pawn \"" + NAME + "\" mortgages " + UNQUOTED_NAME
+                + " for \\$" + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                distressedNoBidder(arguments.text(1), arguments.text(2)),
+                mortgaged(arguments.text(3), arguments.text(4), arguments.number(5)))),
         then("^the game log records that pawn \"" + NAME + "\" offers \\$" + VALUE
                 + " for \"" + NAME + "\"$",
             (world, arguments) -> logRecords(world, distressedOffer(
@@ -184,6 +214,20 @@ final class GameLogStepHandlers {
                 + "\" up for sale to avoid bankruptcy$",
             (world, arguments) -> says(world, arguments.text(1) + " puts " + arguments.text(2)
                 + " up for sale to avoid bankruptcy")),
+        then("^the game report says that pawn \"" + NAME + "\" finds no bidder for " + UNQUOTED_NAME + "$",
+            (world, arguments) -> says(world, arguments.text(1) + " finds no bidder for " + arguments.text(2))),
+        then("^the game report says that pawn \"" + NAME + "\" puts " + UNQUOTED_NAME
+                + " up for sale to avoid bankruptcy before it says that pawn \"" + NAME
+                + "\" finds no bidder for " + UNQUOTED_NAME + "$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + " puts " + arguments.text(2) + " up for sale to avoid bankruptcy",
+                arguments.text(3) + " finds no bidder for " + arguments.text(4))),
+        then("^the game report says that pawn \"" + NAME + "\" finds no bidder for " + UNQUOTED_NAME
+                + " before it says that pawn \"" + NAME + "\" mortgages " + UNQUOTED_NAME
+                + " for \\$" + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + " finds no bidder for " + arguments.text(2),
+                arguments.text(3) + " mortgages " + arguments.text(4) + " for $" + arguments.number(5))),
         then("^the game report says that pawn \"" + NAME + "\" offers \\$" + VALUE
                 + " for \"" + NAME + "\"$",
             (world, arguments) -> says(world, arguments.text(1) + " offers $" + arguments.number(2)

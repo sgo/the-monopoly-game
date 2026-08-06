@@ -171,6 +171,20 @@ class BankruptcyTest {
   }
 
   @Test
+  void aDistressedSaleReportsWhenNobodyCanBid() {
+    Deeds deeds = new Deeds();
+    Ownable land = (Ownable) rules.create(Street.Type.LippenslaanKnokke);
+    give(deeds, land, dog);
+    dog.account().withdraw(new Money(1514));
+    Events events = new Events();
+
+    new Bankruptcy(deeds, rules, players, Strategy.OfPlayers.NOBODY_DECIDES, events).resolve(dog, null);
+
+    assertThat(events.noBidder).isTrue();
+    assertThat(deeds.isMortgaged(land)).isTrue();
+  }
+
+  @Test
   void aDistressedOfferBelowTheMortgageValueIsRejected() {
     Deeds deeds = new Deeds();
     Ownable land = (Ownable) rules.create(Street.Type.LippenslaanKnokke);
@@ -274,6 +288,7 @@ class BankruptcyTest {
   private static final class Events implements Bankruptcy.Events {
     private boolean bankrupt;
     private Player winner;
+    private boolean noBidder;
 
     @Override
     public void bankrupt(Player debtor, Player creditor) {
@@ -283,6 +298,11 @@ class BankruptcyTest {
     @Override
     public void won(Player player) {
       winner = player;
+    }
+
+    @Override
+    public void distressedSaleNoBidder(Player seller, Ownable land) {
+      noBidder = true;
     }
   }
 }
