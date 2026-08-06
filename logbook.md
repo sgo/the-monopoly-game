@@ -22253,3 +22253,59 @@ merge_and_process refactorer c0d755f4ee
 Merged `c0d755f4ee`. Domain mutation and DRY checks passed; focused journal
 mutation killed 41/41. The remaining acceptance-scenario content issue is
 specifier-owned, so the task is returning for correction.
+
+## 2026-08-06T21:40:00Z — specifier fixes the scenario defect, finds a second one underneath
+
+Merged the architect's priority-00 handoff (`5ee6ea5900`) as `05ee145`
+(one append-only conflict in `logbook.md`, resolved the usual way).
+Applied the refactorer's precise diagnosis: deleted the four lines
+`journal-47`/`logging-47`/`report-47` redundantly repeated from each
+file's own `Background:` (`we select 2 players`, both initiative rolls,
+`every other player can complete their turn`) — those steps double-
+queued dog's initiative roll, so dog's actual turn drew the duplicate
+`10` instead of the intended `3` and landed on Noord Station instead of
+Extra Belasting. Verified the fix directly: the first assertion in all
+three scenarios ("puts up for sale... before it records... finds no
+bidder") now passes cleanly — confirmed by re-running the acceptance
+suite and checking the failure output no longer mentions it at all.
+
+That exposed a second, different problem underneath, previously masked
+because the scenario never got past the first assertion to reach it:
+the second assertion line now fails with "Ambiguous step" instead of
+"Unsupported step". Traced to `GameLogStepHandlers.java`: the bare
+`"...finds no bidder for " + UNQUOTED_NAME + "$"` pattern (used
+standalone) and the compound `"...finds no bidder for " + UNQUOTED_NAME
++ " before it records that pawn... mortgages... for \$" + VALUE + "$"`
+pattern (used for the ordering assertion) both match the same input
+text. Root cause: `UNQUOTED_NAME = "(<[^<>]+>|.+?)"` — when this sits as
+the last capture immediately before a bare `$` end-anchor with nothing
+else following, the lazy `.+?` still has to expand however far needed
+to satisfy that anchor, so it silently swallows the *entire rest of the
+line*, including a much longer compound step meant for a different,
+more specific pattern. This is why "finds no bidder for Lippenslaan
+Knokke before it records that pawn dog mortgages Lippenslaan Knokke for
+$90" satisfies both regexes at once.
+
+This is a production step-handler defect, not a Gherkin content issue —
+my scenario wording matches the established "X before it records that
+Y" convention used successfully everywhere else in this file (e.g.
+`card-bank-payout-narration`'s chains); there's nothing to change
+Gherkin-side. Not something for the specifier to fix directly (Java
+regex in the acceptance step handlers is implementation, same
+boundary as every other production-code finding this session). Routing
+back to the coder to fix the pattern (e.g. giving the bare "finds no
+bidder" pattern a tighter, non-greedy-to-end-of-string boundary, or
+ensuring the more specific compound pattern is tried first) — this is
+the same class of regex fragility the refactorer already found and
+fixed once in this exact file (the stray-quote bug in the "mortgages"
+clause), just a second instance of it.
+
+Validated with `bb gherkin-parser` (clean) on all three corrected files.
+Ran `./acceptance/run-acceptance.sh`: 455 tests, 5 failures — the three
+no-bidder scenarios now failing one assertion later than before
+("Ambiguous step" instead of "Unsupported step", confirming the
+Background fix genuinely worked), plus the 2 pre-existing, unrelated
+`cli-packaged-jar` failures still awaiting coder implementation. `mvn
+test` unaffected (Gherkin-only change).
+
+Reporting to the user before committing/handing back to the coder.
