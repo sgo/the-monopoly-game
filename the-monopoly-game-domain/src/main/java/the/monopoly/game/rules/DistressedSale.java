@@ -94,7 +94,10 @@ final class DistressedSale {
         .filter(player -> !player.id().equals(debtor.id()) && !deeds.isBankrupt(player))
         .filter(player -> maximumBid(player, debtor, land).amount() >= minimumBid)
         .toList();
-    if (bidders.isEmpty()) return new AuctionResult(null, Money.ZERO);
+    if (bidders.isEmpty()) {
+      events.distressedSaleNoBidder(debtor, land);
+      return new AuctionResult(null, Money.ZERO);
+    }
 
     List<Money> maximums = bidders.stream().map(player -> maximumBid(player, debtor, land)).toList();
     if (bidders.size() == 1) {

@@ -23,6 +23,7 @@ final class MonopolyStepHelpers {
   /** Either a literal amount or a {@code <placeholder>} naming an example column. */
   static final String VALUE = "(<[^<>]+>|-?[0-9,]+)";
   static final String NAME = "(<[^<>]+>|[^\"]+)";
+  static final String UNQUOTED_NAME = "(<[^<>]+>|.+?)";
   static final Pattern DICE_DESCRIPTION = Pattern.compile("([0-9]+) faced");
 
   private MonopolyStepHelpers() {
@@ -150,6 +151,10 @@ final class MonopolyStepHelpers {
 
   static Claim distressedStarted(String seller, String spaceName) {
     return Claim.of(new Entry.DistressedSaleStarted(idOf(seller), SpaceNames.of(spaceName)));
+  }
+
+  static Claim distressedNoBidder(String seller, String spaceName) {
+    return Claim.of(new Entry.DistressedSaleNoBidder(idOf(seller), SpaceNames.of(spaceName)));
   }
 
   static Claim distressedOffer(String bidder, String spaceName, int price) {

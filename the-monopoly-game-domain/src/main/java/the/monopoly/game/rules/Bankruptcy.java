@@ -158,6 +158,9 @@ public final class Bankruptcy {
     default void distressedSaleStarted(Player seller, Ownable land) {
     }
 
+    default void distressedSaleNoBidder(Player seller, Ownable land) {
+    }
+
     default void distressedOffer(Player bidder, Ownable land, Money price) {
     }
 

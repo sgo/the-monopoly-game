@@ -21269,6 +21269,41 @@ new capability rather than a wrong assertion. `mvn test` still clean
 
 Reporting to the user before committing/handing off.
 
+2026-08-06T21:23:45Z RECEIVED handoff:
+id: 20260806T191326Z_000065_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: a00761a2b9
+created_at: 2026-08-06T19:13:26.190475Z
+enqueued_at: 2026-08-06T19:13:26.414226Z
+task: distressed-sale-no-bidder-narration
+dequeued_at: 2026-08-06T19:13:34.366912Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier a00761a2b9
+
+Merged the handoff, added no-bidder domain events and journal/log/report
+narration, and added acceptance handlers plus a focused bankruptcy unit test.
+Acceptance handlers now match the unquoted multi-word land wording. The
+three new acceptance scenarios still fail because their scripted movement
+lands dog at Noord Station rather than Extra Belasting; full unit testing
+also retains the existing flaky SimulatorTest failure.
+
+2026-08-06T21:24:20Z SENT handoff draft:
+type: git_handoff
+to: refactorer
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: f80b91e4c0
+
+Committed implementation and tests; acceptance and full-unit caveats above
+are included for refactorer follow-up.
+
 ## 2026-08-05T19:02:41Z — coder received handoff from specifier
 
 Handoff message received:
