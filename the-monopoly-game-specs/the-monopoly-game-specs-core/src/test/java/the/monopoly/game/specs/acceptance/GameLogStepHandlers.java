@@ -17,6 +17,7 @@ import static the.monopoly.game.specs.acceptance.GameAccount.says;
 import static the.monopoly.game.specs.acceptance.GameAccount.saysInOrder;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.NAME;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.UNQUOTED_NAME;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.UNQUOTED_NAME_WITHOUT_ORDERING;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.VALUE;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.auctionWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.auctionWonLine;
@@ -163,7 +164,8 @@ final class GameLogStepHandlers {
         then("^the game journal records that pawn \"" + NAME + "\" puts \"" + NAME
                 + "\" up for sale to avoid bankruptcy$",
             (world, arguments) -> records(world, distressedStarted(arguments.text(1), arguments.text(2)))),
-        then("^the game journal records that pawn \"" + NAME + "\" finds no bidder for " + UNQUOTED_NAME + "$",
+        then("^the game journal records that pawn \"" + NAME + "\" finds no bidder for "
+                + UNQUOTED_NAME_WITHOUT_ORDERING + "$",
             (world, arguments) -> records(world, distressedNoBidder(arguments.text(1), arguments.text(2)))),
         then("^the game journal records that pawn \"" + NAME + "\" puts " + UNQUOTED_NAME
                 + " up for sale to avoid bankruptcy before it records that pawn \"" + NAME
@@ -188,7 +190,8 @@ final class GameLogStepHandlers {
         then("^the game log records that pawn \"" + NAME + "\" puts \"" + NAME
                 + "\" up for sale to avoid bankruptcy$",
             (world, arguments) -> logRecords(world, distressedStarted(arguments.text(1), arguments.text(2)))),
-        then("^the game log records that pawn \"" + NAME + "\" finds no bidder for " + UNQUOTED_NAME + "$",
+        then("^the game log records that pawn \"" + NAME + "\" finds no bidder for "
+                + UNQUOTED_NAME_WITHOUT_ORDERING + "$",
             (world, arguments) -> logRecords(world, distressedNoBidder(arguments.text(1), arguments.text(2)))),
         then("^the game log records that pawn \"" + NAME + "\" puts " + UNQUOTED_NAME
                 + " up for sale to avoid bankruptcy before it records that pawn \"" + NAME
@@ -214,7 +217,8 @@ final class GameLogStepHandlers {
                 + "\" up for sale to avoid bankruptcy$",
             (world, arguments) -> says(world, arguments.text(1) + " puts " + arguments.text(2)
                 + " up for sale to avoid bankruptcy")),
-        then("^the game report says that pawn \"" + NAME + "\" finds no bidder for " + UNQUOTED_NAME + "$",
+        then("^the game report says that pawn \"" + NAME + "\" finds no bidder for "
+                + UNQUOTED_NAME_WITHOUT_ORDERING + "$",
             (world, arguments) -> says(world, arguments.text(1) + " finds no bidder for " + arguments.text(2))),
         then("^the game report says that pawn \"" + NAME + "\" puts " + UNQUOTED_NAME
                 + " up for sale to avoid bankruptcy before it says that pawn \"" + NAME
