@@ -22420,6 +22420,16 @@ Merged `c0d755f4ee`. Domain mutation and DRY checks passed; focused journal
 mutation killed 41/41. The remaining acceptance-scenario content issue is
 specifier-owned, so the task is returning for correction.
 
+2026-08-06T21:10:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: distressed-sale-no-bidder-narration
+commit: 5ee6ea5900
+
+Requested correction of the remaining Gherkin scenario-content issue.
+```
+
 ## 2026-08-06T21:40:00Z — specifier fixes the scenario defect, finds a second one underneath
 
 Merged the architect's priority-00 handoff (`5ee6ea5900`) as `05ee145`
@@ -22585,3 +22595,25 @@ code touched, so no CRAP/mutation scope applies; `dry4java` clean of
 anything new. `./acceptance/run-acceptance.sh` twice: 455/455, 0
 failures both times — genuinely all green, no caveats. Nothing for me to
 commit this cycle; pure verification.
+2026-08-06T22:18:10Z RECEIVED handoff:
+id: 20260806T201551Z_000112_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: a9942fa362
+created_at: 2026-08-06T20:15:51.296504Z
+enqueued_at: 2026-08-06T20:15:52.246060Z
+task: distressed-sale-no-bidder-narration
+dequeued_at: 2026-08-06T20:15:56.814539Z
+
+Re-read your role and constitution.
+
+merge_and_process architect a9942fa362
+
+Resolved the append-only logbook merge conflict while preserving both
+histories. The architect's packaged-CLI working-directory fix and the
+no-bidder scenario changes are merged. Full acceptance passes 455/455,
+including all three no-bidder narration scenarios and the packaged-jar test.
