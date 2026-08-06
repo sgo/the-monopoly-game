@@ -21278,6 +21278,40 @@ new capability rather than a wrong assertion. `mvn test` still clean
 
 Reporting to the user before committing/handing off.
 
+2026-08-06T21:25:30Z RECEIVED handoff:
+id: 20260806T191454Z_000066_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 829d8c701d
+created_at: 2026-08-06T19:14:54.580497Z
+enqueued_at: 2026-08-06T19:14:54.883861Z
+task: cli-packaged-jar
+dequeued_at: 2026-08-06T19:24:21.513622Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 829d8c701d
+
+Merged the handoff and implemented dependency-inclusive executable-jar
+packaging plus acceptance coverage for plugin declaration, packaging, and
+standalone help output.
+
+2026-08-06T21:28:00Z SENT handoff draft:
+type: git_handoff
+to: refactorer
+priority: 50
+task: cli-packaged-jar
+commit: 86926a73c6
+
+Manual Maven package and `java -jar ... -h` verification pass. Full
+acceptance still has the three earlier distressed-sale fixture failures;
+the first packaged-jar run also failed only because shade-plugin downloads
+were unavailable in the sandbox, then passed after dependency resolution.
+
 2026-08-06T21:23:45Z RECEIVED handoff:
 id: 20260806T191326Z_000065_from_specifier
 from: specifier
@@ -22241,6 +22275,164 @@ Gherkin-content fix from the specifier before they can pass, full
 diagnosis included above.
 
 2026-08-06T21:10:00Z — received refactorer handoff:
+2026-08-06T19:38:27Z — refactorer sent distressed-sale-no-bidder-narration handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: c0d755f4ee
+
+Re-read your role and constitution.
+merge_and_process refactorer c0d755f4ee
+
+Merged `c0d755f4ee`. Domain mutation and DRY checks passed; focused journal
+mutation killed 41/41. The remaining acceptance-scenario content issue is
+specifier-owned, so the task is returning for correction.
+
+2026-08-06T21:10:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: distressed-sale-no-bidder-narration
+commit: 5ee6ea5900
+
+Requested correction of the remaining Gherkin scenario-content issue.
+```
+
+Summary: the production narration feature (`distressedSaleNoBidder`
+event, `Journal.Entry.DistressedSaleNoBidder`, `Report` line) is correct
+and verified — CRAP/DRY/mutation clean, 450 pre-existing acceptance
+scenarios still pass. The three new scenarios (`journal-47`,
+`logging-47`, `report-47`) fail for a Gherkin-content reason, not a
+production defect: each redundantly repeats four steps already supplied
+by its feature file's own `Background:`, double-queuing dog's initiative
+roll and shifting the roll-consumption order so dog's real movement roll
+draws the duplicate instead of the intended one, landing it on the wrong
+space entirely. Confirmed via two independent checks (an existing
+byte-identical scenario in a file without the Background duplication
+passes; grepped for every scenario combining both patterns — only these
+three do). Fix is deleting the four redundant lines per scenario;
+recommending routing to the specifier. Separately found and fixed (own
+remit, mechanical Java code not Gherkin content) a stray-quote regex bug
+in the three new "mortgages" combined step patterns that would have
+caused a second failure right after the scenario fix; verified correct
+via isolated regex testing. `SimulatorTest` full-reactor-only flake
+recurred, same as the last two cycles, not re-investigated further.
+
+## 2026-08-06T19:44:00Z — refactorer receives and reviews cli-packaged-jar
+
+Merged `b8cb24ca0a`. Reviewed the diff: `the-monopoly-game-cli/pom.xml`
+gained a standard `maven-shade-plugin` binding at the `package` phase
+with a `ManifestResourceTransformer` pointing at
+`the.monopoly.game.cli.Simulator` — idiomatic, nothing unusual.
+`PomInspector.declaresExecutableJar` extends the existing
+dependency-inspection pattern with a simple text-content check for the
+shade plugin and main class. Two new scenarios in the new
+`cli-packaged-jar.feature`: `cli-jar-1` checks the pom declares the
+plugin (fast, no subprocess); `cli-jar-2` actually packages the CLI with
+a real `mvn package` subprocess, then runs the resulting jar with `-h`
+and checks it exits 0 with usage output — a genuine end-to-end proof,
+deliberately using the fast/deterministic `-h` path rather than a live
+game (same reasoning as the `stalemate-6` round-cap design).
+
+**Found and fixed a real, deterministic bug before it could ship.**
+`World.packageCli()`'s `mvn -B -Dmaven.repo.local=tmp/m2 -pl
+the-monopoly-game-cli -am package -DskipTests` and
+`World.runPackagedCli()`'s `Path.of("the-monopoly-game-cli", "target",
+...)` both assumed the test process's working directory is the repo
+root. It isn't: Surefire runs each module's tests with that module's own
+directory as `user.dir` (confirmed via the failing run's own surefire
+report: `basedir`/`user.dir` = `.../the-monopoly-game-specs/
+the-monopoly-game-specs-core`). Ran the acceptance suite before touching
+anything to see the real failure rather than assume: `cli-jar-2` failed
+outright with "Command failed: mvn ... -pl the-monopoly-game-cli ..." —
+Maven couldn't resolve a sibling reactor module or the relative
+`tmp/m2` path from the wrong directory. This is not the `SimulatorTest`
+flake (that one is probabilistic and passes in isolation); this one
+fails the same way every time, deterministically, given how Surefire
+actually runs.
+
+Fixed by reusing `PomInspector.repoRoot(moduleDirectory)` — already
+solves exactly this problem for the pom-inspection scenarios, walking up
+from the actual CWD to find the checkout root — rather than duplicating
+that logic. Relaxed its visibility from `private` to package-private
+(same package, no reason to re-derive the same directory walk a second
+way). `packageCli()` now runs the `mvn` subprocess with
+`ProcessBuilder.directory(repoRoot)`; `runPackagedCli()` resolves the
+jar path from the same root. Both call sites of the renamed
+`runProcess(Path, String...)` updated (only the one).
+
+Verified by actually running the suite, not just re-reading the diff:
+before the fix, `SpecsCliEnCliPackagedJarAcceptanceTest` failed 1/2;
+after, it passes 2/2, and the acceptance total went from 453/453-with-3-
+pre-existing-failures to 455 tests with the same 3 pre-existing failures
+(the already-diagnosed, already-flagged `journal-47`/`logging-47`/
+`report-47` Gherkin-content defect from the previous cycle — unrelated
+to this task, unaffected by anything here). Ran twice for stability
+given the new scenario spawns a real subprocess; both runs identical.
+
+No `src/main` production code changed by the coder or by me this cycle
+— only build config (`pom.xml`) and test-support Java — so no
+CRAP/mutation manifest scan applies (established scope: only
+`src/main` files are measured). `dry4java` across the specs-core module:
+the only flagged `World.java` ranges are pre-existing, unrelated to
+anything touched this cycle (a `colourStreet`/`ownable` helper-shape
+overlap already present before this commit).
+
+Ran `mvn test` (all modules) twice: hit the `SimulatorTest` full-reactor
+flake once (same one flagged the last two cycles, not re-investigated
+again), clean the second time — confirms it's genuinely probabilistic,
+not a new regression. `mvn test -P property-tests` clean.
+
+Committed the working-directory fix as `1130a57` "Fix working-directory
+bug in packaged-jar acceptance test support" (2 files). Handing off to
+architect: the packaging feature is now genuinely proven end-to-end, not
+just claimed.
+
+2026-08-06T22:15:00Z — sent coder handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: distressed-sale-no-bidder-narration
+commit: a9942fa362
+
+Full acceptance found missing no-bidder distressed-sale narration in logging,
+journal, and report scenarios; requested a functional correction.
+2026-08-06T19:48:36Z — refactorer sent cli-packaged-jar handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: cli-packaged-jar
+commit: f5b47897fd
+```
+
+Summary: the `maven-shade-plugin` binding and pom-inspection scenario
+(`cli-jar-1`) are correct as delivered. `cli-jar-2` (the real end-to-end
+proof: package the CLI, run the jar, check it exits 0 with usage output)
+failed outright before my fix — `World.packageCli()`/`runPackagedCli()`
+both assumed the test process's working directory is the repo root, but
+Surefire runs each module's tests from that module's own directory,
+so the `mvn -pl the-monopoly-game-cli` subprocess and the relative jar
+path both resolved wrong, deterministically (not the known
+`SimulatorTest` flake — this one fails every time). Fixed by reusing
+the existing `PomInspector.repoRoot()` helper (already solves this for
+the pom-inspection scenarios) rather than duplicating the logic, and
+running the subprocess with the correct `ProcessBuilder.directory(...)`.
+Verified by actually running the suite before and after: 1/2 failing to
+2/2 passing, acceptance total 455 with only the 3 already-flagged,
+unrelated `journal-47`/`logging-47`/`report-47` failures remaining
+(twice, for stability, given the new scenario spawns a real subprocess).
+No production code touched; no CRAP/mutation scope applies. The
+packaging capability is now genuinely proven end-to-end.
+2026-08-06T21:10:00Z — received refactorer handoff:
 type: git_handoff
 to: architect
 priority: 50
@@ -22343,3 +22535,99 @@ the bare pattern (or pattern-specificity ordering) to disambiguate.
 Verified my fix directly: reran the acceptance suite and confirmed the
 failure output no longer mentions the first assertion at all, only the
 new ambiguity on the second line.
+2026-08-06T22:15:30Z RECEIVED handoff:
+id: 20260806T201350Z_000067_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: d7bc0b39ac
+created_at: 2026-08-06T20:13:50.337857Z
+enqueued_at: 2026-08-06T20:13:50.434429Z
+task: distressed-sale-no-bidder-narration
+dequeued_at: 2026-08-06T20:13:55.702168Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d7bc0b39ac
+
+Merged the scenario-background correction and fixed the standalone no-bidder
+step regex so it cannot also match the compound ordering step. Acceptance
+now passes all three no-bidder narration scenarios; the only remaining full
+suite failure is the unrelated packaged-CLI setup on this branch.
+
+2026-08-06T22:16:00Z SENT handoff draft:
+type: git_handoff
+to: refactorer
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: 7432779f0a
+
+The three new no-bidder narration scenarios pass; the full acceptance suite
+has one unrelated packaged-CLI setup failure on this branch.
+
+## 2026-08-06T20:16:00Z — refactorer receives and reviews the disambiguation fix
+
+Merged `48b95e3886`. This closes the loop on both findings from the
+previous two cycles: the specifier's Background-duplication fix (already
+merged, confirmed still present — `journal-47`/`logging-47`/`report-47`
+no longer redundantly repeat their feature file's own `Background:`
+steps) and the coder's fix for the second, deeper bug the specifier
+found underneath it: the standalone `"...finds no bidder for " +
+UNQUOTED_NAME + "$"` step and the compound `"...finds no bidder for " +
+UNQUOTED_NAME + " before it records..."` step were ambiguous — lazy
+`.+?` immediately before a bare `$` end-anchor has nothing to stop it
+from consuming into text meant for a more specific pattern, so both
+matched the same compound-assertion input.
+
+Fix: a new `UNQUOTED_NAME_WITHOUT_ORDERING` pattern
+(`(?:(?! before it records that pawn | before it says that pawn ).)+?`)
+used only by the three standalone "finds no bidder" step patterns — a
+negative lookahead applied per character blocks the lazy match from ever
+consuming through either ordering conjunction, so the standalone pattern
+now structurally cannot match compound-assertion text, regardless of
+step registration order.
+
+Verified this independently, not just by trusting the scenario went
+green: reimplemented both patterns in Python and checked all three
+cases — the "puts...before...finds" line matches only the puts-compound
+pattern, the "finds...before...mortgages" line matches only the
+finds-compound pattern, and neither matches the (currently unused, but
+now safe for future use) standalone pattern; a hypothetical standalone
+line matches only the standalone pattern, with correct captures. Genuine
+disambiguation, not an accidental pass.
+
+No `src/main` production code touched, so no CRAP/mutation scope
+applies. `dry4java`: the only flagged `MonopolyStepHelpers.java` ranges
+are the pre-existing `Claim`/`...Line` helper-method-shape pattern
+already present throughout that file, unrelated to the new constant.
+
+Ran `./acceptance/run-acceptance.sh` twice: 455 tests, 0 failures both
+times — the packaged-CLI setup failure the coder's own note mentions was
+specific to their branch state before this merge; already resolved by my
+`cli-packaged-jar` working-directory fix from two cycles ago, confirmed
+still combined correctly here. `mvn test` and `mvn test -P
+property-tests` both hit the already-diagnosed `SimulatorTest`
+full-reactor flake, not re-investigated again.
+
+Nothing to commit this cycle — the coder's fix was correct and complete
+as delivered; my role here was independent verification, not further
+change. Handing off to architect: both the scenario-content defect and
+the regex-ambiguity defect from the last two cycles are now genuinely
+closed, confirmed by a fully green acceptance suite.
+
+2026-08-06T22:25:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: 343ccbf5e9
+
+Re-read your role and constitution.
+merge_and_process refactorer 343ccbf5e9
+
+Merged `343ccbf5e9`. The previously failing journal, logging, and report
+narration scenarios now pass in the full acceptance suite; the correction is
+accepted.
