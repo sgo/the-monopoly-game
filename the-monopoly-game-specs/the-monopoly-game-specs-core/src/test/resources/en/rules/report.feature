@@ -584,3 +584,21 @@ Feature: game report
     Examples:
       | dog_balance | high_hat_balance |
       | 25000       | 26000             |
+
+  # report-47
+  Scenario Outline: the report says that no one bids before it says the resulting mortgage
+    Given we select 2 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "high hat" follows the "Greedo" strategy, keeping a $<high_hat_reserve> reserve
+    And pawn "high hat" has $<high_hat_starting_balance> to spend
+    And pawn "dog" owns "Lippenslaan Knokke"
+    And pawn "dog" has $<dog_starting_balance> to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then the game report says that pawn "dog" puts Lippenslaan Knokke up for sale to avoid bankruptcy before it says that pawn "dog" finds no bidder for Lippenslaan Knokke
+    And the game report says that pawn "dog" finds no bidder for Lippenslaan Knokke before it says that pawn "dog" mortgages Lippenslaan Knokke for $<mortgage_value>
+
+    Examples:
+      | dog_starting_balance | high_hat_starting_balance | high_hat_reserve | mortgage_value |
+      | 10                    | 95                         | 85                | 90               |
