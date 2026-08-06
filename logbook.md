@@ -22343,3 +22343,36 @@ Background fix genuinely worked), plus the 2 pre-existing, unrelated
 test` unaffected (Gherkin-only change).
 
 Reporting to the user before committing/handing back to the coder.
+
+2026-08-06T22:15:30Z RECEIVED handoff:
+id: 20260806T201350Z_000067_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: d7bc0b39ac
+created_at: 2026-08-06T20:13:50.337857Z
+enqueued_at: 2026-08-06T20:13:50.434429Z
+task: distressed-sale-no-bidder-narration
+dequeued_at: 2026-08-06T20:13:55.702168Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier d7bc0b39ac
+
+Merged the scenario-background correction and fixed the standalone no-bidder
+step regex so it cannot also match the compound ordering step. Acceptance
+now passes all three no-bidder narration scenarios; the only remaining full
+suite failure is the unrelated packaged-CLI setup on this branch.
+
+2026-08-06T22:16:00Z SENT handoff draft:
+type: git_handoff
+to: refactorer
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: 7432779f0a
+
+The three new no-bidder narration scenarios pass; the full acceptance suite
+has one unrelated packaged-CLI setup failure on this branch.
