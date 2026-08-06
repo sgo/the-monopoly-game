@@ -21612,6 +21612,40 @@ remaining gap is precisely the outer-loop fix itself. `mvn test` clean.
 Reporting to the user before committing/handing back to the coder at
 priority 50.
 
+User approved. Committed as `3c269013aa` "Correct stalemate example
+boundaries to the real >= semantic; add outer-loop termination scenario"
+(2 files, 68 insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: stalemate-detection
+commit: 3c269013aa
+```
+
+Summary: two corrections to the stalemate spec. (1) Retuned every
+Examples-table value in `stalemate-2` through `-5` to sit exactly on the
+$22790 threshold ("clears" = $22790, "does not clear" = $22789),
+matching the real, correct `Money.covers()` (`>=`) semantic rather than
+the `>` ("exceeds") I'd loosely assumed earlier — verified these now
+pass cleanly against the real merged implementation. (2) Added
+`stalemate-6`, using two new pieces of vocabulary — `we play up to 3
+rounds` (a round-capped multi-round play, safe to run regardless of
+whether the outer-loop bug is fixed) and `the game journal records that
+the game ends in a stalemate only once` (a counting assertion) — to
+specify that a stalemate must stop the game outright, not just the
+round it's first detected in, per the refactorer's headline finding
+that `playTurns`'s outer `do-while` never checks the stalemate result.
+Ran the full suite against the real merged implementation: 450 tests,
+exactly 1 failure (`stalemate-6`'s "Unsupported step", since the round
+cap and the outer-loop fix don't exist yet) — confirming every other
+correction now genuinely passes and the sole remaining gap is precisely
+the fix the coder needs to make. Full reasoning and verification detail
+in the logbook entry above.
+
 ## 2026-08-05T19:38:05Z — coder received handoff from specifier
 
 Handoff message received:
@@ -21763,3 +21797,61 @@ merge_and_process refactorer 3f7ec9f15c
 Merged `3f7ec9f15c`. The corrected feature kills 6 of 12 soft Gherkin
 mutations, but 6 still survive; returning the remaining scenario gap to the
 specifier.
+
+## 2026-08-05T22:00:00Z — specifier removes the remaining non-discriminating example columns
+
+Received the architect's second priority-00 handoff (`823c455916`),
+merged as `349943a` (two append-only conflicts in `logbook.md`; the
+second required a manual re-splice after an initial attempt
+accidentally interleaved two independent per-role entries — my own
+"sent to coder" entry and the coder's own separate "received/sent to
+refactorer" entry — into one instead of concatenating them in
+chronological order; caught by re-reading the result before committing
+and fixed with a clean rewrite of that stretch).
+
+The merged manifest header on `stalemate.feature` itself was revealing:
+it lists per-scenario mutation results for only `stalemate-5` (3/3
+killed) and `stalemate-6` (2/2 killed) — the other two positive-boundary
+scenarios I retuned last cycle came through clean. That leaves all 6
+survivors concentrated in `stalemate-2`, `-3`, and `-4`'s 7 remaining
+columns (only 1 of 7 killed).
+
+Root cause, worked out by hand (mutator is off-limits to run directly):
+`stalemate-3` and `-4` test "one player below the threshold blocks a
+stalemate," but only the *one* blocking player's exact value actually
+determines the boolean outcome — `stalemate-3`'s `dog_balance` and
+`stalemate-4`'s `dog_balance`/`high_hat_balance` can be mutated to
+*any* other value and the scenario's fixed assertion ("does not end in
+a stalemate") stays correct regardless, since the other player already
+forces that outcome. These columns were never actually testing
+anything — they were mutation-proof by construction, independent of
+whatever value they held. Fixed by removing them from the Examples
+table entirely and hardcoding them as literal `$22790` (comfortably
+clearing, not the point under test) directly in the `Given` steps,
+leaving only the one genuinely load-bearing value
+(`high_hat_balance`/`iron_box_balance`) parameterized — a value no
+longer in an Examples table can never be a mutation target at all,
+which is a certain fix, not a probabilistic one.
+
+`stalemate-2`'s two columns are different: both players' balances are
+genuinely load-bearing (either one going below $22790 flips the
+outcome), so unlike `-3`/`-4` there's no structural fix available —
+whether a specific mutation trial catches it depends on the mutator's
+pseudo-random-but-deterministic delta direction for that exact value,
+which I have no visibility into without running the tool myself. Left
+`stalemate-2` as-is (already at the tightest meaningful boundary);
+noted this as a known limit of single-example-row boundary testing
+rather than something to keep chasing blind.
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` (no duplicate-in-scenario findings). Ran
+`./acceptance/run-acceptance.sh` against the real merged implementation:
+450/450, zero failures — every scenario, including the restructured
+`stalemate-3`/`-4`, now genuinely passes. `mvn test` at the full-reactor
+level hit the pre-existing `SimulatorTest.keepsPlayingUntilToldToStop`
+flake the refactorer already diagnosed last cycle (full-reactor-only,
+CLI-module-standalone always clean) — reran the CLI module alone 3/3
+clean, confirming this is that same known, already-flagged issue and
+not something this Gherkin-only change caused.
+
+Reporting to the user before committing/handing back to the architect.
