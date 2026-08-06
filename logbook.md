@@ -22271,3 +22271,73 @@ in the three new "mortgages" combined step patterns that would have
 caused a second failure right after the scenario fix; verified correct
 via isolated regex testing. `SimulatorTest` full-reactor-only flake
 recurred, same as the last two cycles, not re-investigated further.
+
+## 2026-08-06T19:44:00Z — refactorer receives and reviews cli-packaged-jar
+
+Merged `b8cb24ca0a`. Reviewed the diff: `the-monopoly-game-cli/pom.xml`
+gained a standard `maven-shade-plugin` binding at the `package` phase
+with a `ManifestResourceTransformer` pointing at
+`the.monopoly.game.cli.Simulator` — idiomatic, nothing unusual.
+`PomInspector.declaresExecutableJar` extends the existing
+dependency-inspection pattern with a simple text-content check for the
+shade plugin and main class. Two new scenarios in the new
+`cli-packaged-jar.feature`: `cli-jar-1` checks the pom declares the
+plugin (fast, no subprocess); `cli-jar-2` actually packages the CLI with
+a real `mvn package` subprocess, then runs the resulting jar with `-h`
+and checks it exits 0 with usage output — a genuine end-to-end proof,
+deliberately using the fast/deterministic `-h` path rather than a live
+game (same reasoning as the `stalemate-6` round-cap design).
+
+**Found and fixed a real, deterministic bug before it could ship.**
+`World.packageCli()`'s `mvn -B -Dmaven.repo.local=tmp/m2 -pl
+the-monopoly-game-cli -am package -DskipTests` and
+`World.runPackagedCli()`'s `Path.of("the-monopoly-game-cli", "target",
+...)` both assumed the test process's working directory is the repo
+root. It isn't: Surefire runs each module's tests with that module's own
+directory as `user.dir` (confirmed via the failing run's own surefire
+report: `basedir`/`user.dir` = `.../the-monopoly-game-specs/
+the-monopoly-game-specs-core`). Ran the acceptance suite before touching
+anything to see the real failure rather than assume: `cli-jar-2` failed
+outright with "Command failed: mvn ... -pl the-monopoly-game-cli ..." —
+Maven couldn't resolve a sibling reactor module or the relative
+`tmp/m2` path from the wrong directory. This is not the `SimulatorTest`
+flake (that one is probabilistic and passes in isolation); this one
+fails the same way every time, deterministically, given how Surefire
+actually runs.
+
+Fixed by reusing `PomInspector.repoRoot(moduleDirectory)` — already
+solves exactly this problem for the pom-inspection scenarios, walking up
+from the actual CWD to find the checkout root — rather than duplicating
+that logic. Relaxed its visibility from `private` to package-private
+(same package, no reason to re-derive the same directory walk a second
+way). `packageCli()` now runs the `mvn` subprocess with
+`ProcessBuilder.directory(repoRoot)`; `runPackagedCli()` resolves the
+jar path from the same root. Both call sites of the renamed
+`runProcess(Path, String...)` updated (only the one).
+
+Verified by actually running the suite, not just re-reading the diff:
+before the fix, `SpecsCliEnCliPackagedJarAcceptanceTest` failed 1/2;
+after, it passes 2/2, and the acceptance total went from 453/453-with-3-
+pre-existing-failures to 455 tests with the same 3 pre-existing failures
+(the already-diagnosed, already-flagged `journal-47`/`logging-47`/
+`report-47` Gherkin-content defect from the previous cycle — unrelated
+to this task, unaffected by anything here). Ran twice for stability
+given the new scenario spawns a real subprocess; both runs identical.
+
+No `src/main` production code changed by the coder or by me this cycle
+— only build config (`pom.xml`) and test-support Java — so no
+CRAP/mutation manifest scan applies (established scope: only
+`src/main` files are measured). `dry4java` across the specs-core module:
+the only flagged `World.java` ranges are pre-existing, unrelated to
+anything touched this cycle (a `colourStreet`/`ownable` helper-shape
+overlap already present before this commit).
+
+Ran `mvn test` (all modules) twice: hit the `SimulatorTest` full-reactor
+flake once (same one flagged the last two cycles, not re-investigated
+again), clean the second time — confirms it's genuinely probabilistic,
+not a new regression. `mvn test -P property-tests` clean.
+
+Committed the working-directory fix as `1130a57` "Fix working-directory
+bug in packaged-jar acceptance test support" (2 files). Handing off to
+architect: the packaging feature is now genuinely proven end-to-end, not
+just claimed.
