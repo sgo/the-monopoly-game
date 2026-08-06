@@ -173,7 +173,7 @@ final class GameLogStepHandlers {
                 distressedNoBidder(arguments.text(3), arguments.text(4)))),
         then("^the game journal records that pawn \"" + NAME + "\" finds no bidder for " + UNQUOTED_NAME
                 + " before it records that pawn \"" + NAME + "\" mortgages " + UNQUOTED_NAME
-                + "\" for \\$" + VALUE + "$",
+                + " for \\$" + VALUE + "$",
             (world, arguments) -> recordsInOrder(world,
                 distressedNoBidder(arguments.text(1), arguments.text(2)),
                 mortgaged(arguments.text(3), arguments.text(4), arguments.number(5)))),
@@ -198,7 +198,7 @@ final class GameLogStepHandlers {
                 distressedNoBidder(arguments.text(3), arguments.text(4)))),
         then("^the game log records that pawn \"" + NAME + "\" finds no bidder for " + UNQUOTED_NAME
                 + " before it records that pawn \"" + NAME + "\" mortgages " + UNQUOTED_NAME
-                + "\" for \\$" + VALUE + "$",
+                + " for \\$" + VALUE + "$",
             (world, arguments) -> logRecordsInOrder(world,
                 distressedNoBidder(arguments.text(1), arguments.text(2)),
                 mortgaged(arguments.text(3), arguments.text(4), arguments.number(5)))),
@@ -224,7 +224,7 @@ final class GameLogStepHandlers {
                 arguments.text(3) + " finds no bidder for " + arguments.text(4))),
         then("^the game report says that pawn \"" + NAME + "\" finds no bidder for " + UNQUOTED_NAME
                 + " before it says that pawn \"" + NAME + "\" mortgages " + UNQUOTED_NAME
-                + "\" for \\$" + VALUE + "$",
+                + " for \\$" + VALUE + "$",
             (world, arguments) -> saysInOrder(world,
                 arguments.text(1) + " finds no bidder for " + arguments.text(2),
                 arguments.text(3) + " mortgages " + arguments.text(4) + " for $" + arguments.number(5))),
