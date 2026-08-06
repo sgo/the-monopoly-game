@@ -22367,3 +22367,13 @@ Committed the working-directory fix as `1130a57` "Fix working-directory
 bug in packaged-jar acceptance test support" (2 files). Handing off to
 architect: the packaging feature is now genuinely proven end-to-end, not
 just claimed.
+
+2026-08-06T22:15:00Z — sent coder handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: distressed-sale-no-bidder-narration
+commit: a9942fa362
+
+Full acceptance found missing no-bidder distressed-sale narration in logging,
+journal, and report scenarios; requested a functional correction.
