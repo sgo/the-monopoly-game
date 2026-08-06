@@ -21983,3 +21983,49 @@ existing subject-verb-object style) firing exactly where
 existing setup (already proves the zero-bidder → falls-through-to-
 mortgage mechanic; only the narration was missing). Fails today with
 "Unsupported step," confirming genuinely new capability.
+
+## 2026-08-06T19:15:00Z — specifies a packaged, standalone CLI jar
+
+The user asked to make sure the game has a packaged/shaded jar to run
+it with. `SIMULATOR.md`/`tasks.md`'s Phase 15 already describe the CLI
+as "a standalone executable process," but that was never actually built
+out — the CLI currently only runs by manually assembling a classpath
+from the module's `target/classes` directories plus every dependency
+jar, exactly as this session's own live-game verification runs had to
+do throughout. This is the same shape of gap as the undocumented
+distressed-sale mechanic and the never-implemented Chance/Community
+Chest decks found earlier this session: a Phase marked "shipped" whose
+stated deliverable was quietly never finished.
+
+Packaging itself is a `pom.xml`/build change, not a game-behavior spec,
+so implementing the shade/assembly plugin is the coder's remit, not
+mine. What's specifiable is the observable behavior: a packaged,
+dependency-inclusive jar exists and runs standalone. Found a directly
+applicable precedent already in this codebase:
+`cli-slf4j-config.feature` already inspects a module's `pom.xml`
+directly via Gherkin (`PomStepHandlers`/`PomInspector`) to verify
+declared dependencies — build-configuration verification via Gherkin is
+an established, accepted pattern here, not something new for this
+project.
+
+Added `cli-packaged-jar.feature` (new file, registered on
+`acceptance/pipeline-features.txt` — a wholly new feature file is
+invisible to `run-acceptance.sh` until listed there, the same lesson
+learned when adding `stalemate.feature`) with two scenarios:
+`cli-jar-1` extends the existing pom-inspection pattern to check for a
+packaging plugin producing an executable jar with main class
+`the.monopoly.game.cli.Simulator`; `cli-jar-2` proves the packaged jar
+actually works end-to-end via its fast, deterministic `-h` path (not a
+live game — bounded and safe to run regardless of implementation
+state, same reasoning as the `stalemate-6` round-cap design earlier).
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` (0 findings — a brand-new file with no repeated step
+text yet). Ran `./acceptance/run-acceptance.sh`: 455 tests, 5 failures —
+the 2 new scenarios (both "Unsupported step", confirming genuinely new
+capability) plus the 3 pre-existing, already-handed-off no-bidder-
+narration failures. `mvn test` hit the same already-known `SimulatorTest`
+flake (confirmed clean 3/3 running the CLI module alone); unrelated to
+this change.
+
+Reporting to the user before committing/handing off.
