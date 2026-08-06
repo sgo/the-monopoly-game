@@ -20,6 +20,24 @@ final class PomStepHandlers {
         step("^I inspect the declared dependencies$",
             (world, arguments) -> world.inspectPomDependencies()),
 
+        step("^I inspect the declared build plugins$",
+            (world, arguments) -> world.inspectPomPlugins()),
+
+        then("^the project packages an executable jar with main class \"" + NAME + "\"$",
+            (world, arguments) -> world.assertExecutableJar(arguments.text(1))),
+
+        given("^the CLI module has been packaged$",
+            (world, arguments) -> world.packageCli()),
+
+        step("^I run the packaged simulator jar with \"" + NAME + "\"$",
+            (world, arguments) -> world.runPackagedCli(arguments.text(1))),
+
+        then("^the packaged jar exits successfully$",
+            (world, arguments) -> world.assertPackagedCliSucceeded()),
+
+        then("^the packaged jar's output explains how to use the simulator$",
+            (world, arguments) -> world.assertPackagedCliUsage()),
+
         then("^the project includes dependency \"" + NAME + "\"$",
             (world, arguments) -> world.assertPomDeclaresDependency(arguments.text(1))),
 

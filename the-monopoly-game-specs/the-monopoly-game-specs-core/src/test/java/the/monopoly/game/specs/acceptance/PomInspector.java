@@ -36,6 +36,16 @@ final class PomInspector {
     return declared;
   }
 
+  static boolean declaresExecutableJar(String moduleDirectory, String mainClass) {
+    Path pom = repoRoot(moduleDirectory).resolve(moduleDirectory).resolve("pom.xml");
+    try {
+      String text = Files.readString(pom);
+      return text.contains("maven-shade-plugin") && text.contains(mainClass);
+    } catch (Exception cause) {
+      throw new AssertionError("Could not read " + pom, cause);
+    }
+  }
+
   /** Walks up from the current working directory to find the checkout containing {@code moduleDirectory}. */
   private static Path repoRoot(String moduleDirectory) {
     Path directory = Path.of("").toAbsolutePath();

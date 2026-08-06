@@ -24,6 +24,8 @@ import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
 
 import java.time.Duration;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -83,6 +85,10 @@ public class World {
   private String pomModuleDirectory;
   private Map<String, String> pomDependencies;
   private String lastCheckedPomDependency;
+  private boolean pomPluginsInspected;
+  private Process packagedCliProcess;
+  private String packagedCliOutput;
+  private int packagedCliExitCode;
   private Entry selectedEvent;
   private String renderedEventText;
   private String loggedEventText;
@@ -805,6 +811,56 @@ public class World {
     if (pomModuleDirectory == null)
       throw new AssertionError("No pom.xml module has been selected yet.");
     pomDependencies = PomInspector.declaredDependencies(pomModuleDirectory);
+  }
+
+  public void inspectPomPlugins() {
+    if (pomModuleDirectory == null)
+      throw new AssertionError("No pom.xml module has been selected yet.");
+    pomPluginsInspected = true;
+  }
+
+  public void assertExecutableJar(String mainClass) {
+    if (!pomPluginsInspected) throw new AssertionError("The build plugins have not been inspected yet.");
+    if (!PomInspector.declaresExecutableJar(pomModuleDirectory, mainClass))
+      throw new AssertionError("Expected an executable shaded jar with main class " + mainClass + ".");
+  }
+
+  public void packageCli() {
+    runProcess("mvn", "-B", "-Dmaven.repo.local=tmp/m2", "-pl", "the-monopoly-game-cli",
+        "-am", "package", "-DskipTests");
+  }
+
+  public void runPackagedCli(String flag) {
+    Path jar = Path.of("the-monopoly-game-cli", "target", "the-monopoly-game-cli-0.0.0-SNAPSHOT.jar");
+    ProcessBuilder builder = new ProcessBuilder("java", "-jar", jar.toString(), flag);
+    try {
+      packagedCliProcess = builder.redirectErrorStream(true).start();
+      packagedCliOutput = new String(packagedCliProcess.getInputStream().readAllBytes());
+      packagedCliExitCode = packagedCliProcess.waitFor();
+    } catch (IOException | InterruptedException cause) {
+      Thread.currentThread().interrupt();
+      throw new AssertionError("Could not run packaged simulator jar.", cause);
+    }
+  }
+
+  public void assertPackagedCliSucceeded() {
+    if (packagedCliProcess == null || packagedCliExitCode != 0)
+      throw new AssertionError("Packaged jar exited with " + packagedCliExitCode + ": " + packagedCliOutput);
+  }
+
+  public void assertPackagedCliUsage() {
+    if (packagedCliOutput == null || !packagedCliOutput.contains("Usage: simulator"))
+      throw new AssertionError("Packaged jar did not print simulator usage: " + packagedCliOutput);
+  }
+
+  private static void runProcess(String... command) {
+    try {
+      Process process = new ProcessBuilder(command).inheritIO().start();
+      if (process.waitFor() != 0) throw new AssertionError("Command failed: " + String.join(" ", command));
+    } catch (IOException | InterruptedException cause) {
+      Thread.currentThread().interrupt();
+      throw new AssertionError("Could not run: " + String.join(" ", command), cause);
+    }
   }
 
   public void assertPomDeclaresDependency(String coordinate) {
