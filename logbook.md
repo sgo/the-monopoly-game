@@ -21987,3 +21987,80 @@ yet. `mvn test` at the full-reactor level hit the same pre-existing
 isolation again); unrelated to this change.
 
 Reporting to the user before committing/handing off.
+
+User approved. Committed as `a00761a2b9` "Specify the missing narration
+when a distressed-sale auction finds no bidder" (4 files, 110
+insertions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: a00761a2b9
+```
+
+Summary: `DistressedSale.auction()` fires `distressedSaleStarted` for
+every candidate property unconditionally, but returns silently with no
+event at all when the auction finds zero eligible bidders — no
+`distressedOffer`, no `distressedSaleWon`, nothing closes the "X puts Y
+up for sale to avoid bankruptcy" narration thread. Most likely to bite
+on spare utilities specifically, since `Greedo.bidForDistressed()` only
+ever bids on a utility when it completes the bidder's own utility
+monopoly (utilities are always `Priority.LOWEST`, never eligible for
+the "deny an opponent" bid streets get). New `Journal.Entry` needed
+(narrated as `"<seller> finds no bidder for <land>"`, matching the
+existing subject-verb-object style) firing exactly where
+`bidders.isEmpty()` currently returns silently. New scenarios
+`journal-47`/`logging-47`/`report-47`, reusing `distressed-sale-3`'s
+existing setup (already proves the zero-bidder → falls-through-to-
+mortgage mechanic; only the narration was missing). Fails today with
+"Unsupported step," confirming genuinely new capability.
+
+## 2026-08-06T19:15:00Z — specifies a packaged, standalone CLI jar
+
+The user asked to make sure the game has a packaged/shaded jar to run
+it with. `SIMULATOR.md`/`tasks.md`'s Phase 15 already describe the CLI
+as "a standalone executable process," but that was never actually built
+out — the CLI currently only runs by manually assembling a classpath
+from the module's `target/classes` directories plus every dependency
+jar, exactly as this session's own live-game verification runs had to
+do throughout. This is the same shape of gap as the undocumented
+distressed-sale mechanic and the never-implemented Chance/Community
+Chest decks found earlier this session: a Phase marked "shipped" whose
+stated deliverable was quietly never finished.
+
+Packaging itself is a `pom.xml`/build change, not a game-behavior spec,
+so implementing the shade/assembly plugin is the coder's remit, not
+mine. What's specifiable is the observable behavior: a packaged,
+dependency-inclusive jar exists and runs standalone. Found a directly
+applicable precedent already in this codebase:
+`cli-slf4j-config.feature` already inspects a module's `pom.xml`
+directly via Gherkin (`PomStepHandlers`/`PomInspector`) to verify
+declared dependencies — build-configuration verification via Gherkin is
+an established, accepted pattern here, not something new for this
+project.
+
+Added `cli-packaged-jar.feature` (new file, registered on
+`acceptance/pipeline-features.txt` — a wholly new feature file is
+invisible to `run-acceptance.sh` until listed there, the same lesson
+learned when adding `stalemate.feature`) with two scenarios:
+`cli-jar-1` extends the existing pom-inspection pattern to check for a
+packaging plugin producing an executable jar with main class
+`the.monopoly.game.cli.Simulator`; `cli-jar-2` proves the packaged jar
+actually works end-to-end via its fast, deterministic `-h` path (not a
+live game — bounded and safe to run regardless of implementation
+state, same reasoning as the `stalemate-6` round-cap design earlier).
+
+Validated with `bb gherkin-parser` (clean) and `bb gherkin-ir-dry-checker
+--include-exact` (0 findings — a brand-new file with no repeated step
+text yet). Ran `./acceptance/run-acceptance.sh`: 455 tests, 5 failures —
+the 2 new scenarios (both "Unsupported step", confirming genuinely new
+capability) plus the 3 pre-existing, already-handed-off no-bidder-
+narration failures. `mvn test` hit the same already-known `SimulatorTest`
+flake (confirmed clean 3/3 running the CLI module alone); unrelated to
+this change.
+
+Reporting to the user before committing/handing off.
