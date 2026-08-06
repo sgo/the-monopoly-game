@@ -21269,6 +21269,40 @@ new capability rather than a wrong assertion. `mvn test` still clean
 
 Reporting to the user before committing/handing off.
 
+2026-08-06T21:25:30Z RECEIVED handoff:
+id: 20260806T191454Z_000066_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 829d8c701d
+created_at: 2026-08-06T19:14:54.580497Z
+enqueued_at: 2026-08-06T19:14:54.883861Z
+task: cli-packaged-jar
+dequeued_at: 2026-08-06T19:24:21.513622Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 829d8c701d
+
+Merged the handoff and implemented dependency-inclusive executable-jar
+packaging plus acceptance coverage for plugin declaration, packaging, and
+standalone help output.
+
+2026-08-06T21:28:00Z SENT handoff draft:
+type: git_handoff
+to: refactorer
+priority: 50
+task: cli-packaged-jar
+commit: 86926a73c6
+
+Manual Maven package and `java -jar ... -h` verification pass. Full
+acceptance still has the three earlier distressed-sale fixture failures;
+the first packaged-jar run also failed only because shade-plugin downloads
+were unavailable in the sandbox, then passed after dependency resolution.
+
 2026-08-06T21:23:45Z RECEIVED handoff:
 id: 20260806T191326Z_000065_from_specifier
 from: specifier
