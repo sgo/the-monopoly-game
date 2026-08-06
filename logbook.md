@@ -22341,3 +22341,34 @@ Committed the working-directory fix as `1130a57` "Fix working-directory
 bug in packaged-jar acceptance test support" (2 files). Handing off to
 architect: the packaging feature is now genuinely proven end-to-end, not
 just claimed.
+
+2026-08-06T19:48:36Z — refactorer sent cli-packaged-jar handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: cli-packaged-jar
+commit: f5b47897fd
+```
+
+Summary: the `maven-shade-plugin` binding and pom-inspection scenario
+(`cli-jar-1`) are correct as delivered. `cli-jar-2` (the real end-to-end
+proof: package the CLI, run the jar, check it exits 0 with usage output)
+failed outright before my fix — `World.packageCli()`/`runPackagedCli()`
+both assumed the test process's working directory is the repo root, but
+Surefire runs each module's tests from that module's own directory,
+so the `mvn -pl the-monopoly-game-cli` subprocess and the relative jar
+path both resolved wrong, deterministically (not the known
+`SimulatorTest` flake — this one fails every time). Fixed by reusing
+the existing `PomInspector.repoRoot()` helper (already solves this for
+the pom-inspection scenarios) rather than duplicating the logic, and
+running the subprocess with the correct `ProcessBuilder.directory(...)`.
+Verified by actually running the suite before and after: 1/2 failing to
+2/2 passing, acceptance total 455 with only the 3 already-flagged,
+unrelated `journal-47`/`logging-47`/`report-47` failures remaining
+(twice, for stability, given the new scenario spawns a real subprocess).
+No production code touched; no CRAP/mutation scope applies. The
+packaging capability is now genuinely proven end-to-end.
