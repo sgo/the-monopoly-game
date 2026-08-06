@@ -826,12 +826,15 @@ public class World {
   }
 
   public void packageCli() {
-    runProcess("mvn", "-B", "-Dmaven.repo.local=tmp/m2", "-pl", "the-monopoly-game-cli",
+    Path root = PomInspector.repoRoot("the-monopoly-game-cli");
+    runProcess(root, "mvn", "-B", "-Dmaven.repo.local=tmp/m2", "-pl", "the-monopoly-game-cli",
         "-am", "package", "-DskipTests");
   }
 
   public void runPackagedCli(String flag) {
-    Path jar = Path.of("the-monopoly-game-cli", "target", "the-monopoly-game-cli-0.0.0-SNAPSHOT.jar");
+    Path root = PomInspector.repoRoot("the-monopoly-game-cli");
+    Path jar = root.resolve("the-monopoly-game-cli").resolve("target")
+        .resolve("the-monopoly-game-cli-0.0.0-SNAPSHOT.jar");
     ProcessBuilder builder = new ProcessBuilder("java", "-jar", jar.toString(), flag);
     try {
       packagedCliProcess = builder.redirectErrorStream(true).start();
@@ -853,9 +856,9 @@ public class World {
       throw new AssertionError("Packaged jar did not print simulator usage: " + packagedCliOutput);
   }
 
-  private static void runProcess(String... command) {
+  private static void runProcess(Path workingDirectory, String... command) {
     try {
-      Process process = new ProcessBuilder(command).inheritIO().start();
+      Process process = new ProcessBuilder(command).directory(workingDirectory.toFile()).inheritIO().start();
       if (process.waitFor() != 0) throw new AssertionError("Command failed: " + String.join(" ", command));
     } catch (IOException | InterruptedException cause) {
       Thread.currentThread().interrupt();

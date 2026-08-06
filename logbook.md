@@ -22060,6 +22060,8 @@ isolation again); unrelated to this change.
 
 Reporting to the user before committing/handing off.
 
+ 
+
 User approved. Committed as `a00761a2b9` "Specify the missing narration
 when a distressed-sale auction finds no bidder" (4 files, 110
 insertions).
@@ -22275,6 +22277,11 @@ Gherkin-content fix from the specifier before they can pass, full
 diagnosis included above.
 
 2026-08-06T21:10:00Z — received refactorer handoff:
+2026-08-06T19:38:27Z — refactorer sent distressed-sale-no-bidder-narration handoff to architect
+
+Handoff message sent:
+
+```
 type: git_handoff
 to: architect
 priority: 50
@@ -22376,3 +22383,125 @@ commit: 7432779f0a
 
 The three new no-bidder narration scenarios pass; the full acceptance suite
 has one unrelated packaged-CLI setup failure on this branch.
+ 2026-08-06T21:10:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: distressed-sale-no-bidder-narration
+commit: 5ee6ea5900
+
+Requested correction of the remaining Gherkin scenario-content issue.
+```
+
+Summary: the production narration feature (`distressedSaleNoBidder`
+event, `Journal.Entry.DistressedSaleNoBidder`, `Report` line) is correct
+and verified — CRAP/DRY/mutation clean, 450 pre-existing acceptance
+scenarios still pass. The three new scenarios (`journal-47`,
+`logging-47`, `report-47`) fail for a Gherkin-content reason, not a
+production defect: each redundantly repeats four steps already supplied
+by its feature file's own `Background:`, double-queuing dog's initiative
+roll and shifting the roll-consumption order so dog's real movement roll
+draws the duplicate instead of the intended one, landing it on the wrong
+space entirely. Confirmed via two independent checks (an existing
+byte-identical scenario in a file without the Background duplication
+passes; grepped for every scenario combining both patterns — only these
+three do). Fix is deleting the four redundant lines per scenario;
+recommending routing to the specifier. Separately found and fixed (own
+remit, mechanical Java code not Gherkin content) a stray-quote regex bug
+in the three new "mortgages" combined step patterns that would have
+caused a second failure right after the scenario fix; verified correct
+via isolated regex testing. `SimulatorTest` full-reactor-only flake
+recurred, same as the last two cycles, not re-investigated further.
+
+## 2026-08-06T19:44:00Z — refactorer receives and reviews cli-packaged-jar
+
+Merged `b8cb24ca0a`. Reviewed the diff: `the-monopoly-game-cli/pom.xml`
+gained a standard `maven-shade-plugin` binding at the `package` phase
+with a `ManifestResourceTransformer` pointing at
+`the.monopoly.game.cli.Simulator` — idiomatic, nothing unusual.
+`PomInspector.declaresExecutableJar` extends the existing
+dependency-inspection pattern with a simple text-content check for the
+shade plugin and main class. Two new scenarios in the new
+`cli-packaged-jar.feature`: `cli-jar-1` checks the pom declares the
+plugin (fast, no subprocess); `cli-jar-2` actually packages the CLI with
+a real `mvn package` subprocess, then runs the resulting jar with `-h`
+and checks it exits 0 with usage output — a genuine end-to-end proof,
+deliberately using the fast/deterministic `-h` path rather than a live
+game (same reasoning as the `stalemate-6` round-cap design).
+
+**Found and fixed a real, deterministic bug before it could ship.**
+`World.packageCli()`'s `mvn -B -Dmaven.repo.local=tmp/m2 -pl
+the-monopoly-game-cli -am package -DskipTests` and
+`World.runPackagedCli()`'s `Path.of("the-monopoly-game-cli", "target",
+...)` both assumed the test process's working directory is the repo
+root. It isn't: Surefire runs each module's tests with that module's own
+directory as `user.dir` (confirmed via the failing run's own surefire
+report: `basedir`/`user.dir` = `.../the-monopoly-game-specs/
+the-monopoly-game-specs-core`). Ran the acceptance suite before touching
+anything to see the real failure rather than assume: `cli-jar-2` failed
+outright with "Command failed: mvn ... -pl the-monopoly-game-cli ..." —
+Maven couldn't resolve a sibling reactor module or the relative
+`tmp/m2` path from the wrong directory. This is not the `SimulatorTest`
+flake (that one is probabilistic and passes in isolation); this one
+fails the same way every time, deterministically, given how Surefire
+actually runs.
+
+Fixed by reusing `PomInspector.repoRoot(moduleDirectory)` — already
+solves exactly this problem for the pom-inspection scenarios, walking up
+from the actual CWD to find the checkout root — rather than duplicating
+that logic. Relaxed its visibility from `private` to package-private
+(same package, no reason to re-derive the same directory walk a second
+way). `packageCli()` now runs the `mvn` subprocess with
+`ProcessBuilder.directory(repoRoot)`; `runPackagedCli()` resolves the
+jar path from the same root. Both call sites of the renamed
+`runProcess(Path, String...)` updated (only the one).
+
+Verified by actually running the suite, not just re-reading the diff:
+before the fix, `SpecsCliEnCliPackagedJarAcceptanceTest` failed 1/2;
+after, it passes 2/2, and the acceptance total went from 453/453-with-3-
+pre-existing-failures to 455 tests with the same 3 pre-existing failures
+(the already-diagnosed, already-flagged `journal-47`/`logging-47`/
+`report-47` Gherkin-content defect from the previous cycle — unrelated
+to this task, unaffected by anything here). Ran twice for stability
+given the new scenario spawns a real subprocess; both runs identical.
+
+No `src/main` production code changed by the coder or by me this cycle
+— only build config (`pom.xml`) and test-support Java — so no
+CRAP/mutation manifest scan applies (established scope: only
+`src/main` files are measured). `dry4java` across the specs-core module:
+the only flagged `World.java` ranges are pre-existing, unrelated to
+anything touched this cycle (a `colourStreet`/`ownable` helper-shape
+overlap already present before this commit).
+
+Ran `mvn test` (all modules) twice: hit the `SimulatorTest` full-reactor
+flake once (same one flagged the last two cycles, not re-investigated
+again), clean the second time — confirms it's genuinely probabilistic,
+not a new regression. `mvn test -P property-tests` clean.
+
+Committed the working-directory fix as `1130a57` "Fix working-directory
+bug in packaged-jar acceptance test support" (2 files). Handing off to
+architect: the packaging feature is now genuinely proven end-to-end, not
+just claimed.
+
+2026-08-06T22:18:10Z RECEIVED handoff:
+id: 20260806T201551Z_000112_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: a9942fa362
+created_at: 2026-08-06T20:15:51.296504Z
+enqueued_at: 2026-08-06T20:15:52.246060Z
+task: distressed-sale-no-bidder-narration
+dequeued_at: 2026-08-06T20:15:56.814539Z
+
+Re-read your role and constitution.
+
+merge_and_process architect a9942fa362
+
+Resolved the append-only logbook merge conflict while preserving both
+histories. The architect's packaged-CLI working-directory fix and the
+no-bidder scenario changes are merged. Full acceptance passes 455/455,
+including all three no-bidder narration scenarios and the packaged-jar test.
