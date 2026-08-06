@@ -48,6 +48,7 @@ en/rules/utility-rent.feature
 en/monopoly.feature
 specs-cli:en/cli.feature
 specs-cli:en/cli-slf4j-config.feature
+specs-cli:en/cli-packaged-jar.feature
 
 # Held back from mutation: the fairness scenario asserts that each face comes
 # up about 100000 times within a 1% margin, so it accepts anything in a 1000
