@@ -23668,6 +23668,18 @@ Accepted the coder's focused correction: an equal-cash first partner no longer
 suppresses a buyout against a lower-balance later partner. The pending
 specifier loop for the 9 surviving buyout-feature soft mutations remains the
 only outstanding work, so no phase-complete sync is sent yet.
+
+2026-08-07T23:18:25Z — received specifier note:
+greedo-monopoly-buyout: could review have caught the price-formula drift?
+
+Yes. The original feature asserted a single $40 payment for the exact
+Meir/Nieuwstraat and $1000/$100 fixture, while the wiring implementation added
+the corresponding exact balance-and-street-price branch. Review should have
+rejected that unexplained correlation and required varied-price and
+varied-balance examples. It also should have noted that the feature exercises
+`MonopolyBuyout.resolve`, not the turn-start integration path where the drift
+was introduced. This is the concrete acceptance-specification gap already
+routed to the specifier.
 ```
 
 Summary: accepting the generalized fix. `price` now always uses the
