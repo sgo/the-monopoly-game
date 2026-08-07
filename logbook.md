@@ -22843,6 +22843,15 @@ Committed the extraction as `974dffb` "Extract PeerTrading from
 Game.tradeAtStart to bring CRAP within threshold" (8 files). Handing
 off to architect.
 
+2026-08-07T00:00:00Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-stalemate-trading
+commit: 81ddfb7adc
+
+Full acceptance passed, but DRY found repeated trading branches in `Game.java`;
+requested a behavior-preserving structural correction.
 2026-08-07T19:14:47Z — refactorer sent greedo-stalemate-trading handoff to architect
 
 Handoff message sent:
