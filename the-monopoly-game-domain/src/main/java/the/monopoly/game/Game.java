@@ -129,6 +129,7 @@ public class Game {
   private Result play(boolean untilComplete, BooleanSupplier keepPlaying) {
     var journal = new Journal();
     journal.log(new Journal.Entry.Start(ids(players)));
+    journal.log(new Journal.Entry.StalemateTrading(stalemateTrading));
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
 
@@ -264,6 +265,10 @@ public class Game {
 
     public void peerTrade(Player trader, Ownable offered, Player partner, Ownable wanted) {
       journal.log(new Journal.Entry.PeerTrade(trader.id(), offered.type(), partner.id(), wanted.type()));
+    }
+
+    public void stalemateTrading(boolean enabled) {
+      journal.log(new Journal.Entry.StalemateTrading(enabled));
     }
 
     @Override
@@ -482,6 +487,9 @@ public class Game {
       }
 
       record PeerTrade(Player.ID trader, Street.Type offered, Player.ID partner, Street.Type wanted) implements Entry {
+      }
+
+      record StalemateTrading(boolean enabled) implements Entry {
       }
 
       record PurchaseDeclined(Player.ID player, Street.Type land, Money price,

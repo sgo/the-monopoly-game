@@ -28,6 +28,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rolled;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rollsATotalOf;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rollsForInitiative;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.salaryCollected;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.stalemateTrading;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStarted;
 import static the.monopoly.game.specs.acceptance.StepHandler.given;
 import static the.monopoly.game.specs.acceptance.StepHandler.step;
@@ -90,6 +91,9 @@ final class JournalStepHandlers {
         then("^the game journal records that the game starts with pawn \"" + NAME
                 + "\" before pawn \"" + NAME + "\"$",
             (world, arguments) -> recordsStartWith(world, arguments.text(1), arguments.text(2))),
+
+        then("^the game journal records that stalemate trading is " + NAME + "$",
+            (world, arguments) -> records(world, stalemateTrading(arguments.text(1)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" rolls " + VALUE + " for initiative$",
             (world, arguments) -> records(world, initiativeRoll(arguments.text(1), arguments.number(2)))),

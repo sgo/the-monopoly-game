@@ -2,6 +2,8 @@ package the.monopoly.game.specs.acceptance;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.NAME;
 import static the.monopoly.game.specs.acceptance.StepHandler.given;
 import static the.monopoly.game.specs.acceptance.StepHandler.step;
@@ -31,6 +33,17 @@ final class PomStepHandlers {
 
         step("^I run the packaged simulator jar with \"" + NAME + "\"$",
             (world, arguments) -> world.runPackagedCli(arguments.text(1))),
+
+        step("^I start the packaged simulator jar with the arguments \"" + NAME + "\"$",
+            (world, arguments) -> world.startPackagedCli(arguments.text(1))),
+
+        then("^the packaged jar's output confirms that stalemate trading is " + NAME + "$",
+            (world, arguments) -> world.assertPackagedCliStalemateTrading(arguments.text(1))),
+
+        step("^I stop the packaged jar$", (world, arguments) -> world.stopPackagedCli()),
+
+        then("^the packaged jar process ends$",
+            (world, arguments) -> assertThat(world.packagedCliProcessEnded()).isTrue()),
 
         then("^the packaged jar exits successfully$",
             (world, arguments) -> world.assertPackagedCliSucceeded()),

@@ -23091,6 +23091,14 @@ Merged `4bd27b15e8`. The trading extraction is accepted: the remaining DRY
 matches are pre-existing journaling-adapter forwarding methods in `Game.java`,
 not the refactored trading component.
 
+2026-08-07T20:10:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-stalemate-trading
+commit: 3b6ab595f4
+
+Phase-complete sync: greedo stalemate trading accepted.
 2026-08-07T21:22:03Z — received specifier handoff:
 id: 20260807T212203Z_000069_from_specifier
 from: specifier
@@ -23203,3 +23211,36 @@ fire) and removed it, backed by a JaCoCo zero-hit confirmation, not
 just the proof alone. No new duplication; 27 mutation sites, well under
 the split threshold; manifest generated fresh (new file).
 `./acceptance/run-acceptance.sh` twice: 477/477, 0 failures both times.
+
+2026-08-07T22:00:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-monopoly-buyout
+commit: c37840f7ba
+
+Re-read your role and constitution.
+merge_and_process refactorer c37840f7ba
+
+Merged `c37840f7ba`. Targeted mutation and DRY are clean; soft Greedo priority
+mutation killed 56/56. The buyout decomposition is accepted.
+
+2026-08-07T21:55:55Z — received specifier handoff:
+id: 20260807T215555Z_000070_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: f75f15d540
+task: greedo-stalemate-cli-flag
+
+Re-read your role and constitution.
+
+merge_and_process specifier f75f15d540
+
+Merged `f75f15d540`. Implemented real CLI parsing and propagation for the
+optional Greedo stalemate-trading flag, packaged-jar process assertions, and
+journal/log/report state narration. Full acceptance passes: 483 tests, 0
+failures.

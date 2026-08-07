@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.concurrent.locks.LockSupport;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
 
@@ -89,6 +90,7 @@ public class World {
   private boolean pomPluginsInspected;
   private Process packagedCliProcess;
   private String packagedCliOutput;
+  private StringBuilder packagedCliOutputBuffer;
   private int packagedCliExitCode;
   private Boolean tradeAccepted;
   private MonopolyBuyout.Outcome buyout;
@@ -910,6 +912,62 @@ public class World {
       Thread.currentThread().interrupt();
       throw new AssertionError("Could not run packaged simulator jar.", cause);
     }
+  }
+
+  public void startPackagedCli(String rawArguments) {
+    Path root = PomInspector.repoRoot("the-monopoly-game-cli");
+    Path jar = root.resolve("the-monopoly-game-cli").resolve("target")
+        .resolve("the-monopoly-game-cli-0.0.0-SNAPSHOT.jar");
+    try {
+      packagedCliOutputBuffer = new StringBuilder();
+      packagedCliProcess = new ProcessBuilder(
+          java.util.stream.Stream.concat(Stream.of("java", "-jar", jar.toString()),
+              Stream.of(rawArguments.trim().split("\\s+"))).toArray(String[]::new))
+          .redirectErrorStream(true).start();
+      Thread reader = new Thread(() -> {
+        try (var input = packagedCliProcess.getInputStream()) {
+          input.transferTo(new java.io.OutputStream() {
+            @Override public void write(int value) {
+              synchronized (packagedCliOutputBuffer) { packagedCliOutputBuffer.append((char) value); }
+            }
+          });
+        } catch (IOException ignored) {
+          // The process may close its stream while being stopped.
+        }
+      });
+      reader.setDaemon(true);
+      reader.start();
+    } catch (IOException cause) {
+      throw new AssertionError("Could not start packaged simulator jar.", cause);
+    }
+  }
+
+  public void assertPackagedCliStalemateTrading(String state) {
+    long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
+    while (System.nanoTime() < deadline) {
+      synchronized (packagedCliOutputBuffer) {
+        if (packagedCliOutputBuffer.toString().contains("Stalemate trading enabled")
+            == state.equals("enabled")) return;
+      }
+      LockSupport.parkNanos(5_000_000);
+    }
+    throw new AssertionError("Packaged jar output did not confirm stalemate trading is " + state
+        + ": " + packagedCliOutputBuffer);
+  }
+
+  public void stopPackagedCli() {
+    if (packagedCliProcess == null) throw new AssertionError("The packaged simulator has not been started.");
+    packagedCliProcess.destroy();
+    try {
+      if (!packagedCliProcess.waitFor(5, java.util.concurrent.TimeUnit.SECONDS)) packagedCliProcess.destroyForcibly();
+    } catch (InterruptedException cause) {
+      Thread.currentThread().interrupt();
+      throw new AssertionError("Interrupted while stopping packaged simulator.", cause);
+    }
+  }
+
+  public boolean packagedCliProcessEnded() {
+    return packagedCliProcess != null && !packagedCliProcess.isAlive();
   }
 
   public void assertPackagedCliSucceeded() {

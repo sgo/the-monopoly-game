@@ -57,6 +57,7 @@ public final class Report {
           name(it.player()) + " wins the auction for " + spaceName(it.land()) + " at $" + it.price().amount();
       case Entry.PeerTrade it -> name(it.trader()) + " trades " + boardSpaceName(it.offered()) + " to "
           + name(it.partner()) + " for " + boardSpaceName(it.wanted());
+      case Entry.StalemateTrading it -> "stalemate trading is " + (it.enabled() ? "enabled" : "disabled");
       case Entry.PurchaseDeclined it -> declineLine(it);
       case Entry.RentPaid it -> name(it.tenant()) + " pays " + name(it.owner()) + " $"
           + it.rent().amount() + " rent for " + spaceName(it.land());
