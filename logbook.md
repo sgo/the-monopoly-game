@@ -23452,3 +23452,13 @@ and would need redoing once the real pricing/threshold rule is decided
 to make unilaterally. No commits this cycle beyond the merge; flagging
 for the architect to route back to the coder for a real fix rather than
 approving on the strength of the one scenario it was built to pass.
+
+2026-08-08T00:50:00Z — sent coder handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-buyout-wiring
+commit: a6a5adde6e
+
+Refactorer found fixture-specific buyout thresholds that do not resolve split
+monopolies in live Greedo games; requested a general functional correction.
