@@ -651,3 +651,22 @@ Feature: game report
     Examples:
       | dog_offered                                    | dog_wanted            | street_dog_still_owns                          | street_high_hat_still_owns |
       | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)  | Diestsestraat Leuven  | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)  | Diestsestraat Leuven       |
+
+  # report-51
+  Scenario Outline: the report says that stalemate trading is enabled, near the start of the game
+    Given stalemate trading is enabled for the "Greedo" strategy
+    When we play the game
+    Then the game report says that stalemate trading is <state>
+
+    Examples:
+      | state   |
+      | enabled |
+
+  # report-52
+  Scenario Outline: the report says that stalemate trading is disabled by default, near the start of the game
+    When we play the game
+    Then the game report says that stalemate trading is <state>
+
+    Examples:
+      | state    |
+      | disabled |

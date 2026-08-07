@@ -57,6 +57,7 @@ public final class Report {
           name(it.player()) + " wins the auction for " + spaceName(it.land()) + " at $" + it.price().amount();
       case Entry.PeerTrade it -> name(it.trader()) + " trades " + boardSpaceName(it.offered()) + " to "
           + name(it.partner()) + " for " + boardSpaceName(it.wanted());
+      case Entry.StalemateTrading it -> "stalemate trading is " + (it.enabled() ? "enabled" : "disabled");
       case Entry.PurchaseDeclined it -> declineLine(it);
       case Entry.RentPaid it -> name(it.tenant()) + " pays " + name(it.owner()) + " $"
           + it.rent().amount() + " rent for " + spaceName(it.land());
@@ -181,55 +182,55 @@ public final class Report {
 
 /* mutate4java-manifest
 version=1
-moduleHash=48b8c24ef2c2c3b7d091ea281f520b3deef2eb7c2e42262b8dc09e87b9bec135
+moduleHash=088b46014b764f1323cf4bc241fbcab1d0e59e69d06bbd1101eb3093bc2e98bc
 scope.0.id=Y2xhc3M6UmVwb3J0I1JlcG9ydDoxOQ
 scope.0.kind=class
 scope.0.startLine=19
-scope.0.endLine=180
-scope.0.semanticHash=455c46b0897908bcd32cb4b808069e897de5e8247f147c443b1c9e477b188011
-scope.1.id=ZmllbGQ6UmVwb3J0I0JPQVJEX1NQQUNFX05BTUVfT1ZFUlJJREVTOjE0NQ
+scope.0.endLine=181
+scope.0.semanticHash=36af6c6d74ab676708edd28a250072c062370e2bc8640b9de044d2f68f698ae7
+scope.1.id=ZmllbGQ6UmVwb3J0I0JPQVJEX1NQQUNFX05BTUVfT1ZFUlJJREVTOjE0Ng
 scope.1.kind=field
-scope.1.startLine=145
-scope.1.endLine=167
+scope.1.startLine=146
+scope.1.endLine=168
 scope.1.semanticHash=6eb67eaa69a04e25ac5429d119e7ade52b31b349bfbef41507f8ce1692daff1b
-scope.2.id=bWV0aG9kOlJlcG9ydCNib2FyZFNwYWNlTmFtZSgxKToxNjk
+scope.2.id=bWV0aG9kOlJlcG9ydCNib2FyZFNwYWNlTmFtZSgxKToxNzA
 scope.2.kind=method
-scope.2.startLine=169
-scope.2.endLine=171
+scope.2.startLine=170
+scope.2.endLine=172
 scope.2.semanticHash=7dcc143fee9458236e6143cec91f4c98d4b78c3de1afb24170abc26433f492c9
 scope.3.id=bWV0aG9kOlJlcG9ydCNjdG9yKDApOjIw
 scope.3.kind=method
 scope.3.startLine=20
 scope.3.endLine=21
 scope.3.semanticHash=fa4ab1d8c774b5a49e26e7b36ba0ec25ba0d7069b207d38eb37beccb7d02dc9c
-scope.4.id=bWV0aG9kOlJlcG9ydCNkZWNsaW5lTGluZSgxKToxMTg
+scope.4.id=bWV0aG9kOlJlcG9ydCNkZWNsaW5lTGluZSgxKToxMTk
 scope.4.kind=method
-scope.4.startLine=118
-scope.4.endLine=126
+scope.4.startLine=119
+scope.4.endLine=127
 scope.4.semanticHash=f8e93f31787af3801c915ba44f5de44f38ccb43e2a127b1f3987d720e4722a8c
 scope.5.id=bWV0aG9kOlJlcG9ydCNsaW5lKDEpOjQ0
 scope.5.kind=method
 scope.5.startLine=44
-scope.5.endLine=116
-scope.5.semanticHash=2d756b959367e26af2fdb3bb501a8f682be6c75b689f5f83395cf8ffe8642b8f
-scope.6.id=bWV0aG9kOlJlcG9ydCNuYW1lKDEpOjE3Nw
+scope.5.endLine=117
+scope.5.semanticHash=3f77fcff6ff5b0b6de506660087d715cff93f8cc86470b5493c53eeea80075fa
+scope.6.id=bWV0aG9kOlJlcG9ydCNuYW1lKDEpOjE3OA
 scope.6.kind=method
-scope.6.startLine=177
-scope.6.endLine=179
+scope.6.startLine=178
+scope.6.endLine=180
 scope.6.semanticHash=cd39b08d1576cbc2e9d2ae25bb54b6b608f1219509ee3d03086e8f3ab4c238fa
-scope.7.id=bWV0aG9kOlJlcG9ydCNuYW1lcygxKToxNzM
+scope.7.id=bWV0aG9kOlJlcG9ydCNuYW1lcygxKToxNzQ
 scope.7.kind=method
-scope.7.startLine=173
-scope.7.endLine=175
+scope.7.startLine=174
+scope.7.endLine=176
 scope.7.semanticHash=7baca973d9baa23bf1205536bbfd229d494b1e2c863e02f6e50c5ce7dcb42959
 scope.8.id=bWV0aG9kOlJlcG9ydCNvZigxKToyMw
 scope.8.kind=method
 scope.8.startLine=23
 scope.8.endLine=25
 scope.8.semanticHash=3bddf559e6362200e39e3d2024808e23da1e3da3deb262e8b89f1402e9edd25e
-scope.9.id=bWV0aG9kOlJlcG9ydCNzcGFjZU5hbWUoMSk6MTM0
+scope.9.id=bWV0aG9kOlJlcG9ydCNzcGFjZU5hbWUoMSk6MTM1
 scope.9.kind=method
-scope.9.startLine=134
-scope.9.endLine=136
+scope.9.startLine=135
+scope.9.endLine=137
 scope.9.semanticHash=56eb8b748063de6798efd6f1a96d5a30f07cf019c0478f7f004006d2fe61eaf8
 */

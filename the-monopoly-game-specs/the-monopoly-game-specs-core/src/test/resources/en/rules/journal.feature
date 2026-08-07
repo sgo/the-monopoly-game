@@ -664,3 +664,22 @@ Feature: game journal
     Examples:
       | dog_offered                                    | dog_wanted            | street_dog_still_owns                          | street_high_hat_still_owns |
       | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)  | Diestsestraat Leuven  | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)  | Diestsestraat Leuven       |
+
+  # journal-51
+  Scenario Outline: the journal records that stalemate trading is enabled, near the start of the game
+    Given stalemate trading is enabled for the "Greedo" strategy
+    When we play the game
+    Then the game journal records that stalemate trading is <state>
+
+    Examples:
+      | state   |
+      | enabled |
+
+  # journal-52
+  Scenario Outline: the journal records that stalemate trading is disabled by default, near the start of the game
+    When we play the game
+    Then the game journal records that stalemate trading is <state>
+
+    Examples:
+      | state    |
+      | disabled |

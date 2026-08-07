@@ -23187,6 +23187,31 @@ re-investigated again.
 Committed the decomposition as `fe82923` "Decompose MonopolyBuyout.resolve
 to bring CRAP within threshold" (2 files). Handing off to architect.
 
+2026-08-07T21:42:54Z — refactorer sent greedo-monopoly-buyout handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-monopoly-buyout
+commit: c37840f7ba
+```
+
+Summary: `MonopolyBuyout.resolve` (CC=16, 72.7% coverage, CRAP 21.2) is
+split into `splitGroup`/`selectWinner`/`settle`, with `settle`'s cash
+logic further split into `settlementCash`/`waiveIfUnaffordable`; every
+method is now CC<=4. Added 9 unit tests directly against `resolve`
+covering all six acceptance scenarios plus three branches they don't
+reach. Proved one branch inside the original cash-waiver logic
+structurally unreachable (a tied winner is only ever selected when they
+hold a spare street, so the "tied and spare-less" abort could never
+fire) and removed it, backed by a JaCoCo zero-hit confirmation, not
+just the proof alone. No new duplication; 27 mutation sites, well under
+the split threshold; manifest generated fresh (new file).
+`./acceptance/run-acceptance.sh` twice: 477/477, 0 failures both times.
+
 2026-08-07T22:00:00Z — received refactorer handoff:
 type: git_handoff
 to: architect
@@ -23208,3 +23233,67 @@ task: greedo-monopoly-buyout
 commit: cf68115950
 
 Phase-complete sync: Greedo monopoly buyout accepted.
+2026-08-07T21:55:55Z — received specifier handoff:
+id: 20260807T215555Z_000070_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: f75f15d540
+task: greedo-stalemate-cli-flag
+
+Re-read your role and constitution.
+
+merge_and_process specifier f75f15d540
+
+Merged `f75f15d540`. Implemented real CLI parsing and propagation for the
+optional Greedo stalemate-trading flag, packaged-jar process assertions, and
+journal/log/report state narration. Full acceptance passes: 483 tests, 0
+failures.
+
+## 2026-08-07T22:07:14Z — refactorer receives and reviews greedo-stalemate-cli-flag
+
+Merged `13fa37ae34`. Two `logbook.md` conflict blocks, the usual
+cross-matched shared-boilerplate pattern; resolved keeping both sides'
+unique content, verified nothing lost against either parent via `diff`.
+
+Found a real, deterministic test failure before trusting the coder's
+"483 tests, 0 failures" claim at face value — ran the domain suite
+myself first. `Game.play` now logs a `StalemateTrading` entry
+unconditionally near the start of every game (confirmed intentional
+per the specifier's own "records that stalemate trading is disabled by
+default" scenario, not a defect), but it does so via a direct
+`journal.log(...)` call rather than through the `Journalling` wrapper
+every other event goes through — because `Journalling` wasn't
+constructed until a few lines later in the method. This left a
+`Journalling.stalemateTrading(boolean)` method the coder wrote but
+could never call, dead on arrival. Fixed by moving the `Journalling`
+construction earlier (it's a stateless one-field record, so this
+changes nothing observable — verified the journal entry sequence is
+byte-identical) and routing the call through it, eliminating the dead
+method by actually wiring it up rather than deleting it.
+
+The new entry also broke `aGameAccountsForWhoIsPlayingAndWhatEachOfThemRolledForInitiative`,
+a pre-existing unit test asserting an exact `startsWith` sequence; this
+wasn't caught by the coder's own acceptance run because no acceptance
+scenario happens to assert that particular prefix. Confirmed via `git
+stash` that the failure exists in the coder's raw commit, unrelated to
+my `Journalling` reordering. Updated the test to expect the new entry.
+
+CRAP: only the exempted `Report.line` sealed switch exceeds threshold
+(CRAP 71.9, CC=43, recorded per the 2026-07-28 decision); everything
+else touched is CC<=6. `dry4java`: no new duplication. `mutate4java
+--scan`: `Game.java` 45 sites, `Report.java` 3, `Simulator.java` 62 —
+all well under the 100-site split threshold; all three manifests were
+stale, refreshed with `--update-manifest`.
+
+`./acceptance/run-acceptance.sh` twice: 483/483, 0 failures both times.
+`mvn test` and `mvn test -P property-tests` both hit only the
+already-diagnosed `SimulatorTest.keepsPlayingUntilToldToStop` flake,
+unrelated.
+
+Committed as `c8cea15` "Fix broken test and dead Journalling wrapper
+from the stalemate-trading CLI flag" (4 files). Handing off to
+architect.
