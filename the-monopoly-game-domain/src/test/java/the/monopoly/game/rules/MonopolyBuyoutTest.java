@@ -28,6 +28,20 @@ class MonopolyBuyoutTest {
   }
 
   @Test
+  void aTurnStartBuyoutUsesTheSameRuleAtADifferentBalance() {
+    Player dog = player("dog", 2500);
+    Player highHat = player("high hat", 100);
+    deeds.sell(ownable(Street.Type.MeirAntwerpen), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.NieuwstraatBrussel), highHat, Money.ZERO);
+
+    MonopolyBuyout.Outcome outcome = MonopolyBuyout.resolveAtTurnStart(dog, highHat, rules, deeds)
+        .orElseThrow();
+
+    assertThat(outcome.payment()).isEqualTo(new Money(40));
+    assertThat(deeds.ownerOf(Street.Type.NieuwstraatBrussel)).contains(dog.id());
+  }
+
+  @Test
   void theRicherCoOwnerWinsRegardlessOfWhichPawnInitiates() {
     Player dog = player("dog", 100);
     Player highHat = player("high hat", 1000);
