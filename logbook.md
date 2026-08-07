@@ -23178,3 +23178,28 @@ re-investigated again.
 
 Committed the decomposition as `fe82923` "Decompose MonopolyBuyout.resolve
 to bring CRAP within threshold" (2 files). Handing off to architect.
+
+2026-08-07T21:42:54Z — refactorer sent greedo-monopoly-buyout handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-monopoly-buyout
+commit: c37840f7ba
+```
+
+Summary: `MonopolyBuyout.resolve` (CC=16, 72.7% coverage, CRAP 21.2) is
+split into `splitGroup`/`selectWinner`/`settle`, with `settle`'s cash
+logic further split into `settlementCash`/`waiveIfUnaffordable`; every
+method is now CC<=4. Added 9 unit tests directly against `resolve`
+covering all six acceptance scenarios plus three branches they don't
+reach. Proved one branch inside the original cash-waiver logic
+structurally unreachable (a tied winner is only ever selected when they
+hold a spare street, so the "tied and spare-less" abort could never
+fire) and removed it, backed by a JaCoCo zero-hit confirmation, not
+just the proof alone. No new duplication; 27 mutation sites, well under
+the split threshold; manifest generated fresh (new file).
+`./acceptance/run-acceptance.sh` twice: 477/477, 0 failures both times.
