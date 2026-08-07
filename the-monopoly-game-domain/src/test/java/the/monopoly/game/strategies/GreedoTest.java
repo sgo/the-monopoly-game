@@ -61,6 +61,108 @@ class GreedoTest {
   }
 
   @Test
+  void aTradeOfferingLandTheTraderDoesNotOwnIsDeclined() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player trader = player(bank, "trader", 0);
+    Player partner = player(bank, "partner", 0);
+    Deeds deeds = new Deeds();
+    deeds.sell(ownable(Street.Type.RueGrandeDinant), trader, Money.ZERO);
+    deeds.sell(ownable(Street.Type.DiestsestraatLeuven), partner, Money.ZERO);
+
+    Strategy.TradeOffer offer = new Strategy.TradeOffer(trader, partner,
+        ownable(Street.Type.NieuwstraatBrussel), ownable(Street.Type.DiestsestraatLeuven));
+
+    assertThat(strategy.accepts(offer, rules, deeds)).isFalse();
+  }
+
+  @Test
+  void aTradeForLandThePartnerDoesNotOwnIsDeclined() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player trader = player(bank, "trader", 0);
+    Player partner = player(bank, "partner", 0);
+    Deeds deeds = new Deeds();
+    deeds.sell(ownable(Street.Type.RueGrandeDinant), trader, Money.ZERO);
+    deeds.sell(ownable(Street.Type.NieuwstraatBrussel), trader, Money.ZERO);
+
+    Strategy.TradeOffer offer = new Strategy.TradeOffer(trader, partner,
+        ownable(Street.Type.NieuwstraatBrussel), ownable(Street.Type.DiestsestraatLeuven));
+
+    assertThat(strategy.accepts(offer, rules, deeds)).isFalse();
+  }
+
+  @Test
+  void aTradeOfferingAHighestPriorityStreetIsDeclined() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player trader = player(bank, "trader", 0);
+    Player partner = player(bank, "partner", 0);
+    Deeds deeds = new Deeds();
+    deeds.sell(ownable(Street.Type.RueGrandeDinant), trader, Money.ZERO);
+    deeds.sell(ownable(Street.Type.LippenslaanKnokke), trader, Money.ZERO);
+    deeds.sell(ownable(Street.Type.DiestsestraatLeuven), partner, Money.ZERO);
+
+    Strategy.TradeOffer offer = new Strategy.TradeOffer(trader, partner,
+        ownable(Street.Type.LippenslaanKnokke), ownable(Street.Type.DiestsestraatLeuven));
+
+    assertThat(strategy.accepts(offer, rules, deeds)).isFalse();
+  }
+
+  @Test
+  void aTradeThatDoesNotCompleteTheTradersColourGroupIsDeclined() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player trader = player(bank, "trader", 0);
+    Player partner = player(bank, "partner", 0);
+    Deeds deeds = new Deeds();
+    deeds.sell(ownable(Street.Type.NieuwstraatBrussel), trader, Money.ZERO);
+    deeds.sell(ownable(Street.Type.DiestsestraatLeuven), partner, Money.ZERO);
+
+    Strategy.TradeOffer offer = new Strategy.TradeOffer(trader, partner,
+        ownable(Street.Type.NieuwstraatBrussel), ownable(Street.Type.DiestsestraatLeuven));
+
+    assertThat(strategy.accepts(offer, rules, deeds)).isFalse();
+  }
+
+  @Test
+  void aTradeWithAPartnerWhoAlreadyOwnsACompleteHighestPriorityMonopolyIsDeclined() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player trader = player(bank, "trader", 0);
+    Player partner = player(bank, "partner", 0);
+    Deeds deeds = new Deeds();
+    deeds.sell(ownable(Street.Type.RueGrandeDinant), trader, Money.ZERO);
+    deeds.sell(ownable(Street.Type.NieuwstraatBrussel), trader, Money.ZERO);
+    deeds.sell(ownable(Street.Type.DiestsestraatLeuven), partner, Money.ZERO);
+    deeds.sell(ownable(Street.Type.SteenstraatBrugge), partner, Money.ZERO);
+    deeds.sell(ownable(Street.Type.PlaceDuMonumentSpa), partner, Money.ZERO);
+    deeds.sell(ownable(Street.Type.KapellestraatOostende), partner, Money.ZERO);
+
+    Strategy.TradeOffer offer = new Strategy.TradeOffer(trader, partner,
+        ownable(Street.Type.NieuwstraatBrussel), ownable(Street.Type.DiestsestraatLeuven));
+
+    assertThat(strategy.accepts(offer, rules, deeds)).isFalse();
+  }
+
+  @Test
+  void aTradeThatCompletesTheTradersColourGroupAndDoesNotHelpAPartnerWithACompleteMonopolyIsAccepted() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player trader = player(bank, "trader", 0);
+    Player partner = player(bank, "partner", 0);
+    Deeds deeds = new Deeds();
+    deeds.sell(ownable(Street.Type.RueGrandeDinant), trader, Money.ZERO);
+    deeds.sell(ownable(Street.Type.NieuwstraatBrussel), trader, Money.ZERO);
+    deeds.sell(ownable(Street.Type.DiestsestraatLeuven), partner, Money.ZERO);
+
+    Strategy.TradeOffer offer = new Strategy.TradeOffer(trader, partner,
+        ownable(Street.Type.NieuwstraatBrussel), ownable(Street.Type.DiestsestraatLeuven));
+
+    assertThat(strategy.accepts(offer, rules, deeds)).isTrue();
+  }
+
+  @Test
   void aDistressedBidToDenyAHighestPriorityMonopolyIsCappedByTheAvailableCash() {
     Rule.Set rules = Rule.Set.Type.official.create();
     Bank bank = rules.bank();

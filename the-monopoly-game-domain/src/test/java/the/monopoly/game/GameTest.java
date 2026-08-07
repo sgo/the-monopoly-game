@@ -220,6 +220,33 @@ class GameTest {
   }
 
   @Test
+  void aStalemateTradingGreedoTradesAwayItsLowestPriorityStreetToCompleteAColourGroupAtTheStartOfItsTurn() {
+    Player dog = players.get(0);
+    Player highHat = players.get(1);
+    Player ironBox = players.get(2);
+    Deeds deeds = new Deeds();
+    ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
+        .filter(land -> land.type() != Street.Type.DiestsestraatLeuven)
+        .forEach(land -> deeds.sell(land, dog, Money.ZERO));
+    deeds.sell((Ownable) ruleSet.create(Street.Type.DiestsestraatLeuven), highHat, Money.ZERO);
+    Strategy.OfPlayers strategies = player ->
+        player.id().equals(dog.id()) ? new Greedo(Money.ZERO, true) : Strategy.UNDECIDED;
+    Map<Player.ID, Cup> cups = Map.of(
+        dog.id(), Cup.of(new Roll(1, 2), new Roll(4, 6)),
+        highHat.id(), Cup.of(new Roll(1, 3), new Roll(4, 6)),
+        ironBox.id(), Cup.of(new Roll(1, 4), new Roll(4, 6))
+    );
+
+    Game.Result result = new Game(
+        ruleSet, players, player -> cups.get(player.id()), strategies, deeds, Cards.Decks.EMPTY,
+        new the.monopoly.game.rules.Jail(ruleSet), true
+    ).playUpToRounds(1);
+
+    assertThat(result.journal()).contains(new Entry.PeerTrade(
+        dog.id(), Street.Type.NieuwstraatBrussel, highHat.id(), Street.Type.DiestsestraatLeuven));
+  }
+
+  @Test
   void aGameStopsBetweenRoundsWhenToldTo() {
     AtomicBoolean stop = new AtomicBoolean();
 
