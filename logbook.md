@@ -23870,3 +23870,99 @@ Rejected the unsupported separate turn-start settlement policy at user direction
 canonical `MonopolyBuyout` settlement policy rather than a cash-only variant.
 Routing the correction to coder with required enabled-path and default-CLI
 coverage.
+
+## 2026-08-07T23:39:07Z — refactorer merges the canonical-settlement fix and finds the oscillation bug still reproduces
+
+Merged `bcde86a010`. One `logbook.md` conflict, the usual cross-matched
+pattern; resolved keeping both sides, `diff` confirms nothing lost.
+
+The code change itself is exactly what the architect's decision above
+calls for: `resolveAtTurnStart`/`cashOnlyPrice` are gone, `Game` now
+calls the single canonical `MonopolyBuyout.resolve` for both the
+standalone and turn-start cases. `spareStreetsOf` and `spareOwner` also
+gained a real fix I hadn't asked for but is worth recording: a new
+`isSplitGroup` check excludes a candidate "spare" street from
+consideration if its own colour group is *itself* already split
+between the same two players — so a second, independent split monopoly
+between the same pair can no longer get miscounted as throwaway
+sweetener collateral for the first one. Note this doesn't touch
+`splitGroup` itself (the method that decides which colour group is
+*the* split being resolved), so the partner-identity gap I flagged two
+cycles ago — a 3+ player game can spuriously match a group split
+between two *other* players — is still there, still 2-player-scoped by
+every existing scenario, still not this task's job to fix.
+
+Deduplicated something I found while reading `spareOwner` rather than
+introduced: it rebuilt `rules.streets()...toList()` from scratch inside
+a nested filter inside a loop over both candidates — up to several
+times per call for no reason, since `splitGroup`/`spareStreetsOf`
+already established the pattern of building that list once. Hoisted it
+out, same for `spareOwner`'s `first`/`second`-to-`other` ternary. Pure
+mechanical cleanup, verified behavior-identical via the existing test
+suite.
+
+Before accepting on the strength of "486/486 and CRAP/DRY/mutation are
+clean," went back to the actual empirical check this whole task exists
+to satisfy: does the ping-pong oscillation the specifier's commit
+documented ("3573 trades in one run") still happen in real, unseeded-
+dice play? Ran 20 two-player Greedo games again. It still happens.
+Run 7 alone: 56 `PeerTrade` events, the last ~30 of them a dead-simple
+back-and-forth of `PlaceVerteVerviers` and `RueDeDiekirchArlon` between
+the same two players, zero `SplitMonopolyWon` for the entire capped
+300-round game. Widened the search (100 runs, detecting any adjacent
+trade pair where A's offered/wanted are exactly B's wanted/offered
+reversed) and found 3/100 genuinely oscillating games, all on 3-member
+colour groups (pink, yellow) — never on the 2-member groups (`brown`,
+`dark_blue`) every acceptance scenario happens to use.
+
+Traced why rather than just reporting the symptom: `MonopolyBuyout`
+only ever engages once `splitGroup` finds a colour group *fully owned*
+and split between exactly two players. For a 3-member group where only
+two of three streets are owned, that never becomes true, so
+`resolveBuyoutAtStart` returns false every turn and the game falls
+through to `tradeAtStart`/`PeerTrading` indefinitely. And `PeerTrading`
+itself has no termination guarantee of its own: `Game.completeTrade`
+executes whatever the *trader's own* strategy selects via
+`Strategy.accepts(TradeOffer,...)` — the partner's strategy is never
+consulted, so nothing stops the partner's own next-turn logic from
+finding the exact reverse trade equally attractive (each side judges
+"does giving up `offered` for `wanted` complete *my* group" against
+whatever the board looks like *after* the last swap) and immediately
+undoing it. This is not a defect in `bcde86a010`'s own diff — the
+no-consent trade mechanism is unchanged from the original
+`greedo-stalemate-trading` commit, and `MonopolyBuyout`'s price formula
+(cash-only vs. canonical) doesn't affect whether it applies to a
+partially-owned 3-member group either way. But it means the actual
+production bug this multi-cycle task exists to fix is not fixed in
+general — only for the specific "whole board owned, exactly one
+2-member colour group split" shape every acceptance scenario happens
+to construct.
+
+Not fixing this myself: whether `MonopolyBuyout` should extend to
+partially-owned groups, whether `PeerTrading` needs a partner-consent
+step or an anti-repeat guard, or whether trading should simply be
+disallowed once a game reaches this pathological shape, are genuine
+design decisions, not a structural cleanup. Flagging with full evidence
+for the architect and, ultimately, the user who made the canonical-
+settlement call above — they should decide whether this is closable as
+"scenario as specified" or needs another round.
+
+CRAP: all touched methods CC<=6, mostly 100% coverage (`isSplitGroup`
+new this cycle at 52.9%, CRAP 5.7, still under threshold; not adding
+dedicated coverage for it since its behavior is already exercised
+indirectly through every `MonopolyBuyoutTest` case that involves a
+spare street, and inventing a test purely to raise a number that's
+already compliant isn't worth it). `dry4java`: no duplicate candidates.
+`mutate4java --scan`: `MonopolyBuyout.java` 36 sites, `Game.java` 58,
+both well under the split threshold; manifests were stale, refreshed.
+`./acceptance/run-acceptance.sh` twice: 486/486, 0 failures both times.
+`mvn test` / `mvn test -P property-tests`: only the already-diagnosed
+`SimulatorTest` flake.
+
+Committed the `spareOwner` cleanup and manifest refresh as `4e8332c`
+"Deduplicate street-list construction in MonopolyBuyout.spareOwner;
+refresh manifests" (2 files). Handing off to architect with the
+oscillation finding front and center — not blocking on it, since
+nothing here regresses a specified scenario and the merge itself is
+sound, but this needs to reach whoever decides whether the task is
+actually done.
