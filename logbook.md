@@ -23471,3 +23471,15 @@ commit: a6a5adde6e
 
 Refactorer found fixture-specific buyout thresholds that do not resolve split
 monopolies in live Greedo games; requested a general functional correction.
+
+2026-08-07T22:47:47Z — received coder handoff:
+type: git_handoff
+from: coder
+to: architect
+priority: 00
+task: greedo-buyout-wiring
+commit: ab264a09a0
+
+Merged `ab264a09a0`. It changes only `logbook.md`; the fixture-specific branch
+in `MonopolyBuyout.price` remains, so the requested general buyout correction
+is still outstanding. Returning the functional defect to coder.
