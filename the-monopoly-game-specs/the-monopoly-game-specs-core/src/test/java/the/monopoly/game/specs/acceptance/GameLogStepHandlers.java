@@ -80,6 +80,8 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rolled;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.salaryCollected;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.stalemateTrading;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.splitMonopolyPaid;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.splitMonopolyWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.soldAHouse;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStarted;
 import static the.monopoly.game.specs.acceptance.StepHandler.step;
@@ -97,6 +99,30 @@ final class GameLogStepHandlers {
 
   static List<StepHandler> handlers() {
     return List.of(
+        then("^the game journal records that pawn \"" + NAME + "\" wins the split monopoly before it records that pawn \""
+                + NAME + "\" starts a turn$",
+            (world, arguments) -> recordsInOrder(world, splitMonopolyWon(arguments.text(1)),
+                turnStarted(arguments.text(2)))),
+        then("^the game journal records that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE
+                + " for the split monopoly$",
+            (world, arguments) -> records(world, splitMonopolyPaid(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+        then("^the game log records that pawn \"" + NAME + "\" wins the split monopoly before it records that pawn \""
+                + NAME + "\" starts a turn$",
+            (world, arguments) -> logRecordsInOrder(world, splitMonopolyWon(arguments.text(1)),
+                turnStarted(arguments.text(2)))),
+        then("^the game log records that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE
+                + " for the split monopoly$",
+            (world, arguments) -> logRecords(world, splitMonopolyPaid(
+                arguments.text(1), arguments.text(2), arguments.number(3)))),
+        then("^the game report says that pawn \"" + NAME + "\" wins the split monopoly before it says that pawn \""
+                + NAME + "\" starts a turn$",
+            (world, arguments) -> saysInOrder(world, arguments.text(1) + " wins the split monopoly",
+                arguments.text(2) + " starts a turn")),
+        then("^the game report says that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE
+                + " for the split monopoly$",
+            (world, arguments) -> says(world, arguments.text(1) + " pays " + arguments.text(2) + " $"
+                + arguments.number(3) + " for the split monopoly")),
         then("^the game log records that stalemate trading is " + NAME + "$",
             (world, arguments) -> logRecords(world, stalemateTrading(arguments.text(1)))),
         then("^the game report says that stalemate trading is " + NAME + "$",

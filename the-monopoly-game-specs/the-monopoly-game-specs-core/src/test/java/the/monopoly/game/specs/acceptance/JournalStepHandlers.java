@@ -52,6 +52,9 @@ final class JournalStepHandlers {
         step("^we play up to " + VALUE + " rounds$",
             (world, arguments) -> world.playUpToRounds(arguments.number(1))),
 
+        step("^we play up to " + VALUE + " round$",
+            (world, arguments) -> world.playUpToRounds(arguments.number(1))),
+
         given("^pawn \"" + NAME + "\"'s account holds \\$" + VALUE + "$",
             (world, arguments) -> world.holdPawnBalance(arguments.text(1), money(arguments.number(2)))),
 

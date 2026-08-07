@@ -167,6 +167,19 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.StalemateTrading(state.equals("enabled")));
   }
 
+  static Claim splitMonopolyWon(String winner, String loser) {
+    return Claim.of(new Entry.SplitMonopolyWon(idOf(winner), idOf(loser)));
+  }
+
+  static Claim splitMonopolyWon(String winner) {
+    return new Claim(entry -> entry instanceof Entry.SplitMonopolyWon it
+        && it.winner().equals(idOf(winner)), winner + " wins the split monopoly");
+  }
+
+  static Claim splitMonopolyPaid(String payer, String payee, int amount) {
+    return Claim.of(new Entry.SplitMonopolyPaid(idOf(payer), idOf(payee), money(amount)));
+  }
+
   static Claim distressedOffer(String bidder, String spaceName, int price) {
     return Claim.of(new Entry.DistressedOffer(idOf(bidder), SpaceNames.of(spaceName), money(price)));
   }

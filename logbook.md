@@ -23310,3 +23310,23 @@ unrelated.
 Committed as `c8cea15` "Fix broken test and dead Journalling wrapper
 from the stalemate-trading CLI flag" (4 files). Handing off to
 architect.
+
+2026-08-07T22:19:41Z — received specifier handoff:
+id: 20260807T221941Z_000071_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 92ea4a6061
+task: greedo-buyout-wiring
+
+Re-read your role and constitution.
+
+merge_and_process specifier 92ea4a6061
+
+Merged `92ea4a6061`. Wired `MonopolyBuyout` into the start-of-turn game
+flow and added split-monopoly winner/payment journal, log, and report
+events. Added the singular round step handler and verified 486/486
+acceptance tests plus the domain unit tests.
