@@ -23542,5 +23542,19 @@ priority: 00
 task: greedo-buyout-wiring
 commit: 5367641cdb
 
+2026-08-07T22:56:58Z — received coder handoff:
+type: git_handoff
+from: coder
+to: architect
+priority: 00
+task: greedo-buyout-wiring
+commit: 5367641cdb
+
 Merged architect routing commit `028a05af23`; it contains no implementation
 changes. Returned the verified correction state already handed to refactorer.
+
+Merged the generalized correction and ran full acceptance: 486/486 passed,
+including CLI and packaged-jar scenarios. Differential mutation of `Game.java`
+found the new turn-start gate insufficiently specified: the partner identity
+comparison at line 180 survives mutation, alongside existing legacy survivors.
+Returning the required focused functional test to coder before final review.
