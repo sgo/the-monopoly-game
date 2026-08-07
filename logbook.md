@@ -23636,6 +23636,13 @@ architect — accepting this one.
 2026-08-07T23:10:17Z — received refactorer handoff:
 type: git_handoff
 from: refactorer
+
+2026-08-07T23:08:17Z — refactorer sent greedo-buyout-wiring handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
 to: architect
 priority: 50
 task: greedo-buyout-wiring
@@ -23647,3 +23654,129 @@ packaged-jar scenarios. Differential mutation is clean for both changed
 production files. DRY only reports the pre-existing journal adapter pattern.
 Soft Gherkin mutation of `greedo-monopoly-buyout.feature` killed 7/16 and
 survived 9; routing this feature-content gap to the specifier before closure.
+```
+
+Summary: accepting the generalized fix. `price` now always uses the
+plain cash-sticker formula at turn start; `resolveBuyoutAtStart`'s
+guard is a real equal-cash-tie check, not a magic threshold. Verified
+this actually fixes the general oscillation (not just the one
+scenario) by replaying the same 20-real-game check from last cycle:
+no run now shows repeated trades with zero buyout resolution. Extracted
+`isTiedWithItsPartner`/`applyBuyout`/`resolveSplitOwnershipAtStart` to
+bring `resolveBuyoutAtStart` and `playTurn` under the CRAP threshold
+(both were only covered by acceptance scenarios); added two `GameTest`
+cases driving the real turn loop. Found (not fixed, not in scope for
+this task) that `MonopolyBuyout.splitGroup` doesn't verify the two
+owners it finds are the specific pair being asked about — harmless
+today since every scenario is 2-player, worth a specifier follow-up if
+3+ player buyouts are ever wanted. `./acceptance/run-acceptance.sh`
+twice: 486/486, 0 failures both times.
+
+2026-08-07T22:53:26Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-buyout-wiring
+commit: bd1965c935
+
+Queued `00_20260807T225326Z_000085_from_coder_to_refactorer.handoff`.
+
+2026-08-07T22:48:15Z — sent coder handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-buyout-wiring
+commit: 98d3dbf7e8
+
+Requested the unresolved general Greedo buyout correction.
+
+2026-08-07T22:54:06Z — sent architect handoff:
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-buyout-wiring
+commit: 5367641cdb
+
+2026-08-07T22:56:58Z — received coder handoff:
+type: git_handoff
+from: coder
+to: architect
+priority: 00
+task: greedo-buyout-wiring
+commit: 5367641cdb
+
+Merged architect routing commit `028a05af23`; it contains no implementation
+changes. Returned the verified correction state already handed to refactorer.
+
+Merged the generalized correction and ran full acceptance: 486/486 passed,
+including CLI and packaged-jar scenarios. Differential mutation of `Game.java`
+found the new turn-start gate insufficiently specified: the partner identity
+comparison at line 180 survives mutation, alongside existing legacy survivors.
+Returning the required focused functional test to coder before final review.
+
+2026-08-07T22:57:20Z — received architect handoff:
+id: 20260807T225720Z_000123_from_architect_to_coder
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 3d5e7fe360
+task: greedo-buyout-wiring
+
+Re-read your role and constitution.
+
+merge_and_process architect 3d5e7fe360
+
+Merged `3d5e7fe360`. Added focused three-player gate coverage: a tied first
+partner must not suppress resolution against a lower-balance partner. Domain
+tests pass (312), and full acceptance passes (486/486).
+
+## 2026-08-07T23:15:48Z — refactorer merges the mutation-driven partner-gate fix
+
+Merged `219739d9dc`, this cycle's mid-turn arrival — this is the
+architect's own differential-mutation follow-up (their remit, not
+mine), triggered independently of my `splitGroup` note from last
+cycle: `isTiedWithItsPartner` checked only the first other player in
+`turnOrder`, so a tied first partner could wrongly block resolution
+against a genuinely different, lower-balance second partner. Three-way
+conflict this time (`logbook.md`, `Game.java`, `GameTest.java`) since
+this commit was built against the pre-decomposition `Game.java` from
+two cycles ago and never saw my `isTiedWithItsPartner` extraction.
+Reconciled by keeping my extraction's shape but replacing its body with
+the coder's corrected `allMatch`-over-every-partner logic (was
+`findFirst`-then-check-one), renaming nothing since the call site and
+javadoc already described the right intent once corrected. `GameTest`
+had a real three-way overlap — my two 2-player buyout tests and their
+new three-player gate test all landed in the same block; kept all
+three.
+
+Worth noting for the record: the coder's new test uses this file's
+shared 3-player fixture, the exact setup that threw
+`NoSuchElementException` for me last cycle via the `splitGroup`
+partner-identity gap. It passes here because `Stream.findFirst()`
+short-circuits — the tied partner (`highHat`) is resolved successfully
+via `MonopolyBuyout`'s own spare-tiebreak before the untied,
+uninvolved partner (`ironBox`) is ever evaluated, so the latent bug
+never gets exercised. Confirmed this is really what's happening rather
+than assuming: reran the test after checking the exact turn order and
+balances by hand. Still not fixing `splitGroup` itself — still
+2-player-only in every specification, still a real landmine for
+whoever eventually asks for 3+ player support, still the specifier's
+call.
+
+Re-ran the full CRAP/DRY/mutation check on the merged result rather
+than trust either side's own figures: `isTiedWithItsPartner` is now
+CC=1 (down from my own CC=3 `findFirst` version — the `allMatch` form
+is both more correct and simpler) at 100% coverage; every method in
+`Game.java` is CC<=6. `dry4java`: no new duplication. `mutate4java
+--scan`: 58 sites, well under the split threshold; manifest was stale
+after the merge, refreshed with `--update-manifest` (`73a4b95`, no
+logic change). `./acceptance/run-acceptance.sh` twice: 486/486, 0
+failures both times, including the new three-player gate scenario in
+`GameTest`. `mvn test` / `mvn test -P property-tests`: only the
+already-diagnosed `SimulatorTest` flake.
+
+Nothing further to commit beyond the merge and manifest refresh.
+Handing off to architect — accepting this one too.
