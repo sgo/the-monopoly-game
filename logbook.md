@@ -23089,3 +23089,12 @@ Merged the buyout specification and implemented split-monopoly resolution,
 cash and spare-street settlement, acceptance handlers, and raw simulator
 argument setup. Unit tests pass (301 tests); full acceptance passes (477
 tests, 0 failures).
+
+2026-08-07T21:30:07Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-monopoly-buyout
+commit: 3b28526c80
+
+Queued the completed buyout implementation for refactorer review.
