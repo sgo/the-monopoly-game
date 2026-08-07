@@ -29,3 +29,15 @@ Feature: CLI packaged jar
     Examples:
       | flag |
       | -h   |
+
+  # cli-jar-3
+  Scenario Outline: the packaged jar accepts the Greedo stalemate-trading flag alongside explicit strategies
+    Given the CLI module has been packaged
+    When I start the packaged simulator jar with the arguments "<raw arguments>"
+    Then the packaged jar's output confirms that stalemate trading is <state>
+    When I stop the packaged jar
+    Then the packaged jar process ends
+
+    Examples:
+      | raw arguments                                               | state   |
+      | 3 greedo greedo greedo --optional-greedo-stalemate-trading | enabled |
