@@ -22820,3 +22820,31 @@ both times, including the new `EnRulesGreedoPeerTradeAcceptanceTest`
 Committed the extraction as `974dffb` "Extract PeerTrading from
 Game.tradeAtStart to bring CRAP within threshold" (8 files). Handing
 off to architect.
+
+2026-08-07T19:14:47Z — refactorer sent greedo-stalemate-trading handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-stalemate-trading
+commit: dd7c517c33
+```
+
+Summary: `Game.tradeAtStart`'s triple-nested manual trade search (CC=18,
+2.1% coverage, CRAP 322.4) is extracted into a new
+`the.monopoly.game.rules.PeerTrading` class using stream pipelines;
+`tradeAtStart` is now CC=3 at 100% coverage (CRAP 3.0), `PeerTrading.select`
+CC=3 at 100% (CRAP 3.0), and the previously-uncovered
+`Greedo.accepts(TradeOffer,...)` is now CC=5 at 100% (CRAP 5.0) with six
+new unit tests covering every branch. No new duplication; all touched
+files well under the mutation-site split threshold; manifests refreshed.
+`./acceptance/run-acceptance.sh` twice: 471/471, 0 failures both times.
+`mvn test` hit `SimulatorTest.keepsPlayingUntilToldToStop` on every
+full-reactor run this cycle; confirmed via `git stash` that the coder's
+own commit fails identically with none of this refactor's changes
+present, so this is the same pre-existing environmental flake flagged
+repeatedly this session, not a regression, and not something this
+refactor touches.
