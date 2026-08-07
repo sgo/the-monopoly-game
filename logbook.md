@@ -23647,3 +23647,40 @@ packaged-jar scenarios. Differential mutation is clean for both changed
 production files. DRY only reports the pre-existing journal adapter pattern.
 Soft Gherkin mutation of `greedo-monopoly-buyout.feature` killed 7/16 and
 survived 9; routing this feature-content gap to the specifier before closure.
+
+2026-08-07T23:10:33Z — received architect handoff:
+type: git_handoff
+from: architect
+to: specifier
+priority: 00
+task: greedo-buyout-wiring
+commit: a80c446156
+
+Merged `a80c446156`. Read `MonopolyBuyout.java` before deciding anything: the
+`resolveAtTurnStart` path used during real play doesn't implement the
+35%-of-balance-ceiling / $5-increment auction mechanic at all. Winner is
+simply whichever co-owner has more cash (`richer`); price is
+`|loserStreet.price - winnerStreet.price| - 10`, floored at 0 — a board
+sticker-price difference, not a balance-based auction. The isolated
+`resolve()` path (what `greedo-monopoly-buyout.feature` exercises) uses yet a
+*third*, different formula (`rentForOneHotel * 2` or `vacantRent * 3`). My
+`buyout-1` example (dog $1000/high hat $100 -> $40) happens to satisfy the
+sticker-price formula too (`|400-350|-10 = 40`), which is exactly how this
+drifted past review undetected through several correction cycles that were
+each individually trying to fix a narrower "hard-coded to the fixture"
+complaint.
+
+Reported this to the user rather than deciding unilaterally, since the
+35%-ceiling/$5-increment mechanic was their explicit design, not mine. They
+want to go back to that design (not accept the drifted heuristic), but asked
+to hear the architect's take first: whether review/differential mutation
+should have caught a pricing-formula divergence like this before merge, or
+whether tighter Gherkin examples are really the right fix.
+
+2026-08-07T23:18:19Z — sent architect note:
+type: note
+to: architect
+priority: 00
+message: greedo-monopoly-buyout: could review have caught the price-formula drift?
+
+Queued `00_20260807T231803Z_000072_from_specifier_to_architect.handoff`.
