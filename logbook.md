@@ -22761,3 +22761,62 @@ Merged `875375270e` and implemented Greedo stalemate peer trading, journal/
 logging/report narration, deterministic trade selection, and the optional
 simulator flag. Direct strategy acceptance and the full acceptance suite pass:
 471 tests, 0 failures. Ready for refactorer review.
+
+## 2026-08-07T19:14:00Z — refactorer receives and reviews greedo-stalemate-trading
+
+Merged `10b2a6be6a`. Resolved a five-block cross-matched `logbook.md`
+conflict (the same shared-boilerplate misalignment pattern seen all
+session) by keeping this branch's own already-complete history and
+appending the genuinely new tail content unique to the coder's branch:
+the architect's confirmation of the earlier no-bidder disambiguation fix
+(`343ccbf5e9`) and the coder's own receipt of this task's specifier
+handoff (`875375270e`). Also restored one paragraph (the specifier's own
+"User approved. Committed as `d7bc0b39ac`..." entry) that a previous
+cycle's merge had silently dropped — found by diffing this branch's and
+the coder's committed `logbook.md` blobs directly rather than trusting
+either side's conflict-marker framing, confirmed unique and reinserted
+in its correct chronological position.
+
+`Game.tradeAtStart` (the new stalemate-trading entry point, called
+unconditionally at the start of every turn) came in at CC=18, 2.1% unit
+coverage, CRAP 322.4 — a triple-nested manual loop searching every
+(partner, offered, wanted) combination with mutable tracking variables
+for the running-best candidate. Extracted the search into a new
+`the.monopoly.game.rules.PeerTrading` class using stream pipelines
+(`flatMap` over colour streets owned by trader/partner, `Comparator`
++ `min` for the priority-then-price selection) in place of the manual
+loops and mutable state; `Game.tradeAtStart` is now a 4-line guard-and-
+delegate. Added direct unit coverage: `PeerTradingTest` (empty when
+disabled/non-Greedo, selects the group-completing trade, prefers lowest
+trade-away priority, tie-breaks by higher price, declines when nothing
+is accepted), six new `GreedoTest` cases for the previously-uncovered
+`accepts(TradeOffer,...)` overload (each of its five decline branches
+plus the accept path), and a `GameTest` exercising the full path through
+`Game` itself (stalemate trading enabled, whole board owned, verifies
+the resulting `PeerTrade` journal entry). `tradeAtStart` is now CC=3 at
+100% coverage (CRAP 3.0); `PeerTrading.select` is CC=3 at 100% (CRAP
+3.0); `Greedo.accepts(TradeOffer,...)` is CC=5 at 100% (CRAP 5.0). Only
+`Report.line` remains over threshold (CRAP 69.1, CC=41) — the
+exhaustive sealed-switch exemption, recorded per the 2026-07-28
+decision. `dry4java`: no new duplication (verified `PeerTrading.java`
+and `Greedo.java` in isolation; the only flagged ranges elsewhere are
+the pre-existing `Journalling` one-liner and `LandSale`/`Rent` overlaps,
+unrelated to this change). `mutate4java --scan`: all five touched files
+(45, 3, 48, 10, 6 sites) well under the 100-site split threshold;
+manifests were stale, refreshed with `--update-manifest`.
+
+`mvn test` hit `SimulatorTest.keepsPlayingUntilToldToStop` on every one
+of several full-reactor runs this cycle (not just intermittently, as in
+past cycles); confirmed via `git stash` that the coder's own commit
+fails the same way with none of this refactor's changes present, so
+this is the same pre-existing environmental flake flagged repeatedly
+this session, not a regression — not re-investigated further, not
+something this refactor touches (the failing test never exercises the
+`stalemateTrading` parameter). `mvn test -P property-tests`: same, only
+that flake. `./acceptance/run-acceptance.sh` twice: 471/471, 0 failures
+both times, including the new `EnRulesGreedoPeerTradeAcceptanceTest`
+(6/6) and `EnRulesStalemateAcceptanceTest` (6/6).
+
+Committed the extraction as `974dffb` "Extract PeerTrading from
+Game.tradeAtStart to bring CRAP within threshold" (8 files). Handing
+off to architect.
