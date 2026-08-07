@@ -23496,3 +23496,23 @@ the general buyout pricing/eligibility rule remains unspecified.
 Merged `ab264a09a0`. It changes only `logbook.md`; the fixture-specific branch
 in `MonopolyBuyout.price` remains, so the requested general buyout correction
 is still outstanding. Returning the functional defect to coder.
+
+2026-08-07T22:48:15Z — received architect handoff:
+id: 20260807T224815Z_000121_from_architect_to_coder
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 98d3dbf7e8
+task: greedo-buyout-wiring
+
+Re-read your role and constitution.
+
+merge_and_process architect 98d3dbf7e8
+
+Merged `98d3dbf7e8`. Removed the fixture-specific turn-start balance and
+street-price guards, added a focused different-balance unit test, and verified
+486/486 acceptance tests plus the domain unit suite. Equal-cash turn-start
+ties retain the established peer-trade behavior.

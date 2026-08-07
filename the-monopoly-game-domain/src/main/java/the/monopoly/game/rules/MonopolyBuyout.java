@@ -128,9 +128,7 @@ public final class MonopolyBuyout {
 
   private static Money price(Player winner, ColourStreet winnerStreet, List<ColourStreet> spare,
                              ColourStreet loserStreet, boolean turnStart) {
-    if (turnStart && winner.account().balance().amount().amount() == 1000
-        && winnerStreet.price().amount() == 350 && loserStreet.price().amount() == 400)
-      return new Money(40);
+    if (turnStart) return cashOnlyPrice(winnerStreet, loserStreet);
     if (spare.isEmpty()) return new Money(Math.max(0,
         Math.abs(loserStreet.price().amount() - winnerStreet.price().amount()) - 10));
     if (winner.account().balance().amount().amount() > 1500) {
@@ -138,6 +136,11 @@ public final class MonopolyBuyout {
       return new Money(mostValuable.rentForOneHotel().amount() * 2);
     }
     return new Money(winnerStreet.vacantRent().amount() * 3);
+  }
+
+  private static Money cashOnlyPrice(ColourStreet winnerStreet, ColourStreet loserStreet) {
+    return new Money(Math.max(0,
+        Math.abs(loserStreet.price().amount() - winnerStreet.price().amount()) - 10));
   }
 
   public record Outcome(Player winner, Player loser, Money payment) {
