@@ -6,6 +6,9 @@ import the.monopoly.game.components.dice.Cup;
 import the.monopoly.game.components.players.Pawn;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.rules.Rule;
+import the.monopoly.game.rules.Cards;
+import the.monopoly.game.rules.Deeds;
+import the.monopoly.game.rules.Jail;
 import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
 
@@ -87,12 +90,18 @@ public final class Simulator {
    * comes first.
    */
   public static Running start(int playerCount, Strategy.OfPlayers strategies) {
+    return start(playerCount, strategies, false);
+  }
+
+  public static Running start(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading) {
     Result rejected = rejectOutOfRange(playerCount);
     if (rejected != null) return new Running(rejected);
 
     Rule.Set rules = Rule.Set.Type.official.create();
     List<Player> players = rules.players().select(playerCount).toList();
-    return new Running(new Game(rules, players, player -> Cup.of(rules.dice().toList()), strategies));
+    Deeds deeds = new Deeds();
+    return new Running(new Game(rules, players, player -> Cup.of(rules.dice().toList()), strategies, deeds,
+        Cards.Decks.official(deeds), new Jail(rules), stalemateTrading));
   }
 
   private static Result rejectOutOfRange(int playerCount) {
