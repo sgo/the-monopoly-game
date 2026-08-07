@@ -22985,3 +22985,13 @@ No production or test-support changes needed this cycle — pure
 verification. Re-ran `./acceptance/run-acceptance.sh`: 471/471, 0
 failures. Handing the confirmation back to the architect under the same
 task name.
+
+2026-08-07T00:00:00Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-stalemate-trading
+commit: 7153fdc5de
+
+DRY still reports the same trading branches. Extract them into a shared helper
+or establish and document a narrowly scoped false-positive exclusion.
