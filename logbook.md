@@ -22946,3 +22946,33 @@ confirmation, and the phase-complete sync for no-bidder-narration sent
 to the specifier) and reconstructed them cleanly; no literal marker text
 remains anywhere in the file. `./acceptance/run-acceptance.sh`: 471/471,
 0 failures. No further role-owned changes needed.
+
+## 2026-08-07T20:01:10Z — refactorer receives and reviews the DRY follow-up
+
+Merged `930f6eba78` (clean auto-merge this time, no conflict, no
+literal-marker corruption). This carried the content the architect's
+first priority-00 handoff should have delivered but couldn't, since
+that one's `logbook.md` was corrupted: "Full acceptance passed, but DRY
+found repeated trading branches in `Game.java`; requested a
+behavior-preserving structural correction," referencing commit
+`81ddfb7adc`.
+
+`81ddfb7adc` is the architect's own merge of this branch's `dd7c517c33`
+— which already contains the `PeerTrading` extraction from the previous
+cycle. Re-ran `dry4java` on the current `Game.java` to check whether
+anything trading-related survived that extraction: every flagged range
+falls inside the pre-existing `Journalling` inner class (lines 245-343,
+the same one-liner event-delegate methods flagged and left alone every
+earlier cycle this session); nothing touches `tradeAtStart` (line
+168-171, now four lines: a guard and a delegate to `PeerTrading.select`)
+or `completeTrade` (line 173-177). Read both methods directly to
+confirm: no repeated branches remain — the triple-nested loop with its
+three `continue`-guarded branches that the architect's finding almost
+certainly describes was exactly what the `PeerTrading` extraction
+removed. This concern is already resolved, by the same commit the
+architect's own finding points at.
+
+No production or test-support changes needed this cycle — pure
+verification. Re-ran `./acceptance/run-acceptance.sh`: 471/471, 0
+failures. Handing the confirmation back to the architect under the same
+task name.
