@@ -23516,3 +23516,12 @@ Merged `98d3dbf7e8`. Removed the fixture-specific turn-start balance and
 street-price guards, added a focused different-balance unit test, and verified
 486/486 acceptance tests plus the domain unit suite. Equal-cash turn-start
 ties retain the established peer-trade behavior.
+
+2026-08-07T22:53:26Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-buyout-wiring
+commit: bd1965c935
+
+Queued `00_20260807T225326Z_000085_from_coder_to_refactorer.handoff`.
