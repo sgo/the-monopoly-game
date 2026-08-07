@@ -22446,6 +22446,16 @@ Merged `c0d755f4ee`. Domain mutation and DRY checks passed; focused journal
 mutation killed 41/41. The remaining acceptance-scenario content issue is
 specifier-owned, so the task is returning for correction.
 
+2026-08-06T21:10:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: distressed-sale-no-bidder-narration
+commit: 5ee6ea5900
+
+Requested correction of the remaining Gherkin scenario-content issue.
+```
+
 ## 2026-08-06T21:40:00Z — specifier fixes the scenario defect, finds a second one underneath
 
 Merged the architect's priority-00 handoff (`5ee6ea5900`) as `05ee145`
@@ -22586,6 +22596,11 @@ the regex-ambiguity defect from the last two cycles are now genuinely
 closed, confirmed by a fully green acceptance suite.
 
 2026-08-06T22:25:00Z — received refactorer handoff:
+2026-08-06T20:22:55Z — refactorer sent distressed-sale-no-bidder-narration handoff to architect
+
+Handoff message sent:
+
+```
 type: git_handoff
 to: architect
 priority: 50
@@ -22607,3 +22622,79 @@ task: distressed-sale-no-bidder-narration
 commit: 478eb0147f
 
 Phase-complete sync: no-bidder narration accepted.
+```
+
+Summary: both defects flagged over the last two cycles are now genuinely
+fixed and independently verified. The specifier's removal of the
+redundant `Background:`-duplicating lines in `journal-47`/`logging-47`/
+`report-47` is confirmed still present. The coder's new
+`UNQUOTED_NAME_WITHOUT_ORDERING` pattern (a per-character negative
+lookahead blocking the lazy match from consuming through either ordering
+conjunction) genuinely disambiguates the standalone "finds no bidder"
+step from the compound "before it records/says" ones — verified with an
+independent Python reimplementation of both patterns against all three
+relevant inputs, not just by trusting the acceptance run. No production
+code touched, so no CRAP/mutation scope applies; `dry4java` clean of
+anything new. `./acceptance/run-acceptance.sh` twice: 455/455, 0
+failures both times — genuinely all green, no caveats. Nothing for me to
+commit this cycle; pure verification.
+2026-08-06T22:18:10Z RECEIVED handoff:
+id: 20260806T201551Z_000112_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: a9942fa362
+created_at: 2026-08-06T20:15:51.296504Z
+enqueued_at: 2026-08-06T20:15:52.246060Z
+task: distressed-sale-no-bidder-narration
+dequeued_at: 2026-08-06T20:15:56.814539Z
+
+Re-read your role and constitution.
+
+merge_and_process architect a9942fa362
+
+Resolved the append-only logbook merge conflict while preserving both
+histories. The architect's packaged-CLI working-directory fix and the
+no-bidder scenario changes are merged. Full acceptance passes 455/455,
+including all three no-bidder narration scenarios and the packaged-jar test.
+
+## 2026-08-06T20:26:00Z — refactorer receives and reviews the architect merge
+
+Merged `4d341122f5` — a merge commit where the coder integrated the
+architect's own `a9942fa362`, resolving an append-only `logbook.md`
+conflict on their side. `PomInspector.java`/`World.java` show as changed
+in this commit's stat only because it's a merge diffed against its first
+parent; there is no actual new production or test-support change beyond
+what I already reviewed and fixed two cycles ago (confirmed via `git
+show 4d341122f5 -- <path>` returning no diff for either file). The two
+`.feature` file changes are the architect's own Gherkin
+acceptance-mutation manifest metadata (per-scenario kill/survive stamps)
+— manifest housekeeping outside my remit, not hand-edited, left as-is.
+
+The `logbook.md` conflict this cycle was the largest cross-matched one
+this session (four separate marker blocks spanning the same
+"sent"/"received" boilerplate-alignment pattern seen every cycle, plus
+two blocks where one side's branch had independently reconstructed
+content already present — verbatim — elsewhere in mine). Resolved by
+reading both sides in full, identifying which pieces were genuinely
+unique to each side versus already-present duplicates from an earlier
+merge, and reassembling in strict chronological order. Made one
+off-by-one slicing mistake mid-resolution (a literal `<<<<<<< HEAD`
+marker line leaked into the reconstructed text because a slice started
+at the marker's own index instead of one past it) and one chronological
+misplacement (the architect's "sent specifier handoff" record landed
+after two later entries) — caught both by re-reading the result before
+committing, same discipline as every prior cycle's logbook-splice
+verification, rather than trusting the mechanical reconstruction blindly.
+Verified via `diff` against both parent versions: zero lines lost
+relative to my own branch; the only "removed" lines relative to the
+coder's branch were the intentionally-deduplicated repeats.
+
+Ran `./acceptance/run-acceptance.sh` twice: 455 tests, 0 failures both
+times. `mvn test` hit the already-diagnosed `SimulatorTest`
+full-reactor-only flake once, unrelated and not re-investigated again.
+Nothing to commit beyond the merge itself. Handing off to architect:
+confirming the fully green state carries through cleanly on my side too.
