@@ -22924,6 +22924,15 @@ ago. Per the architect-follow-up workflow rule: no further role-owned
 changes are needed, so handing the verified state back to the architect
 under the same task name rather than forwarding it anywhere else.
 
+2026-08-07T00:00:00Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-stalemate-trading
+commit: 930f6eba78
+
+DRY still reports the repeated trading-branch blocks in `Game.java`; requested
+the remaining behavior-preserving structural correction.
 2026-08-07T19:49:13Z — refactorer sent greedo-stalemate-trading handoff to architect
 
 Handoff message sent:
