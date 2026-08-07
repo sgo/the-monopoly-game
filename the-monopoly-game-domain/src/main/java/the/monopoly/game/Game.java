@@ -16,6 +16,7 @@ import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
+import the.monopoly.game.rules.MonopolyBuyout;
 import the.monopoly.game.rules.PeerTrading;
 import the.monopoly.game.rules.Rent;
 import the.monopoly.game.rules.Rule;
@@ -23,6 +24,7 @@ import the.monopoly.game.rules.Stalemate;
 import the.monopoly.game.rules.Taxes;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
+import the.monopoly.game.strategies.Greedo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,7 +157,7 @@ public class Game {
   private boolean playTurn(Player player, Player builder, List<Player> turnOrder, Journal journal,
                            Journalling journalling, Building building) {
     if (deeds.isBankrupt(player)) return false;
-    tradeAtStart(player, turnOrder, journalling);
+    if (!resolveBuyoutAtStart(player, turnOrder, journalling)) tradeAtStart(player, turnOrder, journalling);
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
     if (player.id().equals(builder.id()) && !deeds.isBankrupt(player)) building.develop(player);
     if (remainingPlayers().size() <= 1) return true;
@@ -170,6 +172,21 @@ public class Game {
     if (!stalemateTrading || !allOwnableSpacesOwned()) return;
     PeerTrading.select(trader, strategies.forPlayer(trader), turnOrder, rules, deeds).ifPresent(offer ->
         completeTrade(trader, offer, journalling));
+  }
+
+  private boolean resolveBuyoutAtStart(Player trader, List<Player> turnOrder, Journalling journalling) {
+    if (!stalemateTrading || !allOwnableSpacesOwned()) return false;
+    if (!(strategies.forPlayer(trader) instanceof Greedo)) return false;
+    if (trader.account().balance().amount().amount() > 1000) return false;
+    return turnOrder.stream().filter(partner -> partner != trader)
+        .map(partner -> MonopolyBuyout.resolveAtTurnStart(trader, partner, rules, deeds))
+        .filter(Optional::isPresent).map(Optional::orElseThrow).findFirst()
+        .map(outcome -> {
+          journalling.splitMonopolyWon(outcome.winner(), outcome.loser());
+          if (!outcome.payment().equals(Money.ZERO)) journalling.splitMonopolyPaid(
+              outcome.winner(), outcome.loser(), outcome.payment());
+          return true;
+        }).orElse(false);
   }
 
   private void completeTrade(Player trader, Strategy.TradeOffer offer, Journalling journalling) {
@@ -269,6 +286,14 @@ public class Game {
 
     public void stalemateTrading(boolean enabled) {
       journal.log(new Journal.Entry.StalemateTrading(enabled));
+    }
+
+    public void splitMonopolyWon(Player winner, Player loser) {
+      journal.log(new Journal.Entry.SplitMonopolyWon(winner.id(), loser.id()));
+    }
+
+    public void splitMonopolyPaid(Player payer, Player payee, Money amount) {
+      journal.log(new Journal.Entry.SplitMonopolyPaid(payer.id(), payee.id(), amount));
     }
 
     @Override
@@ -490,6 +515,12 @@ public class Game {
       }
 
       record StalemateTrading(boolean enabled) implements Entry {
+      }
+
+      record SplitMonopolyWon(Player.ID winner, Player.ID loser) implements Entry {
+      }
+
+      record SplitMonopolyPaid(Player.ID payer, Player.ID payee, Money amount) implements Entry {
       }
 
       record PurchaseDeclined(Player.ID player, Street.Type land, Money price,

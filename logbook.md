@@ -23225,6 +23225,14 @@ merge_and_process refactorer c37840f7ba
 Merged `c37840f7ba`. Targeted mutation and DRY are clean; soft Greedo priority
 mutation killed 56/56. The buyout decomposition is accepted.
 
+2026-08-07T22:00:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-monopoly-buyout
+commit: cf68115950
+
+Phase-complete sync: Greedo monopoly buyout accepted.
 2026-08-07T21:55:55Z — received specifier handoff:
 id: 20260807T215555Z_000070_from_specifier
 from: specifier
@@ -23317,3 +23325,36 @@ through it instead of deleting the unused method. CRAP/DRY clean
 (only the exempted `Report.line` switch over threshold); manifests
 refreshed. `./acceptance/run-acceptance.sh` twice: 483/483, 0 failures
 both times.
+
+2026-08-08T00:10:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-stalemate-cli-flag
+commit: 8bcfa4c411
+
+Re-read your role and constitution.
+merge_and_process refactorer 8bcfa4c411
+
+Merged `8bcfa4c411`; it contains the refactorer review record only, with no
+additional source changes. The CLI-flag implementation remains accepted.
+
+2026-08-07T22:19:41Z — received specifier handoff:
+id: 20260807T221941Z_000071_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 92ea4a6061
+task: greedo-buyout-wiring
+
+Re-read your role and constitution.
+
+merge_and_process specifier 92ea4a6061
+
+Merged `92ea4a6061`. Wired `MonopolyBuyout` into the start-of-turn game
+flow and added split-monopoly winner/payment journal, log, and report
+events. Added the singular round step handler and verified 486/486
+acceptance tests plus the domain unit tests.
