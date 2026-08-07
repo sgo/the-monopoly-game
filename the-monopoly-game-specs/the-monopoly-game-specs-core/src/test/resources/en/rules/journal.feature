@@ -612,3 +612,55 @@ Feature: game journal
     Examples:
       | dog_starting_balance | high_hat_starting_balance | high_hat_reserve | mortgage_value |
       | 10                    | 95                         | 85                | 90               |
+
+  # journal-48
+  Scenario Outline: the journal records a peer trade completed at the start of a turn, once stalemate trading is enabled for the "Greedo" strategy and the whole board is owned
+    Given stalemate trading is enabled for the "Greedo" strategy
+    And every other ownable space is owned alternately by pawn "dog" and pawn "high hat" in board order
+    And pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "<dog_offered>"
+    And pawn "high hat" owns "<dog_wanted>"
+    And pawn "high hat" owns "Meir Antwerpen"
+    And pawn "dog" will roll 2 and 3 for their turn
+    When we play the game
+    Then the game journal records that pawn "dog" trades "<dog_offered>" to pawn "high hat" for "<dog_wanted>" before it records that pawn "dog" starts a turn
+    And pawn "dog" owns "<street_dog_now_owns>"
+    And pawn "high hat" owns "<street_high_hat_now_owns>"
+
+    Examples:
+      | dog_offered                                    | dog_wanted            | street_dog_now_owns   | street_high_hat_now_owns                       |
+      | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)  | Diestsestraat Leuven  | Diestsestraat Leuven  | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)  |
+
+  # journal-49
+  Scenario Outline: the journal does not record a peer trade when stalemate trading is not enabled for the "Greedo" strategy, even though the whole board is owned
+    Given every other ownable space is owned alternately by pawn "dog" and pawn "high hat" in board order
+    And pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "<dog_offered>"
+    And pawn "high hat" owns "<dog_wanted>"
+    And pawn "high hat" owns "Meir Antwerpen"
+    And pawn "dog" will roll 2 and 3 for their turn
+    When we play the game
+    Then the game journal does not record that pawn "dog" trades "<dog_offered>" to pawn "high hat" for "<dog_wanted>"
+    And pawn "dog" owns "<street_dog_still_owns>"
+    And pawn "high hat" owns "<street_high_hat_still_owns>"
+
+    Examples:
+      | dog_offered                                    | dog_wanted            | street_dog_still_owns                          | street_high_hat_still_owns |
+      | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)  | Diestsestraat Leuven  | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)  | Diestsestraat Leuven       |
+
+  # journal-50
+  Scenario Outline: the journal does not record a peer trade while the board still has unowned space, even though stalemate trading is enabled for the "Greedo" strategy
+    Given stalemate trading is enabled for the "Greedo" strategy
+    And pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "<dog_offered>"
+    And pawn "high hat" owns "<dog_wanted>"
+    And pawn "high hat" owns "Meir Antwerpen"
+    And pawn "dog" will roll 2 and 3 for their turn
+    When we play the game
+    Then the game journal does not record that pawn "dog" trades "<dog_offered>" to pawn "high hat" for "<dog_wanted>"
+    And pawn "dog" owns "<street_dog_still_owns>"
+    And pawn "high hat" owns "<street_high_hat_still_owns>"
+
+    Examples:
+      | dog_offered                                    | dog_wanted            | street_dog_still_owns                          | street_high_hat_still_owns |
+      | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)  | Diestsestraat Leuven  | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)  | Diestsestraat Leuven       |
