@@ -63,6 +63,7 @@ class GameTest {
 
     assertThat(result.journal()).startsWith(
         new Entry.Start(List.of(Pawn.dog.id(), Pawn.high_hat.id(), Pawn.iron_box.id())),
+        new Entry.StalemateTrading(false),
         new Entry.InitiativeRoll(Pawn.dog.id(), 4),
         new Entry.InitiativeRoll(Pawn.high_hat.id(), 10),
         new Entry.InitiativeRoll(Pawn.iron_box.id(), 6),
