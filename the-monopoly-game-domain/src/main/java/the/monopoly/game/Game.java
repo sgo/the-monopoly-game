@@ -177,9 +177,9 @@ public class Game {
   private boolean resolveBuyoutAtStart(Player trader, List<Player> turnOrder, Journalling journalling) {
     if (!stalemateTrading || !allOwnableSpacesOwned()) return false;
     if (!(strategies.forPlayer(trader) instanceof Greedo)) return false;
-    if (turnOrder.stream().filter(partner -> partner != trader).findFirst()
-        .map(Player::account).map(account -> account.balance().amount())
-        .filter(trader.account().balance().amount()::equals).isPresent()) return false;
+    if (turnOrder.stream().filter(partner -> partner != trader)
+        .allMatch(partner -> partner.account().balance().amount()
+            .equals(trader.account().balance().amount()))) return false;
     return turnOrder.stream().filter(partner -> partner != trader)
         .map(partner -> MonopolyBuyout.resolveAtTurnStart(trader, partner, rules, deeds))
         .filter(Optional::isPresent).map(Optional::orElseThrow).findFirst()

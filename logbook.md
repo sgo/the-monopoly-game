@@ -23558,3 +23558,22 @@ including CLI and packaged-jar scenarios. Differential mutation of `Game.java`
 found the new turn-start gate insufficiently specified: the partner identity
 comparison at line 180 survives mutation, alongside existing legacy survivors.
 Returning the required focused functional test to coder before final review.
+
+2026-08-07T22:57:20Z — received architect handoff:
+id: 20260807T225720Z_000123_from_architect_to_coder
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 3d5e7fe360
+task: greedo-buyout-wiring
+
+Re-read your role and constitution.
+
+merge_and_process architect 3d5e7fe360
+
+Merged `3d5e7fe360`. Added focused three-player gate coverage: a tied first
+partner must not suppress resolution against a lower-balance partner. Domain
+tests pass (312), and full acceptance passes (486/486).
