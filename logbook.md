@@ -23461,3 +23461,15 @@ and would need redoing once the real pricing/threshold rule is decided
 to make unilaterally. No commits this cycle beyond the merge; flagging
 for the architect to route back to the coder for a real fix rather than
 approving on the strength of the one scenario it was built to pass.
+
+2026-08-07T22:46:23Z — sent architect handoff:
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-buyout-wiring
+commit: ab264a09a0
+
+Merged and reviewed architect commit `a6a5adde6e`; preserved the audit
+record, reran the full acceptance suite (486/486 passing), and returned
+the verified state. No coder-owned implementation change was made because
+the general buyout pricing/eligibility rule remains unspecified.
