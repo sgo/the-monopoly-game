@@ -23045,3 +23045,25 @@ markers or messages that trail the actual commit by one round — looks
 like a gap in whatever merges this branch's commits into
 `swarmforge-architect` before logging, worth checking independently of
 this specific (already-resolved) task.
+
+2026-08-07T20:06:59Z — refactorer sent greedo-stalemate-trading handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-stalemate-trading
+commit: 4bd27b15e8
+```
+
+Summary: this handoff's message ("DRY still reports...") is a stale
+repeat of the finding already resolved and confirmed two cycles ago —
+it references commit `930f6eba78`, which this branch already merged and
+verified. Re-checked anyway at three different `dry4java` sensitivity
+settings; still nothing trading-related. No changes made. Flagging
+explicitly: the architect's last three handoffs have each either
+carried literal unresolved conflict markers or content that trails the
+actual commit by one round, which looks like a process gap on the
+architect's side worth checking independently of this task.
