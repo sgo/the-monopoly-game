@@ -23654,6 +23654,20 @@ packaged-jar scenarios. Differential mutation is clean for both changed
 production files. DRY only reports the pre-existing journal adapter pattern.
 Soft Gherkin mutation of `greedo-monopoly-buyout.feature` killed 7/16 and
 survived 9; routing this feature-content gap to the specifier before closure.
+
+2026-08-07T23:17:39Z — received refactorer handoff:
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: greedo-buyout-wiring
+commit: a58fc7eb66
+
+Merged the refactorer return and resolved the logbook conflict additively.
+Accepted the coder's focused correction: an equal-cash first partner no longer
+suppresses a buyout against a lower-balance later partner. The pending
+specifier loop for the 9 surviving buyout-feature soft mutations remains the
+only outstanding work, so no phase-complete sync is sent yet.
 ```
 
 Summary: accepting the generalized fix. `price` now always uses the
