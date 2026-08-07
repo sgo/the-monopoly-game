@@ -23483,3 +23483,12 @@ commit: ab264a09a0
 Merged `ab264a09a0`. It changes only `logbook.md`; the fixture-specific branch
 in `MonopolyBuyout.price` remains, so the requested general buyout correction
 is still outstanding. Returning the functional defect to coder.
+
+2026-08-07T22:48:15Z — sent coder handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-buyout-wiring
+commit: 98d3dbf7e8
+
+Requested the unresolved general Greedo buyout correction.
