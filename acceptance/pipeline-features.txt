@@ -34,6 +34,7 @@ en/rules/turn-loop.feature
 en/rules/buying-land.feature
 en/rules/greedo-priority.feature
 en/rules/greedo-peer-trade.feature
+en/rules/greedo-monopoly-buyout.feature
 en/rules/auctions.feature
 en/rules/building.feature
 en/rules/land-sale.feature

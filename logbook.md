@@ -23055,6 +23055,28 @@ like a gap in whatever merges this branch's commits into
 `swarmforge-architect` before logging, worth checking independently of
 this specific (already-resolved) task.
 
+2026-08-07T20:06:59Z — refactorer sent greedo-stalemate-trading handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-stalemate-trading
+commit: 4bd27b15e8
+```
+
+Summary: this handoff's message ("DRY still reports...") is a stale
+repeat of the finding already resolved and confirmed two cycles ago —
+it references commit `930f6eba78`, which this branch already merged and
+verified. Re-checked anyway at three different `dry4java` sensitivity
+settings; still nothing trading-related. No changes made. Flagging
+explicitly: the architect's last three handoffs have each either
+carried literal unresolved conflict markers or content that trails the
+actual commit by one round, which looks like a process gap on the
+architect's side worth checking independently of this task.
+
 2026-08-07T20:10:00Z — received refactorer handoff:
 type: git_handoff
 to: architect
@@ -23077,3 +23099,90 @@ task: greedo-stalemate-trading
 commit: 3b6ab595f4
 
 Phase-complete sync: greedo stalemate trading accepted.
+2026-08-07T21:22:03Z — received specifier handoff:
+id: 20260807T212203Z_000069_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 47f8e92d78
+created_at: 2026-08-07T21:22:03Z
+task: greedo-monopoly-buyout
+
+Re-read your role and constitution.
+
+merge_and_process specifier 47f8e92d78
+
+Merged the buyout specification and implemented split-monopoly resolution,
+cash and spare-street settlement, acceptance handlers, and raw simulator
+argument setup. Unit tests pass (301 tests); full acceptance passes (477
+tests, 0 failures).
+
+## 2026-08-07T21:42:23Z — refactorer receives and reviews greedo-monopoly-buyout
+
+Merged `3b28526c80`. Two `logbook.md` conflict blocks, both the usual
+cross-matched shared-boilerplate pattern (my own "sent" entry and the
+architect's "received" entry both quoting the same handoff header text,
+misaligning git's diff); resolved by keeping both sides' unique
+narrative content and letting the shared header appear once, each in
+its rightful entry. Verified via `diff` against both parents: nothing
+lost from either side.
+
+`MonopolyBuyout.resolve` (new this task) came in at CC=16, 72.7%
+coverage, CRAP 21.2, with a single happy-path unit test backing six
+acceptance scenarios covering genuinely intricate settlement logic
+(richer-wins-on-cash, keep-a-spare-by-paying-double, give-up-a-spare-
+you-can't-afford, an exact tie with nothing to break it, and a tied
+co-owner breaking the tie via a spare). Split into `splitGroup`
+(finding the colour group split between exactly two owners),
+`selectWinner` (richer, falling back to whoever holds a spare street on
+a tie), and `settle` (street lookup, spare calculation, price,
+affordability, transfers) — `settle`'s own cash-adjustment logic
+further split into `settlementCash`/`waiveIfUnaffordable`. Also
+extracted `streetOwnedBy`, replacing two near-identical inline stream
+lookups (winner's street, loser's street) that weren't literally
+flagged by `dry4java` (each too short to hit its `--min-lines`
+threshold) but were obviously the same lookup by eye. Every method is
+now CC<=4.
+
+Added 9 unit tests directly against the public `resolve` API: one per
+acceptance scenario, plus three cases the six scenarios don't reach — a
+richer winner who can't double-afford the sticker price (with a spare,
+gets it free; without one, the monopoly stays split) and both
+no-shared-group early exits. Worked out the exact cash figures by hand
+against the real board data (colour groups, prices, `vacantRent`,
+`rentForOneHotel`) rather than copying the feature file's numbers
+blind, to make sure the tests independently corroborate the spec.
+Cross-checked the extraction's behavior against all six of the
+specifier's own scenarios via the acceptance suite before trusting the
+unit tests alone.
+
+JaCoCo showed one branch — the abort inside the original
+`waiveIfUnaffordable` for a tied, spare-less winner who can't afford
+the price — never executing under any of the 9 new tests or the 6
+acceptance scenarios (`title="All 2 branches missed."`, not just low
+coverage). Proved it structurally unreachable rather than just
+untested: `selectWinner` only ever produces a *tied* winner through
+`spareOwner`, and `spareOwner` only returns a candidate who owns a
+street outside the split group — so by the time a tied winner reaches
+this method, they are, by construction, never spare-less. Removed the
+branch and the now-unused `spare` parameter, same evidentiary standard
+as the `Game.playTurns` dead-code removal earlier this session
+(case-analysis proof plus a JaCoCo-confirmed zero-hit branch, not
+either alone).
+
+`dry4java` on `MonopolyBuyout.java`: no duplicate candidates.
+`mutate4java --scan`: 27 sites, well under the 100-site split
+threshold; this is a new file so there was no manifest to refresh —
+generated one fresh with `--update-manifest`.
+
+`./acceptance/run-acceptance.sh` twice: 477/477, 0 failures both times,
+including all six `greedo-monopoly-buyout` scenarios. `mvn test` and
+`mvn test -P property-tests` both hit only the already-diagnosed
+`SimulatorTest.keepsPlayingUntilToldToStop` flake, unrelated and not
+re-investigated again.
+
+Committed the decomposition as `fe82923` "Decompose MonopolyBuyout.resolve
+to bring CRAP within threshold" (2 files). Handing off to architect.

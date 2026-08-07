@@ -18,6 +18,7 @@ import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
+import the.monopoly.game.rules.MonopolyBuyout;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Stalemate;
 import the.monopoly.game.rules.Turn;
@@ -90,6 +91,7 @@ public class World {
   private String packagedCliOutput;
   private int packagedCliExitCode;
   private Boolean tradeAccepted;
+  private MonopolyBuyout.Outcome buyout;
   private boolean stalemateTrading;
   private boolean simulatorStalemateTrading;
   private Entry selectedEvent;
@@ -265,6 +267,31 @@ public class World {
             "No pawn \"" + pawnName + "\" is at play; these are: "
                 + players.stream().map(it -> it.id().value()).toList()
         ));
+  }
+
+  public void configureSimulatorRaw(String rawArguments) {
+    List<String> arguments = List.of(rawArguments.trim().split("\\s+"));
+    simulatorPlayers = Integer.parseInt(arguments.getFirst());
+    simulatorStrategies = player -> new the.monopoly.game.strategies.Greedo();
+    simulatorStalemateTrading = arguments.contains("--optional-greedo-stalemate-trading");
+  }
+
+  public void resolveSplitMonopoly(String firstPawn, String secondPawn) {
+    if (deeds == null) deeds = new Deeds();
+    buyout = MonopolyBuyout.resolve(pawn(firstPawn), pawn(secondPawn), ruleSet, deeds).orElse(null);
+  }
+
+  public boolean buyoutWinnerIs(String pawnName) {
+    return buyout != null && buyout.winner().id().value().equals(pawnName);
+  }
+
+  public boolean noBuyoutWinner() {
+    return buyout == null;
+  }
+
+  public Money buyoutPayment() {
+    if (buyout == null) throw new AssertionError("The split monopoly has no winner.");
+    return buyout.payment();
   }
 
   /** Starts a scenario's single unnamed player, with an empty account. */
