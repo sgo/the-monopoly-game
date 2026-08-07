@@ -23525,3 +23525,12 @@ task: greedo-buyout-wiring
 commit: bd1965c935
 
 Queued `00_20260807T225326Z_000085_from_coder_to_refactorer.handoff`.
+
+2026-08-07T22:48:15Z — sent coder handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-buyout-wiring
+commit: 98d3dbf7e8
+
+Requested the unresolved general Greedo buyout correction.
