@@ -697,3 +697,21 @@ Feature: game logging
     Examples:
       | state    |
       | disabled |
+
+  # logging-53
+  Scenario Outline: the log resolves a split monopoly buyout at the start of a turn, once the whole board is owned
+    Given stalemate trading is enabled for the "Greedo" strategy
+    And every other ownable space is owned alternately by pawn "dog" and pawn "high hat" in board order
+    And pawn "dog" owns "Meir Antwerpen"
+    And pawn "dog" has $1000 to spend
+    And pawn "high hat" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+    And pawn "high hat" has $100 to spend
+    And pawn "dog" will roll 2 and 3 for their turn
+    When we play up to 1 round
+    Then the game log records that pawn "dog" wins the split monopoly before it records that pawn "dog" starts a turn
+    And the game log records that pawn "dog" pays pawn "high hat" $<price> for the split monopoly
+    And pawn "dog" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+
+    Examples:
+      | price |
+      | 40    |
