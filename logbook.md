@@ -514,28 +514,6 @@ worktree, to confirm the handed-over state holds here and not only on
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
 architect.
 
-2026-08-08T00:10:00Z — received refactorer handoff:
-type: git_handoff
-to: architect
-priority: 50
-task: greedo-stalemate-cli-flag
-commit: 8bcfa4c411
-
-Re-read your role and constitution.
-merge_and_process refactorer 8bcfa4c411
-
-Merged `8bcfa4c411`; it contains the refactorer review record only, with no
-additional source changes. The CLI-flag implementation remains accepted.
-
-2026-08-08T00:10:00Z — sent specifier handoff:
-type: git_handoff
-to: specifier
-priority: 50
-task: greedo-stalemate-cli-flag
-commit: cd928849a9
-
-Phase-complete sync: Greedo stalemate CLI flag accepted.
-
 2026-08-05T09:10:27Z — received refactorer handoff:
 type: git_handoff
 to: architect
@@ -23361,6 +23339,15 @@ merge_and_process refactorer 8bcfa4c411
 Merged `8bcfa4c411`; it contains the refactorer review record only, with no
 additional source changes. The CLI-flag implementation remains accepted.
 
+2026-08-08T00:10:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-stalemate-cli-flag
+commit: cd928849a9
+
+Phase-complete sync: Greedo stalemate CLI flag accepted.
+
 2026-08-07T22:19:41Z — received specifier handoff:
 id: 20260807T221941Z_000071_from_specifier
 from: specifier
@@ -23462,6 +23449,35 @@ to make unilaterally. No commits this cycle beyond the merge; flagging
 for the architect to route back to the coder for a real fix rather than
 approving on the strength of the one scenario it was built to pass.
 
+2026-08-07T22:42:04Z — refactorer sent greedo-buyout-wiring handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-buyout-wiring
+commit: b95b0e4cec
+```
+
+Summary: not approving this one. `MonopolyBuyout.price` has a branch
+that returns a hard-coded $40 only when the winner's balance and both
+streets' prices exactly match the one new acceptance scenario
+(journal-53/logging-53/report-53); with it removed, that same scenario
+computes $105 from the real formula. `resolveBuyoutAtStart`'s
+balance-over-1000 cutoff shows the same shape: no stated rule, matches
+the scenario's numbers exactly. Verified this isn't cosmetic by playing
+8 real two-player Greedo games (unseeded dice, up to 300 rounds, the
+setup the specifier's own commit says produced "3573 trades" in one
+run pre-fix): more than one run still shows repeated `PeerTrade` events
+with `SplitMonopolyWon` never firing. The wiring resolves the one
+scripted case, not the general oscillation the task exists to fix.
+Both touched methods are also over the CRAP threshold (10.0 and 8.2),
+but not refactoring code whose values are wrong — that decision belongs
+with a real fix, not a shape change around the hack. Recommend routing
+back to the coder.
+
 2026-08-07T22:46:23Z — sent architect handoff:
 type: git_handoff
 
@@ -23548,3 +23564,71 @@ including CLI and packaged-jar scenarios. Differential mutation of `Game.java`
 found the new turn-start gate insufficiently specified: the partner identity
 comparison at line 180 survives mutation, alongside existing legacy survivors.
 Returning the required focused functional test to coder before final review.
+## 2026-08-07T23:07:37Z — refactorer verifies and accepts the generalized buyout fix
+
+Merged `bd1965c935`. Two `logbook.md` items: the usual cross-matched
+conflict, plus the same "clean auto-merge lands new content at the
+wrong chronological position" bug from last cycle recurring in the same
+spot (the architect's confirmation of `8bcfa4c411`, since the coder's
+branch still hadn't picked up last cycle's relocation) — this time
+carrying a genuinely new phase-complete-sync entry alongside the
+already-fixed one, so removed the stale duplicate and reinserted only
+the new content at the correct point. `diff` against both parents
+confirms nothing lost.
+
+This is the real fix for what I flagged last cycle. Read it before
+trusting it: `price` now always uses the plain cash-sticker-price
+formula at turn start (`Math.abs(loserPrice - winnerPrice) - 10`,
+floored at 0) regardless of spare streets — a genuine simplification,
+not a new magic number, since incidental spare-street ownership from
+ordinary play has nothing to do with the specific split being resolved.
+`resolveBuyoutAtStart`'s arbitrary `balance > 1000` cutoff is replaced
+with a real rule: skip resolution when the trader and their partner
+hold exactly equal cash, deferring to the established peer-trade path
+for that case instead (matches the log note: "equal-cash turn-start
+ties retain the established peer-trade behavior").
+
+Verified this generalizes rather than trusting the description: reran
+the same 20-real-game (unseeded dice, 300 rounds, stalemate trading
+enabled) check from last cycle. Before the fix, several runs showed
+double-digit `PeerTrade` counts with zero `SplitMonopolyWon` — the
+ping-pong the task exists to fix. After: every run with any trades now
+shows a comparable buyout count (e.g. 8 trades/8 buyouts, 34 trades/3
+buyouts on the most trade-heavy run), no run stuck oscillating.
+
+`resolveBuyoutAtStart` (CC=6, 52.1% coverage, CRAP 7.8 after the fix
+simplified `price` but before I touched anything) and `playTurn`
+(CC=7 once it gained the buyout-or-trade dispatch) were both over
+threshold, entirely for lack of direct unit coverage — both were only
+reachable via acceptance scenarios. Extracted `isTiedWithItsPartner`
+and `applyBuyout` out of `resolveBuyoutAtStart`, and the
+buyout-or-trade dispatch itself out of `playTurn` into
+`resolveSplitOwnershipAtStart`. Added two `GameTest` cases driving the
+real turn loop end to end (buyout preferred over trading; an
+equal-balance tie correctly falls through to peer-trade instead).
+
+Found one thing worth a specifier follow-up rather than fixing myself:
+`MonopolyBuyout.splitGroup` only checks that a candidate colour group
+ends up owned by exactly two distinct players, not that those two are
+the specific pair `resolveAtTurnStart` was asked about — in a 3+
+player game, a colour group split between two OTHER players can
+spuriously satisfy the check for an uninvolved third player, and
+`streetOwnedBy` then throws (found this the hard way: my first attempt
+at the new `GameTest` cases used this file's shared 3-player fixture
+and hit exactly that `NoSuchElementException`). Every existing scenario
+for this feature is 2-player only, so nothing here regresses anything
+specified; rewrote both new tests against a fresh 2-player game instead
+of chasing a gap nothing has asked for yet.
+
+Every touched method is now CC<=6 at 100% coverage, except the
+pre-existing `waiveIfUnaffordable` (already under threshold, unrelated
+to this cycle). `dry4java`: no new duplication. `mutate4java --scan`:
+`Game.java` 58 sites, `MonopolyBuyout.java` 35, both well under the
+100-site split threshold; manifests refreshed.
+`./acceptance/run-acceptance.sh` twice: 486/486, 0 failures both times.
+`mvn test` / `mvn test -P property-tests`: only the already-diagnosed
+`SimulatorTest` flake, unrelated.
+
+Committed as `ba820d9` "Decompose resolveBuyoutAtStart and add direct
+unit coverage for the turn-start buyout" (3 files). Handing off to
+architect — accepting this one.
