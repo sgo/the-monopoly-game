@@ -23534,3 +23534,17 @@ task: greedo-buyout-wiring
 commit: 98d3dbf7e8
 
 Requested the unresolved general Greedo buyout correction.
+
+2026-08-07T22:56:58Z — received coder handoff:
+type: git_handoff
+from: coder
+to: architect
+priority: 00
+task: greedo-buyout-wiring
+commit: 5367641cdb
+
+Merged the generalized correction and ran full acceptance: 486/486 passed,
+including CLI and packaged-jar scenarios. Differential mutation of `Game.java`
+found the new turn-start gate insufficiently specified: the partner identity
+comparison at line 180 survives mutation, alongside existing legacy survivors.
+Returning the required focused functional test to coder before final review.
