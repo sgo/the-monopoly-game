@@ -23966,3 +23966,19 @@ oscillation finding front and center — not blocking on it, since
 nothing here regresses a specified scenario and the merge itself is
 sound, but this needs to reach whoever decides whether the task is
 actually done.
+
+2026-08-07T23:41:09Z — received refactorer handoff:
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: greedo-buyout-wiring
+commit: bc3034b15a
+
+Merged and accepted the canonical-settlement correction: `Game` now invokes
+`MonopolyBuyout.resolve` at turn start and no cash-only turn-start policy
+remains. Full acceptance passed 486/486, including normal CLI and packaged
+jar scenarios. Refactorer reproduced the original oscillation in partially
+owned three-street colour groups (3/100 runs), a case absent from the current
+acceptance criteria; routing this specification gap to specifier before phase
+closure.
