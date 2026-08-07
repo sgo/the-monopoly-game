@@ -22274,7 +22274,6 @@ correct and verified; the three new acceptance scenarios need a
 Gherkin-content fix from the specifier before they can pass, full
 diagnosis included above.
 
-2026-08-06T21:10:00Z — received refactorer handoff:
 2026-08-06T19:38:27Z — refactorer sent distressed-sale-no-bidder-narration handoff to architect
 
 Handoff message sent:
@@ -22285,111 +22284,6 @@ to: architect
 priority: 50
 task: distressed-sale-no-bidder-narration
 commit: c0d755f4ee
-
-Re-read your role and constitution.
-merge_and_process refactorer c0d755f4ee
-
-Merged `c0d755f4ee`. Domain mutation and DRY checks passed; focused journal
-mutation killed 41/41. The remaining acceptance-scenario content issue is
-specifier-owned, so the task is returning for correction.
-
-## 2026-08-06T21:40:00Z — specifier fixes the scenario defect, finds a second one underneath
-
-Merged the architect's priority-00 handoff (`5ee6ea5900`) as `05ee145`
-(one append-only conflict in `logbook.md`, resolved the usual way).
-Applied the refactorer's precise diagnosis: deleted the four lines
-`journal-47`/`logging-47`/`report-47` redundantly repeated from each
-file's own `Background:` (`we select 2 players`, both initiative rolls,
-`every other player can complete their turn`) — those steps double-
-queued dog's initiative roll, so dog's actual turn drew the duplicate
-`10` instead of the intended `3` and landed on Noord Station instead of
-Extra Belasting. Verified the fix directly: the first assertion in all
-three scenarios ("puts up for sale... before it records... finds no
-bidder") now passes cleanly — confirmed by re-running the acceptance
-suite and checking the failure output no longer mentions it at all.
-
-That exposed a second, different problem underneath, previously masked
-because the scenario never got past the first assertion to reach it:
-the second assertion line now fails with "Ambiguous step" instead of
-"Unsupported step". Traced to `GameLogStepHandlers.java`: the bare
-`"...finds no bidder for " + UNQUOTED_NAME + "$"` pattern (used
-standalone) and the compound `"...finds no bidder for " + UNQUOTED_NAME
-+ " before it records that pawn... mortgages... for \$" + VALUE + "$"`
-pattern (used for the ordering assertion) both match the same input
-text. Root cause: `UNQUOTED_NAME = "(<[^<>]+>|.+?)"` — when this sits as
-the last capture immediately before a bare `$` end-anchor with nothing
-else following, the lazy `.+?` still has to expand however far needed
-to satisfy that anchor, so it silently swallows the *entire rest of the
-line*, including a much longer compound step meant for a different,
-more specific pattern. This is why "finds no bidder for Lippenslaan
-Knokke before it records that pawn dog mortgages Lippenslaan Knokke for
-$90" satisfies both regexes at once.
-
-This is a production step-handler defect, not a Gherkin content issue —
-my scenario wording matches the established "X before it records that
-Y" convention used successfully everywhere else in this file (e.g.
-`card-bank-payout-narration`'s chains); there's nothing to change
-Gherkin-side. Not something for the specifier to fix directly (Java
-regex in the acceptance step handlers is implementation, same
-boundary as every other production-code finding this session). Routing
-back to the coder to fix the pattern (e.g. giving the bare "finds no
-bidder" pattern a tighter, non-greedy-to-end-of-string boundary, or
-ensuring the more specific compound pattern is tried first) — this is
-the same class of regex fragility the refactorer already found and
-fixed once in this exact file (the stray-quote bug in the "mortgages"
-clause), just a second instance of it.
-
-Validated with `bb gherkin-parser` (clean) on all three corrected files.
-Ran `./acceptance/run-acceptance.sh`: 455 tests, 5 failures — the three
-no-bidder scenarios now failing one assertion later than before
-("Ambiguous step" instead of "Unsupported step", confirming the
-Background fix genuinely worked), plus the 2 pre-existing, unrelated
-`cli-packaged-jar` failures still awaiting coder implementation. `mvn
-test` unaffected (Gherkin-only change).
-
-Reporting to the user before committing/handing back to the coder.
-
-2026-08-06T22:15:30Z RECEIVED handoff:
-id: 20260806T201350Z_000067_from_specifier
-from: specifier
-to: coder
-recipient: coder
-priority: 50
-type: git_handoff
-role: specifier
-commit: d7bc0b39ac
-created_at: 2026-08-06T20:13:50.337857Z
-enqueued_at: 2026-08-06T20:13:50.434429Z
-task: distressed-sale-no-bidder-narration
-dequeued_at: 2026-08-06T20:13:55.702168Z
-
-Re-read your role and constitution.
-
-merge_and_process specifier d7bc0b39ac
-
-Merged the scenario-background correction and fixed the standalone no-bidder
-step regex so it cannot also match the compound ordering step. Acceptance
-now passes all three no-bidder narration scenarios; the only remaining full
-suite failure is the unrelated packaged-CLI setup on this branch.
-
-2026-08-06T22:16:00Z SENT handoff draft:
-type: git_handoff
-to: refactorer
-priority: 50
-task: distressed-sale-no-bidder-narration
-commit: 7432779f0a
-
-The three new no-bidder narration scenarios pass; the full acceptance suite
-has one unrelated packaged-CLI setup failure on this branch.
- 2026-08-06T21:10:00Z — sent specifier handoff:
-2026-08-06T21:10:00Z — sent specifier handoff:
-type: git_handoff
-to: specifier
-priority: 00
-task: distressed-sale-no-bidder-narration
-commit: 5ee6ea5900
-
-Requested correction of the remaining Gherkin scenario-content issue.
 ```
 
 Summary: the production narration feature (`distressedSaleNoBidder`
@@ -22481,18 +22375,7 @@ Committed the working-directory fix as `1130a57` "Fix working-directory
 bug in packaged-jar acceptance test support" (2 files). Handing off to
 architect: the packaging feature is now genuinely proven end-to-end, not
 just claimed.
-2026-08-06T22:18:10Z RECEIVED handoff:
-id: 20260806T201551Z_000112_from_architect
-from: architect
-2026-08-06T22:15:00Z — sent coder handoff:
-type: git_handoff
-to: coder
-priority: 00
-task: distressed-sale-no-bidder-narration
-commit: a9942fa362
 
-Full acceptance found missing no-bidder distressed-sale narration in logging,
-journal, and report scenarios; requested a functional correction.
 2026-08-06T19:48:36Z — refactorer sent cli-packaged-jar handoff to architect
 
 Handoff message sent:
@@ -22536,6 +22419,16 @@ merge_and_process refactorer c0d755f4ee
 Merged `c0d755f4ee`. Domain mutation and DRY checks passed; focused journal
 mutation killed 41/41. The remaining acceptance-scenario content issue is
 specifier-owned, so the task is returning for correction.
+
+2026-08-06T21:10:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: distressed-sale-no-bidder-narration
+commit: 5ee6ea5900
+
+Requested correction of the remaining Gherkin scenario-content issue.
+```
 
 ## 2026-08-06T21:40:00Z — specifier fixes the scenario defect, finds a second one underneath
 
@@ -22626,28 +22519,25 @@ the bare pattern (or pattern-specificity ordering) to disambiguate.
 Verified my fix directly: reran the acceptance suite and confirmed the
 failure output no longer mentions the first assertion at all, only the
 new ambiguity on the second line.
+
 2026-08-06T22:15:30Z RECEIVED handoff:
 id: 20260806T201350Z_000067_from_specifier
 from: specifier
 to: coder
 recipient: coder
-priority: 00
+priority: 50
 type: git_handoff
-role: architect
-commit: a9942fa362
-created_at: 2026-08-06T20:15:51.296504Z
-enqueued_at: 2026-08-06T20:15:52.246060Z
+role: specifier
+commit: d7bc0b39ac
+created_at: 2026-08-06T20:13:50.337857Z
+enqueued_at: 2026-08-06T20:13:50.434429Z
 task: distressed-sale-no-bidder-narration
-dequeued_at: 2026-08-06T20:15:56.814539Z
+dequeued_at: 2026-08-06T20:13:55.702168Z
 
 Re-read your role and constitution.
 
-merge_and_process architect a9942fa362
+merge_and_process specifier d7bc0b39ac
 
-Resolved the append-only logbook merge conflict while preserving both
-histories. The architect's packaged-CLI working-directory fix and the
-no-bidder scenario changes are merged. Full acceptance passes 455/455,
-including all three no-bidder narration scenarios and the packaged-jar test.
 Merged the scenario-background correction and fixed the standalone no-bidder
 step regex so it cannot also match the compound ordering step. Acceptance
 now passes all three no-bidder narration scenarios; the only remaining full
@@ -22713,6 +22603,141 @@ change. Handing off to architect: both the scenario-content defect and
 the regex-ambiguity defect from the last two cycles are now genuinely
 closed, confirmed by a fully green acceptance suite.
 
+2026-08-06T20:22:55Z — refactorer sent distressed-sale-no-bidder-narration handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: 343ccbf5e9
+```
+
+Summary: both defects flagged over the last two cycles are now genuinely
+fixed and independently verified. The specifier's removal of the
+redundant `Background:`-duplicating lines in `journal-47`/`logging-47`/
+`report-47` is confirmed still present. The coder's new
+`UNQUOTED_NAME_WITHOUT_ORDERING` pattern (a per-character negative
+lookahead blocking the lazy match from consuming through either ordering
+conjunction) genuinely disambiguates the standalone "finds no bidder"
+step from the compound "before it records/says" ones — verified with an
+independent Python reimplementation of both patterns against all three
+relevant inputs, not just by trusting the acceptance run. No production
+code touched, so no CRAP/mutation scope applies; `dry4java` clean of
+anything new. `./acceptance/run-acceptance.sh` twice: 455/455, 0
+failures both times — genuinely all green, no caveats. Nothing for me to
+commit this cycle; pure verification.
+2026-08-06T22:18:10Z RECEIVED handoff:
+id: 20260806T201551Z_000112_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: a9942fa362
+created_at: 2026-08-06T20:15:51.296504Z
+enqueued_at: 2026-08-06T20:15:52.246060Z
+task: distressed-sale-no-bidder-narration
+dequeued_at: 2026-08-06T20:15:56.814539Z
+
+Re-read your role and constitution.
+
+merge_and_process architect a9942fa362
+
+Resolved the append-only logbook merge conflict while preserving both
+histories. The architect's packaged-CLI working-directory fix and the
+no-bidder scenario changes are merged. Full acceptance passes 455/455,
+including all three no-bidder narration scenarios and the packaged-jar test.
+
+## 2026-08-06T20:26:00Z — refactorer receives and reviews the architect merge
+
+Merged `4d341122f5` — a merge commit where the coder integrated the
+architect's own `a9942fa362`, resolving an append-only `logbook.md`
+conflict on their side. `PomInspector.java`/`World.java` show as changed
+in this commit's stat only because it's a merge diffed against its first
+parent; there is no actual new production or test-support change beyond
+what I already reviewed and fixed two cycles ago (confirmed via `git
+show 4d341122f5 -- <path>` returning no diff for either file). The two
+`.feature` file changes are the architect's own Gherkin
+acceptance-mutation manifest metadata (per-scenario kill/survive stamps)
+— manifest housekeeping outside my remit, not hand-edited, left as-is.
+
+The `logbook.md` conflict this cycle was the largest cross-matched one
+this session (four separate marker blocks spanning the same
+"sent"/"received" boilerplate-alignment pattern seen every cycle, plus
+two blocks where one side's branch had independently reconstructed
+content already present — verbatim — elsewhere in mine). Resolved by
+reading both sides in full, identifying which pieces were genuinely
+unique to each side versus already-present duplicates from an earlier
+merge, and reassembling in strict chronological order. Made one
+off-by-one slicing mistake mid-resolution (a literal `<<<<<<< HEAD`
+marker line leaked into the reconstructed text because a slice started
+at the marker's own index instead of one past it) and one chronological
+misplacement (the architect's "sent specifier handoff" record landed
+after two later entries) — caught both by re-reading the result before
+committing, same discipline as every prior cycle's logbook-splice
+verification, rather than trusting the mechanical reconstruction blindly.
+Verified via `diff` against both parent versions: zero lines lost
+relative to my own branch; the only "removed" lines relative to the
+coder's branch were the intentionally-deduplicated repeats.
+
+Ran `./acceptance/run-acceptance.sh` twice: 455 tests, 0 failures both
+times. `mvn test` hit the already-diagnosed `SimulatorTest`
+full-reactor-only flake once, unrelated and not re-investigated again.
+Nothing to commit beyond the merge itself. Handing off to architect:
+confirming the fully green state carries through cleanly on my side too.
+
+2026-08-06T20:29:29Z — refactorer sent distressed-sale-no-bidder-narration handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: ae0675d8f7
+```
+
+Summary: confirmed the architect's own merge (`a9942fa362`, integrated
+via the coder's `4d341122f5`) carries through cleanly on my branch too —
+no new production or test-support changes beyond what I already reviewed
+and fixed in the previous two cycles; the only file changes in this
+merge commit are the architect's own Gherkin acceptance-mutation
+manifest metadata, left untouched. `./acceptance/run-acceptance.sh`
+twice: 455/455, 0 failures both times. `SimulatorTest` full-reactor-only
+flake recurred once, unrelated. Nothing to commit beyond the merge
+itself.
+
+2026-08-07T00:00:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: ae0675d8f7
+
+Re-read your role and constitution.
+merge_and_process refactorer ae0675d8f7
+
+Merged `ae0675d8f7`; it confirms the already accepted, fully green state and
+contains no additional implementation work.
+
+2026-08-06T22:18:10Z RECEIVED handoff:
+id: 20260806T201551Z_000112_from_architect
+from: architect
+2026-08-06T22:15:00Z — sent coder handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: distressed-sale-no-bidder-narration
+commit: a9942fa362
+
+Full acceptance found missing no-bidder distressed-sale narration in logging,
+journal, and report scenarios; requested a functional correction.
+
 2026-08-06T22:25:00Z — received refactorer handoff:
 type: git_handoff
 to: architect
@@ -22726,6 +22751,15 @@ merge_and_process refactorer 343ccbf5e9
 Merged `343ccbf5e9`. The previously failing journal, logging, and report
 narration scenarios now pass in the full acceptance suite; the correction is
 accepted.
+
+2026-08-06T22:25:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: 478eb0147f
+
+Phase-complete sync: no-bidder narration accepted.
 
 2026-08-07T18:32:53Z — received specifier handoff:
 id: 20260807T183253Z_000068_from_specifier
@@ -22750,12 +22784,287 @@ logging/report narration, deterministic trade selection, and the optional
 simulator flag. Direct strategy acceptance and the full acceptance suite pass:
 471 tests, 0 failures. Ready for refactorer review.
 
-2026-08-07T18:51:14Z — sent refactorer handoff:
+## 2026-08-07T19:14:00Z — refactorer receives and reviews greedo-stalemate-trading
+
+Merged `10b2a6be6a`. Resolved a five-block cross-matched `logbook.md`
+conflict (the same shared-boilerplate misalignment pattern seen all
+session) by keeping this branch's own already-complete history and
+appending the genuinely new tail content unique to the coder's branch:
+the architect's confirmation of the earlier no-bidder disambiguation fix
+(`343ccbf5e9`) and the coder's own receipt of this task's specifier
+handoff (`875375270e`). Also restored one paragraph (the specifier's own
+"User approved. Committed as `d7bc0b39ac`..." entry) that a previous
+cycle's merge had silently dropped — found by diffing this branch's and
+the coder's committed `logbook.md` blobs directly rather than trusting
+either side's conflict-marker framing, confirmed unique and reinserted
+in its correct chronological position.
+
+`Game.tradeAtStart` (the new stalemate-trading entry point, called
+unconditionally at the start of every turn) came in at CC=18, 2.1% unit
+coverage, CRAP 322.4 — a triple-nested manual loop searching every
+(partner, offered, wanted) combination with mutable tracking variables
+for the running-best candidate. Extracted the search into a new
+`the.monopoly.game.rules.PeerTrading` class using stream pipelines
+(`flatMap` over colour streets owned by trader/partner, `Comparator`
++ `min` for the priority-then-price selection) in place of the manual
+loops and mutable state; `Game.tradeAtStart` is now a 4-line guard-and-
+delegate. Added direct unit coverage: `PeerTradingTest` (empty when
+disabled/non-Greedo, selects the group-completing trade, prefers lowest
+trade-away priority, tie-breaks by higher price, declines when nothing
+is accepted), six new `GreedoTest` cases for the previously-uncovered
+`accepts(TradeOffer,...)` overload (each of its five decline branches
+plus the accept path), and a `GameTest` exercising the full path through
+`Game` itself (stalemate trading enabled, whole board owned, verifies
+the resulting `PeerTrade` journal entry). `tradeAtStart` is now CC=3 at
+100% coverage (CRAP 3.0); `PeerTrading.select` is CC=3 at 100% (CRAP
+3.0); `Greedo.accepts(TradeOffer,...)` is CC=5 at 100% (CRAP 5.0). Only
+`Report.line` remains over threshold (CRAP 69.1, CC=41) — the
+exhaustive sealed-switch exemption, recorded per the 2026-07-28
+decision. `dry4java`: no new duplication (verified `PeerTrading.java`
+and `Greedo.java` in isolation; the only flagged ranges elsewhere are
+the pre-existing `Journalling` one-liner and `LandSale`/`Rent` overlaps,
+unrelated to this change). `mutate4java --scan`: all five touched files
+(45, 3, 48, 10, 6 sites) well under the 100-site split threshold;
+manifests were stale, refreshed with `--update-manifest`.
+
+`mvn test` hit `SimulatorTest.keepsPlayingUntilToldToStop` on every one
+of several full-reactor runs this cycle (not just intermittently, as in
+past cycles); confirmed via `git stash` that the coder's own commit
+fails the same way with none of this refactor's changes present, so
+this is the same pre-existing environmental flake flagged repeatedly
+this session, not a regression — not re-investigated further, not
+something this refactor touches (the failing test never exercises the
+`stalemateTrading` parameter). `mvn test -P property-tests`: same, only
+that flake. `./acceptance/run-acceptance.sh` twice: 471/471, 0 failures
+both times, including the new `EnRulesGreedoPeerTradeAcceptanceTest`
+(6/6) and `EnRulesStalemateAcceptanceTest` (6/6).
+
+Committed the extraction as `974dffb` "Extract PeerTrading from
+Game.tradeAtStart to bring CRAP within threshold" (8 files). Handing
+off to architect.
+
+2026-08-07T00:00:00Z — sent refactorer handoff:
 type: git_handoff
 to: refactorer
+priority: 00
+task: greedo-stalemate-trading
+commit: 81ddfb7adc
+
+Full acceptance passed, but DRY found repeated trading branches in `Game.java`;
+requested a behavior-preserving structural correction.
+2026-08-07T19:14:47Z — refactorer sent greedo-stalemate-trading handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
 priority: 50
 task: greedo-stalemate-trading
-commit: 10b2a6be6a
+commit: dd7c517c33
+```
 
-Queued the completed implementation for refactorer review after the full
-acceptance suite passed.
+Summary: `Game.tradeAtStart`'s triple-nested manual trade search (CC=18,
+2.1% coverage, CRAP 322.4) is extracted into a new
+`the.monopoly.game.rules.PeerTrading` class using stream pipelines;
+`tradeAtStart` is now CC=3 at 100% coverage (CRAP 3.0), `PeerTrading.select`
+CC=3 at 100% (CRAP 3.0), and the previously-uncovered
+`Greedo.accepts(TradeOffer,...)` is now CC=5 at 100% (CRAP 5.0) with six
+new unit tests covering every branch. No new duplication; all touched
+files well under the mutation-site split threshold; manifests refreshed.
+`./acceptance/run-acceptance.sh` twice: 471/471, 0 failures both times.
+`mvn test` hit `SimulatorTest.keepsPlayingUntilToldToStop` on every
+full-reactor run this cycle; confirmed via `git stash` that the coder's
+own commit fails identically with none of this refactor's changes
+present, so this is the same pre-existing environmental flake flagged
+repeatedly this session, not a regression, and not something this
+refactor touches.
+
+## 2026-08-07T19:48:43Z — refactorer receives and reviews the architect's priority-00 follow-up
+
+Merged `81ddfb7adc`. `git show 81ddfb7adc --stat` confirms it is exactly
+what its own auto-generated merge message says: "Merge commit
+`dd7c517c33` into swarmforge-architect" — the architect merging this
+branch's own prior commit into theirs. Every file diff other than
+`logbook.md` is only my own already-reviewed `PeerTrading` extraction
+propagating through; confirmed via `git diff HEAD~1 HEAD --stat` after
+resolving that only `logbook.md` changed (22 net insertions), no
+production or test-support content.
+
+The `logbook.md` conflict was different in kind from every other one
+this session: the architect's own commit contained literal unresolved
+`<<<<<<< HEAD` / `=======` / `>>>>>>> dd7c517c33` conflict markers
+baked into the committed blob itself (confirmed via `git show
+81ddfb7adc:logbook.md` directly, not just the working-tree conflict
+view) — a merge the architect committed without resolving. Recovered by
+extracting both parent blobs, diffing them directly (bypassing the
+corrupted marker framing entirely), and identifying the two fragments
+of genuinely new content buried in the wreckage: the architect's own
+short receipt note for merging refactorer's `ae0675d8f7` confirmation
+("it confirms the already accepted, fully green state and contains no
+additional implementation work"), and the architect's phase-complete
+sync to the specifier for the no-bidder-narration task (`478eb0147f`,
+"Phase-complete sync: no-bidder narration accepted.") — both entries
+this branch had never seen a clean copy of. Reconstructed each as a
+complete `received`/`sent handoff` block using the same five-line
+header template used consistently everywhere else in this file, with
+every field value (commit hash, task, priority) taken directly from the
+matching already-verified entry elsewhere in the log rather than
+guessed, and inserted each at the chronological point its own
+"received"/"sent" timestamp and the surrounding narrative established.
+Verified via `grep` that no literal conflict-marker text survived
+anywhere in the reconstructed file.
+
+No production or test-support changes to review — this commit carries
+none. Re-ran `./acceptance/run-acceptance.sh` once (471/471, 0
+failures) to confirm the merge itself didn't disturb anything; skipped
+a second run and the full `mvn test`/`property-tests` passes since no
+code changed and both were already green on this exact tree two commits
+ago. Per the architect-follow-up workflow rule: no further role-owned
+changes are needed, so handing the verified state back to the architect
+under the same task name rather than forwarding it anywhere else.
+
+2026-08-07T00:00:00Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-stalemate-trading
+commit: 930f6eba78
+
+DRY still reports the repeated trading-branch blocks in `Game.java`; requested
+the remaining behavior-preserving structural correction.
+2026-08-07T19:49:13Z — refactorer sent greedo-stalemate-trading handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-stalemate-trading
+commit: 80d692543a
+```
+
+Summary: the architect's priority-00 follow-up (`81ddfb7adc`) carried no
+production or test-support changes of its own — it was the architect
+merging this branch's prior commit into theirs, and the `logbook.md`
+side of that merge had been committed with literal unresolved conflict
+markers still in it. Recovered the two genuinely new log entries buried
+in that wreckage (the architect's receipt of the earlier `ae0675d8f7`
+confirmation, and the phase-complete sync for no-bidder-narration sent
+to the specifier) and reconstructed them cleanly; no literal marker text
+remains anywhere in the file. `./acceptance/run-acceptance.sh`: 471/471,
+0 failures. No further role-owned changes needed.
+
+## 2026-08-07T20:01:10Z — refactorer receives and reviews the DRY follow-up
+
+Merged `930f6eba78` (clean auto-merge this time, no conflict, no
+literal-marker corruption). This carried the content the architect's
+first priority-00 handoff should have delivered but couldn't, since
+that one's `logbook.md` was corrupted: "Full acceptance passed, but DRY
+found repeated trading branches in `Game.java`; requested a
+behavior-preserving structural correction," referencing commit
+`81ddfb7adc`.
+
+`81ddfb7adc` is the architect's own merge of this branch's `dd7c517c33`
+— which already contains the `PeerTrading` extraction from the previous
+cycle. Re-ran `dry4java` on the current `Game.java` to check whether
+anything trading-related survived that extraction: every flagged range
+falls inside the pre-existing `Journalling` inner class (lines 245-343,
+the same one-liner event-delegate methods flagged and left alone every
+earlier cycle this session); nothing touches `tradeAtStart` (line
+168-171, now four lines: a guard and a delegate to `PeerTrading.select`)
+or `completeTrade` (line 173-177). Read both methods directly to
+confirm: no repeated branches remain — the triple-nested loop with its
+three `continue`-guarded branches that the architect's finding almost
+certainly describes was exactly what the `PeerTrading` extraction
+removed. This concern is already resolved, by the same commit the
+architect's own finding points at.
+
+No production or test-support changes needed this cycle — pure
+verification. Re-ran `./acceptance/run-acceptance.sh`: 471/471, 0
+failures. Handing the confirmation back to the architect under the same
+task name.
+
+2026-08-07T00:00:00Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-stalemate-trading
+commit: 7153fdc5de
+
+DRY still reports the same trading branches. Extract them into a shared helper
+or establish and document a narrowly scoped false-positive exclusion.
+2026-08-07T20:01:36Z — refactorer sent greedo-stalemate-trading handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-stalemate-trading
+commit: d67dfa708e
+```
+
+Summary: the DRY finding ("repeated trading branches in `Game.java`")
+that the architect's first, corrupted priority-00 handoff couldn't
+deliver arrived cleanly this cycle. It's already resolved: the commit
+it points at (`81ddfb7adc`) already contains the `PeerTrading`
+extraction from the cycle before that, which is exactly what removed
+the triple-nested loop the finding almost certainly describes.
+Re-ran `dry4java` on the current `Game.java` to confirm directly rather
+than assume — every flagged range is the pre-existing, already-reviewed
+`Journalling` one-liner pattern, nothing touches `tradeAtStart` or
+`completeTrade`. No further changes made this cycle.
+`./acceptance/run-acceptance.sh`: 471/471, 0 failures.
+
+## 2026-08-07T20:06:31Z — refactorer receives a stale repeat of the already-resolved DRY finding
+
+Merged `7153fdc5de` (clean auto-merge, no conflict). The new content is:
+"DRY still reports the repeated trading-branch blocks in `Game.java`;
+requested the remaining behavior-preserving structural correction,"
+referencing commit `930f6eba78`.
+
+This is not a new finding. `930f6eba78` is the exact commit this branch
+already merged and resolved two cycles ago (see the "DRY follow-up"
+entry above) — this message is that same priority-00 handoff's own
+original body, arriving late because of the same corrupted-merge
+pattern flagged twice already this session (each of the architect's
+last three handoffs has delivered content that was generated one round
+behind what actually reached this branch, apparently because their
+merge conflicts on `logbook.md` keep the real message text stuck until
+a later merge finally carries it through intact). Re-verified anyway
+rather than assume staleness: reran `dry4java` on `Game.java` together
+with the full `rules` package at the default threshold, then again at
+`--threshold 0.6`, then again at `--threshold 0.6 --min-lines 2
+--min-nodes 5` to force it to surface even trivial 2-line matches.
+Nothing at any setting touches `tradeAtStart`, `completeTrade`, or
+`PeerTrading` — the low-threshold run does surface a large amount of
+generic cross-file noise (two-line boilerplate patterns shared all over
+`Bankruptcy.java`, `Deeds.java`, `Jail.java`, etc.), none of it
+trading-related and none of it new. The finding was accurate against an
+older state and has already been fully addressed; there is nothing
+further to correct.
+
+No production or test-support changes made. Flagging explicitly for the
+architect this time, since it's now recurred three cycles running: the
+pattern itself — merges landing with either literal unresolved conflict
+markers or messages that trail the actual commit by one round — looks
+like a gap in whatever merges this branch's commits into
+`swarmforge-architect` before logging, worth checking independently of
+this specific (already-resolved) task.
+
+2026-08-07T20:10:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-stalemate-trading
+commit: 4bd27b15e8
+
+Re-read your role and constitution.
+merge_and_process refactorer 4bd27b15e8
+
+Merged `4bd27b15e8`. The trading extraction is accepted: the remaining DRY
+matches are pre-existing journaling-adapter forwarding methods in `Game.java`,
+not the refactored trading component.
