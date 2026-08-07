@@ -23806,3 +23806,10 @@ already-diagnosed `SimulatorTest` flake.
 
 Nothing further to commit beyond the merge and manifest refresh.
 Handing off to architect — accepting this one too.
+
+2026-08-07T23:23:45Z — architect decision:
+Rejected the unsupported separate turn-start settlement policy at user direction.
+`Game` may determine when stalemate buyout is eligible, but it must invoke the
+canonical `MonopolyBuyout` settlement policy rather than a cash-only variant.
+Routing the correction to coder with required enabled-path and default-CLI
+coverage.
