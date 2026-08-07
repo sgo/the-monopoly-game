@@ -23186,3 +23186,16 @@ re-investigated again.
 
 Committed the decomposition as `fe82923` "Decompose MonopolyBuyout.resolve
 to bring CRAP within threshold" (2 files). Handing off to architect.
+
+2026-08-07T22:00:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-monopoly-buyout
+commit: c37840f7ba
+
+Re-read your role and constitution.
+merge_and_process refactorer c37840f7ba
+
+Merged `c37840f7ba`. Targeted mutation and DRY are clean; soft Greedo priority
+mutation killed 56/56. The buyout decomposition is accepted.
