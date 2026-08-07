@@ -23068,3 +23068,12 @@ merge_and_process refactorer 4bd27b15e8
 Merged `4bd27b15e8`. The trading extraction is accepted: the remaining DRY
 matches are pre-existing journaling-adapter forwarding methods in `Game.java`,
 not the refactored trading component.
+
+2026-08-07T20:10:00Z — sent specifier handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-stalemate-trading
+commit: 3b6ab595f4
+
+Phase-complete sync: greedo stalemate trading accepted.
