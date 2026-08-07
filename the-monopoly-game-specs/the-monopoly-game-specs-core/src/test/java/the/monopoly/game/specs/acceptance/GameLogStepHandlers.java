@@ -73,6 +73,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesFromPo
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.playerPaidLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.purchaseDeclined;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.peerTrade;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.purchaseDeclinedForReserveLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.purchaseDeclinedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentPaid;
@@ -95,6 +96,37 @@ final class GameLogStepHandlers {
 
   static List<StepHandler> handlers() {
     return List.of(
+        then("^the game journal records that pawn \"" + NAME + "\" trades \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" starts a turn$",
+            (world, arguments) -> recordsInOrder(world,
+                peerTrade(arguments.text(1), arguments.text(2), arguments.text(3), arguments.text(4)),
+                turnStarted(arguments.text(5)))),
+        then("^the game journal does not record that pawn \"" + NAME + "\" trades \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \"" + NAME + "\"$",
+            (world, arguments) -> assertThat(world.journal()).noneMatch(peerTrade(
+                arguments.text(1), arguments.text(2), arguments.text(3), arguments.text(4)).matches())),
+        then("^the game log records that pawn \"" + NAME + "\" trades \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" starts a turn$",
+            (world, arguments) -> logRecordsInOrder(world,
+                peerTrade(arguments.text(1), arguments.text(2), arguments.text(3), arguments.text(4)),
+                turnStarted(arguments.text(5)))),
+        then("^the game log does not record that pawn \"" + NAME + "\" trades \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \"" + NAME + "\"$",
+            (world, arguments) -> assertThat(world.gameLog()).noneMatch(peerTrade(
+                arguments.text(1), arguments.text(2), arguments.text(3), arguments.text(4)).matches())),
+        then("^the game report says that pawn \"" + NAME + "\" trades \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \"" + NAME
+                + "\" before it says that pawn \"" + NAME + "\" starts a turn$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + " trades " + arguments.text(2) + " to " + arguments.text(3)
+                    + " for " + arguments.text(4),
+                arguments.text(5) + " starts a turn")),
+        then("^the game report does not say that pawn \"" + NAME + "\" trades \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \"" + NAME + "\"$",
+            (world, arguments) -> assertThat(world.report()).doesNotContain(arguments.text(1) + " trades "
+                + arguments.text(2) + " to " + arguments.text(3) + " for " + arguments.text(4))),
         then("^the game log records that the game ends in a stalemate before it records that pawn \""
                 + NAME + "\"'s final balance is \\$" + VALUE + "$",
             (world, arguments) -> logRecordsInOrder(world,
