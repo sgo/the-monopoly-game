@@ -22486,6 +22486,40 @@ test` unaffected (Gherkin-only change).
 
 Reporting to the user before committing/handing back to the coder.
 
+User approved. Committed as `d7bc0b39ac` "Fix redundant Background
+duplication in no-bidder-narration scenarios; expose an ambiguous-step
+regex bug underneath" (4 files, 59 insertions, 15 deletions).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: d7bc0b39ac
+```
+
+Summary: the refactorer's scenario-content diagnosis is fixed —
+`journal-47`/`logging-47`/`report-47` no longer redundantly repeat
+their own `Background:` steps, so dog's initiative-roll queue is no
+longer double-queued and the first assertion in each scenario now
+passes. That surfaced a second, previously-masked bug: the second
+assertion now fails with "Ambiguous step" rather than "Unsupported
+step". Root cause in `GameLogStepHandlers.java`, not Gherkin:
+`UNQUOTED_NAME = "(<[^<>]+>|.+?)"`, when it's the last capture
+immediately before a bare `$` end-anchor with nothing following, has to
+expand however far needed to satisfy that anchor — so the bare "X finds
+no bidder for Y" pattern also matches the much longer compound "X finds
+no bidder for Y before it records that... mortgages... for $Z" pattern
+meant for the ordering assertion. Same class of regex fragility the
+refactorer already found and fixed once in this exact file (the
+stray-quote bug in the "mortgages" clause); needs a tighter boundary on
+the bare pattern (or pattern-specificity ordering) to disambiguate.
+Verified my fix directly: reran the acceptance suite and confirmed the
+failure output no longer mentions the first assertion at all, only the
+new ambiguity on the second line.
+
 2026-08-06T22:15:30Z RECEIVED handoff:
 id: 20260806T201350Z_000067_from_specifier
 from: specifier
@@ -22677,3 +22711,53 @@ manifest metadata, left untouched. `./acceptance/run-acceptance.sh`
 twice: 455/455, 0 failures both times. `SimulatorTest` full-reactor-only
 flake recurred once, unrelated. Nothing to commit beyond the merge
 itself.
+
+2026-08-06T22:18:10Z RECEIVED handoff:
+id: 20260806T201551Z_000112_from_architect
+from: architect
+2026-08-06T22:15:00Z — sent coder handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: distressed-sale-no-bidder-narration
+commit: a9942fa362
+
+Full acceptance found missing no-bidder distressed-sale narration in logging,
+journal, and report scenarios; requested a functional correction.
+
+2026-08-06T22:25:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: distressed-sale-no-bidder-narration
+commit: 343ccbf5e9
+
+Re-read your role and constitution.
+merge_and_process refactorer 343ccbf5e9
+
+Merged `343ccbf5e9`. The previously failing journal, logging, and report
+narration scenarios now pass in the full acceptance suite; the correction is
+accepted.
+
+2026-08-07T18:32:53Z — received specifier handoff:
+id: 20260807T183253Z_000068_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 875375270e
+created_at: 2026-08-07T18:32:53.819004Z
+enqueued_at: 2026-08-07T18:32:53.820608Z
+task: greedo-stalemate-trading
+dequeued_at: 2026-08-07T18:33:03.078407Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 875375270e
+
+Merged `875375270e` and implemented Greedo stalemate peer trading, journal/
+logging/report narration, deterministic trade selection, and the optional
+simulator flag. Direct strategy acceptance and the full acceptance suite pass:
+471 tests, 0 failures. Ready for refactorer review.

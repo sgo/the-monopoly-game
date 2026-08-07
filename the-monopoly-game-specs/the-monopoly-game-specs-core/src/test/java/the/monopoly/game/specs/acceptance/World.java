@@ -89,6 +89,9 @@ public class World {
   private Process packagedCliProcess;
   private String packagedCliOutput;
   private int packagedCliExitCode;
+  private Boolean tradeAccepted;
+  private boolean stalemateTrading;
+  private boolean simulatorStalemateTrading;
   private Entry selectedEvent;
   private String renderedEventText;
   private String loggedEventText;
@@ -189,6 +192,13 @@ public class World {
     simulatorStrategies = player -> new the.monopoly.game.strategies.Greedo();
   }
 
+  public void giveSimulatorArgument(String argument) {
+    if (!argument.equals("--optional-greedo-stalemate-trading")) {
+      throw new AssertionError("Unknown simulator argument: " + argument);
+    }
+    simulatorStalemateTrading = true;
+  }
+
   public void runSimulator() {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
     simulatorResult = Simulator.run(simulatorPlayers, simulatorStrategies);
@@ -202,7 +212,7 @@ public class World {
   /** Starts the simulator playing in the background, so the game log fills as it goes. */
   public void startSimulator() {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
-    runningSimulator = Simulator.start(simulatorPlayers, simulatorStrategies);
+    runningSimulator = Simulator.start(simulatorPlayers, simulatorStrategies, simulatorStalemateTrading);
   }
 
   public void stopSimulator() {
@@ -354,7 +364,8 @@ public class World {
                 ? officialDecks.drawCommunityChest() : queuedCommunityChestCards.pollFirst();
           }
         },
-        jail
+        jail,
+        stalemateTrading
     );
     Game.Result result = play.apply(game);
     turnOrder = result.turnOrder();
@@ -508,10 +519,38 @@ public class World {
     pawnStrategies.put(pawnName, new the.monopoly.game.strategies.Greedo(reserve));
   }
 
+  public void enableStalemateTrading(String strategyName) {
+    if (!strategyName.equals("Greedo")) throw new AssertionError("Unknown strategy \"" + strategyName + "\".");
+    stalemateTrading = true;
+    pawnStrategies.put("dog", new the.monopoly.game.strategies.Greedo(Money.ZERO, true));
+  }
+
+  public void ownEveryOtherOwnableAlternately(String firstPawn, String secondPawn) {
+    if (deeds == null) deeds = new Deeds();
+    List<Ownable> ownables = ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast).toList();
+    for (int index = 0; index < ownables.size(); index++) {
+      deeds.sell(ownables.get(index), pawn(index % 2 == 0 ? firstPawn : secondPawn), Money.ZERO);
+    }
+  }
+
   public void assertGreedoPriority(String spaceName, String expected) {
     the.monopoly.game.strategies.Strategy.Priority actual =
         new the.monopoly.game.strategies.Greedo().priority(ownable(SpaceNames.of(spaceName)));
     org.assertj.core.api.Assertions.assertThat(actual.name().toLowerCase()).isEqualTo(expected);
+  }
+
+  public void pawnConsidersTrading(String traderName, String offeredName, String partnerName, String wantedName) {
+    Player trader = pawn(traderName);
+    Player partner = pawn(partnerName);
+    Strategy.TradeOffer offer = new Strategy.TradeOffer(
+        trader, partner, ownable(SpaceNames.of(offeredName)), ownable(SpaceNames.of(wantedName)));
+    tradeAccepted = new the.monopoly.game.strategies.Greedo().accepts(offer, ruleSet, deeds);
+  }
+
+  public void assertGreedoTradeDecision(String decision) {
+    if (tradeAccepted == null) throw new AssertionError("No trade has been considered yet.");
+    boolean expected = decision.equals("accepts");
+    org.assertj.core.api.Assertions.assertThat(tradeAccepted).isEqualTo(expected);
   }
 
   public void queueChanceCard(String card) {

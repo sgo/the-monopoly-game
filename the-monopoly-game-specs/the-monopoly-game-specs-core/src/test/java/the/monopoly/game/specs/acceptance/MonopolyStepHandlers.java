@@ -171,8 +171,18 @@ public final class MonopolyStepHandlers {
         step("^the simulator is configured for (.+) players$",
             (world, arguments) -> world.configureSimulator(arguments.number(1), false)),
 
+        step("^the simulator is given the \"" + NAME + "\" argument$",
+            (world, arguments) -> world.giveSimulatorArgument(arguments.text(1))),
+
         step("^every player selects the \"Greedo\" strategy$",
             (world, arguments) -> world.configureSimulatorWithGreedo()),
+
+        given("^stalemate trading is enabled for the \"" + NAME + "\" strategy$",
+            (world, arguments) -> world.enableStalemateTrading(arguments.text(1))),
+
+        given("^every other ownable space is owned alternately by pawn \"" + NAME
+                + "\" and pawn \"" + NAME + "\" in board order$",
+            (world, arguments) -> world.ownEveryOtherOwnableAlternately(arguments.text(1), arguments.text(2))),
 
         step("^I run the simulator$", (world, arguments) -> world.runSimulator()),
 
@@ -319,7 +329,13 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> world.rollForInitiative()),
 
         then("^the \"Greedo\" strategy's priority for \"" + NAME + "\" is \"" + NAME + "\"$",
-            (world, arguments) -> world.assertGreedoPriority(arguments.text(1), arguments.text(2)))
+            (world, arguments) -> world.assertGreedoPriority(arguments.text(1), arguments.text(2))),
+        step("^pawn \"" + NAME + "\" considers trading \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \"" + NAME + "\"$",
+            (world, arguments) -> world.pawnConsidersTrading(
+                arguments.text(1), arguments.text(2), arguments.text(3), arguments.text(4))),
+        then("^the \"Greedo\" strategy " + NAME + " the trade$",
+            (world, arguments) -> world.assertGreedoTradeDecision(arguments.text(1)))
     );
   }
 }
