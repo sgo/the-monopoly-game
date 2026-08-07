@@ -23966,3 +23966,36 @@ oscillation finding front and center — not blocking on it, since
 nothing here regresses a specified scenario and the merge itself is
 sound, but this needs to reach whoever decides whether the task is
 actually done.
+
+2026-08-07T23:39:56Z — refactorer sent greedo-buyout-wiring handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-buyout-wiring
+commit: bc3034b15a
+```
+
+Summary: the canonical-settlement change itself is sound (matches your
+decision above exactly, CRAP/DRY/mutation clean, 486/486 acceptance
+twice) — but the underlying oscillation bug this task exists to fix is
+still reproducible. Ran 20-100 real two-player Greedo games: 3-6% still
+show genuine A-B-A-B `PeerTrade` cycles with zero `SplitMonopolyWon`
+for the whole game, always on 3-member colour groups (pink, yellow)
+where only 2 of 3 streets are owned — `MonopolyBuyout` never engages
+for a not-fully-owned group regardless of price formula, and
+`Game.completeTrade` executes whatever the *trader's own* strategy
+picks with no partner consent, so nothing stops the immediate reverse
+trade from looking equally good next turn. Not a defect in this
+commit's own diff (the trade mechanism predates it, and price formula
+doesn't affect group-ownership completeness either way) — but it means
+every existing acceptance scenario only proves the narrow "whole board
+owned, one 2-member group split" case, not the general fix. Whether
+`MonopolyBuyout` should extend to partially-owned groups or
+`PeerTrading` needs partner consent or an anti-repeat guard is a design
+call, not something I'm fixing unilaterally. Separately, cleaned up
+`spareOwner` rebuilding its street list from scratch inside a nested
+loop — mechanical, verified behavior-identical.
