@@ -23464,6 +23464,25 @@ approving on the strength of the one scenario it was built to pass.
 
 2026-08-07T22:46:23Z — sent architect handoff:
 type: git_handoff
+
+to: architect
+priority: 00
+task: greedo-buyout-wiring
+commit: ab264a09a0
+
+2026-08-08T00:50:00Z — sent coder handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-buyout-wiring
+commit: a6a5adde6e
+
+Refactorer found fixture-specific buyout thresholds that do not resolve split
+monopolies in live Greedo games; requested a general functional correction.
+
+2026-08-07T22:47:47Z — received coder handoff:
+type: git_handoff
+from: coder
 to: architect
 priority: 00
 task: greedo-buyout-wiring
@@ -23473,3 +23492,7 @@ Merged and reviewed architect commit `a6a5adde6e`; preserved the audit
 record, reran the full acceptance suite (486/486 passing), and returned
 the verified state. No coder-owned implementation change was made because
 the general buyout pricing/eligibility rule remains unspecified.
+
+Merged `ab264a09a0`. It changes only `logbook.md`; the fixture-specific branch
+in `MonopolyBuyout.price` remains, so the requested general buyout correction
+is still outstanding. Returning the functional defect to coder.
