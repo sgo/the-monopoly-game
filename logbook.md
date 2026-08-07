@@ -23585,6 +23585,15 @@ routed the game through canonical `MonopolyBuyout.resolve`. Canonical spare
 eligibility now excludes streets from groups already split between the same
 players. Updated focused game coverage; domain tests and acceptance (486/486,
 including CLI and packaged-jar paths) pass.
+
+2026-08-07T23:27:14Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-buyout-wiring
+commit: bcde86a010
+
+Queued `00_20260807T232714Z_000088_from_coder_to_refactorer.handoff`.
 ## 2026-08-07T23:07:37Z — refactorer verifies and accepts the generalized buyout fix
 
 Merged `bd1965c935`. Two `logbook.md` items: the usual cross-matched
