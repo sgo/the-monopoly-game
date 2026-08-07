@@ -265,7 +265,7 @@ final class JournalStepHandlers {
             (world, arguments) -> world.givePawnGetOutOfJailFreeCard(arguments.text(1))),
 
         given("^pawn \"" + NAME + "\" has \\$" + VALUE + " to spend$",
-            (world, arguments) -> world.arrangePawnBalance(arguments.text(1), money(arguments.number(2)))),
+            (world, arguments) -> world.holdPawnBalance(arguments.text(1), money(arguments.number(2)))),
 
         given("^pawn \"" + NAME + "\" declines the offer for \"" + NAME + "\"$",
             (world, arguments) -> world.pawnDeclines(arguments.text(1), SpaceNames.of(arguments.text(2)))),

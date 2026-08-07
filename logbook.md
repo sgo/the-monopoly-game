@@ -23068,3 +23068,24 @@ merge_and_process refactorer 4bd27b15e8
 Merged `4bd27b15e8`. The trading extraction is accepted: the remaining DRY
 matches are pre-existing journaling-adapter forwarding methods in `Game.java`,
 not the refactored trading component.
+
+2026-08-07T21:22:03Z — received specifier handoff:
+id: 20260807T212203Z_000069_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 47f8e92d78
+created_at: 2026-08-07T21:22:03Z
+task: greedo-monopoly-buyout
+
+Re-read your role and constitution.
+
+merge_and_process specifier 47f8e92d78
+
+Merged the buyout specification and implemented split-monopoly resolution,
+cash and spare-street settlement, acceptance handlers, and raw simulator
+argument setup. Unit tests pass (301 tests); full acceptance passes (477
+tests, 0 failures).

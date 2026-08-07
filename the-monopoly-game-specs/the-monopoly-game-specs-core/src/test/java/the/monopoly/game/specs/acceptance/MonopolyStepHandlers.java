@@ -171,6 +171,23 @@ public final class MonopolyStepHandlers {
         step("^the simulator is configured for (.+) players$",
             (world, arguments) -> world.configureSimulator(arguments.number(1), false)),
 
+        step("^the simulator is configured with the raw arguments \"" + NAME + "\"$",
+            (world, arguments) -> world.configureSimulatorRaw(arguments.text(1))),
+
+        step("^the split monopoly between pawn \"" + NAME + "\" and pawn \"" + NAME
+                + "\" is resolved$",
+            (world, arguments) -> world.resolveSplitMonopoly(arguments.text(1), arguments.text(2))),
+
+        then("^pawn \"" + NAME + "\" wins the split monopoly$",
+            (world, arguments) -> assertThat(world.buyoutWinnerIs(arguments.text(1))).isTrue()),
+
+        then("^no one wins the split monopoly$",
+            (world, arguments) -> assertThat(world.noBuyoutWinner()).isTrue()),
+
+        then("^pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE
+                + " for the split monopoly$",
+            (world, arguments) -> assertThat(world.buyoutPayment()).isEqualTo(money(arguments.number(3)))),
+
         step("^the simulator is given the \"" + NAME + "\" argument$",
             (world, arguments) -> world.giveSimulatorArgument(arguments.text(1))),
 
