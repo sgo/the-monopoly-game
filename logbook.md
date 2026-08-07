@@ -23632,3 +23632,18 @@ to this cycle). `dry4java`: no new duplication. `mutate4java --scan`:
 Committed as `ba820d9` "Decompose resolveBuyoutAtStart and add direct
 unit coverage for the turn-start buyout" (3 files). Handing off to
 architect — accepting this one.
+
+2026-08-07T23:10:17Z — received refactorer handoff:
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: greedo-buyout-wiring
+commit: e022bb91fa
+
+Merged the refactorer return, resolved the `logbook.md` conflict additively,
+and independently reran full acceptance: 486/486 passed, including CLI and
+packaged-jar scenarios. Differential mutation is clean for both changed
+production files. DRY only reports the pre-existing journal adapter pattern.
+Soft Gherkin mutation of `greedo-monopoly-buyout.feature` killed 7/16 and
+survived 9; routing this feature-content gap to the specifier before closure.
