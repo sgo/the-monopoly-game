@@ -248,7 +248,7 @@ class GameTest {
   }
 
   @Test
-  void aStalemateTradingGreedoResolvesASplitMonopolyByBuyoutAtTheStartOfItsTurnRatherThanTrading() {
+  void aStalemateTradingGreedoUsesTheCanonicalBuyoutSettlementAtTheStartOfItsTurn() {
     List<Player> twoPlayers = ruleSet.players().select(2).toList();
     Player dog = twoPlayers.get(0);
     Player highHat = twoPlayers.get(1);
@@ -273,8 +273,8 @@ class GameTest {
 
     assertThat(result.journal()).containsSubsequence(
         new Entry.SplitMonopolyWon(dog.id(), highHat.id()),
-        new Entry.SplitMonopolyPaid(dog.id(), highHat.id(), new Money(40)),
-        new Entry.TurnStarted(dog.id(), new Money(960))
+        new Entry.SplitMonopolyPaid(dog.id(), highHat.id(), new Money(105)),
+        new Entry.TurnStarted(dog.id(), new Money(895))
     );
     assertThat(deeds.ownerOf(Street.Type.NieuwstraatBrussel)).contains(dog.id());
   }

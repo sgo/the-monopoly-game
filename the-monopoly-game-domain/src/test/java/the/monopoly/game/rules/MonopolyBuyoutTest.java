@@ -34,7 +34,7 @@ class MonopolyBuyoutTest {
     deeds.sell(ownable(Street.Type.MeirAntwerpen), dog, Money.ZERO);
     deeds.sell(ownable(Street.Type.NieuwstraatBrussel), highHat, Money.ZERO);
 
-    MonopolyBuyout.Outcome outcome = MonopolyBuyout.resolveAtTurnStart(dog, highHat, rules, deeds)
+    MonopolyBuyout.Outcome outcome = MonopolyBuyout.resolve(dog, highHat, rules, deeds)
         .orElseThrow();
 
     assertThat(outcome.payment()).isEqualTo(new Money(40));

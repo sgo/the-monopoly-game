@@ -23564,6 +23564,27 @@ including CLI and packaged-jar scenarios. Differential mutation of `Game.java`
 found the new turn-start gate insufficiently specified: the partner identity
 comparison at line 180 survives mutation, alongside existing legacy survivors.
 Returning the required focused functional test to coder before final review.
+
+2026-08-07T23:24:11Z — received architect handoff:
+id: 20260807T232411Z_000126_from_architect_to_coder
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 4e94e59ae5
+task: greedo-buyout-wiring
+
+Re-read your role and constitution.
+
+merge_and_process architect 4e94e59ae5
+
+Merged `4e94e59ae5`. Removed the separate turn-start settlement policy and
+routed the game through canonical `MonopolyBuyout.resolve`. Canonical spare
+eligibility now excludes streets from groups already split between the same
+players. Updated focused game coverage; domain tests and acceptance (486/486,
+including CLI and packaged-jar paths) pass.
 ## 2026-08-07T23:07:37Z — refactorer verifies and accepts the generalized buyout fix
 
 Merged `bd1965c935`. Two `logbook.md` items: the usual cross-matched

@@ -183,7 +183,7 @@ public class Game {
     if (!(strategies.forPlayer(trader) instanceof Greedo)) return false;
     if (isTiedWithItsPartner(trader, turnOrder)) return false;
     return turnOrder.stream().filter(partner -> partner != trader)
-        .map(partner -> MonopolyBuyout.resolveAtTurnStart(trader, partner, rules, deeds))
+        .map(partner -> MonopolyBuyout.resolve(trader, partner, rules, deeds))
         .filter(Optional::isPresent).map(Optional::orElseThrow).findFirst()
         .map(outcome -> applyBuyout(outcome, journalling))
         .orElse(false);
