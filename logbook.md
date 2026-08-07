@@ -22870,3 +22870,47 @@ own commit fails identically with none of this refactor's changes
 present, so this is the same pre-existing environmental flake flagged
 repeatedly this session, not a regression, and not something this
 refactor touches.
+
+## 2026-08-07T19:48:43Z — refactorer receives and reviews the architect's priority-00 follow-up
+
+Merged `81ddfb7adc`. `git show 81ddfb7adc --stat` confirms it is exactly
+what its own auto-generated merge message says: "Merge commit
+`dd7c517c33` into swarmforge-architect" — the architect merging this
+branch's own prior commit into theirs. Every file diff other than
+`logbook.md` is only my own already-reviewed `PeerTrading` extraction
+propagating through; confirmed via `git diff HEAD~1 HEAD --stat` after
+resolving that only `logbook.md` changed (22 net insertions), no
+production or test-support content.
+
+The `logbook.md` conflict was different in kind from every other one
+this session: the architect's own commit contained literal unresolved
+`<<<<<<< HEAD` / `=======` / `>>>>>>> dd7c517c33` conflict markers
+baked into the committed blob itself (confirmed via `git show
+81ddfb7adc:logbook.md` directly, not just the working-tree conflict
+view) — a merge the architect committed without resolving. Recovered by
+extracting both parent blobs, diffing them directly (bypassing the
+corrupted marker framing entirely), and identifying the two fragments
+of genuinely new content buried in the wreckage: the architect's own
+short receipt note for merging refactorer's `ae0675d8f7` confirmation
+("it confirms the already accepted, fully green state and contains no
+additional implementation work"), and the architect's phase-complete
+sync to the specifier for the no-bidder-narration task (`478eb0147f`,
+"Phase-complete sync: no-bidder narration accepted.") — both entries
+this branch had never seen a clean copy of. Reconstructed each as a
+complete `received`/`sent handoff` block using the same five-line
+header template used consistently everywhere else in this file, with
+every field value (commit hash, task, priority) taken directly from the
+matching already-verified entry elsewhere in the log rather than
+guessed, and inserted each at the chronological point its own
+"received"/"sent" timestamp and the surrounding narrative established.
+Verified via `grep` that no literal conflict-marker text survived
+anywhere in the reconstructed file.
+
+No production or test-support changes to review — this commit carries
+none. Re-ran `./acceptance/run-acceptance.sh` once (471/471, 0
+failures) to confirm the merge itself didn't disturb anything; skipped
+a second run and the full `mvn test`/`property-tests` passes since no
+code changed and both were already green on this exact tree two commits
+ago. Per the architect-follow-up workflow rule: no further role-owned
+changes are needed, so handing the verified state back to the architect
+under the same task name rather than forwarding it anywhere else.
