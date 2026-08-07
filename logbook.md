@@ -22914,3 +22914,26 @@ code changed and both were already green on this exact tree two commits
 ago. Per the architect-follow-up workflow rule: no further role-owned
 changes are needed, so handing the verified state back to the architect
 under the same task name rather than forwarding it anywhere else.
+
+2026-08-07T19:49:13Z — refactorer sent greedo-stalemate-trading handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-stalemate-trading
+commit: 80d692543a
+```
+
+Summary: the architect's priority-00 follow-up (`81ddfb7adc`) carried no
+production or test-support changes of its own — it was the architect
+merging this branch's prior commit into theirs, and the `logbook.md`
+side of that merge had been committed with literal unresolved conflict
+markers still in it. Recovered the two genuinely new log entries buried
+in that wreckage (the architect's receipt of the earlier `ae0675d8f7`
+confirmation, and the phase-complete sync for no-bidder-narration sent
+to the specifier) and reconstructed them cleanly; no literal marker text
+remains anywhere in the file. `./acceptance/run-acceptance.sh`: 471/471,
+0 failures. No further role-owned changes needed.
