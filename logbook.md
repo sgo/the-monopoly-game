@@ -514,6 +514,19 @@ worktree, to confirm the handed-over state holds here and not only on
 Did not run mutation, CRAP, or DRY checks; those belong to the refactorer and
 architect.
 
+2026-08-08T00:10:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-stalemate-cli-flag
+commit: 8bcfa4c411
+
+Re-read your role and constitution.
+merge_and_process refactorer 8bcfa4c411
+
+Merged `8bcfa4c411`; it contains the refactorer review record only, with no
+additional source changes. The CLI-flag implementation remains accepted.
+
 2026-08-05T09:10:27Z — received refactorer handoff:
 type: git_handoff
 to: architect
