@@ -23629,3 +23629,64 @@ owners it finds are the specific pair being asked about — harmless
 today since every scenario is 2-player, worth a specifier follow-up if
 3+ player buyouts are ever wanted. `./acceptance/run-acceptance.sh`
 twice: 486/486, 0 failures both times.
+
+2026-08-07T22:53:26Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-buyout-wiring
+commit: bd1965c935
+
+Queued `00_20260807T225326Z_000085_from_coder_to_refactorer.handoff`.
+
+2026-08-07T22:48:15Z — sent coder handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-buyout-wiring
+commit: 98d3dbf7e8
+
+Requested the unresolved general Greedo buyout correction.
+
+2026-08-07T22:54:06Z — sent architect handoff:
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-buyout-wiring
+commit: 5367641cdb
+
+2026-08-07T22:56:58Z — received coder handoff:
+type: git_handoff
+from: coder
+to: architect
+priority: 00
+task: greedo-buyout-wiring
+commit: 5367641cdb
+
+Merged architect routing commit `028a05af23`; it contains no implementation
+changes. Returned the verified correction state already handed to refactorer.
+
+Merged the generalized correction and ran full acceptance: 486/486 passed,
+including CLI and packaged-jar scenarios. Differential mutation of `Game.java`
+found the new turn-start gate insufficiently specified: the partner identity
+comparison at line 180 survives mutation, alongside existing legacy survivors.
+Returning the required focused functional test to coder before final review.
+
+2026-08-07T22:57:20Z — received architect handoff:
+id: 20260807T225720Z_000123_from_architect_to_coder
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 3d5e7fe360
+task: greedo-buyout-wiring
+
+Re-read your role and constitution.
+
+merge_and_process architect 3d5e7fe360
+
+Merged `3d5e7fe360`. Added focused three-player gate coverage: a tied first
+partner must not suppress resolution against a lower-balance partner. Domain
+tests pass (312), and full acceptance passes (486/486).

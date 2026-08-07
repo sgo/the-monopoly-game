@@ -189,11 +189,15 @@ public class Game {
         .orElse(false);
   }
 
-  /** Turn-start resolution leaves an equal-cash tie to the established peer-trade behavior. */
+  /**
+   * Turn-start resolution leaves an equal-cash tie to the established peer-trade
+   * behavior — but only when every other player is tied; a lower-balance partner
+   * elsewhere in turn order still leaves a real buyout to resolve against.
+   */
   private boolean isTiedWithItsPartner(Player trader, List<Player> turnOrder) {
-    return turnOrder.stream().filter(partner -> partner != trader).findFirst()
-        .map(Player::account).map(account -> account.balance().amount())
-        .filter(trader.account().balance().amount()::equals).isPresent();
+    return turnOrder.stream().filter(partner -> partner != trader)
+        .allMatch(partner -> partner.account().balance().amount()
+            .equals(trader.account().balance().amount()));
   }
 
   private boolean applyBuyout(MonopolyBuyout.Outcome outcome, Journalling journalling) {
