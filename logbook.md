@@ -23289,3 +23289,31 @@ unrelated.
 Committed as `c8cea15` "Fix broken test and dead Journalling wrapper
 from the stalemate-trading CLI flag" (4 files). Handing off to
 architect.
+
+2026-08-07T22:07:40Z — refactorer sent greedo-stalemate-cli-flag handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-stalemate-cli-flag
+commit: 8bcfa4c411
+```
+
+Summary: found and fixed a real defect before trusting the coder's own
+"483 tests, 0 failures" claim — ran the domain suite directly rather
+than accepting it, and it failed. The new unconditional
+`StalemateTrading` journal entry (intentional, confirmed against the
+specifier's own "disabled by default" scenario) broke a pre-existing
+unit test with an exact `startsWith` assertion the coder's own
+acceptance run never happened to exercise; fixed the test. Separately,
+`Game.play` bypassed the `Journalling` wrapper for this one event
+because `Journalling` wasn't constructed yet at that point in the
+method, leaving `Journalling.stalemateTrading(boolean)` dead on
+arrival; moved the (stateless) construction earlier and wired the call
+through it instead of deleting the unused method. CRAP/DRY clean
+(only the exempted `Report.line` switch over threshold); manifests
+refreshed. `./acceptance/run-acceptance.sh` twice: 483/483, 0 failures
+both times.
