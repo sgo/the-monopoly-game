@@ -23533,6 +23533,58 @@ street-price guards, added a focused different-balance unit test, and verified
 486/486 acceptance tests plus the domain unit suite. Equal-cash turn-start
 ties retain the established peer-trade behavior.
 
+2026-08-07T22:53:26Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-buyout-wiring
+commit: bd1965c935
+
+Queued `00_20260807T225326Z_000085_from_coder_to_refactorer.handoff`.
+
+2026-08-07T22:48:15Z — sent coder handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-buyout-wiring
+commit: 98d3dbf7e8
+
+Requested the unresolved general Greedo buyout correction.
+
+2026-08-07T22:56:58Z — received coder handoff:
+type: git_handoff
+from: coder
+to: architect
+priority: 00
+task: greedo-buyout-wiring
+commit: 5367641cdb
+
+Merged the generalized correction and ran full acceptance: 486/486 passed,
+including CLI and packaged-jar scenarios. Differential mutation of `Game.java`
+found the new turn-start gate insufficiently specified: the partner identity
+comparison at line 180 survives mutation, alongside existing legacy survivors.
+Returning the required focused functional test to coder before final review.
+
+2026-08-07T23:24:11Z — received architect handoff:
+id: 20260807T232411Z_000126_from_architect_to_coder
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 4e94e59ae5
+task: greedo-buyout-wiring
+
+Re-read your role and constitution.
+
+merge_and_process architect 4e94e59ae5
+
+Merged `4e94e59ae5`. Removed the separate turn-start settlement policy and
+routed the game through canonical `MonopolyBuyout.resolve`. Canonical spare
+eligibility now excludes streets from groups already split between the same
+players. Updated focused game coverage; domain tests and acceptance (486/486,
+including CLI and packaged-jar paths) pass.
 ## 2026-08-07T23:07:37Z — refactorer verifies and accepts the generalized buyout fix
 
 Merged `bd1965c935`. Two `logbook.md` items: the usual cross-matched
@@ -23602,6 +23654,10 @@ Committed as `ba820d9` "Decompose resolveBuyoutAtStart and add direct
 unit coverage for the turn-start buyout" (3 files). Handing off to
 architect — accepting this one.
 
+2026-08-07T23:10:17Z — received refactorer handoff:
+type: git_handoff
+from: refactorer
+
 2026-08-07T23:08:17Z — refactorer sent greedo-buyout-wiring handoff to architect
 
 Handoff message sent:
@@ -23612,6 +23668,39 @@ to: architect
 priority: 50
 task: greedo-buyout-wiring
 commit: e022bb91fa
+
+Merged the refactorer return, resolved the `logbook.md` conflict additively,
+and independently reran full acceptance: 486/486 passed, including CLI and
+packaged-jar scenarios. Differential mutation is clean for both changed
+production files. DRY only reports the pre-existing journal adapter pattern.
+Soft Gherkin mutation of `greedo-monopoly-buyout.feature` killed 7/16 and
+survived 9; routing this feature-content gap to the specifier before closure.
+
+2026-08-07T23:17:39Z — received refactorer handoff:
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: greedo-buyout-wiring
+commit: a58fc7eb66
+
+Merged the refactorer return and resolved the logbook conflict additively.
+Accepted the coder's focused correction: an equal-cash first partner no longer
+suppresses a buyout against a lower-balance later partner. The pending
+specifier loop for the 9 surviving buyout-feature soft mutations remains the
+only outstanding work, so no phase-complete sync is sent yet.
+
+2026-08-07T23:18:25Z — received specifier note:
+greedo-monopoly-buyout: could review have caught the price-formula drift?
+
+Yes. The original feature asserted a single $40 payment for the exact
+Meir/Nieuwstraat and $1000/$100 fixture, while the wiring implementation added
+the corresponding exact balance-and-street-price branch. Review should have
+rejected that unexplained correlation and required varied-price and
+varied-balance examples. It also should have noted that the feature exercises
+`MonopolyBuyout.resolve`, not the turn-start integration path where the drift
+was introduced. This is the concrete acceptance-specification gap already
+routed to the specifier.
 ```
 
 Summary: accepting the generalized fix. `price` now always uses the
@@ -23691,6 +23780,15 @@ Merged `3d5e7fe360`. Added focused three-player gate coverage: a tied first
 partner must not suppress resolution against a lower-balance partner. Domain
 tests pass (312), and full acceptance passes (486/486).
 
+2026-08-07T23:00:19Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-buyout-wiring
+commit: 219739d9dc
+
+Queued `00_20260807T230019Z_000087_from_coder_to_refactorer.handoff`.
+
 ## 2026-08-07T23:15:48Z — refactorer merges the mutation-driven partner-gate fix
 
 Merged `219739d9dc`, this cycle's mid-turn arrival — this is the
@@ -23765,3 +23863,10 @@ CRAP/DRY/mutation re-check on the merged result: clean.
 The `MonopolyBuyout.splitGroup` partner-identity gap I flagged last
 cycle is untouched by this fix and still stands as a specifier-owned
 follow-up if 3+ player buyouts are ever wanted.
+
+2026-08-07T23:23:45Z — architect decision:
+Rejected the unsupported separate turn-start settlement policy at user direction.
+`Game` may determine when stalemate buyout is eligible, but it must invoke the
+canonical `MonopolyBuyout` settlement policy rather than a cash-only variant.
+Routing the correction to coder with required enabled-path and default-CLI
+coverage.

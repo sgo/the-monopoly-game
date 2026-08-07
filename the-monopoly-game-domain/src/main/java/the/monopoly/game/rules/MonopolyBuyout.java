@@ -15,20 +15,11 @@ public final class MonopolyBuyout {
   }
 
   public static Optional<Outcome> resolve(Player first, Player second, Rule.Set rules, Deeds deeds) {
-    return resolve(first, second, rules, deeds, false);
-  }
-
-  public static Optional<Outcome> resolveAtTurnStart(Player first, Player second, Rule.Set rules, Deeds deeds) {
-    return resolve(first, second, rules, deeds, true);
-  }
-
-  private static Optional<Outcome> resolve(Player first, Player second, Rule.Set rules, Deeds deeds,
-                                           boolean turnStart) {
     List<ColourStreet> group = splitGroup(first, second, rules, deeds);
     if (group.isEmpty()) return Optional.empty();
     return selectWinner(first, second, rules, deeds, group)
         .flatMap(winner -> settle(winner, winner.id().equals(first.id()) ? second : first,
-            rules, deeds, group, turnStart));
+            rules, deeds, group));
   }
 
   /** The colour group split between exactly these two players, or empty if none qualifies. */
@@ -57,12 +48,11 @@ public final class MonopolyBuyout {
   }
 
   private static Optional<Outcome> settle(
-      Player winner, Player loser, Rule.Set rules, Deeds deeds, List<ColourStreet> group, boolean turnStart) {
+      Player winner, Player loser, Rule.Set rules, Deeds deeds, List<ColourStreet> group) {
     ColourStreet winnerStreet = streetOwnedBy(group, deeds, winner);
     ColourStreet loserStreet = streetOwnedBy(group, deeds, loser);
-    List<ColourStreet> spare = spareStreetsOf(winner, winnerStreet.colourGroup(), rules, deeds);
-    Optional<Money> cash = settlementCash(winner, loser,
-        price(winner, winnerStreet, spare, loserStreet, turnStart), spare);
+    List<ColourStreet> spare = spareStreetsOf(winner, loser, winnerStreet.colourGroup(), rules, deeds);
+    Optional<Money> cash = settlementCash(winner, loser, price(winner, winnerStreet, spare, loserStreet), spare);
     if (cash.isEmpty()) return Optional.empty();
     deeds.transfer(loserStreet, loser, winner, cash.get());
     if (includesSpareSweetener(spare, cash.get(), winner)) {
@@ -99,10 +89,14 @@ public final class MonopolyBuyout {
         .findFirst().orElseThrow();
   }
 
-  private static List<ColourStreet> spareStreetsOf(Player winner, Street.Colour excludedGroup, Rule.Set rules, Deeds deeds) {
-    return rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
+  private static List<ColourStreet> spareStreetsOf(Player winner, Player loser,
+                                                   Street.Colour excludedGroup, Rule.Set rules, Deeds deeds) {
+    List<ColourStreet> streets = rules.streets().filter(ColourStreet.class::isInstance)
+        .map(ColourStreet.class::cast).toList();
+    return streets.stream()
         .filter(it -> it.colourGroup() != excludedGroup)
-        .filter(it -> deeds.ownerOf(it.type()).filter(winner.id()::equals).isPresent()).toList();
+        .filter(it -> deeds.ownerOf(it.type()).filter(winner.id()::equals).isPresent())
+        .filter(it -> !isSplitGroup(groupFor(it, streets), winner, loser, deeds)).toList();
   }
 
   private static List<ColourStreet> groupFor(ColourStreet street, List<ColourStreet> streets) {
@@ -121,14 +115,17 @@ public final class MonopolyBuyout {
     for (Player candidate : List.of(first, second)) {
       if (rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
           .filter(it -> !group.contains(it))
-          .anyMatch(it -> deeds.ownerOf(it.type()).filter(candidate.id()::equals).isPresent())) return candidate;
+          .filter(it -> deeds.ownerOf(it.type()).filter(candidate.id()::equals).isPresent())
+          .filter(it -> !isSplitGroup(groupFor(it, rules.streets().filter(ColourStreet.class::isInstance)
+              .map(ColourStreet.class::cast).toList()), candidate,
+              candidate.id().equals(first.id()) ? second : first, deeds))
+          .findAny().isPresent()) return candidate;
     }
     return null;
   }
 
   private static Money price(Player winner, ColourStreet winnerStreet, List<ColourStreet> spare,
-                             ColourStreet loserStreet, boolean turnStart) {
-    if (turnStart) return cashOnlyPrice(winnerStreet, loserStreet);
+                             ColourStreet loserStreet) {
     if (spare.isEmpty()) return new Money(Math.max(0,
         Math.abs(loserStreet.price().amount() - winnerStreet.price().amount()) - 10));
     if (winner.account().balance().amount().amount() > 1500) {
@@ -138,9 +135,11 @@ public final class MonopolyBuyout {
     return new Money(winnerStreet.vacantRent().amount() * 3);
   }
 
-  private static Money cashOnlyPrice(ColourStreet winnerStreet, ColourStreet loserStreet) {
-    return new Money(Math.max(0,
-        Math.abs(loserStreet.price().amount() - winnerStreet.price().amount()) - 10));
+  private static boolean isSplitGroup(List<ColourStreet> group, Player first, Player second, Deeds deeds) {
+    return group.stream().allMatch(it -> deeds.ownerOf(it.type()).isPresent())
+        && group.stream().map(it -> deeds.ownerOf(it.type()).orElseThrow()).distinct().count() == 2
+        && group.stream().anyMatch(it -> deeds.ownerOf(it.type()).filter(first.id()::equals).isPresent())
+        && group.stream().anyMatch(it -> deeds.ownerOf(it.type()).filter(second.id()::equals).isPresent());
   }
 
   public record Outcome(Player winner, Player loser, Money payment) {
