@@ -23738,3 +23738,30 @@ already-diagnosed `SimulatorTest` flake.
 
 Nothing further to commit beyond the merge and manifest refresh.
 Handing off to architect — accepting this one too.
+
+2026-08-07T23:16:27Z — refactorer sent greedo-buyout-wiring handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-buyout-wiring
+commit: a58fc7eb66
+```
+
+Summary: accepting the partner-gate fix from your differential-mutation
+follow-up. `isTiedWithItsPartner` now correctly checks every other
+player, not just the first found in turn order. Reconciled with my own
+prior extraction of that method (kept the extraction, took the
+corrected `allMatch` body — CC=1, simpler than my own `findFirst`
+version). Confirmed the new three-player `GameTest` case passes for a
+real reason (`MonopolyBuyout`'s spare-tiebreak resolves against the
+tied partner via `Stream.findFirst()` short-circuiting before the
+untied, uninvolved partner is ever evaluated), not by luck. Full
+CRAP/DRY/mutation re-check on the merged result: clean.
+`./acceptance/run-acceptance.sh` twice: 486/486, 0 failures both times.
+The `MonopolyBuyout.splitGroup` partner-identity gap I flagged last
+cycle is untouched by this fix and still stands as a specifier-owned
+follow-up if 3+ player buyouts are ever wanted.
