@@ -23690,3 +23690,51 @@ merge_and_process architect 3d5e7fe360
 Merged `3d5e7fe360`. Added focused three-player gate coverage: a tied first
 partner must not suppress resolution against a lower-balance partner. Domain
 tests pass (312), and full acceptance passes (486/486).
+
+## 2026-08-07T23:15:48Z — refactorer merges the mutation-driven partner-gate fix
+
+Merged `219739d9dc`, this cycle's mid-turn arrival — this is the
+architect's own differential-mutation follow-up (their remit, not
+mine), triggered independently of my `splitGroup` note from last
+cycle: `isTiedWithItsPartner` checked only the first other player in
+`turnOrder`, so a tied first partner could wrongly block resolution
+against a genuinely different, lower-balance second partner. Three-way
+conflict this time (`logbook.md`, `Game.java`, `GameTest.java`) since
+this commit was built against the pre-decomposition `Game.java` from
+two cycles ago and never saw my `isTiedWithItsPartner` extraction.
+Reconciled by keeping my extraction's shape but replacing its body with
+the coder's corrected `allMatch`-over-every-partner logic (was
+`findFirst`-then-check-one), renaming nothing since the call site and
+javadoc already described the right intent once corrected. `GameTest`
+had a real three-way overlap — my two 2-player buyout tests and their
+new three-player gate test all landed in the same block; kept all
+three.
+
+Worth noting for the record: the coder's new test uses this file's
+shared 3-player fixture, the exact setup that threw
+`NoSuchElementException` for me last cycle via the `splitGroup`
+partner-identity gap. It passes here because `Stream.findFirst()`
+short-circuits — the tied partner (`highHat`) is resolved successfully
+via `MonopolyBuyout`'s own spare-tiebreak before the untied,
+uninvolved partner (`ironBox`) is ever evaluated, so the latent bug
+never gets exercised. Confirmed this is really what's happening rather
+than assuming: reran the test after checking the exact turn order and
+balances by hand. Still not fixing `splitGroup` itself — still
+2-player-only in every specification, still a real landmine for
+whoever eventually asks for 3+ player support, still the specifier's
+call.
+
+Re-ran the full CRAP/DRY/mutation check on the merged result rather
+than trust either side's own figures: `isTiedWithItsPartner` is now
+CC=1 (down from my own CC=3 `findFirst` version — the `allMatch` form
+is both more correct and simpler) at 100% coverage; every method in
+`Game.java` is CC<=6. `dry4java`: no new duplication. `mutate4java
+--scan`: 58 sites, well under the split threshold; manifest was stale
+after the merge, refreshed with `--update-manifest` (`73a4b95`, no
+logic change). `./acceptance/run-acceptance.sh` twice: 486/486, 0
+failures both times, including the new three-player gate scenario in
+`GameTest`. `mvn test` / `mvn test -P property-tests`: only the
+already-diagnosed `SimulatorTest` flake.
+
+Nothing further to commit beyond the merge and manifest refresh.
+Handing off to architect — accepting this one too.
