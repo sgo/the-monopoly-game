@@ -23330,3 +23330,12 @@ Merged `92ea4a6061`. Wired `MonopolyBuyout` into the start-of-turn game
 flow and added split-monopoly winner/payment journal, log, and report
 events. Added the singular round step handler and verified 486/486
 acceptance tests plus the domain unit tests.
+
+2026-08-07T22:33:25Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-buyout-wiring
+commit: 7f57f9e910
+
+Queued `50_20260807T223323Z_000083_from_coder_to_refactorer.handoff`.
