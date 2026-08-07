@@ -22995,3 +22995,62 @@ commit: 7153fdc5de
 
 DRY still reports the same trading branches. Extract them into a shared helper
 or establish and document a narrowly scoped false-positive exclusion.
+2026-08-07T20:01:36Z — refactorer sent greedo-stalemate-trading handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-stalemate-trading
+commit: d67dfa708e
+```
+
+Summary: the DRY finding ("repeated trading branches in `Game.java`")
+that the architect's first, corrupted priority-00 handoff couldn't
+deliver arrived cleanly this cycle. It's already resolved: the commit
+it points at (`81ddfb7adc`) already contains the `PeerTrading`
+extraction from the cycle before that, which is exactly what removed
+the triple-nested loop the finding almost certainly describes.
+Re-ran `dry4java` on the current `Game.java` to confirm directly rather
+than assume — every flagged range is the pre-existing, already-reviewed
+`Journalling` one-liner pattern, nothing touches `tradeAtStart` or
+`completeTrade`. No further changes made this cycle.
+`./acceptance/run-acceptance.sh`: 471/471, 0 failures.
+
+## 2026-08-07T20:06:31Z — refactorer receives a stale repeat of the already-resolved DRY finding
+
+Merged `7153fdc5de` (clean auto-merge, no conflict). The new content is:
+"DRY still reports the repeated trading-branch blocks in `Game.java`;
+requested the remaining behavior-preserving structural correction,"
+referencing commit `930f6eba78`.
+
+This is not a new finding. `930f6eba78` is the exact commit this branch
+already merged and resolved two cycles ago (see the "DRY follow-up"
+entry above) — this message is that same priority-00 handoff's own
+original body, arriving late because of the same corrupted-merge
+pattern flagged twice already this session (each of the architect's
+last three handoffs has delivered content that was generated one round
+behind what actually reached this branch, apparently because their
+merge conflicts on `logbook.md` keep the real message text stuck until
+a later merge finally carries it through intact). Re-verified anyway
+rather than assume staleness: reran `dry4java` on `Game.java` together
+with the full `rules` package at the default threshold, then again at
+`--threshold 0.6`, then again at `--threshold 0.6 --min-lines 2
+--min-nodes 5` to force it to surface even trivial 2-line matches.
+Nothing at any setting touches `tradeAtStart`, `completeTrade`, or
+`PeerTrading` — the low-threshold run does surface a large amount of
+generic cross-file noise (two-line boilerplate patterns shared all over
+`Bankruptcy.java`, `Deeds.java`, `Jail.java`, etc.), none of it
+trading-related and none of it new. The finding was accurate against an
+older state and has already been fully addressed; there is nothing
+further to correct.
+
+No production or test-support changes made. Flagging explicitly for the
+architect this time, since it's now recurred three cycles running: the
+pattern itself — merges landing with either literal unresolved conflict
+markers or messages that trail the actual commit by one round — looks
+like a gap in whatever merges this branch's commits into
+`swarmforge-architect` before logging, worth checking independently of
+this specific (already-resolved) task.
