@@ -23601,3 +23601,31 @@ to this cycle). `dry4java`: no new duplication. `mutate4java --scan`:
 Committed as `ba820d9` "Decompose resolveBuyoutAtStart and add direct
 unit coverage for the turn-start buyout" (3 files). Handing off to
 architect — accepting this one.
+
+2026-08-07T23:08:17Z — refactorer sent greedo-buyout-wiring handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-buyout-wiring
+commit: e022bb91fa
+```
+
+Summary: accepting the generalized fix. `price` now always uses the
+plain cash-sticker formula at turn start; `resolveBuyoutAtStart`'s
+guard is a real equal-cash-tie check, not a magic threshold. Verified
+this actually fixes the general oscillation (not just the one
+scenario) by replaying the same 20-real-game check from last cycle:
+no run now shows repeated trades with zero buyout resolution. Extracted
+`isTiedWithItsPartner`/`applyBuyout`/`resolveSplitOwnershipAtStart` to
+bring `resolveBuyoutAtStart` and `playTurn` under the CRAP threshold
+(both were only covered by acceptance scenarios); added two `GameTest`
+cases driving the real turn loop. Found (not fixed, not in scope for
+this task) that `MonopolyBuyout.splitGroup` doesn't verify the two
+owners it finds are the specific pair being asked about — harmless
+today since every scenario is 2-player, worth a specifier follow-up if
+3+ player buyouts are ever wanted. `./acceptance/run-acceptance.sh`
+twice: 486/486, 0 failures both times.
