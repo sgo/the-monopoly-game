@@ -25,6 +25,11 @@ public interface Strategy {
     return false;
   }
 
+  /** Whether the trader should exchange one owned property for another player's property. */
+  default boolean accepts(TradeOffer offer, Rule.Set rules, Deeds deeds) {
+    return false;
+  }
+
   default DeclineReason declineReason(Offer offer) {
     return DeclineReason.NO_BUYING_POLICY;
   }
@@ -62,6 +67,9 @@ public interface Strategy {
     public boolean isAffordable() {
       return available.covers(land.price());
     }
+  }
+
+  record TradeOffer(Player trader, Player partner, Ownable offered, Ownable wanted) {
   }
 
   enum DeclineReason {

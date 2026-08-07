@@ -159,6 +159,10 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.DistressedSaleNoBidder(idOf(seller), SpaceNames.of(spaceName)));
   }
 
+  static Claim peerTrade(String trader, String offered, String partner, String wanted) {
+    return Claim.of(new Entry.PeerTrade(idOf(trader), SpaceNames.of(offered), idOf(partner), SpaceNames.of(wanted)));
+  }
+
   static Claim distressedOffer(String bidder, String spaceName, int price) {
     return Claim.of(new Entry.DistressedOffer(idOf(bidder), SpaceNames.of(spaceName), money(price)));
   }

@@ -17,13 +17,23 @@ import java.util.List;
  */
 public final class Greedo implements Strategy {
   private final Money reserve;
+  private final boolean stalemateTrading;
 
   public Greedo() {
-    this(Money.ZERO);
+    this(Money.ZERO, false);
   }
 
   public Greedo(Money reserve) {
+    this(reserve, false);
+  }
+
+  public Greedo(Money reserve, boolean stalemateTrading) {
     this.reserve = reserve;
+    this.stalemateTrading = stalemateTrading;
+  }
+
+  public boolean stalemateTradingEnabled() {
+    return stalemateTrading;
   }
 
   @Override
@@ -31,6 +41,22 @@ public final class Greedo implements Strategy {
     return offer.isAffordable()
         && (offer.utilityMonopolyOpportunity()
             || offer.available().minus(offer.land().price()).covers(offer.reserve()));
+  }
+
+  @Override
+  public boolean accepts(TradeOffer offer, Rule.Set rules, Deeds deeds) {
+    if (deeds.ownerOf(offer.offered().type()).filter(offer.trader().id()::equals).isEmpty()) return false;
+    if (deeds.ownerOf(offer.wanted().type()).filter(offer.partner().id()::equals).isEmpty()) return false;
+    if (priority(offer.offered()) == Priority.HIGHEST) return false;
+    if (!deeds.completesColourGroup(rules, offer.wanted(), offer.trader())) return false;
+    return !ownsHighestPriorityMonopoly(offer.partner(), rules, deeds);
+  }
+
+  private boolean ownsHighestPriorityMonopoly(Player player, Rule.Set rules, Deeds deeds) {
+    return rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
+        .filter(street -> priority(street) == Priority.HIGHEST)
+        .filter(street -> deeds.ownerOf(street.type()).filter(player.id()::equals).isPresent())
+        .anyMatch(street -> deeds.completesColourGroup(rules, street, player));
   }
 
   @Override

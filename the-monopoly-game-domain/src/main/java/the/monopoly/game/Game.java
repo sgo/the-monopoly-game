@@ -22,6 +22,7 @@ import the.monopoly.game.rules.Stalemate;
 import the.monopoly.game.rules.Taxes;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
+import the.monopoly.game.strategies.Greedo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,7 @@ public class Game {
   private final Deeds deeds;
   private final Cards.Decks decks;
   private final Jail jail;
+  private final boolean stalemateTrading;
 
   public Game(Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies) {
     this(rules, players, cups, strategies, new Deeds(), null);
@@ -67,6 +69,13 @@ public class Game {
       Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
       Cards.Decks decks, Jail jail
   ) {
+    this(rules, players, cups, strategies, deeds, decks, jail, false);
+  }
+
+  public Game(
+      Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
+      Cards.Decks decks, Jail jail, boolean stalemateTrading
+  ) {
     this.rules = rules;
     this.players = players;
     this.cups = cups;
@@ -74,6 +83,7 @@ public class Game {
     this.deeds = deeds;
     this.decks = decks;
     this.jail = jail;
+    this.stalemateTrading = stalemateTrading;
   }
 
   /** A game whose players leave every choice they are offered alone. */
@@ -144,6 +154,7 @@ public class Game {
   private boolean playTurn(Player player, Player builder, List<Player> turnOrder, Journal journal,
                            Journalling journalling, Building building) {
     if (deeds.isBankrupt(player)) return false;
+    tradeAtStart(player, turnOrder, journalling);
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
     if (player.id().equals(builder.id()) && !deeds.isBankrupt(player)) building.develop(player);
     if (remainingPlayers().size() <= 1) return true;
@@ -152,6 +163,54 @@ public class Game {
     remainingPlayers().forEach(it -> journal.log(new Journal.Entry.FinalBalance(
         it.id(), it.account().balance().amount())));
     return true;
+  }
+
+  private void tradeAtStart(Player trader, List<Player> turnOrder, Journalling journalling) {
+    if (!stalemateTrading || !allOwnableSpacesOwned()) return;
+    Strategy strategy = strategies.forPlayer(trader);
+    if (!(strategy instanceof Greedo greedo) || !greedo.stalemateTradingEnabled()) return;
+    Strategy.TradeOffer selected = null;
+    int selectedOfferedPriority = Integer.MAX_VALUE;
+    int selectedOfferedPrice = -1;
+    List<Street.Type> boardOrder = rules.streets().map(Street::type).toList();
+    for (Player partner : turnOrder) {
+      if (partner == trader) continue;
+      for (Street.Type offeredType : boardOrder) {
+        if (deeds.ownerOf(offeredType).filter(trader.id()::equals).isEmpty()) continue;
+        for (Street.Type wantedType : boardOrder) {
+          if (deeds.ownerOf(wantedType).filter(partner.id()::equals).isEmpty()) continue;
+          Ownable offered = (Ownable) rules.create(offeredType);
+          Ownable wanted = (Ownable) rules.create(wantedType);
+          if (!(offered instanceof ColourStreet) || !(wanted instanceof ColourStreet)) continue;
+          if (!strategy.accepts(new Strategy.TradeOffer(trader, partner, offered, wanted), rules, deeds)) continue;
+          int offeredPriority = priorityRank(greedo.priority(offered));
+          int offeredPrice = offered.price().amount();
+          if (offeredPriority < selectedOfferedPriority
+              || (offeredPriority == selectedOfferedPriority && offeredPrice > selectedOfferedPrice)) {
+            selected = new Strategy.TradeOffer(trader, partner, offered, wanted);
+            selectedOfferedPriority = offeredPriority;
+            selectedOfferedPrice = offeredPrice;
+          }
+        }
+      }
+    }
+    if (selected == null) return;
+    deeds.transferWithoutPayment(selected.offered(), trader, selected.partner());
+    deeds.transferWithoutPayment(selected.wanted(), selected.partner(), trader);
+    journalling.peerTrade(trader, selected.offered(), selected.partner(), selected.wanted());
+  }
+
+  private int priorityRank(Greedo.Priority priority) {
+    return switch (priority) {
+      case LOWEST -> 0;
+      case MIDDLE -> 1;
+      case HIGHEST -> 2;
+    };
+  }
+
+  private boolean allOwnableSpacesOwned() {
+    return rules.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
+        .allMatch(it -> !deeds.isUnowned(it.type()));
   }
 
   private List<Player> remainingPlayers() {
@@ -232,6 +291,10 @@ public class Game {
     @Override
     public void soldToPeer(Player seller, Ownable land, Player buyer, Money price) {
       journal.log(new Journal.Entry.LandSold(seller.id(), land.type(), buyer.id(), price));
+    }
+
+    public void peerTrade(Player trader, Ownable offered, Player partner, Ownable wanted) {
+      journal.log(new Journal.Entry.PeerTrade(trader.id(), offered.type(), partner.id(), wanted.type()));
     }
 
     @Override
@@ -447,6 +510,9 @@ public class Game {
 
       /** Land the table bid for, and what the winner paid for it. */
       record AuctionWon(Player.ID player, Street.Type land, Money price) implements Entry {
+      }
+
+      record PeerTrade(Player.ID trader, Street.Type offered, Player.ID partner, Street.Type wanted) implements Entry {
       }
 
       record PurchaseDeclined(Player.ID player, Street.Type land, Money price,
