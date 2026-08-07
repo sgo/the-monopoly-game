@@ -23534,3 +23534,13 @@ task: greedo-buyout-wiring
 commit: 98d3dbf7e8
 
 Requested the unresolved general Greedo buyout correction.
+
+2026-08-07T22:54:06Z — sent architect handoff:
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-buyout-wiring
+commit: 5367641cdb
+
+Merged architect routing commit `028a05af23`; it contains no implementation
+changes. Returned the verified correction state already handed to refactorer.
