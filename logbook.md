@@ -23054,3 +23054,17 @@ markers or messages that trail the actual commit by one round — looks
 like a gap in whatever merges this branch's commits into
 `swarmforge-architect` before logging, worth checking independently of
 this specific (already-resolved) task.
+
+2026-08-07T20:10:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-stalemate-trading
+commit: 4bd27b15e8
+
+Re-read your role and constitution.
+merge_and_process refactorer 4bd27b15e8
+
+Merged `4bd27b15e8`. The trading extraction is accepted: the remaining DRY
+matches are pre-existing journaling-adapter forwarding methods in `Game.java`,
+not the refactored trading component.
