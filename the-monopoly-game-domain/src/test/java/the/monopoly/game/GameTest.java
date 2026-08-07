@@ -248,7 +248,7 @@ class GameTest {
   }
 
   @Test
-  void aStalemateTradingGreedoResolvesASplitMonopolyByBuyoutAtTheStartOfItsTurnRatherThanTrading() {
+  void aStalemateTradingGreedoUsesTheCanonicalBuyoutSettlementAtTheStartOfItsTurn() {
     List<Player> twoPlayers = ruleSet.players().select(2).toList();
     Player dog = twoPlayers.get(0);
     Player highHat = twoPlayers.get(1);
@@ -273,8 +273,8 @@ class GameTest {
 
     assertThat(result.journal()).containsSubsequence(
         new Entry.SplitMonopolyWon(dog.id(), highHat.id()),
-        new Entry.SplitMonopolyPaid(dog.id(), highHat.id(), new Money(40)),
-        new Entry.TurnStarted(dog.id(), new Money(960))
+        new Entry.SplitMonopolyPaid(dog.id(), highHat.id(), new Money(105)),
+        new Entry.TurnStarted(dog.id(), new Money(895))
     );
     assertThat(deeds.ownerOf(Street.Type.NieuwstraatBrussel)).contains(dog.id());
   }
@@ -302,6 +302,32 @@ class GameTest {
     ).playUpToRounds(1);
 
     assertThat(result.journal()).filteredOn(Entry.SplitMonopolyWon.class::isInstance).isEmpty();
+  }
+
+  @Test
+  void aRicherGreedoResolvesAgainstAnyLowerBalancePartnerEvenWhenTheFirstPartnerIsTied() {
+    Player dog = players.get(0);
+    Player highHat = players.get(1);
+    Player ironBox = players.get(2);
+    ironBox.account().withdraw(new Money(1400));
+    Deeds deeds = new Deeds();
+    ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
+        .filter(land -> land.type() != Street.Type.NieuwstraatBrussel)
+        .forEach(land -> deeds.sell(land, dog, Money.ZERO));
+    deeds.sell((Ownable) ruleSet.create(Street.Type.NieuwstraatBrussel), highHat, Money.ZERO);
+    Map<Player.ID, Cup> cups = Map.of(
+        dog.id(), Cup.of(new Roll(3, 2), new Roll(4, 3)),
+        highHat.id(), Cup.of(new Roll(2, 2), new Roll(4, 3)),
+        ironBox.id(), Cup.of(new Roll(1, 1), new Roll(4, 3))
+    );
+
+    Game.Result result = new Game(
+        ruleSet, players, player -> cups.get(player.id()),
+        player -> player.id().equals(dog.id()) ? new Greedo(Money.ZERO, true) : Strategy.UNDECIDED,
+        deeds, Cards.Decks.EMPTY, new the.monopoly.game.rules.Jail(ruleSet), true
+    ).playUpToRounds(1);
+
+    assertThat(result.journal()).contains(new Entry.SplitMonopolyWon(dog.id(), highHat.id()));
   }
 
   @Test
