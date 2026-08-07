@@ -23577,3 +23577,12 @@ merge_and_process architect 3d5e7fe360
 Merged `3d5e7fe360`. Added focused three-player gate coverage: a tied first
 partner must not suppress resolution against a lower-balance partner. Domain
 tests pass (312), and full acceptance passes (486/486).
+
+2026-08-07T23:00:19Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-buyout-wiring
+commit: 219739d9dc
+
+Queued `00_20260807T230019Z_000087_from_coder_to_refactorer.handoff`.
