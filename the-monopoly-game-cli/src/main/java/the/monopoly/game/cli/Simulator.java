@@ -29,6 +29,8 @@ public final class Simulator {
 
   /** Starts the simulator as a command-line program. */
   public static void main(String[] arguments) {
+    if (List.of(arguments).contains("--optional-greedo-stalemate-trading"))
+      System.out.println("Stalemate trading enabled");
     Result result = execute(arguments);
     System.out.println(result.output());
     if (!result.succeeded()) System.exit(result.exitCode());
@@ -54,10 +56,12 @@ public final class Simulator {
 
   private static Result runSelected(String... arguments) {
     int playerCount = arguments.length == 0 ? 2 : Integer.parseInt(arguments[0]);
-    List<String> strategyNames = List.of(arguments).subList(Math.min(1, arguments.length), arguments.length);
+    boolean stalemateTrading = List.of(arguments).contains("--optional-greedo-stalemate-trading");
+    List<String> strategyNames = List.of(arguments).subList(Math.min(1, arguments.length), arguments.length).stream()
+        .filter(argument -> !argument.equals("--optional-greedo-stalemate-trading")).toList();
     if (!strategyNames.isEmpty() && strategyNames.size() != playerCount)
       return new Result(1, "Supply one strategy for each player. " + usage());
-    return run(playerCount, strategiesFor(playerCount, strategyNames));
+    return run(playerCount, strategiesFor(playerCount, strategyNames), stalemateTrading);
   }
 
   static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames) {
@@ -76,11 +80,16 @@ public final class Simulator {
 
   private static String usage() {
     return "Usage: simulator [number of players] [strategy for each player]"
-        + System.lineSeparator() + "Available strategies: " + String.join(", ", STRATEGIES.keySet());
+        + System.lineSeparator() + "Available strategies: " + String.join(", ", STRATEGIES.keySet())
+        + System.lineSeparator() + "Optional flag: --optional-greedo-stalemate-trading";
   }
 
   public static Result run(int playerCount, Strategy.OfPlayers strategies) {
-    return start(playerCount, strategies).awaitEnd();
+    return run(playerCount, strategies, false);
+  }
+
+  public static Result run(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading) {
+    return start(playerCount, strategies, stalemateTrading).awaitEnd();
   }
 
   /**

@@ -79,6 +79,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.purchaseDec
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rolled;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.salaryCollected;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.stalemateTrading;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.soldAHouse;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStarted;
 import static the.monopoly.game.specs.acceptance.StepHandler.step;
@@ -96,6 +97,10 @@ final class GameLogStepHandlers {
 
   static List<StepHandler> handlers() {
     return List.of(
+        then("^the game log records that stalemate trading is " + NAME + "$",
+            (world, arguments) -> logRecords(world, stalemateTrading(arguments.text(1)))),
+        then("^the game report says that stalemate trading is " + NAME + "$",
+            (world, arguments) -> says(world, "stalemate trading is " + arguments.text(1))),
         then("^the game journal records that pawn \"" + NAME + "\" trades \"" + NAME
                 + "\" to pawn \"" + NAME + "\" for \"" + NAME
                 + "\" before it records that pawn \"" + NAME + "\" starts a turn$",
