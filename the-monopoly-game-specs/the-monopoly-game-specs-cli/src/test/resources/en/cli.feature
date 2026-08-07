@@ -88,9 +88,8 @@ Feature: Monopoly command line interface
       | 2       | 50             |
 
   # cli-6
-  Scenario Outline: the CLI accepts the Greedo stalemate-trading flag as a command-line argument and runs normally
-    Given the simulator is configured for <players> players without strategy choices
-    And the simulator is given the "<flag>" argument
+  Scenario Outline: the CLI accepts the Greedo stalemate-trading flag as a real command-line argument, alongside explicit strategies
+    Given the simulator is configured with the raw arguments "<raw arguments>"
     When I start the simulator
     Then the game log records that the game starts
     And the game log records at least <minimum rolls> rolls
@@ -99,5 +98,5 @@ Feature: Monopoly command line interface
     And the game log records no winner
 
     Examples:
-      | players | minimum rolls | flag                                |
-      | 2       | 50             | --optional-greedo-stalemate-trading |
+      | raw arguments                                                | minimum rolls |
+      | 3 greedo greedo greedo --optional-greedo-stalemate-trading  | 50             |

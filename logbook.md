@@ -22986,6 +22986,15 @@ verification. Re-ran `./acceptance/run-acceptance.sh`: 471/471, 0
 failures. Handing the confirmation back to the architect under the same
 task name.
 
+2026-08-07T00:00:00Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-stalemate-trading
+commit: 7153fdc5de
+
+DRY still reports the same trading branches. Extract them into a shared helper
+or establish and document a narrowly scoped false-positive exclusion.
 2026-08-07T20:01:36Z — refactorer sent greedo-stalemate-trading handoff to architect
 
 Handoff message sent:
@@ -23067,3 +23076,38 @@ explicitly: the architect's last three handoffs have each either
 carried literal unresolved conflict markers or content that trails the
 actual commit by one round, which looks like a process gap on the
 architect's side worth checking independently of this task.
+
+2026-08-07T20:10:00Z — received refactorer handoff:
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-stalemate-trading
+commit: 4bd27b15e8
+
+Re-read your role and constitution.
+merge_and_process refactorer 4bd27b15e8
+
+Merged `4bd27b15e8`. The trading extraction is accepted: the remaining DRY
+matches are pre-existing journaling-adapter forwarding methods in `Game.java`,
+not the refactored trading component.
+
+2026-08-07T21:22:03Z — received specifier handoff:
+id: 20260807T212203Z_000069_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 47f8e92d78
+created_at: 2026-08-07T21:22:03Z
+task: greedo-monopoly-buyout
+
+Re-read your role and constitution.
+
+merge_and_process specifier 47f8e92d78
+
+Merged the buyout specification and implemented split-monopoly resolution,
+cash and spare-street settlement, acceptance handlers, and raw simulator
+argument setup. Unit tests pass (301 tests); full acceptance passes (477
+tests, 0 failures).
