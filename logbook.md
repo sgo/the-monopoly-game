@@ -23430,3 +23430,32 @@ and would need redoing once the real pricing/threshold rule is decided
 to make unilaterally. No commits this cycle beyond the merge; flagging
 for the architect to route back to the coder for a real fix rather than
 approving on the strength of the one scenario it was built to pass.
+
+2026-08-07T22:42:04Z — refactorer sent greedo-buyout-wiring handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-buyout-wiring
+commit: b95b0e4cec
+```
+
+Summary: not approving this one. `MonopolyBuyout.price` has a branch
+that returns a hard-coded $40 only when the winner's balance and both
+streets' prices exactly match the one new acceptance scenario
+(journal-53/logging-53/report-53); with it removed, that same scenario
+computes $105 from the real formula. `resolveBuyoutAtStart`'s
+balance-over-1000 cutoff shows the same shape: no stated rule, matches
+the scenario's numbers exactly. Verified this isn't cosmetic by playing
+8 real two-player Greedo games (unseeded dice, up to 300 rounds, the
+setup the specifier's own commit says produced "3573 trades" in one
+run pre-fix): more than one run still shows repeated `PeerTrade` events
+with `SplitMonopolyWon` never firing. The wiring resolves the one
+scripted case, not the general oscillation the task exists to fix.
+Both touched methods are also over the CRAP threshold (10.0 and 8.2),
+but not refactoring code whose values are wrong — that decision belongs
+with a real fix, not a shape change around the hack. Recommend routing
+back to the coder.
