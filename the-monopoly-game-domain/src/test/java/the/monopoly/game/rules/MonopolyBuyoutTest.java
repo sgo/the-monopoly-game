@@ -274,6 +274,19 @@ class MonopolyBuyoutTest {
   }
 
   @Test
+  void aSplitHighestPriorityGroupIsNotBuyoutEligible() {
+    Player dog = player("dog", 1900);
+    Player highHat = player("high hat", 50);
+    deeds.sell(ownable(Street.Type.LippenslaanKnokke), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.RueRoyaleTournai), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.GroenplaatsAntwerpen), highHat, Money.ZERO);
+
+    assertThat(MonopolyBuyout.resolve(dog, highHat, rules, deeds)).isEmpty();
+    assertThat(deeds.ownerOf(Street.Type.LippenslaanKnokke)).contains(dog.id());
+    assertThat(deeds.ownerOf(Street.Type.GroenplaatsAntwerpen)).contains(highHat.id());
+  }
+
+  @Test
   void aSpareSweetenerDoesNotSplitTheWinnersCompleteMonopoly() {
     Player dog = player("dog", 1900);
     Player highHat = player("high hat", 50);

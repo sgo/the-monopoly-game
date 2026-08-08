@@ -36,6 +36,7 @@ public final class MonopolyBuyout {
             || deeds.ownerOf(street.type()).filter(second.id()::equals).isPresent())
         .map(street -> groupFor(street, streets))
         .filter(candidate -> candidate.stream().allMatch(it -> deeds.ownerOf(it.type()).isPresent()))
+        .filter(candidate -> candidate.stream().noneMatch(MonopolyBuyout::isHighestPriority))
         .filter(candidate -> isSplitGroup(candidate, first, second, deeds))
         .max(Comparator.comparingInt(candidate -> candidate.stream()
             .mapToInt(it -> it.price().amount()).max().orElse(0)
@@ -59,6 +60,15 @@ public final class MonopolyBuyout {
     long secondOwned = group.stream().filter(it -> deeds.ownerOf(it.type())
         .filter(second.id()::equals).isPresent()).count();
     return firstOwned == secondOwned ? null : firstOwned > secondOwned ? first : second;
+  }
+
+  private static boolean isHighestPriority(ColourStreet street) {
+    return switch (street.type()) {
+      case LippenslaanKnokke, RueRoyaleTournai, GroenplaatsAntwerpen,
+          RueStLeonardLiege, LangeSteenstraatKortrijk, GrandPlaceMons,
+          SteenstraatBrugge, PlaceDuMonumentSpa, KapellestraatOostende -> true;
+      default -> false;
+    };
   }
 
   private static Optional<Outcome> settle(

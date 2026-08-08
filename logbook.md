@@ -24569,6 +24569,72 @@ loser-owned street in one buyout, or prescribe another rule preventing winner
 flips while the same group remains split. Current one-deed settlement permits
 repeated buyouts of the same group.
 
+2026-08-08T17:35:00Z — received refactorer handoff:
+id: 20260808T173249Z_000100_from_refactorer_to_architect
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: cd494e8d23
+task: greedo-buyout-majority-and-trade-priority
+
+Re-read your role and constitution.
+
+merge_and_process refactorer cd494e8d23
+
+Merged cd494e8d23. Majority ownership now selects the winner of an uneven
+split before cash balance, and Greedo rejects same-colour-group trades. Full
+acceptance passes 507/507. Empirical simulation confirms the previous
+buyout-only and peer-trade oscillations are eliminated. A separate residual
+reclaims the same deed only after financial distress causes a mortgage or
+distressed sale and the former minority wins it at auction; the majority then
+buys it back. This cross-subsystem recurrence needs an explicit rule decision
+before it can be treated as intentional.
+
+2026-08-08T17:35:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-buyout-majority-and-trade-priority
+
+Decide whether a deed recovered through mortgage/distressed sale may be
+immediately bought back via split-monopoly buyout, or specify a affordability
+or reclaim restriction. Current recurrence is bounded but observable.
+
+2026-08-08T18:03:00Z — received specifier handoff:
+id: 20260808T175859Z_000079_from_specifier_to_architect
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 6cddb66231
+task: greedo-buyout-majority-and-trade-priority
+
+Re-read your role and constitution.
+
+merge_and_process specifier 6cddb66231
+
+Merged 6cddb66231. The specifier accepted the bounded distressed-sale
+recurrence under the current mortgage and auction rules, and adjusted the
+journal/log/report peer-trade setup with explicit balances so its expected
+trade is not preempted by a buyout. Full acceptance passes 507/507.
+Differential mutation manifests for MonopolyBuyout and Greedo are current;
+DRY has no production duplicates. Soft mutation: journal 31/31 killed,
+logging 31/31 killed, report has no eligible mutations.
+
+2026-08-08T18:03:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-buyout-majority-and-trade-priority
+
+Phase complete: majority buyout and same-group trade rules are verified; the
+bounded distressed-sale recurrence is accepted by specification.
+
 2026-08-08T13:05:00Z — received specifier handoff:
 id: 20260808T130443Z_000075_from_specifier
 from: specifier
@@ -24737,6 +24803,16 @@ scenarios. Implemented majority ownership as the buyout winner criterion
 before cash tie-breaking, rejected same-colour Greedo trades, and added the
 missing ownership and journal/log/report assertion handlers. Domain tests and
 full acceptance pass.
+
+2026-08-08T17:21:02Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-buyout-majority-and-trade-priority
+commit: b309b446ed
+
+Queued `50_20260808T172102Z_000097_from_coder_to_refactorer.handoff` after
+domain tests and full acceptance passed.
 
 2026-08-08T13:31:13Z — refactorer sent greedo-buyout-partner-identity handoff to architect
 
@@ -25042,4 +25118,63 @@ extracted sameColourGroup out of Greedo.accepts (CC 8→6) and
 oneStreetFromMonopoly/stationReserve out of cashReserve (CC 9→5, pre-
 existing, now in scope), both verified behavior-identical.
 
+## 2026-08-08T18:49:45Z — specifier sends buyout-highest-priority-exclusion to coder
 
+Independently re-verified the architect's phase-complete signal for
+`greedo-buyout-majority-and-trade-priority` (commit `514b690865`,
+claiming journal-58/logging-58/report-58 pass with full mutation
+coverage) rather than trusting it outright. Rebuilt clean and ran
+`./acceptance/run-acceptance.sh` directly: all three scenarios fail.
+The real, pinned-dice run shows `SplitMonopolyWon[winner=high hat,
+loser=dog]` firing before dog's own first turn even starts, well
+before any peer-trade has a chance to run.
+
+Root cause: `MonopolyBuyout` has never had an exclusion for
+HIGHEST-priority colour groups, unlike `Greedo.accepts`/`PeerTrading`,
+which already decline any HIGHEST-priority street. journal-58's board
+setup gives `dog` one street from each HIGHEST group specifically to
+avoid its balance accidentally tying with `high hat`'s (a fix from the
+prior cycle) — but that incidentally makes those three HIGHEST groups
+buyout-eligible splits too. `splitGroup`'s price-spread ranking ties
+pink/green with the HIGHEST groups at $20, and `light_blue` wins the
+tie-break purely by board declaration order, so a HIGHEST-priority
+buyout resolves first regardless of whether the intended pink/green
+dispatch-order fix works correctly.
+
+User confirmed via AskUserQuestion: write up and hand off.
+
+Committed as `d969018` "Specify that MonopolyBuyout must decline a
+split highest-priority group" — added `buyout-12` to
+`greedo-monopoly-buyout.feature`: a majority-owned, easily affordable
+HIGHEST-priority split (mirroring buyout-7's dog-rich/high-hat-poor
+setup) must defer to no one. Verified RED two ways before handoff:
+direct `jshell` probe against `MonopolyBuyout.resolve` (dog wins for
+$10, should be empty), and the real acceptance run (12 run, 1 failure,
+at the new scenario). `ir-dry-checker --include-exact` shows no
+genuine in-scenario exact-duplicate steps introduced.
+
+Not folding this into the still-open `greedo-buyout-majority-and-
+trade-priority` task: the architect already sent phase-complete for
+that task, so per workflow rules this is a new specifier-originated
+finding, not an architect review loop — hence a new task name and a
+normal (not priority-00) handoff to the coder.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: buyout-highest-priority-exclusion
+commit: d969018
+```
+
+Summary: add a HIGHEST-priority exclusion to `MonopolyBuyout`'s
+split-group candidate filter (`splitGroup`/`isSplitGroup` in
+`MonopolyBuyout.java`), mirroring the equivalent check already in
+`Greedo.accepts`. A split HIGHEST-priority colour group must never be
+buyout-eligible. This is expected to also resolve journal-58/
+logging-58/report-58's failure as a side effect, since it removes the
+light_blue/orange/red groups from buyout's candidate pool, leaving
+pink/green as the only split-eligible groups for the intended
+peer-trade dispatch to reach.
