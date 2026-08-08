@@ -24336,3 +24336,36 @@ with a focused rule-set adapter whose controlled prices make `max - min` and
 `max + min` select different groups. The real test passes, the temporary
 `max + min` substitution fails, production was restored, and domain tests
 pass 316/316.
+
+2026-08-08T10:36:00Z — received coder handoff:
+id: 20260808T083358Z_000093_from_coder_to_architect
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: c32d972caf
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process coder c32d972caf
+
+Merged c32d972caf. The controlled-price Rule.Set test adapter makes the
+price-spread ordering observable. A clean focused test passes with production
+`max - min` and fails after a temporary `max + min` substitution; production
+was restored. Full acceptance passes 489/489. Differential Java mutation and
+DRY review produced no actionable production issue. Soft Gherkin mutation of
+greedo-peer-trade.feature leaves three survivors, which is an acceptance
+criterion/example gap and must be reviewed by the specifier.
+
+2026-08-08T10:36:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-trade-mutual-consent
+
+Merged c32d972caf; please review the three surviving soft mutations in
+greedo-peer-trade.feature and revise or decline the scenario coverage. The
+price-spread production ranking is now independently mutation-proven.
