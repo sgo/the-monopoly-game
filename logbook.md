@@ -25263,7 +25263,37 @@ other across classes, so this was a semantic finding, not a tool hit).
 acceptance failure above (it's acceptance-pipeline-only, no domain unit
 test exercises journal-58's exact board shape).
 
-Not committing this as a normal "reviewed and passing" cycle — holding
-the merge locally, writing this up, and handing back with the failure
-and full root-cause front and center rather than papering over it with
-a manifest refresh and a routine-sounding summary.
+Committed the merge and the delegation cleanup together as `3fd6aa8`,
+but not as a normal "reviewed and passing" cycle — the commit message
+and this entry lead with the failure and full root-cause, not a
+manifest refresh and a routine-sounding summary, so nothing downstream
+can mistake this for a clean pass.
+
+2026-08-08T19:10:33Z — refactorer sent buyout-highest-priority-exclusion handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: buyout-highest-priority-exclusion
+commit: 3fd6aa8ac1
+```
+
+Summary: **blocking** — this is not closable as-is. Independently
+verified (not trusting the coder's "full acceptance pass" or the
+specifier's "expected to resolve as a side effect" claims) that
+journal-58/logging-58/report-58 still fail, reproducibly, with or
+without my own change. Root cause: removing the HIGHEST-priority tied
+candidates from `splitGroup`'s price-spread ranking surfaces the exact
+same declaration-order tie-break defect one layer down — `pink` and
+`green` now tie at spread=20 (verified against real official prices),
+and `pink` wins purely by being declared earlier in `Street.Type`, so
+buyout steals the turn from the single complementary peer-trade the
+scenario intends. Full root-cause trace in the received-handoff entry
+above. Separately (verified independent of the failure): delegated
+`isHighestPriority` to `Greedo.priority()` instead of duplicating its
+street list, closing the exact kind of drift risk this task exists to
+prevent. Domain tests 322/322 and property tests 22/22 pass; the
+failure is acceptance-only.
