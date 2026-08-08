@@ -755,3 +755,21 @@ Feature: game logging
     Examples:
       | price |
       | 40    |
+
+  # logging-56
+  Scenario Outline: peer trading never touches a colour group that is a genuine two-owner split, even while the buyout cannot yet afford it
+    Given stalemate trading is enabled for the "Greedo" strategy
+    And every other ownable space is owned alternately by pawn "dog" and pawn "high hat" in board order
+    And pawn "dog" owns "Meir Antwerpen"
+    And pawn "dog" has $<dog_balance> to spend
+    And pawn "high hat" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+    And pawn "high hat" has $<high_hat_balance> to spend
+    When we play up to 5 rounds
+    Then the game log does not record that pawn "dog" trades "Meir Antwerpen" to pawn "high hat" for "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+    And the game log does not record that pawn "high hat" trades "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)" to pawn "dog" for "Meir Antwerpen"
+    And pawn "high hat" does not own "Meir Antwerpen"
+    And pawn "dog" does not own "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+
+    Examples:
+      | dog_balance | high_hat_balance |
+      | 114         | 50                |

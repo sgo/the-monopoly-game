@@ -141,3 +141,33 @@ Feature: Greedo split-monopoly buyout
     Examples:
       | dog_balance | high_hat_balance |
       | 1900        | 50                |
+
+  # buyout-9
+  Scenario Outline: a deal is deferred, not forced for free, when 35% of the richer co-owner's balance falls short of the price
+    Given pawn "dog" owns "Meir Antwerpen"
+    And pawn "dog" has $<dog_balance> to spend
+    And pawn "high hat" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+    And pawn "high hat" has $<high_hat_balance> to spend
+    When the split monopoly between pawn "dog" and pawn "high hat" is resolved
+    Then no one wins the split monopoly
+    And pawn "high hat" does not own "Meir Antwerpen"
+    And pawn "dog" does not own "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+
+    Examples:
+      | dog_balance | high_hat_balance |
+      | 114         | 50                |
+
+  # buyout-10
+  Scenario Outline: the deal proceeds once 35% of the richer co-owner's balance just covers the price
+    Given pawn "dog" owns "Meir Antwerpen"
+    And pawn "dog" has $<dog_balance> to spend
+    And pawn "high hat" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+    And pawn "high hat" has $<high_hat_balance> to spend
+    When the split monopoly between pawn "dog" and pawn "high hat" is resolved
+    Then pawn "dog" wins the split monopoly
+    And pawn "dog" pays pawn "high hat" $<price> for the split monopoly
+    And pawn "dog" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+
+    Examples:
+      | dog_balance | high_hat_balance | price |
+      | 115         | 50                | 40    |
