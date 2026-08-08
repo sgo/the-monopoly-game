@@ -24229,3 +24229,17 @@ Merged `64868a2f70`. Added focused coverage proving that when multiple
 eligible groups are split between the same players, the group with the
 largest price spread is selected. Domain tests pass 316/316 and acceptance
 passes 489/489.
+
+2026-08-08T08:04:28Z — received coder handoff:
+type: git_handoff
+from: coder
+to: architect
+priority: 00
+task: greedo-trade-mutual-consent
+commit: af6068ba71
+
+Merged the added ranking test. Full acceptance passed 489/489, but differential
+mutation still lets the changed `max - min` price-spread expression survive
+when changed to `max + min`. The test's two candidate groups do not make those
+rankings select different outcomes. Returning this precise coverage gap to
+coder before final verification.
