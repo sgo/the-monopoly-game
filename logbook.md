@@ -23685,6 +23685,43 @@ production files. DRY only reports the pre-existing journal adapter pattern.
 Soft Gherkin mutation of `greedo-monopoly-buyout.feature` killed 7/16 and
 survived 9; routing this feature-content gap to the specifier before closure.
 
+2026-08-07T23:10:33Z — received architect handoff:
+type: git_handoff
+from: architect
+to: specifier
+priority: 00
+task: greedo-buyout-wiring
+commit: a80c446156
+
+Merged `a80c446156`. Read `MonopolyBuyout.java` before deciding anything: the
+`resolveAtTurnStart` path used during real play doesn't implement the
+35%-of-balance-ceiling / $5-increment auction mechanic at all. Winner is
+simply whichever co-owner has more cash (`richer`); price is
+`|loserStreet.price - winnerStreet.price| - 10`, floored at 0 — a board
+sticker-price difference, not a balance-based auction. The isolated
+`resolve()` path (what `greedo-monopoly-buyout.feature` exercises) uses yet a
+*third*, different formula (`rentForOneHotel * 2` or `vacantRent * 3`). My
+`buyout-1` example (dog $1000/high hat $100 -> $40) happens to satisfy the
+sticker-price formula too (`|400-350|-10 = 40`), which is exactly how this
+drifted past review undetected through several correction cycles that were
+each individually trying to fix a narrower "hard-coded to the fixture"
+complaint.
+
+Reported this to the user rather than deciding unilaterally, since the
+35%-ceiling/$5-increment mechanic was their explicit design, not mine. They
+want to go back to that design (not accept the drifted heuristic), but asked
+to hear the architect's take first: whether review/differential mutation
+should have caught a pricing-formula divergence like this before merge, or
+whether tighter Gherkin examples are really the right fix.
+
+2026-08-07T23:18:19Z — sent architect note:
+type: note
+to: architect
+priority: 00
+message: greedo-monopoly-buyout: could review have caught the price-formula drift?
+
+Queued `00_20260807T231803Z_000072_from_specifier_to_architect.handoff`.
+
 2026-08-07T23:17:39Z — received refactorer handoff:
 type: git_handoff
 from: refactorer
@@ -23846,9 +23883,148 @@ already-diagnosed `SimulatorTest` flake.
 Nothing further to commit beyond the merge and manifest refresh.
 Handing off to architect — accepting this one too.
 
+2026-08-07T23:16:27Z — refactorer sent greedo-buyout-wiring handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-buyout-wiring
+commit: a58fc7eb66
+```
+
+Summary: accepting the partner-gate fix from your differential-mutation
+follow-up. `isTiedWithItsPartner` now correctly checks every other
+player, not just the first found in turn order. Reconciled with my own
+prior extraction of that method (kept the extraction, took the
+corrected `allMatch` body — CC=1, simpler than my own `findFirst`
+version). Confirmed the new three-player `GameTest` case passes for a
+real reason (`MonopolyBuyout`'s spare-tiebreak resolves against the
+tied partner via `Stream.findFirst()` short-circuiting before the
+untied, uninvolved partner is ever evaluated), not by luck. Full
+CRAP/DRY/mutation re-check on the merged result: clean.
+`./acceptance/run-acceptance.sh` twice: 486/486, 0 failures both times.
+The `MonopolyBuyout.splitGroup` partner-identity gap I flagged last
+cycle is untouched by this fix and still stands as a specifier-owned
+follow-up if 3+ player buyouts are ever wanted.
+
 2026-08-07T23:23:45Z — architect decision:
 Rejected the unsupported separate turn-start settlement policy at user direction.
 `Game` may determine when stalemate buyout is eligible, but it must invoke the
 canonical `MonopolyBuyout` settlement policy rather than a cash-only variant.
 Routing the correction to coder with required enabled-path and default-CLI
 coverage.
+
+## 2026-08-07T23:39:07Z — refactorer merges the canonical-settlement fix and finds the oscillation bug still reproduces
+
+Merged `bcde86a010`. One `logbook.md` conflict, the usual cross-matched
+pattern; resolved keeping both sides, `diff` confirms nothing lost.
+
+The code change itself is exactly what the architect's decision above
+calls for: `resolveAtTurnStart`/`cashOnlyPrice` are gone, `Game` now
+calls the single canonical `MonopolyBuyout.resolve` for both the
+standalone and turn-start cases. `spareStreetsOf` and `spareOwner` also
+gained a real fix I hadn't asked for but is worth recording: a new
+`isSplitGroup` check excludes a candidate "spare" street from
+consideration if its own colour group is *itself* already split
+between the same two players — so a second, independent split monopoly
+between the same pair can no longer get miscounted as throwaway
+sweetener collateral for the first one. Note this doesn't touch
+`splitGroup` itself (the method that decides which colour group is
+*the* split being resolved), so the partner-identity gap I flagged two
+cycles ago — a 3+ player game can spuriously match a group split
+between two *other* players — is still there, still 2-player-scoped by
+every existing scenario, still not this task's job to fix.
+
+Deduplicated something I found while reading `spareOwner` rather than
+introduced: it rebuilt `rules.streets()...toList()` from scratch inside
+a nested filter inside a loop over both candidates — up to several
+times per call for no reason, since `splitGroup`/`spareStreetsOf`
+already established the pattern of building that list once. Hoisted it
+out, same for `spareOwner`'s `first`/`second`-to-`other` ternary. Pure
+mechanical cleanup, verified behavior-identical via the existing test
+suite.
+
+Before accepting on the strength of "486/486 and CRAP/DRY/mutation are
+clean," went back to the actual empirical check this whole task exists
+to satisfy: does the ping-pong oscillation the specifier's commit
+documented ("3573 trades in one run") still happen in real, unseeded-
+dice play? Ran 20 two-player Greedo games again. It still happens.
+Run 7 alone: 56 `PeerTrade` events, the last ~30 of them a dead-simple
+back-and-forth of `PlaceVerteVerviers` and `RueDeDiekirchArlon` between
+the same two players, zero `SplitMonopolyWon` for the entire capped
+300-round game. Widened the search (100 runs, detecting any adjacent
+trade pair where A's offered/wanted are exactly B's wanted/offered
+reversed) and found 3/100 genuinely oscillating games, all on 3-member
+colour groups (pink, yellow) — never on the 2-member groups (`brown`,
+`dark_blue`) every acceptance scenario happens to use.
+
+Traced why rather than just reporting the symptom: `MonopolyBuyout`
+only ever engages once `splitGroup` finds a colour group *fully owned*
+and split between exactly two players. For a 3-member group where only
+two of three streets are owned, that never becomes true, so
+`resolveBuyoutAtStart` returns false every turn and the game falls
+through to `tradeAtStart`/`PeerTrading` indefinitely. And `PeerTrading`
+itself has no termination guarantee of its own: `Game.completeTrade`
+executes whatever the *trader's own* strategy selects via
+`Strategy.accepts(TradeOffer,...)` — the partner's strategy is never
+consulted, so nothing stops the partner's own next-turn logic from
+finding the exact reverse trade equally attractive (each side judges
+"does giving up `offered` for `wanted` complete *my* group" against
+whatever the board looks like *after* the last swap) and immediately
+undoing it. This is not a defect in `bcde86a010`'s own diff — the
+no-consent trade mechanism is unchanged from the original
+`greedo-stalemate-trading` commit, and `MonopolyBuyout`'s price formula
+(cash-only vs. canonical) doesn't affect whether it applies to a
+partially-owned 3-member group either way. But it means the actual
+production bug this multi-cycle task exists to fix is not fixed in
+general — only for the specific "whole board owned, exactly one
+2-member colour group split" shape every acceptance scenario happens
+to construct.
+
+Not fixing this myself: whether `MonopolyBuyout` should extend to
+partially-owned groups, whether `PeerTrading` needs a partner-consent
+step or an anti-repeat guard, or whether trading should simply be
+disallowed once a game reaches this pathological shape, are genuine
+design decisions, not a structural cleanup. Flagging with full evidence
+for the architect and, ultimately, the user who made the canonical-
+settlement call above — they should decide whether this is closable as
+"scenario as specified" or needs another round.
+
+CRAP: all touched methods CC<=6, mostly 100% coverage (`isSplitGroup`
+new this cycle at 52.9%, CRAP 5.7, still under threshold; not adding
+dedicated coverage for it since its behavior is already exercised
+indirectly through every `MonopolyBuyoutTest` case that involves a
+spare street, and inventing a test purely to raise a number that's
+already compliant isn't worth it). `dry4java`: no duplicate candidates.
+`mutate4java --scan`: `MonopolyBuyout.java` 36 sites, `Game.java` 58,
+both well under the split threshold; manifests were stale, refreshed.
+`./acceptance/run-acceptance.sh` twice: 486/486, 0 failures both times.
+`mvn test` / `mvn test -P property-tests`: only the already-diagnosed
+`SimulatorTest` flake.
+
+Committed the `spareOwner` cleanup and manifest refresh as `4e8332c`
+"Deduplicate street-list construction in MonopolyBuyout.spareOwner;
+refresh manifests" (2 files). Handing off to architect with the
+oscillation finding front and center — not blocking on it, since
+nothing here regresses a specified scenario and the merge itself is
+sound, but this needs to reach whoever decides whether the task is
+actually done.
+
+2026-08-07T23:41:09Z — received refactorer handoff:
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: greedo-buyout-wiring
+commit: bc3034b15a
+
+Merged and accepted the canonical-settlement correction: `Game` now invokes
+`MonopolyBuyout.resolve` at turn start and no cash-only turn-start policy
+remains. Full acceptance passed 486/486, including normal CLI and packaged
+jar scenarios. Refactorer reproduced the original oscillation in partially
+owned three-street colour groups (3/100 runs), a case absent from the current
+acceptance criteria; routing this specification gap to specifier before phase
+closure.
