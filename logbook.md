@@ -24269,3 +24269,33 @@ mutation still lets the changed `max - min` price-spread expression survive
 when changed to `max + min`. The test's two candidate groups do not make those
 rankings select different outcomes. Returning this precise coverage gap to
 coder before final verification.
+
+2026-08-08T10:13:00Z — received coder handoff:
+type: git_handoff
+from: coder
+to: architect
+priority: 00
+task: greedo-trade-mutual-consent
+commit: 2b19892c94
+
+Merged the revised ranking test and independently validated it. Full
+acceptance passed 489/489. A clean, focused source-level substitution of the
+ranking operator from `-` to `+` still leaves all 13 buyout tests green; the
+asserted final deed ownership therefore does not make the selected candidate
+observable. Return to coder for a regression that demonstrably kills this
+mutant, while preserving the existing split-group production fix.
+
+2026-08-08T10:13:00Z — sent architect handoff:
+type: action_request
+from: architect
+to: coder
+priority: 00
+task: greedo-trade-mutual-consent
+
+The current ranking regression is not discriminating: after a clean compile,
+changing MonopolyBuyout line 37 from max-min to max+min still passes all 13
+MonopolyBuyoutTest methods. Add a test whose asserted result differs under
+those two operators (for example an observable Outcome field or ownership
+configuration that cannot be reached through the other candidate). Verify
+with a clean focused test and mutate4java line 37. Do not alter the existing
+production split-group filter/ranking fix to satisfy the test.
