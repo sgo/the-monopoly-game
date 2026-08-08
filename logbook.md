@@ -24433,6 +24433,41 @@ task: greedo-trade-mutual-consent
 Phase complete: production ranking coverage and peer-trade scenario review
 are accepted. The retained soft-mutation survivors are case-only equivalents.
 
+2026-08-08T13:32:00Z — received refactorer handoff:
+id: 20260808T133113Z_000098_from_refactorer_to_architect
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 270ad1ce7e
+task: greedo-buyout-partner-identity
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 270ad1ce7e
+
+Merged 270ad1ce7e. The partner-identity correction correctly excludes groups
+split with uninvolved players from buyout selection and from spare-sweetener
+candidates. Full acceptance passes 492/492. Architectural review confirms the
+refactorer's empirical finding: the existing spare-sweetener transfer can
+create a new winner/loser split from an unrelated complete group, and the next
+turn correctly resolves that manufactured split. Repetition causes unbounded
+buyout cycling, so the required prevention policy is an unresolved observable
+behavior decision, not a structural refactoring.
+
+2026-08-08T13:32:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-buyout-partner-identity
+
+Specify the intended rule when a MonopolyBuyout spare sweetener would split an
+otherwise complete unrelated colour group between the same players. Current
+behavior causes repeated future buyouts; do not address it with a separate
+turn-start/cooldown policy without a specified game rule.
+
 2026-08-08T13:05:00Z — received specifier handoff:
 id: 20260808T130443Z_000075_from_specifier
 from: specifier
