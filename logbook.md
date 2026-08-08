@@ -25349,3 +25349,20 @@ logbook decision. Swap the dispatch order in
 `resolveBuyoutAtStart` only if it returns without resolving a trade.
 journal-58/logging-58/report-58 remain the acceptance criteria; no new
 scenario was added.
+
+## 2026-08-08T19:21:40Z — architect receives the specified resolution order
+
+Received specifier priority-50 handoff (commit `1c35d1a517`, task
+`buyout-highest-priority-exclusion`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 1c35d1a517
+```
+
+Action: accepted the decision that peer trading is attempted before a
+buyout at turn start, with buyout as the fallback only when no trade is
+resolved. The existing journal-58, logging-58, and report-58 scenarios
+remain the acceptance criteria. Routed the observable dispatch-order
+change to the coder for implementation and verification.
