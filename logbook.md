@@ -24529,6 +24529,16 @@ regression for a third-party split group being excluded from spare sweeteners,
 and fixed `MonopolyBuyout` accordingly. Domain tests pass 317/317 and full
 acceptance passes 492/492.
 
+2026-08-08T15:22:53Z — sent architect handoff:
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-buyout-partner-identity
+commit: 27a9dbf9a5
+
+Queued `00_20260808T152253Z_000095_from_coder_to_architect.handoff` after
+domain 318/318 and acceptance 492/492 passed.
+
 2026-08-08T13:18:18Z — sent refactorer handoff:
 type: git_handoff
 to: refactorer
