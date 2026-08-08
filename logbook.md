@@ -24468,6 +24468,39 @@ otherwise complete unrelated colour group between the same players. Current
 behavior causes repeated future buyouts; do not address it with a separate
 turn-start/cooldown policy without a specified game rule.
 
+2026-08-08T15:12:00Z — received specifier handoff:
+id: 20260808T151109Z_000076_from_specifier_to_architect
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 1dc8b84793
+task: greedo-buyout-partner-identity
+
+Re-read your role and constitution.
+
+merge_and_process specifier 1dc8b84793
+
+Merged 1dc8b84793. The new buyout scenarios specify that a spare sweetener
+must be withheld when its transfer would split the winner's already-complete
+monopoly, while a sweetener remains valid from a group the winner does not
+completely own. Full acceptance is red exactly on the withholding scenario:
+high hat receives Rue Grande Dinant from dog's complete brown group. This is a
+coder-owned production implementation gap.
+
+2026-08-08T15:12:00Z — sent architect handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-buyout-partner-identity
+
+Implement the specified sweetener eligibility rule. Preserve sweeteners from
+groups not completely owned by the winner; prevent transfers that split a
+winner-owned complete monopoly. The new buyout-7 acceptance scenario is red
+and identifies the failing transfer.
+
 2026-08-08T13:05:00Z — received specifier handoff:
 id: 20260808T130443Z_000075_from_specifier
 from: specifier
