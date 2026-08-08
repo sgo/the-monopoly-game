@@ -24717,3 +24717,113 @@ the winner already completely owns its colour group, while incomplete groups
 remain eligible. Added domain coverage and updated the canonical turn-start
 expectation for a complete-group winner. Domain tests pass 318/318 and full
 acceptance passes 492/492.
+
+2026-08-08T18:22:00Z — refactorer received coder handoff:
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-buyout-affordability
+commit: 93aea9e2f0
+
+Merged `93aea9e2f0` "Defer unaffordable split buyouts" (3-way conflict in
+`logbook.md` only — same sent/received boilerplate misalignment as every
+prior cycle; reconstructed in chronological order, verified via `diff`
+against both parent blobs). This carries both the architect's already-
+accepted sweetener-eligibility fix (`5c883a521a`, reviewed here for the
+first time since it landed while I was between cycles) and the coder's
+own new affordability-deferral change on top.
+
+Reviewed both together. `spareStreetsOf` gained
+`!ownsCompleteGroup(winner, groupFor(it, streets), deeds)`, chained with
+the pre-existing `!isSplitGroup(groupFor(it, streets), deeds)`. Worked
+through the logic: whenever `settle()` runs in real gameplay (only
+reachable once `allOwnableSpacesOwned()`), every street in `it`'s group
+has *some* owner, and `it` itself is winner-owned, so `isSplitGroup`
+(distinct owners > 1) and `ownsCompleteGroup` (winner is the *only*
+owner) are exact complements of each other under that condition — so
+this combined filter is not redundant, it's the intended exclusion:
+a spare candidate must come from a group that's neither split between
+anyone else nor completely winner's own, which (given full ownership)
+is actually impossible, meaning `spareStreetsOf` now always returns
+empty in real play. That's not a bug, it's the point: it structurally
+retires the sweetener mechanic from live gameplay rather than trying to
+special-case around its side effects, which is exactly what closes the
+loop I reported last cycle. `settlementCash` was rewritten to a flat
+35%-of-balance affordability ceiling (full price if affordable, else
+deferred when there's no spare to make up the difference, matching the
+new `buyout-9`/`buyout-10` acceptance scenarios and the two new
+`aRicherWinnerDefers…`/`aRicherWinnerProceeds…` unit tests). `Game`'s
+`resolveBuyoutAtStart` now falls back to `MonopolyBuyout.hasSplit(...)`
+when no outcome resolves, so a deferred split still blocks
+`tradeAtStart`/`PeerTrading` from running instead — fences peer trading
+off a split it can't yet afford to buy out, covered by the new
+`journal-56` acceptance scenario.
+
+**Found and fixed one CRAP violation directly (mechanical, no behavior
+change).** The coder's rewrite of `resolveBuyoutAtStart` — an explicit
+`for` loop plus a trailing `anyMatch` fallback, replacing the previous
+`findFirst`/`map`/`orElse` chain so it could also compute `hasSplit` —
+pushed it to CC=7/CRAP=7.1, over threshold. Extracted the loop into
+`resolvableBuyout(trader, partners)` (returns
+`Optional<MonopolyBuyout.Outcome>`, same `findFirst`-over-present-
+results shape as before) and the trailing check into
+`anySplitExists(trader, partners)`, restoring the original
+`.map(...).orElseGet(...)` composition in `resolveBuyoutAtStart` itself.
+CC now 5/CRAP 5.0; the two new helpers are CC=1 each. Verified
+behavior-identical: 320/320 domain tests unchanged before and after
+the extraction, `resolvableBuyout`'s stream-`findFirst` still stops at
+the same first present outcome as the old loop's early return.
+
+CRAP on `MonopolyBuyout.java`: all methods CC<=4, mostly 100% cov
+(`hasSplit` 0% — only reachable via a genuinely split, currently-
+unresolvable pairing, which real gameplay always resolves or defers
+past before a domain unit test would isolate it; CRAP=2.0, well under
+threshold, not worth inventing a test purely to move that number).
+`dry4java`: no new duplication touching either changed file (the
+`Game.java` hits are the long-accepted `Journalling` one-line-dispatch
+duplication, unrelated). `mutate4java --scan`: `MonopolyBuyout.java` 22
+sites, `Game.java` 57, both manifests stale, refreshed. Domain tests
+320/320, property tests 22/22, `./acceptance/run-acceptance.sh` twice:
+499/499 both times.
+
+**Empirical re-verification — the headline finding from last cycle is
+substantially closed, with one smaller, distinct residual mechanism
+found.** Re-ran the same real-game methodology (2000 two-player Greedo
+games, unseeded dice, `stalemateTrading=true`, capped at 300 rounds).
+The severe regression I reported last cycle is gone: 0 games over 50
+`SplitMonopolyWon` events (was 480/1000), 0 over 100 (was 333/1000),
+average dropped from ~96/game to ~5.5/game, worst single game dropped
+from 495 to 26. Zero games showed the adjacent-reversed-`PeerTrade`
+oscillation pattern either. This is real, substantial progress, not a
+cosmetic improvement.
+
+Did not stop at the aggregate numbers: 286/2000 games (14%) still log
+more than 10 `SplitMonopolyWon` events, so traced one (16 events, all
+`spareSize=0` via a temporary, reverted debug print in `settle()` — not
+committed). This is a third, distinct mechanism, unrelated to the
+sweetener (now inert) or to `PeerTrade` (none appeared): for a 3+
+member colour group split 2-vs-1 between the same two players, `settle`
+transfers only *one* street per resolution (`streetOwnedBy` picks a
+single loser-owned street), so fully consolidating a 2-vs-1 split can
+take several turns. Meanwhile `selectWinner` picks the *currently*
+richer player as winner every time, and the settlement payment itself
+moves money between the two players — so which of them is "richer" can
+flip between resolutions of the very same still-split group, handing
+the same street back and forth a few times before the group either
+fully consolidates or the two balances stop crossing. Traced example:
+`orange` (3-member) cycling `GroenplaatsAntwerpen`/`LippenslaanKnokke`/
+`RueRoyaleTournai` between `dog` and `high hat` seven times across the
+game, zero spare, zero trades. Far lower severity than what this task
+fixed (max 26 vs. 495, no game exceeded 2000-run's 50/100 thresholds)
+and it terminates in practice once balances stop crossing back and
+forth, but it is real and distinct.
+
+Not fixing this myself — whether `settle` should consolidate an entire
+2-vs-1 group in one resolution instead of one street at a time, whether
+`selectWinner` needs some stickiness/hysteresis so the same group
+doesn't re-flip winner turn to turn, or whether this is simply accepted
+as bounded, low-volume noise, is a new-behavior design call, not a
+structural refactor. Given the sharply lower severity, flagging this as
+a residual note worth a decision, not a blocker — recommending the
+architect and user treat this task's core fix as accepted rather than
+holding the phase open for it, unless further review disagrees.
