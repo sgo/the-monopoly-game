@@ -275,8 +275,8 @@ class GameTest {
 
     assertThat(result.journal()).containsSubsequence(
         new Entry.SplitMonopolyWon(dog.id(), highHat.id()),
-        new Entry.SplitMonopolyPaid(dog.id(), highHat.id(), new Money(105)),
-        new Entry.TurnStarted(dog.id(), new Money(895))
+        new Entry.SplitMonopolyPaid(dog.id(), highHat.id(), new Money(40)),
+        new Entry.TurnStarted(dog.id(), new Money(960))
     );
     assertThat(deeds.ownerOf(Street.Type.NieuwstraatBrussel)).contains(dog.id());
   }

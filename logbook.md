@@ -24152,6 +24152,28 @@ the architect and, ultimately, the user who has been tracking this
 oscillation issue across the whole task — the fix is real progress, not a
 false claim, but "closable" is still their call.
 
+2026-08-08T07:52:20Z — refactorer sent greedo-trade-mutual-consent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-trade-mutual-consent
+commit: cabb31556a
+```
+
+Summary: merge and mechanical cleanup (manifest refresh only) are sound,
+314+22 domain tests and 489/489 acceptance twice. Empirical re-check finds
+the reciprocal-consent fix genuinely closes the previously-reported
+3-member-group oscillation and cuts overall reproduction ~100x, but a
+narrower, structurally distinct gap remains for 2-member colour groups
+(`brown` specifically), rooted in `MonopolyBuyout.splitGroup` picking its
+candidate group by price spread before checking whether that candidate is
+actually split — full root-cause trace and reproduction rate in the
+received-handoff entry above.
+
 2026-08-08T07:53:36Z — received refactorer handoff:
 type: git_handoff
 from: refactorer
@@ -24411,6 +24433,74 @@ task: greedo-trade-mutual-consent
 Phase complete: production ranking coverage and peer-trade scenario review
 are accepted. The retained soft-mutation survivors are case-only equivalents.
 
+2026-08-08T13:32:00Z — received refactorer handoff:
+id: 20260808T133113Z_000098_from_refactorer_to_architect
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 270ad1ce7e
+task: greedo-buyout-partner-identity
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 270ad1ce7e
+
+Merged 270ad1ce7e. The partner-identity correction correctly excludes groups
+split with uninvolved players from buyout selection and from spare-sweetener
+candidates. Full acceptance passes 492/492. Architectural review confirms the
+refactorer's empirical finding: the existing spare-sweetener transfer can
+create a new winner/loser split from an unrelated complete group, and the next
+turn correctly resolves that manufactured split. Repetition causes unbounded
+buyout cycling, so the required prevention policy is an unresolved observable
+behavior decision, not a structural refactoring.
+
+2026-08-08T13:32:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-buyout-partner-identity
+
+Specify the intended rule when a MonopolyBuyout spare sweetener would split an
+otherwise complete unrelated colour group between the same players. Current
+behavior causes repeated future buyouts; do not address it with a separate
+turn-start/cooldown policy without a specified game rule.
+
+2026-08-08T15:12:00Z — received specifier handoff:
+id: 20260808T151109Z_000076_from_specifier_to_architect
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 1dc8b84793
+task: greedo-buyout-partner-identity
+
+Re-read your role and constitution.
+
+merge_and_process specifier 1dc8b84793
+
+Merged 1dc8b84793. The new buyout scenarios specify that a spare sweetener
+must be withheld when its transfer would split the winner's already-complete
+monopoly, while a sweetener remains valid from a group the winner does not
+completely own. Full acceptance is red exactly on the withholding scenario:
+high hat receives Rue Grande Dinant from dog's complete brown group. This is a
+coder-owned production implementation gap.
+
+2026-08-08T15:12:00Z — sent architect handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-buyout-partner-identity
+
+Implement the specified sweetener eligibility rule. Preserve sweeteners from
+groups not completely owned by the winner; prevent transfers that split a
+winner-owned complete monopoly. The new buyout-7 acceptance scenario is red
+and identifies the failing transfer.
+
 2026-08-08T13:05:00Z — received specifier handoff:
 id: 20260808T130443Z_000075_from_specifier
 from: specifier
@@ -24448,3 +24538,100 @@ commit: 51df4b1934
 
 Queued `50_20260808T131818Z_000094_from_coder_to_refactorer.handoff` after
 domain 317/317 and acceptance 492/492 passed.
+2026-08-08T15:10:00Z — refactorer received coder handoff:
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-buyout-partner-identity
+commit: 51df4b1934
+
+Merged `51df4b1934` "Handle buyouts with uninvolved third players" (3-way
+conflict in `logbook.md` only — same sent/received boilerplate
+misalignment as every prior cycle; reconstructed both entries in
+chronological order, verified via `diff` against both parent blobs).
+
+The production fix is narrowly correct and well tested. `splitGroup` now
+filters candidates to `isSplitGroup(candidate, first, second, deeds)`
+*before* ranking by price spread, rather than ranking first and checking
+split-ness of only the winner afterward — this closes both the
+partner-identity gap (an uninvolved third player's group no longer
+masquerades as a real split between the two players asked about) and,
+as a side effect, the residual ranking-order bug I flagged last cycle
+(`4bcc9ab..cabb315`) where a wider-spread unsplit group could
+permanently blind buyout to a genuinely split narrower-spread group.
+`spareStreetsOf` now uses a plain 2-arg `isSplitGroup(group, deeds)` to
+exclude ANY split group from spare-sweetener candidates, not just one
+split with the specific loser — correctly stops a third party's split
+group from being handed out as a sweetener. CRAP: all `MonopolyBuyout`
+methods CC<=4, 100% cov except `waiveIfUnaffordable` (unchanged from
+prior cycles). `dry4java`: no new duplication touching changed files.
+`mutate4java --scan` on `MonopolyBuyout.java`: 19 sites, well under
+threshold, manifest stale, refreshed. Domain tests 317/317, property
+tests 22/22, `./acceptance/run-acceptance.sh` twice: 492/492 both times.
+`World.java`/`MonopolyStepHandlers.java`/`GameLogStepHandlers.java` grew
+by a handful of lines each for the round-robin-ownership step and new
+assertion variants; consistent with every prior cycle, no manifest is
+expected for these (`src/test`, not `src/main`) so no scan/split applied.
+
+**Severe finding from empirical re-verification — this is the headline
+of this review, not a minor addendum.** Re-ran real two-player Greedo
+games (unseeded dice, `stalemateTrading=true`, capped at 300 rounds) to
+check whether the reported oscillation is actually gone now, the same
+discipline I've applied every cycle on this task. It is not gone — it
+has gotten dramatically worse in a different shape. Across 1000 games:
+672 (67%) log more than 10 `SplitMonopolyWon` events, 480 (48%) more
+than 50, 333 (33%) more than 100; the average is ~96 per game and the
+worst observed was 495 in a single capped game — with, in the clearest
+reproduction, essentially zero `PeerTrade` entries interspersed at all.
+This is not the narrow 2-member-group peer-trade ping-pong I reported
+last cycle (which my adjacent-`PeerTrade`-reversal detector would have
+caught) — it is `MonopolyBuyout` resolving, un-resolving, and
+re-resolving the *same handful of colour groups against itself*, turn
+after turn, for the rest of the game.
+
+Traced the mechanism: `settle()` already had a "spare sweetener" step
+(`includesSpareSweetener` / `deeds.transfer(spare.getFirst(), winner,
+loser, Money.ZERO)`, both pre-existing, untouched by this commit) that
+gives the winner's spare street from an *unrelated, otherwise fully-owned*
+colour group to the loser for free whenever the settlement is cash-free
+or the winner's balance is under 2000 — a real Monopoly-flavored
+"sweeten the deal" mechanic. Handing that spare street away necessarily
+splits its own, previously-whole colour group between winner and loser.
+Before this commit, `splitGroup`'s rank-then-check-split ordering bug
+usually stopped buyout from ever noticing that newly-manufactured split
+on a later turn (it kept re-selecting the wrong, unsplit max-spread
+candidate instead) — so the sweetener's side effect was mostly inert.
+Now that `splitGroup` correctly finds *any* genuinely split group, it
+reliably rediscovers the group the previous turn's sweetener just split,
+resolves it (handing out a fresh sweetener of its own, from yet another
+still-whole group), and the cycle repeats — touring through the board's
+remaining colour groups, sometimes settling into a tight two-group
+back-and-forth, for the rest of the capped game. In other words: fixing
+the reported gap correctly unmasked a second, larger, pre-existing gap
+in the unrelated sweetener mechanic that the first bug had been
+accidentally hiding.
+
+Not fixing this myself — deciding whether the sweetener should ever be
+allowed to create a fresh split, whether buyout needs a cooldown or
+anti-reciprocity guard against re-resolving a group it (or its own
+sweetener) just touched, or some other design change, is squarely a new-
+behavior decision, not a structural refactor. Given the reproduction
+rate (majority of games, not an edge case) and severity (hundreds of
+buyout events consuming the entire remaining game), flagging this as
+likely blocking for phase completion, not a routine residual note.
+
+2026-08-08T15:13:53Z — received architect handoff:
+id: 20260808T151353Z_000135_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+task: greedo-buyout-partner-identity
+commit: 5c883a521a
+
+Merged the architect review and the specified buyout-7/buyout-8 scenarios.
+Implemented the sweetener eligibility rule: a spare street is withheld when
+the winner already completely owns its colour group, while incomplete groups
+remain eligible. Added domain coverage and updated the canonical turn-start
+expectation for a complete-group winner. Domain tests pass 318/318 and full
+acceptance passes 492/492.
