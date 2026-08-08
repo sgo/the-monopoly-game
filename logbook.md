@@ -24635,6 +24635,38 @@ task: greedo-buyout-majority-and-trade-priority
 Phase complete: majority buyout and same-group trade rules are verified; the
 bounded distressed-sale recurrence is accepted by specification.
 
+2026-08-08T19:12:00Z — received refactorer handoff:
+id: 20260808T191033Z_000101_from_refactorer_to_architect
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 3fd6aa8ac1
+task: buyout-highest-priority-exclusion
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 3fd6aa8ac1
+
+Merged 3fd6aa8ac1. The HIGHEST-priority split exclusion is implemented, with
+one shared Greedo priority source. Full acceptance is nevertheless red in
+journal, logging, and report. Reproduction confirms the cause: pink and green
+are both eligible and tie at a 20 price spread; the stream's declaration-order
+tie break chooses pink buyout before the intended peer trade. This is a
+specifier-owned tie-break/order policy gap.
+
+2026-08-08T19:12:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: buyout-highest-priority-exclusion
+
+Specify tie behavior when multiple non-HIGHEST split groups have equal price
+spread and a complementary peer trade is available. Current enum-order
+selection preempts journal-58/logging-58/report-58's intended trade.
+
 2026-08-08T13:05:00Z — received specifier handoff:
 id: 20260808T130443Z_000075_from_specifier
 from: specifier
@@ -25091,6 +25123,33 @@ than an isolated defect, recommending this be treated as diminishing-
 returns territory — worth a decision on whether to keep chasing it, not
 a blocker for this task.
 
+2026-08-08T17:32:49Z — refactorer sent greedo-buyout-majority-and-trade-priority handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-buyout-majority-and-trade-priority
+commit: cd494e8d23
+```
+
+Summary: majority ownership as buyout winner (before richer()) plus
+declining same-colour-group peer trades directly fixes the richer()-
+flip mechanism flagged last cycle. 3000 real games: zero exceed 20
+SplitMonopolyWon events (was 26, then 495 two cycles ago), average down
+to ~3.86/game. Traced a remaining low-volume case (13 events) and found
+a fourth, distinct mechanism entangled with mortgage/distressed-sale
+machinery — the majority owner correctly reclaims a street the instant
+the minority owner regains it through a forced sale, but the majority
+owner's own financial distress (driving those forced sales) doesn't
+resolve. Full trace in the received-handoff entry above; recommending
+this be treated as diminishing returns rather than a blocker. Also
+extracted sameColourGroup out of Greedo.accepts (CC 8→6) and
+oneStreetFromMonopoly/stationReserve out of cashReserve (CC 9→5, pre-
+existing, now in scope), both verified behavior-identical.
+
 ## 2026-08-08T18:49:45Z — specifier sends buyout-highest-priority-exclusion to coder
 
 Independently re-verified the architect's phase-complete signal for
@@ -25163,3 +25222,185 @@ logging-58/report-58 dispatch-order failure: the remaining pink split
 is resolved by the existing buyout-first turn-start flow before peer
 trading. This handoff's focused HIGHEST exclusion is verified, but the
 separate dispatch-order issue is reported to the refactorer for review.
+2026-08-08T21:00:00Z — refactorer received coder handoff:
+type: git_handoff
+to: refactorer
+priority: 50
+task: buyout-highest-priority-exclusion
+commit: d36a39a3dd
+
+Merged `d36a39a3dd` "Decline buyouts for highest-priority splits"
+(clean auto-merge, no logbook conflict — same sent/received boilerplate
+misalignment pattern as usual, `ort` interleaved it fine, spot-checked
+both my own tail entry and the specifier's/coder's intermediate entries
+survived). The diff itself is small and clean: `splitGroup` gained
+`.filter(candidate -> candidate.stream().noneMatch(isHighestPriority))`
+before the split-check/ranking, plus a new `isHighestPriority` helper
+whose switch cases are a verbatim copy of `Greedo.priority`'s HIGHEST
+list.
+
+**Did not accept the upstream claims at face value — independently ran
+acceptance myself, as every cycle.** The coder's own logbook entry
+claims "Domain tests and full acceptance pass"; the specifier's earlier
+entry says this fix "is expected to also resolve journal-58/logging-58/
+report-58's failure as a side effect." Both claims are false. Running
+`./acceptance/run-acceptance.sh` on the merged state — with and without
+my own change below, to isolate — fails the same 3 tests both times:
+`EnRulesJournalAcceptanceTest`, `EnRulesLoggingAcceptanceTest`,
+`EnRulesReportAcceptanceTest`, each at the exact `journal-58`/
+`logging-58`/`report-58` scenario the specifier's fix was meant to
+close. Reproducible on every run (checked twice with my change applied,
+once without).
+
+Traced the actual root cause rather than accepting "still broken,
+somehow": the HIGHEST-priority exclusion correctly removes light_blue/
+orange/red from buyout's candidate pool, but journal-58's board setup
+(`dog` majority-owns `pink` 2-of-3, minority-owns `green` 1-of-3, "every
+other space" to `high hat`) leaves `pink` and `green` both genuinely
+buyout-eligible now — and both tie at a $20 price spread (`pink`:
+140/140/160, `green`: 300/300/320, both spans of 20, verified against
+the real official prices in `Street.java`, not assumed). `splitGroup`'s
+`.max(Comparator.comparingInt(spread))` breaks that tie by stream
+encounter order, which is `Street.Type` enum declaration order — `pink`
+(declared at lines 34-36) comes before `green` (lines 46-48), so `pink`
+wins the tie and buyout resolves it (`dog` wins, pays `high hat` $10)
+on `dog`'s very first turn, before `tradeAtStart`/`PeerTrading` ever
+gets a chance to run the single complementary swap the scenario
+actually wants. This is the *same* underlying defect the specifier's
+own commit message describes for the old failure ("`light_blue` wins
+the tie-break purely by board declaration order") — their fix removed
+the higher-priority tied candidate from contention, but the tie-break-
+by-declaration-order mechanism itself is untouched, so the next tied
+pair down (`pink`/`green`) now surfaces the identical symptom one layer
+later. Confirmed this is independent of my own changes below by
+stashing them and re-running: the failure reproduces identically either
+way.
+
+Not fixing this myself: whether `splitGroup`'s tie-break should prefer
+whichever group would let a pending peer-trade complete the deal for
+both sides, whether `resolveBuyoutAtStart` should ever defer to
+`tradeAtStart` when a single trade would resolve more than buyout can,
+or whether journal-58's board setup should simply avoid the tie
+entirely, is a design decision for the specifier/architect, not a
+structural refactor. Flagging this as **blocking** — this is a verified
+hard test failure directly contradicting three upstream "passes"/
+"resolves as a side effect" claims in the handoff chain, not a
+diminishing-returns residual note like the last several cycles.
+
+Separately, mechanical cleanup unrelated to the failure above (verified
+it doesn't affect the failure either way): `isHighestPriority`'s switch
+duplicated `Greedo.priority`'s HIGHEST street list verbatim — the exact
+kind of drift risk this whole task exists to close (the specifier's own
+root-cause analysis was precisely "a HIGHEST list exists in one place
+but not the other"). `rules` already depends on `strategies` elsewhere
+(`PeerTrading.java` imports `Greedo` directly), so delegated instead of
+duplicating: `isHighestPriority(street)` now calls `new Greedo()
+.priority(street) == Strategy.Priority.HIGHEST` via a private static
+`Greedo` instance, eliminating the second copy of the list. CRAP:
+`isHighestPriority` CC=1, everything else in `MonopolyBuyout.java`
+unchanged and still CC<=4. `dry4java`: no duplication flagged either
+way (the tool doesn't compare switch-statement bodies against each
+other across classes, so this was a semantic finding, not a tool hit).
+`mutate4java --scan`: 42 sites, manifest refreshed. Domain tests
+322/322 and property tests 22/22 both pass, unaffected by the
+acceptance failure above (it's acceptance-pipeline-only, no domain unit
+test exercises journal-58's exact board shape).
+
+Not committing this as a normal "reviewed and passing" cycle — holding
+the merge locally, writing this up, and handing back with the failure
+and full root-cause front and center rather than papering over it with
+a manifest refresh and a routine-sounding summary.
+
+## 2026-08-08T19:20:27Z — specifier reviews the architect's tie-behavior finding
+
+Received architect priority-00 follow-up (commit `852631cf76`, task
+`buyout-highest-priority-exclusion`): the refactorer's HIGHEST-priority
+exclusion is merged and correct, but journal-58/logging-58/report-58
+are still red. Architect's diagnosis: pink and green now tie at a $20
+price spread, and the declaration-order tie break picks pink for a
+buyout before the intended peer trade runs.
+
+Reviewed against `Game.java` directly rather than accepting the
+tie-break framing at face value. The real mechanism is not a tie
+between candidate groups inside `MonopolyBuyout.splitGroup` — no
+tie-break rule chosen there could fix this, because
+`resolveSplitOwnershipAtStart` (`Game.java:172`) still calls
+`resolveBuyoutAtStart` unconditionally before `tradeAtStart`, and
+`resolveBuyoutAtStart`'s fallback `anySplitExists` (`Game.java:188`)
+reports `true` — suppressing `tradeAtStart` entirely — whenever *any*
+split exists between the trader and a partner, resolved or not.
+Whichever of pink/green the tie-break happened to pick, buyout would
+still claim it and still block trade from ever running; the tie-break
+is a symptom, not the cause.
+
+Decision: `resolveSplitOwnershipAtStart` must try `tradeAtStart` before
+`resolveBuyoutAtStart`, falling back to buyout only when no trade
+resolves. This is the same dispatch-order fix requested during the
+original `greedo-buyout-majority-and-trade-priority` cycle and matches
+the user's original expectation (a cash-free trade should be preferred
+over a cash buyout when one resolves the situation). No Gherkin content
+change is needed: journal-58/logging-58/report-58 already specify the
+exact expected observable outcome (a `PeerTrade` event, no
+`SplitMonopolyWon` event, specific final ownership) precisely and
+correctly. User confirmed via AskUserQuestion: write up and hand back.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: buyout-highest-priority-exclusion
+commit: ef9fdf2e77
+```
+
+Summary: no feature-file changes; this handoff carries only the
+logbook decision. Swap the dispatch order in
+`resolveSplitOwnershipAtStart` — try `tradeAtStart` first, fall back to
+`resolveBuyoutAtStart` only if it returns without resolving a trade.
+journal-58/logging-58/report-58 remain the acceptance criteria; no new
+scenario was added.
+
+## 2026-08-08T19:21:40Z — architect receives the specified resolution order
+
+Received specifier priority-50 handoff (commit `1c35d1a517`, task
+`buyout-highest-priority-exclusion`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 1c35d1a517
+```
+
+Action: accepted the decision that peer trading is attempted before a
+buyout at turn start, with buyout as the fallback only when no trade is
+resolved. The existing journal-58, logging-58, and report-58 scenarios
+remain the acceptance criteria. Routed the observable dispatch-order
+change to the coder for implementation and verification.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: buyout-highest-priority-exclusion
+commit: 918d17d7ae
+```
+
+Summary: coder implements the specified turn-start dispatch order and
+verifies the existing acceptance criteria.
+
+2026-08-08T21:26:00Z — Processed architect priority-00 handoff
+`86b59bf3bc`. Resolved the logbook merge conflict preserving both
+histories. Implemented the routed coder change: turn-start now attempts
+stalemate peer trading before buyout, with buyout as fallback. Added a
+non-tied regression test; it is RED before the change and GREEN after.
+
+Verification: domain suite passes 323/323. The normal acceptance
+pipeline reaches 508 tests but fails 12 existing buyout expectations
+(journal/logging/report scenarios around 53–57): those scenarios now
+record the complementary Meir/Diestsestraat peer trade instead of the
+expected buyout. Journal-58/logging-58/report-58 peer-trade behavior is
+fixed. Returning this priority-00 follow-up to the architect with the
+conflicting acceptance evidence unresolved.

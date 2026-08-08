@@ -169,13 +169,16 @@ public class Game {
   }
 
   private void resolveSplitOwnershipAtStart(Player trader, List<Player> turnOrder, Journalling journalling) {
-    if (!resolveBuyoutAtStart(trader, turnOrder, journalling)) tradeAtStart(trader, turnOrder, journalling);
+    if (!tradeAtStart(trader, turnOrder, journalling)) resolveBuyoutAtStart(trader, turnOrder, journalling);
   }
 
-  private void tradeAtStart(Player trader, List<Player> turnOrder, Journalling journalling) {
-    if (!stalemateTrading || !allOwnableSpacesOwned()) return;
-    PeerTrading.select(trader, strategies.forPlayer(trader), turnOrder, rules, deeds).ifPresent(offer ->
-        completeTrade(trader, offer, journalling));
+  private boolean tradeAtStart(Player trader, List<Player> turnOrder, Journalling journalling) {
+    if (!stalemateTrading || !allOwnableSpacesOwned()) return false;
+    return PeerTrading.select(trader, strategies.forPlayer(trader), turnOrder, rules, deeds)
+        .map(offer -> {
+          completeTrade(trader, offer, journalling);
+          return true;
+        }).orElse(false);
   }
 
   private boolean resolveBuyoutAtStart(Player trader, List<Player> turnOrder, Journalling journalling) {
