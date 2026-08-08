@@ -24562,6 +24562,16 @@ regression for a third-party split group being excluded from spare sweeteners,
 and fixed `MonopolyBuyout` accordingly. Domain tests pass 317/317 and full
 acceptance passes 492/492.
 
+2026-08-08T16:20:41Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-buyout-affordability
+commit: 93aea9e2f0
+
+Queued `50_20260808T162041Z_000096_from_coder_to_refactorer.handoff` after
+domain 320/320 and acceptance 492/492 passed.
+
 2026-08-08T16:14:54Z — received specifier handoff:
 id: 20260808T161454Z_000077_from_specifier
 from: specifier
