@@ -201,6 +201,9 @@ public final class MonopolyStepHandlers {
                 + "\" and pawn \"" + NAME + "\" in board order$",
             (world, arguments) -> world.ownEveryOtherOwnableAlternately(arguments.text(1), arguments.text(2))),
 
+        given("^every other ownable space is owned by pawn \"" + NAME + "\"$",
+            (world, arguments) -> world.ownEveryOtherOwnable(arguments.text(1))),
+
         given("^every other ownable space is owned in round-robin order by pawn \"" + NAME
                 + "\", pawn \"" + NAME + "\", and pawn \"" + NAME + "\" in board order$",
             (world, arguments) -> world.ownEveryOtherOwnableRoundRobin(

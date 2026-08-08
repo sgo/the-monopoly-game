@@ -47,6 +47,8 @@ public final class Greedo implements Strategy {
   public boolean accepts(TradeOffer offer, Rule.Set rules, Deeds deeds) {
     if (deeds.ownerOf(offer.offered().type()).filter(offer.trader().id()::equals).isEmpty()) return false;
     if (deeds.ownerOf(offer.wanted().type()).filter(offer.partner().id()::equals).isEmpty()) return false;
+    if (offer.offered() instanceof ColourStreet offered && offer.wanted() instanceof ColourStreet wanted
+        && offered.colourGroup() == wanted.colourGroup()) return false;
     if (priority(offer.offered()) == Priority.HIGHEST) return false;
     if (!deeds.completesColourGroup(rules, offer.wanted(), offer.trader())) return false;
     return !ownsHighestPriorityMonopoly(offer.partner(), rules, deeds);

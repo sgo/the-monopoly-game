@@ -258,6 +258,22 @@ class MonopolyBuyoutTest {
   }
 
   @Test
+  void theCoOwnerWithMoreStreetsWinsEvenWhenTheyHaveLessCash() {
+    Player dog = player("dog", 100);
+    Player highHat = player("high hat", 5000);
+    deeds.sell(ownable(Street.Type.RueDeDiekirchArlon), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.BruulMechelen), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.PlaceVerteVerviers), highHat, Money.ZERO);
+
+    MonopolyBuyout.Outcome outcome = MonopolyBuyout.resolve(dog, highHat, rules, deeds)
+        .orElseThrow();
+
+    assertThat(outcome.winner()).isEqualTo(dog);
+    assertThat(outcome.payment()).isEqualTo(new Money(10));
+    assertThat(deeds.ownerOf(Street.Type.PlaceVerteVerviers)).contains(dog.id());
+  }
+
+  @Test
   void aSpareSweetenerDoesNotSplitTheWinnersCompleteMonopoly() {
     Player dog = player("dog", 1900);
     Player highHat = player("high hat", 50);

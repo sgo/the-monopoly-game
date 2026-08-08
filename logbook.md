@@ -24723,6 +24723,21 @@ rate (majority of games, not an edge case) and severity (hundreds of
 buyout events consuming the entire remaining game), flagging this as
 likely blocking for phase completion, not a routine residual note.
 
+2026-08-08T17:14:48Z — received specifier handoff:
+id: 20260808T171448Z_000078_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+task: greedo-buyout-majority-and-trade-priority
+commit: 24e2324996
+
+Merged the majority-owner, same-colour-trade, and acceptance assertion
+scenarios. Implemented majority ownership as the buyout winner criterion
+before cash tie-breaking, rejected same-colour Greedo trades, and added the
+missing ownership and journal/log/report assertion handlers. Domain tests and
+full acceptance pass.
+
 2026-08-08T13:31:13Z — refactorer sent greedo-buyout-partner-identity handoff to architect
 
 Handoff message sent:
