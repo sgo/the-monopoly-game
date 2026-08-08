@@ -25431,3 +25431,63 @@ record the complementary Meir/Diestsestraat peer trade instead of the
 expected buyout. Journal-58/logging-58/report-58 peer-trade behavior is
 fixed. Returning this priority-00 follow-up to the architect with the
 conflicting acceptance evidence unresolved.
+
+## 2026-08-08T19:38:46Z — specifier resolves the trade-first acceptance conflict
+
+Received architect priority-00 follow-up (commit `a9b0507401`, task
+`buyout-highest-priority-exclusion`): the coder's trade-first dispatch
+order is implemented correctly and journal-58/logging-58/report-58 now
+pass, but 12 examples across journal-53, journal-55, journal-57 (and
+their logging/report counterparts) regressed — the architect diagnosed
+this as a "price-spread tie" and enum-order artifact.
+
+Reviewed against `Game.java`, `PeerTrading.java`, and the actual
+scenario setups directly rather than accepting the tie-break framing.
+Confirmed the real cause is the same shape of contamination already
+fixed once for journal-58 (that time with HIGHEST-priority streets):
+journal-53/55/57 fill the rest of the board by alternating (or
+round-robin, for the 3-player journal-55) ownership between the two
+disputing players, which incidentally splits the brown group between
+them too, alongside the deliberately-specified dark_blue/pink split
+under test. That creates a second, entirely legitimate Greedo trade —
+a spare dark_blue street for a spare brown street, each completing the
+other player's group — which correctly preempts the buyout these
+scenarios exist to isolate. journal-56 (deferred-buyout, same-group
+exclusion) turned out to share the identical setup and the identical
+latent defect, caught empirically by running the full acceptance suite
+rather than trusting a partial fix.
+
+Trade-first dispatch itself needed no change: it is doing exactly what
+it should. The defect was in these four scenarios' test setup, not in
+policy. Fixed by switching their board-filler step from
+"alternately"/"round-robin" (between the two disputing players) to a
+single uninvolved owner — "high hat" for the 2-player scenarios,
+"iron box" for the 3-player journal/logging/report-55 — matching
+journal-58's already-proven isolation pattern. Verified via a direct
+`PeerTrading.select` probe before editing that this removes the
+incidental trade candidate entirely (returns empty), and via the full
+`./acceptance/run-acceptance.sh` run after editing: 508/508, up from
+507 total with 3 failing. Domain unit tests unaffected. No assertion
+text changed in any of the four scenarios — only the board-filler
+`Given` step.
+
+User confirmed via AskUserQuestion before editing.
+
+Committed as `f359ee410d` "Isolate journal/logging/report-53/55/56/57
+from incidental trade contamination".
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: buyout-highest-priority-exclusion
+commit: f359ee410d
+```
+
+Summary: trade-first dispatch order is correct and requires no further
+change. The four affected scenarios' board-filler steps were the
+actual defect (incidental same-two-player cross-group split), fixed by
+giving the board filler to a single uninvolved owner instead. Full
+acceptance is green (508/508); task should be advanceable now.
