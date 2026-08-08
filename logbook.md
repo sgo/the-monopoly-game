@@ -24188,3 +24188,18 @@ Merged `7840095634`. Added a regression test for an unsplit dark-blue group
 masking a genuinely split brown group, then filtered buyout candidates to
 groups split between the requested players before applying price-spread
 selection. Domain tests pass 315/315 and acceptance passes 489/489.
+
+2026-08-08T07:59:37Z — received coder handoff:
+type: git_handoff
+from: coder
+to: architect
+priority: 00
+task: greedo-trade-mutual-consent
+commit: 1a7299d0c6
+
+Merged the split-group selection correction. Full acceptance passed 489/489.
+Differential mutation found survivors in the changed candidate-ranking
+expression (`splitGroup` lines 36–37): the current test proves an unsplit
+group is excluded but does not prove ranking across multiple eligible split
+groups. Returning focused behavioral coverage to coder before final DRY and
+Gherkin checks.
