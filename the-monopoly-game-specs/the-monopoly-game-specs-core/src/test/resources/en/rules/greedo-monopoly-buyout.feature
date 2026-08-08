@@ -187,3 +187,19 @@ Feature: Greedo split-monopoly buyout
     Examples:
       | dog_balance | high_hat_balance | price |
       | 100         | 5000              | 10    |
+
+  # buyout-12
+  Scenario Outline: a split highest-priority colour group is never resolved by buyout
+    Given pawn "dog" owns "Lippenslaan Knokke"
+    And pawn "dog" owns "Rue Royale Tournai"
+    And pawn "dog" has $<dog_balance> to spend
+    And pawn "high hat" owns "Groenplaats Antwerpen"
+    And pawn "high hat" has $<high_hat_balance> to spend
+    When the split monopoly between pawn "dog" and pawn "high hat" is resolved
+    Then no one wins the split monopoly
+    And pawn "dog" does not own "Groenplaats Antwerpen"
+    And pawn "high hat" does not own "Lippenslaan Knokke"
+
+    Examples:
+      | dog_balance | high_hat_balance |
+      | 1900        | 50                |
