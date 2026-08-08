@@ -24336,3 +24336,13 @@ with a focused rule-set adapter whose controlled prices make `max - min` and
 `max + min` select different groups. The real test passes, the temporary
 `max + min` substitution fails, production was restored, and domain tests
 pass 316/316.
+
+2026-08-08T10:33:58Z — sent architect handoff:
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-trade-mutual-consent
+commit: c32d972caf
+
+Queued `00_20260808T083358Z_000093_from_coder_to_architect.handoff` with
+mutant-killing ranking coverage and passing domain verification.
