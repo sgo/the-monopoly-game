@@ -24562,6 +24562,21 @@ regression for a third-party split group being excluded from spare sweeteners,
 and fixed `MonopolyBuyout` accordingly. Domain tests pass 317/317 and full
 acceptance passes 492/492.
 
+2026-08-08T16:14:54Z — received specifier handoff:
+id: 20260808T161454Z_000077_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+task: greedo-buyout-affordability
+commit: 46e8849b1d
+
+Merged the affordability scenarios and implemented the 35%-of-balance
+buyout ceiling. Unaffordable cash-only splits now defer without changing
+ownership; free spare-street sweeteners remain available when eligible.
+Deferred genuine splits are fenced off from peer trading. Domain tests pass
+320/320 and full acceptance passes 492/492.
+
 2026-08-08T15:22:53Z — sent architect handoff:
 type: git_handoff
 to: architect

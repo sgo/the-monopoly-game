@@ -136,6 +136,32 @@ class MonopolyBuyoutTest {
   }
 
   @Test
+  void aRicherWinnerDefersABuyoutWhenThirtyFivePercentCannotCoverThePrice() {
+    Player dog = player("dog", 114);
+    Player highHat = player("high hat", 50);
+    deeds.sell(ownable(Street.Type.MeirAntwerpen), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.NieuwstraatBrussel), highHat, Money.ZERO);
+
+    assertThat(MonopolyBuyout.resolve(dog, highHat, rules, deeds)).isEmpty();
+    assertThat(deeds.ownerOf(Street.Type.MeirAntwerpen)).contains(dog.id());
+    assertThat(deeds.ownerOf(Street.Type.NieuwstraatBrussel)).contains(highHat.id());
+  }
+
+  @Test
+  void aRicherWinnerProceedsWhenThirtyFivePercentJustCoversThePrice() {
+    Player dog = player("dog", 115);
+    Player highHat = player("high hat", 50);
+    deeds.sell(ownable(Street.Type.MeirAntwerpen), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.NieuwstraatBrussel), highHat, Money.ZERO);
+
+    MonopolyBuyout.Outcome outcome = MonopolyBuyout.resolve(dog, highHat, rules, deeds)
+        .orElseThrow();
+
+    assertThat(outcome.payment()).isEqualTo(new Money(40));
+    assertThat(deeds.ownerOf(Street.Type.NieuwstraatBrussel)).contains(dog.id());
+  }
+
+  @Test
   void aRicherWinnerWithNoSpareAndNoAffordableCashLeavesTheMonopolySplit() {
     Player dog = player("dog", 50);
     Player highHat = player("high hat", 10);

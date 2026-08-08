@@ -182,11 +182,13 @@ public class Game {
     if (!stalemateTrading || !allOwnableSpacesOwned()) return false;
     if (!(strategies.forPlayer(trader) instanceof Greedo)) return false;
     if (isTiedWithItsPartner(trader, turnOrder)) return false;
-    return turnOrder.stream().filter(partner -> partner != trader)
-        .map(partner -> MonopolyBuyout.resolve(trader, partner, rules, deeds))
-        .filter(Optional::isPresent).map(Optional::orElseThrow).findFirst()
-        .map(outcome -> applyBuyout(outcome, journalling))
-        .orElse(false);
+    List<Player> partners = turnOrder.stream().filter(partner -> partner != trader).toList();
+    for (Player partner : partners) {
+      Optional<MonopolyBuyout.Outcome> outcome = MonopolyBuyout.resolve(trader, partner, rules, deeds);
+      if (outcome.isPresent()) return applyBuyout(outcome.orElseThrow(), journalling);
+    }
+    return partners.stream().anyMatch(partner ->
+        MonopolyBuyout.hasSplit(trader, partner, rules, deeds));
   }
 
   /**
