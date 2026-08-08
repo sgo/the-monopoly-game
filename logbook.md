@@ -24534,6 +24534,41 @@ task: greedo-buyout-partner-identity
 Phase complete: the specified sweetener eligibility rule is implemented and
 verified. Retained soft mutations are equivalent within their balance bands.
 
+2026-08-08T16:34:00Z — received refactorer handoff:
+id: 20260808T163303Z_000099_from_refactorer_to_architect
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: dd8bcb1c02
+task: greedo-buyout-affordability
+
+Re-read your role and constitution.
+
+merge_and_process refactorer dd8bcb1c02
+
+Merged dd8bcb1c02. Affordability deferral and the refactored buyout-start
+boundary pass full acceptance 499/499. The former high-volume sweetener loop
+is substantially eliminated, but empirical simulation still finds a distinct
+2-vs-1 colour-group loop: each resolution transfers only one loser deed, and
+cash settlement can flip which owner is richer before the next turn. The same
+group can consequently be re-split and re-resolved. This is observable game
+behavior requiring a specification decision on whole-group consolidation or
+winner stickiness, not a structural change.
+
+2026-08-08T16:34:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-buyout-affordability
+
+Specify whether resolving a 3+ street split monopoly must consolidate every
+loser-owned street in one buyout, or prescribe another rule preventing winner
+flips while the same group remains split. Current one-deed settlement permits
+repeated buyouts of the same group.
+
 2026-08-08T13:05:00Z — received specifier handoff:
 id: 20260808T130443Z_000075_from_specifier
 from: specifier
