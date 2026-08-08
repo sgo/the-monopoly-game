@@ -31,13 +31,12 @@ public final class MonopolyBuyout {
             || deeds.ownerOf(street.type()).filter(second.id()::equals).isPresent())
         .map(street -> groupFor(street, streets))
         .filter(candidate -> candidate.stream().allMatch(it -> deeds.ownerOf(it.type()).isPresent()))
+        .filter(candidate -> isSplitGroup(candidate, first, second, deeds))
         .max(Comparator.comparingInt(candidate -> candidate.stream()
             .mapToInt(it -> it.price().amount()).max().orElse(0)
             - candidate.stream().mapToInt(it -> it.price().amount()).min().orElse(0)))
         .orElse(List.of());
-    boolean splitBetweenBoth = !group.isEmpty()
-        && group.stream().map(it -> deeds.ownerOf(it.type()).orElseThrow()).distinct().count() == 2;
-    return splitBetweenBoth ? group : List.of();
+    return group;
   }
 
   private static Optional<Player> selectWinner(

@@ -24013,6 +24013,39 @@ nothing here regresses a specified scenario and the merge itself is
 sound, but this needs to reach whoever decides whether the task is
 actually done.
 
+2026-08-07T23:39:56Z — refactorer sent greedo-buyout-wiring handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-buyout-wiring
+commit: bc3034b15a
+```
+
+Summary: the canonical-settlement change itself is sound (matches your
+decision above exactly, CRAP/DRY/mutation clean, 486/486 acceptance
+twice) — but the underlying oscillation bug this task exists to fix is
+still reproducible. Ran 20-100 real two-player Greedo games: 3-6% still
+show genuine A-B-A-B `PeerTrade` cycles with zero `SplitMonopolyWon`
+for the whole game, always on 3-member colour groups (pink, yellow)
+where only 2 of 3 streets are owned — `MonopolyBuyout` never engages
+for a not-fully-owned group regardless of price formula, and
+`Game.completeTrade` executes whatever the *trader's own* strategy
+picks with no partner consent, so nothing stops the immediate reverse
+trade from looking equally good next turn. Not a defect in this
+commit's own diff (the trade mechanism predates it, and price formula
+doesn't affect group-ownership completeness either way) — but it means
+every existing acceptance scenario only proves the narrow "whole board
+owned, one 2-member group split" case, not the general fix. Whether
+`MonopolyBuyout` should extend to partially-owned groups or
+`PeerTrading` needs partner consent or an anti-repeat guard is a design
+call, not something I'm fixing unilaterally. Separately, cleaned up
+`spareOwner` rebuilding its street list from scratch inside a nested
+loop — mechanical, verified behavior-identical.
+
 2026-08-07T23:41:09Z — received refactorer handoff:
 type: git_handoff
 from: refactorer
@@ -24050,6 +24083,7 @@ unit coverage for reciprocal and trader-only offers; domain tests pass and
 full acceptance passes 489/489.
 
 2026-08-08T07:33:04Z — sent refactorer handoff:
+2026-08-08T09:53:00Z — refactorer received coder handoff:
 type: git_handoff
 to: refactorer
 priority: 50
@@ -24057,3 +24091,100 @@ task: greedo-trade-mutual-consent
 commit: ad1ba58bbd
 
 Queued `50_20260808T073304Z_000089_from_coder_to_refactorer.handoff`.
+Merged `ad1ba58bbd` "Require mutual consent for Greedo peer trades" (3-way
+conflict in `logbook.md` only — the classic sent/received boilerplate
+misalignment against my own prior entry; reconstructed both entries in
+chronological order, verified via `diff` against both parent blobs).
+
+Reviewed the diff: `PeerTrading.select` now filters the chosen offer through
+`deeds.completesColourGroup(rules, offer.offered(), offer.partner())` —
+the trade only proceeds if giving `offered` away also completes the
+*partner's* group, not just the trader's own (already checked by
+`Greedo.accepts`). New/changed unit tests (`PeerTradingTest`, `GameTest`)
+and three new Gherkin scenarios (journal/logging/report `-54`) cover the
+one-sided-benefit-only case explicitly. CRAP: `PeerTrading` all methods
+CC<=4 (select itself CC=3, 100% cov). `dry4java`: no new duplication
+touching changed files. `mutate4java --scan`: 6 sites in `PeerTrading.java`,
+manifest was stale, refreshed. `mvn test` (314) and `-P property-tests`
+(22): all green. `./acceptance/run-acceptance.sh` twice: 489/489 both
+times.
+
+Re-verified empirically rather than trusting the green numbers, since
+fixing the oscillation for good is the actual point of this multi-cycle
+task: ran 200 real two-player Greedo games (unseeded dice) — 0 oscillating
+out of 200 for the previously-reported case (3-member groups, pink/yellow),
+confirming this fix does what it says for the case it targets. Widened to
+2000 runs to hunt for anything rarer: found 1 genuine oscillating game
+(`RueGrandeDinant`<->`DiestsestraatLeuven`, the `brown` group, traded back
+and forth for the rest of the capped 300-round game). Traced it with a
+temporary, reverted debug print (not committed) rather than guessing: for
+this game, `MonopolyBuyout.splitGroup` never once returns a non-empty
+group across 480 `resolve()` calls, even though `brown` is genuinely split
+the whole time. Root cause is in `splitGroup` itself — pre-existing, not
+touched by `ad1ba58bbd`'s diff: it picks the single candidate colour group
+with the *largest* price-spread via `.max(...)` first, and only afterward
+checks whether that one particular group happens to be split. On this
+board `dark_blue` (spread 50) always wins that `.max()` over `brown`
+(spread 0, both streets price 60) — including *after* `dark_blue` itself
+gets resolved and consolidated to one owner, at which point `splitGroup`
+keeps re-selecting the now-unsplit `dark_blue`, finds `splitBetweenBoth ==
+false`, and returns empty forever, never once considering `brown` even
+though it is the only group still actually split. That starves
+`resolveBuyoutAtStart` completely, and `tradeAtStart`/`PeerTrading` is the
+only mechanism left standing — where the new reciprocal-consent check
+is a no-op for a 2-member group: with only one other street in the group,
+"the partner already owns every other street in the group" is trivially
+true no matter which direction the trade runs, so it can't block anything
+here. Net effect: the fix in this commit correctly closes the case it
+targets (3+ member groups needing a real completion check on both sides)
+and cuts the reproduction rate roughly two orders of magnitude (from
+3-6% of games down to about 1 in 2000, or ~0.05%), but does not close the
+task's goal in general — a rarer, structurally different gap remains,
+specifically in `MonopolyBuyout.splitGroup`'s candidate-selection order
+plus the reciprocal-consent check's blind spot for 2-member groups.
+Not fixing either myself: `splitGroup` picking the wrong candidate is a
+genuine behavioral defect (not a restructuring), and whether to fix
+selection order, filter candidates to split-only before ranking by
+spread, or handle 2-member groups differently in `PeerTrading` are design
+calls outside refactorer's remit. Committed the manifest refresh alone;
+no other file changes from this review. Flagging with full evidence for
+the architect and, ultimately, the user who has been tracking this
+oscillation issue across the whole task — the fix is real progress, not a
+false claim, but "closable" is still their call.
+
+2026-08-08T07:53:36Z — received refactorer handoff:
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: greedo-trade-mutual-consent
+commit: cabb31556a
+
+Merged and accepted reciprocal consent for Greedo peer trades. Full
+acceptance passed 489/489, including the three new mutual-consent scenarios.
+The remaining `MonopolyBuyout.splitGroup` failure is functional: it ranks a
+possibly unsplit group before checking whether it is split between the given
+players, masking an actual split group. Returning this contract violation to
+coder; phase remains open.
+
+2026-08-08T09:57:10Z — received architect handoff:
+id: 20260808T075357Z_000128_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 7840095634
+created_at: 2026-08-08T07:53:57.180158Z
+enqueued_at: 2026-08-08T07:53:57.825826Z
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process architect 7840095634
+
+Merged `7840095634`. Added a regression test for an unsplit dark-blue group
+masking a genuinely split brown group, then filtered buyout candidates to
+groups split between the requested players before applying price-spread
+selection. Domain tests pass 315/315 and acceptance passes 489/489.

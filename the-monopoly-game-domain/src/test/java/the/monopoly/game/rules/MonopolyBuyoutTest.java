@@ -161,6 +161,22 @@ class MonopolyBuyoutTest {
     assertThat(MonopolyBuyout.resolve(dog, highHat, rules, deeds)).isEmpty();
   }
 
+  @Test
+  void itResolvesASplitGroupEvenWhenAnUnsplitGroupHasALargerPriceSpread() {
+    Player dog = player("dog", 1000);
+    Player highHat = player("high hat", 100);
+    deeds.sell(ownable(Street.Type.MeirAntwerpen), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.NieuwstraatBrussel), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.RueGrandeDinant), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.DiestsestraatLeuven), highHat, Money.ZERO);
+
+    MonopolyBuyout.Outcome outcome = MonopolyBuyout.resolve(dog, highHat, rules, deeds)
+        .orElseThrow();
+
+    assertThat(outcome.winner()).isEqualTo(dog);
+    assertThat(deeds.ownerOf(Street.Type.DiestsestraatLeuven)).contains(dog.id());
+  }
+
   private Ownable ownable(Street.Type type) {
     return (Ownable) rules.create(type);
   }
