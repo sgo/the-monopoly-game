@@ -25366,3 +25366,16 @@ buyout at turn start, with buyout as the fallback only when no trade is
 resolved. The existing journal-58, logging-58, and report-58 scenarios
 remain the acceptance criteria. Routed the observable dispatch-order
 change to the coder for implementation and verification.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: buyout-highest-priority-exclusion
+commit: 918d17d7ae
+```
+
+Summary: coder implements the specified turn-start dispatch order and
+verifies the existing acceptance criteria.
