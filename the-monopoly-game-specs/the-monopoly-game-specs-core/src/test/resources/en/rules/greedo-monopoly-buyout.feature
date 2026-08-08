@@ -171,3 +171,19 @@ Feature: Greedo split-monopoly buyout
     Examples:
       | dog_balance | high_hat_balance | price |
       | 115         | 50                | 40    |
+
+  # buyout-11
+  Scenario Outline: the co-owner who already holds more of a split colour group wins it, even when poorer
+    Given pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "dog" owns "Bruul Mechelen"
+    And pawn "dog" has $<dog_balance> to spend
+    And pawn "high hat" owns "Place Verte Verviers"
+    And pawn "high hat" has $<high_hat_balance> to spend
+    When the split monopoly between pawn "dog" and pawn "high hat" is resolved
+    Then pawn "dog" wins the split monopoly
+    And pawn "dog" pays pawn "high hat" $<price> for the split monopoly
+    And pawn "dog" owns "Place Verte Verviers"
+
+    Examples:
+      | dog_balance | high_hat_balance | price |
+      | 100         | 5000              | 10    |
