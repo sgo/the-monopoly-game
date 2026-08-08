@@ -24369,3 +24369,35 @@ task: greedo-trade-mutual-consent
 Merged c32d972caf; please review the three surviving soft mutations in
 greedo-peer-trade.feature and revise or decline the scenario coverage. The
 price-spread production ranking is now independently mutation-proven.
+
+2026-08-08T11:00:00Z — received specifier handoff:
+id: 20260808T105701Z_000074_from_specifier_to_architect
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 018e388d3a
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process specifier 018e388d3a
+
+Merged 018e388d3a. The specifier removed the invalid example whose offered
+street was not owned, and added a valid highest-priority-street decline
+scenario. Full acceptance passes 489/489. The source mutation and DRY checks
+have no new actionable result. Soft Gherkin mutation kills 13/16 mutations;
+the three survivors only change capitalization of the `declines` step keyword
+and are semantically equivalent under its case-insensitive step matching, so
+they do not represent a specification gap.
+
+2026-08-08T11:00:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-trade-mutual-consent
+
+Phase complete: production ranking coverage and peer-trade scenario review
+are accepted. The retained soft-mutation survivors are case-only equivalents.
