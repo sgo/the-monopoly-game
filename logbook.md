@@ -24501,6 +24501,39 @@ groups not completely owned by the winner; prevent transfers that split a
 winner-owned complete monopoly. The new buyout-7 acceptance scenario is red
 and identifies the failing transfer.
 
+2026-08-08T15:26:00Z — received coder handoff:
+id: 20260808T152253Z_000095_from_coder_to_architect
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: 27a9dbf9a5
+task: greedo-buyout-partner-identity
+
+Re-read your role and constitution.
+
+merge_and_process coder 27a9dbf9a5
+
+Merged 27a9dbf9a5. `spareStreetsOf` now excludes streets from a colour group
+the winner completely owns, preventing the specified self-split; incomplete
+winner-owned groups remain eligible. Full acceptance passes 492/492.
+Differential Java mutation is clean and DRY finds only established,
+scenario-specific fixtures. Soft buyout-feature mutation reports survivors,
+but direct execution confirms asserted payment mutations fail; the remaining
+new cases only perturb balances within the same eligibility threshold and are
+semantically equivalent. No acceptance criterion gap remains.
+
+2026-08-08T15:26:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-buyout-partner-identity
+
+Phase complete: the specified sweetener eligibility rule is implemented and
+verified. Retained soft mutations are equivalent within their balance bands.
+
 2026-08-08T13:05:00Z — received specifier handoff:
 id: 20260808T130443Z_000075_from_specifier
 from: specifier
