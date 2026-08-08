@@ -22,7 +22,6 @@ Feature: Greedo peer trading between non-leading players
       | dog_owned         | dog_offered                                    | dog_wanted                                     | decision |
       | Rue Grande Dinant | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)  | Diestsestraat Leuven                           | accepts  |
       | Rue Grande Dinant | Rue de Diekirch Arlon                          | Diestsestraat Leuven                           | accepts  |
-      | Rue Grande Dinant | Groenplaats Antwerpen                          | Diestsestraat Leuven                           | declines |
       | Meir Antwerpen    | Rue de Diekirch Arlon                          | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)  | accepts  |
 
   # greedo-trade-2
@@ -50,3 +49,14 @@ Feature: Greedo peer trading between non-leading players
     Examples:
       | decision |
       | declines |
+
+  # greedo-trade-4
+  Scenario Outline: Greedo declines a trade that would give up a highest-priority street
+    Given pawn "dog" owns "<dog_offered>"
+    And pawn "high hat" owns "Diestsestraat Leuven"
+    When pawn "dog" considers trading "<dog_offered>" to pawn "high hat" for "Diestsestraat Leuven"
+    Then the "Greedo" strategy <decision> the trade
+
+    Examples:
+      | dog_offered            | decision |
+      | Groenplaats Antwerpen  | declines |
