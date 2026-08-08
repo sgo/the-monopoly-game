@@ -24433,6 +24433,107 @@ task: greedo-trade-mutual-consent
 Phase complete: production ranking coverage and peer-trade scenario review
 are accepted. The retained soft-mutation survivors are case-only equivalents.
 
+2026-08-08T13:32:00Z — received refactorer handoff:
+id: 20260808T133113Z_000098_from_refactorer_to_architect
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 270ad1ce7e
+task: greedo-buyout-partner-identity
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 270ad1ce7e
+
+Merged 270ad1ce7e. The partner-identity correction correctly excludes groups
+split with uninvolved players from buyout selection and from spare-sweetener
+candidates. Full acceptance passes 492/492. Architectural review confirms the
+refactorer's empirical finding: the existing spare-sweetener transfer can
+create a new winner/loser split from an unrelated complete group, and the next
+turn correctly resolves that manufactured split. Repetition causes unbounded
+buyout cycling, so the required prevention policy is an unresolved observable
+behavior decision, not a structural refactoring.
+
+2026-08-08T13:32:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-buyout-partner-identity
+
+Specify the intended rule when a MonopolyBuyout spare sweetener would split an
+otherwise complete unrelated colour group between the same players. Current
+behavior causes repeated future buyouts; do not address it with a separate
+turn-start/cooldown policy without a specified game rule.
+
+2026-08-08T15:12:00Z — received specifier handoff:
+id: 20260808T151109Z_000076_from_specifier_to_architect
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 1dc8b84793
+task: greedo-buyout-partner-identity
+
+Re-read your role and constitution.
+
+merge_and_process specifier 1dc8b84793
+
+Merged 1dc8b84793. The new buyout scenarios specify that a spare sweetener
+must be withheld when its transfer would split the winner's already-complete
+monopoly, while a sweetener remains valid from a group the winner does not
+completely own. Full acceptance is red exactly on the withholding scenario:
+high hat receives Rue Grande Dinant from dog's complete brown group. This is a
+coder-owned production implementation gap.
+
+2026-08-08T15:12:00Z — sent architect handoff:
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-buyout-partner-identity
+
+Implement the specified sweetener eligibility rule. Preserve sweeteners from
+groups not completely owned by the winner; prevent transfers that split a
+winner-owned complete monopoly. The new buyout-7 acceptance scenario is red
+and identifies the failing transfer.
+
+2026-08-08T15:26:00Z — received coder handoff:
+id: 20260808T152253Z_000095_from_coder_to_architect
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: 27a9dbf9a5
+task: greedo-buyout-partner-identity
+
+Re-read your role and constitution.
+
+merge_and_process coder 27a9dbf9a5
+
+Merged 27a9dbf9a5. `spareStreetsOf` now excludes streets from a colour group
+the winner completely owns, preventing the specified self-split; incomplete
+winner-owned groups remain eligible. Full acceptance passes 492/492.
+Differential Java mutation is clean and DRY finds only established,
+scenario-specific fixtures. Soft buyout-feature mutation reports survivors,
+but direct execution confirms asserted payment mutations fail; the remaining
+new cases only perturb balances within the same eligibility threshold and are
+semantically equivalent. No acceptance criterion gap remains.
+
+2026-08-08T15:26:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-buyout-partner-identity
+
+Phase complete: the specified sweetener eligibility rule is implemented and
+verified. Retained soft mutations are equivalent within their balance bands.
+
 2026-08-08T13:05:00Z — received specifier handoff:
 id: 20260808T130443Z_000075_from_specifier
 from: specifier
@@ -24461,6 +24562,40 @@ regression for a third-party split group being excluded from spare sweeteners,
 and fixed `MonopolyBuyout` accordingly. Domain tests pass 317/317 and full
 acceptance passes 492/492.
 
+2026-08-08T16:14:54Z — received specifier handoff:
+id: 20260808T161454Z_000077_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+task: greedo-buyout-affordability
+commit: 46e8849b1d
+
+Merged the affordability scenarios and implemented the 35%-of-balance
+buyout ceiling. Unaffordable cash-only splits now defer without changing
+ownership; free spare-street sweeteners remain available when eligible.
+Deferred genuine splits are fenced off from peer trading. Domain tests pass
+320/320 and full acceptance passes 492/492.
+
+2026-08-08T15:22:53Z — sent architect handoff:
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-buyout-partner-identity
+commit: 27a9dbf9a5
+
+Queued `00_20260808T152253Z_000095_from_coder_to_architect.handoff` after
+domain 318/318 and acceptance 492/492 passed.
+
+2026-08-08T13:18:18Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-buyout-partner-identity
+commit: 51df4b1934
+
+Queued `50_20260808T131818Z_000094_from_coder_to_refactorer.handoff` after
+domain 317/317 and acceptance 492/492 passed.
 2026-08-08T15:10:00Z — refactorer received coder handoff:
 type: git_handoff
 to: refactorer
@@ -24566,3 +24701,19 @@ majority of real games (67% of 1000 games logged >10 SplitMonopolyWon
 events, 33% >100, avg ~96/game, worst 495). Full root-cause trace in the
 received-handoff entry above; flagging as likely blocking for phase
 completion given the reproduction rate and severity.
+
+2026-08-08T15:13:53Z — received architect handoff:
+id: 20260808T151353Z_000135_from_architect
+from: architect
+to: coder
+priority: 00
+type: git_handoff
+task: greedo-buyout-partner-identity
+commit: 5c883a521a
+
+Merged the architect review and the specified buyout-7/buyout-8 scenarios.
+Implemented the sweetener eligibility rule: a spare street is withheld when
+the winner already completely owns its colour group, while incomplete groups
+remain eligible. Added domain coverage and updated the canonical turn-start
+expectation for a complete-group winner. Domain tests pass 318/318 and full
+acceptance passes 492/492.

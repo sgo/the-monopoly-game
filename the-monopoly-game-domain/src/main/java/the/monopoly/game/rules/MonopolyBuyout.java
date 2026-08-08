@@ -22,6 +22,11 @@ public final class MonopolyBuyout {
             rules, deeds, group));
   }
 
+  /** Whether these players currently split a complete colour group. */
+  public static boolean hasSplit(Player first, Player second, Rule.Set rules, Deeds deeds) {
+    return !splitGroup(first, second, rules, deeds).isEmpty();
+  }
+
   /** The colour group split between exactly these two players, or empty if none qualifies. */
   private static List<ColourStreet> splitGroup(Player first, Player second, Rule.Set rules, Deeds deeds) {
     List<ColourStreet> streets = rules.streets().filter(ColourStreet.class::isInstance)
@@ -51,7 +56,7 @@ public final class MonopolyBuyout {
     ColourStreet winnerStreet = streetOwnedBy(group, deeds, winner);
     ColourStreet loserStreet = streetOwnedBy(group, deeds, loser);
     List<ColourStreet> spare = spareStreetsOf(winner, loser, winnerStreet.colourGroup(), rules, deeds);
-    Optional<Money> cash = settlementCash(winner, loser, price(winner, winnerStreet, spare, loserStreet), spare);
+    Optional<Money> cash = settlementCash(winner, price(winner, winnerStreet, spare, loserStreet), spare);
     if (cash.isEmpty()) return Optional.empty();
     deeds.transfer(loserStreet, loser, winner, cash.get());
     if (includesSpareSweetener(spare, cash.get(), winner)) {
@@ -60,23 +65,13 @@ public final class MonopolyBuyout {
     return Optional.of(new Outcome(winner, loser, cash.get()));
   }
 
-  /** The sticker price adjusted for what the winner can actually afford, or empty if no settlement is possible. */
-  private static Optional<Money> settlementCash(Player winner, Player loser, Money stickerPrice, List<ColourStreet> spare) {
-    Money cash = waiveIfUnaffordable(winner, loser, stickerPrice);
-    return cash.equals(Money.ZERO) && spare.isEmpty() ? Optional.empty() : Optional.of(cash);
-  }
-
-  /**
-   * The winner pays the sticker price outright when they can afford double it (a cushion
-   * against undershooting on a close-run settlement); a richer winner who can't gets it for
-   * nothing instead. A winner tied on cash always pays it as-is, since {@link #selectWinner}
-   * only picks a tied winner when they hold a spare street to sweeten the deal with, so this
-   * branch never needs to waive anything.
-   */
-  private static Money waiveIfUnaffordable(Player winner, Player loser, Money stickerPrice) {
-    if (stickerPrice.equals(Money.ZERO)) return stickerPrice;
-    if (winner.account().balance().amount().covers(new Money(stickerPrice.amount() * 2))) return stickerPrice;
-    return winner.account().balance().amount().exceeds(loser.account().balance().amount()) ? Money.ZERO : stickerPrice;
+  /** The sticker price when the winner's 35% offer ceiling covers it. */
+  private static Optional<Money> settlementCash(Player winner, Money stickerPrice,
+                                                 List<ColourStreet> spare) {
+    if (stickerPrice.equals(Money.ZERO)) return Optional.of(stickerPrice);
+    int maximumOffer = winner.account().balance().amount().amount() * 35 / 100;
+    if (stickerPrice.amount() <= maximumOffer) return Optional.of(stickerPrice);
+    return spare.isEmpty() ? Optional.empty() : Optional.of(Money.ZERO);
   }
 
   private static boolean includesSpareSweetener(List<ColourStreet> spare, Money cash, Player winner) {
@@ -95,6 +90,7 @@ public final class MonopolyBuyout {
     return streets.stream()
         .filter(it -> it.colourGroup() != excludedGroup)
         .filter(it -> deeds.ownerOf(it.type()).filter(winner.id()::equals).isPresent())
+        .filter(it -> !ownsCompleteGroup(winner, groupFor(it, streets), deeds))
         .filter(it -> !isSplitGroup(groupFor(it, streets), deeds)).toList();
   }
 
@@ -145,6 +141,10 @@ public final class MonopolyBuyout {
   private static boolean isSplitGroup(List<ColourStreet> group, Deeds deeds) {
     return group.stream().allMatch(it -> deeds.ownerOf(it.type()).isPresent())
         && group.stream().map(it -> deeds.ownerOf(it.type()).orElseThrow()).distinct().count() > 1;
+  }
+
+  private static boolean ownsCompleteGroup(Player owner, List<ColourStreet> group, Deeds deeds) {
+    return group.stream().allMatch(it -> deeds.ownerOf(it.type()).filter(owner.id()::equals).isPresent());
   }
 
   public record Outcome(Player winner, Player loser, Money payment) {
