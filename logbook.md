@@ -24345,4 +24345,96 @@ task: greedo-trade-mutual-consent
 commit: c32d972caf
 
 Queued `00_20260808T083358Z_000093_from_coder_to_architect.handoff` with
-mutant-killing ranking coverage and passing domain verification.
+ mutant-killing ranking coverage and passing domain verification.
+2026-08-08T10:36:00Z — received coder handoff:
+id: 20260808T083358Z_000093_from_coder_to_architect
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: c32d972caf
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process coder c32d972caf
+
+Merged c32d972caf. The controlled-price Rule.Set test adapter makes the
+price-spread ordering observable. A clean focused test passes with production
+`max - min` and fails after a temporary `max + min` substitution; production
+was restored. Full acceptance passes 489/489. Differential Java mutation and
+DRY review produced no actionable production issue. Soft Gherkin mutation of
+greedo-peer-trade.feature leaves three survivors, which is an acceptance
+criterion/example gap and must be reviewed by the specifier.
+
+2026-08-08T10:36:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-trade-mutual-consent
+
+Merged c32d972caf; please review the three surviving soft mutations in
+greedo-peer-trade.feature and revise or decline the scenario coverage. The
+price-spread production ranking is now independently mutation-proven.
+
+2026-08-08T11:00:00Z — received specifier handoff:
+id: 20260808T105701Z_000074_from_specifier_to_architect
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 018e388d3a
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process specifier 018e388d3a
+
+Merged 018e388d3a. The specifier removed the invalid example whose offered
+street was not owned, and added a valid highest-priority-street decline
+scenario. Full acceptance passes 489/489. The source mutation and DRY checks
+have no new actionable result. Soft Gherkin mutation kills 13/16 mutations;
+the three survivors only change capitalization of the `declines` step keyword
+and are semantically equivalent under its case-insensitive step matching, so
+they do not represent a specification gap.
+
+2026-08-08T11:00:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-trade-mutual-consent
+
+Phase complete: production ranking coverage and peer-trade scenario review
+are accepted. The retained soft-mutation survivors are case-only equivalents.
+
+2026-08-08T13:05:00Z — received specifier handoff:
+id: 20260808T130443Z_000075_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 046bed0495
+created_at: 2026-08-08T13:04:43.629088Z
+enqueued_at: 2026-08-08T13:04:44.421488Z
+task: greedo-buyout-partner-identity
+
+Re-read your role and constitution.
+
+merge_and_process specifier 046bed0495
+
+Merged `046bed0495`. Added journal, logging, and report acceptance scenarios
+for split-monopoly buyout with an uninvolved third player, and retained the
+specifier's corrected Greedo priority scenario. No production changes were
+required.
+
+Implemented the missing acceptance handlers for round-robin ownership and
+standalone split-monopoly journal/log/report assertions. Added a domain
+regression for a third-party split group being excluded from spare sweeteners,
+and fixed `MonopolyBuyout` accordingly. Domain tests pass 317/317 and full
+acceptance passes 492/492.

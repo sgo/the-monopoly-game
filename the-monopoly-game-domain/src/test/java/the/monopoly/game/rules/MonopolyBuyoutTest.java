@@ -205,6 +205,24 @@ class MonopolyBuyoutTest {
     assertThat(deeds.ownerOf(Street.Type.BoulevardDAvroyLiege)).contains(highHat.id());
   }
 
+  @Test
+  void aThirdPlayerSplittingAnotherGroupDoesNotMakeThatStreetASpareSweetener() {
+    Player dog = player("dog", 1000);
+    Player highHat = player("high hat", 100);
+    Player ironBox = player("iron box", 100);
+    deeds.sell(ownable(Street.Type.MeirAntwerpen), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.NieuwstraatBrussel), highHat, Money.ZERO);
+    deeds.sell(ownable(Street.Type.RueDeDiekirchArlon), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.BruulMechelen), highHat, Money.ZERO);
+    deeds.sell(ownable(Street.Type.PlaceVerteVerviers), ironBox, Money.ZERO);
+
+    MonopolyBuyout.Outcome outcome = MonopolyBuyout.resolve(dog, highHat, rules, deeds)
+        .orElseThrow();
+
+    assertThat(outcome.payment()).isEqualTo(new Money(40));
+    assertThat(deeds.ownerOf(Street.Type.RueDeDiekirchArlon)).contains(dog.id());
+  }
+
   private Ownable ownable(Street.Type type) {
     return (Ownable) rules.create(type);
   }

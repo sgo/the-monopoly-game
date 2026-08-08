@@ -95,7 +95,7 @@ public final class MonopolyBuyout {
     return streets.stream()
         .filter(it -> it.colourGroup() != excludedGroup)
         .filter(it -> deeds.ownerOf(it.type()).filter(winner.id()::equals).isPresent())
-        .filter(it -> !isSplitGroup(groupFor(it, streets), winner, loser, deeds)).toList();
+        .filter(it -> !isSplitGroup(groupFor(it, streets), deeds)).toList();
   }
 
   private static List<ColourStreet> groupFor(ColourStreet street, List<ColourStreet> streets) {
@@ -140,6 +140,11 @@ public final class MonopolyBuyout {
         && group.stream().map(it -> deeds.ownerOf(it.type()).orElseThrow()).distinct().count() == 2
         && group.stream().anyMatch(it -> deeds.ownerOf(it.type()).filter(first.id()::equals).isPresent())
         && group.stream().anyMatch(it -> deeds.ownerOf(it.type()).filter(second.id()::equals).isPresent());
+  }
+
+  private static boolean isSplitGroup(List<ColourStreet> group, Deeds deeds) {
+    return group.stream().allMatch(it -> deeds.ownerOf(it.type()).isPresent())
+        && group.stream().map(it -> deeds.ownerOf(it.type()).orElseThrow()).distinct().count() > 1;
   }
 
   public record Outcome(Player winner, Player loser, Money payment) {

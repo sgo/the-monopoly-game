@@ -99,6 +99,8 @@ final class GameLogStepHandlers {
 
   static List<StepHandler> handlers() {
     return List.of(
+        then("^the game journal records that pawn \"" + NAME + "\" wins the split monopoly$",
+            (world, arguments) -> records(world, splitMonopolyWon(arguments.text(1)))),
         then("^the game journal records that pawn \"" + NAME + "\" wins the split monopoly before it records that pawn \""
                 + NAME + "\" starts a turn$",
             (world, arguments) -> recordsInOrder(world, splitMonopolyWon(arguments.text(1)),
@@ -111,6 +113,8 @@ final class GameLogStepHandlers {
                 + NAME + "\" starts a turn$",
             (world, arguments) -> logRecordsInOrder(world, splitMonopolyWon(arguments.text(1)),
                 turnStarted(arguments.text(2)))),
+        then("^the game log records that pawn \"" + NAME + "\" wins the split monopoly$",
+            (world, arguments) -> logRecords(world, splitMonopolyWon(arguments.text(1)))),
         then("^the game log records that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE
                 + " for the split monopoly$",
             (world, arguments) -> logRecords(world, splitMonopolyPaid(
@@ -119,6 +123,8 @@ final class GameLogStepHandlers {
                 + NAME + "\" starts a turn$",
             (world, arguments) -> saysInOrder(world, arguments.text(1) + " wins the split monopoly",
                 arguments.text(2) + " starts a turn")),
+        then("^the game report says that pawn \"" + NAME + "\" wins the split monopoly$",
+            (world, arguments) -> says(world, arguments.text(1) + " wins the split monopoly")),
         then("^the game report says that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE
                 + " for the split monopoly$",
             (world, arguments) -> says(world, arguments.text(1) + " pays " + arguments.text(2) + " $"
