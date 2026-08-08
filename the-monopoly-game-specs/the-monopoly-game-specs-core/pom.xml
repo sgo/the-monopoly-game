@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>the-monopoly-game-specs-core</artifactId>
-    <version>0.0.0-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -63,6 +63,6 @@
     <parent>
         <groupId>the.monopoly.game</groupId>
         <artifactId>the-monopoly-game-specs</artifactId>
-        <version>0.0.0-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
 </project>
