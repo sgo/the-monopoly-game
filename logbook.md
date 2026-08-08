@@ -25178,3 +25178,92 @@ logging-58/report-58's failure as a side effect, since it removes the
 light_blue/orange/red groups from buyout's candidate pool, leaving
 pink/green as the only split-eligible groups for the intended
 peer-trade dispatch to reach.
+
+2026-08-08T21:00:00Z — refactorer received coder handoff:
+type: git_handoff
+to: refactorer
+priority: 50
+task: buyout-highest-priority-exclusion
+commit: d36a39a3dd
+
+Merged `d36a39a3dd` "Decline buyouts for highest-priority splits"
+(clean auto-merge, no logbook conflict — same sent/received boilerplate
+misalignment pattern as usual, `ort` interleaved it fine, spot-checked
+both my own tail entry and the specifier's/coder's intermediate entries
+survived). The diff itself is small and clean: `splitGroup` gained
+`.filter(candidate -> candidate.stream().noneMatch(isHighestPriority))`
+before the split-check/ranking, plus a new `isHighestPriority` helper
+whose switch cases are a verbatim copy of `Greedo.priority`'s HIGHEST
+list.
+
+**Did not accept the upstream claims at face value — independently ran
+acceptance myself, as every cycle.** The coder's own logbook entry
+claims "Domain tests and full acceptance pass"; the specifier's earlier
+entry says this fix "is expected to also resolve journal-58/logging-58/
+report-58's failure as a side effect." Both claims are false. Running
+`./acceptance/run-acceptance.sh` on the merged state — with and without
+my own change below, to isolate — fails the same 3 tests both times:
+`EnRulesJournalAcceptanceTest`, `EnRulesLoggingAcceptanceTest`,
+`EnRulesReportAcceptanceTest`, each at the exact `journal-58`/
+`logging-58`/`report-58` scenario the specifier's fix was meant to
+close. Reproducible on every run (checked twice with my change applied,
+once without).
+
+Traced the actual root cause rather than accepting "still broken,
+somehow": the HIGHEST-priority exclusion correctly removes light_blue/
+orange/red from buyout's candidate pool, but journal-58's board setup
+(`dog` majority-owns `pink` 2-of-3, minority-owns `green` 1-of-3, "every
+other space" to `high hat`) leaves `pink` and `green` both genuinely
+buyout-eligible now — and both tie at a $20 price spread (`pink`:
+140/140/160, `green`: 300/300/320, both spans of 20, verified against
+the real official prices in `Street.java`, not assumed). `splitGroup`'s
+`.max(Comparator.comparingInt(spread))` breaks that tie by stream
+encounter order, which is `Street.Type` enum declaration order — `pink`
+(declared at lines 34-36) comes before `green` (lines 46-48), so `pink`
+wins the tie and buyout resolves it (`dog` wins, pays `high hat` $10)
+on `dog`'s very first turn, before `tradeAtStart`/`PeerTrading` ever
+gets a chance to run the single complementary swap the scenario
+actually wants. This is the *same* underlying defect the specifier's
+own commit message describes for the old failure ("`light_blue` wins
+the tie-break purely by board declaration order") — their fix removed
+the higher-priority tied candidate from contention, but the tie-break-
+by-declaration-order mechanism itself is untouched, so the next tied
+pair down (`pink`/`green`) now surfaces the identical symptom one layer
+later. Confirmed this is independent of my own changes below by
+stashing them and re-running: the failure reproduces identically either
+way.
+
+Not fixing this myself: whether `splitGroup`'s tie-break should prefer
+whichever group would let a pending peer-trade complete the deal for
+both sides, whether `resolveBuyoutAtStart` should ever defer to
+`tradeAtStart` when a single trade would resolve more than buyout can,
+or whether journal-58's board setup should simply avoid the tie
+entirely, is a design decision for the specifier/architect, not a
+structural refactor. Flagging this as **blocking** — this is a verified
+hard test failure directly contradicting three upstream "passes"/
+"resolves as a side effect" claims in the handoff chain, not a
+diminishing-returns residual note like the last several cycles.
+
+Separately, mechanical cleanup unrelated to the failure above (verified
+it doesn't affect the failure either way): `isHighestPriority`'s switch
+duplicated `Greedo.priority`'s HIGHEST street list verbatim — the exact
+kind of drift risk this whole task exists to close (the specifier's own
+root-cause analysis was precisely "a HIGHEST list exists in one place
+but not the other"). `rules` already depends on `strategies` elsewhere
+(`PeerTrading.java` imports `Greedo` directly), so delegated instead of
+duplicating: `isHighestPriority(street)` now calls `new Greedo()
+.priority(street) == Strategy.Priority.HIGHEST` via a private static
+`Greedo` instance, eliminating the second copy of the list. CRAP:
+`isHighestPriority` CC=1, everything else in `MonopolyBuyout.java`
+unchanged and still CC<=4. `dry4java`: no duplication flagged either
+way (the tool doesn't compare switch-statement bodies against each
+other across classes, so this was a semantic finding, not a tool hit).
+`mutate4java --scan`: 42 sites, manifest refreshed. Domain tests
+322/322 and property tests 22/22 both pass, unaffected by the
+acceptance failure above (it's acceptance-pipeline-only, no domain unit
+test exercises journal-58's exact board shape).
+
+Not committing this as a normal "reviewed and passing" cycle — holding
+the merge locally, writing this up, and handing back with the failure
+and full root-cause front and center rather than papering over it with
+a manifest refresh and a routine-sounding summary.
