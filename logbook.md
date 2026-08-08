@@ -24569,6 +24569,40 @@ loser-owned street in one buyout, or prescribe another rule preventing winner
 flips while the same group remains split. Current one-deed settlement permits
 repeated buyouts of the same group.
 
+2026-08-08T17:35:00Z — received refactorer handoff:
+id: 20260808T173249Z_000100_from_refactorer_to_architect
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: cd494e8d23
+task: greedo-buyout-majority-and-trade-priority
+
+Re-read your role and constitution.
+
+merge_and_process refactorer cd494e8d23
+
+Merged cd494e8d23. Majority ownership now selects the winner of an uneven
+split before cash balance, and Greedo rejects same-colour-group trades. Full
+acceptance passes 507/507. Empirical simulation confirms the previous
+buyout-only and peer-trade oscillations are eliminated. A separate residual
+reclaims the same deed only after financial distress causes a mortgage or
+distressed sale and the former minority wins it at auction; the majority then
+buys it back. This cross-subsystem recurrence needs an explicit rule decision
+before it can be treated as intentional.
+
+2026-08-08T17:35:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-buyout-majority-and-trade-priority
+
+Decide whether a deed recovered through mortgage/distressed sale may be
+immediately bought back via split-monopoly buyout, or specify a affordability
+or reclaim restriction. Current recurrence is bounded but observable.
+
 2026-08-08T13:05:00Z — received specifier handoff:
 id: 20260808T130443Z_000075_from_specifier
 from: specifier
@@ -25014,4 +25048,3 @@ is now entangled with legitimate financial-distress mechanics rather
 than an isolated defect, recommending this be treated as diminishing-
 returns territory — worth a decision on whether to keep chasing it, not
 a blocker for this task.
-
