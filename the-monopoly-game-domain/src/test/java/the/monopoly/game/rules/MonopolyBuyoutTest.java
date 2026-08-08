@@ -1,11 +1,16 @@
 package the.monopoly.game.rules;
 
 import org.junit.jupiter.api.Test;
+import the.monopoly.game.components.board.Board;
 import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.dice.Dice;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
+
+import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -187,7 +192,14 @@ class MonopolyBuyoutTest {
     deeds.sell(ownable(Street.Type.VeldstraatGent), dog, Money.ZERO);
     deeds.sell(ownable(Street.Type.BoulevardDAvroyLiege), highHat, Money.ZERO);
 
-    MonopolyBuyout.resolve(dog, highHat, rules, deeds).orElseThrow();
+    Rule.Set rankingRules = rulesWithPrices(Map.of(
+        Street.Type.MeirAntwerpen, 100,
+        Street.Type.NieuwstraatBrussel, 200,
+        Street.Type.BoulevardTirouCharleroi, 150,
+        Street.Type.VeldstraatGent, 150,
+        Street.Type.BoulevardDAvroyLiege, 160));
+
+    MonopolyBuyout.resolve(dog, highHat, rankingRules, deeds).orElseThrow();
 
     assertThat(deeds.ownerOf(Street.Type.NieuwstraatBrussel)).contains(dog.id());
     assertThat(deeds.ownerOf(Street.Type.BoulevardDAvroyLiege)).contains(highHat.id());
@@ -204,5 +216,53 @@ class MonopolyBuyoutTest {
     Player player = new Player(id, bank.accountOf(id));
     player.account().deposit(new Money(balance));
     return player;
+  }
+
+  private Rule.Set rulesWithPrices(Map<Street.Type, Integer> prices) {
+    Rule.Set original = rules;
+    return new Rule.Set() {
+      @Override
+      public Stream<Dice> dice() {
+        return original.dice();
+      }
+
+      @Override
+      public Player.Pool players() {
+        return original.players();
+      }
+
+      @Override
+      public Bank bank() {
+        return original.bank();
+      }
+
+      @Override
+      public void activate(Rule.Type type) {
+        original.activate(type);
+      }
+
+      @Override
+      public Street create(Street.Type type) {
+        return original.create(type);
+      }
+
+      @Override
+      public Board gameboard() {
+        return original.gameboard();
+      }
+
+      @Override
+      public Stream<Street> streets() {
+        return original.streets().map(street -> {
+          if (!(street instanceof the.monopoly.game.components.streets.ColourStreet colourStreet)
+              || !prices.containsKey(street.type())) return street;
+          return new the.monopoly.game.components.streets.ColourStreet(
+              colourStreet.type(), colourStreet.colourGroup(),
+              new Money(prices.get(street.type())), colourStreet.rentByHouses(),
+              colourStreet.rentForOneHotel(), colourStreet.constructionCost(),
+              colourStreet.landMortgageValue());
+        });
+      }
+    };
   }
 }

@@ -24313,3 +24313,26 @@ production split-group filter/ranking fix to satisfy the test.
 2026-08-08T10:14:00Z — delivery correction: the initial action_request draft
 was rejected by swarm_handoff because handoffs must be git_handoff metadata
 only. Resending commit b998812b5e; its log entry contains the full p00 request.
+
+2026-08-08T10:34:00Z — received architect handoff:
+id: 20260808T083121Z_000131_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: aae513cabb
+created_at: 2026-08-08T08:31:21.635477Z
+enqueued_at: 2026-08-08T08:31:21.920753Z
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process architect aae513cabb
+
+Merged `aae513cabb`. Replaced the non-discriminating official-price fixture
+with a focused rule-set adapter whose controlled prices make `max - min` and
+`max + min` select different groups. The real test passes, the temporary
+`max + min` substitution fails, production was restored, and domain tests
+pass 316/316.
