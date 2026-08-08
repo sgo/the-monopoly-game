@@ -24635,6 +24635,38 @@ task: greedo-buyout-majority-and-trade-priority
 Phase complete: majority buyout and same-group trade rules are verified; the
 bounded distressed-sale recurrence is accepted by specification.
 
+2026-08-08T19:12:00Z — received refactorer handoff:
+id: 20260808T191033Z_000101_from_refactorer_to_architect
+from: refactorer
+to: architect
+recipient: architect
+priority: 50
+type: git_handoff
+role: refactorer
+commit: 3fd6aa8ac1
+task: buyout-highest-priority-exclusion
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 3fd6aa8ac1
+
+Merged 3fd6aa8ac1. The HIGHEST-priority split exclusion is implemented, with
+one shared Greedo priority source. Full acceptance is nevertheless red in
+journal, logging, and report. Reproduction confirms the cause: pink and green
+are both eligible and tie at a 20 price spread; the stream's declaration-order
+tie break chooses pink buyout before the intended peer trade. This is a
+specifier-owned tie-break/order policy gap.
+
+2026-08-08T19:12:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: buyout-highest-priority-exclusion
+
+Specify tie behavior when multiple non-HIGHEST split groups have equal price
+spread and a complementary peer trade is available. Current enum-order
+selection preempts journal-58/logging-58/report-58's intended trade.
+
 2026-08-08T13:05:00Z — received specifier handoff:
 id: 20260808T130443Z_000075_from_specifier
 from: specifier
