@@ -25340,7 +25340,7 @@ type: git_handoff
 to: architect
 priority: 50
 task: buyout-highest-priority-exclusion
-commit: <to be filled>
+commit: ef9fdf2e77
 ```
 
 Summary: no feature-file changes; this handoff carries only the
