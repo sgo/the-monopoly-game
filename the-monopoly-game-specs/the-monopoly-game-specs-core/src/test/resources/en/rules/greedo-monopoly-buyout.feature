@@ -1,5 +1,5 @@
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-07T23:10:10.444602Z","feature_name":"Greedo split-monopoly buyout","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/greedo-monopoly-buyout.feature","background_hash":"e15f13aafcac0600c3aaaaf97d370d153eb29c5c34b3d00e93ab47602feefe9c","implementation_hash":"unknown","scenarios":[{"index":4,"name":"an exact tie in cash with no eligible streets leaves the monopoly split","scenario_hash":"5ad5cbfff85dfb65890d9e7a0244197dbdcd8fecdc532c09a16fe84de59c2e6f","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-07T23:10:10.444602Z"}]}
+# {"version":1,"tested_at":"2026-08-08T15:24:37.282896Z","feature_name":"Greedo split-monopoly buyout","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/greedo-monopoly-buyout.feature","background_hash":"e15f13aafcac0600c3aaaaf97d370d153eb29c5c34b3d00e93ab47602feefe9c","implementation_hash":"unknown","scenarios":[{"index":4,"name":"an exact tie in cash with no eligible streets leaves the monopoly split","scenario_hash":"5ad5cbfff85dfb65890d9e7a0244197dbdcd8fecdc532c09a16fe84de59c2e6f","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-07T23:10:10.444602Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -141,3 +141,33 @@ Feature: Greedo split-monopoly buyout
     Examples:
       | dog_balance | high_hat_balance |
       | 1900        | 50                |
+
+  # buyout-9
+  Scenario Outline: a deal is deferred, not forced for free, when 35% of the richer co-owner's balance falls short of the price
+    Given pawn "dog" owns "Meir Antwerpen"
+    And pawn "dog" has $<dog_balance> to spend
+    And pawn "high hat" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+    And pawn "high hat" has $<high_hat_balance> to spend
+    When the split monopoly between pawn "dog" and pawn "high hat" is resolved
+    Then no one wins the split monopoly
+    And pawn "high hat" does not own "Meir Antwerpen"
+    And pawn "dog" does not own "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+
+    Examples:
+      | dog_balance | high_hat_balance |
+      | 114         | 50                |
+
+  # buyout-10
+  Scenario Outline: the deal proceeds once 35% of the richer co-owner's balance just covers the price
+    Given pawn "dog" owns "Meir Antwerpen"
+    And pawn "dog" has $<dog_balance> to spend
+    And pawn "high hat" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+    And pawn "high hat" has $<high_hat_balance> to spend
+    When the split monopoly between pawn "dog" and pawn "high hat" is resolved
+    Then pawn "dog" wins the split monopoly
+    And pawn "dog" pays pawn "high hat" $<price> for the split monopoly
+    And pawn "dog" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+
+    Examples:
+      | dog_balance | high_hat_balance | price |
+      | 115         | 50                | 40    |
