@@ -60,3 +60,14 @@ Feature: Greedo peer trading between non-leading players
     Examples:
       | dog_offered            | decision |
       | Groenplaats Antwerpen  | declines |
+
+  # greedo-trade-5
+  Scenario Outline: Greedo declines a trade where the offered and wanted streets belong to the same colour group
+    Given pawn "dog" owns "Meir Antwerpen"
+    And pawn "high hat" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+    When pawn "dog" considers trading "Meir Antwerpen" to pawn "high hat" for "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+    Then the "Greedo" strategy <decision> the trade
+
+    Examples:
+      | decision |
+      | declines |

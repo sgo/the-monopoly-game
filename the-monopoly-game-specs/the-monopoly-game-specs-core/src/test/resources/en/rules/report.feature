@@ -746,3 +746,40 @@ Feature: game report
     Examples:
       | dog_balance | high_hat_balance |
       | 114         | 50                |
+
+  # report-57
+  Scenario Outline: the majority owner within a split colour group wins the buyout during real play, even when poorer
+    Given stalemate trading is enabled for the "Greedo" strategy
+    And every other ownable space is owned alternately by pawn "dog" and pawn "high hat" in board order
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "dog" owns "Bruul Mechelen"
+    And pawn "dog" has $<dog_balance> to spend
+    And pawn "high hat" owns "Place Verte Verviers"
+    When we play up to 3 rounds
+    Then the game report says that pawn "dog" wins the split monopoly
+    And pawn "dog" owns "Place Verte Verviers"
+
+    Examples:
+      | dog_balance |
+      | 100          |
+
+  # report-58
+  Scenario Outline: peer trading resolves two complementary splits with one cash-free swap, before buyout ever considers either group
+    Given stalemate trading is enabled for the "Greedo" strategy
+    And every other ownable space is owned by pawn "high hat"
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "dog" owns "Bruul Mechelen"
+    And pawn "dog" owns "<dog_offered>"
+    And pawn "dog" owns "Lippenslaan Knokke"
+    And pawn "dog" owns "Rue St-Léonard Liège"
+    And pawn "dog" owns "Steenstraat Brugge"
+    When we play up to 1 round
+    Then the game report says that pawn "dog" trades "<dog_offered>" to pawn "high hat" for "<dog_wanted>"
+    And the game report does not say that pawn "dog" wins the split monopoly
+    And the game report does not say that pawn "high hat" wins the split monopoly
+    And pawn "dog" owns "<street_dog_now_owns>"
+    And pawn "high hat" owns "<street_high_hat_now_owns>"
+
+    Examples:
+      | dog_offered              | dog_wanted            | street_dog_now_owns   | street_high_hat_now_owns |
+      | Boulevard Tirou Charleroi | Place Verte Verviers  | Place Verte Verviers  | Boulevard Tirou Charleroi |
