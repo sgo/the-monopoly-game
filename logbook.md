@@ -25516,3 +25516,25 @@ and the normal acceptance pipeline passes 508/508. No further
 coder-owned implementation changes were needed; the architect's
 fixture reconciliation resolves the prior acceptance conflict while
 retaining the peer-trade-before-buyout behavior.
+
+## 2026-08-08T19:55:47Z — architect closes buyout highest-priority exclusion
+
+Received coder priority-00 handoff (commit `9ac01a66ff`, task
+`buyout-highest-priority-exclusion`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 9ac01a66ff
+```
+
+Action: accepted the coder verification. The final review found and
+removed the new duplicate peer-trade test fixture without changing
+behavior. Differential Java mutation is current for `Game.java`; DRY
+has no new meaningful duplication. Soft Gherkin mutation refreshed the
+three changed feature manifests: price mutations were killed, and the
+remaining balance perturbations are equivalent within the same
+affordability or majority-outcome class. Final verification passed:
+323 domain tests, 22 property tests, and 508 acceptance tests. No
+further coder or refactorer loop is warranted; sent the phase-complete
+state to the specifier.
