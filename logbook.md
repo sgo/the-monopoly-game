@@ -24603,6 +24603,38 @@ Decide whether a deed recovered through mortgage/distressed sale may be
 immediately bought back via split-monopoly buyout, or specify a affordability
 or reclaim restriction. Current recurrence is bounded but observable.
 
+2026-08-08T18:03:00Z — received specifier handoff:
+id: 20260808T175859Z_000079_from_specifier_to_architect
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 6cddb66231
+task: greedo-buyout-majority-and-trade-priority
+
+Re-read your role and constitution.
+
+merge_and_process specifier 6cddb66231
+
+Merged 6cddb66231. The specifier accepted the bounded distressed-sale
+recurrence under the current mortgage and auction rules, and adjusted the
+journal/log/report peer-trade setup with explicit balances so its expected
+trade is not preempted by a buyout. Full acceptance passes 507/507.
+Differential mutation manifests for MonopolyBuyout and Greedo are current;
+DRY has no production duplicates. Soft mutation: journal 31/31 killed,
+logging 31/31 killed, report has no eligible mutations.
+
+2026-08-08T18:03:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-buyout-majority-and-trade-priority
+
+Phase complete: majority buyout and same-group trade rules are verified; the
+bounded distressed-sale recurrence is accepted by specification.
+
 2026-08-08T13:05:00Z — received specifier handoff:
 id: 20260808T130443Z_000075_from_specifier
 from: specifier
