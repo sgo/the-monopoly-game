@@ -24438,3 +24438,13 @@ standalone split-monopoly journal/log/report assertions. Added a domain
 regression for a third-party split group being excluded from spare sweeteners,
 and fixed `MonopolyBuyout` accordingly. Domain tests pass 317/317 and full
 acceptance passes 492/492.
+
+2026-08-08T13:18:18Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-buyout-partner-identity
+commit: 51df4b1934
+
+Queued `50_20260808T131818Z_000094_from_coder_to_refactorer.handoff` after
+domain 317/317 and acceptance 492/492 passed.
