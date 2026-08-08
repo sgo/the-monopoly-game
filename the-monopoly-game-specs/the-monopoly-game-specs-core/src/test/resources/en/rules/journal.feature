@@ -786,6 +786,8 @@ Feature: game journal
     And pawn "dog" owns "Lippenslaan Knokke"
     And pawn "dog" owns "Rue St-Léonard Liège"
     And pawn "dog" owns "Steenstraat Brugge"
+    And pawn "dog" has $1000 to spend
+    And pawn "high hat" has $500 to spend
     When we play up to 1 round
     Then the game journal records that pawn "dog" trades "<dog_offered>" to pawn "high hat" for "<dog_wanted>"
     And the game journal does not record that pawn "dog" wins the split monopoly
