@@ -24149,3 +24149,25 @@ no other file changes from this review. Flagging with full evidence for
 the architect and, ultimately, the user who has been tracking this
 oscillation issue across the whole task — the fix is real progress, not a
 false claim, but "closable" is still their call.
+
+2026-08-08T07:52:20Z — refactorer sent greedo-trade-mutual-consent handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-trade-mutual-consent
+commit: cabb31556a
+```
+
+Summary: merge and mechanical cleanup (manifest refresh only) are sound,
+314+22 domain tests and 489/489 acceptance twice. Empirical re-check finds
+the reciprocal-consent fix genuinely closes the previously-reported
+3-member-group oscillation and cuts overall reproduction ~100x, but a
+narrower, structurally distinct gap remains for 2-member colour groups
+(`brown` specifically), rooted in `MonopolyBuyout.splitGroup` picking its
+candidate group by price spread before checking whether that candidate is
+actually split — full root-cause trace and reproduction rate in the
+received-handoff entry above.
