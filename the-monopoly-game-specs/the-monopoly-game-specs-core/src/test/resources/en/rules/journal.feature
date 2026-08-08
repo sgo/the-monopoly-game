@@ -719,3 +719,25 @@ Feature: game journal
     Examples:
       | dog_offered    | dog_wanted           | street_dog_still_owns | street_high_hat_still_owns |
       | Meir Antwerpen | Diestsestraat Leuven | Meir Antwerpen        | Diestsestraat Leuven       |
+
+  # journal-55
+  Scenario Outline: a split monopoly resolves via buyout even with an uninvolved third player in the game
+    Given we select 3 players
+    And pawn "iron box" will roll 10 for initiative
+    And pawn "dog" will roll 7 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And stalemate trading is enabled for the "Greedo" strategy
+    And every other ownable space is owned in round-robin order by pawn "dog", pawn "high hat", and pawn "iron box" in board order
+    And pawn "dog" owns "Meir Antwerpen"
+    And pawn "dog" has $1000 to spend
+    And pawn "high hat" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+    And pawn "high hat" has $100 to spend
+    When we play up to 3 rounds
+    Then the game journal records that pawn "dog" wins the split monopoly
+    And the game journal records that pawn "dog" pays pawn "high hat" $<price> for the split monopoly
+    And pawn "dog" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+
+    Examples:
+      | price |
+      | 40    |

@@ -562,6 +562,27 @@ public class World {
     }
   }
 
+  public void ownEveryOtherOwnableRoundRobin(String... pawns) {
+    if (deeds == null) deeds = new Deeds();
+    List<Ownable> ownables = ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast).toList();
+    Map<Street.Colour, Integer> groupSizes = new HashMap<>();
+    ownables.stream().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
+        .forEach(street -> groupSizes.merge(street.colourGroup(), 1, Integer::sum));
+    Map<Street.Colour, Integer> groupPositions = new HashMap<>();
+    int otherPosition = 0;
+    for (int index = 0; index < ownables.size(); index++) {
+      Ownable ownable = ownables.get(index);
+      String owner;
+      if (ownable instanceof ColourStreet street) {
+        int position = groupPositions.merge(street.colourGroup(), 1, Integer::sum) - 1;
+        owner = pawns[position % Math.min(pawns.length, groupSizes.get(street.colourGroup()))];
+      } else {
+        owner = pawns[otherPosition++ % pawns.length];
+      }
+      deeds.sell(ownable, pawn(owner), Money.ZERO);
+    }
+  }
+
   public void assertGreedoPriority(String spaceName, String expected) {
     the.monopoly.game.strategies.Strategy.Priority actual =
         new the.monopoly.game.strategies.Greedo().priority(ownable(SpaceNames.of(spaceName)));

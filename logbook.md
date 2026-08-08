@@ -24082,6 +24082,7 @@ trade selection, preserving Greedo's preferred-offer ordering. Added focused
 unit coverage for reciprocal and trader-only offers; domain tests pass and
 full acceptance passes 489/489.
 
+2026-08-08T07:33:04Z — sent refactorer handoff:
 2026-08-08T09:53:00Z — refactorer received coder handoff:
 type: git_handoff
 to: refactorer
@@ -24089,6 +24090,7 @@ priority: 50
 task: greedo-trade-mutual-consent
 commit: ad1ba58bbd
 
+Queued `50_20260808T073304Z_000089_from_coder_to_refactorer.handoff`.
 Merged `ad1ba58bbd` "Require mutual consent for Greedo peer trades" (3-way
 conflict in `logbook.md` only — the classic sent/received boilerplate
 misalignment against my own prior entry; reconstructed both entries in
@@ -24171,3 +24173,290 @@ narrower, structurally distinct gap remains for 2-member colour groups
 candidate group by price spread before checking whether that candidate is
 actually split — full root-cause trace and reproduction rate in the
 received-handoff entry above.
+
+2026-08-08T07:53:36Z — received refactorer handoff:
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: greedo-trade-mutual-consent
+commit: cabb31556a
+
+Merged and accepted reciprocal consent for Greedo peer trades. Full
+acceptance passed 489/489, including the three new mutual-consent scenarios.
+The remaining `MonopolyBuyout.splitGroup` failure is functional: it ranks a
+possibly unsplit group before checking whether it is split between the given
+players, masking an actual split group. Returning this contract violation to
+coder; phase remains open.
+
+2026-08-08T09:57:10Z — received architect handoff:
+id: 20260808T075357Z_000128_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 7840095634
+created_at: 2026-08-08T07:53:57.180158Z
+enqueued_at: 2026-08-08T07:53:57.825826Z
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process architect 7840095634
+
+Merged `7840095634`. Added a regression test for an unsplit dark-blue group
+masking a genuinely split brown group, then filtered buyout candidates to
+groups split between the requested players before applying price-spread
+selection. Domain tests pass 315/315 and acceptance passes 489/489.
+
+2026-08-08T09:57:36Z — sent architect handoff:
+ type: git_handoff
+2026-08-08T07:59:37Z — received coder handoff:
+ type: git_handoff
+ from: coder
+to: architect
+priority: 00
+task: greedo-trade-mutual-consent
+commit: 1a7299d0c6
+
+Queued `00_20260808T075736Z_000090_from_coder_to_architect.handoff` with the
+ verified split-group selection fix.
+Merged the split-group selection correction. Full acceptance passed 489/489.
+Differential mutation found survivors in the changed candidate-ranking
+expression (`splitGroup` lines 36–37): the current test proves an unsplit
+group is excluded but does not prove ranking across multiple eligible split
+groups. Returning focused behavioral coverage to coder before final DRY and
+Gherkin checks.
+
+2026-08-08T10:06:30Z — received architect handoff:
+id: 20260808T080448Z_000130_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 1f742c69e4
+created_at: 2026-08-08T08:04:48.753240Z
+enqueued_at: 2026-08-08T08:04:49.207901Z
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process architect 1f742c69e4
+
+Merged `1f742c69e4`. Strengthened the ranking regression so the intended
+`max - min` price-spread ordering differs from the surviving `max + min`
+mutant: dark blue has the larger spread while green has the larger sum.
+Domain tests pass 316/316 and acceptance passes 489/489.
+
+2026-08-08T10:06:59Z — sent architect handoff:
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-trade-mutual-consent
+commit: 2b19892c94
+
+Queued `00_20260808T080659Z_000092_from_coder_to_architect.handoff` with
+coverage that distinguishes spread ranking from the surviving sum mutant.
+
+2026-08-08T10:02:00Z — received architect handoff:
+id: 20260808T075956Z_000129_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 64868a2f70
+created_at: 2026-08-08T07:59:56.395158Z
+enqueued_at: 2026-08-08T07:59:57.441413Z
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process architect 64868a2f70
+
+Merged `64868a2f70`. Added focused coverage proving that when multiple
+eligible groups are split between the same players, the group with the
+largest price spread is selected. Domain tests pass 316/316 and acceptance
+passes 489/489.
+
+2026-08-08T10:02:17Z — sent architect handoff:
+type: git_handoff
+2026-08-08T08:04:28Z — received coder handoff:
+type: git_handoff
+from: coder
+to: architect
+priority: 00
+task: greedo-trade-mutual-consent
+commit: af6068ba71
+
+Queued `00_20260808T080217Z_000091_from_coder_to_architect.handoff` with
+focused ranking coverage and passing verification.
+Merged the added ranking test. Full acceptance passed 489/489, but differential
+mutation still lets the changed `max - min` price-spread expression survive
+when changed to `max + min`. The test's two candidate groups do not make those
+rankings select different outcomes. Returning this precise coverage gap to
+coder before final verification.
+
+2026-08-08T10:13:00Z — received coder handoff:
+type: git_handoff
+from: coder
+to: architect
+priority: 00
+task: greedo-trade-mutual-consent
+commit: 2b19892c94
+
+Merged the revised ranking test and independently validated it. Full
+acceptance passed 489/489. A clean, focused source-level substitution of the
+ranking operator from `-` to `+` still leaves all 13 buyout tests green; the
+asserted final deed ownership therefore does not make the selected candidate
+observable. Return to coder for a regression that demonstrably kills this
+mutant, while preserving the existing split-group production fix.
+
+2026-08-08T10:13:00Z — sent architect handoff:
+type: action_request
+from: architect
+to: coder
+priority: 00
+task: greedo-trade-mutual-consent
+
+The current ranking regression is not discriminating: after a clean compile,
+changing MonopolyBuyout line 37 from max-min to max+min still passes all 13
+MonopolyBuyoutTest methods. Add a test whose asserted result differs under
+those two operators (for example an observable Outcome field or ownership
+configuration that cannot be reached through the other candidate). Verify
+with a clean focused test and mutate4java line 37. Do not alter the existing
+production split-group filter/ranking fix to satisfy the test.
+
+2026-08-08T10:14:00Z — delivery correction: the initial action_request draft
+was rejected by swarm_handoff because handoffs must be git_handoff metadata
+only. Resending commit b998812b5e; its log entry contains the full p00 request.
+
+2026-08-08T10:34:00Z — received architect handoff:
+id: 20260808T083121Z_000131_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: aae513cabb
+created_at: 2026-08-08T08:31:21.635477Z
+enqueued_at: 2026-08-08T08:31:21.920753Z
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process architect aae513cabb
+
+Merged `aae513cabb`. Replaced the non-discriminating official-price fixture
+with a focused rule-set adapter whose controlled prices make `max - min` and
+`max + min` select different groups. The real test passes, the temporary
+`max + min` substitution fails, production was restored, and domain tests
+pass 316/316.
+
+2026-08-08T10:33:58Z — sent architect handoff:
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-trade-mutual-consent
+commit: c32d972caf
+
+Queued `00_20260808T083358Z_000093_from_coder_to_architect.handoff` with
+ mutant-killing ranking coverage and passing domain verification.
+2026-08-08T10:36:00Z — received coder handoff:
+id: 20260808T083358Z_000093_from_coder_to_architect
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: c32d972caf
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process coder c32d972caf
+
+Merged c32d972caf. The controlled-price Rule.Set test adapter makes the
+price-spread ordering observable. A clean focused test passes with production
+`max - min` and fails after a temporary `max + min` substitution; production
+was restored. Full acceptance passes 489/489. Differential Java mutation and
+DRY review produced no actionable production issue. Soft Gherkin mutation of
+greedo-peer-trade.feature leaves three survivors, which is an acceptance
+criterion/example gap and must be reviewed by the specifier.
+
+2026-08-08T10:36:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-trade-mutual-consent
+
+Merged c32d972caf; please review the three surviving soft mutations in
+greedo-peer-trade.feature and revise or decline the scenario coverage. The
+price-spread production ranking is now independently mutation-proven.
+
+2026-08-08T11:00:00Z — received specifier handoff:
+id: 20260808T105701Z_000074_from_specifier_to_architect
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 018e388d3a
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process specifier 018e388d3a
+
+Merged 018e388d3a. The specifier removed the invalid example whose offered
+street was not owned, and added a valid highest-priority-street decline
+scenario. Full acceptance passes 489/489. The source mutation and DRY checks
+have no new actionable result. Soft Gherkin mutation kills 13/16 mutations;
+the three survivors only change capitalization of the `declines` step keyword
+and are semantically equivalent under its case-insensitive step matching, so
+they do not represent a specification gap.
+
+2026-08-08T11:00:00Z — sent architect handoff:
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-trade-mutual-consent
+
+Phase complete: production ranking coverage and peer-trade scenario review
+are accepted. The retained soft-mutation survivors are case-only equivalents.
+
+2026-08-08T13:05:00Z — received specifier handoff:
+id: 20260808T130443Z_000075_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 046bed0495
+created_at: 2026-08-08T13:04:43.629088Z
+enqueued_at: 2026-08-08T13:04:44.421488Z
+task: greedo-buyout-partner-identity
+
+Re-read your role and constitution.
+
+merge_and_process specifier 046bed0495
+
+Merged `046bed0495`. Added journal, logging, and report acceptance scenarios
+for split-monopoly buyout with an uninvolved third player, and retained the
+specifier's corrected Greedo priority scenario. No production changes were
+required.
+
+Implemented the missing acceptance handlers for round-robin ownership and
+standalone split-monopoly journal/log/report assertions. Added a domain
+regression for a third-party split group being excluded from spare sweeteners,
+and fixed `MonopolyBuyout` accordingly. Domain tests pass 317/317 and full
+acceptance passes 492/492.
