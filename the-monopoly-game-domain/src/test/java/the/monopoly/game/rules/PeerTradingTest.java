@@ -38,14 +38,11 @@ class PeerTradingTest {
   }
 
   @Test
-  void selectsTheTradeThatCompletesAColourGroup() {
+  void declinesATradeWithinTheSameColourGroup() {
     deeds.sell(ownable(Street.Type.RueGrandeDinant), dog, Money.ZERO);
     deeds.sell(ownable(Street.Type.DiestsestraatLeuven), highHat, Money.ZERO);
 
-    Optional<Strategy.TradeOffer> selected = select(new Greedo(Money.ZERO, true));
-
-    assertThat(selected).contains(new Strategy.TradeOffer(
-        dog, highHat, ownable(Street.Type.RueGrandeDinant), ownable(Street.Type.DiestsestraatLeuven)));
+    assertThat(select(new Greedo(Money.ZERO, true))).isEmpty();
   }
 
   @Test

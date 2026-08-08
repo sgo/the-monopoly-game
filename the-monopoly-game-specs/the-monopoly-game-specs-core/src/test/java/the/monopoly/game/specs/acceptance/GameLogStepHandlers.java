@@ -129,6 +129,27 @@ final class GameLogStepHandlers {
                 + " for the split monopoly$",
             (world, arguments) -> says(world, arguments.text(1) + " pays " + arguments.text(2) + " $"
                 + arguments.number(3) + " for the split monopoly")),
+        then("^the game journal records that pawn \"" + NAME + "\" trades \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \"" + NAME + "\"$",
+            (world, arguments) -> records(world, peerTrade(
+                arguments.text(1), arguments.text(2), arguments.text(3), arguments.text(4)))),
+        then("^the game log records that pawn \"" + NAME + "\" trades \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \"" + NAME + "\"$",
+            (world, arguments) -> logRecords(world, peerTrade(
+                arguments.text(1), arguments.text(2), arguments.text(3), arguments.text(4)))),
+        then("^the game report says that pawn \"" + NAME + "\" trades \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \"" + NAME + "\"$",
+            (world, arguments) -> says(world, arguments.text(1) + " trades " + arguments.text(2)
+                + " to " + arguments.text(3) + " for " + arguments.text(4))),
+        then("^the game journal does not record that pawn \"" + NAME + "\" wins the split monopoly$",
+            (world, arguments) -> assertThat(world.journal()).noneMatch(
+                splitMonopolyWon(arguments.text(1)).matches())),
+        then("^the game log does not record that pawn \"" + NAME + "\" wins the split monopoly$",
+            (world, arguments) -> assertThat(world.gameLog()).noneMatch(
+                splitMonopolyWon(arguments.text(1)).matches())),
+        then("^the game report does not say that pawn \"" + NAME + "\" wins the split monopoly$",
+            (world, arguments) -> assertThat(world.report()).doesNotContain(
+                arguments.text(1) + " wins the split monopoly")),
         then("^the game log records that stalemate trading is " + NAME + "$",
             (world, arguments) -> logRecords(world, stalemateTrading(arguments.text(1)))),
         then("^the game report says that stalemate trading is " + NAME + "$",

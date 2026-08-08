@@ -46,9 +46,19 @@ public final class MonopolyBuyout {
 
   private static Optional<Player> selectWinner(
       Player first, Player second, Rule.Set rules, Deeds deeds, List<ColourStreet> group) {
-    Player winner = richer(first, second);
+    Player winner = majorityOwner(first, second, group, deeds);
+    if (winner == null) winner = richer(first, second);
     if (winner == null) winner = spareOwner(first, second, rules, deeds, group);
     return Optional.ofNullable(winner);
+  }
+
+  private static Player majorityOwner(Player first, Player second,
+                                      List<ColourStreet> group, Deeds deeds) {
+    long firstOwned = group.stream().filter(it -> deeds.ownerOf(it.type())
+        .filter(first.id()::equals).isPresent()).count();
+    long secondOwned = group.stream().filter(it -> deeds.ownerOf(it.type())
+        .filter(second.id()::equals).isPresent()).count();
+    return firstOwned == secondOwned ? null : firstOwned > secondOwned ? first : second;
   }
 
   private static Optional<Outcome> settle(

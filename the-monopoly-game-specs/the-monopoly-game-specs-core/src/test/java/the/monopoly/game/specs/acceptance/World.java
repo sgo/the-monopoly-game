@@ -562,6 +562,12 @@ public class World {
     }
   }
 
+  public void ownEveryOtherOwnable(String pawnName) {
+    if (deeds == null) deeds = new Deeds();
+    ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
+        .forEach(ownable -> deeds.sell(ownable, pawn(pawnName), Money.ZERO));
+  }
+
   public void ownEveryOtherOwnableRoundRobin(String... pawns) {
     if (deeds == null) deeds = new Deeds();
     List<Ownable> ownables = ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast).toList();
