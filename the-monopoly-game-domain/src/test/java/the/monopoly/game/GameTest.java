@@ -221,15 +221,17 @@ class GameTest {
   }
 
   @Test
-  void aStalemateTradingGreedoTradesAwayItsLowestPriorityStreetToCompleteAColourGroupAtTheStartOfItsTurn() {
+  void aStalemateTradingGreedoTradesWhenBothPlayersCompleteColourGroupsAtTheStartOfItsTurn() {
     Player dog = players.get(0);
     Player highHat = players.get(1);
     Player ironBox = players.get(2);
     Deeds deeds = new Deeds();
     ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
-        .filter(land -> land.type() != Street.Type.DiestsestraatLeuven)
+        .filter(land -> land.type() != Street.Type.DiestsestraatLeuven
+            && land.type() != Street.Type.MeirAntwerpen)
         .forEach(land -> deeds.sell(land, dog, Money.ZERO));
     deeds.sell((Ownable) ruleSet.create(Street.Type.DiestsestraatLeuven), highHat, Money.ZERO);
+    deeds.sell((Ownable) ruleSet.create(Street.Type.MeirAntwerpen), highHat, Money.ZERO);
     Strategy.OfPlayers strategies = player ->
         player.id().equals(dog.id()) ? new Greedo(Money.ZERO, true) : Strategy.UNDECIDED;
     Map<Player.ID, Cup> cups = Map.of(

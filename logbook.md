@@ -23585,6 +23585,15 @@ routed the game through canonical `MonopolyBuyout.resolve`. Canonical spare
 eligibility now excludes streets from groups already split between the same
 players. Updated focused game coverage; domain tests and acceptance (486/486,
 including CLI and packaged-jar paths) pass.
+
+2026-08-07T23:27:14Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-buyout-wiring
+commit: bcde86a010
+
+Queued `00_20260807T232714Z_000088_from_coder_to_refactorer.handoff`.
 ## 2026-08-07T23:07:37Z — refactorer verifies and accepts the generalized buyout fix
 
 Merged `bd1965c935`. Two `logbook.md` items: the usual cross-matched
@@ -23675,6 +23684,43 @@ packaged-jar scenarios. Differential mutation is clean for both changed
 production files. DRY only reports the pre-existing journal adapter pattern.
 Soft Gherkin mutation of `greedo-monopoly-buyout.feature` killed 7/16 and
 survived 9; routing this feature-content gap to the specifier before closure.
+
+2026-08-07T23:10:33Z — received architect handoff:
+type: git_handoff
+from: architect
+to: specifier
+priority: 00
+task: greedo-buyout-wiring
+commit: a80c446156
+
+Merged `a80c446156`. Read `MonopolyBuyout.java` before deciding anything: the
+`resolveAtTurnStart` path used during real play doesn't implement the
+35%-of-balance-ceiling / $5-increment auction mechanic at all. Winner is
+simply whichever co-owner has more cash (`richer`); price is
+`|loserStreet.price - winnerStreet.price| - 10`, floored at 0 — a board
+sticker-price difference, not a balance-based auction. The isolated
+`resolve()` path (what `greedo-monopoly-buyout.feature` exercises) uses yet a
+*third*, different formula (`rentForOneHotel * 2` or `vacantRent * 3`). My
+`buyout-1` example (dog $1000/high hat $100 -> $40) happens to satisfy the
+sticker-price formula too (`|400-350|-10 = 40`), which is exactly how this
+drifted past review undetected through several correction cycles that were
+each individually trying to fix a narrower "hard-coded to the fixture"
+complaint.
+
+Reported this to the user rather than deciding unilaterally, since the
+35%-ceiling/$5-increment mechanic was their explicit design, not mine. They
+want to go back to that design (not accept the drifted heuristic), but asked
+to hear the architect's take first: whether review/differential mutation
+should have caught a pricing-formula divergence like this before merge, or
+whether tighter Gherkin examples are really the right fix.
+
+2026-08-07T23:18:19Z — sent architect note:
+type: note
+to: architect
+priority: 00
+message: greedo-monopoly-buyout: could review have caught the price-formula drift?
+
+Queued `00_20260807T231803Z_000072_from_specifier_to_architect.handoff`.
 
 2026-08-07T23:17:39Z — received refactorer handoff:
 type: git_handoff
@@ -23999,3 +24045,39 @@ owned, one 2-member group split" case, not the general fix. Whether
 call, not something I'm fixing unilaterally. Separately, cleaned up
 `spareOwner` rebuilding its street list from scratch inside a nested
 loop — mechanical, verified behavior-identical.
+
+2026-08-07T23:41:09Z — received refactorer handoff:
+type: git_handoff
+from: refactorer
+to: architect
+priority: 50
+task: greedo-buyout-wiring
+commit: bc3034b15a
+
+Merged and accepted the canonical-settlement correction: `Game` now invokes
+`MonopolyBuyout.resolve` at turn start and no cash-only turn-start policy
+remains. Full acceptance passed 486/486, including normal CLI and packaged
+jar scenarios. Refactorer reproduced the original oscillation in partially
+owned three-street colour groups (3/100 runs), a case absent from the current
+acceptance criteria; routing this specification gap to specifier before phase
+closure.
+
+2026-08-08T07:25:44Z — received specifier handoff:
+id: 20260808T072544Z_000073_from_specifier_to_coder
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: deb8430a9f
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process specifier deb8430a9f
+
+Merged `deb8430a9f`. Added reciprocal monopoly-completion consent to peer
+trade selection, preserving Greedo's preferred-offer ordering. Added focused
+unit coverage for reciprocal and trader-only offers; domain tests pass and
+full acceptance passes 489/489.

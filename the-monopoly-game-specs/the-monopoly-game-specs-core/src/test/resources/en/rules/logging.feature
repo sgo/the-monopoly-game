@@ -715,3 +715,21 @@ Feature: game logging
     Examples:
       | price |
       | 40    |
+
+  # logging-54
+  Scenario Outline: the log does not record a peer trade that would only benefit the trader, not the partner
+    Given stalemate trading is enabled for the "Greedo" strategy
+    And every other ownable space is owned alternately by pawn "dog" and pawn "high hat" in board order
+    And pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "<dog_offered>"
+    And pawn "dog" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
+    And pawn "high hat" owns "<dog_wanted>"
+    And pawn "dog" will roll 2 and 3 for their turn
+    When we play up to 1 round
+    Then the game log does not record that pawn "dog" trades "<dog_offered>" to pawn "high hat" for "<dog_wanted>"
+    And pawn "dog" owns "<street_dog_still_owns>"
+    And pawn "high hat" owns "<street_high_hat_still_owns>"
+
+    Examples:
+      | dog_offered    | dog_wanted           | street_dog_still_owns | street_high_hat_still_owns |
+      | Meir Antwerpen | Diestsestraat Leuven | Meir Antwerpen        | Diestsestraat Leuven       |
