@@ -25151,3 +25151,15 @@ logging-58/report-58's failure as a side effect, since it removes the
 light_blue/orange/red groups from buyout's candidate pool, leaving
 pink/green as the only split-eligible groups for the intended
 peer-trade dispatch to reach.
+
+2026-08-08 — Received specifier handoff `06248fa960` for
+`buyout-highest-priority-exclusion` and merged it. Added a regression
+test and implementation filter so `MonopolyBuyout` declines any split
+colour group containing a Greedo HIGHEST-priority street, matching the
+strategy's priority list. Domain tests pass: 322 tests, 0 failures.
+
+The full acceptance run still has the pre-existing journal-58/
+logging-58/report-58 dispatch-order failure: the remaining pink split
+is resolved by the existing buyout-first turn-start flow before peer
+trading. This handoff's focused HIGHEST exclusion is verified, but the
+separate dispatch-order issue is reported to the refactorer for review.
