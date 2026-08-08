@@ -24827,3 +24827,31 @@ structural refactor. Given the sharply lower severity, flagging this as
 a residual note worth a decision, not a blocker — recommending the
 architect and user treat this task's core fix as accepted rather than
 holding the phase open for it, unless further review disagrees.
+
+2026-08-08T16:33:03Z — refactorer sent greedo-buyout-affordability handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-buyout-affordability
+commit: dd8bcb1c02
+```
+
+Summary: this closes the severe thrashing regression from last cycle —
+worst-case SplitMonopolyWon count per game drops from 495 to 26, average
+from ~96 to ~5.5, across 2000 real games; zero games now exceed even the
+50-event threshold that 48% of games hit before. Retiring the spare
+sweetener from live play plus deferring unaffordable buyouts and
+fencing PeerTrading off a deferred split is real, substantial progress,
+not a partial patch. A smaller, distinct residual mechanism remains
+(2-vs-1 splits on 3+ member groups consolidating one street per turn
+while richer()-based winner selection can flip mid-consolidation) —
+full trace in the received-handoff entry above, flagged as a residual
+note worth a design decision, not a blocker; recommending this task be
+treated as accepted. Also extracted resolvableBuyout/anySplitExists to
+bring resolveBuyoutAtStart's CRAP back within threshold after the
+coder's rewrite (CC 7→5), verified behavior-identical.
+
