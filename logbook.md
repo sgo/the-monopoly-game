@@ -24460,3 +24460,85 @@ standalone split-monopoly journal/log/report assertions. Added a domain
 regression for a third-party split group being excluded from spare sweeteners,
 and fixed `MonopolyBuyout` accordingly. Domain tests pass 317/317 and full
 acceptance passes 492/492.
+
+2026-08-08T15:10:00Z — refactorer received coder handoff:
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-buyout-partner-identity
+commit: 51df4b1934
+
+Merged `51df4b1934` "Handle buyouts with uninvolved third players" (3-way
+conflict in `logbook.md` only — same sent/received boilerplate
+misalignment as every prior cycle; reconstructed both entries in
+chronological order, verified via `diff` against both parent blobs).
+
+The production fix is narrowly correct and well tested. `splitGroup` now
+filters candidates to `isSplitGroup(candidate, first, second, deeds)`
+*before* ranking by price spread, rather than ranking first and checking
+split-ness of only the winner afterward — this closes both the
+partner-identity gap (an uninvolved third player's group no longer
+masquerades as a real split between the two players asked about) and,
+as a side effect, the residual ranking-order bug I flagged last cycle
+(`4bcc9ab..cabb315`) where a wider-spread unsplit group could
+permanently blind buyout to a genuinely split narrower-spread group.
+`spareStreetsOf` now uses a plain 2-arg `isSplitGroup(group, deeds)` to
+exclude ANY split group from spare-sweetener candidates, not just one
+split with the specific loser — correctly stops a third party's split
+group from being handed out as a sweetener. CRAP: all `MonopolyBuyout`
+methods CC<=4, 100% cov except `waiveIfUnaffordable` (unchanged from
+prior cycles). `dry4java`: no new duplication touching changed files.
+`mutate4java --scan` on `MonopolyBuyout.java`: 19 sites, well under
+threshold, manifest stale, refreshed. Domain tests 317/317, property
+tests 22/22, `./acceptance/run-acceptance.sh` twice: 492/492 both times.
+`World.java`/`MonopolyStepHandlers.java`/`GameLogStepHandlers.java` grew
+by a handful of lines each for the round-robin-ownership step and new
+assertion variants; consistent with every prior cycle, no manifest is
+expected for these (`src/test`, not `src/main`) so no scan/split applied.
+
+**Severe finding from empirical re-verification — this is the headline
+of this review, not a minor addendum.** Re-ran real two-player Greedo
+games (unseeded dice, `stalemateTrading=true`, capped at 300 rounds) to
+check whether the reported oscillation is actually gone now, the same
+discipline I've applied every cycle on this task. It is not gone — it
+has gotten dramatically worse in a different shape. Across 1000 games:
+672 (67%) log more than 10 `SplitMonopolyWon` events, 480 (48%) more
+than 50, 333 (33%) more than 100; the average is ~96 per game and the
+worst observed was 495 in a single capped game — with, in the clearest
+reproduction, essentially zero `PeerTrade` entries interspersed at all.
+This is not the narrow 2-member-group peer-trade ping-pong I reported
+last cycle (which my adjacent-`PeerTrade`-reversal detector would have
+caught) — it is `MonopolyBuyout` resolving, un-resolving, and
+re-resolving the *same handful of colour groups against itself*, turn
+after turn, for the rest of the game.
+
+Traced the mechanism: `settle()` already had a "spare sweetener" step
+(`includesSpareSweetener` / `deeds.transfer(spare.getFirst(), winner,
+loser, Money.ZERO)`, both pre-existing, untouched by this commit) that
+gives the winner's spare street from an *unrelated, otherwise fully-owned*
+colour group to the loser for free whenever the settlement is cash-free
+or the winner's balance is under 2000 — a real Monopoly-flavored
+"sweeten the deal" mechanic. Handing that spare street away necessarily
+splits its own, previously-whole colour group between winner and loser.
+Before this commit, `splitGroup`'s rank-then-check-split ordering bug
+usually stopped buyout from ever noticing that newly-manufactured split
+on a later turn (it kept re-selecting the wrong, unsplit max-spread
+candidate instead) — so the sweetener's side effect was mostly inert.
+Now that `splitGroup` correctly finds *any* genuinely split group, it
+reliably rediscovers the group the previous turn's sweetener just split,
+resolves it (handing out a fresh sweetener of its own, from yet another
+still-whole group), and the cycle repeats — touring through the board's
+remaining colour groups, sometimes settling into a tight two-group
+back-and-forth, for the rest of the capped game. In other words: fixing
+the reported gap correctly unmasked a second, larger, pre-existing gap
+in the unrelated sweetener mechanic that the first bug had been
+accidentally hiding.
+
+Not fixing this myself — deciding whether the sweetener should ever be
+allowed to create a fresh split, whether buyout needs a cooldown or
+anti-reciprocity guard against re-resolving a group it (or its own
+sweetener) just touched, or some other design change, is squarely a new-
+behavior decision, not a structural refactor. Given the reproduction
+rate (majority of games, not an edge case) and severity (hundreds of
+buyout events consuming the entire remaining game), flagging this as
+likely blocking for phase completion, not a routine residual note.
