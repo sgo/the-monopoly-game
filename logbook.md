@@ -24299,3 +24299,7 @@ those two operators (for example an observable Outcome field or ownership
 configuration that cannot be reached through the other candidate). Verify
 with a clean focused test and mutate4java line 37. Do not alter the existing
 production split-group filter/ranking fix to satisfy the test.
+
+2026-08-08T10:14:00Z — delivery correction: the initial action_request draft
+was rejected by swarm_handoff because handoffs must be git_handoff metadata
+only. Resending commit b998812b5e; its log entry contains the full p00 request.
