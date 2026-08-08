@@ -24542,3 +24542,27 @@ behavior decision, not a structural refactor. Given the reproduction
 rate (majority of games, not an edge case) and severity (hundreds of
 buyout events consuming the entire remaining game), flagging this as
 likely blocking for phase completion, not a routine residual note.
+
+2026-08-08T13:31:13Z — refactorer sent greedo-buyout-partner-identity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-buyout-partner-identity
+commit: 270ad1ce7e
+```
+
+Summary: the partner-identity fix itself is correct and well tested,
+317/22 domain tests and 492/492 acceptance twice, manifest refresh only
+on top. But empirical re-check found a severe, newly-unmasked regression:
+MonopolyBuyout's spare-sweetener mechanic manufactures a fresh split
+group as a side effect of every settlement, and buyout now reliably
+rediscovers and re-resolves that group next turn — a self-sustaining
+loop with essentially no peer trades involved, reproducing in the
+majority of real games (67% of 1000 games logged >10 SplitMonopolyWon
+events, 33% >100, avg ~96/game, worst 495). Full root-cause trace in the
+received-handoff entry above; flagging as likely blocking for phase
+completion given the reproduction rate and severity.
