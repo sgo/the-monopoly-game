@@ -24738,6 +24738,16 @@ before cash tie-breaking, rejected same-colour Greedo trades, and added the
 missing ownership and journal/log/report assertion handlers. Domain tests and
 full acceptance pass.
 
+2026-08-08T17:21:02Z — sent refactorer handoff:
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-buyout-majority-and-trade-priority
+commit: b309b446ed
+
+Queued `50_20260808T172102Z_000097_from_coder_to_refactorer.handoff` after
+domain tests and full acceptance passed.
+
 2026-08-08T13:31:13Z — refactorer sent greedo-buyout-partner-identity handoff to architect
 
 Handoff message sent:
