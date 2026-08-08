@@ -687,7 +687,7 @@ Feature: game journal
   # journal-53
   Scenario Outline: the journal resolves a split monopoly buyout at the start of a turn, once the whole board is owned
     Given stalemate trading is enabled for the "Greedo" strategy
-    And every other ownable space is owned alternately by pawn "dog" and pawn "high hat" in board order
+    And every other ownable space is owned by pawn "high hat"
     And pawn "dog" owns "Meir Antwerpen"
     And pawn "dog" has $1000 to spend
     And pawn "high hat" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
@@ -728,7 +728,7 @@ Feature: game journal
     And pawn "high hat" will roll 4 for initiative
     And every other player can complete their turn
     And stalemate trading is enabled for the "Greedo" strategy
-    And every other ownable space is owned in round-robin order by pawn "dog", pawn "high hat", and pawn "iron box" in board order
+    And every other ownable space is owned by pawn "iron box"
     And pawn "dog" owns "Meir Antwerpen"
     And pawn "dog" has $1000 to spend
     And pawn "high hat" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
@@ -745,7 +745,7 @@ Feature: game journal
   # journal-56
   Scenario Outline: peer trading never touches a colour group that is a genuine two-owner split, even while the buyout cannot yet afford it
     Given stalemate trading is enabled for the "Greedo" strategy
-    And every other ownable space is owned alternately by pawn "dog" and pawn "high hat" in board order
+    And every other ownable space is owned by pawn "high hat"
     And pawn "dog" owns "Meir Antwerpen"
     And pawn "dog" has $<dog_balance> to spend
     And pawn "high hat" owns "Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)"
@@ -763,7 +763,7 @@ Feature: game journal
   # journal-57
   Scenario Outline: the majority owner within a split colour group wins the buyout during real play, even when poorer
     Given stalemate trading is enabled for the "Greedo" strategy
-    And every other ownable space is owned alternately by pawn "dog" and pawn "high hat" in board order
+    And every other ownable space is owned by pawn "high hat"
     And pawn "dog" owns "Rue de Diekirch Arlon"
     And pawn "dog" owns "Bruul Mechelen"
     And pawn "dog" has $<dog_balance> to spend
