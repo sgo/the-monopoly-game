@@ -24230,6 +24230,16 @@ Merged `1f742c69e4`. Strengthened the ranking regression so the intended
 mutant: dark blue has the larger spread while green has the larger sum.
 Domain tests pass 316/316 and acceptance passes 489/489.
 
+2026-08-08T10:06:59Z — sent architect handoff:
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-trade-mutual-consent
+commit: 2b19892c94
+
+Queued `00_20260808T080659Z_000092_from_coder_to_architect.handoff` with
+coverage that distinguishes spread ranking from the surviving sum mutant.
+
 2026-08-08T10:02:00Z — received architect handoff:
 id: 20260808T075956Z_000129_from_architect
 from: architect
