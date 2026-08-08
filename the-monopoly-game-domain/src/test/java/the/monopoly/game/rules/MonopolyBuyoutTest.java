@@ -177,6 +177,22 @@ class MonopolyBuyoutTest {
     assertThat(deeds.ownerOf(Street.Type.DiestsestraatLeuven)).contains(dog.id());
   }
 
+  @Test
+  void itRanksEligibleSplitGroupsByPriceSpread() {
+    Player dog = player("dog", 1000);
+    Player highHat = player("high hat", 100);
+    deeds.sell(ownable(Street.Type.RueGrandeDinant), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.DiestsestraatLeuven), highHat, Money.ZERO);
+    deeds.sell(ownable(Street.Type.SteenstraatBrugge), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.PlaceDuMonumentSpa), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.KapellestraatOostende), highHat, Money.ZERO);
+
+    MonopolyBuyout.resolve(dog, highHat, rules, deeds).orElseThrow();
+
+    assertThat(deeds.ownerOf(Street.Type.KapellestraatOostende)).contains(dog.id());
+    assertThat(deeds.ownerOf(Street.Type.DiestsestraatLeuven)).contains(highHat.id());
+  }
+
   private Ownable ownable(Street.Type type) {
     return (Ownable) rules.create(type);
   }

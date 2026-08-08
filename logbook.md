@@ -24190,11 +24190,42 @@ groups split between the requested players before applying price-spread
 selection. Domain tests pass 315/315 and acceptance passes 489/489.
 
 2026-08-08T09:57:36Z — sent architect handoff:
-type: git_handoff
+ type: git_handoff
+2026-08-08T07:59:37Z — received coder handoff:
+ type: git_handoff
+ from: coder
 to: architect
 priority: 00
 task: greedo-trade-mutual-consent
 commit: 1a7299d0c6
 
 Queued `00_20260808T075736Z_000090_from_coder_to_architect.handoff` with the
-verified split-group selection fix.
+ verified split-group selection fix.
+Merged the split-group selection correction. Full acceptance passed 489/489.
+Differential mutation found survivors in the changed candidate-ranking
+expression (`splitGroup` lines 36–37): the current test proves an unsplit
+group is excluded but does not prove ranking across multiple eligible split
+groups. Returning focused behavioral coverage to coder before final DRY and
+Gherkin checks.
+
+2026-08-08T10:02:00Z — received architect handoff:
+id: 20260808T075956Z_000129_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 64868a2f70
+created_at: 2026-08-08T07:59:56.395158Z
+enqueued_at: 2026-08-08T07:59:57.441413Z
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process architect 64868a2f70
+
+Merged `64868a2f70`. Added focused coverage proving that when multiple
+eligible groups are split between the same players, the group with the
+largest price spread is selected. Domain tests pass 316/316 and acceptance
+passes 489/489.
