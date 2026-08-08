@@ -25299,3 +25299,53 @@ Not committing this as a normal "reviewed and passing" cycle — holding
 the merge locally, writing this up, and handing back with the failure
 and full root-cause front and center rather than papering over it with
 a manifest refresh and a routine-sounding summary.
+
+## 2026-08-08T19:20:27Z — specifier reviews the architect's tie-behavior finding
+
+Received architect priority-00 follow-up (commit `852631cf76`, task
+`buyout-highest-priority-exclusion`): the refactorer's HIGHEST-priority
+exclusion is merged and correct, but journal-58/logging-58/report-58
+are still red. Architect's diagnosis: pink and green now tie at a $20
+price spread, and the declaration-order tie break picks pink for a
+buyout before the intended peer trade runs.
+
+Reviewed against `Game.java` directly rather than accepting the
+tie-break framing at face value. The real mechanism is not a tie
+between candidate groups inside `MonopolyBuyout.splitGroup` — no
+tie-break rule chosen there could fix this, because
+`resolveSplitOwnershipAtStart` (`Game.java:172`) still calls
+`resolveBuyoutAtStart` unconditionally before `tradeAtStart`, and
+`resolveBuyoutAtStart`'s fallback `anySplitExists` (`Game.java:188`)
+reports `true` — suppressing `tradeAtStart` entirely — whenever *any*
+split exists between the trader and a partner, resolved or not.
+Whichever of pink/green the tie-break happened to pick, buyout would
+still claim it and still block trade from ever running; the tie-break
+is a symptom, not the cause.
+
+Decision: `resolveSplitOwnershipAtStart` must try `tradeAtStart` before
+`resolveBuyoutAtStart`, falling back to buyout only when no trade
+resolves. This is the same dispatch-order fix requested during the
+original `greedo-buyout-majority-and-trade-priority` cycle and matches
+the user's original expectation (a cash-free trade should be preferred
+over a cash buyout when one resolves the situation). No Gherkin content
+change is needed: journal-58/logging-58/report-58 already specify the
+exact expected observable outcome (a `PeerTrade` event, no
+`SplitMonopolyWon` event, specific final ownership) precisely and
+correctly. User confirmed via AskUserQuestion: write up and hand back.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: buyout-highest-priority-exclusion
+commit: <to be filled>
+```
+
+Summary: no feature-file changes; this handoff carries only the
+logbook decision. Swap the dispatch order in
+`resolveSplitOwnershipAtStart` — try `tradeAtStart` first, fall back to
+`resolveBuyoutAtStart` only if it returns without resolving a trade.
+journal-58/logging-58/report-58 remain the acceptance criteria; no new
+scenario was added.
