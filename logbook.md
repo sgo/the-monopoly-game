@@ -24188,3 +24188,13 @@ Merged `7840095634`. Added a regression test for an unsplit dark-blue group
 masking a genuinely split brown group, then filtered buyout candidates to
 groups split between the requested players before applying price-spread
 selection. Domain tests pass 315/315 and acceptance passes 489/489.
+
+2026-08-08T09:57:36Z — sent architect handoff:
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-trade-mutual-consent
+commit: 1a7299d0c6
+
+Queued `00_20260808T075736Z_000090_from_coder_to_architect.handoff` with the
+verified split-group selection fix.
