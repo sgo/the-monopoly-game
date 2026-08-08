@@ -25015,3 +25015,31 @@ than an isolated defect, recommending this be treated as diminishing-
 returns territory — worth a decision on whether to keep chasing it, not
 a blocker for this task.
 
+2026-08-08T17:32:49Z — refactorer sent greedo-buyout-majority-and-trade-priority handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-buyout-majority-and-trade-priority
+commit: cd494e8d23
+```
+
+Summary: majority ownership as buyout winner (before richer()) plus
+declining same-colour-group peer trades directly fixes the richer()-
+flip mechanism flagged last cycle. 3000 real games: zero exceed 20
+SplitMonopolyWon events (was 26, then 495 two cycles ago), average down
+to ~3.86/game. Traced a remaining low-volume case (13 events) and found
+a fourth, distinct mechanism entangled with mortgage/distressed-sale
+machinery — the majority owner correctly reclaims a street the instant
+the minority owner regains it through a forced sale, but the majority
+owner's own financial distress (driving those forced sales) doesn't
+resolve. Full trace in the received-handoff entry above; recommending
+this be treated as diminishing returns rather than a blocker. Also
+extracted sameColourGroup out of Greedo.accepts (CC 8→6) and
+oneStreetFromMonopoly/stationReserve out of cashReserve (CC 9→5, pre-
+existing, now in scope), both verified behavior-identical.
+
+
