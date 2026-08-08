@@ -181,16 +181,16 @@ class MonopolyBuyoutTest {
   void itRanksEligibleSplitGroupsByPriceSpread() {
     Player dog = player("dog", 1000);
     Player highHat = player("high hat", 100);
-    deeds.sell(ownable(Street.Type.RueGrandeDinant), dog, Money.ZERO);
-    deeds.sell(ownable(Street.Type.DiestsestraatLeuven), highHat, Money.ZERO);
-    deeds.sell(ownable(Street.Type.SteenstraatBrugge), dog, Money.ZERO);
-    deeds.sell(ownable(Street.Type.PlaceDuMonumentSpa), dog, Money.ZERO);
-    deeds.sell(ownable(Street.Type.KapellestraatOostende), highHat, Money.ZERO);
+    deeds.sell(ownable(Street.Type.MeirAntwerpen), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.NieuwstraatBrussel), highHat, Money.ZERO);
+    deeds.sell(ownable(Street.Type.BoulevardTirouCharleroi), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.VeldstraatGent), dog, Money.ZERO);
+    deeds.sell(ownable(Street.Type.BoulevardDAvroyLiege), highHat, Money.ZERO);
 
     MonopolyBuyout.resolve(dog, highHat, rules, deeds).orElseThrow();
 
-    assertThat(deeds.ownerOf(Street.Type.KapellestraatOostende)).contains(dog.id());
-    assertThat(deeds.ownerOf(Street.Type.DiestsestraatLeuven)).contains(highHat.id());
+    assertThat(deeds.ownerOf(Street.Type.NieuwstraatBrussel)).contains(dog.id());
+    assertThat(deeds.ownerOf(Street.Type.BoulevardDAvroyLiege)).contains(highHat.id());
   }
 
   private Ownable ownable(Street.Type type) {

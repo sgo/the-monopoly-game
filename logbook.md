@@ -24208,6 +24208,28 @@ group is excluded but does not prove ranking across multiple eligible split
 groups. Returning focused behavioral coverage to coder before final DRY and
 Gherkin checks.
 
+2026-08-08T10:06:30Z — received architect handoff:
+id: 20260808T080448Z_000130_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 1f742c69e4
+created_at: 2026-08-08T08:04:48.753240Z
+enqueued_at: 2026-08-08T08:04:49.207901Z
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process architect 1f742c69e4
+
+Merged `1f742c69e4`. Strengthened the ranking regression so the intended
+`max - min` price-spread ordering differs from the surviving `max + min`
+mutant: dark blue has the larger spread while green has the larger sum.
+Domain tests pass 316/316 and acceptance passes 489/489.
+
 2026-08-08T10:02:00Z — received architect handoff:
 id: 20260808T075956Z_000129_from_architect
 from: architect
@@ -24232,6 +24254,9 @@ passes 489/489.
 
 2026-08-08T10:02:17Z — sent architect handoff:
 type: git_handoff
+2026-08-08T08:04:28Z — received coder handoff:
+type: git_handoff
+from: coder
 to: architect
 priority: 00
 task: greedo-trade-mutual-consent
@@ -24239,3 +24264,8 @@ commit: af6068ba71
 
 Queued `00_20260808T080217Z_000091_from_coder_to_architect.handoff` with
 focused ranking coverage and passing verification.
+Merged the added ranking test. Full acceptance passed 489/489, but differential
+mutation still lets the changed `max - min` price-spread expression survive
+when changed to `max + min`. The test's two candidate groups do not make those
+rankings select different outcomes. Returning this precise coverage gap to
+coder before final verification.
