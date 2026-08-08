@@ -24028,3 +24028,23 @@ jar scenarios. Refactorer reproduced the original oscillation in partially
 owned three-street colour groups (3/100 runs), a case absent from the current
 acceptance criteria; routing this specification gap to specifier before phase
 closure.
+
+2026-08-08T07:25:44Z — received specifier handoff:
+id: 20260808T072544Z_000073_from_specifier_to_coder
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: deb8430a9f
+task: greedo-trade-mutual-consent
+
+Re-read your role and constitution.
+
+merge_and_process specifier deb8430a9f
+
+Merged `deb8430a9f`. Added reciprocal monopoly-completion consent to peer
+trade selection, preserving Greedo's preferred-offer ordering. Added focused
+unit coverage for reciprocal and trader-only offers; domain tests pass and
+full acceptance passes 489/489.

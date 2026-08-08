@@ -54,6 +54,7 @@ class PeerTradingTest {
     deeds.sell(ownable(Street.Type.NieuwstraatBrussel), dog, Money.ZERO);
     deeds.sell(ownable(Street.Type.RueDeDiekirchArlon), dog, Money.ZERO);
     deeds.sell(ownable(Street.Type.DiestsestraatLeuven), highHat, Money.ZERO);
+    deeds.sell(ownable(Street.Type.MeirAntwerpen), highHat, Money.ZERO);
 
     Optional<Strategy.TradeOffer> selected = select(new Greedo(Money.ZERO, true));
 
@@ -62,16 +63,14 @@ class PeerTradingTest {
   }
 
   @Test
-  void betweenEquallyLowPriorityCandidatesTheMoreValuablePropertyIsOffered() {
-    deeds.sell(ownable(Street.Type.RueGrandeDinant), dog, Money.ZERO);
+  void rejectsATradeThatOnlyBenefitsTheTrader() {
+    deeds.sell(ownable(Street.Type.RueDeDiekirchArlon), dog, Money.ZERO);
     deeds.sell(ownable(Street.Type.MeirAntwerpen), dog, Money.ZERO);
-    deeds.sell(ownable(Street.Type.NieuwstraatBrussel), dog, Money.ZERO);
-    deeds.sell(ownable(Street.Type.DiestsestraatLeuven), highHat, Money.ZERO);
+    deeds.sell(ownable(Street.Type.PlaceVerteVerviers), highHat, Money.ZERO);
 
     Optional<Strategy.TradeOffer> selected = select(new Greedo(Money.ZERO, true));
 
-    assertThat(selected).map(Strategy.TradeOffer::offered)
-        .contains(ownable(Street.Type.NieuwstraatBrussel));
+    assertThat(selected).isEmpty();
   }
 
   @Test

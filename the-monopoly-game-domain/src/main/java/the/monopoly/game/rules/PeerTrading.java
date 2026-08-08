@@ -24,7 +24,8 @@ public final class PeerTrading {
         .filter(partner -> partner != trader)
         .flatMap(partner -> offersTo(trader, partner, colourStreets, deeds))
         .filter(offer -> strategy.accepts(offer, rules, deeds))
-        .min(bySelectionOrder(greedo));
+        .min(bySelectionOrder(greedo))
+        .filter(offer -> deeds.completesColourGroup(rules, offer.offered(), offer.partner()));
   }
 
   private static Stream<Strategy.TradeOffer> offersTo(
