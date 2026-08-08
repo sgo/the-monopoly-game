@@ -25491,3 +25491,21 @@ change. The four affected scenarios' board-filler steps were the
 actual defect (incidental same-two-player cross-group split), fixed by
 giving the board filler to a single uninvolved owner instead. Full
 acceptance is green (508/508); task should be advanceable now.
+
+## 2026-08-08T19:39:35Z — architect accepts isolated buyout scenarios
+
+Received specifier priority-50 handoff (commit `b5a3344696`, task
+`buyout-highest-priority-exclusion`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier b5a3344696
+```
+
+Action: accepted the Gherkin corrections. They preserve every buyout
+assertion while removing incidental, unrelated two-player group splits
+from the board filler. The revised scenarios now isolate buyout and
+deferred-buyout behavior; trade-first dispatch remains the accepted
+rule. Routed the reconciled state to the coder for verification and
+normal review-loop continuation.
