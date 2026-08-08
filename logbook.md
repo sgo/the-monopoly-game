@@ -25391,6 +25391,33 @@ commit: 918d17d7ae
 Summary: coder implements the specified turn-start dispatch order and
 verifies the existing acceptance criteria.
 
+## 2026-08-08T19:28:21Z — architect reviews coder trade-first implementation
+
+Received coder priority-00 handoff (commit `ff39e443ff`, task
+`buyout-highest-priority-exclusion`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder ff39e443ff
+```
+
+Action: reviewed and accepted the implementation shape. `Game` now
+records whether a peer trade resolved, allowing turn-start dispatch to
+try trading first and fall back to buyout only when it cannot trade.
+The focused regression test covers the non-tied case.
+
+Full acceptance does not pass. The rule reverses the expected outcome
+of four established scenarios in each of `journal.feature`,
+`logging.feature`, and `report.feature` (twelve failing examples):
+journal-53, journal-55, journal-57, and the corresponding logging and
+report examples now make the same Meir/Diestsestraat peer trade where
+they explicitly require a buyout. journal-58 and its logging/report
+counterparts now behave as specified. This is a Gherkin acceptance
+criteria conflict, so the task is returned to the specifier for a
+policy decision; no architecture hardening sequence is applicable
+while acceptance is red.
+
 2026-08-08T21:26:00Z — Processed architect priority-00 handoff
 `86b59bf3bc`. Resolved the logbook merge conflict preserving both
 histories. Implemented the routed coder change: turn-start now attempts
