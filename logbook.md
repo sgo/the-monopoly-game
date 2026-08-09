@@ -25306,10 +25306,40 @@ other across classes, so this was a semantic finding, not a tool hit).
 acceptance failure above (it's acceptance-pipeline-only, no domain unit
 test exercises journal-58's exact board shape).
 
-Not committing this as a normal "reviewed and passing" cycle — holding
-the merge locally, writing this up, and handing back with the failure
-and full root-cause front and center rather than papering over it with
-a manifest refresh and a routine-sounding summary.
+Committed the merge and the delegation cleanup together as `3fd6aa8`,
+but not as a normal "reviewed and passing" cycle — the commit message
+and this entry lead with the failure and full root-cause, not a
+manifest refresh and a routine-sounding summary, so nothing downstream
+can mistake this for a clean pass.
+
+2026-08-08T19:10:33Z — refactorer sent buyout-highest-priority-exclusion handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: buyout-highest-priority-exclusion
+commit: 3fd6aa8ac1
+```
+
+Summary: **blocking** — this is not closable as-is. Independently
+verified (not trusting the coder's "full acceptance pass" or the
+specifier's "expected to resolve as a side effect" claims) that
+journal-58/logging-58/report-58 still fail, reproducibly, with or
+without my own change. Root cause: removing the HIGHEST-priority tied
+candidates from `splitGroup`'s price-spread ranking surfaces the exact
+same declaration-order tie-break defect one layer down — `pink` and
+`green` now tie at spread=20 (verified against real official prices),
+and `pink` wins purely by being declared earlier in `Street.Type`, so
+buyout steals the turn from the single complementary peer-trade the
+scenario intends. Full root-cause trace in the received-handoff entry
+above. Separately (verified independent of the failure): delegated
+`isHighestPriority` to `Greedo.priority()` instead of duplicating its
+street list, closing the exact kind of drift risk this task exists to
+prevent. Domain tests 322/322 and property tests 22/22 pass; the
+failure is acceptance-only.
 
 ## 2026-08-08T19:20:27Z — specifier reviews the architect's tie-behavior finding
 
@@ -25510,6 +25540,11 @@ deferred-buyout behavior; trade-first dispatch remains the accepted
 rule. Routed the reconciled state to the coder for verification and
 normal review-loop continuation.
 
+2026-08-09T16:27:28Z — Completed specifier handoff `player-age-tracking`
+(`2c9c37ebd3`). Added per-player age tracking to turn-start, salary, jail,
+winner, and stalemate journal events plus report rendering and acceptance
+bindings. Verification passed: 324 domain tests and 520 acceptance tests.
+
 2026-08-08T21:41:30Z — Processed architect priority-00 handoff
 `857f5bf5ed`. Verified the reconciled state: domain tests pass 323/323
 and the normal acceptance pipeline passes 508/508. No further
@@ -25569,3 +25604,86 @@ to each remaining player's final balance on a stalemate ending, and
 the winner's final age on an ordinary bankruptcy-decided ending. Ran
 ir-dry-checker against all three changed files first; no accidental
 repeated steps within the new scenarios.
+
+## 2026-08-09T16:36:00Z — refactorer reviews player-age-tracking
+
+Received coder priority-50 handoff (commit `fcfa17db89`, task
+`player-age-tracking`).
+
+Merged. This pulled in the entire `buyout-highest-priority-exclusion`
+resolution chain I had left blocking (specifier's trade-before-buyout
+dispatch-order decision, coder's implementation, the specifier's
+board-filler isolation fix for journal/logging/report-53/55/56/57,
+architect's close-out) plus a version bump to 0.1.0-SNAPSHOT, on top of
+the actual `player-age-tracking` commit. `logbook.md` conflicted with
+the usual sent/received boilerplate-misalignment pattern, compounded
+this time by a stale pre-correction draft of my own prior entry ("Not
+committing this... holding the merge locally") that had propagated
+through the architect/specifier/coder chain instead of the corrected
+text I actually committed ("Committed... as 3fd6aa8ac1"). Resolved by
+keeping my accurate wording and splicing in every downstream entry
+unchanged, verified via `grep -c` for conflict markers (zero) and a
+full read-through confirming nothing was dropped.
+
+Did not take the "phase-complete"/"reconciled" claims in that inherited
+history on faith either — ran the full suite myself. Domain: clean, no
+failures. Acceptance: `./acceptance/run-acceptance.sh` → 520/520,
+confirming journal-58/logging-58/report-58 (the scenarios I flagged
+blocking last cycle) now genuinely pass under the trade-before-buyout
+dispatch order, not just claimed.
+
+Reviewed the actual `player-age-tracking` diff. `Game.Journalling`
+gained a `Map<Player.ID, Integer> ages`, incremented on
+`collectedSalary` and `sentToJail` (each represents a lap of the board),
+surfaced via `Journal.Entry.TurnStarted.age()` and a new
+`Entry.FinalAge` logged on win/stalemate. `Report.line` gained one more
+case for `FinalAge`. Semantically sound and narrowly scoped; no
+behavior beyond what the task asked for.
+
+CRAP: `Game.java` and `Report.java` both clean except the standing
+`Report.line` sealed-switch exemption (CC now 46, CRAP 73.1 — the
+exhaustive-switch shape is unchanged, it just gained one more
+straight-line case for `FinalAge`). No new violation anywhere else (max
+CC 6, `playTurns`/`playTurn`, both 100% covered). DRY: no duplicates.
+`mutate4java --scan`: 64 sites in `Game.java`, 3 in `Report.java`, both
+far under the 100-site split threshold; manifests were stale (scope
+changed) and refreshed via `--update-manifest`.
+
+One mechanical DRY fix, unrelated to CRAP or mutation: the coder's new
+`JournalStepHandlers` jail-ordering steps called
+`the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered(...)`
+fully package-qualified, the only such call in the file — every other
+`MonopolyStepHelpers` method there is reached through a static import,
+including a fresh one added two lines above for `idOf` in this very
+commit. Added `import static
+the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered;`
+and dropped the qualification at both call sites to match the file's
+own convention.
+
+Verified after the fix: domain tests clean, full acceptance
+520/520 unchanged.
+
+## 2026-08-09T14:39:35Z — architect reviews player-age-tracking
+
+Received refactorer priority-50 handoff (commit `bbc819657a`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer bbc819657a
+```
+
+Action: accepted the architecture of the implementation. Age state is
+encapsulated inside `Game.Journalling`, and the journal/report boundary
+is explicit through `TurnStarted.age` and `FinalAge`; no core rule or
+UI dependency leaks across modules. Differential Java mutation for
+`Game` and `Report` is current, and the DRY findings are existing
+event-adapter repetitions.
+
+Soft Gherkin mutation exposed a specification weakness in the new
+age-after-passing-start and age-after-jail scenarios: each queues a
+parameterized turn roll and then queues a second fixed `1 and 2` roll.
+Several roll mutations therefore survive without testing the stated
+age behavior. This acceptance-content finding is routed to the
+specifier; the task cannot close until that loop returns.
