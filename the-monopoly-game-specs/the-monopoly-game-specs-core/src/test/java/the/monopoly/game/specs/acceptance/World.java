@@ -929,7 +929,7 @@ public class World {
   public void runPackagedCli(String flag) {
     Path root = PomInspector.repoRoot("the-monopoly-game-cli");
     Path jar = root.resolve("the-monopoly-game-cli").resolve("target")
-        .resolve("the-monopoly-game-cli-0.1.0-SNAPSHOT.jar");
+        .resolve("the-monopoly-game-cli-0.2.0-SNAPSHOT.jar");
     ProcessBuilder builder = new ProcessBuilder("java", "-jar", jar.toString(), flag);
     try {
       packagedCliProcess = builder.redirectErrorStream(true).start();
@@ -944,7 +944,7 @@ public class World {
   public void startPackagedCli(String rawArguments) {
     Path root = PomInspector.repoRoot("the-monopoly-game-cli");
     Path jar = root.resolve("the-monopoly-game-cli").resolve("target")
-        .resolve("the-monopoly-game-cli-0.1.0-SNAPSHOT.jar");
+        .resolve("the-monopoly-game-cli-0.2.0-SNAPSHOT.jar");
     try {
       packagedCliOutputBuffer = new StringBuilder();
       packagedCliProcess = new ProcessBuilder(
