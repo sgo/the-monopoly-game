@@ -784,3 +784,55 @@ Feature: game report
     Examples:
       | dog_offered              | dog_wanted            | street_dog_now_owns   | street_high_hat_now_owns |
       | Boulevard Tirou Charleroi | Place Verte Verviers  | Place Verte Verviers  | Boulevard Tirou Charleroi |
+
+  # report-59
+  Scenario Outline: the report narrates a player's age increasing after passing start
+    Given pawn "dog" starts at position <dog_start_position>
+    And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
+    And pawn "dog" will roll 1 and 2 for their turn
+    When we play up to 2 rounds
+    Then the game report says that pawn "dog" starts a turn aged <starting_age> years before it says that pawn "dog" collects a salary of $<dog_salary>
+    And the game report says that pawn "dog" collects a salary of $<dog_salary> before it says that pawn "dog" starts a turn aged <age_after_passing_start> years
+
+    Examples:
+      | dog_start_position | dog_die_1 | dog_die_2 | dog_salary | starting_age | age_after_passing_start |
+      | 37                  | 1         | 2         | 200        | 0            | 1                        |
+
+  # report-60
+  Scenario Outline: the report narrates a player's age increasing after being sent to jail
+    Given pawn "dog" starts at position <dog_start_position>
+    And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
+    And pawn "dog" will roll 1 and 2 for their turn
+    When we play up to 2 rounds
+    Then the game report says that pawn "dog" starts a turn aged <starting_age> years before it says that pawn "dog" is sent to jail from landing on "<space>"
+    And the game report says that pawn "dog" is sent to jail from landing on "<space>" before it says that pawn "dog" starts a turn aged <age_after_jailed> years
+
+    Examples:
+      | dog_start_position | dog_die_1 | dog_die_2 | space                                 | starting_age | age_after_jailed |
+      | 27                  | 1         | 2         | Naar de Gevangenis / Allez en Prison  | 0            | 1                 |
+
+  # report-61
+  Scenario Outline: the report narrates each remaining player's final age once the game ends in a stalemate
+    Given pawn "dog" starts at position 37
+    And pawn "dog" will roll 1 and 2 for their turn
+    And pawn "dog"'s account holds $<dog_starting_account>
+    And pawn "high hat"'s account holds $<high_hat_starting_account>
+    When we play the game
+    Then the game report says that the game ends in a stalemate before it says that pawn "dog"'s final balance is $<dog_final_balance>
+    And the game report says that pawn "dog"'s final balance is $<dog_final_balance> before it says that pawn "dog"'s final age is <dog_final_age> years
+    And the game report says that pawn "dog"'s final age is <dog_final_age> years before it says that pawn "high hat"'s final balance is $<high_hat_final_balance>
+    And the game report says that pawn "high hat"'s final balance is $<high_hat_final_balance> before it says that pawn "high hat"'s final age is <high_hat_final_age> years
+
+    Examples:
+      | dog_starting_account | dog_final_balance | high_hat_starting_account | high_hat_final_balance | dog_final_age | high_hat_final_age |
+      | 24800                 | 25000              | 26000                      | 26000                   | 1              | 0                   |
+
+  # report-62
+  Scenario Outline: the report narrates the winner's final age once the game ends in an ordinary win
+    Given pawn "dog" has $<starting_balance> to spend
+    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    Then the game report says that pawn "high hat" wins the game before it says that pawn "high hat"'s final age is <high_hat_final_age> years
+
+    Examples:
+      | starting_balance | high_hat_final_age |
+      | 5                  | 0                   |
