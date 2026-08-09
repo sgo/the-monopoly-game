@@ -20,7 +20,9 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bankReceive
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bankReceivedLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeRoll;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeWon;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.idOf;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalBalance;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalAge;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.money;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moved;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesFromPosition;
@@ -30,6 +32,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rollsForIni
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.salaryCollected;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.stalemateTrading;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStarted;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStartedAtAge;
 import static the.monopoly.game.specs.acceptance.StepHandler.given;
 import static the.monopoly.game.specs.acceptance.StepHandler.step;
 import static the.monopoly.game.specs.acceptance.StepHandler.then;
@@ -106,6 +109,36 @@ final class JournalStepHandlers {
 
         then("^the game journal records that pawn \"" + NAME + "\" starts a turn$",
             (world, arguments) -> records(world, turnStarted(arguments.text(1)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" starts a turn aged " + VALUE
+                + " years$",
+            (world, arguments) -> records(world, turnStartedAtAge(arguments.text(1), arguments.number(2)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" starts a turn aged " + VALUE
+                + " years before it records that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                turnStartedAtAge(arguments.text(1), arguments.number(2)),
+                salaryCollected(arguments.text(3), arguments.number(4)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE
+                + " before it records that pawn \"" + NAME + "\" starts a turn aged " + VALUE + " years$",
+            (world, arguments) -> recordsInOrder(world,
+                salaryCollected(arguments.text(1), arguments.number(2)),
+                turnStartedAtAge(arguments.text(3), arguments.number(4)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" starts a turn aged " + VALUE
+                + " years before it records that pawn \"" + NAME + "\" is sent to jail from landing on \"" + NAME + "\"$",
+            (world, arguments) -> recordsInOrder(world,
+                turnStartedAtAge(arguments.text(1), arguments.number(2)),
+                the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered(
+                    arguments.text(3), arguments.text(4)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" is sent to jail from landing on \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" starts a turn aged " + VALUE + " years$",
+            (world, arguments) -> recordsInOrder(world,
+                the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered(
+                    arguments.text(1), arguments.text(2)),
+                turnStartedAtAge(arguments.text(3), arguments.number(4)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" rolls a total of " + VALUE + "$",
             (world, arguments) -> records(world, rolled(arguments.text(1), arguments.number(2)))),
@@ -255,6 +288,27 @@ final class JournalStepHandlers {
 
         then("^the game journal records that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
             (world, arguments) -> records(world, finalBalance(arguments.text(1), arguments.number(2)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\"'s final age is " + VALUE + " years$",
+            (world, arguments) -> records(world, finalAge(arguments.text(1), arguments.number(2)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE
+                + " before it records that pawn \"" + NAME + "\"'s final age is " + VALUE + " years$",
+            (world, arguments) -> recordsInOrder(world,
+                finalBalance(arguments.text(1), arguments.number(2)),
+                finalAge(arguments.text(3), arguments.number(4)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\"'s final age is " + VALUE
+                + " years before it records that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                finalAge(arguments.text(1), arguments.number(2)),
+                finalBalance(arguments.text(3), arguments.number(4)))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" wins the game before it records that pawn \""
+                + NAME + "\"'s final age is " + VALUE + " years$",
+            (world, arguments) -> recordsInOrder(world,
+                Claim.of(new Entry.Won(idOf(arguments.text(1)))),
+                finalAge(arguments.text(2), arguments.number(3)))),
 
         then("^the game journal records that the game ends in a stalemate before it records that pawn \""
                 + NAME + "\"'s final balance is \\$" + VALUE + "$",

@@ -25510,6 +25510,11 @@ deferred-buyout behavior; trade-first dispatch remains the accepted
 rule. Routed the reconciled state to the coder for verification and
 normal review-loop continuation.
 
+2026-08-09T16:27:28Z — Completed specifier handoff `player-age-tracking`
+(`2c9c37ebd3`). Added per-player age tracking to turn-start, salary, jail,
+winner, and stalemate journal events plus report rendering and acceptance
+bindings. Verification passed: 324 domain tests and 520 acceptance tests.
+
 2026-08-08T21:41:30Z — Processed architect priority-00 handoff
 `857f5bf5ed`. Verified the reconciled state: domain tests pass 323/323
 and the normal acceptance pipeline passes 508/508. No further

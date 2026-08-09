@@ -108,6 +108,24 @@ final class GameAccount {
     saidAt(world.report(), phrase);
   }
 
+  static void saysTurnStartedWith(World world, String pawnName, int balance, int reserve) {
+    String expected = pawnName + " starts a turn";
+    String balanceText = "$" + balance;
+    String reserveText = "$" + reserve + " reserve";
+    if (world.report().lines().noneMatch(line -> line.contains(expected)
+        && line.contains(balanceText) && line.contains(reserveText)))
+      throw new AssertionError("The game report says no turn start for " + pawnName
+          + " with " + balanceText + " and a " + reserveText + ":\n" + world.report());
+  }
+
+  static void saysTurnStartedWithBalance(World world, String pawnName, int balance) {
+    String expected = pawnName + " starts a turn";
+    String balanceText = "$" + balance;
+    if (world.report().lines().noneMatch(line -> line.contains(expected) && line.contains(balanceText)))
+      throw new AssertionError("The game report says no turn start for " + pawnName
+          + " with " + balanceText + ":\n" + world.report());
+  }
+
   /** Whether the line naming everyone at the table names these two in this order. */
   static void saysStartWith(World world, String firstPawn, String secondPawn) {
     String start = world.report().lines()

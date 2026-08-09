@@ -55,8 +55,18 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.TurnStarted(idOf(pawnName), money(balance), money(reserve)));
   }
 
+  static Claim turnStartedAtAge(String pawnName, int age) {
+    return new Claim(entry -> entry instanceof Entry.TurnStarted it
+        && it.player().equals(idOf(pawnName)) && it.age() == age,
+        pawnName + " starts a turn aged " + age + " years");
+  }
+
   static Claim finalBalance(String pawnName, int balance) {
     return Claim.of(new Entry.FinalBalance(idOf(pawnName), money(balance)));
+  }
+
+  static Claim finalAge(String pawnName, int age) {
+    return Claim.of(new Entry.FinalAge(idOf(pawnName), age));
   }
 
   static Claim purchaseDeclined(String pawnName, String spaceName, int price,

@@ -27,7 +27,9 @@ import the.monopoly.game.strategies.Strategy;
 import the.monopoly.game.strategies.Greedo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
@@ -130,7 +132,8 @@ public class Game {
 
   private Result play(boolean untilComplete, BooleanSupplier keepPlaying) {
     var journal = new Journal();
-    Journalling journalling = new Journalling(journal);
+    Map<Player.ID, Integer> ages = new HashMap<>();
+    Journalling journalling = new Journalling(journal, ages);
     journal.log(new Journal.Entry.Start(ids(players)));
     journalling.stalemateTrading(stalemateTrading);
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
@@ -163,8 +166,10 @@ public class Game {
     if (remainingPlayers().size() <= 1) return true;
     if (!Stalemate.reached(rules, players, deeds)) return false;
     journal.log(new Journal.Entry.Stalemate());
-    remainingPlayers().forEach(it -> journal.log(new Journal.Entry.FinalBalance(
-        it.id(), it.account().balance().amount())));
+    remainingPlayers().forEach(it -> {
+      journal.log(new Journal.Entry.FinalBalance(it.id(), it.account().balance().amount()));
+      journal.log(new Journal.Entry.FinalAge(it.id(), journalling.age(it)));
+    });
     return true;
   }
 
@@ -245,11 +250,12 @@ public class Game {
     return total;
   }
 
-  private void takeTurn(Player player, Journal journal, Turn.Events events, Landings landings) {
+  private void takeTurn(Player player, Journal journal, Journalling journalling, Landings landings) {
     Strategy strategy = strategies.forPlayer(player);
     journal.log(new Journal.Entry.TurnStarted(
-        player.id(), player.account().balance().amount(), strategy.cashReserve(player, rules, deeds)));
-    new Turn(rules, cups.forPlayer(player), events, landings, jail, strategy, deeds).take(player);
+        player.id(), player.account().balance().amount(), strategy.cashReserve(player, rules, deeds),
+        journalling.age(player)));
+    new Turn(rules, cups.forPlayer(player), journalling, landings, jail, strategy, deeds).take(player);
   }
 
   private Landings landingsFor(Player player, List<Player> turnOrder, Journalling journalling) {
@@ -273,8 +279,16 @@ public class Game {
   }
 
   /** Writes down what a turn and a sale say they did, as the game's account of it. */
-  private record Journalling(Journal journal)
+  private record Journalling(Journal journal, Map<Player.ID, Integer> ages)
       implements Turn.Events, LandSale.Events, Rent.Events, Building.Events, Cards.Events, Taxes.Events, Jail.Events, Bankruptcy.Events {
+    private int age(Player player) {
+      return ages.getOrDefault(player.id(), 0);
+    }
+
+    private void ageAfter(Player player) {
+      ages.merge(player.id(), 1, Integer::sum);
+    }
+
     @Override
     public void rolled(Player player, Roll roll) {
       journal.log(new Journal.Entry.Rolled(player.id(), roll.total()));
@@ -287,6 +301,7 @@ public class Game {
 
     @Override
     public void collectedSalary(Player player, Money salary) {
+      ageAfter(player);
       journal.log(new Journal.Entry.SalaryCollected(player.id(), salary));
     }
 
@@ -424,6 +439,7 @@ public class Game {
 
     @Override
     public void sentToJail(Player player, Street.Type cause) {
+      ageAfter(player);
       journal.log(new Journal.Entry.JailEntered(player.id(), cause));
     }
 
@@ -455,6 +471,7 @@ public class Game {
     @Override
     public void won(Player player) {
       journal.log(new Journal.Entry.Won(player.id()));
+      journal.log(new Journal.Entry.FinalAge(player.id(), age(player)));
     }
   }
 
@@ -511,9 +528,13 @@ public class Game {
       }
 
       /** The pawn's account balance is carried at this point so the turn's starting money is on record. */
-      record TurnStarted(Player.ID player, Money balance, Money reserve) implements Entry {
+      record TurnStarted(Player.ID player, Money balance, Money reserve, int age) implements Entry {
         public TurnStarted(Player.ID player, Money balance) {
-          this(player, balance, Money.ZERO);
+          this(player, balance, Money.ZERO, 0);
+        }
+
+        public TurnStarted(Player.ID player, Money balance, Money reserve) {
+          this(player, balance, reserve, 0);
         }
       }
 
@@ -636,6 +657,9 @@ public class Game {
       }
 
       record FinalBalance(Player.ID player, Money balance) implements Entry {
+      }
+
+      record FinalAge(Player.ID player, int age) implements Entry {
       }
 
       record Won(Player.ID player) implements Entry {

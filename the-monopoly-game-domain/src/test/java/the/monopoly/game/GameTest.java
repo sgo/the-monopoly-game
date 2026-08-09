@@ -130,6 +130,26 @@ class GameTest {
   }
 
   @Test
+  void aPlayerStartsAtAgeZeroAndAgesAfterPassingStart() {
+    Player dog = players.getFirst();
+    dog.position().moveTo(37);
+    Map<Player.ID, Cup> cups = Map.of(
+        dog.id(), Cup.of(new Roll(5, 5), new Roll(1, 2), new Roll(1, 2)),
+        players.get(1).id(), Cup.of(new Roll(1, 3), new Roll(4, 6), new Roll(4, 6)),
+        players.get(2).id(), Cup.of(new Roll(1, 4), new Roll(4, 6), new Roll(4, 6))
+    );
+
+    Game.Result result = game(players, player -> cups.get(player.id())).playUpToRounds(2);
+
+    assertThat(result.journal()).extracting(Entry::getClass).contains(Entry.TurnStarted.class);
+    assertThat(result.journal()).filteredOn(Entry.TurnStarted.class::isInstance)
+        .filteredOn(entry -> ((Entry.TurnStarted) entry).player().equals(dog.id()))
+        .extracting(entry -> ((Entry.TurnStarted) entry).age())
+        .containsExactly(0, 1);
+    assertThat(result.journal()).contains(new Entry.SalaryCollected(dog.id(), new Money(200)));
+  }
+
+  @Test
   void aGameThrowsTheDiceTheRulesCallForWhenGivenNoneOfItsOwn() {
     Game.Result result = game(players, Cup.of(ruleSet.dice().toList())).play();
 
@@ -150,7 +170,8 @@ class GameTest {
     Game.Result result = game(twoPlayers, player -> cups.get(player.id())).playToCompletion();
 
     assertThat(result.journal()).endsWith(
-        new Entry.Bankrupt(dog.id(), null), new Entry.Won(twoPlayers.get(1).id())
+        new Entry.Bankrupt(dog.id(), null), new Entry.Won(twoPlayers.get(1).id()),
+        new Entry.FinalAge(twoPlayers.get(1).id(), 0)
     );
     assertThat(result.winner()).contains(twoPlayers.get(1));
   }
