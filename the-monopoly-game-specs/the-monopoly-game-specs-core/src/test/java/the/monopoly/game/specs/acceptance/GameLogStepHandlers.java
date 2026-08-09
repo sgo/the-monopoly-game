@@ -15,6 +15,8 @@ import static the.monopoly.game.specs.acceptance.GameAccount.records;
 import static the.monopoly.game.specs.acceptance.GameAccount.recordsInOrder;
 import static the.monopoly.game.specs.acceptance.GameAccount.says;
 import static the.monopoly.game.specs.acceptance.GameAccount.saysInOrder;
+import static the.monopoly.game.specs.acceptance.GameAccount.saysTurnStartedWith;
+import static the.monopoly.game.specs.acceptance.GameAccount.saysTurnStartedWithBalance;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.NAME;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.UNQUOTED_NAME;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.UNQUOTED_NAME_WITHOUT_ORDERING;
@@ -46,6 +48,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.inheritedLi
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeRoll;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalBalance;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalAge;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEnteredLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailCardUsed;
@@ -84,6 +87,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.splitMonopo
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.splitMonopolyWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.soldAHouse;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStarted;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStartedAtAge;
 import static the.monopoly.game.specs.acceptance.StepHandler.step;
 import static the.monopoly.game.specs.acceptance.StepHandler.then;
 
@@ -99,6 +103,80 @@ final class GameLogStepHandlers {
 
   static List<StepHandler> handlers() {
     return List.of(
+        then("^the game log records that pawn \"" + NAME + "\" starts a turn aged " + VALUE
+                + " years before it records that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                turnStartedAtAge(arguments.text(1), arguments.number(2)),
+                salaryCollected(arguments.text(3), arguments.number(4)))),
+        then("^the game log records that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE
+                + " before it records that pawn \"" + NAME + "\" starts a turn aged " + VALUE + " years$",
+            (world, arguments) -> logRecordsInOrder(world,
+                salaryCollected(arguments.text(1), arguments.number(2)),
+                turnStartedAtAge(arguments.text(3), arguments.number(4)))),
+        then("^the game log records that pawn \"" + NAME + "\" starts a turn aged " + VALUE
+                + " years before it records that pawn \"" + NAME + "\" is sent to jail from landing on \"" + NAME + "\"$",
+            (world, arguments) -> logRecordsInOrder(world,
+                turnStartedAtAge(arguments.text(1), arguments.number(2)),
+                jailEntered(arguments.text(3), arguments.text(4)))),
+        then("^the game log records that pawn \"" + NAME + "\" is sent to jail from landing on \"" + NAME
+                + "\" before it records that pawn \"" + NAME + "\" starts a turn aged " + VALUE + " years$",
+            (world, arguments) -> logRecordsInOrder(world,
+                jailEntered(arguments.text(1), arguments.text(2)),
+                turnStartedAtAge(arguments.text(3), arguments.number(4)))),
+        then("^the game log records that pawn \"" + NAME + "\"'s final age is " + VALUE + " years$",
+            (world, arguments) -> logRecords(world, finalAge(arguments.text(1), arguments.number(2)))),
+        then("^the game log records that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE
+                + " before it records that pawn \"" + NAME + "\"'s final age is " + VALUE + " years$",
+            (world, arguments) -> logRecordsInOrder(world,
+                finalBalance(arguments.text(1), arguments.number(2)),
+                finalAge(arguments.text(3), arguments.number(4)))),
+        then("^the game log records that pawn \"" + NAME + "\"'s final age is " + VALUE
+                + " years before it records that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                finalAge(arguments.text(1), arguments.number(2)),
+                finalBalance(arguments.text(3), arguments.number(4)))),
+        then("^the game report says that pawn \"" + NAME + "\" starts a turn aged " + VALUE
+                + " years before it says that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + " starts a turn aged " + arguments.number(2) + " years",
+                arguments.text(3) + " collects a salary of $" + arguments.number(4))),
+        then("^the game report says that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE
+                + " before it says that pawn \"" + NAME + "\" starts a turn aged " + VALUE + " years$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + " collects a salary of $" + arguments.number(2),
+                arguments.text(3) + " starts a turn aged " + arguments.number(4) + " years")),
+        then("^the game report says that pawn \"" + NAME + "\" starts a turn aged " + VALUE
+                + " years before it says that pawn \"" + NAME + "\" is sent to jail from landing on \"" + NAME + "\"$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + " starts a turn aged " + arguments.number(2) + " years",
+                arguments.text(3) + " is sent to jail from landing on " + arguments.text(4))),
+        then("^the game report says that pawn \"" + NAME + "\" is sent to jail from landing on \"" + NAME
+                + "\" before it says that pawn \"" + NAME + "\" starts a turn aged " + VALUE + " years$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + " is sent to jail from landing on " + arguments.text(2),
+                arguments.text(3) + " starts a turn aged " + arguments.number(4) + " years")),
+        then("^the game report says that pawn \"" + NAME + "\"'s final age is " + VALUE + " years$",
+            (world, arguments) -> says(world, arguments.text(1) + "'s final age is " + arguments.number(2) + " years")),
+        then("^the game report says that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE
+                + " before it says that pawn \"" + NAME + "\"'s final age is " + VALUE + " years$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + "'s final balance is $" + arguments.number(2),
+                arguments.text(3) + "'s final age is " + arguments.number(4) + " years")),
+        then("^the game report says that pawn \"" + NAME + "\"'s final age is " + VALUE
+                + " years before it says that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + "'s final age is " + arguments.number(2) + " years",
+                arguments.text(3) + "'s final balance is $" + arguments.number(4))),
+        then("^the game log records that pawn \"" + NAME + "\" wins the game before it records that pawn \""
+                + NAME + "\"'s final age is " + VALUE + " years$",
+            (world, arguments) -> logRecordsInOrder(world,
+                Claim.of(new Entry.Won(idOf(arguments.text(1)))),
+                finalAge(arguments.text(2), arguments.number(3)))),
+        then("^the game report says that pawn \"" + NAME + "\" wins the game before it says that pawn \""
+                + NAME + "\"'s final age is " + VALUE + " years$",
+            (world, arguments) -> saysInOrder(world,
+                arguments.text(1) + " wins the game",
+                arguments.text(2) + "'s final age is " + arguments.number(3) + " years")),
         then("^the game journal records that pawn \"" + NAME + "\" wins the split monopoly$",
             (world, arguments) -> records(world, splitMonopolyWon(arguments.text(1)))),
         then("^the game journal records that pawn \"" + NAME + "\" wins the split monopoly before it records that pawn \""
@@ -515,7 +593,7 @@ final class GameLogStepHandlers {
               // log-1 guarantees the logged text is the report's rendered text, so
               // checking the played game's own report proves what the real log line
               // says, not just that the structured entry carries the right balance.
-              says(world, pawnName + " starts a turn with $" + balance);
+              saysTurnStartedWithBalance(world, pawnName, balance);
             }),
 
         then("^the game log records that pawn \"" + NAME + "\" rolls a total of " + VALUE + "$",
@@ -829,8 +907,8 @@ final class GameLogStepHandlers {
 
         then("^the game report says that pawn \"" + NAME + "\" starts a turn with \\$" + VALUE
                 + " and a \\$" + VALUE + " reserve$",
-            (world, arguments) -> says(world, arguments.text(1) + " starts a turn with $"
-                + arguments.number(2) + " and a $" + arguments.number(3) + " reserve")),
+            (world, arguments) -> saysTurnStartedWith(world, arguments.text(1),
+                arguments.number(2), arguments.number(3))),
 
         then("^the game report says that pawn \"" + NAME + "\" draws the chance card \"" + NAME
                 + "\" before it says that pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + "$",

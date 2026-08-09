@@ -136,6 +136,44 @@ stalemate. No reasonably-scoped trading strategy eliminates the deadlock in
 general; at best it narrows how often it happens. Treated as a known
 characteristic, not a defect — no fix planned.
 
+### Optional: Greedo stalemate trading
+
+An opt-in CLI flag, `--optional-greedo-stalemate-trading`, enables a second
+mechanism once the whole board is owned: at the start of each "Greedo"
+player's turn, it first tries an ordinary cash-free peer trade to complete
+one of its own colour groups (same acceptance rules as normal — it will
+never give up or accept a highest-priority street, or trade within the same
+colour group), and only if no trade is available does it fall back to a
+buyout of any colour group currently split between it and exactly one other
+player: the co-owner already holding the majority of that group wins it
+(favoring whichever trailing player already has a foothold, not whichever
+is richer), settling in cash within a 35%-of-balance ceiling, deferring
+rather than forcing a free transfer if neither can afford it yet, and never
+touching a split highest-priority group at all.
+
+This confirms the "at best it narrows how often it happens" prediction
+above, with real numbers. Measured directly, playing each game to genuine
+completion (no round limit, matching the CLI's own real dice/no-turn-limit
+behavior — see [CLI](#cli) below):
+
+- **3-player, 1000 games each:** stalemate rate drops from 48.2% (482/1000)
+  without the flag to 17.6% (176/1000) with it.
+- **2-player, 3000 games:** a trade happened in 616 games (~21%). Of the 571
+  of those that went on to resolve by ordinary bankruptcy, the player who
+  was trailing (lower cash) right before that first trade won 362 of them —
+  63%, against 37% for the player who was already ahead. The trade itself is
+  actually initiated by the *leading* player slightly more often (57% vs.
+  43%) — the mechanism has no built-in preference for the trailing player,
+  it just completes whichever monopoly it can on whoever's turn it is — but
+  the trailing player still comes out ahead more often than not once it
+  fires.
+
+Still not a general fix — most of the "narrows how often it happens" caveat
+above still applies, and a meaningful fraction of games still stalemate
+even with the flag on — but it measurably converts a large share of
+would-be stalemates into an ordinary, decisive bankruptcy ending, and does
+so more often in the trailing player's favor than not.
+
 ### Journal and report
 
 As the game is played, game events should be written to a journal and included

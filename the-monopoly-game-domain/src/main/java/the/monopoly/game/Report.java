@@ -46,8 +46,8 @@ public final class Report {
       case Entry.Start it -> "The game starts with " + names(it.players());
       case Entry.InitiativeRoll it -> name(it.player()) + " rolls " + it.total() + " for initiative";
       case Entry.InitiativeWon it -> name(it.player()) + " wins initiative";
-      case Entry.TurnStarted it -> name(it.player()) + " starts a turn with $" + it.balance().amount()
-          + " and a $" + it.reserve().amount() + " reserve";
+      case Entry.TurnStarted it -> name(it.player()) + " starts a turn aged " + it.age() + " years with $"
+          + it.balance().amount() + " and a $" + it.reserve().amount() + " reserve";
       case Entry.Rolled it -> name(it.player()) + " rolls a total of " + it.total();
       case Entry.Moved it -> name(it.player()) + " moves from position " + it.from() + " ("
           + boardSpaceName(it.fromSpace()) + ") to " + it.to() + " (" + boardSpaceName(it.toSpace()) + ")";
@@ -115,6 +115,7 @@ public final class Report {
           + (it.creditor() == null ? "the bank" : name(it.creditor()));
       case Entry.Stalemate it -> "The game ends in a stalemate";
       case Entry.FinalBalance it -> name(it.player()) + "'s final balance is $" + it.balance().amount();
+      case Entry.FinalAge it -> name(it.player()) + "'s final age is " + it.age() + " years";
       case Entry.Won it -> name(it.player()) + " wins the game";
     };
   }

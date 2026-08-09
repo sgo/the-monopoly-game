@@ -34,7 +34,7 @@ class ReportTest {
         new Entry.Rolled(Pawn.dog.id(), 5),
         new Entry.Moved(Pawn.dog.id(), 0, 5)
     )).isEqualTo("""
-        dog starts a turn with $1500 and a $0 reserve
+        dog starts a turn aged 0 years with $1500 and a $0 reserve
         dog rolls a total of 5
         dog moves from position 0 (Start) to 5 (Noord Station / Gare du Nord)""");
   }
@@ -42,7 +42,7 @@ class ReportTest {
   @Test
   void aReportTellsATurnStartWithThePawnsBalanceAtThatPoint() {
     assertThat(report(new Entry.TurnStarted(Pawn.dog.id(), new Money(1300))))
-        .isEqualTo("dog starts a turn with $1300 and a $0 reserve");
+        .isEqualTo("dog starts a turn aged 0 years with $1300 and a $0 reserve");
   }
 
   @Test
