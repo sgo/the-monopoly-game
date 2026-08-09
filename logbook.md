@@ -25631,3 +25631,28 @@ own convention.
 
 Verified after the fix: domain tests clean, full acceptance
 520/520 unchanged.
+
+## 2026-08-09T14:39:35Z — architect reviews player-age-tracking
+
+Received refactorer priority-50 handoff (commit `bbc819657a`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer bbc819657a
+```
+
+Action: accepted the architecture of the implementation. Age state is
+encapsulated inside `Game.Journalling`, and the journal/report boundary
+is explicit through `TurnStarted.age` and `FinalAge`; no core rule or
+UI dependency leaks across modules. Differential Java mutation for
+`Game` and `Report` is current, and the DRY findings are existing
+event-adapter repetitions.
+
+Soft Gherkin mutation exposed a specification weakness in the new
+age-after-passing-start and age-after-jail scenarios: each queues a
+parameterized turn roll and then queues a second fixed `1 and 2` roll.
+Several roll mutations therefore survive without testing the stated
+age behavior. This acceptance-content finding is routed to the
+specifier; the task cannot close until that loop returns.
