@@ -222,15 +222,19 @@ In principle ambiguity is a variant of under-specification. But what I mean here
 The plan looked ok. I couldn't come up with extra tasks.
 And there's no need. I can observe the result and act on that feedback.
 
-Dus, bij de tweede poging om het spel te starten werd het spel netjes gespeeld door 2 spelers tot 1 van hen het spel won.
+So at my second attempt to run the simulation, it was played by two players until one fo them won. 
 
-Daar vielen echter nog steeds een paar zaken op:
+A few things were notable:
 
-De spelers kopen straten maar bouwen niet snel.
-De eerste speler die naar de gevangenis werd gestuurd speelde meteen een volgende zet om dan buiten de gevangenis zich alsnog uit de gevangenis te kopen.
-Straten werden af en toe verloot.
-De status van de bankrekening per speler was niet zichtbaar en dus was het verloop van het spel moeilijk te volgen.
-Er ontbraken meldingen van het gebruik van kans en algemeen fonds kaarten.
+- Streets were bought, but building usually took a longer time.
+  - Building is only possible once a player owns a full colour group as per the rules.
+- The first player sent to jail would immediately move another turn but still believe they're in jail having already left jail.
+  - A player landing on "Go to jail" with a double equal value dice roll was still allowed their second turn.
+- Streets are occasionally auctioned off to settle debt.
+- The impact on player's bank balances was never visualised.
+  - Making it difficult to understand why certain things happen.
+- No notifications were shown of Chance or Community Chest cards being pulled.
+  - The game was actually loaded with empty decks
 
-Zoals verwacht ontbreken er specificaties waar ik en de AI niet aan gedacht hebben.
-Rinse & repeat.
+As expected, specifications were missing both I and the AI did not think of.
+So we rinse & repeat.
