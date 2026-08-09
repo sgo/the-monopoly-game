@@ -25753,6 +25753,29 @@ acceptance contract, not grounds for a test-only turn policy or a
 gameplay change. Routed to the specifier for a durable specification
 of how the real CLI game is kept observable before stop.
 
+## 2026-08-09T15:05:38Z — architect reviews CLI roll-threshold resolution
+
+Received specifier priority-50 handoff (commit `692f29e7da`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 692f29e7da
+```
+
+Action: accepted the removal of the 50-roll completion flake. The
+specifier changed only the two two-player CLI examples to ten rolls;
+the eight-player check remains at fifty. Full acceptance is clean.
+
+Soft Gherkin mutation of `specs-cli:en/cli.feature` nevertheless
+survived three of six mutations: cli-1's threshold `10 -> 2`, cli-2's
+threshold `50 -> 55`, and cli-5's threshold `10 -> 18`. Each describes
+a tolerated amount of genuine progress, so the current feature has no
+assertion capable of distinguishing those changed values. This is a
+scenario-content coverage gap; route it to the specifier instead of
+altering CLI/gameplay behavior or editing the feature directly.
+
 ## 2026-08-09T15:03:00Z — specifier lowers cli-1/cli-5 roll threshold
 
 Received architect priority-00 handoff (commit `929eb94721`, task
