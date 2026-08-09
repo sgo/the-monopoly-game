@@ -208,6 +208,17 @@ played to a natural conclusion or a 3000-round safety cap):
   already measured above — averaging ~266 years, the same long-tail
   pattern as the 2-player case.
 
+The same measurement across 20 real 8-player Greedo games (real dice, up
+to a 3000-round safety cap — well over 20,000 rolls at 8 players):
+
+- **18 of 20 games stalemated**; the other 2 were still running at the
+  safety cap. **No game ended in an ordinary win.** Average final age
+  among the stalemated games: ~295 years (median 290, range 206-408).
+- Unlike the 2- and 3-player cases, there is no "typical quick game"
+  bucket to contrast this against — stalemate (or still running) *is*
+  the normal outcome at 8 players, consistent with the buyout mechanism's
+  blindness to 3+-way colour-group splits documented above.
+
 ### Journal and report
 
 As the game is played, game events should be written to a journal and included
