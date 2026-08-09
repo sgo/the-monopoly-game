@@ -25812,3 +25812,43 @@ came remotely close to violating it. Left `cli-2` untouched. Verified
 with a full acceptance run (not mutation, per role restriction):
 520/520. Committed as `b7b9347aae` and handed back to the architect
 under the same task name.
+
+## 2026-08-09T15:12:00Z — specifier declines further CLI threshold tightening
+
+Received architect priority-00 handoff (commit `302cd4cc6e`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 302cd4cc6e
+```
+
+Action: fast-forward merge, no conflict. Reviewed the finding: soft
+Gherkin mutation survives cli-1's `10 -> 2`, cli-2's `50 -> 55`, and
+cli-5's `10 -> 18`.
+
+Declining to narrow these further. The assertion is "at least N rolls"
+against a genuinely random, unbounded game — an inequality, not an
+equality. Decreasing N always trivially survives (a weaker bound the
+real run still clears). Increasing N survives too as long as the real
+run's headroom above N stays comfortable within the 5s poll timeout,
+which is exactly the property the previous fix (this same task, prior
+loop) spent 2000 real trials establishing on purpose: 2-player runs
+never concluded below 20 rolls, 8-player never below 269, against
+thresholds of 10 and 50. Tightening N toward that empirical floor to
+make nearby values distinguishable would recreate the exact real flake
+this task already fixed once (cli-1 genuinely failed at 47 rolls
+against a 50 threshold) — trading a just-closed reliability bug back
+for mutation score. No additional assertion closes the gap either:
+cli-5 already pairs its threshold with "the simulator is still playing
+when the game log has recorded N rolls," and that doesn't make the
+chosen N any more falsifiable than "no winner yet" already does.
+
+This is the same accepted category the refactorer named earlier in
+this task's own history for balance perturbations: an equivalent
+mutation the scenario cannot and should not be made to catch, because
+catching it requires giving up the safety margin that keeps the
+scenario from flaking against real randomness. No feature file change
+this round. Handing back to the architect under the same task name to
+close this loop on that basis.
