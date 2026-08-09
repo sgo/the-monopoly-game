@@ -25573,3 +25573,61 @@ affordability or majority-outcome class. Final verification passed:
 323 domain tests, 22 property tests, and 508 acceptance tests. No
 further coder or refactorer loop is warranted; sent the phase-complete
 state to the specifier.
+
+## 2026-08-09T16:36:00Z — refactorer reviews player-age-tracking
+
+Received coder priority-50 handoff (commit `fcfa17db89`, task
+`player-age-tracking`).
+
+Merged. This pulled in the entire `buyout-highest-priority-exclusion`
+resolution chain I had left blocking (specifier's trade-before-buyout
+dispatch-order decision, coder's implementation, the specifier's
+board-filler isolation fix for journal/logging/report-53/55/56/57,
+architect's close-out) plus a version bump to 0.1.0-SNAPSHOT, on top of
+the actual `player-age-tracking` commit. `logbook.md` conflicted with
+the usual sent/received boilerplate-misalignment pattern, compounded
+this time by a stale pre-correction draft of my own prior entry ("Not
+committing this... holding the merge locally") that had propagated
+through the architect/specifier/coder chain instead of the corrected
+text I actually committed ("Committed... as 3fd6aa8ac1"). Resolved by
+keeping my accurate wording and splicing in every downstream entry
+unchanged, verified via `grep -c` for conflict markers (zero) and a
+full read-through confirming nothing was dropped.
+
+Did not take the "phase-complete"/"reconciled" claims in that inherited
+history on faith either — ran the full suite myself. Domain: clean, no
+failures. Acceptance: `./acceptance/run-acceptance.sh` → 520/520,
+confirming journal-58/logging-58/report-58 (the scenarios I flagged
+blocking last cycle) now genuinely pass under the trade-before-buyout
+dispatch order, not just claimed.
+
+Reviewed the actual `player-age-tracking` diff. `Game.Journalling`
+gained a `Map<Player.ID, Integer> ages`, incremented on
+`collectedSalary` and `sentToJail` (each represents a lap of the board),
+surfaced via `Journal.Entry.TurnStarted.age()` and a new
+`Entry.FinalAge` logged on win/stalemate. `Report.line` gained one more
+case for `FinalAge`. Semantically sound and narrowly scoped; no
+behavior beyond what the task asked for.
+
+CRAP: `Game.java` and `Report.java` both clean except the standing
+`Report.line` sealed-switch exemption (CC now 46, CRAP 73.1 — the
+exhaustive-switch shape is unchanged, it just gained one more
+straight-line case for `FinalAge`). No new violation anywhere else (max
+CC 6, `playTurns`/`playTurn`, both 100% covered). DRY: no duplicates.
+`mutate4java --scan`: 64 sites in `Game.java`, 3 in `Report.java`, both
+far under the 100-site split threshold; manifests were stale (scope
+changed) and refreshed via `--update-manifest`.
+
+One mechanical DRY fix, unrelated to CRAP or mutation: the coder's new
+`JournalStepHandlers` jail-ordering steps called
+`the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered(...)`
+fully package-qualified, the only such call in the file — every other
+`MonopolyStepHelpers` method there is reached through a static import,
+including a fresh one added two lines above for `idOf` in this very
+commit. Added `import static
+the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered;`
+and dropped the qualification at both call sites to match the file's
+own convention.
+
+Verified after the fix: domain tests clean, full acceptance
+520/520 unchanged.

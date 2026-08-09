@@ -21,6 +21,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.bankReceive
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeRoll;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.idOf;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalBalance;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalAge;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.money;
@@ -130,14 +131,12 @@ final class JournalStepHandlers {
                 + " years before it records that pawn \"" + NAME + "\" is sent to jail from landing on \"" + NAME + "\"$",
             (world, arguments) -> recordsInOrder(world,
                 turnStartedAtAge(arguments.text(1), arguments.number(2)),
-                the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered(
-                    arguments.text(3), arguments.text(4)))),
+                jailEntered(arguments.text(3), arguments.text(4)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" is sent to jail from landing on \"" + NAME
                 + "\" before it records that pawn \"" + NAME + "\" starts a turn aged " + VALUE + " years$",
             (world, arguments) -> recordsInOrder(world,
-                the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered(
-                    arguments.text(1), arguments.text(2)),
+                jailEntered(arguments.text(1), arguments.text(2)),
                 turnStartedAtAge(arguments.text(3), arguments.number(4)))),
 
         then("^the game journal records that pawn \"" + NAME + "\" rolls a total of " + VALUE + "$",
