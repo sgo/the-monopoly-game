@@ -197,6 +197,17 @@ So for a typical (non-stalemate) 2-player game, expect players to reach
 somewhere around their late teens to low twenties in age by the time
 someone goes bankrupt.
 
+The same measurement across 20 real 3-player Greedo games (real dice,
+played to a natural conclusion or a 3000-round safety cap):
+
+- **11 of 20 games ended in an ordinary win.** Average age reached: ~14
+  years (median 13, range 7-29) — noticeably lower than the 2-player
+  figure, since three players splitting rent income tends to bring on a
+  bankruptcy sooner relative to how many laps of the board have passed.
+- **9 of 20 stalemated** — matching the ~48% no-trading stalemate rate
+  already measured above — averaging ~266 years, the same long-tail
+  pattern as the 2-player case.
+
 ### Journal and report
 
 As the game is played, game events should be written to a journal and included
