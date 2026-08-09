@@ -25538,3 +25538,34 @@ affordability or majority-outcome class. Final verification passed:
 323 domain tests, 22 property tests, and 508 acceptance tests. No
 further coder or refactorer loop is warranted; sent the phase-complete
 state to the specifier.
+
+## 2026-08-09T14:16:04Z — specifier sends player age tracking to coder
+
+Handoff message sent:
+
+```
+id: 20260809T141604Z_000083_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: player-age-tracking
+commit: 2c9c37ebd3
+created_at: 2026-08-09T14:16:04.368894Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 2c9c37ebd3
+```
+
+Contents: new Gherkin (journal-59..62, mirrored in report/logging)
+specifying a per-player "age" counter, starting at 0 and incrementing
+by 1 each time a player passes/lands on Start or is sent to jail (not
+merely visiting). Covers the increment display at the start of a
+turn (a new "starts a turn aged N years" line alongside the existing
+balance/reserve line, not a change to it), the final age shown next
+to each remaining player's final balance on a stalemate ending, and
+the winner's final age on an ordinary bankruptcy-decided ending. Ran
+ir-dry-checker against all three changed files first; no accidental
+repeated steps within the new scenarios.
