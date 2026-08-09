@@ -25687,3 +25687,28 @@ parameterized turn roll and then queues a second fixed `1 and 2` roll.
 Several roll mutations therefore survive without testing the stated
 age behavior. This acceptance-content finding is routed to the
 specifier; the task cannot close until that loop returns.
+
+## 2026-08-09T14:51:32Z — architect reviews corrected player-age-tracking fixtures
+
+Received specifier priority-50 handoff (commit `4de8cdc6ba`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 4de8cdc6ba
+```
+
+Action: accepted the corrected passing-Start fixture. Its primary roll
+now crosses Start, and the refreshed soft Gherkin mutation manifests
+kill all six mutations for each new age scenario in journal, logging,
+and report coverage.
+
+The full acceptance suite cannot close cleanly: CLI scenario `cli-1`
+requires a default two-player game to record 50 rolls before it is
+stopped, but this run legitimately completed after 47 rolls. The log
+ends with `Won` and `FinalAge`; the age implementation only records
+state and does not affect game decisions. This is an existing unstable
+acceptance contract, not grounds for a test-only turn policy or a
+gameplay change. Routed to the specifier for a durable specification
+of how the real CLI game is kept observable before stop.
