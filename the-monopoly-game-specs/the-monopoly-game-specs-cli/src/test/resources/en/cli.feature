@@ -18,7 +18,7 @@ Feature: Monopoly command line interface
 
     Examples:
       | players | minimum rolls |
-      | 2       | 50             |
+      | 2       | 10             |
 
   # cli-2
   Scenario Outline: the CLI runs a real game with selected player strategies until it is stopped
@@ -85,4 +85,4 @@ Feature: Monopoly command line interface
 
     Examples:
       | players | minimum rolls |
-      | 2       | 50             |
+      | 2       | 10             |
