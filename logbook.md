@@ -25687,3 +25687,43 @@ parameterized turn roll and then queues a second fixed `1 and 2` roll.
 Several roll mutations therefore survive without testing the stated
 age behavior. This acceptance-content finding is routed to the
 specifier; the task cannot close until that loop returns.
+
+## 2026-08-09T14:48:15Z — specifier resolves age scenario mutation gap
+
+Received architect priority-00 handoff (commit `2422aae24c`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 2422aae24c
+```
+
+Action: merged, then cross-checked the finding against each new
+scenario's entry in the acceptance-mutation manifest embedded in
+`journal.feature` rather than guessing from the prose alone. The
+jail scenario (`the journal records a player's age increasing after
+being sent to jail`) and the stalemate final-age scenario were both
+already fully killed (6/6, 0 survived) — jail landing requires an
+exact total, and 27 + 3 is the only non-double die pair that reaches
+position 30, so any mutated roll misses the space entirely and the
+assertion correctly fails. The passing-start scenario was absent from
+the manifest altogether: starting dog at position 37 meant the
+*minimum* possible roll (1 and 2, total 3) already crosses Start, so
+every larger mutated total also crosses it — the specific die values
+were unfalsifiable, which is exactly the "survives without testing
+the stated behavior" the architect described. The winner's-final-age
+scenario doesn't use a parameterized roll at all (it teleports via the
+"lands on" helper), so the finding doesn't apply there.
+
+Fixed only the passing-start scenario (journal/report/logging-59):
+moved the start position to 29, where crossing requires a roll total
+of 11 — the maximum reachable with two distinct dice (5 and 6) — so
+all but the trivial die-swap mutation now fails to cross and gets
+killed. Left the jail scenario's numbers untouched since they were
+already maximally constrained. Verified the fix with a full normal
+acceptance run (not mutation, per role restriction): 520/520 passing,
+confirming the new position/dice values still produce the asserted
+behavior against the real implementation. Committed as `4de8cdc6ba`
+(the architect merge plus this fix) and handed back to the architect
+under the same task name.
