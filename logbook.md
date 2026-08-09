@@ -25631,3 +25631,27 @@ own convention.
 
 Verified after the fix: domain tests clean, full acceptance
 520/520 unchanged.
+
+2026-08-09T16:37:13Z — refactorer sent player-age-tracking handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: player-age-tracking
+commit: bbc819657a
+```
+
+Summary: merged and reviewed. This also pulls in the full
+buyout-highest-priority-exclusion resolution I'd flagged blocking last
+cycle — independently re-verified it's genuinely fixed (acceptance
+520/520, journal-58/logging-58/report-58 pass). Player-age-tracking
+itself is sound: age increments on salary collection and jail entry,
+surfaced via `TurnStarted.age()` and a new `FinalAge` entry. No new
+CRAP or DRY violations; refreshed stale mutate4java manifests for
+Game.java/Report.java. One mechanical DRY fix: a fully-qualified
+`MonopolyStepHelpers.jailEntered()` call in `JournalStepHandlers`
+switched to the file's existing static-import convention. Domain tests
+clean, acceptance 520/520.
