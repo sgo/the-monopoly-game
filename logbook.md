@@ -25752,3 +25752,40 @@ state and does not affect game decisions. This is an existing unstable
 acceptance contract, not grounds for a test-only turn policy or a
 gameplay change. Routed to the specifier for a durable specification
 of how the real CLI game is kept observable before stop.
+
+## 2026-08-09T15:03:00Z — specifier lowers cli-1/cli-5 roll threshold
+
+Received architect priority-00 handoff (commit `929eb94721`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 929eb94721
+```
+
+Action: merged (second logbook conflict, same sent/received
+boilerplate-misalignment shape as before; spliced both entries back in
+by diffing against `git show <side>:logbook.md` for each parent rather
+than trusting the marker placement). Investigated the actual test
+harness (`World.awaitGameLog`, `MonopolyStepHandlers.java`) before
+deciding anything: it polls for N `Entry.Rolled` records with a 5s
+timeout and no awareness the game can conclude early, so a genuine
+47-roll win just times out with a real `AssertionError` — not a hang,
+not a silent pass, an honest but racy failure.
+
+Rather than guess a safer number, measured it: 2000 real (unseeded
+dice) 2-player Greedo games via `Game.playUpToRounds`, counting
+`Entry.Rolled` up to `Won`/`Stalemate`. Minimum rolls to conclusion was
+26; zero endings under 20; the old 50-roll threshold had 5/2000 (0.25%)
+endings under it, and a first, smaller batch reproduced the exact `47`
+the architect saw, confirming the model matches production. 8-player
+`cli-2` needed no change: minimum there was 269 rolls over 150 trials,
+nowhere near its threshold.
+
+Lowered `cli-1` and `cli-5`'s minimum-rolls example from 50 to 10 —
+still proves several genuine turns happened, but no observed trial
+came remotely close to violating it. Left `cli-2` untouched. Verified
+with a full acceptance run (not mutation, per role restriction):
+520/520. Committed as `b7b9347aae` and handed back to the architect
+under the same task name.
