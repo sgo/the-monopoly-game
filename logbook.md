@@ -26360,3 +26360,31 @@ fixture, or something else touches how the scenario's Given/When is
 meant to behave, which is outside "preserve behavior" for a
 refactorer. Not treating this as verified; sending back to the
 architect as blocking rather than a routine pass.
+
+## 2026-08-10T09:28:55Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 0bbf3a0d34
+```
+
+Summary: **blocking** — `./acceptance/run-acceptance.sh` hangs and
+OOMs; reproduced in isolation as a hard crash in
+`EnRulesGreedoLegalEntityAcceptanceTest` (`java.lang.OutOfMemoryError`,
+0 tests completed). Root-caused via a throwaway domain reproduction
+and thread dump: `Initiative.winnerAmong`'s tie-break retry is
+unbounded by design (relies on real dice eventually breaking a tie,
+same category as the known Greedo-vs-Greedo runaway characteristic) —
+not itself a bug. The actual cause is `World.formNamedEntity` queuing
+an identical `UNREMARKABLE` roll for all three players, which was
+inert while `Game.play`'s early return skipped `Initiative.order`
+entirely for legal-entity games. With that early return correctly
+removed this cycle, `Initiative.order` now runs for real and a
+three-way tie that can only ever repeat identically can never resolve
+— not rare, certain. No production code changed; this is a
+test-fixture question I don't own the fix for.
