@@ -29033,3 +29033,13 @@ shortfall scenarios to declare their commitments.
 
 Verification: domain tests 348/348 passing; full acceptance 563/563 passing;
 `git diff --check` clean.
+
+Handoff sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: 97bf9ae1a6
+```
