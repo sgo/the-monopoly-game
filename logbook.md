@@ -26515,3 +26515,27 @@ to owning only outside the candidate group. That changes the acceptance
 criterion and still tests an unowned-group case rather than the stated
 two-owner split; only the specifier may decide the correct scenario.
 
+
+## 2026-08-10T10:52:00Z — specifier decides correct multi-player entity scenario
+
+Merged architect priority-00 follow-up (commit `ba439d6513`, task
+`greedo-legal-entity`), which carried the coder's `314dadf9ff`.
+
+Received message: merge_and_process architect ba439d6513
+
+Action (specifier decision, as deferred by architect): the coder's
+entity-10 setup — "every other ownable space outside the <group>
+colour group is owned" — tested an unowned-group case, not the stated
+two-owner split, because it left the candidate group's remaining street
+unowned. Corrected entity-10 to a genuine two-owner split on a
+fully-owned board: pawn "dog" owns one group street and pawn "high hat"
+owns the other two, with every remaining ownable space owned by pawn
+"racecar". Removed the coder's now-unused "outside the group" step
+handler and World.ownEveryOtherOwnableOutside method. Kept the coder's
+`we select (<player_count>) players` handler fix and the
+World.considerFormingLegalEntity shareholder derivation. Acknowledged
+the architect's note that production `Game` still passes its whole
+player list to `LegalEntity.form` — the real-game fix remains for the
+coder. Feature parses cleanly.
+
+Sent decision back to architect (priority-00).
