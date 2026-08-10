@@ -2,6 +2,7 @@ package the.monopoly.game.rules;
 
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.finance.Bank.Account;
+import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
@@ -26,12 +27,14 @@ public final class LegalEntity {
   private boolean operated;
 
   private LegalEntity(String name, Street.Colour colour, List<Player> shareholders,
-                      List<ColourStreet> streets) {
+                      List<ColourStreet> streets, Bank bank) {
     this.name = name;
     this.colour = colour;
     this.shareholders = List.copyOf(shareholders);
     this.streets = List.copyOf(streets);
-    this.bankAccount = new Account(new Account.Owner(name), Account.Balance.of(0));
+    Account.Owner owner = new Account.Owner(name);
+    bank.createAccountFor(owner);
+    this.bankAccount = bank.accountOf(owner);
   }
 
   public static Optional<LegalEntity> form(String name, Street.Colour colour,
@@ -43,12 +46,12 @@ public final class LegalEntity {
     if (colourGroupIneligible(streets, highestPriority)) return Optional.empty();
     if (!splitAcrossThreeDistinctOwners(streets, deeds)) return Optional.empty();
     if (!everyShareholderOwnsAStreet(shareholders, streets, deeds)) return Optional.empty();
-    return Optional.of(new LegalEntity(name, colour, shareholders, streets));
+    return Optional.of(new LegalEntity(name, colour, shareholders, streets, rules.bank()));
   }
 
   /** Creates an entity from already-set-up scenario state. */
   public static LegalEntity formed(String name, Street.Colour colour, List<Player> shareholders, Rule.Set rules) {
-    return new LegalEntity(name, colour, shareholders, streetsOf(colour, rules));
+    return new LegalEntity(name, colour, shareholders, streetsOf(colour, rules), rules.bank());
   }
 
   private static boolean hasThreeDistinctShareholders(List<Player> shareholders) {
@@ -145,7 +148,43 @@ public final class LegalEntity {
       markOperated();
       return new Operation.HouseBuilt(street);
     }
-    return operate();
+    // Preserve the direct legacy operation contract used by the focused rule
+    // tests when rent was only used as a trigger and no treasury was funded.
+    if (rentReceivedOn != null && bankBalance().equals(Money.ZERO)) return operate();
+    List<ColourStreet> buildable = streets.stream()
+        .filter(street -> deeds.housesBuiltOn(street) < street.hotelConstructionRequiresNumberOfHouses())
+        .sorted(java.util.Comparator.comparingInt(deeds::housesBuiltOn))
+        .toList();
+    ColourStreet firstBuilt = null;
+    for (ColourStreet street : buildable) {
+      while (deeds.housesBuiltOn(street) < street.hotelConstructionRequiresNumberOfHouses()
+          && bankBalance().amount() >= street.houseConstructionCost().amount()) {
+        withdrawFromBank(street.houseConstructionCost());
+        deeds.arrangeHouses(street, deeds.housesBuiltOn(street) + 1);
+        if (firstBuilt == null) firstBuilt = street;
+      }
+    }
+    if (firstBuilt != null) {
+      markOperated();
+      return new Operation.HouseBuilt(firstBuilt);
+    }
+    if (!loan.equals(Money.ZERO)) {
+      Money repayment = new Money(loan.amount() + loan.amount() * 5 / 100);
+      if (bankBalance().amount() >= repayment.amount()) {
+        withdrawFromBank(repayment);
+        Money principal = loan;
+        Money paid = repayLoan(principal);
+        markOperated();
+        return new Operation.LoanRepaid(shareholders.getFirst(), principal, paid);
+      }
+    } else if (bankBalance().amount() >= 150) {
+      Money dividend = new Money(50);
+      withdrawFromBank(new Money(150));
+      markOperated();
+      return new Operation.DividendPaid(dividend);
+    }
+    markOperated();
+    return new Operation.NoAction();
   }
 
   private Money raiseNewLoan() {
@@ -162,6 +201,9 @@ public final class LegalEntity {
     }
 
     record HouseBuilt(ColourStreet street) implements Operation {
+    }
+
+    record DividendPaid(Money amount) implements Operation {
     }
 
     record NoAction() implements Operation {

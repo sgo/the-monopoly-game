@@ -66,6 +66,7 @@ public class World {
   private Rule.Set ruleSet = Rule.Set.Type.official.create();
   private Street space;
   private List<Player> players;
+  private boolean gameStarted;
   private Player player;
   private Dice dice;
   private Map<Dice.Face, Integer> rolls;
@@ -379,6 +380,7 @@ public class World {
   }
 
   private void playAndCapture(Function<Game, Game.Result> play) {
+    gameStarted = true;
     Cards.Decks officialDecks = Cards.Decks.official(deeds == null ? deeds = new Deeds() : deeds);
     Game game = new Game(
         ruleSet, players(), player -> () -> nextQueuedPawnRoll(player), this::strategyOf,
@@ -658,6 +660,12 @@ public class World {
 
   public int housesBuilt(Street.Type land) {
     return deeds.housesBuiltOn((ColourStreet) ruleSet.create(land));
+  }
+
+  public void arrangeOrAssertHouses(Street.Type land, int houses) {
+    if (!gameStarted) arrangeHouses(land, houses);
+    else if (housesBuilt(land) != houses)
+      throw new AssertionError("Expected " + houses + " houses on " + land + " but found " + housesBuilt(land));
   }
 
   public int totalHouses(Street.Colour colour) {

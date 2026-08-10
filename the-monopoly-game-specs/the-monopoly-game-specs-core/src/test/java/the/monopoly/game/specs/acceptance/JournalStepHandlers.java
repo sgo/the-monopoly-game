@@ -486,11 +486,13 @@ final class JournalStepHandlers {
         given("^pawn \"" + NAME + "\" holds a \"Get Out of Jail Free\" card$",
             (world, arguments) -> assertThat(world.holdsGetOutOfJailFreeCard(arguments.text(1))).isTrue()),
 
-        given("^the street \"" + NAME + "\" has " + VALUE + " house\\(s\\) built$",
-            (world, arguments) -> world.arrangeHouses(SpaceNames.of(arguments.text(1)), arguments.number(2))),
+        step("^the street \"" + NAME + "\" has " + VALUE + " house\\(s\\) built$",
+            (world, arguments) -> world.arrangeOrAssertHouses(
+                SpaceNames.of(arguments.text(1)), arguments.number(2))),
 
-        then("^the street \"" + NAME + "\" has " + VALUE + " houses built$",
-            (world, arguments) -> assertThat(world.housesBuilt(SpaceNames.of(arguments.text(1)))).isEqualTo(arguments.number(2))),
+        step("^the street \"" + NAME + "\" has " + VALUE + " houses built$",
+            (world, arguments) -> world.arrangeOrAssertHouses(
+                SpaceNames.of(arguments.text(1)), arguments.number(2))),
 
         then("^the pink colour group is developed up to no more than (<total_houses>) houses$",
             (world, arguments) -> assertThat(world.totalHouses(Street.Colour.pink)).isLessThanOrEqualTo(arguments.number(1))),
@@ -571,10 +573,6 @@ final class JournalStepHandlers {
 
         then("^the player is no longer in jail$",
             (world, arguments) -> assertThat(world.playerIsInJail()).isFalse()),
-
-        then("^the street \"" + NAME + "\" has " + VALUE + " house\\(s\\) built$",
-            (world, arguments) -> assertThat(world.housesBuiltOn(SpaceNames.of(arguments.text(1))))
-                .isEqualTo(arguments.number(2))),
 
         then("^the street \"" + NAME + "\" has a hotel built$",
             (world, arguments) -> assertThat(world.hasHotelOn(SpaceNames.of(arguments.text(1)))).isTrue()),

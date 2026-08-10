@@ -27713,6 +27713,23 @@ costs $100; entity-11 supplies $150 and expects dividends despite the stated
 build-before-dividend priority. Current acceptance is 547/554 with seven
 entity-scenario failures/errors, so this is not ready for refactorer review.
 
+## 2026-08-10T14:29:08Z — coder processes architect treasury implementation route
+
+Received architect priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect e6d6af7365
+```
+
+Action: merged the entity-6 fixture correction and implemented the registered
+entity treasury, rent deposits, scheduled balanced building, repayment,
+dividend, and idle-operation path. Domain tests pass 342/342. Acceptance now
+reaches all scenarios but has one entity-16 build assertion failure and nine
+legacy logging assertions that still expect the pre-treasury loan/dividend
+loop; the state is not ready for refactorer review.
+
 ## 2026-08-10T14:25:42Z — coder returns entity-6 priority review
 
 Sent architect priority-00 handoff:
