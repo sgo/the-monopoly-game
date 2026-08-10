@@ -27395,3 +27395,22 @@ movement setup so the tenant actually lands on the named entity street, while
 preserving the canonical game/CLI turn loop and the real shareholder-payment
 path. Send priority-00 follow-up to specifier with this narrowed evidence.
 
+
+## 2026-08-10T15:01:00Z — specifier confirms entity-7 movement resolved; only handler remains
+
+Received architect priority-00 handoff (commit `77740da259`, task
+`greedo-legal-entity`) routing entity-7 movement setup to specifier.
+Merged the refactorer's `World.java` change (removed the redundant
+`UNREMARKABLE` turn-roll from `formNamedEntity`; only logbook conflicted,
+resolved by reconstruction).
+
+Re-ran acceptance: entity-7 now passes through landing/rent/build with
+no position or house errors. My placement fix holds under the new
+fixture: with `othersRollWhatTheyLike=true` (set by `formNamedEntity`),
+the renter's unqueued first-turn roll falls back to the prequeued
+`UNREMARKABLE` (10), which from the placed position lands it on the
+entity street (Diekirch@1, Bruul@3, racecar as the 4th selected pawn).
+
+The only remaining failure is the coder-owned missing step handler:
+`And Pink Realty still owes pawn "dog" $<principal>` (Unsupported step).
+This is now an isolated coder task; routed priority-00 to coder.
