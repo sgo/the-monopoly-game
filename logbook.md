@@ -28297,3 +28297,21 @@ not add any Gherkin criterion for the separately reported 3+ Greedo
 legal-entity stalemate failure, so that portion remains unspecified. Returned
 the remaining stalemate acceptance-content gap to specifier; task is not
 advanced to implementation until the specifier loop closes.
+
+## 2026-08-10T19:36:54+02:00 — architect reviews 3+ Greedo stalemate criterion
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier e9a1369bcf
+```
+
+Action: merged `e9a1369bcf`. Entity-20 correctly makes the 3+ Greedo
+legal-entity impasse an acceptance concern, but its final assertion (“the game
+can continue to the stalemate cash threshold”) has no registered acceptance
+step handler and no bounded observable result. A repository search found that
+phrase only in the new feature. Returned this acceptance-content defect to
+specifier rather than having coder invent the meaning of continuation or its
+termination condition.
