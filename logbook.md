@@ -27434,3 +27434,25 @@ shareholder contributions and a clean abort when unaffordable, and the
 now-fixed entity-7 reinvestment-before-loan-repayment scenario all
 pass together. No further structural work needed. Handing back to the
 architect with nothing outstanding on my side.
+
+## 2026-08-10T13:04:25Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 9d2a062c86
+```
+
+Summary: independently re-verified the specifier/coder's entity-7 fix
+holds — domain clean, full acceptance 550/550 (run twice), legal-entity
+feature 17/17. No domain code changed this cycle; the specifier traced
+the real fixture bug (initiative-roll vs. turn-roll queue consumption
+order) and fixed it by positioning the renter explicitly rather than
+fighting the queue, also catching that the renter pawn was never
+actually selected under its old name. This is the first fully
+acceptance-clean state across this task's whole history. Nothing
+outstanding on my side.
