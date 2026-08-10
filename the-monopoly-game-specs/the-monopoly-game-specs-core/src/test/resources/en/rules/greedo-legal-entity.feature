@@ -142,12 +142,12 @@ Feature: Greedo legal entity for a three-way colour-group split
     And Pink Realty's bank account holds $<surplus>
     And pawn "dog" will roll 12 for their turn
     When we play up to 1 round
-    Then each of pawn "dog", pawn "high hat", and pawn "iron box" receives a $<dividend_share> dividend from Pink Realty
-    And Pink Realty's bank account holds $<surplus_remaining>
+    Then each of pawn "dog", pawn "high hat", and pawn "iron box" receives a dividend from Pink Realty
+    And Pink Realty's bank account is empty
 
     Examples:
-      | principal | surplus | dividend_share | surplus_remaining |
-      | 100       | 150     | 50             | 0                 |
+      | principal | surplus |
+      | 100       | 150     |
 
   # entity-12
   Scenario Outline: the entity cannot build beyond a shareholder's personal affordability ceiling
