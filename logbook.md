@@ -27116,3 +27116,10 @@ Merged the review/refactor state and integrated canonical shareholder
 contributions. Removed the extra scripted roll that delayed explicit pawn
 rolls. Domain tests pass (335 tests); acceptance is 548/550 because entity-7
 roll 12 does not land either requested pink street from Start.
+
+## 2026-08-10T12:46:56Z — coder forwards integrated economy state
+
+Sent priority-00 git handoff for `greedo-legal-entity` at commit
+`7713889b17` to the refactorer. It includes the canonical contribution path
+and the scripted-roll queue correction; acceptance remains 548/550 due to
+entity-7's board-position mismatch.
