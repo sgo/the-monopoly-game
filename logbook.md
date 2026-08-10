@@ -27483,3 +27483,46 @@ The greedo-legal-entity task (3+ player Greedo stalemate via legal
 entities) is complete through the pipeline: spec written, redesigned
 economy, multi-player formation fixed, narration integrated, and all
 loops closed. Awaiting next feature to specify.
+
+## 2026-08-10T15:40:00Z — specifier: legal-entity operate loop defect + bank-account design (awaiting confirmation)
+
+Ran 8-player Greedo games with `--optional-greedo-stalemate-trading`
+and `--optional-greedo-legal-entity` and studied the logs. Found a
+serious entity-engine defect in the stalemate case.
+
+### Defect: unbounded loan->dividend spam with no real cash
+In games that reached a stalemate, the operate loop fired thousands of
+`<Entity> raises a loan of $150` followed immediately by
+`<Entity> pays each ... an equal dividend` events. One run showed Green
+Realty issuing 20,544 such pairs; runs ranged 41k-73k. Resolving/winning
+games were healthy (~178-208).
+
+Trace:
+- `Game.operateLegalEntities` runs every player turn
+  (Game.java:177). Each entity calls `operate(deeds)` once per turn.
+- `LegalEntity.operate(deeds)` (LegalEntity.java:115) only drives the
+  productive `HouseBuilt` path when a *tenant has landed and paid rent*
+  (`rentReceivedOn != null`). Otherwise it falls through to
+  `operate()` (105-110), the toggle: `loan==0 ? raise $150 + $50
+  dividend : repay $157`.
+- So while no tenant lands, the entity toggles loan-up -> dividend ->
+  repay forever, emitting spurious journal events every turn.
+
+Two consequences:
+1. Event explosion (log/report bloat) with no economic effect:
+   `Game.operateLegalEntities` (Game.java:193-204) only *journals*
+   the loan/dividend; it does not move cash. LegalEntity has no bank
+   reference.
+2. Entity rent is collected from a tenant (`Rent.java:43` withdraws
+   the tenant) but **deposited nowhere** — `receiveRent` only records
+   the street. The money vanishes.
+
+### Agreed design (user): give the entity a bank account
+`Bank.Simple` (Bank.java:74) already keys accounts by `Account.Owner`;
+the entity can own one (owner keyed by entity name). Money flows:
+- raising loans / collecting entity rent -> DEPOSIT into entity account;
+- repaying loans / paying dividends -> WITHDRAW from entity account.
+
+This makes rent land in a real treasury and debits loans/dividends from
+it, ending the free-money loop and grounding the cash circuit. Pending
+confirmation before routing to architect/coder.
