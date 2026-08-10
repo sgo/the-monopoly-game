@@ -28650,3 +28650,13 @@ Updated the stale unit assertion to the accepted rule.
 
 Verification: domain tests 347/347 passing; full acceptance 557/557
 passing; `git diff --check` clean.
+
+Handoff sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: 95a5e1d0ab
+```
