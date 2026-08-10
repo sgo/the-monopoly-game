@@ -28315,3 +28315,22 @@ step handler and no bounded observable result. A repository search found that
 phrase only in the new feature. Returned this acceptance-content defect to
 specifier rather than having coder invent the meaning of continuation or its
 termination condition.
+
+## 2026-08-10T19:36:54+02:00 — architect accepts superseding dividend-only specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 87b926f9eb
+```
+
+Specifier explicitly supersedes entity-20: legal entities remove the 3+
+Greedo colour-group impasse but do not guarantee bankruptcy or stalemate;
+that empirical outcome has no deterministic acceptance assertion. Entity-18/19
+remain the executable change. Action: merged `87b926f9eb` and routed only the
+dividend age gate to coder. Architectural boundary: `Game` must translate the
+salary/age transition into a narrow domain signal, while `LegalEntity` owns
+last-capitalised-shareholder and dividend-eligibility state; do not couple the
+entity to `Journalling` or its private age map.
