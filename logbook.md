@@ -26185,3 +26185,30 @@ only the same pre-existing `Journalling` event-adapter shape already
 accepted by the architect; nothing new.
 
 Committed the Game/LegalEntity/MonopolyBuyout/Greedo changes together.
+
+## 2026-08-10T08:41:54Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 0833ce8f28
+```
+
+Summary: merged the coder's fix for the testability gap I flagged last
+cycle. `World.playUpToRounds` no longer bypasses `Game.play()` for
+legal-entity turns; the acceptance scenarios now drive the real
+`resolveLegalEntityAtStart`/`operateLegalEntities` path. Reduced the
+resulting `playTurn` CRAP regression (8.0, from the new legal-entity
+early return) back to 6.0 via the same guard-clause-extraction pattern
+used on `LegalEntity.form` last cycle, preserving the coder's exact
+unconditional-call order. Also deduplicated `MonopolyBuyout`'s
+pre-existing throwaway-`Greedo`-instance priority check against the
+new `Greedo.priorityOf` static method. Domain and acceptance suites
+verified green throughout, 545/545 acceptance unchanged before and
+after every step. `Game.java` is now at 75 mutation sites, the closest
+any file here has come to the 100-site split threshold — flagging for
+visibility, not yet actionable.
