@@ -26049,6 +26049,16 @@ prevents the fixture fallback from creating an unbreakable tie.
 
 Verification: domain tests 332/332 passing; full acceptance 545/545
 passing; `git diff --check` clean.
+
+Handoff sent to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 1ca8540a13
+```
 2026-08-10T07:40:00Z — Received specifier handoff:
 id: 20260810T073726Z_000087_from_specifier
 from: specifier
