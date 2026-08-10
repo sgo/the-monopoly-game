@@ -189,6 +189,21 @@ class LegalEntityTest {
   }
 
   @Test
+  void aDividendCannotBePaidAgainUntilTheQualifyingShareholderGrowsOlderAgain() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.depositToBank(new Money(300));
+    entity.recordCapitalization(dog);
+    entity.shareholderGrewOlder(dog);
+
+    assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.DividendPaid(new Money(50)));
+    entity.markOperated();
+    assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.NoAction());
+    assertThat(entity.bankBalance()).isEqualTo(new Money(150));
+  }
+
+  @Test
   void borrowsAnExactRemainderAwareShortfallWhenEveryShareholderCanAffordTheirShare() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);

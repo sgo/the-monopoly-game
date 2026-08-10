@@ -28415,3 +28415,31 @@ priority: 00
 task: greedo-legal-entity
 commit: 113c116bf9
 ```
+
+## 2026-08-10T18:14:26Z — coder processes dividend-state correction
+
+Received architect priority-00 handoff:
+
+```
+id: 20260810T181426Z_000188_from_architect_to_coder
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: e2944437e4
+created_at: 2026-08-10T18:14:26.907662Z
+enqueued_at: 2026-08-10T18:14:27.693319Z
+task: greedo-legal-entity
+dequeued_at: 2026-08-10T18:14:35.507863Z
+
+Re-read your role and constitution.
+
+merge_and_process architect e2944437e4
+```
+
+Action: merged `e2944437e4`, recorded actual shareholder funding as the
+last-capitalized-shareholder transition, consumed the age qualification when
+paying a dividend, and added regression coverage. Domain tests pass 346/346;
+the full acceptance pipeline passes.

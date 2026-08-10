@@ -199,6 +199,7 @@ public final class LegalEntity {
       Money share = shares.get(index);
       shareholder.account().withdraw(share);
       recordShareholderPayment(shareholder, share);
+      recordCapitalization(shareholder);
     }
     return shortfall;
   }
@@ -238,6 +239,7 @@ public final class LegalEntity {
     Money dividend = new Money(50);
     withdrawFromBank(new Money(150));
     shareholders.forEach(player -> player.account().deposit(dividend));
+    lastCapitalizedShareholderGrewOlder = false;
     return new Operation.DividendPaid(dividend);
   }
 
