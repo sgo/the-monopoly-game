@@ -116,6 +116,15 @@ public final class Report {
       case Entry.Stalemate it -> "The game ends in a stalemate";
       case Entry.FinalBalance it -> name(it.player()) + "'s final balance is $" + it.balance().amount();
       case Entry.FinalAge it -> name(it.player()) + "'s final age is " + it.age() + " years";
+      case Entry.LegalEntityFormed it -> it.name() + " is formed, held in equal thirds by "
+          + it.shareholders().stream().map(Report::name).collect(java.util.stream.Collectors.joining(", "));
+      case Entry.LegalEntityLoanRaised it -> it.name() + " raises a loan of $" + it.amount().amount()
+          + " from " + it.shareholders().stream().map(Report::name).collect(java.util.stream.Collectors.joining(", "));
+      case Entry.LegalEntityLoanRepaid it -> it.name() + " repays " + name(it.shareholder()) + " $"
+          + it.repayment().amount() + " for the loan";
+      case Entry.LegalEntityDividendPaid it -> it.name() + " pays each of "
+          + it.shareholders().stream().map(Report::name).collect(java.util.stream.Collectors.joining(", "))
+          + " an equal dividend";
       case Entry.Won it -> name(it.player()) + " wins the game";
     };
   }
@@ -186,55 +195,55 @@ public final class Report {
 
 /* mutate4java-manifest
 version=1
-moduleHash=e8249d118e7d55163d029d09c2f2f269964900e2bb5f5a25418ac16754f61898
+moduleHash=2853d30c86526e2905c86186be12e2e76e24200fbf65f40b93bbff2a1977645c
 scope.0.id=Y2xhc3M6UmVwb3J0I1JlcG9ydDoxOQ
 scope.0.kind=class
 scope.0.startLine=19
-scope.0.endLine=185
-scope.0.semanticHash=da80c3ea2c6bbd80860720e93812eb39bcadb4110fd9785cc7768e85e2e3b19b
-scope.1.id=ZmllbGQ6UmVwb3J0I0JPQVJEX1NQQUNFX05BTUVfT1ZFUlJJREVTOjE1MA
+scope.0.endLine=194
+scope.0.semanticHash=5506d674b6cb57fc05394425e22f645e854edd8fa4c84fabf2e743e4e134e3e5
+scope.1.id=ZmllbGQ6UmVwb3J0I0JPQVJEX1NQQUNFX05BTUVfT1ZFUlJJREVTOjE1OQ
 scope.1.kind=field
-scope.1.startLine=150
-scope.1.endLine=172
+scope.1.startLine=159
+scope.1.endLine=181
 scope.1.semanticHash=6eb67eaa69a04e25ac5429d119e7ade52b31b349bfbef41507f8ce1692daff1b
-scope.2.id=bWV0aG9kOlJlcG9ydCNib2FyZFNwYWNlTmFtZSgxKToxNzQ
+scope.2.id=bWV0aG9kOlJlcG9ydCNib2FyZFNwYWNlTmFtZSgxKToxODM
 scope.2.kind=method
-scope.2.startLine=174
-scope.2.endLine=176
+scope.2.startLine=183
+scope.2.endLine=185
 scope.2.semanticHash=7dcc143fee9458236e6143cec91f4c98d4b78c3de1afb24170abc26433f492c9
 scope.3.id=bWV0aG9kOlJlcG9ydCNjdG9yKDApOjIw
 scope.3.kind=method
 scope.3.startLine=20
 scope.3.endLine=21
 scope.3.semanticHash=fa4ab1d8c774b5a49e26e7b36ba0ec25ba0d7069b207d38eb37beccb7d02dc9c
-scope.4.id=bWV0aG9kOlJlcG9ydCNkZWNsaW5lTGluZSgxKToxMjM
+scope.4.id=bWV0aG9kOlJlcG9ydCNkZWNsaW5lTGluZSgxKToxMzI
 scope.4.kind=method
-scope.4.startLine=123
-scope.4.endLine=131
+scope.4.startLine=132
+scope.4.endLine=140
 scope.4.semanticHash=f8e93f31787af3801c915ba44f5de44f38ccb43e2a127b1f3987d720e4722a8c
 scope.5.id=bWV0aG9kOlJlcG9ydCNsaW5lKDEpOjQ0
 scope.5.kind=method
 scope.5.startLine=44
-scope.5.endLine=121
-scope.5.semanticHash=887f08e62b04736b9292c304b92542cf3131cbfa0045f53383c6b54d682324ed
-scope.6.id=bWV0aG9kOlJlcG9ydCNuYW1lKDEpOjE4Mg
+scope.5.endLine=130
+scope.5.semanticHash=725f13dafe51d24cc67119433784fa8059fdf934cd8e30759bf9d524b58dcd2b
+scope.6.id=bWV0aG9kOlJlcG9ydCNuYW1lKDEpOjE5MQ
 scope.6.kind=method
-scope.6.startLine=182
-scope.6.endLine=184
+scope.6.startLine=191
+scope.6.endLine=193
 scope.6.semanticHash=cd39b08d1576cbc2e9d2ae25bb54b6b608f1219509ee3d03086e8f3ab4c238fa
-scope.7.id=bWV0aG9kOlJlcG9ydCNuYW1lcygxKToxNzg
+scope.7.id=bWV0aG9kOlJlcG9ydCNuYW1lcygxKToxODc
 scope.7.kind=method
-scope.7.startLine=178
-scope.7.endLine=180
+scope.7.startLine=187
+scope.7.endLine=189
 scope.7.semanticHash=7baca973d9baa23bf1205536bbfd229d494b1e2c863e02f6e50c5ce7dcb42959
 scope.8.id=bWV0aG9kOlJlcG9ydCNvZigxKToyMw
 scope.8.kind=method
 scope.8.startLine=23
 scope.8.endLine=25
 scope.8.semanticHash=3bddf559e6362200e39e3d2024808e23da1e3da3deb262e8b89f1402e9edd25e
-scope.9.id=bWV0aG9kOlJlcG9ydCNzcGFjZU5hbWUoMSk6MTM5
+scope.9.id=bWV0aG9kOlJlcG9ydCNzcGFjZU5hbWUoMSk6MTQ4
 scope.9.kind=method
-scope.9.startLine=139
-scope.9.endLine=141
+scope.9.startLine=148
+scope.9.endLine=150
 scope.9.semanticHash=56eb8b748063de6798efd6f1a96d5a30f07cf019c0478f7f004006d2fe61eaf8
 */

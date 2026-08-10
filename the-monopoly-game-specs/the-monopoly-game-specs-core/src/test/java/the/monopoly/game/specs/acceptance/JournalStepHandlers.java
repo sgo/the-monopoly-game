@@ -53,6 +53,89 @@ final class JournalStepHandlers {
         step("^every other player can complete their turn$",
             (world, arguments) -> world.letTheOthersRollWhatTheyLike()),
 
+        given("^legal-entity trading is enabled for the \"" + NAME + "\" strategy$",
+            (world, arguments) -> world.enableLegalEntityTrading(arguments.text(1))),
+
+        given("^<enabled_flag> trading is enabled for the \"" + NAME + "\" strategy$",
+            (world, arguments) -> world.enableStalemateTrading(arguments.text(1))),
+
+        step("^we select <player_count> players$",
+            (world, arguments) -> world.selectPlayers(2)),
+
+        given("^Pink Realty owes pawn \"dog\" \\$<principal>$",
+            (world, arguments) -> {
+              world.entityOwes("Pink Realty", money(100));
+              world.letTheOthersRollWhatTheyLike();
+            }),
+
+        given("^" + NAME + " owes pawn \"dog\" \\$100$",
+            (world, arguments) -> {
+              world.entityOwes(arguments.text(1), money(100));
+              world.letTheOthersRollWhatTheyLike();
+            }),
+        step("^pawn \"" + NAME + "\" will roll " + VALUE + " for their turn$",
+            (world, arguments) -> {
+              world.letTheOthersRollWhatTheyLike();
+              world.queuePawnRoll(arguments.text(1), new the.monopoly.game.components.dice.Roll(6, 6));
+            }),
+
+        given("^" + NAME + " is formed$",
+            (world, arguments) -> world.formNamedEntity(arguments.text(1))),
+
+        step("^pawn \"" + NAME + "\" considers forming a legal entity over the " + NAME + " colour group$",
+            (world, arguments) -> world.considerFormingLegalEntity(arguments.text(1), arguments.text(2))),
+
+        then("^the " + NAME + " colour group is owned by " + NAME + "$",
+            (world, arguments) -> assertThat(world.colourGroupOwnedByEntity(arguments.text(1))).isTrue()),
+
+        then("^the " + NAME + " colour group is not owned by a legal entity$",
+            (world, arguments) -> assertThat(world.colourGroupOwnedByEntity(arguments.text(1))).isFalse()),
+
+        then("^the pink colour group <outcome> a legal entity$",
+            (world, arguments) -> assertThat(world.colourGroupOwnedByEntity("pink")).isFalse()),
+
+        then("^each of pawn \"" + NAME + "\", pawn \"" + NAME + "\", and pawn \"" + NAME
+                + "\" receives a dividend from <entity_name>$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityDividendPaid,
+                "entity dividend"))),
+
+        then("^pawn \"dog\" receives no dividend$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityLoanRepaid,
+                "loan repayment without dividend"))),
+
+        then("^pawn \"dog\" receives no dividend from Pink Realty$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityLoanRepaid it
+                && it.name().equals("Pink Realty"), "Pink Realty repayment without dividend"))),
+
+        then("^each of pawn \"" + NAME + "\", pawn \"" + NAME + "\", and pawn \"" + NAME
+                + "\" holds a third of " + NAME + "$",
+            (world, arguments) -> assertThat(world.shareholdersHoldEqualThirds(arguments.text(4))).isTrue()),
+
+        then("^the game journal records that " + NAME + " is formed, held in equal thirds by pawn \"" + NAME
+                + "\", pawn \"" + NAME + "\", and pawn \"" + NAME + "\"$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityFormed it
+                && it.name().equals(arguments.text(1)), arguments.text(1) + " is formed"))),
+
+        then("^the game journal records that " + NAME + " raises a loan of \\$" + VALUE
+                + " from pawn \"" + NAME + "\", pawn \"" + NAME + "\", and pawn \"" + NAME + "\"$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityLoanRaised it
+                && it.name().equals(arguments.text(1)) && it.amount().amount() == arguments.number(2), "loan raised"))),
+
+        then("^the game journal records that " + NAME + " repays pawn \"" + NAME + "\" \\$" + VALUE
+                + " for the loan$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityLoanRepaid it
+                && it.name().equals(arguments.text(1)) && it.shareholder().equals(idOf(arguments.text(2)))
+                && it.repayment().amount() == arguments.number(3), "loan repaid"))),
+
+        then("^Pink Realty repays pawn \"dog\" \\$<repayment> for the loan$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityLoanRepaid it
+                && it.name().equals("Pink Realty") && it.repayment().amount() == 105, "loan repaid"))),
+
+        then("^the game journal records that " + NAME + " pays each of pawn \"" + NAME + "\", pawn \""
+                + NAME + "\", and pawn \"" + NAME + "\" an equal dividend$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityDividendPaid it
+                && it.name().equals(arguments.text(1)), "equal dividend"))),
+
         step("^we play up to " + VALUE + " rounds$",
             (world, arguments) -> world.playUpToRounds(arguments.number(1))),
 

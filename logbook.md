@@ -25895,3 +25895,550 @@ journal.feature, report.feature, and logging.feature files. A CLI flag
 scenario (`cli-jar-4`, `--optional-greedo-legal-entity`) was added and
 the feature registered on the acceptance pipeline. All-new step
 vocabulary requires new step handlers and implementation.
+
+## 2026-08-10T08:23:56Z — architect reviews greedo-legal-entity
+
+Received refactorer priority-50 handoff (commit `b258e7a3e2`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer b258e7a3e2
+```
+
+Action: architectural review found that the legal-entity acceptance
+scenarios do not exercise the game. `World.playUpToRounds` branches
+when an entity exists, invokes `LegalEntity.operate()` directly, and
+constructs journal events itself instead of calling `Game`. This makes
+the tests pass even if `Game.playTurn` fails to operate the entity or
+changes its ordering. Route to coder: remove the test-only branch and
+make the real game turn loop satisfy the scenarios. The rules package
+also directly instantiates `strategies.Greedo` solely to discover the
+priority tier, which should be removed as part of the boundary cleanup.
+
+## 2026-08-10T08:43:01Z — architect re-reviews greedo-legal-entity
+
+Received refactorer priority-50 handoff (commit `0833ce8f28`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 0833ce8f28
+```
+
+Action: rejected the attempted real-turn-path fix. It removes the
+test-helper shortcut, but `Game.play` now detects an existing entity,
+operates it, and returns before initiative or any normal turn. Further,
+`Game.playTurn` returns immediately whenever an entity operates. Both
+are still legal-entity-only execution paths rather than gameplay wired
+into the canonical turn loop. The rules package also still imports
+`strategies.Greedo` for priority, violating dependency direction.
+Route to coder for one integrated turn-start policy with rules-owned
+priority knowledge (or an inward-facing abstraction), without early
+returning from the game/turn loop.
+
+## 2026-08-10T08:58:52Z — architect accepts canonical legal-entity turn path
+
+Received coder priority-00 handoff (commit `ddbcd3ced2`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder ddbcd3ced2
+```
+
+Action: accepted removal of the early-return path: entity settlement
+now precedes, but does not replace, the normal initiative and turn
+flow. Completed a behavior-preserving boundary correction: `LegalEntity`
+now receives its highest-priority eligibility predicate from `Game` and
+test setup, so rules no longer import the strategy layer. Focused
+LegalEntity tests, full acceptance, Java mutation (23/23 covered
+mutants killed), DRY review, soft Gherkin mutation, and 22 property
+tests are clean.
+
+## 2026-08-10T09:35:13Z — architect receives blocked legal-entity review
+
+Received refactorer priority-00 handoff (commit `0bbf3a0d34`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 0bbf3a0d34
+```
+
+Action: accepted the blocking diagnosis. With the test-only early
+return removed, `World.formNamedEntity` queues the same 4+6 initiative
+roll for all three players and keeps that value as its fallback.
+`Initiative.winnerAmong` therefore re-rolls an unbreakable tie until
+the JVM exhausts its heap. This is a deterministic acceptance-helper
+fixture defect, not a Gherkin-content change. Route to coder to give
+the fixture distinct deterministic initiative rolls while preserving
+the real `Game` turn path.
+
+## 2026-08-10T09:47:10Z — architect accepts legal-entity initiative fixture fix
+
+Received coder priority-00 handoff (commit `1ca8540a13`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 1ca8540a13
+```
+
+Action: accepted the fixture correction. `formNamedEntity` now queues
+distinct deterministic initiative totals before its unchanged ordinary
+turn rolls, so the real initiative rule terminates and the canonical
+`Game` turn path remains in use. Full acceptance passes 545/545,
+including the formerly OOM legal-entity scenarios. Route the
+behavior-preserving test-helper change to refactorer for final review.
+
+## 2026-08-10T09:45:29Z — coder fixes legal-entity initiative fixture
+
+Processed architect commit `655b46e7ec` for `greedo-legal-entity`.
+Updated `World.formNamedEntity` so each player receives a distinct
+deterministic initiative roll, followed by the existing unremarkable
+turn roll. This preserves the real `Game.play`/initiative/turn path and
+prevents the fixture fallback from creating an unbreakable tie.
+
+Verification: domain tests 332/332 passing; full acceptance 545/545
+passing; `git diff --check` clean.
+2026-08-10T07:40:00Z — Received specifier handoff:
+id: 20260810T073726Z_000087_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 8b0cc9799c
+created_at: 2026-08-10T07:37:26.927064Z
+enqueued_at: 2026-08-10T07:37:27.200582Z
+task: greedo-legal-entity
+dequeued_at: 2026-08-10T07:37:35.581433Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 8b0cc9799c
+
+Action: merged the specification commit and began implementing the legal-entity behavior slice.
+
+## 2026-08-10T08:12:00Z — refactorer reviews greedo-legal-entity
+
+Received coder priority-50 handoff (commit `4c5615b277`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 4c5615b277
+```
+
+Action: merged (third instance of the recurring logbook sent/received
+boilerplate-misalignment conflict; resolved by keeping my own
+"sent player-age-tracking handoff" entry and splicing the incoming
+branch's full downstream chain after it in the order presented —
+architect review, a Gherkin-mutation gap on the age scenarios routed
+to and resolved by the specifier, two rounds of CLI roll-threshold
+flake fixes, task closure, and the start of this task). Verified zero
+remaining conflict markers and no `git diff --check` whitespace
+issues. Committed the merge as `3bd658e`.
+
+Reviewed the diff (`LegalEntity` domain type, `Deeds.form`/
+`entityOwnerOf`/`legalEntities`, `Game.resolveLegalEntityAtStart`/
+`operateLegalEntities`, `Greedo`'s new `legalEntityTrading` flag
+following its existing `stalemateTrading` telescoping-constructor
+convention, `Report.line` cases). Semantically sound and narrowly
+scoped: three-way colour-group splits consolidate into a company once
+the whole board is owned, excluded from Greedo's always-highest-
+priority group, holding equal thirds; it then raises a $150 loan with
+a $50 dividend, or repays an outstanding loan at 5% interest, once per
+entity for the rest of the game (`operated` never resets — confirmed
+this is the entire lifetime cycle, not a per-round one, by grep; no
+scenario exercises more than one round so this is unverified beyond
+what's specified, not something I changed or would decide unilaterally).
+
+Two refactors, both behavior-preserving and verified by full domain
+(`mvn -q -o test`) and acceptance (`./acceptance/run-acceptance.sh`,
+545/545 both before and after) re-runs:
+
+1. `LegalEntity.form` was CC=9, CRAP=9.1, over both the tool's own 8.0
+   warning and this role's 6.0 policy threshold. Extracted its six
+   guard clauses into named predicate methods
+   (`hasThreeDistinctShareholders`, `boardFullyOwned`, `streetsOf`,
+   `colourGroupIneligible`, `splitAcrossThreeDistinctOwners`,
+   `everyShareholderOwnsAStreet`). One of the original six checks
+   (colour-group streets individually unowned) was provably redundant
+   with the whole-board-owned check that already runs first —
+   `ColourStreet implements Ownable`, so if every `Ownable` is owned
+   the subset is too — and folded into `colourGroupIneligible` instead
+   of kept as a dead branch. Also deduplicated the colour-group street
+   lookup between `form` and `formed` into the shared `streetsOf`.
+   Result: CC=6, and after adding unit test coverage for the branches
+   no existing test reached (see below), CRAP=6.0 at 100% coverage —
+   exactly at the policy threshold. `streets.isEmpty()` inside
+   `colourGroupIneligible` is unreachable with the only `Rule.Set`
+   this project has (`official`, which has all eight colours); did not
+   chase covering it with a hand-built fake `Rule.Set` for a branch
+   that can't occur against real project state — judged not
+   "reasonable" coverage-chasing under this role's mandate.
+
+2. The $150 loan / $50 dividend / 5%-interest-repayment decision was
+   duplicated almost verbatim between `Game.operateLegalEntities` and
+   the acceptance test harness's `World.playUpToRounds` — and not just
+   duplicated but diverged: `World.java`'s copy recomputed the
+   repayment formula by hand instead of calling `LegalEntity.repayLoan`,
+   and never called `raiseLoan`/`repayLoan`/`markOperated` at all, so
+   it logged what operating would produce without the entity's own
+   state ever actually changing. Extracted the decision into a single
+   new `LegalEntity.operate()` returning a sealed `Operation`
+   (`LoanRaisedWithDividend`/`LoanRepaid`), and pointed both
+   `Game.operateLegalEntities` and `World.playUpToRounds` at it. Same
+   numbers, same target shareholder, same journal entries — confirmed
+   by the unchanged 545/545 acceptance result — but now one formula
+   instead of two, and the test harness actually mutates the entity it
+   claims to have operated.
+
+Added six unit tests to `LegalEntityTest` (one per guard clause
+`form` rejects on, plus both `operate()` branches) to close the
+coverage gap the CC reduction exposed, and deduplicated the existing
+success-path test's manual "own everything else" loop against a new
+`ownEveryRemainingSpace` helper shared with the new tests.
+
+`mutate4java --scan` on every file this touched (`Game.java` 14 sites,
+`LegalEntity.java` 13, `Report.java` 3, `Deeds.java` 14, `Greedo.java`
+14) — all far under the 100-site split threshold. All five manifests
+were stale (`LegalEntity.java` had none yet) and refreshed via
+`--update-manifest`; diffed each afterward to confirm only the
+embedded comment block changed, no functional lines. `dry4java` across
+the same files found only the pre-existing `Journalling` event-adapter
+repetition shape the architect already accepted in an earlier cycle
+(logged 2026-08-09T14:39:35Z); my four new `entityFormed`/
+`entityLoanRaised`/`entityLoanRepaid`/`entityDividendPaid` adapters
+fit that same accepted shape and weren't separately flagged.
+
+One finding I'm not acting on, flagging for the architect instead:
+`World.playUpToRounds` still bypasses `Game.play()` entirely whenever
+legal entities are in play, calling `entity.operate()` directly rather
+than driving it through `resolveLegalEntityAtStart`/`playTurn`. That
+means `Game.resolveLegalEntityAtStart` sits at 11.4% domain-test
+coverage and neither it nor the real per-turn `operateLegalEntities`
+invocation path is exercised by any acceptance scenario — entity-6/7/8
+in `greedo-legal-entity.feature` test the *outcome* of operating
+faithfully (same code, now, after the dedup above) but never the
+*timing* decision of when a real game triggers it. Redesigning that
+timing so the fixture can drive real gameplay is a specification/
+behavior question (how "Given ... owes ... $X" as a precondition
+should compose with actually playing turns), not a structure-preserving
+refactor, so I'm leaving it for the architect to route to the
+specifier if it's judged worth closing.
+
+Committed the LegalEntity/Game/World changes and this entry together.
+
+## 2026-08-10T08:19:35Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: b258e7a3e2
+```
+
+Summary: merged and reviewed. Legal-entity formation/loan/dividend
+mechanics are sound; reduced `LegalEntity.form` from CRAP 9.1 to 6.0
+via guard-clause extraction (one clause folded as provably redundant
+with an earlier board-ownership check), extracted the loan/dividend
+decision into a shared `LegalEntity.operate()` used by both real
+gameplay and the acceptance fixture (which previously hand-duplicated
+and diverged from it, never actually mutating the entity), and added
+unit coverage for both. DRY findings are the pre-existing accepted
+event-adapter shape. Domain and acceptance suites verified green
+throughout, 545/545 acceptance unchanged before and after. Flagged but
+did not act on: `World.playUpToRounds` bypasses `Game.play()` for
+legal-entity turns, so the real per-turn trigger path
+(`resolveLegalEntityAtStart`, 11.4% covered) isn't exercised by any
+acceptance scenario — a specification-level timing question, not a
+structural one.
+
+## 2026-08-10T08:36:00Z — refactorer reviews the real-turn-path fix for greedo-legal-entity
+
+Received coder priority-50 handoff (commit `08b0104e74`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 08b0104e74
+```
+
+Action: merged cleanly (no conflict this time — logbook.md
+auto-merged). This closes the loop the architect opened after my prior
+handoff: architect commit `9073078` (logbook-only, no code) confirmed
+`World.playUpToRounds`'s test-only branch and routed it to the coder,
+also flagging that `LegalEntity`'s old `GreedoPriority` inner class
+instantiated `strategies.Greedo` just to read a priority tier.
+
+Coder's fix: removed `World.playUpToRounds`'s bypass entirely, so
+"play up to 1 round" now always drives the real `Game.play()`/
+`playTurn()`. Made `Game.play`/`playTurn` recognize an entity-operate-
+only turn (legal-entity trading enabled, entities exist, at least one
+unoperated) and return immediately after operating rather than running
+a full turn — that's how "Given Pink Realty owes pawn dog $100 / When
+we play up to 1 round" now resolves through the real engine without
+needing dice or initiative order. Also removed the `GreedoPriority`
+inner class in favour of a new `static Greedo.priorityOf(Ownable)`,
+called directly from `LegalEntity.colourGroupIneligible`. Verified:
+domain and acceptance both green, 545/545 acceptance unchanged from
+before this fix, confirming the timing rewrite didn't change any
+observable outcome — only which code path produces it.
+
+One CRAP regression from the `playTurn` change: adding
+`if (legalEntityTrading && legalEntityOperated) return true;` pushed
+it from CC=6 to CC=8 (CRAP 8.0), over both the tool's 8.0 warning and
+this role's 6.0 policy line. Extracted the same way as the earlier
+`LegalEntity.form` reduction: `settleLegalEntities(trader, journalling)`
+now owns the `resolveLegalEntityAtStart` call, the `operateLegalEntities`
+call, and the `legalEntityTrading &&` gate — preserving the original
+unconditional-call order exactly (I initially wrote it as a
+short-circuiting `&&` expression, which would have skipped calling
+`operateLegalEntities` whenever `legalEntityTrading` was false, unlike
+the coder's version which always called it; caught this before
+committing and rewrote it to keep the original evaluation order). Also
+extracted the pre-existing `player.id().equals(builder.id()) &&
+!deeds.isBankrupt(player)` builder-development condition into
+`isBuilderStillSolvent`, since one more CC unit needed to come out to
+clear the threshold and this guard was the same shape as the
+`LegalEntity.form` extractions. Back to CC=6, CRAP=6.0. No other
+changed method exceeded the threshold.
+
+Also found, while re-reading `LegalEntity`'s new `Greedo.priorityOf`:
+`MonopolyBuyout.java` (pre-existing, untouched by any commit this
+task) carried the exact same pattern the coder had just removed from
+`LegalEntity` — a `private static final Greedo PRIORITY = new Greedo()`
+field held only to call `.priority(street)`. Since a clean static
+alternative now exists specifically for this, pointed
+`MonopolyBuyout.isHighestPriority` at `Greedo.priorityOf` and dropped
+its own instance field. Behavior-identical (same method, same
+argument), confirmed by the unchanged 545/545 acceptance result;
+CRAP for the affected `MonopolyBuyout` methods stayed at the same
+values (`isHighestPriority` CC=1 before and after).
+
+`mutate4java --scan` on every file this touched (`Game.java` 75 sites,
+`LegalEntity.java` 26, `MonopolyBuyout.java` 42, `Greedo.java` 53) —
+all under the 100-site split threshold, though `Game.java` at 75 is
+the closest any file in this project has come; worth watching on its
+next change. All four manifests were stale and refreshed via
+`--update-manifest`. `dry4java` across the same files:
+only the same pre-existing `Journalling` event-adapter shape already
+accepted by the architect; nothing new.
+
+Committed the Game/LegalEntity/MonopolyBuyout/Greedo changes together.
+
+## 2026-08-10T08:41:54Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 0833ce8f28
+```
+
+Summary: merged the coder's fix for the testability gap I flagged last
+cycle. `World.playUpToRounds` no longer bypasses `Game.play()` for
+legal-entity turns; the acceptance scenarios now drive the real
+`resolveLegalEntityAtStart`/`operateLegalEntities` path. Reduced the
+resulting `playTurn` CRAP regression (8.0, from the new legal-entity
+early return) back to 6.0 via the same guard-clause-extraction pattern
+used on `LegalEntity.form` last cycle, preserving the coder's exact
+unconditional-call order. Also deduplicated `MonopolyBuyout`'s
+pre-existing throwaway-`Greedo`-instance priority check against the
+new `Greedo.priorityOf` static method. Domain and acceptance suites
+verified green throughout, 545/545 acceptance unchanged before and
+after every step. `Game.java` is now at 75 mutation sites, the closest
+any file here has come to the 100-site split threshold — flagging for
+visibility, not yet actionable.
+
+## 2026-08-10T09:35:00Z — refactorer finds a blocking OOM in greedo-legal-entity
+
+Received architect priority-00 handoff (commit `17be87ed7b`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 17be87ed7b
+```
+
+Action: merged cleanly (no conflict). This carries the architect's
+rejection of my prior `0833ce8f28` handoff (logged `08:43:01Z`,
+inherited via the merge): the entity-operate-only early return I had
+just reduced the CRAP for was itself the wrong shape — still a
+legal-entity-only execution path bypassing the canonical turn loop,
+and `rules` still imported `strategies.Greedo` for priority, which I
+had made worse by pointing `MonopolyBuyout` at it too. Routed to
+coder, who removed the early return entirely (`settleLegalEntities`
+now precedes but never replaces a normal turn) and decoupled
+`LegalEntity` from the strategy layer by having it take a
+`Predicate<ColourStreet> highestPriority` parameter instead of calling
+`Strategy`/`Greedo` directly — `rules` no longer imports `strategies`
+anywhere in this file. The architect accepted that fix, then sent one
+more patch of its own (`17be87ed7b`) supplying the predicate from
+`Game`/test call sites and fixing `Deeds.isUnowned` to also check
+`entityOwners` (a real latent bug: without it, once a colour group
+became an entity, `isUnowned` kept reporting its streets as unowned,
+since `deeds.form()` moves them out of the `owners` map into
+`entityOwners`, which would have permanently blocked
+`boardFullyOwned` and anything else checking `isUnowned` after the
+first entity formed).
+
+I do not consider this state verified. Per this role's standing
+discipline of independently re-running the suites rather than trusting
+an inherited "clean" claim (the architect's `08:58:52Z` entry says
+"full acceptance... clean" for the coder's fix, before this last
+patch): `./acceptance/run-acceptance.sh` did not finish inside its
+120s budget and was killed; re-running just the generated
+`EnRulesGreedoLegalEntityAcceptanceTest` class in isolation reproduced
+a hard `java.lang.OutOfMemoryError: Java heap space` after ~70s
+(`Tests run: 0` — it never got far enough to report even one passing
+scenario). This is a genuine crash, not a slow test: default JVM heap,
+not a small one, was exhausted.
+
+Root-caused with a throwaway domain-only reproduction (not committed —
+written to `the-monopoly-game-domain/src/test/java/the/monopoly/game/`,
+deleted again once diagnosed) replicating `World.formNamedEntity`'s
+"Pink Realty is formed" setup — 3 players, pink split into a 3-way
+entity, every other space owned solo by the second player, real
+`Game.playUpToRounds(1)` — and a `jstack` thread dump on the hung JVM.
+The stack is unambiguous:
+
+```
+at the.monopoly.game.rules.Initiative.winnerAmong(Initiative.java:41)
+at the.monopoly.game.rules.Initiative.order(Initiative.java:27)
+at the.monopoly.game.Game.play(Game.java:150)
+```
+
+`Initiative.winnerAmong` re-rolls tied players "as many times as it
+takes" by design (its own doc comment) — an intentional, accepted
+unbounded retry that relies on real dice eventually breaking a tie,
+the same category as the already-known Greedo-vs-Greedo runaway
+characteristic. That design is not the bug. The bug is upstream of it:
+`World.formNamedEntity` queues the exact same `UNREMARKABLE` roll
+(4, 6) for every one of the 3 players, and falls back to that same
+constant roll forever afterward via `othersRollWhatTheyLike`. Under
+the old early-return `Game.play`, `Initiative.order` was never called
+for a legal-entity-only game, so this was harmless. Now that the
+early return is gone — correctly, per the architect's own reasoning —
+`Game.play` reaches `Initiative.order` for real, and three players who
+can only ever roll an identical total can never break their three-way
+tie. It is not rare; it is certain. Every re-roll produces the same
+tie, forever, until the JVM runs out of heap building up the retry
+state.
+
+This is a test-fixture defect exposed by an otherwise-correct
+architectural fix, not a structural issue in my remit, and not
+something I'm willing to patch unilaterally: whether the right fix is
+distinct fixed rolls for initiative specifically, real dice for this
+fixture, or something else touches how the scenario's Given/When is
+meant to behave, which is outside "preserve behavior" for a
+refactorer. Not treating this as verified; sending back to the
+architect as blocking rather than a routine pass.
+
+## 2026-08-10T09:28:55Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 0bbf3a0d34
+```
+
+Summary: **blocking** — `./acceptance/run-acceptance.sh` hangs and
+OOMs; reproduced in isolation as a hard crash in
+`EnRulesGreedoLegalEntityAcceptanceTest` (`java.lang.OutOfMemoryError`,
+0 tests completed). Root-caused via a throwaway domain reproduction
+and thread dump: `Initiative.winnerAmong`'s tie-break retry is
+unbounded by design (relies on real dice eventually breaking a tie,
+same category as the known Greedo-vs-Greedo runaway characteristic) —
+not itself a bug. The actual cause is `World.formNamedEntity` queuing
+an identical `UNREMARKABLE` roll for all three players, which was
+inert while `Game.play`'s early return skipped `Initiative.order`
+entirely for legal-entity games. With that early return correctly
+removed this cycle, `Initiative.order` now runs for real and a
+three-way tie that can only ever repeat identically can never resolve
+— not rare, certain. No production code changed; this is a
+test-fixture question I don't own the fix for.
+
+## 2026-08-10T11:52:00Z — refactorer confirms the legal-entity initiative fixture fix
+
+Received architect priority-00 handoff (commit `324d809159`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 324d809159
+```
+
+Action: merged cleanly, no conflict. Traces back through the
+inherited history: the architect routed my OOM finding to the coder
+(not the specifier — this is step-implementation code, not Gherkin
+scenario content), and the coder's fix (`1ca8540a13`) is exactly the
+shape I'd have expected from the root cause: `formNamedEntity` now
+queues a distinct deterministic initiative total per player
+(`rollTotalling(3 + index)` — totals 3, 4, 5, no tie possible) ahead
+of each player's existing `UNREMARKABLE` ordinary-turn roll, so
+`Initiative.order` resolves on its first pass and the real `Game`
+turn path stays in use exactly as this whole task's turn-loop
+integration intended.
+
+Did not take the architect's "full acceptance passes 545/545" on
+faith — re-ran both suites myself. Domain: clean. Acceptance:
+545/545, ~31s (down from a hang that OOM'd past 70s before). The
+specific class re-checked directly: `EnRulesGreedoLegalEntityAcceptanceTest`
+now 12/12 in 0.022s, matching its pre-regression baseline exactly.
+
+Reviewed the four-line diff itself: minimal, correct, and idiomatic
+for the file — reuses the existing `rollTotalling`/`queuePawnRoll`
+helpers rather than adding new ones, and the repeated `players()`
+calls inside the loop are the same style already used elsewhere in
+this file (it's a trivial field accessor, not worth caching). Ran
+`dry4java` over the whole file: five duplicate blocks reported, all
+in unrelated pre-existing regions (554–564, 814–863, 1038–1062,
+1127–1139) with no overlap with this change; out of scope for a
+narrow fix-verification loop, not touching them. No CRAP concerns —
+this is test-support code with trivial complexity (a single bounded
+for-loop), not a `src/main/java` file this role's CRAP threshold
+tooling targets.
+
+No further role-owned changes needed. Handing back to the architect.
+
+## 2026-08-10T09:51:35Z — architect closes greedo-legal-entity
+
+Received refactorer priority-00 handoff (commit `e2f6b9f830`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer e2f6b9f830
+```
+
+Action: accepted final review. The deterministic distinct initiative
+rolls remove the former OOM while preserving the real canonical game
+turn path. Refactorer independently verified the legal-entity class
+12/12 and full acceptance 545/545. All coder/refactorer loops are
+closed; send the phase-complete priority-50 sync to specifier.
+

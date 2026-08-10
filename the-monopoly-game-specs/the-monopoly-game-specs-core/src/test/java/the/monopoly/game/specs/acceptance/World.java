@@ -18,6 +18,7 @@ import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
+import the.monopoly.game.rules.LegalEntity;
 import the.monopoly.game.rules.MonopolyBuyout;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Stalemate;
@@ -95,6 +96,7 @@ public class World {
   private Boolean tradeAccepted;
   private MonopolyBuyout.Outcome buyout;
   private boolean stalemateTrading;
+  private boolean legalEntityTrading;
   private boolean simulatorStalemateTrading;
   private Entry selectedEvent;
   private String renderedEventText;
@@ -394,7 +396,8 @@ public class World {
           }
         },
         jail,
-        stalemateTrading
+        stalemateTrading,
+        legalEntityTrading
     );
     Game.Result result = play.apply(game);
     turnOrder = result.turnOrder();
@@ -554,6 +557,68 @@ public class World {
     pawnStrategies.put("dog", new the.monopoly.game.strategies.Greedo(Money.ZERO, true));
   }
 
+  public void enableLegalEntityTrading(String strategyName) {
+    if (!strategyName.equals("Greedo")) throw new AssertionError("Unknown strategy \"" + strategyName + "\".");
+    legalEntityTrading = true;
+    pawnStrategies.put("dog", new the.monopoly.game.strategies.Greedo(Money.ZERO, false, true));
+  }
+
+  public void considerFormingLegalEntity(String pawnName, String colourName) {
+    if (!legalEntityTrading) return;
+    Street.Colour colour = Street.Colour.valueOf(colourName.replace(' ', '_'));
+    if (players().size() != 3 || colour == Street.Colour.orange) return;
+    if (ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
+        .anyMatch(it -> deeds == null || deeds.isUnowned(it.type()))) return;
+    formEntity(colour, false);
+  }
+
+  public void formNamedEntity(String name) {
+    othersRollWhatTheyLike = true;
+    for (int index = 0; index < players().size(); index++) {
+      Player player = players().get(index);
+      queuePawnRoll(player.id().value(), rollTotalling(3 + index));
+      queuePawnRoll(player.id().value(), UNREMARKABLE);
+    }
+    formEntity(Street.Colour.valueOf(name.substring(0, name.indexOf(' ')).toLowerCase()), true);
+  }
+
+  private void formEntity(Street.Colour colour, boolean seedBoard) {
+    if (deeds == null) deeds = new Deeds();
+    List<Player> shareholders = players().stream().limit(3).toList();
+    if (seedBoard) {
+      List<ColourStreet> group = ruleSet.streets().filter(ColourStreet.class::isInstance)
+          .map(ColourStreet.class::cast).filter(it -> it.colourGroup() == colour).toList();
+      for (int index = 0; index < group.size() && index < shareholders.size(); index++)
+        if (deeds.isUnowned(group.get(index).type())) deeds.sell(group.get(index), shareholders.get(index), Money.ZERO);
+      Player defaultOwner = shareholders.get(1);
+      ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
+          .filter(it -> deeds.isUnowned(it.type())).forEach(it -> deeds.sell(it, defaultOwner, Money.ZERO));
+    }
+    String name = Character.toUpperCase(colour.name().charAt(0)) + colour.name().substring(1) + " Realty";
+    LegalEntity entity = seedBoard
+        ? LegalEntity.formed(name, colour, shareholders, ruleSet)
+        : LegalEntity.form(name, colour, shareholders, ruleSet, deeds,
+            street -> Strategy.priorityOf(street) == Strategy.Priority.HIGHEST).orElse(null);
+    if (entity != null) deeds.form(entity);
+  }
+
+  public boolean colourGroupOwnedByEntity(String colourName) {
+    if (!legalEntityTrading) return false;
+    Street.Colour colour = Street.Colour.valueOf(colourName.replace(' ', '_'));
+    return ruleSet.streets().filter(it -> it instanceof ColourStreet street && street.colourGroup() == colour)
+        .map(Street::type).allMatch(type -> deeds.entityOwnerOf(type).isPresent());
+  }
+
+  public boolean shareholdersHoldEqualThirds(String entityName) {
+    LegalEntity entity = deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst().orElse(null);
+    return entity != null && entity.shareholders().stream().allMatch(player -> entity.shareOf(player) == 1.0 / 3.0);
+  }
+
+  public void entityOwes(String entityName, Money principal) {
+    deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).raiseLoan(principal);
+  }
+
   public void ownEveryOtherOwnableAlternately(String firstPawn, String secondPawn) {
     if (deeds == null) deeds = new Deeds();
     List<Ownable> ownables = ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast).toList();
@@ -565,6 +630,7 @@ public class World {
   public void ownEveryOtherOwnable(String pawnName) {
     if (deeds == null) deeds = new Deeds();
     ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
+        .filter(ownable -> deeds.isUnowned(ownable.type()))
         .forEach(ownable -> deeds.sell(ownable, pawn(pawnName), Money.ZERO));
   }
 
@@ -979,6 +1045,19 @@ public class World {
       LockSupport.parkNanos(5_000_000);
     }
     throw new AssertionError("Packaged jar output did not confirm stalemate trading is " + state
+        + ": " + packagedCliOutputBuffer);
+  }
+
+  public void assertPackagedCliLegalEntity(String state) {
+    long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
+    while (System.nanoTime() < deadline) {
+      synchronized (packagedCliOutputBuffer) {
+        if (packagedCliOutputBuffer.toString().contains("Legal entity trading enabled")
+            == state.equals("enabled")) return;
+      }
+      LockSupport.parkNanos(5_000_000);
+    }
+    throw new AssertionError("Packaged jar output did not confirm legal entity trading is " + state
         + ": " + packagedCliOutputBuffer);
   }
 

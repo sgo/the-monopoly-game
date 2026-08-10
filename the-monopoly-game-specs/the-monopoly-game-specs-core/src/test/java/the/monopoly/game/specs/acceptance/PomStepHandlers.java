@@ -40,6 +40,9 @@ final class PomStepHandlers {
         then("^the packaged jar's output confirms that stalemate trading is " + NAME + "$",
             (world, arguments) -> world.assertPackagedCliStalemateTrading(arguments.text(1))),
 
+        then("^the packaged jar's output confirms that legal entity is " + NAME + "$",
+            (world, arguments) -> world.assertPackagedCliLegalEntity(arguments.text(1))),
+
         step("^I stop the packaged jar$", (world, arguments) -> world.stopPackagedCli()),
 
         then("^the packaged jar process ends$",
