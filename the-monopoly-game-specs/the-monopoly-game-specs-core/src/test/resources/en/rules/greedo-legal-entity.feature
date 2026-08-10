@@ -93,7 +93,8 @@ Feature: Greedo legal entity for a three-way colour-group split
 
   # entity-7
   Scenario Outline: the entity's rent is reinvested into further houses before the loan is repaid
-    Given Pink Realty is formed
+    Given we select 4 players
+    And Pink Realty is formed
     And Pink Realty owes pawn "dog" $<principal>
     And pawn "<renter>" will roll 12 for their turn
     And pawn "<renter>" will claim rent for "<renter_street>"
