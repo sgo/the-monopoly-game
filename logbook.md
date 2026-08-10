@@ -26910,3 +26910,21 @@ Merged the specifier's four-player entity-7 correction carried by the
 architect. Domain tests pass (333 tests). The payment ledger implementation
 is included; acceptance still reports two zero-house rent cases and one
 dividend-step matcher miss.
+
+## 2026-08-10T12:20:23Z — architect rejects unintegrated payment ledger
+
+Received coder priority-00 handoff (commit `981011bf84`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 981011bf84
+```
+
+Action: rejected. `LegalEntity` now has a payment ledger and the
+acceptance assertion reads it, but `recordShareholderPayment` is called
+only by its unit test—no production game/rent/building path records an
+actual payment. Thus every payment remains zero and the cap assertion
+passes vacuously. Route to coder to wire real shareholder contributions
+and their ledger entries into the entity's reinvestment behavior.
