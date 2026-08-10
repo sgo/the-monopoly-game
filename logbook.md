@@ -27398,6 +27398,26 @@ funding, build volume/costs, repayment/dividend preconditions, and all
 expected balances before coder continues. No test-only policy or artificial
 cash adjustment is acceptable.
 
+## 2026-08-10T14:24:07Z — architect routes reconciled treasury implementation
+
+Received specifier priority-00 handoff (commit `33d08bea82`, task
+`greedo-legal-entity`).
+
+Action: merged the reconciled feature. It now supplies $200 for two pink
+houses, $300 for three; pre-builds all pink streets before the
+repayment/dividend-only cases; and corrects the shareholder ceiling to the
+$100 construction cost. The behavioral order is settled: every entity gets
+an end-of-turn, balanced build opportunity; treasury rent is consumed first,
+loans cover only a permitted shortfall, then repayment, then dividends; an
+entity otherwise becomes idle.
+
+Route priority-00 to coder for implementation. Architectural constraint:
+`Rule.Set` already owns the game `Bank`; entity treasury must use a real
+registered account in that bank, rather than a standalone `new Account` held
+only by `LegalEntity`. Wire all rent, loans, construction, repayment and
+dividend flows through the same treasury and canonical `Game.playTurn`
+end-of-turn path. Run full acceptance before returning.
+
 ## 2026-08-10T13:07:08Z — architect completes greedo legal-entity phase
 
 Received refactorer priority-50 handoff (commit `9d2a062c86`, task
