@@ -131,19 +131,30 @@ public final class LegalEntity {
         .sorted(java.util.Comparator.comparingInt(deeds::housesBuiltOn))
         .toList();
     ColourStreet firstBuilt = null;
+    Money loanRaised = Money.ZERO;
     while (bankBalance().amount() > 0) {
       ColourStreet next = buildable.stream()
           .filter(street -> deeds.housesBuiltOn(street) < street.hotelConstructionRequiresNumberOfHouses())
-          .filter(street -> bankBalance().amount() >= street.houseConstructionCost().amount())
           .min(java.util.Comparator.comparingInt(deeds::housesBuiltOn))
           .orElse(null);
       if (next == null) break;
+      if (bankBalance().amount() < next.houseConstructionCost().amount()
+          && loan.equals(Money.ZERO) && rentReceivedOn == null) {
+        Money shortfall = next.houseConstructionCost().minus(bankBalance());
+        recordLoan(shortfall);
+        depositToBank(shortfall);
+        loanRaised = shortfall;
+        Money share = new Money((shortfall.amount() + shareholders.size() - 1) / shareholders.size());
+        shareholders.forEach(player -> player.account().withdraw(share));
+      }
+      if (bankBalance().amount() < next.houseConstructionCost().amount()) break;
       withdrawFromBank(next.houseConstructionCost());
       deeds.arrangeHouses(next, deeds.housesBuiltOn(next) + 1);
       if (firstBuilt == null) firstBuilt = next;
     }
     if (firstBuilt != null) {
       markOperated();
+      if (!loanRaised.equals(Money.ZERO)) return new Operation.LoanRaisedAndHouseBuilt(loanRaised, firstBuilt);
       return new Operation.HouseBuilt(firstBuilt);
     }
     if (!loan.equals(Money.ZERO)) {
@@ -181,6 +192,12 @@ public final class LegalEntity {
     }
 
     record HouseBuilt(ColourStreet street) implements Operation {
+    }
+
+    record LoanRaised(Money amount) implements Operation {
+    }
+
+    record LoanRaisedAndHouseBuilt(Money loan, ColourStreet street) implements Operation {
     }
 
     record DividendPaid(Money amount) implements Operation {

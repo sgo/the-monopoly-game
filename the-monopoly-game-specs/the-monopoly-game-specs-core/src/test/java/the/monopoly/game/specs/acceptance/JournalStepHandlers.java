@@ -86,12 +86,12 @@ final class JournalStepHandlers {
         given("^Pink Realty's loan has been fully repaid$",
             (world, arguments) -> world.entityLoanFullyRepaid("Pink Realty")),
 
-        given("^Pink Realty's bank account holds \\$" + VALUE + "$",
-            (world, arguments) -> world.entityBankHolds("Pink Realty", money(arguments.number(1)))),
+        given("^" + NAME + "'s bank account holds \\$" + VALUE + "$",
+            (world, arguments) -> world.entityBankHolds(arguments.text(1), money(arguments.number(2)))),
 
-        then("^Pink Realty's bank account holds \\$" + VALUE + "$",
-            (world, arguments) -> assertThat(world.entityBankBalance("Pink Realty"))
-                .isEqualTo(money(arguments.number(1)))),
+        then("^" + NAME + "'s bank account holds \\$" + VALUE + "$",
+            (world, arguments) -> assertThat(world.entityBankBalance(arguments.text(1)))
+                .isEqualTo(money(arguments.number(2)))),
 
         step("^Pink Realty raises a loan of \\$" + VALUE + "$",
             (world, arguments) -> world.entityRaisesLoan("Pink Realty", money(arguments.number(1)))),
@@ -99,8 +99,8 @@ final class JournalStepHandlers {
         given("^Pink Realty owns no outstanding loan$",
             (world, arguments) -> assertThat(world.entityLoan("Pink Realty")).isEqualTo(money(0))),
 
-        given("^Pink Realty's bank account is empty$",
-            (world, arguments) -> world.entityBankHolds("Pink Realty", money(0))),
+        given("^" + NAME + "'s bank account is empty$",
+            (world, arguments) -> world.entityBankHolds(arguments.text(1), money(0))),
 
         then("^the pink colour group is developed up to at least (<houses_at_least>) houses$",
             (world, arguments) -> assertThat(world.totalHouses(Street.Colour.pink))

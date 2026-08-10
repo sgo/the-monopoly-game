@@ -27919,3 +27919,18 @@ commit: 63e7e6e317
 
 Returned the verified contradiction in entity-6; no coder-owned production
 implementation was applied during this review loop.
+
+## 2026-08-10T14:57:43Z — coder processes architect completion handoff
+
+Received architect priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 16f4421fb3
+```
+
+Action: merged the specifier-owned legacy treasury fixture updates. Added
+generic entity bank-account acceptance steps and canonical shortfall-loan
+funding before balanced construction. Domain tests pass 342/342 and the full
+acceptance pipeline passes 554/554.

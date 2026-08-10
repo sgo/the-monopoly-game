@@ -198,6 +198,10 @@ public class Game {
           journalling.entityDividendPaid(entity, it.dividend());
         }
         case LegalEntity.Operation.HouseBuilt ignored -> { }
+        case LegalEntity.Operation.LoanRaisedAndHouseBuilt it -> {
+          journalling.entityLoanRaised(entity, it.loan());
+        }
+        case LegalEntity.Operation.LoanRaised it -> journalling.entityLoanRaised(entity, it.amount());
         case LegalEntity.Operation.DividendPaid it -> journalling.entityDividendPaid(entity, it.amount());
         case LegalEntity.Operation.NoAction ignored -> { }
       }
