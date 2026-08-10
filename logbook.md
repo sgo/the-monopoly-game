@@ -26039,6 +26039,24 @@ fixture defect, not a Gherkin-content change. Route to coder to give
 the fixture distinct deterministic initiative rolls while preserving
 the real `Game` turn path.
 
+## 2026-08-10T09:47:10Z — architect accepts legal-entity initiative fixture fix
+
+Received coder priority-00 handoff (commit `1ca8540a13`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 1ca8540a13
+```
+
+Action: accepted the fixture correction. `formNamedEntity` now queues
+distinct deterministic initiative totals before its unchanged ordinary
+turn rolls, so the real initiative rule terminates and the canonical
+`Game` turn path remains in use. Full acceptance passes 545/545,
+including the formerly OOM legal-entity scenarios. Route the
+behavior-preserving test-helper change to refactorer for final review.
+
 ## 2026-08-10T09:45:29Z — coder fixes legal-entity initiative fixture
 
 Processed architect commit `655b46e7ec` for `greedo-legal-entity`.
