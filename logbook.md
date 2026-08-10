@@ -28232,6 +28232,28 @@ environmental flake already confirmed unrelated via an A/B worktree
 comparison earlier in this task; domain-scoped runs stayed clean
 throughout.
 
+## 2026-08-10T17:33:18Z — refactorer sent correct-entity-treasury-shortfall-loans handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: correct-entity-treasury-shortfall-loans
+commit: 1e8b5ae1ad
+```
+
+Summary: reviewed the corrected shortfall-loan rule (real per-
+shareholder affordability, exact remainder-aware split, replacing the
+removed same-turn rent-arrival gate). Found my own earlier test was
+still passing after the rule it named was deleted, but for an
+unrelated reason — replaced it with one that genuinely exercises the
+new split and a successful borrow. Also found and deduplicated the
+split formula itself, independently computed in two methods; extracted
+`sharesOf(Money)`. Domain and acceptance re-verified green throughout,
+554/554, no CRAP violations remaining in `LegalEntity.java`.
+
 ## %s — specifier studies 8-player Greedo entity logs, flags abnormal activity
 
 Ran five 8-player Greedo games with --optional-greedo-stalemate-trading
@@ -28356,6 +28378,57 @@ and a true age eligibility flag is never consumed after payment, permitting a
 later rent-triggered dividend without a new qualifying age increase. Those
 implementation findings remain in this log for the coder correction after the
 specifier loop closes.
+
+## 2026-08-10T19:36:54+02:00 — architect accepts zero-share capitalisation correction
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 1d8911fedf
+```
+
+Action: merged and accepted `1d8911fedf`. A shareholder with a zero-value
+remainder allocation is no longer recorded as a capitaliser; the focused $1
+shortfall test proves only Dog's positive $1 debit establishes the tracked
+shareholder. Routed the corrected dividend age-gate work to refactorer for
+final structural review and hardening verification.
+
+## 2026-08-10T18:31:50Z — architect accepts final dividend-gate review
+
+Received refactorer priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 6fbab3965e
+```
+
+Action: merged and accepted `6fbab3965e`. The final review retains the narrow
+salary-to-entity signal without exposing `Game.Journalling`'s age map, and
+confirms positive-only capitalisation plus one-shot age qualification. Full
+acceptance passed 556/556 twice in the refactorer review. Architect closing
+verification: differential mutation has no changed surface; DRY reports only
+the established Game event-adapter shape and distinct dividend tests; soft
+Gherkin mutation completed without errors; separate property suite passed
+22/22. Sent phase-complete sync to specifier at priority 50.
+
+## 2026-08-10T18:31:50Z — architect receives shareholder entity-rent rule
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 62aeeee061
+```
+
+Action: merged `62aeeee061`. Entity-21 requires a shareholder who lands on an
+entity-owned street to pay rent into the entity treasury, just as a
+non-shareholder does. Production review confirms the only contradictory
+branch is `Rent.collect(LegalEntity, ...)`'s shareholder exemption; routed its
+removal and full acceptance verification to coder.
 
 ## 2026-08-10T19:36:54+02:00 — architect reviews corrected dividend qualification
 
@@ -28509,3 +28582,61 @@ priority: 00
 task: greedo-legal-entity
 commit: 1d8911fedf
 ```
+## 2026-08-10T20:10:00Z — refactorer reviews the dividend age-eligibility gate
+
+Received architect priority-00 handoff (commit `dfdf28bde9`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect dfdf28bde9
+```
+
+Action: merged (eleventh instance of the recurring logbook conflict,
+resolved the same way as always). This carries a genuinely important
+finding: the specifier ran five real 8-player Greedo games with
+stalemate-trading and legal-entity trading together and caught two
+things static review never would have — a dividend firing purely on a
+money threshold with no shareholder-age trigger at all (1,184
+dividends over 26,850 turns in one run, ~once per 23 turns, entirely
+untethered from the "grows a year older" language the feature was
+supposed to encode), and the 3+-Greedo stalemate not actually breaking
+in 4 of 5 runs regardless (240–514 player-years before the process
+just kept grinding). The specifier explicitly descoped the second
+finding — legal entities remove the colour-group impasse but were
+never guaranteed to force bankruptcy or a stalemate resolution, and
+that empirical outcome has no deterministic acceptance criterion to
+hold code to — the same "accepted, not a defect" category as the
+already-known Greedo-vs-Greedo real-dice runaway characteristic. Worth
+carrying forward: this project now has *two* instances of that
+category, not one.
+
+The first finding became `LegalEntity` owning a
+`lastCapitalizedShareholder`/`lastCapitalizedShareholderGrewOlder`
+pair: a dividend only pays when nobody has ever needed a shortfall
+loan (pure-rent entities stay unrestricted, matching the original
+design) or when the specific shareholder who funded the last shortfall
+has since aged. `Game`'s only change is a one-line signal in
+`collectedSalary` — `deeds.legalEntities().forEach(entity ->
+entity.shareholderGrewOlder(player))` — with no exposure of its
+private age map, matching the architect's stated boundary from this
+same review thread. Two edge cases were caught and fixed before this
+reached me: a zero-value remainder share (someone owed nothing because
+the split didn't reach them) was being recorded as a capitalizer
+anyway, and the eligibility flag wasn't consumed after paying,
+permitting a second dividend without a new qualifying age transition.
+
+Independently re-verified rather than trusting the "552/553" and later
+"passes" claims scattered through the merged history: domain clean,
+full acceptance 556/556, run twice. Structural review found nothing
+requiring a fix — a first for this task. CRAP: `repayLoanOrPayDividend`
+grew from CC=3 to CC=5 adding the eligibility condition, still under
+threshold; every other touched method is CC≤5. `dry4java`: only the
+same accepted `Game.java` event-adapter shape, plus two structurally
+similar `LegalEntityTest` cases that in fact test different things
+(which shareholder's age counts, versus whether the flag is consumed
+after payment) — matches this file's existing convention for test
+shape, not real duplication. `mutate4java --scan`: `Game.java` 73
+sites, `LegalEntity.java` 75 — both manifests refreshed, no functional
+changes needed on my side this cycle.
