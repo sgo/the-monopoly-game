@@ -28335,6 +28335,28 @@ salary/age transition into a narrow domain signal, while `LegalEntity` owns
 last-capitalised-shareholder and dividend-eligibility state; do not couple the
 entity to `Journalling` or its private age map.
 
+## 2026-08-10T19:36:54+02:00 — architect reviews returned dividend-age gate
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 113c116bf9
+```
+
+Action: merged and rejected as not ready. The coder correctly reports full
+acceptance at 552/553: entity-19 asserts that Dog's default-position roll of
+12 collects salary, but that move does not pass Start. This is a Gherkin
+acceptance-content contradiction and is returned to specifier first. Production
+review also found two held coder corrections: `borrowShortfall` debits real
+shareholders without calling `recordCapitalization`, leaving normal entities
+with no last-capitalised shareholder and therefore balance-only dividends;
+and a true age eligibility flag is never consumed after payment, permitting a
+later rent-triggered dividend without a new qualifying age increase. Those
+implementation findings remain in this log for the coder correction after the
+specifier loop closes.
+
 ## 2026-08-10T18:03:15Z — coder processes Greedo legal-entity dividend gate
 
 Received architect priority-00 handoff:
