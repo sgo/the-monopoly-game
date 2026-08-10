@@ -106,11 +106,14 @@ Feature: Greedo legal entity for a three-way colour-group split
 
     Examples:
       | principal | rent | houses_at_least | rent_remaining |
-      | 200       | 100  | 2               | 0              |
+      | 200       | 200  | 2               | 0              |
 
   # entity-8
   Scenario Outline: no dividend is paid while any shareholder loan to the entity is still outstanding
     Given Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has 4 houses built
+    And the street "Bruul Mechelen" has 4 houses built
+    And the street "Place Verte Verviers" has 4 houses built
     And Pink Realty owes pawn "dog" $<principal>
     And Pink Realty's bank account holds $<surplus>
     And every other ownable space is owned by pawn "racecar"
@@ -124,6 +127,9 @@ Feature: Greedo legal entity for a three-way colour-group split
   # entity-11
   Scenario Outline: a dividend is paid only after the entire loan plus interest has been repaid
     Given Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has 4 houses built
+    And the street "Bruul Mechelen" has 4 houses built
+    And the street "Place Verte Verviers" has 4 houses built
     And Pink Realty owes pawn "dog" $<principal>
     And Pink Realty's loan has been fully repaid
     And Pink Realty's bank account holds $<surplus>
@@ -149,7 +155,7 @@ Feature: Greedo legal entity for a three-way colour-group split
 
     Examples:
       | loan | ceiling_share | total_houses |
-      | 90   | 30            | 1            |
+      | 100  | 40            | 1            |
 
   # entity-13
   Scenario Outline: rent collected from a tenant is deposited into the entity's bank account
@@ -186,7 +192,7 @@ Feature: Greedo legal entity for a three-way colour-group split
 
     Examples:
       | rent | max_loan | houses_at_least | rent_remaining |
-      | 100  | 0        | 2               | 0              |
+      | 100  | 0        | 1               | 0              |
 
   # entity-16
   Scenario Outline: the entity builds as many houses as it can afford at the end of the turn
@@ -199,7 +205,7 @@ Feature: Greedo legal entity for a three-way colour-group split
 
     Examples:
       | rent | street_1               | street_2       | street_3              | total_houses | rent_remaining |
-      | 150  | Rue de Diekirch Arlon  | Bruul Mechelen | Place Verte Verviers  | 3            | 0              |
+      | 300  | Rue de Diekirch Arlon  | Bruul Mechelen | Place Verte Verviers  | 3            | 0              |
 
   # entity-17
   Scenario Outline: an entity with nothing to build, repay, or pay becomes idle instead of spinning

@@ -27393,6 +27393,48 @@ movement setup so the tenant actually lands on the named entity street, while
 preserving the canonical game/CLI turn loop and the real shareholder-payment
 path. Send priority-00 follow-up to specifier with this narrowed evidence.
 
+## 2026-08-10T14:12:45Z — architect escalates treasury-spec reconciliation
+
+Received coder priority-00 handoff (commit `2035b65a75`, task
+`greedo-legal-entity`).
+
+Action: merged the initial treasury seam: entity rent deposits to a real
+entity account, and `raiseLoan` deposits the raised amount. The submitted
+feature also introduces end-of-turn treasury assertions. This is not a
+completion handoff: `LegalEntity.operate(Deeds)` still uses the old
+rent-gated, free contribution path, and loan repayment/dividend still do not
+withdraw from treasury.
+
+Independent acceptance reports 6 failures in the 21 legal-entity scenarios.
+The spec currently conflicts with the board and stated priority: pink houses
+cost $100 each, while entity-7/entity-15 expect two houses from $100; and
+entity-11 expects a dividend from $150 while build-before-dividend leaves a
+buildable $100 house. Entity-16 similarly expects three $100 houses from
+$150. Route one priority-00 request to specifier to reconcile treasury
+funding, build volume/costs, repayment/dividend preconditions, and all
+expected balances before coder continues. No test-only policy or artificial
+cash adjustment is acceptable.
+
+## 2026-08-10T14:24:07Z — architect routes reconciled treasury implementation
+
+Received specifier priority-00 handoff (commit `33d08bea82`, task
+`greedo-legal-entity`).
+
+Action: merged the reconciled feature. It now supplies $200 for two pink
+houses, $300 for three; pre-builds all pink streets before the
+repayment/dividend-only cases; and corrects the shareholder ceiling to the
+$100 construction cost. The behavioral order is settled: every entity gets
+an end-of-turn, balanced build opportunity; treasury rent is consumed first,
+loans cover only a permitted shortfall, then repayment, then dividends; an
+entity otherwise becomes idle.
+
+Route priority-00 to coder for implementation. Architectural constraint:
+`Rule.Set` already owns the game `Bank`; entity treasury must use a real
+registered account in that bank, rather than a standalone `new Account` held
+only by `LegalEntity`. Wire all rent, loans, construction, repayment and
+dividend flows through the same treasury and canonical `Game.playTurn`
+end-of-turn path. Run full acceptance before returning.
+
 ## 2026-08-10T13:07:08Z — architect completes greedo legal-entity phase
 
 Received refactorer priority-50 handoff (commit `9d2a062c86`, task
