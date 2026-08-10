@@ -28395,6 +28395,41 @@ shortfall test proves only Dog's positive $1 debit establishes the tracked
 shareholder. Routed the corrected dividend age-gate work to refactorer for
 final structural review and hardening verification.
 
+## 2026-08-10T18:31:50Z — architect accepts final dividend-gate review
+
+Received refactorer priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 6fbab3965e
+```
+
+Action: merged and accepted `6fbab3965e`. The final review retains the narrow
+salary-to-entity signal without exposing `Game.Journalling`'s age map, and
+confirms positive-only capitalisation plus one-shot age qualification. Full
+acceptance passed 556/556 twice in the refactorer review. Architect closing
+verification: differential mutation has no changed surface; DRY reports only
+the established Game event-adapter shape and distinct dividend tests; soft
+Gherkin mutation completed without errors; separate property suite passed
+22/22. Sent phase-complete sync to specifier at priority 50.
+
+## 2026-08-10T18:31:50Z — architect receives shareholder entity-rent rule
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 62aeeee061
+```
+
+Action: merged `62aeeee061`. Entity-21 requires a shareholder who lands on an
+entity-owned street to pay rent into the entity treasury, just as a
+non-shareholder does. Production review confirms the only contradictory
+branch is `Rent.collect(LegalEntity, ...)`'s shareholder exemption; routed its
+removal and full acceptance verification to coder.
+
 ## 2026-08-10T19:36:54+02:00 — architect reviews corrected dividend qualification
 
 Received coder priority-00 handoff:
@@ -28538,6 +28573,15 @@ Action: merged `aba659c065` and corrected shortfall funding so zero-value
 share allocations do not become the last-capitalized shareholder. Added a
 remainder-specific regression test; the focused LegalEntity tests pass 19/19.
 
+Sent priority-00 handoff to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 1d8911fedf
+```
 ## 2026-08-10T20:10:00Z — refactorer reviews the dividend age-eligibility gate
 
 Received architect priority-00 handoff (commit `dfdf28bde9`, task
@@ -28621,3 +28665,13 @@ structural pass this task has had. Both manifests refreshed. The
 specifier's separate finding that the 3+ Greedo stalemate isn't
 actually guaranteed to resolve was explicitly descoped as an accepted
 characteristic, not something requiring a fix.
+
+## 2026-08-10T19:25:09Z — coder implements shareholder entity rent
+
+Removed the shareholder exemption from `Rent.collect(LegalEntity, ...)`;
+shareholders now pay the same double vacant rent as other tenants when
+landing on their entity's street, while mortgaged streets remain exempt.
+Updated the stale unit assertion to the accepted rule.
+
+Verification: domain tests 347/347 passing; full acceptance 557/557
+passing; `git diff --check` clean.
