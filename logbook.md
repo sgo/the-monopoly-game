@@ -26440,3 +26440,47 @@ removed this cycle, `Initiative.order` now runs for real and a
 three-way tie that can only ever repeat identically can never resolve
 — not rare, certain. No production code changed; this is a
 test-fixture question I don't own the fix for.
+
+## 2026-08-10T11:52:00Z — refactorer confirms the legal-entity initiative fixture fix
+
+Received architect priority-00 handoff (commit `324d809159`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 324d809159
+```
+
+Action: merged cleanly, no conflict. Traces back through the
+inherited history: the architect routed my OOM finding to the coder
+(not the specifier — this is step-implementation code, not Gherkin
+scenario content), and the coder's fix (`1ca8540a13`) is exactly the
+shape I'd have expected from the root cause: `formNamedEntity` now
+queues a distinct deterministic initiative total per player
+(`rollTotalling(3 + index)` — totals 3, 4, 5, no tie possible) ahead
+of each player's existing `UNREMARKABLE` ordinary-turn roll, so
+`Initiative.order` resolves on its first pass and the real `Game`
+turn path stays in use exactly as this whole task's turn-loop
+integration intended.
+
+Did not take the architect's "full acceptance passes 545/545" on
+faith — re-ran both suites myself. Domain: clean. Acceptance:
+545/545, ~31s (down from a hang that OOM'd past 70s before). The
+specific class re-checked directly: `EnRulesGreedoLegalEntityAcceptanceTest`
+now 12/12 in 0.022s, matching its pre-regression baseline exactly.
+
+Reviewed the four-line diff itself: minimal, correct, and idiomatic
+for the file — reuses the existing `rollTotalling`/`queuePawnRoll`
+helpers rather than adding new ones, and the repeated `players()`
+calls inside the loop are the same style already used elsewhere in
+this file (it's a trivial field accessor, not worth caching). Ran
+`dry4java` over the whole file: five duplicate blocks reported, all
+in unrelated pre-existing regions (554–564, 814–863, 1038–1062,
+1127–1139) with no overlap with this change; out of scope for a
+narrow fix-verification loop, not touching them. No CRAP concerns —
+this is test-support code with trivial complexity (a single bounded
+for-loop), not a `src/main/java` file this role's CRAP threshold
+tooling targets.
+
+No further role-owned changes needed. Handing back to the architect.
