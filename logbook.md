@@ -26769,3 +26769,89 @@ shareholder's personal affordability ceiling; members do not top up a
 short partner's share). entity-6/8 reinforced on a fully-owned board.
 Formation still requires the whole board owned (stalemate breaker).
 Some steps are new vocabulary requiring new step handlers.
+
+## 2026-08-10T11:58:00Z — coder receives specifier economy handoff
+
+Received specifier priority-50 handoff (commit `98bf5a37dd`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 280525cf28
+```
+
+Action: merged (fifth instance of the recurring logbook conflict,
+same shape as before, resolved the same way). This cycle carries no
+new production or test code beyond `ac2415fbe2`, which I already
+reviewed and fixed last cycle — just coder/architect verification
+records confirming the same state. Confirmed via `git diff --stat --
+'*.java'` between my prior commit and this merge tip: zero Java files
+changed.
+
+Also found and fixed a genuine logbook-structure defect from this
+merge's automatic (non-conflicting) portion: git's line-based 3-way
+merge matched the wrong occurrence of an identical "domain tests
+332/332... acceptance 549/549... git diff --check clean" line (it
+recurs verbatim across two different entries) and spliced the
+"architect accepts verified multi-player entity path" entry into the
+middle of an unrelated earlier entry, separating its narrative from
+its own handoff block. Relocated it to its correct position,
+chronologically right after the entry it was actually responding to.
+This is a new failure mode for the recurring conflict pattern — not a
+`<<<<<<<`/`=======`/`>>>>>>>` conflict at all, since git considered
+this hunk unambiguous, but the same underlying repeated-boilerplate
+cause. Worth remembering: verify the *placement* of auto-merged
+content near duplicate-looking text, not just the presence of
+conflict markers.
+
+Re-verified rather than trusting the inherited state: domain clean,
+full acceptance 549/549. No structural work needed — the code is
+exactly what I already reviewed. Handing back to the architect.
+
+## 2026-08-10T13:05:00Z — architect accepts redundant entity review
+
+Received refactorer priority-00 handoff (commit `7bcae6c15d`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 7bcae6c15d
+```
+
+Action: accepted the re-confirmation and preserved its logbook
+placement repair. It contains no new production or test code, and the
+phase-complete sync for this task was already sent to the specifier at
+`0f6a3ac515`; no duplicate phase handoff is warranted.
+merge_and_process specifier 98bf5a37dd
+```
+
+Merged the specifier commit without editing its feature file. Implemented
+end-of-turn legal-entity settlement, entity-owned rent recognition, and
+acceptance support for the new assertions. Domain tests pass (332 tests).
+The new rent-reinvestment scenarios remain blocked because their Background
+selects three players (`dog`, `high hat`, `iron box`) while the scenarios ask
+`ship` to roll and claim rent; `ship` is not in the selected turn order.
+Escalated this specification inconsistency to the architect for resolution.
+
+## 2026-08-10T12:08:10Z — architect rejects incomplete reinvestment coverage
+
+Received coder priority-50 handoff (commit `ff3ced2b8e`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder ff3ced2b8e
+```
+
+Action: merged the reinvestment implementation for review, but it is
+not advanceable. The new rent-reinvestment scenarios select only dog,
+high hat, and iron box while asking ship to roll/claim rent, so their
+acceptance setup cannot run. In addition, the new assertion helper
+`shareholderPaymentsWithin` only checks that balances are nonnegative;
+it does not record or validate amounts paid to the entity. Route the
+scenario-player inconsistency to specifier and the incomplete
+payment-accounting/assertion behavior to coder.
+
