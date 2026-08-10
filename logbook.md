@@ -28499,3 +28499,13 @@ merge_and_process architect aba659c065
 Action: merged `aba659c065` and corrected shortfall funding so zero-value
 share allocations do not become the last-capitalized shareholder. Added a
 remainder-specific regression test; the focused LegalEntity tests pass 19/19.
+
+Sent priority-00 handoff to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 1d8911fedf
+```
