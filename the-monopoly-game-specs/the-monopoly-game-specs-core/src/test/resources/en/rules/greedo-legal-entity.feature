@@ -99,11 +99,12 @@ Feature: Greedo legal entity for a three-way colour-group split
     And Pink Realty owes pawn "dog" $<principal>
     When we play up to 1 round
     Then the pink colour group is developed up to at least <houses_at_least> houses
+    And Pink Realty's bank account holds $<rent_remaining>
     And Pink Realty still owes pawn "dog" $<principal>
 
     Examples:
-      | principal | rent | houses_at_least |
-      | 200       | 500  | 1               |
+      | principal | rent | houses_at_least | rent_remaining |
+      | 200       | 100  | 2               | 0              |
 
   # entity-8
   Scenario Outline: no dividend is paid while any shareholder loan to the entity is still outstanding
@@ -176,22 +177,24 @@ Feature: Greedo legal entity for a three-way colour-group split
     When we play up to 1 round
     Then Pink Realty raises no more than $<max_loan> in loans
     And the pink colour group is developed up to at least <houses_at_least> houses
+    And Pink Realty's bank account holds $<rent_remaining>
 
     Examples:
-      | rent | max_loan | houses_at_least |
-      | 500  | 0        | 1               |
+      | rent | max_loan | houses_at_least | rent_remaining |
+      | 100  | 0        | 2               | 0              |
 
   # entity-16
   Scenario Outline: the entity builds as many houses as it can afford at the end of the turn
     Given Pink Realty is formed
     And Pink Realty's bank account holds $<rent>
     When we play up to 1 round
-    Then the <street_1> and the <street_2> each have a house built
+    Then the <street_1>, the <street_2>, and the <street_3> each have a house built
     And the pink colour group is developed up to <total_houses> houses
+    And Pink Realty's bank account holds $<rent_remaining>
 
     Examples:
-      | rent | street_1              | street_2               | total_houses |
-      | 1000 | Rue de Diekirch Arlon | Bruul Mechelen          | 2            |
+      | rent | street_1               | street_2       | street_3              | total_houses | rent_remaining |
+      | 150  | Rue de Diekirch Arlon  | Bruul Mechelen | Place Verte Verviers  | 3            | 0              |
 
   # entity-17
   Scenario Outline: an entity with nothing to build, repay, or pay becomes idle instead of spinning
