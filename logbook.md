@@ -26492,3 +26492,25 @@ priority: 00
 task: greedo-legal-entity
 commit: 314dadf9ff
 ```
+
+## 2026-08-10T10:47:47Z — architect rejects test-only multi-player entity support
+
+Received coder priority-00 handoff (commit `314dadf9ff`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 314dadf9ff
+```
+
+Action: rejected. The coder derives the three shareholders only in
+`World.considerFormingLegalEntity`; production `Game` still passes its
+entire player list to `LegalEntity.form`, which rejects any list other
+than exactly three. The 4- and 8-player scenarios therefore do not
+exercise real gameplay. Route to coder to select candidate-group owners
+inside the production turn-start policy. Also route to specifier: the
+coder changed entity-10's Gherkin setup from owning every other space
+to owning only outside the candidate group. That changes the acceptance
+criterion and still tests an unowned-group case rather than the stated
+two-owner split; only the specifier may decide the correct scenario.
