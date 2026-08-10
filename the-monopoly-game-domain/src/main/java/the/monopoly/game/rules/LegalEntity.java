@@ -116,7 +116,7 @@ public final class LegalEntity {
   public Money shareholderPayment(Player shareholder) {
     return shareholderPayments.getOrDefault(shareholder.id(), Money.ZERO);
   }
-  Player lastCapitalizedShareholder() { return lastCapitalizedShareholder; }
+  public Player lastCapitalizedShareholder() { return lastCapitalizedShareholder; }
   public void recordCapitalization(Player shareholder) {
     if (!shareholders.contains(shareholder)) throw new IllegalArgumentException("Not a shareholder.");
     lastCapitalizedShareholder = shareholder;

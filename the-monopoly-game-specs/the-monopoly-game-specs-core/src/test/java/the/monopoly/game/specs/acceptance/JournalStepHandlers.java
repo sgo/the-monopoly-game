@@ -95,6 +95,9 @@ final class JournalStepHandlers {
         given("^the last-capitalised shareholder of Pink Realty is pawn \"" + NAME + "\"$",
             (world, arguments) -> world.entityLastCapitalizedShareholder("Pink Realty", arguments.text(1))),
 
+        given("^the last-capitalised shareholder of Pink Realty grows a year older$",
+            (world, arguments) -> world.entityLastCapitalizedShareholderGrewOlder("Pink Realty")),
+
         then("^" + NAME + "'s bank account holds \\$" + VALUE + "$",
             (world, arguments) -> assertThat(world.entityBankBalance(arguments.text(1)))
                 .isEqualTo(money(arguments.number(2)))),
