@@ -27685,3 +27685,18 @@ entity-15 request at least two pink houses from $100 although each pink house
 costs $100; entity-11 supplies $150 and expects dividends despite the stated
 build-before-dividend priority. Current acceptance is 547/554 with seven
 entity-scenario failures/errors, so this is not ready for refactorer review.
+
+## 2026-08-10T14:25:42Z — coder returns entity-6 priority review
+
+Sent architect priority-00 handoff:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 63e7e6e317
+```
+
+Returned the verified contradiction in entity-6; no coder-owned production
+implementation was applied during this review loop.
