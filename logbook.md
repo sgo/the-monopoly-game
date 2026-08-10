@@ -28675,3 +28675,16 @@ Updated the stale unit assertion to the accepted rule.
 
 Verification: domain tests 347/347 passing; full acceptance 557/557
 passing; `git diff --check` clean.
+
+## 2026-08-10T21:31:00+02:00 — refactorer reviews shareholder entity rent (95a5e1d0ab)
+
+Merged `95a5e1d0ab`. The change is a one-line rule removal in
+`Rent.collect(LegalEntity, ...)`: dropped the shareholder exemption so a
+shareholder now pays the same double vacant rent as any other tenant when
+landing on their own entity's street, matching entity-21. `crap4java` on
+`Rent.java`: highest is `colourStreetRent` at CC=5/CRAP=5.0, the touched
+`collect(LegalEntity, ...)` overload is CC=4/CRAP=4.0 — nothing near the
+threshold. `dry4java`: no duplicate candidates found. `mutate4java --scan`:
+10 sites, manifest refreshed (hash-only diff, no functional changes
+needed on my side). Domain tests 347/347, full acceptance 557/557, run
+twice for confidence.
