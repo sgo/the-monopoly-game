@@ -27376,6 +27376,28 @@ movement setup so the tenant actually lands on the named entity street, while
 preserving the canonical game/CLI turn loop and the real shareholder-payment
 path. Send priority-00 follow-up to specifier with this narrowed evidence.
 
+## 2026-08-10T14:12:45Z — architect escalates treasury-spec reconciliation
+
+Received coder priority-00 handoff (commit `2035b65a75`, task
+`greedo-legal-entity`).
+
+Action: merged the initial treasury seam: entity rent deposits to a real
+entity account, and `raiseLoan` deposits the raised amount. The submitted
+feature also introduces end-of-turn treasury assertions. This is not a
+completion handoff: `LegalEntity.operate(Deeds)` still uses the old
+rent-gated, free contribution path, and loan repayment/dividend still do not
+withdraw from treasury.
+
+Independent acceptance reports 6 failures in the 21 legal-entity scenarios.
+The spec currently conflicts with the board and stated priority: pink houses
+cost $100 each, while entity-7/entity-15 expect two houses from $100; and
+entity-11 expects a dividend from $150 while build-before-dividend leaves a
+buildable $100 house. Entity-16 similarly expects three $100 houses from
+$150. Route one priority-00 request to specifier to reconcile treasury
+funding, build volume/costs, repayment/dividend preconditions, and all
+expected balances before coder continues. No test-only policy or artificial
+cash adjustment is acceptable.
+
 ## 2026-08-10T13:07:08Z — architect completes greedo legal-entity phase
 
 Received refactorer priority-50 handoff (commit `9d2a062c86`, task
