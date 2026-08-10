@@ -25965,6 +25965,28 @@ changes its ordering. Route to coder: remove the test-only branch and
 make the real game turn loop satisfy the scenarios. The rules package
 also directly instantiates `strategies.Greedo` solely to discover the
 priority tier, which should be removed as part of the boundary cleanup.
+
+## 2026-08-10T08:43:01Z — architect re-reviews greedo-legal-entity
+
+Received refactorer priority-50 handoff (commit `0833ce8f28`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 0833ce8f28
+```
+
+Action: rejected the attempted real-turn-path fix. It removes the
+test-helper shortcut, but `Game.play` now detects an existing entity,
+operates it, and returns before initiative or any normal turn. Further,
+`Game.playTurn` returns immediately whenever an entity operates. Both
+are still legal-entity-only execution paths rather than gameplay wired
+into the canonical turn loop. The rules package also still imports
+`strategies.Greedo` for priority, violating dependency direction.
+Route to coder for one integrated turn-start policy with rules-owned
+priority knowledge (or an inward-facing abstraction), without early
+returning from the game/turn loop.
 2026-08-10T07:40:00Z — Received specifier handoff:
 id: 20260810T073726Z_000087_from_specifier
 from: specifier
@@ -26096,3 +26118,105 @@ refactor, so I'm leaving it for the architect to route to the
 specifier if it's judged worth closing.
 
 Committed the LegalEntity/Game/World changes and this entry together.
+
+## 2026-08-10T08:19:35Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: b258e7a3e2
+```
+
+Summary: merged and reviewed. Legal-entity formation/loan/dividend
+mechanics are sound; reduced `LegalEntity.form` from CRAP 9.1 to 6.0
+via guard-clause extraction (one clause folded as provably redundant
+with an earlier board-ownership check), extracted the loan/dividend
+decision into a shared `LegalEntity.operate()` used by both real
+gameplay and the acceptance fixture (which previously hand-duplicated
+and diverged from it, never actually mutating the entity), and added
+unit coverage for both. DRY findings are the pre-existing accepted
+event-adapter shape. Domain and acceptance suites verified green
+throughout, 545/545 acceptance unchanged before and after. Flagged but
+did not act on: `World.playUpToRounds` bypasses `Game.play()` for
+legal-entity turns, so the real per-turn trigger path
+(`resolveLegalEntityAtStart`, 11.4% covered) isn't exercised by any
+acceptance scenario — a specification-level timing question, not a
+structural one.
+
+## 2026-08-10T08:36:00Z — refactorer reviews the real-turn-path fix for greedo-legal-entity
+
+Received coder priority-50 handoff (commit `08b0104e74`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 08b0104e74
+```
+
+Action: merged cleanly (no conflict this time — logbook.md
+auto-merged). This closes the loop the architect opened after my prior
+handoff: architect commit `9073078` (logbook-only, no code) confirmed
+`World.playUpToRounds`'s test-only branch and routed it to the coder,
+also flagging that `LegalEntity`'s old `GreedoPriority` inner class
+instantiated `strategies.Greedo` just to read a priority tier.
+
+Coder's fix: removed `World.playUpToRounds`'s bypass entirely, so
+"play up to 1 round" now always drives the real `Game.play()`/
+`playTurn()`. Made `Game.play`/`playTurn` recognize an entity-operate-
+only turn (legal-entity trading enabled, entities exist, at least one
+unoperated) and return immediately after operating rather than running
+a full turn — that's how "Given Pink Realty owes pawn dog $100 / When
+we play up to 1 round" now resolves through the real engine without
+needing dice or initiative order. Also removed the `GreedoPriority`
+inner class in favour of a new `static Greedo.priorityOf(Ownable)`,
+called directly from `LegalEntity.colourGroupIneligible`. Verified:
+domain and acceptance both green, 545/545 acceptance unchanged from
+before this fix, confirming the timing rewrite didn't change any
+observable outcome — only which code path produces it.
+
+One CRAP regression from the `playTurn` change: adding
+`if (legalEntityTrading && legalEntityOperated) return true;` pushed
+it from CC=6 to CC=8 (CRAP 8.0), over both the tool's 8.0 warning and
+this role's 6.0 policy line. Extracted the same way as the earlier
+`LegalEntity.form` reduction: `settleLegalEntities(trader, journalling)`
+now owns the `resolveLegalEntityAtStart` call, the `operateLegalEntities`
+call, and the `legalEntityTrading &&` gate — preserving the original
+unconditional-call order exactly (I initially wrote it as a
+short-circuiting `&&` expression, which would have skipped calling
+`operateLegalEntities` whenever `legalEntityTrading` was false, unlike
+the coder's version which always called it; caught this before
+committing and rewrote it to keep the original evaluation order). Also
+extracted the pre-existing `player.id().equals(builder.id()) &&
+!deeds.isBankrupt(player)` builder-development condition into
+`isBuilderStillSolvent`, since one more CC unit needed to come out to
+clear the threshold and this guard was the same shape as the
+`LegalEntity.form` extractions. Back to CC=6, CRAP=6.0. No other
+changed method exceeded the threshold.
+
+Also found, while re-reading `LegalEntity`'s new `Greedo.priorityOf`:
+`MonopolyBuyout.java` (pre-existing, untouched by any commit this
+task) carried the exact same pattern the coder had just removed from
+`LegalEntity` — a `private static final Greedo PRIORITY = new Greedo()`
+field held only to call `.priority(street)`. Since a clean static
+alternative now exists specifically for this, pointed
+`MonopolyBuyout.isHighestPriority` at `Greedo.priorityOf` and dropped
+its own instance field. Behavior-identical (same method, same
+argument), confirmed by the unchanged 545/545 acceptance result;
+CRAP for the affected `MonopolyBuyout` methods stayed at the same
+values (`isHighestPriority` CC=1 before and after).
+
+`mutate4java --scan` on every file this touched (`Game.java` 75 sites,
+`LegalEntity.java` 26, `MonopolyBuyout.java` 42, `Greedo.java` 53) —
+all under the 100-site split threshold, though `Game.java` at 75 is
+the closest any file in this project has come; worth watching on its
+next change. All four manifests were stale and refreshed via
+`--update-manifest`. `dry4java` across the same files:
+only the same pre-existing `Journalling` event-adapter shape already
+accepted by the architect; nothing new.
+
+Committed the Game/LegalEntity/MonopolyBuyout/Greedo changes together.
