@@ -26855,3 +26855,20 @@ it does not record or validate amounts paid to the entity. Route the
 scenario-player inconsistency to specifier and the incomplete
 payment-accounting/assertion behavior to coder.
 
+
+## 2026-08-10T12:10:06Z — specifier resolves entity-7 renter inconsistency
+
+Received architect priority-00 escalation (commit `facc22d72b`, task
+`greedo-legal-entity`), which routed the scenario-player inconsistency
+back to specifier. Merged the associated coder reinvestment work with no
+Java conflict; resolved a logbook-only conflict by reconstruction.
+
+Action: fixed entity-7. The rent-reinvestment scenario asked `ship` to
+roll/claim rent, but the Background selects only 3 players (dog, high
+hat, iron box), leaving `ship` out of the turn order. Added `Given we
+select 4 players` to entity-7 so `ship` is a selected non-shareholder
+renter paying Pink Realty, while dog/high hat/iron box remain the
+equal-thirds shareholders. entity-11/12 use only the 3 shareholders (no
+external renter) so they remain coherent. Committed as `434341563d`.
+
+Sent architect priority-00 git_handoff with that commit.
