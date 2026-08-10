@@ -26855,3 +26855,18 @@ it does not record or validate amounts paid to the entity. Route the
 scenario-player inconsistency to specifier and the incomplete
 payment-accounting/assertion behavior to coder.
 
+## 2026-08-10T12:10:15Z — architect accepts reinvestment renter correction
+
+Received specifier priority-00 handoff (commit `434341563d`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 434341563d
+```
+
+Action: accepted entity-7's explicit four-player setup, making ship a
+valid renter in the scenario. The Gherkin inconsistency is closed.
+Forward this correction to coder with the still-outstanding requirement
+to account for and assert actual shareholder payments to an entity.
