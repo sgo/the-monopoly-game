@@ -26514,3 +26514,16 @@ coder changed entity-10's Gherkin setup from owning every other space
 to owning only outside the candidate group. That changes the acceptance
 criterion and still tests an unowned-group case rather than the stated
 two-owner split; only the specifier may decide the correct scenario.
+
+## 2026-08-10T10:50:10Z — coder routes production shareholder fix
+
+Updated `Game.resolveLegalEntityAtStart` to derive the shareholder list
+from the candidate colour group's actual deed owners before calling
+`LegalEntity.form`, allowing the real turn-start policy to support larger
+games without changing the production entity rule.
+
+Restored entity-10's original Gherkin setup as directed. Domain tests are
+332/332 passing. Full acceptance reaches 549 tests with 547 passing and
+only entity-10's two scenarios failing because the stated setup assigns
+the third group street to `racecar`, creating three owners; that scenario
+decision is routed to the specifier.
