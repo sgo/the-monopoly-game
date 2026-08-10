@@ -52,24 +52,16 @@ class LegalEntityTest {
 
   @Test
   void aColourGroupLedByTheHighestPriorityStreetNeverConsolidates() {
-    own(Street.Type.LippenslaanKnokke, dog);
-    own(Street.Type.RueRoyaleTournai, highHat);
-    own(Street.Type.GroenplaatsAntwerpen, ironBox);
-    ownEveryRemainingSpace(highHat);
-
-    assertThat(LegalEntity.form("Orange Realty", Street.Colour.orange,
-        List.of(dog, highHat, ironBox), rules, deeds, LegalEntityTest::highestPriority)).isEmpty();
+    assertFormationIsImpossible("Orange Realty", Street.Colour.orange,
+        List.of(Street.Type.LippenslaanKnokke, Street.Type.RueRoyaleTournai, Street.Type.GroenplaatsAntwerpen),
+        List.of(dog, highHat, ironBox), List.of(dog, highHat, ironBox));
   }
 
   @Test
   void aGroupNotSplitAcrossThreeOwnersPreventsFormation() {
-    own(Street.Type.RueDeDiekirchArlon, dog);
-    own(Street.Type.BruulMechelen, dog);
-    own(Street.Type.PlaceVerteVerviers, highHat);
-    ownEveryRemainingSpace(highHat);
-
-    assertThat(LegalEntity.form("Pink Realty", Street.Colour.pink,
-        List.of(dog, highHat, ironBox), rules, deeds, LegalEntityTest::highestPriority)).isEmpty();
+    assertFormationIsImpossible("Pink Realty", Street.Colour.pink,
+        List.of(Street.Type.RueDeDiekirchArlon, Street.Type.BruulMechelen, Street.Type.PlaceVerteVerviers),
+        List.of(dog, dog, highHat), List.of(dog, highHat, ironBox));
   }
 
   @Test
@@ -151,6 +143,8 @@ class LegalEntityTest {
         List.of(dog, highHat, ironBox), rules);
     entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
     entity.depositToBank(new Money(150));
+    entity.recordCapitalization(dog);
+    entity.shareholderGrewOlder(dog);
 
     LegalEntity.Operation operation = entity.operate(deeds);
 
@@ -159,6 +153,54 @@ class LegalEntityTest {
     assertThat(dog.account().balance().amount()).isEqualTo(new Money(50));
     assertThat(highHat.account().balance().amount()).isEqualTo(new Money(50));
     assertThat(ironBox.account().balance().amount()).isEqualTo(new Money(50));
+  }
+
+  @Test
+  void operatingDoesNotPayADividendBeforeTheLastCapitalizedShareholderGrowsOlder() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.depositToBank(new Money(150));
+    entity.recordCapitalization(dog);
+
+    assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.NoAction());
+    assertThat(entity.bankBalance()).isEqualTo(new Money(150));
+  }
+
+  @Test
+  void onlyTheLastCapitalizedShareholdersAgeIncreaseEnablesADividend() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.depositToBank(new Money(150));
+    entity.recordCapitalization(dog);
+    entity.shareholderGrewOlder(highHat);
+
+    assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.NoAction());
+
+    LegalEntity eligible = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    eligible.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    eligible.depositToBank(new Money(150));
+    eligible.recordCapitalization(dog);
+    eligible.shareholderGrewOlder(dog);
+
+    assertThat(eligible.operate(deeds)).isEqualTo(new LegalEntity.Operation.DividendPaid(new Money(50)));
+  }
+
+  @Test
+  void aDividendCannotBePaidAgainUntilTheQualifyingShareholderGrowsOlderAgain() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.depositToBank(new Money(300));
+    entity.recordCapitalization(dog);
+    entity.shareholderGrewOlder(dog);
+
+    assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.DividendPaid(new Money(50)));
+    entity.markOperated();
+    assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.NoAction());
+    assertThat(entity.bankBalance()).isEqualTo(new Money(150));
   }
 
   @Test
@@ -182,6 +224,24 @@ class LegalEntityTest {
     assertThat(dog.account().balance().amount()).isEqualTo(new Money(17));
     assertThat(highHat.account().balance().amount()).isEqualTo(new Money(18));
     assertThat(ironBox.account().balance().amount()).isEqualTo(new Money(18));
+  }
+
+  @Test
+  void zeroRemainderSharesDoNotBecomeTheLastCapitalizedShareholder() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    ColourStreet street = entity.streets().getFirst();
+    entity.depositToBank(new Money(99));
+    dog.account().deposit(new Money(10));
+    highHat.account().deposit(new Money(10));
+    ironBox.account().deposit(new Money(10));
+
+    assertThat(entity.operate(deeds))
+        .isEqualTo(new LegalEntity.Operation.LoanRaisedAndHouseBuilt(new Money(1), street));
+    assertThat(entity.lastCapitalizedShareholder()).isEqualTo(dog);
+    assertThat(entity.shareholderPayment(dog)).isEqualTo(new Money(1));
+    assertThat(entity.shareholderPayment(highHat)).isEqualTo(Money.ZERO);
+    assertThat(entity.shareholderPayment(ironBox)).isEqualTo(Money.ZERO);
   }
 
   @Test
@@ -233,6 +293,17 @@ class LegalEntityTest {
         .map(it -> (the.monopoly.game.components.streets.Ownable) it)
         .filter(it -> deeds.isUnowned(it.type()))
         .forEach(it -> deeds.sell(it, owner, Money.ZERO));
+  }
+
+  private void ownColourGroupAndRemainingSpaces(List<Street.Type> types, List<Player> owners, Player remainingOwner) {
+    for (int index = 0; index < types.size(); index++) own(types.get(index), owners.get(index));
+    ownEveryRemainingSpace(remainingOwner);
+  }
+
+  private void assertFormationIsImpossible(String name, Street.Colour colour, List<Street.Type> types,
+                                           List<Player> owners, List<Player> shareholders) {
+    ownColourGroupAndRemainingSpaces(types, owners, highHat);
+    assertThat(LegalEntity.form(name, colour, shareholders, rules, deeds, LegalEntityTest::highestPriority)).isEmpty();
   }
 
   private static boolean highestPriority(ColourStreet street) {

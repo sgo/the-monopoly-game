@@ -1,3 +1,7 @@
+# acceptance-mutation-manifest-begin
+# {"version":1,"tested_at":"2026-08-10T17:36:35.189910Z","feature_name":"Greedo legal entity for a three-way colour-group split","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/greedo-legal-entity.feature","background_hash":"fd82b050e2caf6974e2f44e0c1ce996c7bd99ce3d3e5d035db5a75223654814e","implementation_hash":"unknown","scenarios":[{"index":0,"name":"three Greedo co-owners of a colour group coalesce into a legal entity holding equal shares","scenario_hash":"2ef5e96b2ea70f8ff71751ea4b35eae5952a85776b607e56ec76b4482675c459","mutation_count":15,"result":{"Total":15,"Killed":15,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":3,"name":"the entity never consolidates a highest-priority colour group","scenario_hash":"072ba692ad338f0bcd5a482bf5606f8b18a5d2a4d1062bd8c5f03beed450891f","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":4,"name":"a two-player split of an eligible colour group does not form an entity","scenario_hash":"afc4ab1a1890586142a97b70d380ecac4e4354146c8064aa6e08fc415602c178","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":13,"name":"the entity builds as many houses as it can afford at the end of the turn","scenario_hash":"2fb2bcce463e71807420f255baea8b84f75d80be4d796e4d29d0e1e70d9b84e4","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"}]}
+# acceptance-mutation-manifest-end
+
 # language: en
 
 Feature: Greedo legal entity for a three-way colour-group split
@@ -224,6 +228,45 @@ Feature: Greedo legal entity for a three-way colour-group split
     Examples:
       | scenario |
       | idle     |
+
+  # entity-18
+  Scenario Outline: no dividend is paid unless the last-capitalised shareholder grows a year older
+    Given Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has 4 houses built
+    And the street "Bruul Mechelen" has 4 houses built
+    And the street "Place Verte Verviers" has 4 houses built
+    And Pink Realty owes pawn "dog" $<principal>
+    And Pink Realty's loan has been fully repaid
+    And Pink Realty's bank account holds $<surplus>
+    And the last-capitalised shareholder of Pink Realty has not aged since funding a build
+    When we play up to 1 round
+    Then pawn "dog" receives no dividend from Pink Realty
+
+    Examples:
+      | principal | surplus |
+      | 0         | 150     |
+
+  # entity-19
+  Scenario Outline: the entity pays an equal dividend when the last-capitalised shareholder grows a year older
+    Given Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has 4 houses built
+    And the street "Bruul Mechelen" has 4 houses built
+    And the street "Place Verte Verviers" has 4 houses built
+    And Pink Realty owes pawn "dog" $<principal>
+    And Pink Realty's loan has been fully repaid
+    And Pink Realty's bank account holds $<surplus>
+    And the last-capitalised shareholder of Pink Realty is pawn "dog"
+    And pawn "dog" starts at position <position>
+    And pawn "dog" will roll 12 for their turn
+    When we play up to 1 round
+    Then pawn "dog" collects a salary and grows a year older
+    And each of pawn "dog", pawn "high hat", and pawn "iron box" receives a $<dividend_share> dividend from Pink Realty
+
+    Examples:
+      | principal | surplus | position | dividend_share |
+      | 0         | 150     | 32       | 50             |
+
+  
 
   # entity-9
   Scenario Outline: the entity forms from exactly the three co-owners of a colour group even when the game has more than three players

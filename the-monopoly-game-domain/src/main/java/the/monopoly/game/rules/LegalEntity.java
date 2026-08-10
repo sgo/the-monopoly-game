@@ -24,6 +24,8 @@ public final class LegalEntity {
   private final Account bankAccount;
   private ColourStreet rentReceivedOn;
   private final Map<Player.ID, Money> shareholderPayments = new HashMap<>();
+  private Player lastCapitalizedShareholder;
+  private boolean lastCapitalizedShareholderGrewOlder;
   private boolean operated;
 
   private LegalEntity(String name, Street.Colour colour, List<Player> shareholders,
@@ -109,6 +111,19 @@ public final class LegalEntity {
   public Money shareholderPayment(Player shareholder) {
     return shareholderPayments.getOrDefault(shareholder.id(), Money.ZERO);
   }
+  Player lastCapitalizedShareholder() { return lastCapitalizedShareholder; }
+  public void recordCapitalization(Player shareholder) {
+    if (!shareholders.contains(shareholder)) throw new IllegalArgumentException("Not a shareholder.");
+    lastCapitalizedShareholder = shareholder;
+    lastCapitalizedShareholderGrewOlder = false;
+  }
+  public void shareholderGrewOlder(Player shareholder) {
+    if (lastCapitalizedShareholder != null
+        && lastCapitalizedShareholder.id().equals(shareholder.id())) {
+      lastCapitalizedShareholderGrewOlder = true;
+      operated = false;
+    }
+  }
   public Money repayLoan(Money principal) {
     Money repayment = new Money(principal.amount() + principal.amount() * 5 / 100);
     loan = loan.minus(principal);
@@ -185,6 +200,7 @@ public final class LegalEntity {
       Money share = shares.get(index);
       shareholder.account().withdraw(share);
       recordShareholderPayment(shareholder, share);
+      if (!share.equals(Money.ZERO)) recordCapitalization(shareholder);
     }
     return shortfall;
   }
@@ -205,7 +221,9 @@ public final class LegalEntity {
 
   private Operation repayLoanOrPayDividend() {
     if (!loan.equals(Money.ZERO)) return repayLoanIfAffordable();
-    return bankBalance().amount() >= 150 ? payDividend() : null;
+    return bankBalance().amount() >= 150
+        && (lastCapitalizedShareholder == null || lastCapitalizedShareholderGrewOlder)
+        ? payDividend() : null;
   }
 
   private Operation repayLoanIfAffordable() {
@@ -222,6 +240,7 @@ public final class LegalEntity {
     Money dividend = new Money(50);
     withdrawFromBank(new Money(150));
     shareholders.forEach(player -> player.account().deposit(dividend));
+    lastCapitalizedShareholderGrewOlder = false;
     return new Operation.DividendPaid(dividend);
   }
 
