@@ -26275,3 +26275,88 @@ verified green throughout, 545/545 acceptance unchanged before and
 after every step. `Game.java` is now at 75 mutation sites, the closest
 any file here has come to the 100-site split threshold — flagging for
 visibility, not yet actionable.
+
+## 2026-08-10T09:35:00Z — refactorer finds a blocking OOM in greedo-legal-entity
+
+Received architect priority-00 handoff (commit `17be87ed7b`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 17be87ed7b
+```
+
+Action: merged cleanly (no conflict). This carries the architect's
+rejection of my prior `0833ce8f28` handoff (logged `08:43:01Z`,
+inherited via the merge): the entity-operate-only early return I had
+just reduced the CRAP for was itself the wrong shape — still a
+legal-entity-only execution path bypassing the canonical turn loop,
+and `rules` still imported `strategies.Greedo` for priority, which I
+had made worse by pointing `MonopolyBuyout` at it too. Routed to
+coder, who removed the early return entirely (`settleLegalEntities`
+now precedes but never replaces a normal turn) and decoupled
+`LegalEntity` from the strategy layer by having it take a
+`Predicate<ColourStreet> highestPriority` parameter instead of calling
+`Strategy`/`Greedo` directly — `rules` no longer imports `strategies`
+anywhere in this file. The architect accepted that fix, then sent one
+more patch of its own (`17be87ed7b`) supplying the predicate from
+`Game`/test call sites and fixing `Deeds.isUnowned` to also check
+`entityOwners` (a real latent bug: without it, once a colour group
+became an entity, `isUnowned` kept reporting its streets as unowned,
+since `deeds.form()` moves them out of the `owners` map into
+`entityOwners`, which would have permanently blocked
+`boardFullyOwned` and anything else checking `isUnowned` after the
+first entity formed).
+
+I do not consider this state verified. Per this role's standing
+discipline of independently re-running the suites rather than trusting
+an inherited "clean" claim (the architect's `08:58:52Z` entry says
+"full acceptance... clean" for the coder's fix, before this last
+patch): `./acceptance/run-acceptance.sh` did not finish inside its
+120s budget and was killed; re-running just the generated
+`EnRulesGreedoLegalEntityAcceptanceTest` class in isolation reproduced
+a hard `java.lang.OutOfMemoryError: Java heap space` after ~70s
+(`Tests run: 0` — it never got far enough to report even one passing
+scenario). This is a genuine crash, not a slow test: default JVM heap,
+not a small one, was exhausted.
+
+Root-caused with a throwaway domain-only reproduction (not committed —
+written to `the-monopoly-game-domain/src/test/java/the/monopoly/game/`,
+deleted again once diagnosed) replicating `World.formNamedEntity`'s
+"Pink Realty is formed" setup — 3 players, pink split into a 3-way
+entity, every other space owned solo by the second player, real
+`Game.playUpToRounds(1)` — and a `jstack` thread dump on the hung JVM.
+The stack is unambiguous:
+
+```
+at the.monopoly.game.rules.Initiative.winnerAmong(Initiative.java:41)
+at the.monopoly.game.rules.Initiative.order(Initiative.java:27)
+at the.monopoly.game.Game.play(Game.java:150)
+```
+
+`Initiative.winnerAmong` re-rolls tied players "as many times as it
+takes" by design (its own doc comment) — an intentional, accepted
+unbounded retry that relies on real dice eventually breaking a tie,
+the same category as the already-known Greedo-vs-Greedo runaway
+characteristic. That design is not the bug. The bug is upstream of it:
+`World.formNamedEntity` queues the exact same `UNREMARKABLE` roll
+(4, 6) for every one of the 3 players, and falls back to that same
+constant roll forever afterward via `othersRollWhatTheyLike`. Under
+the old early-return `Game.play`, `Initiative.order` was never called
+for a legal-entity-only game, so this was harmless. Now that the
+early return is gone — correctly, per the architect's own reasoning —
+`Game.play` reaches `Initiative.order` for real, and three players who
+can only ever roll an identical total can never break their three-way
+tie. It is not rare; it is certain. Every re-roll produces the same
+tie, forever, until the JVM runs out of heap building up the retry
+state.
+
+This is a test-fixture defect exposed by an otherwise-correct
+architectural fix, not a structural issue in my remit, and not
+something I'm willing to patch unilaterally: whether the right fix is
+distinct fixed rolls for initiative specifically, real dice for this
+fixture, or something else touches how the scenario's Given/When is
+meant to behave, which is outside "preserve behavior" for a
+refactorer. Not treating this as verified; sending back to the
+architect as blocking rather than a routine pass.
