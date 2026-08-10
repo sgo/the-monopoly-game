@@ -27492,6 +27492,24 @@ loan-raised narration scenarios exercise a permitted build shortfall (with
 the required ceiling/preconditions) or otherwise revise their expected
 behavior consistently; return one complete narration fixture update.
 
+## 2026-08-10T14:55:55Z — architect holds final treasury review for combined return
+
+Received coder priority-00 handoff (commit `69e97552ac`, task
+`greedo-legal-entity`).
+
+Action: merged. The coder removed the obsolete rent-gated operation branches,
+added the exact total-house assertion, and now transfers repayment and equal
+dividend cash from treasury to the shareholders' real accounts. The remaining
+production item is the already-settled loan-shortfall path: when treasury
+cannot fund the next balanced build, the entity must raise only the permitted
+per-share shortfall before considering repayment/dividend.
+
+Do not issue another partial coder review. The specifier has been asked for
+the matching loan-raised narration fixtures. Once that complete feature input
+returns, route one combined final implementation handoff to coder covering
+the shortfall loan and full acceptance, then send the resulting change to
+refactorer for structural review.
+
 ## 2026-08-10T14:26:50Z — architect escalates entity-6 treasury precondition
 
 Received coder priority-00 handoff (commit `63e7e6e317`, task
