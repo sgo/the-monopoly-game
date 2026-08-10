@@ -171,9 +171,10 @@ public class Game {
   private boolean playTurn(Player player, Player builder, List<Player> turnOrder, Journal journal,
                            Journalling journalling, Building building) {
     if (deeds.isBankrupt(player)) return false;
-    settleLegalEntities(player, journalling);
+    resolveLegalEntityAtStart(player, journalling);
     resolveSplitOwnershipAtStart(player, turnOrder, journalling);
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
+    operateLegalEntities(journalling);
     if (isBuilderStillSolvent(player, builder)) building.develop(player);
     if (remainingPlayers().size() <= 1) return true;
     if (!Stalemate.reached(rules, players, deeds)) return false;
@@ -188,23 +189,18 @@ public class Game {
   private boolean operateLegalEntities(Journalling journalling) {
     boolean operated = deeds.legalEntities().stream().anyMatch(entity -> !entity.operated());
     deeds.legalEntities().forEach(entity -> {
-      if (entity.operated()) return;
-      switch (entity.operate()) {
+      if (entity.operated() && !entity.receivedRent()) return;
+      switch (entity.operate(deeds)) {
         case LegalEntity.Operation.LoanRepaid it ->
             journalling.entityLoanRepaid(entity, it.shareholder(), it.principal(), it.repayment());
         case LegalEntity.Operation.LoanRaisedWithDividend it -> {
           journalling.entityLoanRaised(entity, it.loan());
           journalling.entityDividendPaid(entity, it.dividend());
         }
+        case LegalEntity.Operation.HouseBuilt ignored -> { }
       }
     });
     return operated;
-  }
-
-  /** Resolves entity formation and, in a legal-entity-only game, operates entities instead of a normal turn. */
-  private void settleLegalEntities(Player trader, Journalling journalling) {
-    resolveLegalEntityAtStart(trader, journalling);
-    operateLegalEntities(journalling);
   }
 
   private boolean isBuilderStillSolvent(Player player, Player builder) {

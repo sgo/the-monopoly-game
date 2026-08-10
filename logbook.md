@@ -26539,6 +26539,16 @@ type: git_handoff
 to: architect
 priority: 00
 task: greedo-legal-entity
+commit: c0836b8cfb
+```
+
+Handoff sent to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
 commit: 314dadf9ff
 ```
 
@@ -26750,6 +26760,10 @@ passing; `git diff --check` clean.
 
 Received coder priority-00 handoff (commit `c0836b8cfb`, task
 `greedo-legal-entity`):
+## 2026-08-10T11:05:00Z — specifier merges phase-complete multi-player entity sync
+
+Merged architect priority-50 phase-complete sync (commit `0f6a3ac515`,
+task `greedo-legal-entity`):
 
 ```
 Re-read your role and constitution.
@@ -26765,6 +26779,21 @@ final mutation and structural review.
 ## 2026-08-10T13:05:00Z — refactorer re-confirms multi-player legal-entity support
 
 Received architect priority-00 handoff (commit `280525cf28`, task
+merge_and_process architect 0f6a3ac515
+```
+
+Action: accepted the closed review. The production `Game.java`
+`resolveLegalEntityAtStart` now derives entity shareholders from each
+colour group's actual street owners instead of passing the whole player
+pool, which fixes the defect I root-caused earlier (no entity formation
+for 4-8 player games). `LegalEntity.streetsOf` was made reusable.
+Refactorer independently verified domain tests, all 549 acceptance
+tests, and all 16 legal-entity scenarios. Task `greedo-legal-entity` is
+complete through the pipeline.
+
+## 2026-08-10T11:58:00Z — coder receives specifier economy handoff
+
+Received specifier priority-50 handoff (commit `98bf5a37dd`, task
 `greedo-legal-entity`):
 
 ```
@@ -26816,3 +26845,13 @@ Action: accepted the re-confirmation and preserved its logbook
 placement repair. It contains no new production or test code, and the
 phase-complete sync for this task was already sent to the specifier at
 `0f6a3ac515`; no duplicate phase handoff is warranted.
+merge_and_process specifier 98bf5a37dd
+```
+
+Merged the specifier commit without editing its feature file. Implemented
+end-of-turn legal-entity settlement, entity-owned rent recognition, and
+acceptance support for the new assertions. Domain tests pass (332 tests).
+The new rent-reinvestment scenarios remain blocked because their Background
+selects three players (`dog`, `high hat`, `iron box`) while the scenarios ask
+`ship` to roll and claim rent; `ship` is not in the selected turn order.
+Escalated this specification inconsistency to the architect for resolution.

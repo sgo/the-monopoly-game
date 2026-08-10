@@ -33,6 +33,16 @@ public class Rent implements Landings {
   public void resolve(Player tenant, Street space, Roll roll) {
     if (!(space instanceof Ownable land)) return;
     deeds.ownerOf(land.type()).flatMap(this::playerNamed).ifPresent(owner -> collect(owner, tenant, land, roll));
+    deeds.entityOwnerOf(land.type()).ifPresent(entity -> collect(entity, tenant, (ColourStreet) land));
+  }
+
+  private void collect(LegalEntity entity, Player tenant, ColourStreet land) {
+    if (entity.shareholders().contains(tenant) || deeds.isMortgaged(land)) return;
+    Money rent = land.vacantRent().plus(land.vacantRent());
+    if (tenant.account().balance().amount().amount() >= rent.amount()) {
+      tenant.account().withdraw(rent);
+      entity.receiveRent(land);
+    }
   }
 
   private void collect(Player owner, Player tenant, Ownable land, Roll roll) {
