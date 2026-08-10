@@ -181,6 +181,23 @@ Feature: Greedo legal entity for a three-way colour-group split
       | renter  | renter_position | renter_street          | rent |
       | racecar | 3               | Bruul Mechelen         | 20   |
 
+  # entity-21
+  Scenario Outline: a shareholder pays rent when landing on their own legal entity's street
+    Given we select 4 players
+    And Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has 4 houses built
+    And the street "Bruul Mechelen" has 4 houses built
+    And the street "Place Verte Verviers" has 4 houses built
+    And pawn "<renter>" starts at position <renter_position>
+    And pawn "<renter>" will claim rent for "<renter_street>"
+    When pawn "<renter>" lands on "<renter_street>"
+    Then Pink Realty's bank account holds $<rent>
+    And pawn "<renter>" has paid $<rent> in rent
+
+    Examples:
+      | renter    | renter_position | renter_street          | rent |
+      | iron box  | 3               | Bruul Mechelen         | 20   |
+
   # entity-14
   Scenario Outline: a raised loan is deposited into the entity's bank account
     Given Pink Realty is formed
