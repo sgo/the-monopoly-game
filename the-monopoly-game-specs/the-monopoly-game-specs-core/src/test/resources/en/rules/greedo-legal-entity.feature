@@ -137,11 +137,12 @@ Feature: Greedo legal entity for a three-way colour-group split
     And we select <player_count> players
     And pawn "dog" owns "<street_dog>"
     And pawn "high hat" owns "<street_high_hat>"
+    And pawn "high hat" owns "<street_high_hat_extras>"
     And every other ownable space is owned by pawn "racecar"
     When pawn "dog" considers forming a legal entity over the <group> colour group
     Then the <group> colour group is not owned by a legal entity
 
     Examples:
-      | player_count | group | street_dog            | street_high_hat      |
-      | 4            | pink  | Rue de Diekirch Arlon | Bruul Mechelen       |
-      | 8            | green | Boulevard Tirou Charleroi | Veldstraat Gent |
+      | player_count | group | street_dog            | street_high_hat      | street_high_hat_extras |
+      | 4            | pink  | Rue de Diekirch Arlon | Bruul Mechelen       | Place Verte Verviers   |
+      | 8            | green | Boulevard Tirou Charleroi | Veldstraat Gent  | Boulevard d'Avroy Liège |
