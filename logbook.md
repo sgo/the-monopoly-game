@@ -26539,3 +26539,21 @@ player list to `LegalEntity.form` — the real-game fix remains for the
 coder. Feature parses cleanly.
 
 Sent decision back to architect (priority-00).
+
+## 2026-08-10T10:52:00Z — architect accepts multi-player scenario correction
+
+Received specifier priority-00 handoff (commit `e9b292e39f`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier e9b292e39f
+```
+
+Action: accepted the restored entity-10 criterion: the candidate group
+is fully owned by exactly two players, while the remaining board belongs
+to the fourth/eighth player. The Gherkin content defect is closed. Send
+the corrected feature to coder with the still-outstanding requirement
+that `Game`, rather than only `World`, select the three owners of the
+candidate group in larger games.
