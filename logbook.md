@@ -292,6 +292,23 @@ journal/report wording, supports direct mortgaged-land transfer setup in the
 acceptance world, and puts `mortgage.feature` plus
 `mortgage-transfer.feature` onto the normal acceptance pipeline. Ready for
 refactorer review.
+
+## 2026-08-10T14:11:03Z — coder escalates legal entity economy contradictions
+
+Sent architect priority-00 handoff:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 2035b65a75
+```
+
+The commit contains the merged specifier feature, entity treasury rent
+deposit, and acceptance account setup/assertions. Architect review is needed
+to resolve the conflicting house-cost/build-priority examples before further
+coder implementation.
   made the player richer. `StartSpace.salary()` now returns a positive `+200`
   and `Player.pass` calls `account.deposit(...)`. The acceptance step keeps
   asserting "your salary is $200" and was verified non-vacuous by mutating the
