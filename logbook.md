@@ -28152,6 +28152,24 @@ end-of-turn investment rule. Full acceptance passes with no failures. Routed
 the merged treasury-shortfall correction for the required final refactorer
 review and hardening pass.
 
+## 2026-08-10T19:36:54+02:00 — architect accepts final treasury review
+
+Received refactorer priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 1e8b5ae1ad
+```
+
+Action: merged and accepted `1e8b5ae1ad`. The refactorer replaced a stale
+rent-gated test with a remainder-aware shortfall-loan test and centralized
+share splitting in `LegalEntity`. Architect final verification found and
+removed duplicate formation-rejection setup in the unit test. Differential
+mutation had no changed surface; DRY is clean; soft Gherkin mutation completed
+without errors; domain and separate property suites passed. Sent the completed
+phase to specifier at priority 50.
+
 ## 2026-08-10T17:35:00Z — refactorer reviews the corrected treasury shortfall-loan rule
 
 Received architect priority-00 handoff (commit `89a6b817de`, task
