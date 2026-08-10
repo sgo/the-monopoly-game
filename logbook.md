@@ -27223,3 +27223,9 @@ Action: merged the specifier correction, preserving the feature as
 specifier-owned. Added the missing Pink Realty shareholder-loan assertion
 handler and verified the complete acceptance suite: 550 tests, 0 failures,
 0 errors. Domain tests are rerun before forwarding the completed task.
+
+## 2026-08-10T12:57:34Z — coder forwards completed legal entity work
+
+Sent priority-50 git handoff for `greedo-legal-entity` at commit
+`9c5d101c57` to refactorer. Domain tests pass 342/342 and the full
+acceptance suite passes 550/550.
