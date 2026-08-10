@@ -28430,6 +28430,27 @@ non-shareholder does. Production review confirms the only contradictory
 branch is `Rent.collect(LegalEntity, ...)`'s shareholder exemption; routed its
 removal and full acceptance verification to coder.
 
+## 2026-08-10T18:31:50Z — architect receives superseding entity-economy specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 1836615573
+```
+
+Action: merged `1836615573`, which supersedes the earlier shareholder-rent-only
+handoff while retaining entity-21. Entity-22/23 define funded shareholders
+making one exact group loan available to an empty entity treasury, allowing
+balanced development across all entity streets through four houses and then
+hotels. This replaces the current zero-balance loop entry and one-outstanding-
+loan limitation. Architectural routing: keep group funding, balanced building,
+hotel progression, and real entity treasury state cohesive within the domain
+entity; preserve `Game` as orchestration and do not add a test-only turn policy.
+Routed the consolidated implementation to coder; its earlier narrower handoff
+is superseded by this state.
+
 ## 2026-08-10T19:36:54+02:00 — architect reviews corrected dividend qualification
 
 Received coder priority-00 handoff:
