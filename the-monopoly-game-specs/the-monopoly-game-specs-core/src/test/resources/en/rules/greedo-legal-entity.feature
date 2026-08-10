@@ -113,3 +113,36 @@ Feature: Greedo legal entity for a three-way colour-group split
     Examples:
       | principal |
       | 100       |
+
+  # entity-9
+  Scenario Outline: the entity forms from exactly the three co-owners of a colour group even when the game has more than three players
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And we select <player_count> players
+    And pawn "dog" owns "<street_dog>"
+    And pawn "high hat" owns "<street_high_hat>"
+    And pawn "iron box" owns "<street_iron_box>"
+    And every other ownable space is owned by pawn "racecar"
+    When pawn "dog" considers forming a legal entity over the <group> colour group
+    Then the <group> colour group is owned by <entity_name>
+    And each of pawn "dog", pawn "high hat", and pawn "iron box" holds a third of <entity_name>
+
+    Examples:
+      | player_count | group  | street_dog                | street_high_hat         | street_iron_box          | entity_name  |
+      | 4            | pink   | Rue de Diekirch Arlon     | Bruul Mechelen          | Place Verte Verviers     | Pink Realty  |
+      | 8            | yellow | Grote Markt Hasselt       | Place de l'Ange Namur   | Hoogstraat (Brussel) / Rue Haute (Bruxelles) | Yellow Realty |
+
+  # entity-10
+  Scenario Outline: the entity does not form when the colour group is split across only two owners in a larger game
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And we select <player_count> players
+    And pawn "dog" owns "<street_dog>"
+    And pawn "high hat" owns "<street_high_hat>"
+    And pawn "high hat" owns "<street_high_hat_extras>"
+    And every other ownable space is owned by pawn "racecar"
+    When pawn "dog" considers forming a legal entity over the <group> colour group
+    Then the <group> colour group is not owned by a legal entity
+
+    Examples:
+      | player_count | group | street_dog            | street_high_hat      | street_high_hat_extras |
+      | 4            | pink  | Rue de Diekirch Arlon | Bruul Mechelen       | Place Verte Verviers   |
+      | 8            | green | Boulevard Tirou Charleroi | Veldstraat Gent  | Boulevard d'Avroy Liège |
