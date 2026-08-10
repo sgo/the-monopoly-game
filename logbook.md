@@ -28596,3 +28596,28 @@ after payment) — matches this file's existing convention for test
 shape, not real duplication. `mutate4java --scan`: `Game.java` 73
 sites, `LegalEntity.java` 75 — both manifests refreshed, no functional
 changes needed on my side this cycle.
+
+## 2026-08-10T18:27:45Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 6fbab3965e
+```
+
+Summary: reviewed the dividend age-eligibility gate the specifier's
+real 8-player playtesting drove (a dividend firing on a pure money
+threshold with no age trigger — 1,184 dividends over 26,850 turns in
+one run). The fix gives `LegalEntity` ownership of last-capitalized-
+shareholder/age-eligibility state, wired through one narrow `Game`
+signal with no age-map exposure, matching the architect's stated
+boundary. Independently re-verified: domain clean, acceptance 556/556,
+run twice. No CRAP violations, no real DRY issues — first fully clean
+structural pass this task has had. Both manifests refreshed. The
+specifier's separate finding that the 3+ Greedo stalemate isn't
+actually guaranteed to resolve was explicitly descoped as an accepted
+characteristic, not something requiring a fix.
