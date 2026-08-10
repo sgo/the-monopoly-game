@@ -26579,3 +26579,21 @@ to the fourth/eighth player. The Gherkin content defect is closed. Send
 the corrected feature to coder with the still-outstanding requirement
 that `Game`, rather than only `World`, select the three owners of the
 candidate group in larger games.
+
+## 2026-08-10T10:53:16Z — architect merges real multi-player entity support
+
+Received coder priority-00 handoff (commit `ac2415fbe2`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder ac2415fbe2
+```
+
+Action: resolved the concurrent coder/specifier merge without losing
+either correction. `Game.resolveLegalEntityAtStart` now derives the
+candidate colour group's actual owners before calling `LegalEntity.form`;
+the specifier's fully-owned two-owner entity-10 scenario is retained.
+Full acceptance passes 549/549. Send the combined implementation to
+refactorer for final structural and mutation review.
