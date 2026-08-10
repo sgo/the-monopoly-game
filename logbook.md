@@ -28357,6 +28357,23 @@ later rent-triggered dividend without a new qualifying age increase. Those
 implementation findings remain in this log for the coder correction after the
 specifier loop closes.
 
+## 2026-08-10T19:36:54+02:00 — architect accepts entity-19 salary setup repair
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier a6e028e1b8
+```
+
+Action: merged `a6e028e1b8`. Entity-19 now starts Dog on position 32, so the
+specified roll of 12 crosses Start and makes the salary/age assertion
+executable. The acceptance-content loop is closed. Sent the held production
+correction to coder: actual shareholder funding must establish the entity's
+last-capitalised shareholder, and a paid dividend must consume the qualifying
+age signal so only a new qualifying age transition permits another dividend.
+
 ## 2026-08-10T18:03:15Z — coder processes Greedo legal-entity dividend gate
 
 Received architect priority-00 handoff:
