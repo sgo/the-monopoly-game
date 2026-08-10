@@ -27183,3 +27183,31 @@ duplication in `LegalEntityTest.java` between two earlier form()
 guard-clause tests (present since an earlier cycle, not from this
 change) plus the usual accepted `Game.java` event-adapter shape;
 nothing new.
+
+## 2026-08-10T12:45:23Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 03a9339063
+```
+
+Summary: reviewed the wired shareholder-contribution fix that closed
+the architect's "vacuous payment ledger" rejection. `LegalEntity
+.operate(Deeds)` now funds house reinvestment from real, individually-
+capped equal shareholder contributions, aborting cleanly via a new
+`NoAction` result when the group can't collectively afford it. Fixed
+a CRAP regression the merge introduced (`operateLegalEntities` CC=7)
+via the usual guard-extraction pattern, not the sealed-switch
+exemption. Updated my own now-stale unit test for the new
+affordability check and added coverage for the `NoAction` branch.
+Domain clean, acceptance 548/550 — the specifier's four-player
+entity-7 fix genuinely stops the earlier crash, but the two examples
+still fail on a different assertion now (0 houses built, not a
+missing-pawn error). Reporting the precise current failure mode since
+it changed; not chasing it further myself as it's acceptance-wiring
+behavior, not structure.
