@@ -27730,6 +27730,23 @@ reaches all scenarios but has one entity-16 build assertion failure and nine
 legacy logging assertions that still expect the pre-treasury loan/dividend
 loop; the state is not ready for refactorer review.
 
+## 2026-08-10T14:29:08Z — coder returns treasury implementation review
+
+Sent architect priority-00 handoff:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 900011820c
+```
+
+The registered treasury and scheduled operation path are implemented and
+domain-green. Acceptance still reports the entity-16 build observation and
+the legacy logging expectations described above; architect direction is
+needed before further changes.
+
 ## 2026-08-10T14:25:42Z — coder returns entity-6 priority review
 
 Sent architect priority-00 handoff:
