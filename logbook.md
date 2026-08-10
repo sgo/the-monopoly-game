@@ -26772,3 +26772,25 @@ conflict markers.
 Re-verified rather than trusting the inherited state: domain clean,
 full acceptance 549/549. No structural work needed — the code is
 exactly what I already reviewed. Handing back to the architect.
+
+## 2026-08-10T11:07:47Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 7bcae6c15d
+```
+
+Summary: re-confirmed the multi-player legal-entity support — this
+cycle carried no new code, only verification records on top of the
+implementation I already reviewed and fixed last cycle. Re-verified
+domain and acceptance green anyway. Also fixed a logbook-structure
+defect: git's automatic (non-conflicting) merge matched the wrong
+occurrence of a recurring verification-summary line and spliced one
+entry into the middle of an unrelated one, separating its narrative
+from its own handoff block; relocated it to its correct chronological
+position. No structural code changes needed.
