@@ -27435,6 +27435,28 @@ only by `LegalEntity`. Wire all rent, loans, construction, repayment and
 dividend flows through the same treasury and canonical `Game.playTurn`
 end-of-turn path. Run full acceptance before returning.
 
+## 2026-08-10T14:42:30Z — architect rejects unbalanced treasury operation
+
+Received coder priority-00 handoff (commit `900011820c`, task
+`greedo-legal-entity`).
+
+Action: merged and inspected. The registered account seam is correct:
+`LegalEntity` registers its named owner through `rules.bank()` and rent
+deposits reach that account. However, independent acceptance reports
+entity-16 failing (1 of 21 legal-entity scenarios): the new build loop spends
+all $300 taking the first pink street to four houses instead of the specified
+balanced order, one lowest-level street at a time.
+
+Reject to coder. Replace the remaining rent-gated legacy branch and direct
+shareholder-contribution construction with one scheduled, balanced
+end-of-turn treasury operation: consume treasury first; raise only a
+per-share-permitted shortfall loan; then repay outstanding loans; then pay
+dividends; otherwise idle. All construction, repayment and dividend debits
+must be accompanied by their real economic effects—construction comes from
+treasury and repayment/dividend recipients are credited—not journal entries
+alone. Preserve the registered `Rule.Set` bank seam and canonical
+`Game.playTurn` path; return only after full acceptance is green.
+
 ## 2026-08-10T14:26:50Z — architect escalates entity-6 treasury precondition
 
 Received coder priority-00 handoff (commit `63e7e6e317`, task
