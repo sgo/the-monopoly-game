@@ -27031,3 +27031,33 @@ Committed the domain/test fixes together. Handing back to the
 architect: the compile fix and coverage additions are done, but the
 task cannot be considered acceptance-clean until the specifier resolves
 the `ship`-pawn scenario mismatch already routed to them.
+
+## 2026-08-10T12:32:31Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 5685c98f67
+```
+
+Summary: reviewed the legal-entity economy redesign (rent reinvests
+into houses before loan repayment/dividend). Found and fixed a genuine
+specs-core compile error (`World.shareholderPaymentsWithin` called an
+unimported helper) that the coder's "domain tests pass" claim didn't
+catch, since domain tests don't include specs-core. After the fix,
+548/550 acceptance — the 2 failures are exactly the already-escalated
+`ship`-pawn scenario mismatch, confirmed still open, not new. Closed
+two CRAP violations (`Rent.collect(LegalEntity,...)` 20.0→4.0,
+`LegalEntity.operate(Deeds)` 12.0→3.0) with focused unit tests, since
+the blocked acceptance scenarios were the only path that would have
+exercised either method. Also fixed a second instance of a logbook
+auto-merge placement corruption (this time with text actually dropped,
+not just misplaced) by restoring the original wording from its
+first-written commit. Separately confirmed an unrelated CLI test
+failure is a pre-existing environmental flake via an A/B worktree
+comparison, not a regression. Task remains blocked on the specifier's
+open scenario-player fix; not something I can close myself.
