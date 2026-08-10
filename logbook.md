@@ -28051,6 +28051,16 @@ methods and the nested `Bank.Simple` override, not a real gap; none of
 the affected methods exceed CRAP 6.0 even taking the 0% at face value,
 so nothing here needed a workaround.
 
+2026-08-10T15:27:56Z — received refactorer handoff `5e9bcb3b9b`
+(including coder implementation `b23781f738`): structural review and
+cleanup of the entity-treasury redesign. Architect acceptance review
+found no reported test failures, but rejected the production loan path:
+it prevents a loan after actual rent, withdraws an unchecked rounded
+share from every shareholder, and does not record those debits in the
+shareholder-payment ledger. Sent one bounded p00 correction to coder;
+refactorer review remains pending until the corrected implementation
+returns.
+
 `dry4java` across all changed files: only the pre-existing accepted
 `Game.java` event-adapter shape; nothing new introduced by any of this
 cycle's changes. `mutate4java --scan`: `Game.java` 73 sites,
