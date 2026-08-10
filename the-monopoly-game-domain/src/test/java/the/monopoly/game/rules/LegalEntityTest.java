@@ -111,10 +111,11 @@ class LegalEntityTest {
   }
 
   @Test
-  void operatingAfterReceivingRentBuildsAHouseOnTheRentedStreetBeforeAnythingElse() {
+  void operatingAfterReceivingRentBuildsAHouseFundedByEqualShareholderContributions() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
     ColourStreet street = entity.streets().getFirst();
+    fund(dog, highHat, ironBox);
     entity.receiveRent(street);
 
     LegalEntity.Operation operation = entity.operate(deeds);
@@ -123,6 +124,28 @@ class LegalEntityTest {
     assertThat(deeds.housesBuiltOn(street)).isEqualTo(1);
     assertThat(entity.receivedRent()).isFalse();
     assertThat(entity.operated()).isTrue();
+    Money share = contributionFor(street);
+    assertThat(entity.shareholderPayment(dog)).isEqualTo(share);
+    assertThat(entity.shareholderPayment(highHat)).isEqualTo(share);
+    assertThat(entity.shareholderPayment(ironBox)).isEqualTo(share);
+    assertThat(dog.account().balance().amount()).isEqualTo(new Money(50).minus(share));
+  }
+
+  @Test
+  void operatingTakesNoPaymentWhenShareholdersCannotFundTheFullHouseCost() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    ColourStreet street = entity.streets().getFirst();
+    entity.receiveRent(street);
+
+    LegalEntity.Operation operation = entity.operate(deeds);
+
+    assertThat(operation).isEqualTo(new LegalEntity.Operation.NoAction());
+    assertThat(deeds.housesBuiltOn(street)).isEqualTo(0);
+    assertThat(entity.receivedRent()).isFalse();
+    assertThat(entity.operated()).isTrue();
+    assertThat(entity.shareholderPayment(dog)).isEqualTo(Money.ZERO);
+    assertThat(dog.account().balance().amount()).isEqualTo(Money.ZERO);
   }
 
   @Test
@@ -137,6 +160,15 @@ class LegalEntityTest {
 
     assertThat(operation).isEqualTo(new LegalEntity.Operation.LoanRaisedWithDividend(
         new Money(150), new Money(50)));
+  }
+
+  private Money contributionFor(ColourStreet street) {
+    int cost = street.houseConstructionCost().amount();
+    return new Money((cost + 2) / 3);
+  }
+
+  private void fund(Player... shareholders) {
+    for (Player shareholder : shareholders) shareholder.account().deposit(new Money(50));
   }
 
   @Test

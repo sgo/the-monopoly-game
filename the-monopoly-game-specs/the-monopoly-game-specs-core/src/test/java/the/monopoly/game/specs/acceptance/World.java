@@ -630,6 +630,11 @@ public class World {
     entity.repayLoan(entity.loan());
   }
 
+  public Money entityLoan(String entityName) {
+    return deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).loan();
+  }
+
   public int housesBuilt(Street.Type land) {
     return deeds.housesBuiltOn((ColourStreet) ruleSet.create(land));
   }

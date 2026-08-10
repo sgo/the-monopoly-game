@@ -86,6 +86,10 @@ final class JournalStepHandlers {
         given("^Pink Realty's loan has been fully repaid$",
             (world, arguments) -> world.entityLoanFullyRepaid("Pink Realty")),
 
+        then("^Pink Realty still owes pawn \"dog\" \\$(<principal>)$",
+            (world, arguments) -> assertThat(world.entityLoan("Pink Realty"))
+                .isEqualTo(money(arguments.number(1)))),
+
         given("^pawn \"" + NAME + "\" has a balance that allows only \\$(<ceiling_share>) toward the entity$",
             (world, arguments) -> world.arrangePawnBalance(arguments.text(1), money(arguments.number(2)))),
 
