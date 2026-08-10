@@ -27956,3 +27956,109 @@ Action: merged the specifier-owned legacy treasury fixture updates. Added
 generic entity bank-account acceptance steps and canonical shortfall-loan
 funding before balanced construction. Domain tests pass 342/342 and the full
 acceptance pipeline passes 554/554.
+
+## 2026-08-10T15:00:00Z — refactorer reviews the entity bank-account treasury redesign
+
+Received coder priority-00 handoff (commit `b23781f738`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder b23781f738
+```
+
+Action: merged (ninth instance of the recurring logbook conflict,
+resolved the same way as always). This carries a large expansion: the
+specifier playtested 8-player Greedo stalemate games with legal-entity
+trading and found a real defect — the operate loop toggled loan-raise
+and dividend forever with no cash backing either event (one run showed
+20,544 spurious pairs for a single entity), because rent withdrawn
+from a tenant was never deposited anywhere and the journal events
+never moved real money. Fix, after several architect rejection/fix
+loops visible in the merged history: give each entity a genuine bank
+account (`Bank.Account.Owner` keyed by entity name, reusing the
+existing `Bank.Simple` accounts map), collect rent into it, and
+replace the old two-state loan/dividend toggle with an end-of-turn
+build opportunity — drain the entity's own rent first, borrow only
+the shortfall (capped per-share, no partial contributions), build as
+many houses as affordable in balanced (fewest-houses-first) order,
+then repay any outstanding loan, then pay a dividend, then idle.
+Independently re-verified rather than trusting the "554/554" claim:
+domain clean, full acceptance 554/554, run twice.
+
+Two structural issues, both genuine and both mine to fix:
+
+1. **`LegalEntity.operate(Deeds)` was CRAP 41.6** — CC=13, 44.7%
+   covered, the highest complexity this task has produced. Decomposed
+   into `buildAsMuchAsAffordable`/`attemptToBuildOneHouse` (extracting
+   a small `BuildStep` record so the outer loop derives its result
+   declaratively from a list of steps afterward instead of threading
+   two pieces of mutable state through imperative branches) and
+   `repayLoanOrPayDividend`/`repayLoanIfAffordable`/`payDividend`.
+   Every extracted piece is independently ≤CC 5.
+
+2. **The old no-arg `operate()` was dead code**, confirmed with a
+   whole-tree `grep` for `.operate()` before touching anything: the
+   redesigned `Game.operateLegalEntities` only ever calls
+   `operate(deeds)` now. Removed `operate()`, its private
+   `raiseNewLoan()` helper, and the `Operation.LoanRaisedWithDividend`
+   record it alone produced. Also removed `Operation.LoanRaised`
+   (the standalone one, not `LoanRaisedAndHouseBuilt`) after confirming
+   *zero* constructors anywhere in the tree, including test code —
+   entity-14's "raises a loan" scenario calls `raiseLoan()` directly
+   and never touches an `Operation` at all. Both removals required
+   dropping the matching cases from `Game.operateLegalEntities`'s
+   switch, which the sealed interface's exhaustiveness check enforced
+   automatically — if I'd missed a live producer, the build would have
+   told me immediately.
+
+   The double coincidence here is worth naming: **my own two oldest
+   `LegalEntityTest` cases were unit-testing that dead no-arg
+   `operate()`** — coverage for a method nothing in production called
+   anymore, the exact "vacuous test" shape the architect flagged me
+   for in an earlier cycle, just self-inflicted this time instead of
+   caught by someone else. Deleted them. A third existing test
+   (`operatingSkipsReinvestmentWhenTheRentedStreetAlreadyHasAHouse`)
+   turned out to pass only because its fixture left the bank account
+   at zero, not because of the specific behavior its name claimed
+   (rent-gating a single street) — the new model has no such gating,
+   it builds on whichever eligible street has fewest houses. Replaced
+   it with a real test of the balanced-build-order claim
+   (`operatingBuildsOnTheStreetWithFewestHousesFirst`) and added
+   direct coverage for the loan-repayment and dividend branches
+   (`repayLoanIfAffordable`/`payDividend`, both previously 0% covered
+   at the unit level, only reachable through acceptance) plus the
+   same-turn borrowing restraint (`canBorrowForBuilding`'s
+   `rentReceivedOn == null` gate). Also removed two now-unused test
+   helpers (`contributionFor`, `fund`) left over from a prior cycle's
+   superseded assertions.
+
+`Game.operateLegalEntities` sits at CC=7/CRAP=7.0 after removing the
+two dead switch cases (down from CC=9 before). The switch is now
+exactly 5 cases wide, matching the reduced sealed `Operation` type
+exactly, each case a straight-line dispatch — invoking the standing
+sealed-switch CRAP exemption here, same basis as `Report.line`: this
+cannot go lower without hiding a branch the compiler currently checks
+for me. Every other method in `Game.java`, `LegalEntity.java`,
+`Rent.java`, and `Bank.java` is at or under CRAP 6.0 after these
+changes. One coverage oddity noted but not chased: crap4java reports
+0% coverage for several trivially-simple `Bank.java` methods
+(`createAccountFor`, `accountOf`) that the JaCoCo HTML report shows as
+genuinely exercised by every `LegalEntity` construction — looks like a
+tool-side attribution quirk between the `Bank` interface's default
+methods and the nested `Bank.Simple` override, not a real gap; none of
+the affected methods exceed CRAP 6.0 even taking the 0% at face value,
+so nothing here needed a workaround.
+
+`dry4java` across all changed files: only the pre-existing accepted
+`Game.java` event-adapter shape; nothing new introduced by any of this
+cycle's changes. `mutate4java --scan`: `Game.java` 73 sites,
+`LegalEntity.java` 57, `Rent.java` 11, `Bank.java` 14 — all well under
+the split threshold; all four manifests refreshed.
+
+Re-verified after every structural change, not just at the end:
+domain green throughout, full acceptance 554/554 held steady across
+the dead-code removal, the `operate(Deeds)` decomposition, and each
+new test addition — nothing here changed observable behavior, only
+which code produces it and how well that code is covered.

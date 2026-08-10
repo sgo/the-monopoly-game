@@ -85,32 +85,6 @@ class LegalEntityTest {
   }
 
   @Test
-  void operatingWithNoOutstandingLoanRaisesOneAndPaysADividend() {
-    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
-        List.of(dog, highHat, ironBox), rules);
-
-    LegalEntity.Operation operation = entity.operate();
-
-    assertThat(operation).isEqualTo(new LegalEntity.Operation.LoanRaisedWithDividend(
-        new Money(150), new Money(50)));
-    assertThat(entity.loan()).isEqualTo(new Money(150));
-    assertThat(entity.operated()).isTrue();
-  }
-
-  @Test
-  void operatingWithAnOutstandingLoanRepaysItWithFivePercentInterest() {
-    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
-        List.of(dog, highHat, ironBox), rules);
-    entity.raiseLoan(new Money(100));
-
-    LegalEntity.Operation operation = entity.operate();
-
-    assertThat(operation).isEqualTo(new LegalEntity.Operation.LoanRepaid(
-        dog, new Money(100), new Money(105)));
-    assertThat(entity.loan()).isEqualTo(Money.ZERO);
-  }
-
-  @Test
   void operatingBuildsAHouseFromTheEntityTreasury() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
@@ -140,25 +114,67 @@ class LegalEntityTest {
   }
 
   @Test
-  void operatingSkipsReinvestmentWhenTheRentedStreetAlreadyHasAHouse() {
+  void operatingBuildsOnTheStreetWithFewestHousesFirst() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    ColourStreet ahead = entity.streets().get(0);
+    ColourStreet behind = entity.streets().get(1);
+    deeds.arrangeHouses(ahead, 1);
+    entity.depositToBank(behind.houseConstructionCost());
+
+    LegalEntity.Operation operation = entity.operate(deeds);
+
+    assertThat(operation).isEqualTo(new LegalEntity.Operation.HouseBuilt(behind));
+    assertThat(deeds.housesBuiltOn(behind)).isEqualTo(1);
+    assertThat(deeds.housesBuiltOn(ahead)).isEqualTo(1);
+  }
+
+  @Test
+  void operatingRepaysAnOutstandingLoanWithFivePercentInterestWhenNothingIsBuildable() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.raiseLoan(new Money(100));
+    entity.depositToBank(new Money(5));
+
+    LegalEntity.Operation operation = entity.operate(deeds);
+
+    assertThat(operation).isEqualTo(new LegalEntity.Operation.LoanRepaid(dog, new Money(100), new Money(105)));
+    assertThat(entity.loan()).isEqualTo(Money.ZERO);
+    assertThat(entity.bankBalance()).isEqualTo(Money.ZERO);
+    assertThat(dog.account().balance().amount()).isEqualTo(new Money(105));
+  }
+
+  @Test
+  void operatingPaysADividendWhenNothingIsBuildableAndNoLoanIsOutstanding() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.depositToBank(new Money(150));
+
+    LegalEntity.Operation operation = entity.operate(deeds);
+
+    assertThat(operation).isEqualTo(new LegalEntity.Operation.DividendPaid(new Money(50)));
+    assertThat(entity.bankBalance()).isEqualTo(Money.ZERO);
+    assertThat(dog.account().balance().amount()).isEqualTo(new Money(50));
+    assertThat(highHat.account().balance().amount()).isEqualTo(new Money(50));
+    assertThat(ironBox.account().balance().amount()).isEqualTo(new Money(50));
+  }
+
+  @Test
+  void operatingDoesNotBorrowToTopUpRentReceivedThisSameTurn() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
     ColourStreet street = entity.streets().getFirst();
-    deeds.arrangeHouses(street, 1);
+    entity.depositToBank(new Money(30));
     entity.receiveRent(street);
 
     LegalEntity.Operation operation = entity.operate(deeds);
 
     assertThat(operation).isEqualTo(new LegalEntity.Operation.NoAction());
-  }
-
-  private Money contributionFor(ColourStreet street) {
-    int cost = street.houseConstructionCost().amount();
-    return new Money((cost + 2) / 3);
-  }
-
-  private void fund(Player... shareholders) {
-    for (Player shareholder : shareholders) shareholder.account().deposit(new Money(50));
+    assertThat(deeds.housesBuiltOn(street)).isZero();
+    assertThat(entity.loan()).isEqualTo(Money.ZERO);
+    assertThat(entity.bankBalance()).isEqualTo(new Money(30));
   }
 
   @Test
