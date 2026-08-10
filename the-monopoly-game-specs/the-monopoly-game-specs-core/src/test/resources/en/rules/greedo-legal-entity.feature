@@ -82,14 +82,16 @@ Feature: Greedo legal entity for a three-way colour-group split
   Scenario Outline: the entity repays a shareholder loan with five percent interest on top before paying any dividend
     Given Pink Realty is formed
     And Pink Realty owes pawn "dog" $<principal>
+    And Pink Realty's bank account holds $<funds>
     And every other ownable space is owned by pawn "racecar"
     When we play up to 1 round
     Then Pink Realty repays pawn "dog" $<repayment> for the loan
+    And Pink Realty's bank account holds $<funds_remaining>
     And pawn "dog" receives no dividend
 
     Examples:
-      | principal | repayment |
-      | 100       | 105       |
+      | principal | funds | repayment | funds_remaining |
+      | 100       | 105   | 105       | 0               |
 
   # entity-7
   Scenario Outline: the entity builds houses from rent at the end of the turn before repaying its loan
@@ -110,26 +112,29 @@ Feature: Greedo legal entity for a three-way colour-group split
   Scenario Outline: no dividend is paid while any shareholder loan to the entity is still outstanding
     Given Pink Realty is formed
     And Pink Realty owes pawn "dog" $<principal>
+    And Pink Realty's bank account holds $<surplus>
     And every other ownable space is owned by pawn "racecar"
     When we play up to 1 round
     Then pawn "dog" receives no dividend from Pink Realty
 
     Examples:
-      | principal |
-      | 100       |
+      | principal | surplus |
+      | 100       | 150     |
 
   # entity-11
   Scenario Outline: a dividend is paid only after the entire loan plus interest has been repaid
     Given Pink Realty is formed
     And Pink Realty owes pawn "dog" $<principal>
     And Pink Realty's loan has been fully repaid
+    And Pink Realty's bank account holds $<surplus>
     And pawn "dog" will roll 12 for their turn
     When we play up to 1 round
-    Then each of pawn "dog", pawn "high hat", and pawn "iron box" receives a dividend from Pink Realty
+    Then each of pawn "dog", pawn "high hat", and pawn "iron box" receives a $<dividend_share> dividend from Pink Realty
+    And Pink Realty's bank account holds $<surplus_remaining>
 
     Examples:
-      | principal |
-      | 100       |
+      | principal | surplus | dividend_share | surplus_remaining |
+      | 100       | 150     | 50             | 0                 |
 
   # entity-12
   Scenario Outline: the entity cannot build beyond a shareholder's personal affordability ceiling
