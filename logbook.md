@@ -25952,6 +25952,28 @@ changes its ordering. Route to coder: remove the test-only branch and
 make the real game turn loop satisfy the scenarios. The rules package
 also directly instantiates `strategies.Greedo` solely to discover the
 priority tier, which should be removed as part of the boundary cleanup.
+
+## 2026-08-10T08:43:01Z — architect re-reviews greedo-legal-entity
+
+Received refactorer priority-50 handoff (commit `0833ce8f28`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 0833ce8f28
+```
+
+Action: rejected the attempted real-turn-path fix. It removes the
+test-helper shortcut, but `Game.play` now detects an existing entity,
+operates it, and returns before initiative or any normal turn. Further,
+`Game.playTurn` returns immediately whenever an entity operates. Both
+are still legal-entity-only execution paths rather than gameplay wired
+into the canonical turn loop. The rules package also still imports
+`strategies.Greedo` for priority, violating dependency direction.
+Route to coder for one integrated turn-start policy with rules-owned
+priority knowledge (or an inward-facing abstraction), without early
+returning from the game/turn loop.
 2026-08-10T07:40:00Z — Received specifier handoff:
 id: 20260810T073726Z_000087_from_specifier
 from: specifier
