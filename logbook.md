@@ -27752,6 +27752,21 @@ dividend operations from an empty treasury, which is indistinguishable from
 the new entity-17 idle scenario under the canonical state. This requires
 specifier/architect resolution rather than a test-only condition.
 
+## 2026-08-10T14:44:31Z — coder returns balanced-operation review
+
+Sent architect priority-00 handoff:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 8796dd4561
+```
+
+Returned the balanced build correction and the unresolved empty-treasury
+legacy-scenario conflict.
+
 ## 2026-08-10T14:29:08Z — coder processes architect treasury implementation route
 
 Received architect priority-00 handoff:
