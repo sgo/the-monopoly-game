@@ -156,13 +156,16 @@ public final class LegalEntity {
         .sorted(java.util.Comparator.comparingInt(deeds::housesBuiltOn))
         .toList();
     ColourStreet firstBuilt = null;
-    for (ColourStreet street : buildable) {
-      while (deeds.housesBuiltOn(street) < street.hotelConstructionRequiresNumberOfHouses()
-          && bankBalance().amount() >= street.houseConstructionCost().amount()) {
-        withdrawFromBank(street.houseConstructionCost());
-        deeds.arrangeHouses(street, deeds.housesBuiltOn(street) + 1);
-        if (firstBuilt == null) firstBuilt = street;
-      }
+    while (bankBalance().amount() > 0) {
+      ColourStreet next = buildable.stream()
+          .filter(street -> deeds.housesBuiltOn(street) < street.hotelConstructionRequiresNumberOfHouses())
+          .filter(street -> bankBalance().amount() >= street.houseConstructionCost().amount())
+          .min(java.util.Comparator.comparingInt(deeds::housesBuiltOn))
+          .orElse(null);
+      if (next == null) break;
+      withdrawFromBank(next.houseConstructionCost());
+      deeds.arrangeHouses(next, deeds.housesBuiltOn(next) + 1);
+      if (firstBuilt == null) firstBuilt = next;
     }
     if (firstBuilt != null) {
       markOperated();

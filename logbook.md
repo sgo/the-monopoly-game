@@ -27735,6 +27735,23 @@ costs $100; entity-11 supplies $150 and expects dividends despite the stated
 build-before-dividend priority. Current acceptance is 547/554 with seven
 entity-scenario failures/errors, so this is not ready for refactorer review.
 
+## 2026-08-10T14:43:15Z — coder processes architect balanced-operation rejection
+
+Received architect priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect d4fd940747
+```
+
+Action: merged the review and corrected the treasury build loop to balanced
+round-robin order. Domain tests remain green at 342/342. The remaining legacy
+logging/report/journal scenarios request automatic loan, repayment, and
+dividend operations from an empty treasury, which is indistinguishable from
+the new entity-17 idle scenario under the canonical state. This requires
+specifier/architect resolution rather than a test-only condition.
+
 ## 2026-08-10T14:29:08Z — coder processes architect treasury implementation route
 
 Received architect priority-00 handoff:
