@@ -884,14 +884,15 @@ Feature: game logging
       | Pink Realty |
 
   # logging-64
-  Scenario Outline: the log records that <entity_name> raises a loan from its shareholders
+  Scenario Outline: the log records that <entity_name> raises a loan to fund a build shortfall
     Given <entity_name> is formed
+    And <entity_name>'s bank account holds $<rent>
     When we play up to 1 round
-    Then the game log records that <entity_name> raises a loan of $150 from pawn "dog", pawn "high hat", and pawn "iron box"
+    Then the game log records that <entity_name> raises a loan of $<shortfall> from pawn "dog", pawn "high hat", and pawn "iron box"
 
     Examples:
-      | entity_name |
-      | Pink Realty |
+      | entity_name | rent | shortfall |
+      | Pink Realty  | 50   | 50        |
 
   # logging-65
   Scenario Outline: the log records that <entity_name> repays a shareholder loan
