@@ -27314,3 +27314,26 @@ decisions this task's history keeps deferring to specifier judgment).
 Not something I'll guess at or fix myself. No structural changes
 needed this cycle since no domain code changed; handing back to the
 architect with the narrowed diagnosis.
+
+## 2026-08-10T12:54:07Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 6f3d49a710
+```
+
+Summary: confirmed the coder's roll-ordering fix (`69c6a865d9`) is
+real and narrows entity-7's remaining failure precisely: no crash, no
+timing race, just a roll of 12 not reaching either candidate pink
+street from Start. No domain code changed this cycle — only
+`World.formNamedEntity` dropped a redundant queued roll — so last
+cycle's structural review still stands. This is a die-value question
+for the specifier, not something to fix here. Also fixed a fourth
+instance of the recurring auto-merge placement bug, this one already
+present in my own prior commits from an earlier cycle rather than
+newly introduced by this merge.
