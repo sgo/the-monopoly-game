@@ -26895,3 +26895,18 @@ Action: accepted entity-7's explicit four-player setup, making ship a
 valid renter in the scenario. The Gherkin inconsistency is closed.
 Forward this correction to coder with the still-outstanding requirement
 to account for and assert actual shareholder payments to an entity.
+
+## 2026-08-10T12:24:00Z — coder returns corrected architect follow-up
+
+Received architect priority-00 handoff (commit `f2f16c85ad`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+merge_and_process architect f2f16c85ad
+```
+
+Merged the specifier's four-player entity-7 correction carried by the
+architect. Domain tests pass (333 tests). The payment ledger implementation
+is included; acceptance still reports two zero-house rent cases and one
+dividend-step matcher miss.
