@@ -573,7 +573,6 @@ public class World {
   }
 
   public void formNamedEntity(String name) {
-    legalEntityTrading = true;
     othersRollWhatTheyLike = true;
     players().forEach(player -> queuePawnRoll(player.id().value(), UNREMARKABLE));
     formEntity(Street.Colour.valueOf(name.substring(0, name.indexOf(' ')).toLowerCase()), true);

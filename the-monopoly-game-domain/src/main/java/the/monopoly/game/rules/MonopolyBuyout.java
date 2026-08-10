@@ -66,7 +66,7 @@ public final class MonopolyBuyout {
 
   /** Whether Greedo would refuse to trade this street away, mirroring {@link Greedo#accepts}. */
   private static boolean isHighestPriority(ColourStreet street) {
-    return Greedo.priorityOf(street) == Strategy.Priority.HIGHEST;
+    return Strategy.priorityOf(street) == Strategy.Priority.HIGHEST;
   }
 
   private static Optional<Outcome> settle(

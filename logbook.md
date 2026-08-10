@@ -1,5 +1,13 @@
 # Logbook
 
+## 2026-08-10T10:50:00Z — coder requests architect help on legal-entity turn loop
+
+The architect-mandated removal of legal-entity early returns leaves the
+canonical acceptance run hanging in `EnRulesGreedoLegalEntityAcceptanceTest`
+after its first three scenarios, while the domain suite remains green at 332
+tests. Requesting architect review of the gameplay-loop policy and fixture
+timing before proceeding.
+
 ## 2026-08-10T10:06:00Z — coder received architect priority-00 follow-up
 
 Handoff message received:

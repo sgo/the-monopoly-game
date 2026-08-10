@@ -139,15 +139,7 @@ public final class Greedo implements Strategy {
   }
 
   public static Priority priorityOf(Ownable land) {
-    return switch (land.type()) {
-      case LippenslaanKnokke, RueRoyaleTournai, GroenplaatsAntwerpen,
-          RueStLeonardLiege, LangeSteenstraatKortrijk, GrandPlaceMons,
-          SteenstraatBrugge, PlaceDuMonumentSpa, KapellestraatOostende -> Priority.HIGHEST;
-      case RueGrandeDinant, DiestsestraatLeuven, RueDeDiekirchArlon,
-          BruulMechelen, PlaceVerteVerviers, GroteMarktHasselt,
-          PlaceDeLAngeNamur, HoogstraatBrussel -> Priority.MIDDLE;
-      default -> Priority.LOWEST;
-    };
+    return Strategy.priorityOf(land);
   }
 
   @Override

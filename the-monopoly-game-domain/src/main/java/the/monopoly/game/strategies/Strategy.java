@@ -95,6 +95,18 @@ public interface Strategy {
     return Priority.LOWEST;
   }
 
+  static Priority priorityOf(Ownable land) {
+    return switch (land.type()) {
+      case LippenslaanKnokke, RueRoyaleTournai, GroenplaatsAntwerpen,
+          RueStLeonardLiege, LangeSteenstraatKortrijk, GrandPlaceMons,
+          SteenstraatBrugge, PlaceDuMonumentSpa, KapellestraatOostende -> Priority.HIGHEST;
+      case RueGrandeDinant, DiestsestraatLeuven, RueDeDiekirchArlon,
+          BruulMechelen, PlaceVerteVerviers, GroteMarktHasselt,
+          PlaceDeLAngeNamur, HoogstraatBrussel -> Priority.MIDDLE;
+      default -> Priority.LOWEST;
+    };
+  }
+
   /** Maximum offer for a property sold by a debtor trying to avoid bankruptcy. */
   default Money bidForDistressed(Offer offer, Player bidder, Player debtor,
                                  List<Player> players, Rule.Set rules, Deeds deeds) {
