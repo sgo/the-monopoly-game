@@ -111,24 +111,18 @@ class LegalEntityTest {
   }
 
   @Test
-  void operatingAfterReceivingRentBuildsAHouseFundedByEqualShareholderContributions() {
+  void operatingBuildsAHouseFromTheEntityTreasury() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
     ColourStreet street = entity.streets().getFirst();
-    fund(dog, highHat, ironBox);
-    entity.receiveRent(street);
+    entity.depositToBank(new Money(100));
 
     LegalEntity.Operation operation = entity.operate(deeds);
 
     assertThat(operation).isEqualTo(new LegalEntity.Operation.HouseBuilt(street));
     assertThat(deeds.housesBuiltOn(street)).isEqualTo(1);
-    assertThat(entity.receivedRent()).isFalse();
     assertThat(entity.operated()).isTrue();
-    Money share = contributionFor(street);
-    assertThat(entity.shareholderPayment(dog)).isEqualTo(share);
-    assertThat(entity.shareholderPayment(highHat)).isEqualTo(share);
-    assertThat(entity.shareholderPayment(ironBox)).isEqualTo(share);
-    assertThat(dog.account().balance().amount()).isEqualTo(new Money(50).minus(share));
+    assertThat(entity.bankBalance()).isEqualTo(Money.ZERO);
   }
 
   @Test
@@ -136,13 +130,10 @@ class LegalEntityTest {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
     ColourStreet street = entity.streets().getFirst();
-    entity.receiveRent(street);
-
     LegalEntity.Operation operation = entity.operate(deeds);
 
     assertThat(operation).isEqualTo(new LegalEntity.Operation.NoAction());
     assertThat(deeds.housesBuiltOn(street)).isEqualTo(0);
-    assertThat(entity.receivedRent()).isFalse();
     assertThat(entity.operated()).isTrue();
     assertThat(entity.shareholderPayment(dog)).isEqualTo(Money.ZERO);
     assertThat(dog.account().balance().amount()).isEqualTo(Money.ZERO);
@@ -158,8 +149,7 @@ class LegalEntityTest {
 
     LegalEntity.Operation operation = entity.operate(deeds);
 
-    assertThat(operation).isEqualTo(new LegalEntity.Operation.LoanRaisedWithDividend(
-        new Money(150), new Money(50)));
+    assertThat(operation).isEqualTo(new LegalEntity.Operation.NoAction());
   }
 
   private Money contributionFor(ColourStreet street) {
@@ -191,14 +181,12 @@ class LegalEntityTest {
     highHat.account().deposit(new Money(1500));
     ironBox.account().deposit(new Money(1500));
     ColourStreet street = (ColourStreet) rules.create(Street.Type.RueDeDiekirchArlon);
-    entity.receiveRent(street);
+    entity.depositToBank(new Money(100));
 
     entity.operate(deeds);
 
     assertThat(deeds.housesBuiltOn(street)).isEqualTo(1);
-    assertThat(entity.shareholderPayment(dog)).isEqualTo(new Money(34));
-    assertThat(entity.shareholderPayment(highHat)).isEqualTo(new Money(34));
-    assertThat(entity.shareholderPayment(ironBox)).isEqualTo(new Money(34));
+    assertThat(entity.bankBalance()).isEqualTo(Money.ZERO);
   }
 
   @Test

@@ -27787,6 +27787,38 @@ dividend operations from an empty treasury, which is indistinguishable from
 the new entity-17 idle scenario under the canonical state. This requires
 specifier/architect resolution rather than a test-only condition.
 
+## 2026-08-10T14:47:05Z — coder processes architect operation-semantics route
+
+Received architect priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 22fdf6feff
+```
+
+Action: removed the rent-gated shareholder-contribution and legacy operation
+branches, added real shareholder credits for loan repayment and dividends,
+and added the exact total-house acceptance assertion. Domain tests pass
+342/342 and all 21 greedo legal-entity scenarios pass. The full suite has
+nine remaining legacy journal/report/logging failures, which the architect
+routed to specifier as a separate fixture update.
+
+## 2026-08-10T14:44:31Z — coder returns balanced-operation review
+
+Sent architect priority-00 handoff:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 8796dd4561
+```
+
+Returned the balanced build correction and the unresolved empty-treasury
+legacy-scenario conflict.
+
 ## 2026-08-10T14:29:08Z — coder processes architect treasury implementation route
 
 Received architect priority-00 handoff:
