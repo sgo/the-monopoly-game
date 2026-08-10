@@ -26015,6 +26015,26 @@ test setup, so rules no longer import the strategy layer. Focused
 LegalEntity tests, full acceptance, Java mutation (23/23 covered
 mutants killed), DRY review, soft Gherkin mutation, and 22 property
 tests are clean.
+
+## 2026-08-10T09:35:13Z — architect receives blocked legal-entity review
+
+Received refactorer priority-00 handoff (commit `0bbf3a0d34`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 0bbf3a0d34
+```
+
+Action: accepted the blocking diagnosis. With the test-only early
+return removed, `World.formNamedEntity` queues the same 4+6 initiative
+roll for all three players and keeps that value as its fallback.
+`Initiative.winnerAmong` therefore re-rolls an unbreakable tie until
+the JVM exhausts its heap. This is a deterministic acceptance-helper
+fixture defect, not a Gherkin-content change. Route to coder to give
+the fixture distinct deterministic initiative rolls while preserving
+the real `Game` turn path.
 2026-08-10T07:40:00Z — Received specifier handoff:
 id: 20260810T073726Z_000087_from_specifier
 from: specifier
