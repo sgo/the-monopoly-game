@@ -96,16 +96,16 @@ Feature: Greedo legal entity for a three-way colour-group split
     Given we select 4 players
     And Pink Realty is formed
     And Pink Realty owes pawn "dog" $<principal>
-    And pawn "<renter>" will roll 12 for their turn
+    And pawn "<renter>" starts at position <renter_position>
     And pawn "<renter>" will claim rent for "<renter_street>"
     When we play up to 1 round
     Then the street "<renter_street>" has <houses_after> houses built
     And Pink Realty still owes pawn "dog" $<principal>
 
     Examples:
-      | principal | renter | renter_street          | houses_after |
-      | 200       | ship   | Rue de Diekirch Arlon  | 1            |
-      | 200       | ship   | Bruul Mechelen         | 1            |
+      | principal | renter | renter_position | renter_street          | houses_after |
+      | 200       | ship   | 1               | Rue de Diekirch Arlon  | 1            |
+      | 200       | ship   | 3               | Bruul Mechelen         | 1            |
 
   # entity-8
   Scenario Outline: no dividend is paid while any shareholder loan to the entity is still outstanding
