@@ -25873,3 +25873,25 @@ or feature change is warranted.
 Sent phase-complete priority-50 handoff to specifier (task
 `player-age-tracking`, commit recorded by this entry) after all
 specifier/coder/refactorer loops closed.
+
+## 2026-08-10T07:37:26Z — specifier sends greedo-legal-entity to coder
+
+Sent coder priority-50 handoff (commit `8b0cc9799c`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 8b0cc9799c
+```
+
+Contents: specification for a Legal Entity mechanism that breaks the
+3+-player Greedo stalemate. `greedo-legal-entity.feature` defines
+formation (equal thirds over pink/yellow/green), eligibility guards
+(whole board owned, legal-entity flag, non-highest-priority, 3+
+co-owners), loan raise/repay at 5%, and dividend-on-age-advance. The
+journal/report/log narration was distributed into the dedicated
+journal.feature, report.feature, and logging.feature files. A CLI flag
+scenario (`cli-jar-4`, `--optional-greedo-legal-entity`) was added and
+the feature registered on the acceptance pipeline. All-new step
+vocabulary requires new step handlers and implementation.
