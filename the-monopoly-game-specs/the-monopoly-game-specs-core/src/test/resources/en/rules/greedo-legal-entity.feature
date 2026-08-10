@@ -247,13 +247,11 @@ Feature: Greedo legal entity for a three-way colour-group split
       | idle     |
 
   # entity-22
-  Scenario Outline: an entity with an empty bank but funded shareholders raises a loan and develops up to hotels when a loan can cover it
+  Scenario Outline: an entity with an empty bank whose shareholders commit to a group build loan develops one house on every street it can fund
     Given we select 4 players
     And Pink Realty is formed
     And Pink Realty's bank account is empty
-    And pawn "high hat" has a balance that allows only $<share> toward the entity
-    And pawn "iron box" has a balance that allows only $<share> toward the entity
-    And pawn "dog" has a balance that allows only $<share> toward the entity
+    And each shareholder commits $<share> toward Pink Realty's build
     When we play up to 1 round
     Then Pink Realty raises a loan of $<loan>
     And the street "<street_1>" has <houses_per_street> houses built
@@ -268,13 +266,11 @@ Feature: Greedo legal entity for a three-way colour-group split
       | 1200 | Rue de Diekirch Arlon | Bruul Mechelen | Place Verte Verviers  | 4                 | 400   |
 
   # entity-23
-  Scenario Outline: an entity builds a hotel on every street when a loan can cover the hotels
+  Scenario Outline: an entity whose shareholders commit to a group build loan builds a hotel on every street when it can fund the hotels
     Given we select 4 players
     And Pink Realty is formed
     And Pink Realty's bank account is empty
-    And pawn "high hat" has a balance that allows only $<share> toward the entity
-    And pawn "iron box" has a balance that allows only $<share> toward the entity
-    And pawn "dog" has a balance that allows only $<share> toward the entity
+    And each shareholder commits $<share> toward Pink Realty's build
     When we play up to 1 round
     Then Pink Realty raises a loan of $<loan>
     And the street "<street_1>" has a hotel built
