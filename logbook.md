@@ -28213,3 +28213,25 @@ No CRAP violations anywhere in `LegalEntity.java` after this change.
 environmental flake already confirmed unrelated via an A/B worktree
 comparison earlier in this task; domain-scoped runs stayed clean
 throughout.
+
+## 2026-08-10T17:33:18Z — refactorer sent correct-entity-treasury-shortfall-loans handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: correct-entity-treasury-shortfall-loans
+commit: 1e8b5ae1ad
+```
+
+Summary: reviewed the corrected shortfall-loan rule (real per-
+shareholder affordability, exact remainder-aware split, replacing the
+removed same-turn rent-arrival gate). Found my own earlier test was
+still passing after the rule it named was deleted, but for an
+unrelated reason — replaced it with one that genuinely exercises the
+new split and a successful borrow. Also found and deduplicated the
+split formula itself, independently computed in two methods; extracted
+`sharesOf(Money)`. Domain and acceptance re-verified green throughout,
+554/554, no CRAP violations remaining in `LegalEntity.java`.
