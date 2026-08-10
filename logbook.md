@@ -26757,3 +26757,21 @@ for 4-8 player games). `LegalEntity.streetsOf` was made reusable.
 Refactorer independently verified domain tests, all 549 acceptance
 tests, and all 16 legal-entity scenarios. Task `greedo-legal-entity` is
 complete through the pipeline.
+
+## 2026-08-10T11:58:00Z — coder receives specifier economy handoff
+
+Received specifier priority-50 handoff (commit `98bf5a37dd`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+merge_and_process specifier 98bf5a37dd
+```
+
+Merged the specifier commit without editing its feature file. Implemented
+end-of-turn legal-entity settlement, entity-owned rent recognition, and
+acceptance support for the new assertions. Domain tests pass (332 tests).
+The new rent-reinvestment scenarios remain blocked because their Background
+selects three players (`dog`, `high hat`, `iron box`) while the scenarios ask
+`ship` to roll and claim rent; `ship` is not in the selected turn order.
+Escalated this specification inconsistency to the architect for resolution.
