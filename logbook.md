@@ -29061,3 +29061,33 @@ shortfall scenarios to declare their commitments.
 
 Verification: domain tests 348/348 passing; full acceptance 563/563 passing;
 `git diff --check` clean.
+
+## 2026-08-10T23:20:00+02:00 — refactorer reviews committed shortfall enforcement (97bf9ae1a6)
+
+Merged `97bf9ae1a6`. Two fixes land together, both closing loops I raised or
+the architect independently caught last cycle:
+
+1. Entity-11's dice-driven dividend trigger is gone — replaced with an
+   explicit "the last-capitalised shareholder of <Entity> grows a year
+   older" step (`World.entityLastCapitalizedShareholderGrewOlder`,
+   `LegalEntity.lastCapitalizedShareholder()` made public). Re-verified: 4
+   consecutive clean acceptance runs, matching my root-cause diagnosis last
+   cycle (the roll-12-implies-doubles-implies-extra-turn mechanism is now
+   entirely removed from the scenario rather than worked around).
+
+2. `canBorrowForBuilding`'s `bankBalance().amount() > 0 → return true`
+   bypass is removed outright — every group-financed shortfall now requires
+   real shareholder commitment and affordability, whether or not the
+   treasury already holds funds. This is the same bypass I found and
+   reverted two cycles ago when I couldn't independently confirm it was
+   safe to remove; the architect caught it structurally and routed it to
+   the coder. journal.feature/logging.feature/report.feature's shared
+   "raises a loan to fund a build shortfall" scenarios were updated in
+   step with explicit commitment amounts, so nothing was left relying on
+   the removed bypass.
+
+`crap4java`: every method <=6 (`affordableBuildPlan`/`form` at the
+threshold, `canBorrowForBuilding` now CC=3, simpler than before). `dry4java`:
+none. `mutate4java --scan`: 92 sites, manifest refreshed. No functional
+changes needed on my side — purely verification and a manifest refresh.
+Domain tests 348/348. Acceptance 563/563, confirmed clean across 4 runs.
