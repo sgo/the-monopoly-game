@@ -640,8 +640,10 @@ public class World {
   }
 
   public boolean shareholderPaymentsWithin(int ceiling) {
-    return deeds.legalEntities().stream().flatMap(entity -> entity.shareholders().stream())
-        .allMatch(player -> player.account().balance().amount().amount() >= 0);
+    Money limit = money(ceiling);
+    return deeds.legalEntities().stream()
+        .flatMap(entity -> entity.shareholders().stream().map(entity::shareholderPayment))
+        .allMatch(payment -> !payment.exceeds(limit));
   }
 
   public void ownEveryOtherOwnableAlternately(String firstPawn, String secondPawn) {
