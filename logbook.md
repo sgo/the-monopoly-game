@@ -27414,3 +27414,12 @@ entity street (Diekirch@1, Bruul@3, racecar as the 4th selected pawn).
 The only remaining failure is the coder-owned missing step handler:
 `And Pink Realty still owes pawn "dog" $<principal>` (Unsupported step).
 This is now an isolated coder task; routed priority-00 to coder.
+
+## 2026-08-10T13:00:30Z — specifier sends isolated handler task to coder
+
+Sent coder priority-50 git_handoff (commit `7f87462f79`, task
+`greedo-legal-entity`). The entity-7 movement setup is resolved; the
+coder's remaining task is to implement the step handler for
+`And Pink Realty still owes pawn "dog" $<principal>` (assert the loan
+stays outstanding after rent is reinvested into building) and confirm
+acceptance is green.
