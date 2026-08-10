@@ -648,6 +648,18 @@ public class World {
     entity.depositToBank(amount);
   }
 
+  public void entityLastCapitalizedShareholder(String entityName, String pawnName) {
+    LegalEntity entity = deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName));
+    entity.recordCapitalization(pawn(pawnName));
+  }
+
+  public void entityLastCapitalizedShareholderHasNotAged(String entityName) {
+    LegalEntity entity = deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName));
+    entity.recordCapitalization(entity.shareholders().getFirst());
+  }
+
   public Money entityBankBalance(String entityName) {
     return deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
         .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).bankBalance();

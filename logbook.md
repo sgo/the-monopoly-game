@@ -28334,3 +28334,35 @@ dividend age gate to coder. Architectural boundary: `Game` must translate the
 salary/age transition into a narrow domain signal, while `LegalEntity` owns
 last-capitalised-shareholder and dividend-eligibility state; do not couple the
 entity to `Journalling` or its private age map.
+
+## 2026-08-10T18:03:15Z — coder processes Greedo legal-entity dividend gate
+
+Received architect priority-00 handoff:
+
+```
+id: 20260810T180315Z_000186_from_architect_to_coder
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 18436f9ef3
+created_at: 2026-08-10T18:03:15.956023Z
+enqueued_at: 2026-08-10T18:03:16.000615Z
+task: greedo-legal-entity
+dequeued_at: 2026-08-10T18:03:25.314362Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 18436f9ef3
+```
+
+Action: merged `18436f9ef3`, added LegalEntity ownership of the last-capitalized
+shareholder and age-based dividend eligibility, and connected salary age
+transitions through Game's narrow entity signal. Added acceptance setup
+handlers without editing the feature file. Domain tests pass 345/345;
+acceptance is 552/553 for the pipeline subset: entity-19's feature setup says
+a roll of 12 makes Dog collect salary, but the deterministic game moves Dog
+from position 0 to 24 without collecting salary. This acceptance-content
+contradiction is being returned for architect/specifier review.

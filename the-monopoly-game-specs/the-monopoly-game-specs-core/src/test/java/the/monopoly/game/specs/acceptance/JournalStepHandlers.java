@@ -89,6 +89,12 @@ final class JournalStepHandlers {
         given("^" + NAME + "'s bank account holds \\$" + VALUE + "$",
             (world, arguments) -> world.entityBankHolds(arguments.text(1), money(arguments.number(2)))),
 
+        given("^the last-capitalised shareholder of Pink Realty has not aged since funding a build$",
+            (world, arguments) -> world.entityLastCapitalizedShareholderHasNotAged("Pink Realty")),
+
+        given("^the last-capitalised shareholder of Pink Realty is pawn \"" + NAME + "\"$",
+            (world, arguments) -> world.entityLastCapitalizedShareholder("Pink Realty", arguments.text(1))),
+
         then("^" + NAME + "'s bank account holds \\$" + VALUE + "$",
             (world, arguments) -> assertThat(world.entityBankBalance(arguments.text(1)))
                 .isEqualTo(money(arguments.number(2)))),
@@ -168,8 +174,12 @@ final class JournalStepHandlers {
                 "loan repayment without dividend"))),
 
         then("^pawn \"dog\" receives no dividend from Pink Realty$",
-            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityLoanRepaid it
-                && it.name().equals("Pink Realty"), "Pink Realty repayment without dividend"))),
+            (world, arguments) -> assertThat(world.journal()).noneMatch(entry ->
+                entry instanceof Entry.LegalEntityDividendPaid it && it.name().equals("Pink Realty"))),
+
+        then("^pawn \"" + NAME + "\" collects a salary and grows a year older$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.SalaryCollected it
+                && it.player().equals(idOf(arguments.text(1))), "salary and age increase"))),
 
         then("^each of pawn \"" + NAME + "\", pawn \"" + NAME + "\", and pawn \"" + NAME
                 + "\" holds a third of " + NAME + "$",
