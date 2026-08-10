@@ -863,3 +863,54 @@ Feature: game logging
     Examples:
       | starting_balance | high_hat_final_age |
       | 5                  | 0                   |
+
+  # logging-63
+  Scenario Outline: the log records that <entity_name> is formed, held in equal thirds by the three co-owners
+    Given we select 3 players
+    And pawn "iron box" will roll 10 for initiative
+    And pawn "dog" will roll 7 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And legal-entity trading is enabled for the "Greedo" strategy
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "high hat" owns "Bruul Mechelen"
+    And pawn "iron box" owns "Place Verte Verviers"
+    And every other ownable space is owned by pawn "high hat"
+    When we play up to 1 round
+    Then the game log records that <entity_name> is formed, held in equal thirds by pawn "dog", pawn "high hat", and pawn "iron box"
+
+    Examples:
+      | entity_name |
+      | Pink Realty |
+
+  # logging-64
+  Scenario Outline: the log records that <entity_name> raises a loan from its shareholders
+    Given <entity_name> is formed
+    When we play up to 1 round
+    Then the game log records that <entity_name> raises a loan of $150 from pawn "dog", pawn "high hat", and pawn "iron box"
+
+    Examples:
+      | entity_name |
+      | Pink Realty |
+
+  # logging-65
+  Scenario Outline: the log records that <entity_name> repays a shareholder loan
+    Given <entity_name> is formed
+    And <entity_name> owes pawn "dog" $100
+    When we play up to 1 round
+    Then the game log records that <entity_name> repays pawn "dog" $105 for the loan
+
+    Examples:
+      | entity_name |
+      | Pink Realty |
+
+  # logging-66
+  Scenario Outline: the log records an equal dividend paid by <entity_name> to each shareholder
+    Given <entity_name> is formed
+    And pawn "dog" will roll 12 for their turn
+    When we play up to 1 round
+    Then the game log records that <entity_name> pays each of pawn "dog", pawn "high hat", and pawn "iron box" an equal dividend
+
+    Examples:
+      | entity_name |
+      | Pink Realty |
