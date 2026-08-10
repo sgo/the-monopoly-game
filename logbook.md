@@ -28908,3 +28908,13 @@ scenarios; 562 pass and entity-23 fails because its unconstrained default dog
 roll lands on the entity street, adding $20 rent before the expected $170
 dividend (actual dividend $58, remainder $2). This is the documented
 architect/specifier scenario ambiguity, not a production failure.
+
+Handoff sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: b53c3882d8
+```
