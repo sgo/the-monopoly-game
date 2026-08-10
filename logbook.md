@@ -27560,3 +27560,15 @@ opportunity to build houses**. Funding sources, in order:
   (`NoAction`) instead of toggling loan-dividend forever.
 
 Awaiting confirmation before routing to architect/coder.
+
+## 2026-08-10T16:10:00Z — specifier: build-funding option 1 confirmed (drain rent first, loan only shortfall)
+
+On the two open questions for the end-of-turn entity build, the user
+confirmed **option 1**: when an entity builds, **drain rent from its
+bank account first**; raise a loan **only for any shortfall**. This
+keeps rent for later loan repayment / dividends, avoids needless debt,
+and aligns with "repay before dividend." An entity that already has
+enough rent in its account to cover the next build does not raise a new
+loan for it.
+
+Still holding for full confirmation before routing to architect/coder.
