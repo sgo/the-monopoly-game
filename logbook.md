@@ -28749,3 +28749,56 @@ shareholder-affordability behavior remains bounded.
 
 Verification: domain tests 347/347 passing; full acceptance 562/562 passing;
 `git diff --check` clean.
+
+## 2026-08-10T22:10:00+02:00 — refactorer reviews entity development ladder (05f44c91c2)
+
+Merged `05f44c91c2`. `crap4java` flagged `affordableBuildPlan` at CC=11/CRAP=11.0,
+above threshold. The method's complexity traced to a `canReachHotels` gate
+combining four conditions (`bankBalance()==0`, `shareholders.size()==3`,
+every shareholder's balance `<=500`, `loan==0`) and `canBorrowForBuilding`
+carrying a matching `shareholders.size()!=3 || balance>500` gate. Suspected
+these were overfit to the exact acceptance figures (entity-22/23's $100-500
+shareholder ceilings), so tried removing them outright — this broke 5
+existing `LegalEntityTest` cases (entity idle from 4-houses-plus-treasury-
+funds now silently built a hotel instead) and, after a narrower attempt,
+entity-17 ("nothing to build, repay, or pay becomes idle") since ordinary
+$1500-balance shareholders can trivially afford a hotel's per-share cost
+too. Confirmed via this failure that `shareholders.size()==3`/`balance<=500`
+in `canBorrowForBuilding` is genuinely load-bearing — it is standing in for
+"deliberately balance-capped test shareholders" versus "shareholders with
+ordinary/default funds," which the domain has no other signal to
+distinguish — so left it untouched rather than guess at a general rule that
+isn't mine to invent.
+
+The narrower, verified-safe part: `canReachHotels`'s own
+`shareholders.size()==3 && balance<=500` clauses were redundant given
+`bankBalance().equals(Money.ZERO)` already disambiguates every currently
+tested case (confirmed by dropping just those two clauses and re-running
+domain + acceptance, both clean). Also extracted the two `shortfall>0`
+break conditions into `cannotExtendPlan` (pure decomposition, condition-
+by-condition equivalent, verified by trace). `affordableBuildPlan` now
+CC=5/CRAP=5.0; every method in the file is ≤6. `dry4java`: none. Also
+consolidated a genuine duplicate step registration in
+`JournalStepHandlers.java` (`<ceiling_share>` vs `<share>` — two entity
+scenarios spell the same placeholder differently in their raw, unsubstituted
+step text, per `StepHandler`'s match-before-resolve design) into one
+alternation-based pattern. `mutate4java --scan` on `LegalEntity.java`: 92
+sites, manifest refreshed.
+
+Also found, while chasing an intermittent failure during this review: entity-11
+("a dividend is paid only after the entire loan plus interest has been repaid")
+can flake independently of this commit. `payDividend()` withdraws a fixed $150
+rather than the entity's actual balance; if an unconstrained shareholder's
+random roll happens to land on their own entity's street this same turn (live
+since the 95a5e1d0ab shareholder-rent fix), the incidental rent inflates the
+bank balance beyond what the scenario's hardcoded `surplus_remaining` expects.
+Confirmed via 7 clean acceptance runs on the pre-ladder baseline (95a5e1d0ab
+alone, via A/B worktree) versus 1 failure in 9 runs after this commit — not
+conclusively new, and not something a structural refactor should silently
+patch (fixing it means deciding whether the entity's dividend should drain
+its exact balance or a fixed amount, or whether entity-11 should constrain
+every player's roll). Flagging for the architect/specifier rather than
+guessing.
+
+Domain tests 347/347. Full acceptance 562/562, run five times across this
+review for confidence given the flake above.
