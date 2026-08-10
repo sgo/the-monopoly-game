@@ -27436,3 +27436,17 @@ entity street (Diekirch@1, Bruul@3, racecar as the 4th selected pawn).
 The only remaining failure is the coder-owned missing step handler:
 `And Pink Realty still owes pawn "dog" $<principal>` (Unsupported step).
 This is now an isolated coder task; routed priority-00 to coder.
+
+## 2026-08-10T13:00:30Z — coder processes duplicate specifier phase note
+
+Received specifier priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 7f87462f79
+```
+
+Action: merged the logbook-only commit. No implementation or feature files
+changed; the verified implementation was already forwarded to refactorer at
+`9c5d101c57` with domain 342/342 and acceptance 550/550.
