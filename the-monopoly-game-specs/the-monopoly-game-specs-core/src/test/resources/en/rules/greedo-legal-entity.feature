@@ -81,6 +81,9 @@ Feature: Greedo legal entity for a three-way colour-group split
   # entity-6
   Scenario Outline: the entity repays a shareholder loan with five percent interest on top before paying any dividend
     Given Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has 4 houses built
+    And the street "Bruul Mechelen" has 4 houses built
+    And the street "Place Verte Verviers" has 4 houses built
     And Pink Realty owes pawn "dog" $<principal>
     And Pink Realty's bank account holds $<funds>
     And every other ownable space is owned by pawn "racecar"

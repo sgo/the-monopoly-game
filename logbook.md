@@ -27435,6 +27435,33 @@ only by `LegalEntity`. Wire all rent, loans, construction, repayment and
 dividend flows through the same treasury and canonical `Game.playTurn`
 end-of-turn path. Run full acceptance before returning.
 
+## 2026-08-10T14:26:50Z — architect escalates entity-6 treasury precondition
+
+Received coder priority-00 handoff (commit `63e7e6e317`, task
+`greedo-legal-entity`).
+
+Action: accepted the coder's narrow finding. Entity-6 provides $105 treasury
+funds and expects a $105 loan repayment, but leaves the pink group buildable.
+Under the now-settled build-before-repay priority, that $100 must first build
+a house, so repayment cannot occur. Route priority-00 to specifier to make
+entity-6's preconditions consistent (for example, fully develop the group to
+isolate repayment, as entity-8/entity-11 already do), without changing the
+economy ordering. No production implementation is authorized until that
+single feature decision is returned.
+
+## 2026-08-10T14:28:48Z — architect routes unblocked treasury implementation
+
+Received specifier priority-00 handoff (commit `4659513f8f`, task
+`greedo-legal-entity`).
+
+Action: merged. Entity-6 now pre-builds all pink streets to four houses, so
+its $105 treasury fund legitimately tests repayment before dividend without
+competing with the settled build-first priority. The feature's treasury
+economy is now internally consistent. Route priority-00 to coder to implement
+the real registered entity-bank account and the complete canonical end-of-turn
+operate order already stated in `180bf448ce`; run full acceptance and return
+the production change for review.
+
 ## 2026-08-10T14:24:37Z — coder reviews architect treasury reconciliation
 
 Received architect priority-00 handoff:
