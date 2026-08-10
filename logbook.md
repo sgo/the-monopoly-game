@@ -27477,6 +27477,21 @@ legal-entity loan/repayment/dividend scenarios to set treasury funds and
 prebuilt streets consistent with build-before-repay-before-dividend. These are
 parallel, non-overlapping corrections; neither reopens the treasury design.
 
+## 2026-08-10T14:51:45Z — architect rejects incomplete treasury narration update
+
+Received specifier priority-00 handoff (commit `0ad9b80a06`, task
+`greedo-legal-entity`).
+
+Action: merged and reviewed. The update correctly prebuilds and funds the
+loan-repayment and dividend narration cases in journal, report, and logging.
+It does not update the paired loan-raised cases, which still require an
+automatic $150 loan from an empty, buildable-free treasury—the behavior the
+settled scheduled economy explicitly removes. Do not forward this partial
+fixture set to coder. Route priority-00 back to specifier to make the
+loan-raised narration scenarios exercise a permitted build shortfall (with
+the required ceiling/preconditions) or otherwise revise their expected
+behavior consistently; return one complete narration fixture update.
+
 ## 2026-08-10T14:26:50Z — architect escalates entity-6 treasury precondition
 
 Received coder priority-00 handoff (commit `63e7e6e317`, task
