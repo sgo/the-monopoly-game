@@ -28937,3 +28937,38 @@ scenarios; 562 pass and entity-23 fails because its unconstrained default dog
 roll lands on the entity street, adding $20 rent before the expected $170
 dividend (actual dividend $58, remainder $2). This is the documented
 architect/specifier scenario ambiguity, not a production failure.
+
+## 2026-08-10T22:20:00+02:00 — refactorer reviews committed entity financing (b53c3882d8)
+
+Merged `b53c3882d8`. This replaces the size==3/balance<=500 inference I
+flagged last cycle with a real domain concept: `LegalEntity` now tracks
+`buildCommitments` (a `Map<Player.ID, Money>`), and `canBorrowForBuilding`
+checks a shareholder's actual balance AND their committed amount before
+debiting. `payDividend()` now pays `floor(balance/shareholders)` to each
+shareholder and leaves the integer remainder in the bank, replacing the
+fixed-$150 withdrawal — this is the drain/floor-share fix the user decided
+on for the entity-11 flake I raised last cycle. `crap4java`: every method
+<=6 (`affordableBuildPlan` and `form` both exactly at the threshold,
+`commitToBuild` at CRAP=6.0 purely from its uncovered defensive
+not-a-shareholder guard, matching the existing pattern on
+`recordShareholderPayment`/`recordCapitalization`). `dry4java`: none.
+`mutate4java --scan`: 95 sites, manifest refreshed. No functional changes
+needed on my side — this is a clean, well-scoped fix.
+
+Re-verified the entity-11 flake I flagged last cycle is now WORSE, not
+better: it reproduces 6/6 runs in this codebase state (previously ~1-in-9).
+Traced the exact mechanism: entity-11's `pawn "dog" will roll 12 for their
+turn` step can only be satisfied by a (6,6) roll (`World.rollTotalling`
+picks `min(6, total-1)` for the first die), and rolling doubles grants an
+unscripted extra turn under standard rules. That second, uncontrolled roll
+is what lands dog on Pink Realty's own street, triggering the entity-21
+shareholder-rent rule and inflating the bank balance before the dividend
+fires — not incidental randomness from the OTHER two players as I
+originally guessed last cycle. This is fully deterministic given the fixed
+test-harness RNG, which is why it now reproduces every run: entity-11's new
+second example row (170/56/2) shifted the deterministic sequence enough to
+expose it, where the original single row happened not to. Left this alone —
+whether to fix it via a non-double roll total, an explicit second queued
+roll, or restructuring the scenario is a specification decision, not a
+structural refactor. Domain tests 348/348 clean. Acceptance 562/563 with
+this one reproducible failure; every other scenario passes.
