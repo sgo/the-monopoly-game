@@ -1,5 +1,35 @@
 # Logbook
 
+## 2026-08-10T10:06:00Z — coder received architect priority-00 follow-up
+
+Handoff message received:
+
+```
+id: 20260810T082417Z_000149_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 90730782c6
+created_at: 2026-08-10T08:24:17.324646Z
+enqueued_at: 2026-08-10T08:24:17.839999Z
+task: greedo-legal-entity
+dequeued_at: 2026-08-10T08:24:21.609658Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 90730782c6
+```
+
+Action: merged the architect review commit and began removing the acceptance
+harness bypass so legal-entity operation runs through the real game turn loop.
+
+Completed the follow-up by removing the World-side synthetic journal path,
+routing legal-entity operation through Game, and moving priority lookup behind
+Greedo's strategy API. Domain tests: 332 passed. Acceptance: 545 passed.
+
 ## 2026-08-10T10:04:00Z — completed greedo-legal-entity
 
 Merged specifier commit `8b0cc9799c`, implemented legal-entity formation, ownership, equal shares, loans, repayment interest, dividends, journal/report/logging support, and the CLI flag. Verified with 326 domain tests and 545 acceptance scenarios. Prepared handoff to refactorer.
@@ -25901,6 +25931,27 @@ or feature change is warranted.
 Sent phase-complete priority-50 handoff to specifier (task
 `player-age-tracking`, commit recorded by this entry) after all
 specifier/coder/refactorer loops closed.
+
+## 2026-08-10T08:23:56Z — architect reviews greedo-legal-entity
+
+Received refactorer priority-50 handoff (commit `b258e7a3e2`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer b258e7a3e2
+```
+
+Action: architectural review found that the legal-entity acceptance
+scenarios do not exercise the game. `World.playUpToRounds` branches
+when an entity exists, invokes `LegalEntity.operate()` directly, and
+constructs journal events itself instead of calling `Game`. This makes
+the tests pass even if `Game.playTurn` fails to operate the entity or
+changes its ordering. Route to coder: remove the test-only branch and
+make the real game turn loop satisfy the scenarios. The rules package
+also directly instantiates `strategies.Greedo` solely to discover the
+priority tier, which should be removed as part of the boundary cleanup.
 2026-08-10T07:40:00Z — Received specifier handoff:
 id: 20260810T073726Z_000087_from_specifier
 from: specifier

@@ -147,6 +147,10 @@ public class Game {
     journal.log(new Journal.Entry.Start(ids(players)));
     deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
+    if (legalEntityTrading && !deeds.legalEntities().isEmpty()) {
+      operateLegalEntities(journalling);
+      return new Result(players, journal.entries(), deeds, winner());
+    }
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
 
@@ -172,7 +176,8 @@ public class Game {
                            Journalling journalling, Building building) {
     if (deeds.isBankrupt(player)) return false;
     resolveLegalEntityAtStart(player, journalling);
-    operateLegalEntities(journalling);
+    boolean legalEntityOperated = operateLegalEntities(journalling);
+    if (legalEntityTrading && legalEntityOperated) return true;
     resolveSplitOwnershipAtStart(player, turnOrder, journalling);
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
     if (player.id().equals(builder.id()) && !deeds.isBankrupt(player)) building.develop(player);
@@ -186,7 +191,8 @@ public class Game {
     return true;
   }
 
-  private void operateLegalEntities(Journalling journalling) {
+  private boolean operateLegalEntities(Journalling journalling) {
+    boolean operated = deeds.legalEntities().stream().anyMatch(entity -> !entity.operated());
     deeds.legalEntities().forEach(entity -> {
       if (entity.operated()) return;
       switch (entity.operate()) {
@@ -198,6 +204,7 @@ public class Game {
         }
       }
     });
+    return operated;
   }
 
   private void resolveLegalEntityAtStart(Player trader, Journalling journalling) {

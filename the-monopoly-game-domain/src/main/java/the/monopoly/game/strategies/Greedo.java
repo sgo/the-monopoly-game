@@ -135,6 +135,10 @@ public final class Greedo implements Strategy {
 
   @Override
   public Priority priority(Ownable land) {
+    return priorityOf(land);
+  }
+
+  public static Priority priorityOf(Ownable land) {
     return switch (land.type()) {
       case LippenslaanKnokke, RueRoyaleTournai, GroenplaatsAntwerpen,
           RueStLeonardLiege, LangeSteenstraatKortrijk, GrandPlaceMons,
