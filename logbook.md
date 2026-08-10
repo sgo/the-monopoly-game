@@ -27381,3 +27381,56 @@ for the specifier, not something to fix here. Also fixed a fourth
 instance of the recurring auto-merge placement bug, this one already
 present in my own prior commits from an earlier cycle rather than
 newly introduced by this merge.
+
+## 2026-08-10T13:30:00Z — refactorer confirms greedo-legal-entity is acceptance-clean
+
+Received coder priority-50 handoff (commit `9c5d101c57`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 9c5d101c57
+```
+
+Action: merged (ninth instance of the recurring logbook conflict,
+three hunks this time — resolved the same way as always, keeping my
+own verified content and threading the incoming branch's genuinely new
+entries in without duplicating what I already had). This carries the
+specifier's actual root-cause fix and the coder's completion: the
+specifier traced the fixture bug precisely — `World.formNamedEntity`
+prequeues every selected pawn an `UNREMARKABLE`=10 roll, and
+`Game.playUpToRounds` consumes each pawn's *first* queued roll as
+their *initiative* roll, not their turn roll, so a later explicit
+`will roll 12` queued entry was always shadowed by that prequeued 10
+landing as the turn roll instead. Rather than fight the queue, the
+specifier rewrote entity-7 to place the renter by explicit board
+position 10 spaces before the target street (so the deterministic
+prequeued 10 lands them there directly) and corrected the renter's
+identity from `ship` to `racecar` — with `we select 4 players`, the
+pool follows `Pawn.values()` order (`dog`, `high hat`, `iron box`,
+`racecar`), and `ship` was never actually selected at all, a second,
+independent bug hiding under the first. The coder added the one
+missing step handler this exposed (`Then Pink Realty still owes pawn
+"dog" $<principal>`, mirroring the existing `entityLoanFullyRepaid`
+lookup shape) and reported the full suite green.
+
+Independently re-verified rather than trusting that claim: domain
+clean, full acceptance **550/550**, run twice for confidence given
+this session's earlier transient-flake history —
+`EnRulesGreedoLegalEntityAcceptanceTest` itself at 17/17. No domain
+code changed this cycle (`Game.java`/`LegalEntity.java`/`Rent.java`
+are untouched since my last structural review, which still stands);
+the only production-adjacent change is the new `World.entityLoan`
+lookup, which duplicates `entityLoanFullyRepaid`'s find-or-throw shape
+at two call sites — matching this file's existing convention of many
+similar small per-entity lookups, not worth extracting.
+
+`greedo-legal-entity` is genuinely acceptance-clean for the first time
+across this whole multi-cycle task: legal-entity formation (3- and
+4/8-player), loan raise/repay with interest, dividends gated on a
+clear loan, rent-funded house reinvestment with equal capped
+shareholder contributions and a clean abort when unaffordable, and the
+now-fixed entity-7 reinvestment-before-loan-repayment scenario all
+pass together. No further structural work needed. Handing back to the
+architect with nothing outstanding on my side.
