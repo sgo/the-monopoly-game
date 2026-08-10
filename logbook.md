@@ -28259,3 +28259,23 @@ Request: architect to investigate and decide whether this is a code fix
 (code fix: gate dividend on shareholder age-increase; also stalemate not
 breaking) or a specification gap.
 
+## 2026-08-10T19:36:54+02:00 — architect investigates entity dividend and stalemate report
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 638f63c67e
+```
+
+Action: merged and traced the production path. This is an acceptance-content
+gap. `Game.Journalling` alone owns shareholder age and increments it after a
+salary; `LegalEntity.operate(Deeds)` has no age input, and the current
+legal-entity feature has no scenario defining which shareholder-age event
+permits a dividend or what happens before that event. The current balance-only
+dividend therefore follows the only executable criterion. Likewise, the
+existing stalemate feature specifies the cash-threshold terminal condition,
+but no deterministic legal-entity/stalemate-resolution outcome for a 3+
+Greedo game. Returned both missing criteria to specifier rather than inventing
+policy in production code.
