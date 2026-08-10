@@ -28073,6 +28073,34 @@ the dead-code removal, the `operate(Deeds)` decomposition, and each
 new test addition — nothing here changed observable behavior, only
 which code produces it and how well that code is covered.
 
+## 2026-08-10T15:24:47Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 5e9bcb3b9b
+```
+
+Summary: reviewed the entity bank-account treasury redesign the
+specifier's playtesting drove (unbounded loan/dividend spam with no
+real cash behind it, rent money deposited nowhere). Found and removed
+genuinely dead code — the old no-arg `operate()`, its private helper,
+and two `Operation` record types with zero producers anywhere,
+confirmed by a whole-tree grep and cross-checked against test code
+too. My own two oldest unit tests turned out to be testing that dead
+method — the same vacuous-test shape the architect caught me on before,
+this time self-inflicted. Decomposed the resulting `operate(Deeds)`
+from CRAP 41.6 (CC=13) into six methods each ≤CC 5, fixed a stale test
+whose fixture passed for the wrong reason under the new model, and
+added direct coverage for the previously-untested repayment and
+dividend branches. Domain and acceptance both re-verified green
+throughout, 554/554 held steady across every change. No behavior
+changed, only structure and coverage.
+
 ## 2026-08-10T15:28:48Z — coder processes shortfall-loan correction
 
 Received architect priority-00 handoff:
@@ -28089,12 +28117,220 @@ shareholder-payment ledger. Domain tests pass 343/343. Acceptance is 553/554;
 entity-13 still expects a $20 rent treasury to remain after the turn, while
 the settled end-of-turn rule permits borrowing/building after actual rent.
 
-Sent priority-00 handoff to architect:
+## 2026-08-10T16:02:29Z — architect receives corrected shortfall-loan return
+
+Received coder priority-00 handoff:
 
 ```
-type: git_handoff
-to: architect
-priority: 00
-task: correct-entity-treasury-shortfall-loans
-commit: 92ab0c765b
+Re-read your role and constitution.
+
+merge_and_process coder 92ab0c765b
 ```
+
+Action: merged and reviewed `92ab0c765b`. It removes the rent-received
+borrowing gate, distributes a shortfall exactly across shareholders only when
+each can pay, prevents partial debits, and records each debit in the entity
+ledger. The coder's full acceptance result is 553/554: entity-13 asserts that
+rent remains in the treasury at turn end, contradicting the accepted
+end-of-turn build-from-rent-and-shortfall rule. Sent a priority-00
+acceptance-content reconciliation to specifier; no feature file was edited by
+architect.
+
+## 2026-08-10T17:22:27Z — architect receives entity-13 reconciliation
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 39364a552d
+```
+
+Action: merged `39364a552d`. The spec now prebuilds all Pink Realty streets
+in entity-13, isolating the asserted rent deposit from the separate
+end-of-turn investment rule. Full acceptance passes with no failures. Routed
+the merged treasury-shortfall correction for the required final refactorer
+review and hardening pass.
+
+## 2026-08-10T19:36:54+02:00 — architect accepts final treasury review
+
+Received refactorer priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 1e8b5ae1ad
+```
+
+Action: merged and accepted `1e8b5ae1ad`. The refactorer replaced a stale
+rent-gated test with a remainder-aware shortfall-loan test and centralized
+share splitting in `LegalEntity`. Architect final verification found and
+removed duplicate formation-rejection setup in the unit test. Differential
+mutation had no changed surface; DRY is clean; soft Gherkin mutation completed
+without errors; domain and separate property suites passed. Sent the completed
+phase to specifier at priority 50.
+
+## 2026-08-10T17:35:00Z — refactorer reviews the corrected treasury shortfall-loan rule
+
+Received architect priority-00 handoff (commit `89a6b817de`, task
+`correct-entity-treasury-shortfall-loans`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 89a6b817de
+```
+
+Action: merged (tenth instance of the recurring logbook conflict,
+resolved the same way as always). New task name — the specifier gave
+this follow-up its own handoff name rather than folding it back into
+`greedo-legal-entity`.
+
+The correction: `canBorrowForBuilding`'s `rentReceivedOn == null` gate
+— the "don't borrow the same turn rent arrived" rule I wrote a
+dedicated unit test for two cycles ago — has been removed entirely and
+replaced with a real per-shareholder affordability check, plus an
+exact remainder-aware split (`base + 1` for as many shareholders as
+the remainder covers, instead of the old blanket ceiling-division
+share that could over-charge everyone equally and was never checked
+against actual balance at all before withdrawing).
+
+This directly broke the accuracy of my own
+`operatingDoesNotBorrowToTopUpRentReceivedThisSameTurn` test: it kept
+*passing*, but only because its shareholders had zero balance (an
+unrelated reason), not because of the rule it named and existed to
+prove — which no longer exists. Confirmed this by hand-tracing before
+touching anything, then verified empirically. Replaced it with
+`borrowsAnExactRemainderAwareShortfallWhenEveryShareholderCanAffordTheirShare`,
+which actually exercises the new split (a $97 shortfall over 3
+shareholders splits 33/32/32) and the borrow succeeding — my first
+attempt got this wrong too, forgetting that `buildAsMuchAsAffordable`'s
+outer loop still requires `bankBalance() > 0` to ever enter (the same
+zero-entry idle guard behind entity-17, confirmed a few cycles back);
+seeded the bank with $3 first so the loop actually runs. Also dropped
+a now-pointless `receiveRent()` call from an adjacent, still-accurate
+coder test (`doesNotTakePartialShareholderContributionsWhenHouseIsUnaffordable`)
+that no longer does anything now that the gate is gone.
+
+While rewriting, found `canBorrowForBuilding` and `borrowShortfall`
+independently computing the identical base/remainder split formula —
+`dry4java` didn't flag it (below its similarity threshold against the
+surrounding code), but it's the same business rule duplicated in two
+places, exactly the kind of drift risk a refactorer should catch by
+reading rather than waiting on a tool. Extracted `sharesOf(Money)` as
+the one place that formula lives now; both callers just look their
+shares up by index. `canBorrowForBuilding` dropped from CC=5 to CC=2
+as a side effect of expressing the affordability check as a stream
+`allMatch` instead of an imperative loop once the split moved out.
+
+Domain and acceptance both re-verified green throughout — 554/554,
+run twice — including through my own two rounds of test corrections.
+No CRAP violations anywhere in `LegalEntity.java` after this change.
+`mutate4java --scan`: 64 sites, manifest refreshed. The one CLI
+`SimulatorTest` failure seen mid-cycle is the same pre-existing
+environmental flake already confirmed unrelated via an A/B worktree
+comparison earlier in this task; domain-scoped runs stayed clean
+throughout.
+
+## %s — specifier studies 8-player Greedo entity logs, flags abnormal activity
+
+Ran five 8-player Greedo games with --optional-greedo-stalemate-trading
+--optional-greedo-legal-entity against the merged treasury-shortfall build.
+
+Abnormal activity #1 — entity is a dividend machine, not age-gated.
+LegalEntity.repayLoanOrPayDividend pays a $50 dividend to each shareholder
+whenever bankBalance() >= 150, with no shareholder-age-increase trigger
+(agreed trigger: 'each time the last capitalized shareholder grows a year
+older'). Game.operateLegalEntities calls operate() every turn with no age
+gate. Quantified (run2): 26,850 turns, ages to 402 years, yet 1,184
+dividends fire (~once per 23 turns) purely on the money threshold.
+
+Abnormal activity #2 — the Greedo stalemate is NOT broken. 4 of 5 runs
+never terminate via stalemate-break; they grind to 240-514 player-years.
+The only ending run (run3) ended via bankruptcy, not the entity. The
+feature adds a dividend machine to a centuries-long grind instead of
+resolving the 3+ Greedo stalemate.
+
+Acceptance scenarios (entity-6/8/11) pass because they drive LegalEntity
+via the harness and check money/loan state, but do not exercise the missing
+age-trigger, so the bug ships unnoticed in the CLI path.
+
+Request: architect to investigate and decide whether this is a code fix
+(code fix: gate dividend on shareholder age-increase; also stalemate not
+breaking) or a specification gap.
+
+## 2026-08-10T19:36:54+02:00 — architect investigates entity dividend and stalemate report
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 638f63c67e
+```
+
+Action: merged and traced the production path. This is an acceptance-content
+gap. `Game.Journalling` alone owns shareholder age and increments it after a
+salary; `LegalEntity.operate(Deeds)` has no age input, and the current
+legal-entity feature has no scenario defining which shareholder-age event
+permits a dividend or what happens before that event. The current balance-only
+dividend therefore follows the only executable criterion. Likewise, the
+existing stalemate feature specifies the cash-threshold terminal condition,
+but no deterministic legal-entity/stalemate-resolution outcome for a 3+
+Greedo game. Returned both missing criteria to specifier rather than inventing
+policy in production code.
+
+## 2026-08-10T19:36:54+02:00 — architect reviews dividend age-gating criteria
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 091179f71b
+```
+
+Action: merged `091179f71b`. Entity-18/19 now define a deterministic dividend
+gate: no dividend before the last-capitalised shareholder's next age increase,
+then an equal dividend after that shareholder collects salary. The return does
+not add any Gherkin criterion for the separately reported 3+ Greedo
+legal-entity stalemate failure, so that portion remains unspecified. Returned
+the remaining stalemate acceptance-content gap to specifier; task is not
+advanced to implementation until the specifier loop closes.
+
+## 2026-08-10T19:36:54+02:00 — architect reviews 3+ Greedo stalemate criterion
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier e9a1369bcf
+```
+
+Action: merged `e9a1369bcf`. Entity-20 correctly makes the 3+ Greedo
+legal-entity impasse an acceptance concern, but its final assertion (“the game
+can continue to the stalemate cash threshold”) has no registered acceptance
+step handler and no bounded observable result. A repository search found that
+phrase only in the new feature. Returned this acceptance-content defect to
+specifier rather than having coder invent the meaning of continuation or its
+termination condition.
+
+## 2026-08-10T19:36:54+02:00 — architect accepts superseding dividend-only specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 87b926f9eb
+```
+
+Specifier explicitly supersedes entity-20: legal entities remove the 3+
+Greedo colour-group impasse but do not guarantee bankruptcy or stalemate;
+that empirical outcome has no deterministic acceptance assertion. Entity-18/19
+remain the executable change. Action: merged `87b926f9eb` and routed only the
+dividend age gate to coder. Architectural boundary: `Game` must translate the
+salary/age transition into a narrow domain signal, while `LegalEntity` owns
+last-capitalised-shareholder and dividend-eligibility state; do not couple the
+entity to `Journalling` or its private age map.

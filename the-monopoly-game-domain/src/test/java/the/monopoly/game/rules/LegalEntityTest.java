@@ -52,24 +52,16 @@ class LegalEntityTest {
 
   @Test
   void aColourGroupLedByTheHighestPriorityStreetNeverConsolidates() {
-    own(Street.Type.LippenslaanKnokke, dog);
-    own(Street.Type.RueRoyaleTournai, highHat);
-    own(Street.Type.GroenplaatsAntwerpen, ironBox);
-    ownEveryRemainingSpace(highHat);
-
-    assertThat(LegalEntity.form("Orange Realty", Street.Colour.orange,
-        List.of(dog, highHat, ironBox), rules, deeds, LegalEntityTest::highestPriority)).isEmpty();
+    assertFormationIsImpossible("Orange Realty", Street.Colour.orange,
+        List.of(Street.Type.LippenslaanKnokke, Street.Type.RueRoyaleTournai, Street.Type.GroenplaatsAntwerpen),
+        List.of(dog, highHat, ironBox), List.of(dog, highHat, ironBox));
   }
 
   @Test
   void aGroupNotSplitAcrossThreeOwnersPreventsFormation() {
-    own(Street.Type.RueDeDiekirchArlon, dog);
-    own(Street.Type.BruulMechelen, dog);
-    own(Street.Type.PlaceVerteVerviers, highHat);
-    ownEveryRemainingSpace(highHat);
-
-    assertThat(LegalEntity.form("Pink Realty", Street.Colour.pink,
-        List.of(dog, highHat, ironBox), rules, deeds, LegalEntityTest::highestPriority)).isEmpty();
+    assertFormationIsImpossible("Pink Realty", Street.Colour.pink,
+        List.of(Street.Type.RueDeDiekirchArlon, Street.Type.BruulMechelen, Street.Type.PlaceVerteVerviers),
+        List.of(dog, dog, highHat), List.of(dog, highHat, ironBox));
   }
 
   @Test
@@ -162,19 +154,26 @@ class LegalEntityTest {
   }
 
   @Test
-  void operatingDoesNotBorrowToTopUpRentReceivedThisSameTurn() {
+  void borrowsAnExactRemainderAwareShortfallWhenEveryShareholderCanAffordTheirShare() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
     ColourStreet street = entity.streets().getFirst();
-    entity.depositToBank(new Money(30));
-    entity.receiveRent(street);
+    entity.depositToBank(new Money(3));
+    dog.account().deposit(new Money(50));
+    highHat.account().deposit(new Money(50));
+    ironBox.account().deposit(new Money(50));
 
     LegalEntity.Operation operation = entity.operate(deeds);
 
-    assertThat(operation).isEqualTo(new LegalEntity.Operation.NoAction());
-    assertThat(deeds.housesBuiltOn(street)).isZero();
-    assertThat(entity.loan()).isEqualTo(Money.ZERO);
-    assertThat(entity.bankBalance()).isEqualTo(new Money(30));
+    assertThat(operation).isEqualTo(new LegalEntity.Operation.LoanRaisedAndHouseBuilt(new Money(97), street));
+    assertThat(deeds.housesBuiltOn(street)).isEqualTo(1);
+    assertThat(entity.loan()).isEqualTo(new Money(97));
+    assertThat(entity.shareholderPayment(dog)).isEqualTo(new Money(33));
+    assertThat(entity.shareholderPayment(highHat)).isEqualTo(new Money(32));
+    assertThat(entity.shareholderPayment(ironBox)).isEqualTo(new Money(32));
+    assertThat(dog.account().balance().amount()).isEqualTo(new Money(17));
+    assertThat(highHat.account().balance().amount()).isEqualTo(new Money(18));
+    assertThat(ironBox.account().balance().amount()).isEqualTo(new Money(18));
   }
 
   @Test
@@ -213,7 +212,6 @@ class LegalEntityTest {
     highHat.account().deposit(new Money(30));
     ironBox.account().deposit(new Money(30));
     ColourStreet street = (ColourStreet) rules.create(Street.Type.RueDeDiekirchArlon);
-    entity.receiveRent(street);
 
     entity.operate(deeds);
 
@@ -227,6 +225,17 @@ class LegalEntityTest {
         .map(it -> (the.monopoly.game.components.streets.Ownable) it)
         .filter(it -> deeds.isUnowned(it.type()))
         .forEach(it -> deeds.sell(it, owner, Money.ZERO));
+  }
+
+  private void ownColourGroupAndRemainingSpaces(List<Street.Type> types, List<Player> owners, Player remainingOwner) {
+    for (int index = 0; index < types.size(); index++) own(types.get(index), owners.get(index));
+    ownEveryRemainingSpace(remainingOwner);
+  }
+
+  private void assertFormationIsImpossible(String name, Street.Colour colour, List<Street.Type> types,
+                                           List<Player> owners, List<Player> shareholders) {
+    ownColourGroupAndRemainingSpaces(types, owners, highHat);
+    assertThat(LegalEntity.form(name, colour, shareholders, rules, deeds, LegalEntityTest::highestPriority)).isEmpty();
   }
 
   private static boolean highestPriority(ColourStreet street) {
