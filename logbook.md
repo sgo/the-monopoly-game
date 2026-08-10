@@ -28366,3 +28366,13 @@ acceptance is 552/553 for the pipeline subset: entity-19's feature setup says
 a roll of 12 makes Dog collect salary, but the deterministic game moves Dog
 from position 0 to 24 without collecting salary. This acceptance-content
 contradiction is being returned for architect/specifier review.
+
+Sent priority-00 handoff to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 113c116bf9
+```
