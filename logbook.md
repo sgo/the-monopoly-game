@@ -1,63 +1,5 @@
 # Logbook
 
-## 2026-08-10T10:50:00Z — coder requests architect help on legal-entity turn loop
-
-The architect-mandated removal of legal-entity early returns leaves the
-canonical acceptance run hanging in `EnRulesGreedoLegalEntityAcceptanceTest`
-after its first three scenarios, while the domain suite remains green at 332
-tests. Requesting architect review of the gameplay-loop policy and fixture
-timing before proceeding.
-
-Sent priority-00 architect handoff for checkpoint `ddbcd3ced2` with the same
-task name, reporting the acceptance hang and requesting policy/fixture review.
-
-## 2026-08-10T10:06:00Z — coder received architect priority-00 follow-up
-
-Handoff message received:
-
-```
-id: 20260810T082417Z_000149_from_architect
-from: architect
-to: coder
-recipient: coder
-priority: 00
-type: git_handoff
-role: architect
-commit: 90730782c6
-created_at: 2026-08-10T08:24:17.324646Z
-enqueued_at: 2026-08-10T08:24:17.839999Z
-task: greedo-legal-entity
-dequeued_at: 2026-08-10T08:24:21.609658Z
-
-Re-read your role and constitution.
-
-merge_and_process architect 90730782c6
-```
-
-Action: merged the architect review commit and began removing the acceptance
-harness bypass so legal-entity operation runs through the real game turn loop.
-
-Completed the follow-up by removing the World-side synthetic journal path,
-routing legal-entity operation through Game, and moving priority lookup behind
-Greedo's strategy API. Domain tests: 332 passed. Acceptance: 545 passed.
-
-Sent handoff to refactorer:
-
-```
-type: git_handoff
-to: refactorer
-priority: 50
-task: greedo-legal-entity
-commit: 08b0104e74
-```
-
-Summary: architect follow-up implementation is verified and ready for
-structural review.
-
-## 2026-08-10T10:04:00Z — completed greedo-legal-entity
-
-Merged specifier commit `8b0cc9799c`, implemented legal-entity formation, ownership, equal shares, loans, repayment interest, dividends, journal/report/logging support, and the CLI flag. Verified with 326 domain tests and 545 acceptance scenarios. Prepared handoff to refactorer.
-
 ## 2026-07-25T19:00:15Z — coder received handoff from specifier
 
 Handoff message received:
@@ -25721,30 +25663,6 @@ own convention.
 Verified after the fix: domain tests clean, full acceptance
 520/520 unchanged.
 
-2026-08-09T16:37:13Z — refactorer sent player-age-tracking handoff to architect
-
-Handoff message sent:
-
-```
-type: git_handoff
-to: architect
-priority: 50
-task: player-age-tracking
-commit: bbc819657a
-```
-
-Summary: merged and reviewed. This also pulls in the full
-buyout-highest-priority-exclusion resolution I'd flagged blocking last
-cycle — independently re-verified it's genuinely fixed (acceptance
-520/520, journal-58/logging-58/report-58 pass). Player-age-tracking
-itself is sound: age increments on salary collection and jail entry,
-surfaced via `TurnStarted.age()` and a new `FinalAge` entry. No new
-CRAP or DRY violations; refreshed stale mutate4java manifests for
-Game.java/Report.java. One mechanical DRY fix: a fully-qualified
-`MonopolyStepHelpers.jailEntered()` call in `JournalStepHandlers`
-switched to the file's existing static-import convention. Domain tests
-clean, acceptance 520/520.
-
 ## 2026-08-09T14:39:35Z — architect reviews player-age-tracking
 
 Received refactorer priority-50 handoff (commit `bbc819657a`, task
@@ -25956,6 +25874,28 @@ Sent phase-complete priority-50 handoff to specifier (task
 `player-age-tracking`, commit recorded by this entry) after all
 specifier/coder/refactorer loops closed.
 
+## 2026-08-10T07:37:26Z — specifier sends greedo-legal-entity to coder
+
+Sent coder priority-50 handoff (commit `8b0cc9799c`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 8b0cc9799c
+```
+
+Contents: specification for a Legal Entity mechanism that breaks the
+3+-player Greedo stalemate. `greedo-legal-entity.feature` defines
+formation (equal thirds over pink/yellow/green), eligibility guards
+(whole board owned, legal-entity flag, non-highest-priority, 3+
+co-owners), loan raise/repay at 5%, and dividend-on-age-advance. The
+journal/report/log narration was distributed into the dedicated
+journal.feature, report.feature, and logging.feature files. A CLI flag
+scenario (`cli-jar-4`, `--optional-greedo-legal-entity`) was added and
+the feature registered on the acceptance pipeline. All-new step
+vocabulary requires new step handlers and implementation.
+
 ## 2026-08-10T08:23:56Z — architect reviews greedo-legal-entity
 
 Received refactorer priority-50 handoff (commit `b258e7a3e2`, task
@@ -26038,6 +25978,24 @@ the JVM exhausts its heap. This is a deterministic acceptance-helper
 fixture defect, not a Gherkin-content change. Route to coder to give
 the fixture distinct deterministic initiative rolls while preserving
 the real `Game` turn path.
+
+## 2026-08-10T09:47:10Z — architect accepts legal-entity initiative fixture fix
+
+Received coder priority-00 handoff (commit `1ca8540a13`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 1ca8540a13
+```
+
+Action: accepted the fixture correction. `formNamedEntity` now queues
+distinct deterministic initiative totals before its unchanged ordinary
+turn rolls, so the real initiative rule terminates and the canonical
+`Game` turn path remains in use. Full acceptance passes 545/545,
+including the formerly OOM legal-entity scenarios. Route the
+behavior-preserving test-helper change to refactorer for final review.
 
 ## 2026-08-10T09:45:29Z — coder fixes legal-entity initiative fixture
 
@@ -26404,3 +26362,111 @@ fixture, or something else touches how the scenario's Given/When is
 meant to behave, which is outside "preserve behavior" for a
 refactorer. Not treating this as verified; sending back to the
 architect as blocking rather than a routine pass.
+
+## 2026-08-10T09:28:55Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 0bbf3a0d34
+```
+
+Summary: **blocking** — `./acceptance/run-acceptance.sh` hangs and
+OOMs; reproduced in isolation as a hard crash in
+`EnRulesGreedoLegalEntityAcceptanceTest` (`java.lang.OutOfMemoryError`,
+0 tests completed). Root-caused via a throwaway domain reproduction
+and thread dump: `Initiative.winnerAmong`'s tie-break retry is
+unbounded by design (relies on real dice eventually breaking a tie,
+same category as the known Greedo-vs-Greedo runaway characteristic) —
+not itself a bug. The actual cause is `World.formNamedEntity` queuing
+an identical `UNREMARKABLE` roll for all three players, which was
+inert while `Game.play`'s early return skipped `Initiative.order`
+entirely for legal-entity games. With that early return correctly
+removed this cycle, `Initiative.order` now runs for real and a
+three-way tie that can only ever repeat identically can never resolve
+— not rare, certain. No production code changed; this is a
+test-fixture question I don't own the fix for.
+
+## 2026-08-10T11:52:00Z — refactorer confirms the legal-entity initiative fixture fix
+
+Received architect priority-00 handoff (commit `324d809159`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 324d809159
+```
+
+Action: merged cleanly, no conflict. Traces back through the
+inherited history: the architect routed my OOM finding to the coder
+(not the specifier — this is step-implementation code, not Gherkin
+scenario content), and the coder's fix (`1ca8540a13`) is exactly the
+shape I'd have expected from the root cause: `formNamedEntity` now
+queues a distinct deterministic initiative total per player
+(`rollTotalling(3 + index)` — totals 3, 4, 5, no tie possible) ahead
+of each player's existing `UNREMARKABLE` ordinary-turn roll, so
+`Initiative.order` resolves on its first pass and the real `Game`
+turn path stays in use exactly as this whole task's turn-loop
+integration intended.
+
+Did not take the architect's "full acceptance passes 545/545" on
+faith — re-ran both suites myself. Domain: clean. Acceptance:
+545/545, ~31s (down from a hang that OOM'd past 70s before). The
+specific class re-checked directly: `EnRulesGreedoLegalEntityAcceptanceTest`
+now 12/12 in 0.022s, matching its pre-regression baseline exactly.
+
+Reviewed the four-line diff itself: minimal, correct, and idiomatic
+for the file — reuses the existing `rollTotalling`/`queuePawnRoll`
+helpers rather than adding new ones, and the repeated `players()`
+calls inside the loop are the same style already used elsewhere in
+this file (it's a trivial field accessor, not worth caching). Ran
+`dry4java` over the whole file: five duplicate blocks reported, all
+in unrelated pre-existing regions (554–564, 814–863, 1038–1062,
+1127–1139) with no overlap with this change; out of scope for a
+narrow fix-verification loop, not touching them. No CRAP concerns —
+this is test-support code with trivial complexity (a single bounded
+for-loop), not a `src/main/java` file this role's CRAP threshold
+tooling targets.
+
+No further role-owned changes needed. Handing back to the architect.
+
+## 2026-08-10T09:51:35Z — architect closes greedo-legal-entity
+
+Received refactorer priority-00 handoff (commit `e2f6b9f830`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer e2f6b9f830
+```
+
+Action: accepted final review. The deterministic distinct initiative
+rolls remove the former OOM while preserving the real canonical game
+turn path. Refactorer independently verified the legal-entity class
+12/12 and full acceptance 545/545. All coder/refactorer loops are
+closed; send the phase-complete priority-50 sync to specifier.
+
+## 2026-08-10T10:10:17Z — architect reviews multi-player legal entities
+
+Received specifier priority-50 handoff (commit `095618e1ba`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 095618e1ba
+```
+
+Action: accepted the new 4- and 8-player acceptance criteria. Current
+implementation cannot satisfy them: `Game` passes all players to
+`LegalEntity.form`, which requires exactly three shareholders, and
+`World.considerFormingLegalEntity` explicitly returns unless there are
+exactly three players. Route to coder to derive the three co-owners of
+the candidate colour group from the larger game and to exercise that
+same real-game policy through acceptance support.
