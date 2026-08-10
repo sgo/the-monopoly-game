@@ -27934,3 +27934,18 @@ Action: merged the specifier-owned legacy treasury fixture updates. Added
 generic entity bank-account acceptance steps and canonical shortfall-loan
 funding before balanced construction. Domain tests pass 342/342 and the full
 acceptance pipeline passes 554/554.
+
+## 2026-08-10T15:04:19Z — coder forwards verified treasury implementation
+
+Sent refactorer priority-00 handoff:
+
+```
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-legal-entity
+commit: b23781f738
+```
+
+Forwarded the fully verified registered treasury, balanced construction,
+shortfall loan, repayment/dividend credits, and acceptance step coverage.
