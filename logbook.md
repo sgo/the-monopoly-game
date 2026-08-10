@@ -28414,6 +28414,22 @@ the established Game event-adapter shape and distinct dividend tests; soft
 Gherkin mutation completed without errors; separate property suite passed
 22/22. Sent phase-complete sync to specifier at priority 50.
 
+## 2026-08-10T18:31:50Z — architect receives shareholder entity-rent rule
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 62aeeee061
+```
+
+Action: merged `62aeeee061`. Entity-21 requires a shareholder who lands on an
+entity-owned street to pay rent into the entity treasury, just as a
+non-shareholder does. Production review confirms the only contradictory
+branch is `Rent.collect(LegalEntity, ...)`'s shareholder exemption; routed its
+removal and full acceptance verification to coder.
+
 ## 2026-08-10T19:36:54+02:00 — architect reviews corrected dividend qualification
 
 Received coder priority-00 handoff:
