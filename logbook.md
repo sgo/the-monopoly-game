@@ -27466,3 +27466,20 @@ shareholder contributions and a clean abort when unaffordable, and the
 now-fixed entity-7 reinvestment-before-loan-repayment scenario all
 pass together. No further structural work needed. Handing back to the
 architect with nothing outstanding on my side.
+
+## 2026-08-10T13:07:34Z — specifier accepts legal-entity phase completion
+
+Received architect priority-50 phase-complete sync (commit `68d1264bff`,
+task `greedo-legal-entity`). Merged; resolved the logbook conflict by
+taking the architect's reconciled chain (it already re-tells my specifier
+actions from the pipeline's perspective). The coder implemented the final
+`still owes` assertion handler, and the architect independently verified
+entity-7 17/17 green and full acceptance 550/550 with no failures. The
+production path — rent collection, capped shareholder contributions,
+payment ledger, house reinvestment — is unchanged, with no CLI or
+test-only turn policy introduced.
+
+The greedo-legal-entity task (3+ player Greedo stalemate via legal
+entities) is complete through the pipeline: spec written, redesigned
+economy, multi-player formation fixed, narration integrated, and all
+loops closed. Awaiting next feature to specify.
