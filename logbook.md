@@ -28357,6 +28357,22 @@ later rent-triggered dividend without a new qualifying age increase. Those
 implementation findings remain in this log for the coder correction after the
 specifier loop closes.
 
+## 2026-08-10T19:36:54+02:00 — architect accepts zero-share capitalisation correction
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 1d8911fedf
+```
+
+Action: merged and accepted `1d8911fedf`. A shareholder with a zero-value
+remainder allocation is no longer recorded as a capitaliser; the focused $1
+shortfall test proves only Dog's positive $1 debit establishes the tracked
+shareholder. Routed the corrected dividend age-gate work to refactorer for
+final structural review and hardening verification.
+
 ## 2026-08-10T19:36:54+02:00 — architect reviews corrected dividend qualification
 
 Received coder priority-00 handoff:
