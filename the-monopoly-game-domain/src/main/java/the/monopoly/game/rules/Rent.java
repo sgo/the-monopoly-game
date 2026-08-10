@@ -37,7 +37,7 @@ public class Rent implements Landings {
   }
 
   private void collect(LegalEntity entity, Player tenant, ColourStreet land) {
-    if (entity.shareholders().contains(tenant) || deeds.isMortgaged(land)) return;
+    if (deeds.isMortgaged(land)) return;
     Money rent = land.vacantRent().plus(land.vacantRent());
     if (tenant.account().balance().amount().amount() >= rent.amount()) {
       tenant.account().withdraw(rent);

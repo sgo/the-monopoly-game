@@ -28640,3 +28640,13 @@ after payment) — matches this file's existing convention for test
 shape, not real duplication. `mutate4java --scan`: `Game.java` 73
 sites, `LegalEntity.java` 75 — both manifests refreshed, no functional
 changes needed on my side this cycle.
+
+## 2026-08-10T19:25:09Z — coder implements shareholder entity rent
+
+Removed the shareholder exemption from `Rent.collect(LegalEntity, ...)`;
+shareholders now pay the same double vacant rent as other tenants when
+landing on their entity's street, while mortgaged streets remain exempt.
+Updated the stale unit assertion to the accepted rule.
+
+Verification: domain tests 347/347 passing; full acceptance 557/557
+passing; `git diff --check` clean.
