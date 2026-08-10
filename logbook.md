@@ -28088,3 +28088,22 @@ each shareholder's real balance, with exact per-share amounts recorded in the
 shareholder-payment ledger. Domain tests pass 343/343. Acceptance is 553/554;
 entity-13 still expects a $20 rent treasury to remain after the turn, while
 the settled end-of-turn rule permits borrowing/building after actual rent.
+
+## 2026-08-10T16:02:29Z — architect receives corrected shortfall-loan return
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 92ab0c765b
+```
+
+Action: merged and reviewed `92ab0c765b`. It removes the rent-received
+borrowing gate, distributes a shortfall exactly across shareholders only when
+each can pay, prevents partial debits, and records each debit in the entity
+ledger. The coder's full acceptance result is 553/554: entity-13 asserts that
+rent remains in the treasury at turn end, contradicting the accepted
+end-of-turn build-from-rent-and-shortfall rule. Sent a priority-00
+acceptance-content reconciliation to specifier; no feature file was edited by
+architect.
