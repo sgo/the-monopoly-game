@@ -573,7 +573,6 @@ public class World {
   }
 
   public void formNamedEntity(String name) {
-    legalEntityTrading = true;
     othersRollWhatTheyLike = true;
     players().forEach(player -> queuePawnRoll(player.id().value(), UNREMARKABLE));
     formEntity(Street.Colour.valueOf(name.substring(0, name.indexOf(' ')).toLowerCase()), true);
@@ -594,7 +593,8 @@ public class World {
     String name = Character.toUpperCase(colour.name().charAt(0)) + colour.name().substring(1) + " Realty";
     LegalEntity entity = seedBoard
         ? LegalEntity.formed(name, colour, shareholders, ruleSet)
-        : LegalEntity.form(name, colour, shareholders, ruleSet, deeds).orElse(null);
+        : LegalEntity.form(name, colour, shareholders, ruleSet, deeds,
+            street -> Strategy.priorityOf(street) == Strategy.Priority.HIGHEST).orElse(null);
     if (entity != null) deeds.form(entity);
   }
 

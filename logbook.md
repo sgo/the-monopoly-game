@@ -1,5 +1,13 @@
 # Logbook
 
+## 2026-08-10T10:50:00Z — coder requests architect help on legal-entity turn loop
+
+The architect-mandated removal of legal-entity early returns leaves the
+canonical acceptance run hanging in `EnRulesGreedoLegalEntityAcceptanceTest`
+after its first three scenarios, while the domain suite remains green at 332
+tests. Requesting architect review of the gameplay-loop policy and fixture
+timing before proceeding.
+
 ## 2026-08-10T10:06:00Z — coder received architect priority-00 follow-up
 
 Handoff message received:
@@ -29,6 +37,19 @@ harness bypass so legal-entity operation runs through the real game turn loop.
 Completed the follow-up by removing the World-side synthetic journal path,
 routing legal-entity operation through Game, and moving priority lookup behind
 Greedo's strategy API. Domain tests: 332 passed. Acceptance: 545 passed.
+
+Sent handoff to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: 08b0104e74
+```
+
+Summary: architect follow-up implementation is verified and ready for
+structural review.
 
 ## 2026-08-10T10:04:00Z — completed greedo-legal-entity
 
@@ -25952,6 +25973,48 @@ changes its ordering. Route to coder: remove the test-only branch and
 make the real game turn loop satisfy the scenarios. The rules package
 also directly instantiates `strategies.Greedo` solely to discover the
 priority tier, which should be removed as part of the boundary cleanup.
+
+## 2026-08-10T08:43:01Z — architect re-reviews greedo-legal-entity
+
+Received refactorer priority-50 handoff (commit `0833ce8f28`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 0833ce8f28
+```
+
+Action: rejected the attempted real-turn-path fix. It removes the
+test-helper shortcut, but `Game.play` now detects an existing entity,
+operates it, and returns before initiative or any normal turn. Further,
+`Game.playTurn` returns immediately whenever an entity operates. Both
+are still legal-entity-only execution paths rather than gameplay wired
+into the canonical turn loop. The rules package also still imports
+`strategies.Greedo` for priority, violating dependency direction.
+Route to coder for one integrated turn-start policy with rules-owned
+priority knowledge (or an inward-facing abstraction), without early
+returning from the game/turn loop.
+
+## 2026-08-10T08:58:52Z — architect accepts canonical legal-entity turn path
+
+Received coder priority-00 handoff (commit `ddbcd3ced2`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder ddbcd3ced2
+```
+
+Action: accepted removal of the early-return path: entity settlement
+now precedes, but does not replace, the normal initiative and turn
+flow. Completed a behavior-preserving boundary correction: `LegalEntity`
+now receives its highest-priority eligibility predicate from `Game` and
+test setup, so rules no longer import the strategy layer. Focused
+LegalEntity tests, full acceptance, Java mutation (23/23 covered
+mutants killed), DRY review, soft Gherkin mutation, and 22 property
+tests are clean.
 2026-08-10T07:40:00Z — Received specifier handoff:
 id: 20260810T073726Z_000087_from_specifier
 from: specifier

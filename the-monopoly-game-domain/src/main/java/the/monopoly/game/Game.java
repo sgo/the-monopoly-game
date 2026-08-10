@@ -147,10 +147,6 @@ public class Game {
     journal.log(new Journal.Entry.Start(ids(players)));
     deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
-    if (legalEntityTrading && !deeds.legalEntities().isEmpty()) {
-      operateLegalEntities(journalling);
-      return new Result(players, journal.entries(), deeds, winner());
-    }
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
 
@@ -175,7 +171,7 @@ public class Game {
   private boolean playTurn(Player player, Player builder, List<Player> turnOrder, Journal journal,
                            Journalling journalling, Building building) {
     if (deeds.isBankrupt(player)) return false;
-    if (settleLegalEntities(player, journalling)) return true;
+    settleLegalEntities(player, journalling);
     resolveSplitOwnershipAtStart(player, turnOrder, journalling);
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
     if (isBuilderStillSolvent(player, builder)) building.develop(player);
@@ -206,10 +202,9 @@ public class Game {
   }
 
   /** Resolves entity formation and, in a legal-entity-only game, operates entities instead of a normal turn. */
-  private boolean settleLegalEntities(Player trader, Journalling journalling) {
+  private void settleLegalEntities(Player trader, Journalling journalling) {
     resolveLegalEntityAtStart(trader, journalling);
-    boolean legalEntityOperated = operateLegalEntities(journalling);
-    return legalEntityTrading && legalEntityOperated;
+    operateLegalEntities(journalling);
   }
 
   private boolean isBuilderStillSolvent(Player player, Player builder) {
@@ -220,7 +215,8 @@ public class Game {
     if (!legalEntityTrading) return;
     rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
         .map(ColourStreet::colourGroup).distinct()
-        .map(colour -> LegalEntity.form(entityName(colour), colour, players, rules, deeds))
+        .map(colour -> LegalEntity.form(entityName(colour), colour, players, rules, deeds,
+            street -> Strategy.priorityOf(street) == Strategy.Priority.HIGHEST))
         .filter(Optional::isPresent).map(Optional::orElseThrow).findFirst()
         .ifPresent(entity -> {
           deeds.form(entity);

@@ -28,7 +28,7 @@ public class Deeds {
   private final java.util.Set<Player.ID> bankrupt = new java.util.HashSet<>();
 
   public boolean isUnowned(Street.Type land) {
-    return !owners.containsKey(land);
+    return !owners.containsKey(land) && !entityOwners.containsKey(land);
   }
 
   /** Who holds the title to this land, if anyone does. */
