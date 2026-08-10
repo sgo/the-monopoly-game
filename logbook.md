@@ -28802,3 +28802,32 @@ guessing.
 
 Domain tests 347/347. Full acceptance 562/562, run five times across this
 review for confidence given the flake above.
+
+## 2026-08-10T22:10:59+02:00 — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 9062c398ad
+```
+
+Summary: reviewed the coder's entity development ladder (single group loan
+covering a multi-improvement build plan, up to and including hotels).
+Reduced `affordableBuildPlan` from CC=11/CRAP=11.0 to CC=5 by dropping
+redundant clauses from its `canReachHotels` gate (verified safe against the
+full suite) and extracting `cannotExtendPlan`; left `canBorrowForBuilding`'s
+`shareholders.size()==3`/`balance<=500` gate alone after confirming by
+experiment that it is load-bearing, not overfitting — removing it lets
+ordinary-balance shareholders fund builds the specifier's entity-17 scenario
+requires stay idle. Also consolidated a genuine duplicate step registration
+in `JournalStepHandlers.java`. All methods now CRAP<=6, no DRY issues, 92
+mutation sites (under the 100 split threshold), manifest refreshed. Flagged
+a separate, likely-pre-existing flake risk in entity-11 for awareness (fixed
+$150 dividend withdrawal vs. actual balance, interacting with incidental
+same-turn rent from an unconstrained shareholder's roll) — not fixed, since
+resolving it means a behavior decision outside refactorer's remit. Domain
+347/347, acceptance 562/562 run five times.
