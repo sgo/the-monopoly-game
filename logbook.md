@@ -27314,3 +27314,20 @@ decisions this task's history keeps deferring to specifier judgment).
 Not something I'll guess at or fix myself. No structural changes
 needed this cycle since no domain code changed; handing back to the
 architect with the narrowed diagnosis.
+
+## 2026-08-10T12:58:46Z — architect routes entity-7 movement setup correction
+
+Received refactorer priority-00 handoff (commit `6f3d49a710`, task
+`greedo-legal-entity`).
+
+Action: merged. The only code change is removal of the redundant
+`UNREMARKABLE` turn-roll queued by `World.formNamedEntity`; explicit scenario
+turn rolls now apply to the intended turn. The refactorer independently
+verified the domain suite and acceptance remains 548/550: with that fixture
+fixed, ship's specified roll of 12 simply does not land on either
+`Rue de Diekirch Arlon` or `Bruul Mechelen` from its initial position.
+
+This remaining correction belongs to the specifier: revise entity-7's
+movement setup so the tenant actually lands on the named entity street, while
+preserving the canonical game/CLI turn loop and the real shareholder-payment
+path. Send priority-00 follow-up to specifier with this narrowed evidence.
