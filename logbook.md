@@ -26928,3 +26928,18 @@ only by its unit test—no production game/rent/building path records an
 actual payment. Thus every payment remains zero and the cap assertion
 passes vacuously. Route to coder to wire real shareholder contributions
 and their ledger entries into the entity's reinvestment behavior.
+
+## 2026-08-10T12:23:00Z — coder receives payment integration follow-up
+
+Received architect priority-00 handoff (commit `ba43ac968d`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+merge_and_process architect ba43ac968d
+```
+
+Merged the review state and wired real equal-shareholder contributions into
+entity house reinvestment. Contributions are withdrawn and ledgered only
+when the complete house cost is affordable; unaffordable funding takes no
+partial payments. Focused coverage passes with 335 domain tests.

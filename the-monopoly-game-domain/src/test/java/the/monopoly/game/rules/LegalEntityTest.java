@@ -122,6 +122,41 @@ class LegalEntityTest {
     assertThat(entity.shareholderPayment(ironBox)).isEqualTo(Money.ZERO);
   }
 
+  @Test
+  void fundsAnEntityHouseWithEqualShareholderContributions() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    dog.account().deposit(new Money(1500));
+    highHat.account().deposit(new Money(1500));
+    ironBox.account().deposit(new Money(1500));
+    ColourStreet street = (ColourStreet) rules.create(Street.Type.RueDeDiekirchArlon);
+    entity.receiveRent(street);
+
+    entity.operate(deeds);
+
+    assertThat(deeds.housesBuiltOn(street)).isEqualTo(1);
+    assertThat(entity.shareholderPayment(dog)).isEqualTo(new Money(34));
+    assertThat(entity.shareholderPayment(highHat)).isEqualTo(new Money(34));
+    assertThat(entity.shareholderPayment(ironBox)).isEqualTo(new Money(34));
+  }
+
+  @Test
+  void doesNotTakePartialShareholderContributionsWhenHouseIsUnaffordable() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    dog.account().deposit(new Money(30));
+    highHat.account().deposit(new Money(30));
+    ironBox.account().deposit(new Money(30));
+    ColourStreet street = (ColourStreet) rules.create(Street.Type.RueDeDiekirchArlon);
+    entity.receiveRent(street);
+
+    entity.operate(deeds);
+
+    assertThat(deeds.housesBuiltOn(street)).isZero();
+    assertThat(entity.shareholderPayment(dog)).isEqualTo(Money.ZERO);
+    assertThat(dog.account().balance().amount()).isEqualTo(new Money(30));
+  }
+
   private void ownEveryRemainingSpace(Player owner) {
     rules.streets().filter(it -> it instanceof the.monopoly.game.components.streets.Ownable)
         .map(it -> (the.monopoly.game.components.streets.Ownable) it)

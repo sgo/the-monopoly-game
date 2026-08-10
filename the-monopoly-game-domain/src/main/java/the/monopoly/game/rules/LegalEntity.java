@@ -115,6 +115,21 @@ public final class LegalEntity {
   public Operation operate(Deeds deeds) {
     if (rentReceivedOn != null && deeds.housesBuiltOn(rentReceivedOn) == 0) {
       ColourStreet street = rentReceivedOn;
+      Money cost = street.houseConstructionCost();
+      int contribution = (cost.amount() + shareholders.size() - 1) / shareholders.size();
+      int available = shareholders.stream()
+          .mapToInt(player -> Math.min(contribution, player.account().balance().amount().amount()))
+          .sum();
+      if (available < cost.amount()) {
+        rentReceivedOn = null;
+        markOperated();
+        return new Operation.NoAction();
+      }
+      shareholders.forEach(player -> {
+        Money payment = new Money(Math.min(contribution, player.account().balance().amount().amount()));
+        player.account().withdraw(payment);
+        recordShareholderPayment(player, payment);
+      });
       deeds.arrangeHouses(street, 1);
       rentReceivedOn = null;
       markOperated();
@@ -137,6 +152,9 @@ public final class LegalEntity {
     }
 
     record HouseBuilt(ColourStreet street) implements Operation {
+    }
+
+    record NoAction() implements Operation {
     }
   }
 
