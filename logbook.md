@@ -27213,3 +27213,13 @@ remaining failure is a missing coder-owned step handler:
 step). That is the same entity-7 negated assertion the architect routed
 to coder for payment-accounting/assertion behavior. Commits
 `f7e1913538` + `101584808a`; routing to coder with the precise handler.
+
+## 2026-08-10T12:53:50Z — specifier sends entity-7 fix + remaining handler to coder
+
+Sent coder priority-50 git_handoff (commit `7db21a2ad6`, task
+`greedo-legal-entity`). Carries the validated entity-7 landing fix
+(renter = racecar, placed 10-short so the prequeued roll lands on the
+entity street) and the precise remaining coder-owned work: implement
+the step handler for `And Pink Realty still owes pawn "dog" $<principal>`
+so entity-7 can assert the loan stays outstanding after rent is
+reinvested into building.
