@@ -26038,6 +26038,17 @@ the JVM exhausts its heap. This is a deterministic acceptance-helper
 fixture defect, not a Gherkin-content change. Route to coder to give
 the fixture distinct deterministic initiative rolls while preserving
 the real `Game` turn path.
+
+## 2026-08-10T09:45:29Z — coder fixes legal-entity initiative fixture
+
+Processed architect commit `655b46e7ec` for `greedo-legal-entity`.
+Updated `World.formNamedEntity` so each player receives a distinct
+deterministic initiative roll, followed by the existing unremarkable
+turn roll. This preserves the real `Game.play`/initiative/turn path and
+prevents the fixture fallback from creating an unbreakable tie.
+
+Verification: domain tests 332/332 passing; full acceptance 545/545
+passing; `git diff --check` clean.
 2026-08-10T07:40:00Z — Received specifier handoff:
 id: 20260810T073726Z_000087_from_specifier
 from: specifier
