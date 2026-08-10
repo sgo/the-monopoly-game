@@ -152,6 +152,9 @@ final class JournalStepHandlers {
         given("^pawn \"" + NAME + "\" has a balance that allows only \\$(<ceiling_share>) toward the entity$",
             (world, arguments) -> world.arrangePawnBalance(arguments.text(1), money(arguments.number(2)))),
 
+        given("^pawn \"" + NAME + "\" has a balance that allows only \\$(<share>) toward the entity$",
+            (world, arguments) -> world.arrangePawnBalance(arguments.text(1), money(arguments.number(2)))),
+
         step("^pawn \"" + NAME + "\" considers forming a legal entity over the " + NAME + " colour group$",
             (world, arguments) -> world.considerFormingLegalEntity(arguments.text(1), arguments.text(2))),
 
