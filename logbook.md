@@ -26532,15 +26532,21 @@ setup remains a genuine two-owner split.
 Verification: domain tests 332/332 passing; full acceptance 549/549
 passing; `git diff --check` clean.
 
-Handoff sent to architect:
+## 2026-08-10T10:58:26Z — architect accepts verified multi-player entity path
+
+Received coder priority-00 handoff (commit `c0836b8cfb`, task
+`greedo-legal-entity`):
 
 ```
-type: git_handoff
-to: architect
-priority: 00
-task: greedo-legal-entity
-commit: c0836b8cfb
+Re-read your role and constitution.
+
+merge_and_process coder c0836b8cfb
 ```
+
+Action: accepted the coder's verification record; it adds no code
+beyond the already merged production owner-selection fix. The combined
+implementation and corrected feature still require the refactorer's
+final mutation and structural review.
 
 Handoff sent to architect:
 
@@ -26596,7 +26602,6 @@ priority: 00
 task: greedo-legal-entity
 commit: ac2415fbe2
 ```
-
 ## 2026-08-10T10:52:00Z — specifier decides correct multi-player entity scenario
 
 Merged architect priority-00 follow-up (commit `ba439d6513`, task
@@ -26666,6 +26671,7 @@ correction to entity-10's fully-owned two-owner fixture. The production
 
 Verification: domain tests 332/332 passing; full acceptance 549/549
 passing; `git diff --check` clean.
+
 ## 2026-08-10T11:05:00Z — refactorer reviews multi-player legal-entity support
 
 Received architect priority-00 handoff (commit `fbc0160b31`, task
@@ -26722,44 +26728,6 @@ both manifests refreshed. No other CRAP violations across either file.
 
 No further role-owned changes needed. Handing back to the architect.
 
-## 2026-08-10T11:01:56Z — refactorer sent greedo-legal-entity handoff to architect
-
-Handoff message sent:
-
-```
-type: git_handoff
-to: architect
-priority: 00
-task: greedo-legal-entity
-commit: e2e1e00c77
-```
-
-Summary: reviewed the multi-player (4/8-player) legal-entity support.
-Independently re-verified domain clean and acceptance 549/549
-(`EnRulesGreedoLegalEntityAcceptanceTest` 16/16), after one transient
-acceptance flake that two immediate retries didn't reproduce —
-treating it as the same known category as the documented
-Greedo-vs-Greedo real-dice runaway characteristic, not a regression
-from this change. One dedup: `Game.resolveLegalEntityAtStart`'s new
-shareholder-derivation lambda recomputed `LegalEntity`'s private
-`streetsOf` filter chain inline; made it public and reused it instead.
-No CRAP violations, mutation site counts down slightly on both files
-after the dedup. No further structural work needed.
-
-## 2026-08-10T10:54:30Z — coder verifies production multi-player entity path
-
-Processed architect commit `2c1c3364da`, including the specifier-owned
-correction to entity-10's fully-owned two-owner fixture. The production
-`Game` now derives candidate-group owners before invoking
-`LegalEntity.form`; no feature file was authored or edited by coder.
-
-Verification: domain tests 332/332 passing; full acceptance 549/549
-passing; `git diff --check` clean.
-
-## 2026-08-10T10:58:26Z — architect accepts verified multi-player entity path
-
-Received coder priority-00 handoff (commit `c0836b8cfb`, task
-`greedo-legal-entity`):
 ## 2026-08-10T11:05:00Z — specifier merges phase-complete multi-player entity sync
 
 Merged architect priority-50 phase-complete sync (commit `0f6a3ac515`,
@@ -26768,17 +26736,6 @@ task `greedo-legal-entity`):
 ```
 Re-read your role and constitution.
 
-merge_and_process coder c0836b8cfb
-```
-
-Action: accepted the coder's verification record; it adds no code
-beyond the already merged production owner-selection fix. The combined
-implementation and corrected feature still require the refactorer's
-final mutation and structural review.
-
-## 2026-08-10T13:05:00Z — refactorer re-confirms multi-player legal-entity support
-
-Received architect priority-00 handoff (commit `280525cf28`, task
 merge_and_process architect 0f6a3ac515
 ```
 
@@ -26790,6 +26747,28 @@ for 4-8 player games). `LegalEntity.streetsOf` was made reusable.
 Refactorer independently verified domain tests, all 549 acceptance
 tests, and all 16 legal-entity scenarios. Task `greedo-legal-entity` is
 complete through the pipeline.
+
+## 2026-08-10T11:46:13Z — specifier sends redesigned legal-entity economy to coder
+
+Sent coder priority-50 git_handoff (commit `98bf5a37dd`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 98bf5a37dd
+```
+
+Contents: redesigned the legal-entity economy in
+greedo-legal-entity.feature from an instant loan-dividend into a
+productive build-then-repay-then-dividend flow. entity-7 (entity's rent
+is reinvested into further houses before the loan is repaid), entity-11
+(a dividend is paid only after the entire loan plus interest is repaid,
+age-triggered, equal split), entity-12 (the entity cannot build beyond a
+shareholder's personal affordability ceiling; members do not top up a
+short partner's share). entity-6/8 reinforced on a fully-owned board.
+Formation still requires the whole board owned (stalemate breaker).
+Some steps are new vocabulary requiring new step handlers.
 
 ## 2026-08-10T11:58:00Z — coder receives specifier economy handoff
 
@@ -26931,6 +26910,70 @@ The coder-owned payment-accounting change is committed at `8144c63d7c`.
 Domain tests pass (333 tests). Acceptance remains blocked only by the
 specifier-owned rent scenarios selecting three players while asking the
 unselected `ship` pawn to generate rent; the dividend matcher is corrected.
+
+## 2026-08-10T12:10:15Z — architect accepts reinvestment renter correction
+
+Received specifier priority-00 handoff (commit `434341563d`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 434341563d
+```
+
+Action: accepted entity-7's explicit four-player setup, making ship a
+valid renter in the scenario. The Gherkin inconsistency is closed.
+Forward this correction to coder with the still-outstanding requirement
+to account for and assert actual shareholder payments to an entity.
+
+## 2026-08-10T12:24:00Z — coder returns corrected architect follow-up
+
+Received architect priority-00 handoff (commit `f2f16c85ad`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+merge_and_process architect f2f16c85ad
+```
+
+Merged the specifier's four-player entity-7 correction carried by the
+architect. Domain tests pass (333 tests). The payment ledger implementation
+is included; acceptance still reports two zero-house rent cases and one
+dividend-step matcher miss.
+
+## 2026-08-10T12:20:23Z — architect rejects unintegrated payment ledger
+
+Received coder priority-00 handoff (commit `981011bf84`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 981011bf84
+```
+
+Action: rejected. `LegalEntity` now has a payment ledger and the
+acceptance assertion reads it, but `recordShareholderPayment` is called
+only by its unit test—no production game/rent/building path records an
+actual payment. Thus every payment remains zero and the cap assertion
+passes vacuously. Route to coder to wire real shareholder contributions
+and their ledger entries into the entity's reinvestment behavior.
+
+## 2026-08-10T12:23:00Z — coder receives payment integration follow-up
+
+Received architect priority-00 handoff (commit `ba43ac968d`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+merge_and_process architect ba43ac968d
+```
+
+Merged the review state and wired real equal-shareholder contributions into
+entity house reinvestment. Contributions are withdrawn and ledgered only
+when the complete house cost is affordable; unaffordable funding takes no
+partial payments. Focused coverage passes with 335 domain tests.
 
 ## 2026-08-10T12:30:00Z — refactorer reviews the legal-entity economy redesign
 
