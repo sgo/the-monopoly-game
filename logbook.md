@@ -26943,3 +26943,9 @@ Merged the review state and wired real equal-shareholder contributions into
 entity house reinvestment. Contributions are withdrawn and ledgered only
 when the complete house cost is affordable; unaffordable funding takes no
 partial payments. Focused coverage passes with 335 domain tests.
+
+## 2026-08-10T12:23:41Z — coder forwards contribution implementation
+
+Sent priority-00 git handoff for `greedo-legal-entity` at commit
+`986a53cb2d` to the refactorer. It contains the production contribution
+path, affordability guard, and focused unit coverage.
