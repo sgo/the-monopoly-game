@@ -86,6 +86,55 @@ final class JournalStepHandlers {
         given("^Pink Realty's loan has been fully repaid$",
             (world, arguments) -> world.entityLoanFullyRepaid("Pink Realty")),
 
+        given("^Pink Realty's bank account holds \\$" + VALUE + "$",
+            (world, arguments) -> world.entityBankHolds("Pink Realty", money(arguments.number(1)))),
+
+        then("^Pink Realty's bank account holds \\$" + VALUE + "$",
+            (world, arguments) -> assertThat(world.entityBankBalance("Pink Realty"))
+                .isEqualTo(money(arguments.number(1)))),
+
+        step("^Pink Realty raises a loan of \\$" + VALUE + "$",
+            (world, arguments) -> world.entityRaisesLoan("Pink Realty", money(arguments.number(1)))),
+
+        given("^Pink Realty owns no outstanding loan$",
+            (world, arguments) -> assertThat(world.entityLoan("Pink Realty")).isEqualTo(money(0))),
+
+        given("^Pink Realty's bank account is empty$",
+            (world, arguments) -> world.entityBankHolds("Pink Realty", money(0))),
+
+        then("^the pink colour group is developed up to at least (<houses_at_least>) houses$",
+            (world, arguments) -> assertThat(world.totalHouses(Street.Colour.pink))
+                .isGreaterThanOrEqualTo(arguments.number(1))),
+
+        then("^Pink Realty raises no more than \\$(<max_loan>) in loans$",
+            (world, arguments) -> assertThat(world.gameLog().stream()
+                .filter(Entry.LegalEntityLoanRaised.class::isInstance)
+                .map(Entry.LegalEntityLoanRaised.class::cast)
+                .filter(entry -> entry.name().equals("Pink Realty"))
+                .mapToInt(entry -> entry.amount().amount()).sum())
+                .isLessThanOrEqualTo(arguments.number(1))),
+
+        then("^each of pawn \"dog\", pawn \"high hat\", and pawn \"iron box\" receives a \\$(<dividend_share>) dividend from Pink Realty$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityDividendPaid it
+                && it.name().equals("Pink Realty") && it.amount().amount() == arguments.number(1), "dividend amount"))),
+
+        then("^the " + NAME + ", the " + NAME + ", and the " + NAME + " each have a house built$",
+            (world, arguments) -> {
+              assertThat(world.housesBuilt(SpaceNames.of(arguments.text(1)))).isGreaterThanOrEqualTo(1);
+              assertThat(world.housesBuilt(SpaceNames.of(arguments.text(2)))).isGreaterThanOrEqualTo(1);
+              assertThat(world.housesBuilt(SpaceNames.of(arguments.text(3)))).isGreaterThanOrEqualTo(1);
+            }),
+
+        then("^pawn \"" + NAME + "\" has paid \\$" + VALUE + " in rent$",
+            (world, arguments) -> assertThat(world.pawnBalanceIsAfterRent(
+                arguments.text(1), money(arguments.number(2)))).isTrue()),
+
+        then("^Pink Realty issues no loan, repayment, or dividend$",
+            (world, arguments) -> assertThat(world.gameLog().stream().anyMatch(entry ->
+                entry instanceof Entry.LegalEntityLoanRaised
+                    || entry instanceof Entry.LegalEntityLoanRepaid
+                    || entry instanceof Entry.LegalEntityDividendPaid)).isFalse()),
+
         then("^Pink Realty still owes pawn \"dog\" \\$(<principal>)$",
             (world, arguments) -> assertThat(world.entityLoan("Pink Realty"))
                 .isEqualTo(money(arguments.number(1)))),

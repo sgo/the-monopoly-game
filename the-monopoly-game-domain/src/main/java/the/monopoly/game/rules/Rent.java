@@ -41,6 +41,7 @@ public class Rent implements Landings {
     Money rent = land.vacantRent().plus(land.vacantRent());
     if (tenant.account().balance().amount().amount() >= rent.amount()) {
       tenant.account().withdraw(rent);
+      entity.depositToBank(rent);
       entity.receiveRent(land);
     }
   }

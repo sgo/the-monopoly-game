@@ -1,6 +1,7 @@
 package the.monopoly.game.rules;
 
 import the.monopoly.game.components.finance.Money;
+import the.monopoly.game.components.finance.Bank.Account;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
@@ -19,6 +20,7 @@ public final class LegalEntity {
   private final List<Player> shareholders;
   private final List<ColourStreet> streets;
   private Money loan = Money.ZERO;
+  private final Account bankAccount;
   private ColourStreet rentReceivedOn;
   private final Map<Player.ID, Money> shareholderPayments = new HashMap<>();
   private boolean operated;
@@ -29,6 +31,7 @@ public final class LegalEntity {
     this.colour = colour;
     this.shareholders = List.copyOf(shareholders);
     this.streets = List.copyOf(streets);
+    this.bankAccount = new Account(new Account.Owner(name), Account.Balance.of(0));
   }
 
   public static Optional<LegalEntity> form(String name, Street.Colour colour,
@@ -84,9 +87,16 @@ public final class LegalEntity {
   public double shareOf(Player shareholder) { return shareholders.contains(shareholder) ? 1.0 / shareholders.size() : 0.0; }
 
   public Money loan() { return loan; }
+  public Money bankBalance() { return bankAccount.balance().amount(); }
+  public void depositToBank(Money amount) { bankAccount.deposit(amount); }
+  public void withdrawFromBank(Money amount) { bankAccount.withdraw(amount); }
   public boolean operated() { return operated; }
   public void markOperated() { operated = true; }
-  public void raiseLoan(Money amount) { loan = loan.plus(amount); }
+  public void raiseLoan(Money amount) {
+    loan = loan.plus(amount);
+    bankAccount.deposit(amount);
+  }
+  public void recordLoan(Money amount) { loan = loan.plus(amount); }
   public void receiveRent(ColourStreet street) { rentReceivedOn = street; }
   public boolean receivedRent() { return rentReceivedOn != null; }
   public void recordShareholderPayment(Player shareholder, Money amount) {

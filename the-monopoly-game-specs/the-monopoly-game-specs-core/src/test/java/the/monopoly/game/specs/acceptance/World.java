@@ -621,7 +621,12 @@ public class World {
 
   public void entityOwes(String entityName, Money principal) {
     deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
-        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).raiseLoan(principal);
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).recordLoan(principal);
+  }
+
+  public void entityRaisesLoan(String entityName, Money amount) {
+    deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).raiseLoan(amount);
   }
 
   public void entityLoanFullyRepaid(String entityName) {
@@ -633,6 +638,22 @@ public class World {
   public Money entityLoan(String entityName) {
     return deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
         .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).loan();
+  }
+
+  public void entityBankHolds(String entityName, Money amount) {
+    LegalEntity entity = deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName));
+    entity.depositToBank(amount);
+  }
+
+  public Money entityBankBalance(String entityName) {
+    return deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).bankBalance();
+  }
+
+  public boolean pawnBalanceIsAfterRent(String pawnName, Money rent) {
+    Player pawn = pawn(pawnName);
+    return pawn.account().balance().amount().equals(ruleSet.players().startingCapital().minus(rent));
   }
 
   public int housesBuilt(Street.Type land) {
