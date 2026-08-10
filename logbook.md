@@ -26527,3 +26527,13 @@ Restored entity-10's original Gherkin setup as directed. Domain tests are
 only entity-10's two scenarios failing because the stated setup assigns
 the third group street to `racecar`, creating three owners; that scenario
 decision is routed to the specifier.
+
+Handoff sent to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: ac2415fbe2
+```
