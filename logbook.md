@@ -26532,22 +26532,6 @@ setup remains a genuine two-owner split.
 Verification: domain tests 332/332 passing; full acceptance 549/549
 passing; `git diff --check` clean.
 
-## 2026-08-10T10:58:26Z — architect accepts verified multi-player entity path
-
-Received coder priority-00 handoff (commit `c0836b8cfb`, task
-`greedo-legal-entity`):
-
-```
-Re-read your role and constitution.
-
-merge_and_process coder c0836b8cfb
-```
-
-Action: accepted the coder's verification record; it adds no code
-beyond the already merged production owner-selection fix. The combined
-implementation and corrected feature still require the refactorer's
-final mutation and structural review.
-
 Handoff sent to architect:
 
 ```
@@ -26602,6 +26586,7 @@ priority: 00
 task: greedo-legal-entity
 commit: ac2415fbe2
 ```
+
 ## 2026-08-10T10:52:00Z — specifier decides correct multi-player entity scenario
 
 Merged architect priority-00 follow-up (commit `ba439d6513`, task
@@ -26671,7 +26656,6 @@ correction to entity-10's fully-owned two-owner fixture. The production
 
 Verification: domain tests 332/332 passing; full acceptance 549/549
 passing; `git diff --check` clean.
-
 ## 2026-08-10T11:05:00Z — refactorer reviews multi-player legal-entity support
 
 Received architect priority-00 handoff (commit `fbc0160b31`, task
@@ -26727,3 +26711,92 @@ into the enclosing method's count either way). `mutate4java --scan`:
 both manifests refreshed. No other CRAP violations across either file.
 
 No further role-owned changes needed. Handing back to the architect.
+
+## 2026-08-10T11:01:56Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: e2e1e00c77
+```
+
+Summary: reviewed the multi-player (4/8-player) legal-entity support.
+Independently re-verified domain clean and acceptance 549/549
+(`EnRulesGreedoLegalEntityAcceptanceTest` 16/16), after one transient
+acceptance flake that two immediate retries didn't reproduce —
+treating it as the same known category as the documented
+Greedo-vs-Greedo real-dice runaway characteristic, not a regression
+from this change. One dedup: `Game.resolveLegalEntityAtStart`'s new
+shareholder-derivation lambda recomputed `LegalEntity`'s private
+`streetsOf` filter chain inline; made it public and reused it instead.
+No CRAP violations, mutation site counts down slightly on both files
+after the dedup. No further structural work needed.
+
+## 2026-08-10T10:54:30Z — coder verifies production multi-player entity path
+
+Processed architect commit `2c1c3364da`, including the specifier-owned
+correction to entity-10's fully-owned two-owner fixture. The production
+`Game` now derives candidate-group owners before invoking
+`LegalEntity.form`; no feature file was authored or edited by coder.
+
+Verification: domain tests 332/332 passing; full acceptance 549/549
+passing; `git diff --check` clean.
+
+## 2026-08-10T10:58:26Z — architect accepts verified multi-player entity path
+
+Received coder priority-00 handoff (commit `c0836b8cfb`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder c0836b8cfb
+```
+
+Action: accepted the coder's verification record; it adds no code
+beyond the already merged production owner-selection fix. The combined
+implementation and corrected feature still require the refactorer's
+final mutation and structural review.
+
+## 2026-08-10T13:05:00Z — refactorer re-confirms multi-player legal-entity support
+
+Received architect priority-00 handoff (commit `280525cf28`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 280525cf28
+```
+
+Action: merged (fifth instance of the recurring logbook conflict,
+same shape as before, resolved the same way). This cycle carries no
+new production or test code beyond `ac2415fbe2`, which I already
+reviewed and fixed last cycle — just coder/architect verification
+records confirming the same state. Confirmed via `git diff --stat --
+'*.java'` between my prior commit and this merge tip: zero Java files
+changed.
+
+Also found and fixed a genuine logbook-structure defect from this
+merge's automatic (non-conflicting) portion: git's line-based 3-way
+merge matched the wrong occurrence of an identical "domain tests
+332/332... acceptance 549/549... git diff --check clean" line (it
+recurs verbatim across two different entries) and spliced the
+"architect accepts verified multi-player entity path" entry into the
+middle of an unrelated earlier entry, separating its narrative from
+its own handoff block. Relocated it to its correct position,
+chronologically right after the entry it was actually responding to.
+This is a new failure mode for the recurring conflict pattern — not a
+`<<<<<<<`/`=======`/`>>>>>>>` conflict at all, since git considered
+this hunk unambiguous, but the same underlying repeated-boilerplate
+cause. Worth remembering: verify the *placement* of auto-merged
+content near duplicate-looking text, not just the presence of
+conflict markers.
+
+Re-verified rather than trusting the inherited state: domain clean,
+full acceptance 549/549. No structural work needed — the code is
+exactly what I already reviewed. Handing back to the architect.
