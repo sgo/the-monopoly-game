@@ -53,7 +53,7 @@ public final class LegalEntity {
         .noneMatch(it -> deeds.isUnowned(it.type()));
   }
 
-  private static List<ColourStreet> streetsOf(Street.Colour colour, Rule.Set rules) {
+  public static List<ColourStreet> streetsOf(Street.Colour colour, Rule.Set rules) {
     return rules.streets().filter(ColourStreet.class::isInstance)
         .map(ColourStreet.class::cast).filter(it -> it.colourGroup() == colour).toList();
   }
@@ -116,12 +116,12 @@ public final class LegalEntity {
 
 /* mutate4java-manifest
 version=1
-moduleHash=da7e12c513c701c06149fae11e1468261abedfe9bda8c56adae1dad9542582ca
+moduleHash=8b30b4d0d2aa41ef574d88e847097ca54bf7f39f04a3158d83cdc5c4c781e21e
 scope.0.id=Y2xhc3M6TGVnYWxFbnRpdHkjTGVnYWxFbnRpdHk6MTQ
 scope.0.kind=class
 scope.0.startLine=14
 scope.0.endLine=115
-scope.0.semanticHash=eb042592b57dd833d335ba0fd05ba5887441ed9c4b96e8dff8f92395a7438700
+scope.0.semanticHash=ca51b76267d126a26098e628812136dcb4e2bb5910a1d209e7abd1554ec1fe18
 scope.1.id=Y2xhc3M6TGVnYWxFbnRpdHkuT3BlcmF0aW9uI09wZXJhdGlvbjoxMDc
 scope.1.kind=class
 scope.1.startLine=107
@@ -296,15 +296,15 @@ scope.35.id=bWV0aG9kOkxlZ2FsRW50aXR5I3N0cmVldHNPZigyKTo1Ng
 scope.35.kind=method
 scope.35.startLine=56
 scope.35.endLine=59
-scope.35.semanticHash=79eae6782c1d21a467a07b61763563daeaf0277bc647a3162b9f73999c890cb1
+scope.35.semanticHash=20dcba0a9dc440b6eaa72b374c3cdb05c172e301c9db4e6843e9b438c0854040
 scope.36.id=bWV0aG9kOkxlZ2FsRW50aXR5Lk9wZXJhdGlvbi5Mb2FuUmFpc2VkV2l0aERpdmlkZW5kI2N0b3IoMik6MTA4
 scope.36.kind=method
 scope.36.startLine=1
 scope.36.endLine=115
-scope.36.semanticHash=56e061aed90f5222ffa7b43fd1b20fce67eac46ee94bdeaf8628f30f6c41bc54
+scope.36.semanticHash=2234ddc451153364b2d5bfb39f002b99bb940709537828df78199c365ee77506
 scope.37.id=bWV0aG9kOkxlZ2FsRW50aXR5Lk9wZXJhdGlvbi5Mb2FuUmVwYWlkI2N0b3IoMyk6MTEx
 scope.37.kind=method
 scope.37.startLine=1
 scope.37.endLine=115
-scope.37.semanticHash=56e061aed90f5222ffa7b43fd1b20fce67eac46ee94bdeaf8628f30f6c41bc54
+scope.37.semanticHash=2234ddc451153364b2d5bfb39f002b99bb940709537828df78199c365ee77506
 */

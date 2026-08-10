@@ -26425,6 +26425,45 @@ tooling targets.
 
 No further role-owned changes needed. Handing back to the architect.
 
+## 2026-08-10T11:05:00Z — architect closes multi-player legal entities
+
+Received refactorer priority-00 handoff (commit `e2e1e00c77`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer e2e1e00c77
+```
+
+Action: accepted the behavior-preserving deduplication of candidate
+colour-group lookup. Refactorer independently verified domain tests,
+all 549 acceptance tests, and all 16 legal-entity scenarios. The one
+observed transient full-suite failure did not reproduce in two immediate
+retries and the pure deduplication does not alter game behavior. All
+coder/refactorer loops are closed; send the phase-complete priority-50
+sync to specifier.
+
+## 2026-08-10T09:50:34Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: e2f6b9f830
+```
+
+Summary: confirmed, independently, that the coder's initiative-fixture
+fix genuinely resolves the OOM I reported last cycle — domain clean,
+acceptance 545/545 in ~31s, `EnRulesGreedoLegalEntityAcceptanceTest`
+back to its 12/12 baseline. The four-line diff (`formNamedEntity`
+queuing distinct deterministic initiative rolls ahead of the existing
+ordinary-turn roll) is minimal, correct, and idiomatic; no CRAP or DRY
+concerns from this change. No structural work needed on my side.
+
 ## 2026-08-10T09:51:35Z — architect closes greedo-legal-entity
 
 Received refactorer priority-00 handoff (commit `e2f6b9f830`, task
@@ -26492,6 +26531,22 @@ setup remains a genuine two-owner split.
 
 Verification: domain tests 332/332 passing; full acceptance 549/549
 passing; `git diff --check` clean.
+
+## 2026-08-10T10:58:26Z — architect accepts verified multi-player entity path
+
+Received coder priority-00 handoff (commit `c0836b8cfb`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder c0836b8cfb
+```
+
+Action: accepted the coder's verification record; it adds no code
+beyond the already merged production owner-selection fix. The combined
+implementation and corrected feature still require the refactorer's
+final mutation and structural review.
 
 Handoff sent to architect:
 
@@ -26599,6 +26654,24 @@ the corrected feature to coder with the still-outstanding requirement
 that `Game`, rather than only `World`, select the three owners of the
 candidate group in larger games.
 
+## 2026-08-10T10:53:16Z — architect merges real multi-player entity support
+
+Received coder priority-00 handoff (commit `ac2415fbe2`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder ac2415fbe2
+```
+
+Action: resolved the concurrent coder/specifier merge without losing
+either correction. `Game.resolveLegalEntityAtStart` now derives the
+candidate colour group's actual owners before calling `LegalEntity.form`;
+the specifier's fully-owned two-owner entity-10 scenario is retained.
+Full acceptance passes 549/549. Send the combined implementation to
+refactorer for final structural and mutation review.
+
 ## 2026-08-10T10:54:30Z — coder verifies production multi-player entity path
 
 Processed architect commit `2c1c3364da`, including the specifier-owned
@@ -26608,3 +26681,79 @@ correction to entity-10's fully-owned two-owner fixture. The production
 
 Verification: domain tests 332/332 passing; full acceptance 549/549
 passing; `git diff --check` clean.
+
+## 2026-08-10T11:05:00Z — refactorer reviews multi-player legal-entity support
+
+Received architect priority-00 handoff (commit `fbc0160b31`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect fbc0160b31
+```
+
+Action: merged (fourth instance of the recurring logbook sent/received
+boilerplate-misalignment conflict, same shape as before — my own "sent
+handoff" entry interleaved with a long downstream chain; resolved by
+keeping my entry intact and splicing the incoming chain in after it,
+verified via `grep` for zero remaining markers and a full read-through
+for coherence). This carries the whole multi-player expansion that
+happened after my last handoff: 4- and 8-player games couldn't form
+entities at all (`Game.resolveLegalEntityAtStart` passed the entire
+player pool to `LegalEntity.form`'s exactly-three guard), a specifier
+round on the right entity-10 acceptance criterion (a genuine two-owner
+split, not an unowned-group case), and a coder fix — accepted by the
+architect only after an initial rejection for testing the fixture path
+but not the real `Game` policy — deriving shareholders from the
+candidate colour group's actual deed owners in production code too.
+
+Independently re-verified rather than trusting the inherited "549/549"
+claim: domain clean, full acceptance 549/549,
+`EnRulesGreedoLegalEntityAcceptanceTest` at 16/16 (up from 12,
+matching the new entity-9/entity-10 examples). One acceptance run
+along the way failed after a change of mine (detailed below); two
+immediate retries both passed 549/549 clean, and the failure report
+was already gone by the time I went to inspect it (the script
+overwrites reports each run). Given a transient flake in a suite with
+real-dice games is an already-documented, accepted characteristic here
+(see the Greedo-vs-Greedo runaway note), and my change was a pure
+reuse of an existing pure function with no logic change, I'm treating
+this as that same category rather than a regression — but flagging it
+plainly rather than silently discarding the data point.
+
+Structural finding: `Game.resolveLegalEntityAtStart`'s new
+shareholder-derivation lambda recomputed the candidate colour group's
+streets with the exact same filter chain `LegalEntity.streetsOf`
+already has privately. `dry4java` didn't catch it (below its
+min-lines/min-nodes threshold, same reason it missed the `jailEntered`
+qualification a few cycles back) but it's the same computation
+duplicated in two files. Made `LegalEntity.streetsOf` public and
+pointed `Game` at it instead of re-deriving the stream inline. CRAP
+for `resolveLegalEntityAtStart` unchanged (CC=2, CRAP=4.8 — the
+duplicated logic lived inside a lambda, which this tool doesn't fold
+into the enclosing method's count either way). `mutate4java --scan`:
+`Game.java` 71 sites (down from 75), `LegalEntity.java` 25 (was 26),
+both manifests refreshed. No other CRAP violations across either file.
+
+No further role-owned changes needed. Handing back to the architect.
+
+## 2026-08-10T11:05:00Z — specifier merges phase-complete multi-player entity sync
+
+Merged architect priority-50 phase-complete sync (commit `0f6a3ac515`,
+task `greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 0f6a3ac515
+```
+
+Action: accepted the closed review. The production `Game.java`
+`resolveLegalEntityAtStart` now derives entity shareholders from each
+colour group's actual street owners instead of passing the whole player
+pool, which fixes the defect I root-caused earlier (no entity formation
+for 4-8 player games). `LegalEntity.streetsOf` was made reusable.
+Refactorer independently verified domain tests, all 549 acceptance
+tests, and all 16 legal-entity scenarios. Task `greedo-legal-entity` is
+complete through the pipeline.
