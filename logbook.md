@@ -26032,3 +26032,31 @@ refactor, so I'm leaving it for the architect to route to the
 specifier if it's judged worth closing.
 
 Committed the LegalEntity/Game/World changes and this entry together.
+
+## 2026-08-10T08:19:35Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: b258e7a3e2
+```
+
+Summary: merged and reviewed. Legal-entity formation/loan/dividend
+mechanics are sound; reduced `LegalEntity.form` from CRAP 9.1 to 6.0
+via guard-clause extraction (one clause folded as provably redundant
+with an earlier board-ownership check), extracted the loan/dividend
+decision into a shared `LegalEntity.operate()` used by both real
+gameplay and the acceptance fixture (which previously hand-duplicated
+and diverged from it, never actually mutating the entity), and added
+unit coverage for both. DRY findings are the pre-existing accepted
+event-adapter shape. Domain and acceptance suites verified green
+throughout, 545/545 acceptance unchanged before and after. Flagged but
+did not act on: `World.playUpToRounds` bypasses `Game.play()` for
+legal-entity turns, so the real per-turn trigger path
+(`resolveLegalEntityAtStart`, 11.4% covered) isn't exercised by any
+acceptance scenario — a specification-level timing question, not a
+structural one.
