@@ -27789,6 +27789,22 @@ and added the exact total-house acceptance assertion. Domain tests pass
 nine remaining legacy journal/report/logging failures, which the architect
 routed to specifier as a separate fixture update.
 
+## 2026-08-10T14:50:01Z — coder returns completed treasury operation
+
+Sent architect priority-00 handoff:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 69e97552ac
+```
+
+Returned the coder-owned implementation: registered treasury, balanced
+construction, actual repayment/dividend credits, idle behavior, and green
+domain plus legal-entity acceptance verification.
+
 ## 2026-08-10T14:44:31Z — coder returns balanced-operation review
 
 Sent architect priority-00 handoff:
