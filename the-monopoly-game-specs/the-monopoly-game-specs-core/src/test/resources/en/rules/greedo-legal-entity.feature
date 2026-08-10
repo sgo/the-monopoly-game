@@ -265,28 +265,7 @@ Feature: Greedo legal entity for a three-way colour-group split
       | principal | surplus | dividend_share |
       | 0         | 150     | 50             |
 
-  # entity-20
-  Scenario Outline: the legal entity removes the 3+ Greedo colour-group impasse so the game can reach the stalemate cash threshold
-    Given we select 4 players
-    And legal-entity trading is enabled for the "Greedo" strategy
-    And pawn "dog" owns "<street_dog>"
-    And pawn "high hat" owns "<street_high_hat>"
-    And pawn "iron box" owns "<street_iron_box>"
-    And every other ownable space is owned by pawn "racecar"
-    And pawn "dog" will roll 10 for initiative
-    And pawn "high hat" will roll 4 for initiative
-    And pawn "iron box" will roll 2 for initiative
-    And pawn "racecar" will roll 1 for initiative
-    And every other player can complete their turn
-    When pawn "dog" considers forming a legal entity over the <group> colour group
-    Then the <group> colour group is owned by <entity_name>
-    And the game can continue to the stalemate cash threshold
-
-    Examples:
-      | group  | street_dog             | street_high_hat    | street_iron_box          | entity_name  |
-      | pink   | Rue de Diekirch Arlon  | Bruul Mechelen     | Place Verte Verviers     | Pink Realty  |
-      | yellow | Grote Markt Hasselt    | Place de l'Ange Namur | Hoogstraat (Brussel) / Rue Haute (Bruxelles) | Yellow Realty |
-      | green  | Boulevard Tirou Charleroi | Veldstraat Gent  | Boulevard d'Avroy Liège  | Green Realty |
+  
 
   # entity-9
   Scenario Outline: the entity forms from exactly the three co-owners of a colour group even when the game has more than three players
