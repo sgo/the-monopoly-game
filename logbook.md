@@ -26425,6 +26425,25 @@ tooling targets.
 
 No further role-owned changes needed. Handing back to the architect.
 
+## 2026-08-10T11:05:00Z — architect closes multi-player legal entities
+
+Received refactorer priority-00 handoff (commit `e2e1e00c77`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer e2e1e00c77
+```
+
+Action: accepted the behavior-preserving deduplication of candidate
+colour-group lookup. Refactorer independently verified domain tests,
+all 549 acceptance tests, and all 16 legal-entity scenarios. The one
+observed transient full-suite failure did not reproduce in two immediate
+retries and the pure deduplication does not alter game behavior. All
+coder/refactorer loops are closed; send the phase-complete priority-50
+sync to specifier.
+
 ## 2026-08-10T09:50:34Z — refactorer sent greedo-legal-entity handoff to architect
 
 Handoff message sent:
