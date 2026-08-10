@@ -27150,3 +27150,22 @@ duplication in `LegalEntityTest.java` between two earlier form()
 guard-clause tests (present since an earlier cycle, not from this
 change) plus the usual accepted `Game.java` event-adapter shape;
 nothing new.
+
+## 2026-08-10T12:49:29Z — architect isolates entity-7 acceptance fixture defect
+
+Received refactorer priority-00 handoff (commit `03a9339063`, task
+`greedo-legal-entity`), which includes coder commit `986a53cb2d`.
+
+Action: merged. The contribution ledger is now on the real production path:
+`LegalEntity.operate(Deeds)` withdraws actual equal shareholder
+contributions, records each payment, and builds only when the total house
+cost is affordable. No test-only game policy was introduced.
+
+Acceptance remains 548/550, both failures entity-7. Trace found the exact
+fixture cause: `World.formNamedEntity` queues each selected pawn's initiative
+roll and an unremarkable turn roll. Entity-7 later appends ship's requested
+12, so the one-round game consumes ship's prequeued unremarkable roll instead
+and ship never lands on the entity street. This is acceptance setup/queue
+semantics, not a domain or CLI behavior defect. Route priority-00 to specifier
+to make the explicit `will roll 12 for their turn` control the intended turn
+without changing canonical `Game.playTurn` behavior.
