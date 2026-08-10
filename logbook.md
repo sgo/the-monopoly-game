@@ -26493,6 +26493,16 @@ setup remains a genuine two-owner split.
 Verification: domain tests 332/332 passing; full acceptance 549/549
 passing; `git diff --check` clean.
 
+Handoff sent to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 314dadf9ff
+```
+
 ## 2026-08-10T10:47:47Z — architect rejects test-only multi-player entity support
 
 Received coder priority-00 handoff (commit `314dadf9ff`, task
@@ -26515,6 +26525,18 @@ to owning only outside the candidate group. That changes the acceptance
 criterion and still tests an unowned-group case rather than the stated
 two-owner split; only the specifier may decide the correct scenario.
 
+## 2026-08-10T10:50:10Z — coder routes production shareholder fix
+
+Updated `Game.resolveLegalEntityAtStart` to derive the shareholder list
+from the candidate colour group's actual deed owners before calling
+`LegalEntity.form`, allowing the real turn-start policy to support larger
+games without changing the production entity rule.
+
+Restored entity-10's original Gherkin setup as directed. Domain tests are
+332/332 passing. Full acceptance reaches 549 tests with 547 passing and
+only entity-10's two scenarios failing because the stated setup assigns
+the third group street to `racecar`, creating three owners; that scenario
+decision is routed to the specifier.
 
 ## 2026-08-10T10:52:00Z — specifier decides correct multi-player entity scenario
 
