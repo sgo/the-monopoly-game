@@ -26894,3 +26894,10 @@ merge_and_process architect facc22d72b
 
 Merged the review commit and replaced the vacuous shareholder-payment
 assertion with a LegalEntity payment ledger, including focused unit coverage.
+
+## 2026-08-10T12:19:00Z — coder forwards architect follow-up implementation
+
+The coder-owned payment-accounting change is committed at `8144c63d7c`.
+Domain tests pass (333 tests). Acceptance remains blocked only by the
+specifier-owned rent scenarios selecting three players while asking the
+unselected `ship` pawn to generate rent; the dividend matcher is corrected.
