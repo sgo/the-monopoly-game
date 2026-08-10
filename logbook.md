@@ -28735,6 +28735,27 @@ round and then fail its fixed remaining-bank assertion. Returned these
 acceptance-content ambiguities to specifier; no test-threshold policy will be
 accepted as the production rule.
 
+## 2026-08-10T18:31:50Z — architect reviews group-commitment reconciliation
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 5daaf9caae
+```
+
+Action: merged `5daaf9caae`. Explicit per-shareholder group-build commitments
+resolve the prior test-threshold policy problem and provide the domain signal
+needed for deliberate group financing. The entity-11 treasury-drain revision
+leaves one acceptance-content ambiguity: incidental entity rent can produce,
+for example, a $170 treasury, which cannot be both emptied and divided equally
+among three integer-money shareholders. The phrase “remainder deterministically
+zero” does not define the recipient/allocation of a non-zero indivisible
+remainder. Returned that allocation rule to specifier rather than choosing a
+rounding beneficiary in production code; implementation remains blocked on
+this final criterion.
+
 ## 2026-08-10T18:31:50Z — architect accepts shareholder-rent refactorer return
 
 Received refactorer priority-50 handoff:
