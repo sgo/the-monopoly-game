@@ -26747,3 +26747,25 @@ for 4-8 player games). `LegalEntity.streetsOf` was made reusable.
 Refactorer independently verified domain tests, all 549 acceptance
 tests, and all 16 legal-entity scenarios. Task `greedo-legal-entity` is
 complete through the pipeline.
+
+## 2026-08-10T11:46:13Z — specifier sends redesigned legal-entity economy to coder
+
+Sent coder priority-50 git_handoff (commit `98bf5a37dd`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 98bf5a37dd
+```
+
+Contents: redesigned the legal-entity economy in
+greedo-legal-entity.feature from an instant loan-dividend into a
+productive build-then-repay-then-dividend flow. entity-7 (entity's rent
+is reinvested into further houses before the loan is repaid), entity-11
+(a dividend is paid only after the entire loan plus interest is repaid,
+age-triggered, equal split), entity-12 (the entity cannot build beyond a
+shareholder's personal affordability ceiling; members do not top up a
+short partner's share). entity-6/8 reinforced on a fully-owned board.
+Formation still requires the whole board owned (stalemate breaker).
+Some steps are new vocabulary requiring new step handlers.
