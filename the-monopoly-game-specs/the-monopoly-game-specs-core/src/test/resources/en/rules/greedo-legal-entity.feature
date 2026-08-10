@@ -164,6 +164,9 @@ Feature: Greedo legal entity for a three-way colour-group split
   Scenario Outline: rent collected from a tenant is deposited into the entity's bank account
     Given we select 4 players
     And Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has 4 houses built
+    And the street "Bruul Mechelen" has 4 houses built
+    And the street "Place Verte Verviers" has 4 houses built
     And pawn "<renter>" starts at position <renter_position>
     And pawn "<renter>" will claim rent for "<renter_street>"
     When pawn "<renter>" lands on "<renter_street>"
