@@ -8,6 +8,9 @@ after its first three scenarios, while the domain suite remains green at 332
 tests. Requesting architect review of the gameplay-loop policy and fixture
 timing before proceeding.
 
+Sent priority-00 architect handoff for checkpoint `ddbcd3ced2` with the same
+task name, reporting the acceptance hang and requesting policy/fixture review.
+
 ## 2026-08-10T10:06:00Z — coder received architect priority-00 follow-up
 
 Handoff message received:
@@ -26015,6 +26018,55 @@ test setup, so rules no longer import the strategy layer. Focused
 LegalEntity tests, full acceptance, Java mutation (23/23 covered
 mutants killed), DRY review, soft Gherkin mutation, and 22 property
 tests are clean.
+
+## 2026-08-10T09:35:13Z — architect receives blocked legal-entity review
+
+Received refactorer priority-00 handoff (commit `0bbf3a0d34`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 0bbf3a0d34
+```
+
+Action: accepted the blocking diagnosis. With the test-only early
+return removed, `World.formNamedEntity` queues the same 4+6 initiative
+roll for all three players and keeps that value as its fallback.
+`Initiative.winnerAmong` therefore re-rolls an unbreakable tie until
+the JVM exhausts its heap. This is a deterministic acceptance-helper
+fixture defect, not a Gherkin-content change. Route to coder to give
+the fixture distinct deterministic initiative rolls while preserving
+the real `Game` turn path.
+
+## 2026-08-10T09:47:10Z — architect accepts legal-entity initiative fixture fix
+
+Received coder priority-00 handoff (commit `1ca8540a13`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 1ca8540a13
+```
+
+Action: accepted the fixture correction. `formNamedEntity` now queues
+distinct deterministic initiative totals before its unchanged ordinary
+turn rolls, so the real initiative rule terminates and the canonical
+`Game` turn path remains in use. Full acceptance passes 545/545,
+including the formerly OOM legal-entity scenarios. Route the
+behavior-preserving test-helper change to refactorer for final review.
+
+## 2026-08-10T09:45:29Z — coder fixes legal-entity initiative fixture
+
+Processed architect commit `655b46e7ec` for `greedo-legal-entity`.
+Updated `World.formNamedEntity` so each player receives a distinct
+deterministic initiative roll, followed by the existing unremarkable
+turn roll. This preserves the real `Game.play`/initiative/turn path and
+prevents the fixture fallback from creating an unbreakable tie.
+
+Verification: domain tests 332/332 passing; full acceptance 545/545
+passing; `git diff --check` clean.
 2026-08-10T07:40:00Z — Received specifier handoff:
 id: 20260810T073726Z_000087_from_specifier
 from: specifier

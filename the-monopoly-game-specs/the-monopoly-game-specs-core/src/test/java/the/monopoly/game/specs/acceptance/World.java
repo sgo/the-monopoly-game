@@ -574,7 +574,11 @@ public class World {
 
   public void formNamedEntity(String name) {
     othersRollWhatTheyLike = true;
-    players().forEach(player -> queuePawnRoll(player.id().value(), UNREMARKABLE));
+    for (int index = 0; index < players().size(); index++) {
+      Player player = players().get(index);
+      queuePawnRoll(player.id().value(), rollTotalling(3 + index));
+      queuePawnRoll(player.id().value(), UNREMARKABLE);
+    }
     formEntity(Street.Colour.valueOf(name.substring(0, name.indexOf(' ')).toLowerCase()), true);
   }
 
