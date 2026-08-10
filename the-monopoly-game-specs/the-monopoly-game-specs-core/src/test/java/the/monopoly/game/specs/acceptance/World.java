@@ -640,15 +640,6 @@ public class World {
         .forEach(ownable -> deeds.sell(ownable, pawn(pawnName), Money.ZERO));
   }
 
-  public void ownEveryOtherOwnableOutside(String pawnName, String colourName) {
-    if (deeds == null) deeds = new Deeds();
-    Street.Colour colour = Street.Colour.valueOf(colourName);
-    ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
-        .filter(ownable -> !(ownable instanceof ColourStreet street && street.colourGroup() == colour))
-        .filter(ownable -> deeds.isUnowned(ownable.type()))
-        .forEach(ownable -> deeds.sell(ownable, pawn(pawnName), Money.ZERO));
-  }
-
   public void ownEveryOtherOwnableRoundRobin(String... pawns) {
     if (deeds == null) deeds = new Deeds();
     List<Ownable> ownables = ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast).toList();

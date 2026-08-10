@@ -204,10 +204,6 @@ public final class MonopolyStepHandlers {
         given("^every other ownable space is owned by pawn \"" + NAME + "\"$",
             (world, arguments) -> world.ownEveryOtherOwnable(arguments.text(1))),
 
-        given("^every other ownable space outside the " + NAME + " colour group is owned by pawn \""
-                + NAME + "\"$",
-            (world, arguments) -> world.ownEveryOtherOwnableOutside(arguments.text(2), arguments.text(1))),
-
         given("^every other ownable space is owned in round-robin order by pawn \"" + NAME
                 + "\", pawn \"" + NAME + "\", and pawn \"" + NAME + "\" in board order$",
             (world, arguments) -> world.ownEveryOtherOwnableRoundRobin(
