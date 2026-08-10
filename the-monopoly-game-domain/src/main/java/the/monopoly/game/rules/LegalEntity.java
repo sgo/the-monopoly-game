@@ -1,6 +1,8 @@
 package the.monopoly.game.rules;
 
 import the.monopoly.game.components.finance.Money;
+import the.monopoly.game.components.finance.Bank.Account;
+import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
@@ -19,16 +21,20 @@ public final class LegalEntity {
   private final List<Player> shareholders;
   private final List<ColourStreet> streets;
   private Money loan = Money.ZERO;
+  private final Account bankAccount;
   private ColourStreet rentReceivedOn;
   private final Map<Player.ID, Money> shareholderPayments = new HashMap<>();
   private boolean operated;
 
   private LegalEntity(String name, Street.Colour colour, List<Player> shareholders,
-                      List<ColourStreet> streets) {
+                      List<ColourStreet> streets, Bank bank) {
     this.name = name;
     this.colour = colour;
     this.shareholders = List.copyOf(shareholders);
     this.streets = List.copyOf(streets);
+    Account.Owner owner = new Account.Owner(name);
+    bank.createAccountFor(owner);
+    this.bankAccount = bank.accountOf(owner);
   }
 
   public static Optional<LegalEntity> form(String name, Street.Colour colour,
@@ -40,12 +46,12 @@ public final class LegalEntity {
     if (colourGroupIneligible(streets, highestPriority)) return Optional.empty();
     if (!splitAcrossThreeDistinctOwners(streets, deeds)) return Optional.empty();
     if (!everyShareholderOwnsAStreet(shareholders, streets, deeds)) return Optional.empty();
-    return Optional.of(new LegalEntity(name, colour, shareholders, streets));
+    return Optional.of(new LegalEntity(name, colour, shareholders, streets, rules.bank()));
   }
 
   /** Creates an entity from already-set-up scenario state. */
   public static LegalEntity formed(String name, Street.Colour colour, List<Player> shareholders, Rule.Set rules) {
-    return new LegalEntity(name, colour, shareholders, streetsOf(colour, rules));
+    return new LegalEntity(name, colour, shareholders, streetsOf(colour, rules), rules.bank());
   }
 
   private static boolean hasThreeDistinctShareholders(List<Player> shareholders) {
@@ -84,9 +90,16 @@ public final class LegalEntity {
   public double shareOf(Player shareholder) { return shareholders.contains(shareholder) ? 1.0 / shareholders.size() : 0.0; }
 
   public Money loan() { return loan; }
+  public Money bankBalance() { return bankAccount.balance().amount(); }
+  public void depositToBank(Money amount) { bankAccount.deposit(amount); }
+  public void withdrawFromBank(Money amount) { bankAccount.withdraw(amount); }
   public boolean operated() { return operated; }
   public void markOperated() { operated = true; }
-  public void raiseLoan(Money amount) { loan = loan.plus(amount); }
+  public void raiseLoan(Money amount) {
+    loan = loan.plus(amount);
+    bankAccount.deposit(amount);
+  }
+  public void recordLoan(Money amount) { loan = loan.plus(amount); }
   public void receiveRent(ColourStreet street) { rentReceivedOn = street; }
   public boolean receivedRent() { return rentReceivedOn != null; }
   public void recordShareholderPayment(Player shareholder, Money amount) {
@@ -113,29 +126,56 @@ public final class LegalEntity {
 
   /** Applies the entity's end-of-turn priority: reinvest rent before debt service. */
   public Operation operate(Deeds deeds) {
-    if (rentReceivedOn != null && deeds.housesBuiltOn(rentReceivedOn) == 0) {
-      ColourStreet street = rentReceivedOn;
-      Money cost = street.houseConstructionCost();
-      int contribution = (cost.amount() + shareholders.size() - 1) / shareholders.size();
-      int available = shareholders.stream()
-          .mapToInt(player -> Math.min(contribution, player.account().balance().amount().amount()))
-          .sum();
-      if (available < cost.amount()) {
-        rentReceivedOn = null;
-        markOperated();
-        return new Operation.NoAction();
+    List<ColourStreet> buildable = streets.stream()
+        .filter(street -> deeds.housesBuiltOn(street) < street.hotelConstructionRequiresNumberOfHouses())
+        .sorted(java.util.Comparator.comparingInt(deeds::housesBuiltOn))
+        .toList();
+    ColourStreet firstBuilt = null;
+    Money loanRaised = Money.ZERO;
+    while (bankBalance().amount() > 0) {
+      ColourStreet next = buildable.stream()
+          .filter(street -> deeds.housesBuiltOn(street) < street.hotelConstructionRequiresNumberOfHouses())
+          .min(java.util.Comparator.comparingInt(deeds::housesBuiltOn))
+          .orElse(null);
+      if (next == null) break;
+      if (bankBalance().amount() < next.houseConstructionCost().amount()
+          && loan.equals(Money.ZERO) && rentReceivedOn == null) {
+        Money shortfall = next.houseConstructionCost().minus(bankBalance());
+        recordLoan(shortfall);
+        depositToBank(shortfall);
+        loanRaised = shortfall;
+        Money share = new Money((shortfall.amount() + shareholders.size() - 1) / shareholders.size());
+        shareholders.forEach(player -> player.account().withdraw(share));
       }
-      shareholders.forEach(player -> {
-        Money payment = new Money(Math.min(contribution, player.account().balance().amount().amount()));
-        player.account().withdraw(payment);
-        recordShareholderPayment(player, payment);
-      });
-      deeds.arrangeHouses(street, 1);
-      rentReceivedOn = null;
-      markOperated();
-      return new Operation.HouseBuilt(street);
+      if (bankBalance().amount() < next.houseConstructionCost().amount()) break;
+      withdrawFromBank(next.houseConstructionCost());
+      deeds.arrangeHouses(next, deeds.housesBuiltOn(next) + 1);
+      if (firstBuilt == null) firstBuilt = next;
     }
-    return operate();
+    if (firstBuilt != null) {
+      markOperated();
+      if (!loanRaised.equals(Money.ZERO)) return new Operation.LoanRaisedAndHouseBuilt(loanRaised, firstBuilt);
+      return new Operation.HouseBuilt(firstBuilt);
+    }
+    if (!loan.equals(Money.ZERO)) {
+      Money repayment = new Money(loan.amount() + loan.amount() * 5 / 100);
+      if (bankBalance().amount() >= repayment.amount()) {
+        withdrawFromBank(repayment);
+        Money principal = loan;
+        Money paid = repayLoan(principal);
+        shareholders.getFirst().account().deposit(paid);
+        markOperated();
+        return new Operation.LoanRepaid(shareholders.getFirst(), principal, paid);
+      }
+    } else if (bankBalance().amount() >= 150) {
+      Money dividend = new Money(50);
+      withdrawFromBank(new Money(150));
+      shareholders.forEach(player -> player.account().deposit(dividend));
+      markOperated();
+      return new Operation.DividendPaid(dividend);
+    }
+    markOperated();
+    return new Operation.NoAction();
   }
 
   private Money raiseNewLoan() {
@@ -152,6 +192,15 @@ public final class LegalEntity {
     }
 
     record HouseBuilt(ColourStreet street) implements Operation {
+    }
+
+    record LoanRaised(Money amount) implements Operation {
+    }
+
+    record LoanRaisedAndHouseBuilt(Money loan, ColourStreet street) implements Operation {
+    }
+
+    record DividendPaid(Money amount) implements Operation {
     }
 
     record NoAction() implements Operation {

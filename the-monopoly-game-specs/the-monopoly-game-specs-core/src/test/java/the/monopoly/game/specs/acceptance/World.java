@@ -66,6 +66,7 @@ public class World {
   private Rule.Set ruleSet = Rule.Set.Type.official.create();
   private Street space;
   private List<Player> players;
+  private boolean gameStarted;
   private Player player;
   private Dice dice;
   private Map<Dice.Face, Integer> rolls;
@@ -379,6 +380,7 @@ public class World {
   }
 
   private void playAndCapture(Function<Game, Game.Result> play) {
+    gameStarted = true;
     Cards.Decks officialDecks = Cards.Decks.official(deeds == null ? deeds = new Deeds() : deeds);
     Game game = new Game(
         ruleSet, players(), player -> () -> nextQueuedPawnRoll(player), this::strategyOf,
@@ -621,7 +623,12 @@ public class World {
 
   public void entityOwes(String entityName, Money principal) {
     deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
-        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).raiseLoan(principal);
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).recordLoan(principal);
+  }
+
+  public void entityRaisesLoan(String entityName, Money amount) {
+    deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).raiseLoan(amount);
   }
 
   public void entityLoanFullyRepaid(String entityName) {
@@ -635,8 +642,30 @@ public class World {
         .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).loan();
   }
 
+  public void entityBankHolds(String entityName, Money amount) {
+    LegalEntity entity = deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName));
+    entity.depositToBank(amount);
+  }
+
+  public Money entityBankBalance(String entityName) {
+    return deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).bankBalance();
+  }
+
+  public boolean pawnBalanceIsAfterRent(String pawnName, Money rent) {
+    Player pawn = pawn(pawnName);
+    return pawn.account().balance().amount().equals(ruleSet.players().startingCapital().minus(rent));
+  }
+
   public int housesBuilt(Street.Type land) {
     return deeds.housesBuiltOn((ColourStreet) ruleSet.create(land));
+  }
+
+  public void arrangeOrAssertHouses(Street.Type land, int houses) {
+    if (!gameStarted) arrangeHouses(land, houses);
+    else if (housesBuilt(land) != houses)
+      throw new AssertionError("Expected " + houses + " houses on " + land + " but found " + housesBuilt(land));
   }
 
   public int totalHouses(Street.Colour colour) {

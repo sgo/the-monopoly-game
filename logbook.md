@@ -292,6 +292,23 @@ journal/report wording, supports direct mortgaged-land transfer setup in the
 acceptance world, and puts `mortgage.feature` plus
 `mortgage-transfer.feature` onto the normal acceptance pipeline. Ready for
 refactorer review.
+
+## 2026-08-10T14:11:03Z — coder escalates legal entity economy contradictions
+
+Sent architect priority-00 handoff:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 2035b65a75
+```
+
+The commit contains the merged specifier feature, entity treasury rent
+deposit, and acceptance account setup/assertions. Architect review is needed
+to resolve the conflicting house-cost/build-priority examples before further
+coder implementation.
   made the player richer. `StartSpace.salary()` now returns a positive `+200`
   and `Player.pass` calls `account.deposit(...)`. The acceptance step keeps
   asserting "your salary is $200" and was verified non-vacuous by mutating the
@@ -27359,6 +27376,218 @@ Not something I'll guess at or fix myself. No structural changes
 needed this cycle since no domain code changed; handing back to the
 architect with the narrowed diagnosis.
 
+## 2026-08-10T12:58:46Z — architect routes entity-7 movement setup correction
+
+Received refactorer priority-00 handoff (commit `6f3d49a710`, task
+`greedo-legal-entity`).
+
+Action: merged. The only code change is removal of the redundant
+`UNREMARKABLE` turn-roll queued by `World.formNamedEntity`; explicit scenario
+turn rolls now apply to the intended turn. The refactorer independently
+verified the domain suite and acceptance remains 548/550: with that fixture
+fixed, ship's specified roll of 12 simply does not land on either
+`Rue de Diekirch Arlon` or `Bruul Mechelen` from its initial position.
+
+This remaining correction belongs to the specifier: revise entity-7's
+movement setup so the tenant actually lands on the named entity street, while
+preserving the canonical game/CLI turn loop and the real shareholder-payment
+path. Send priority-00 follow-up to specifier with this narrowed evidence.
+
+## 2026-08-10T14:12:45Z — architect escalates treasury-spec reconciliation
+
+Received coder priority-00 handoff (commit `2035b65a75`, task
+`greedo-legal-entity`).
+
+Action: merged the initial treasury seam: entity rent deposits to a real
+entity account, and `raiseLoan` deposits the raised amount. The submitted
+feature also introduces end-of-turn treasury assertions. This is not a
+completion handoff: `LegalEntity.operate(Deeds)` still uses the old
+rent-gated, free contribution path, and loan repayment/dividend still do not
+withdraw from treasury.
+
+Independent acceptance reports 6 failures in the 21 legal-entity scenarios.
+The spec currently conflicts with the board and stated priority: pink houses
+cost $100 each, while entity-7/entity-15 expect two houses from $100; and
+entity-11 expects a dividend from $150 while build-before-dividend leaves a
+buildable $100 house. Entity-16 similarly expects three $100 houses from
+$150. Route one priority-00 request to specifier to reconcile treasury
+funding, build volume/costs, repayment/dividend preconditions, and all
+expected balances before coder continues. No test-only policy or artificial
+cash adjustment is acceptable.
+
+## 2026-08-10T14:24:07Z — architect routes reconciled treasury implementation
+
+Received specifier priority-00 handoff (commit `33d08bea82`, task
+`greedo-legal-entity`).
+
+Action: merged the reconciled feature. It now supplies $200 for two pink
+houses, $300 for three; pre-builds all pink streets before the
+repayment/dividend-only cases; and corrects the shareholder ceiling to the
+$100 construction cost. The behavioral order is settled: every entity gets
+an end-of-turn, balanced build opportunity; treasury rent is consumed first,
+loans cover only a permitted shortfall, then repayment, then dividends; an
+entity otherwise becomes idle.
+
+Route priority-00 to coder for implementation. Architectural constraint:
+`Rule.Set` already owns the game `Bank`; entity treasury must use a real
+registered account in that bank, rather than a standalone `new Account` held
+only by `LegalEntity`. Wire all rent, loans, construction, repayment and
+dividend flows through the same treasury and canonical `Game.playTurn`
+end-of-turn path. Run full acceptance before returning.
+
+## 2026-08-10T14:42:30Z — architect rejects unbalanced treasury operation
+
+Received coder priority-00 handoff (commit `900011820c`, task
+`greedo-legal-entity`).
+
+Action: merged and inspected. The registered account seam is correct:
+`LegalEntity` registers its named owner through `rules.bank()` and rent
+deposits reach that account. However, independent acceptance reports
+entity-16 failing (1 of 21 legal-entity scenarios): the new build loop spends
+all $300 taking the first pink street to four houses instead of the specified
+balanced order, one lowest-level street at a time.
+
+Reject to coder. Replace the remaining rent-gated legacy branch and direct
+shareholder-contribution construction with one scheduled, balanced
+end-of-turn treasury operation: consume treasury first; raise only a
+per-share-permitted shortfall loan; then repay outstanding loans; then pay
+dividends; otherwise idle. All construction, repayment and dividend debits
+must be accompanied by their real economic effects—construction comes from
+treasury and repayment/dividend recipients are credited—not journal entries
+alone. Preserve the registered `Rule.Set` bank seam and canonical
+`Game.playTurn` path; return only after full acceptance is green.
+
+## 2026-08-10T14:46:17Z — architect splits treasury completion by owner
+
+Received coder priority-00 handoff (commit `8796dd4561`, task
+`greedo-legal-entity`).
+
+Action: merged. The balanced build loop now selects a lowest-level street on
+each iteration, but the full acceptance suite still has ten failures:
+entity-16's exact `developed up to N houses` step is unsupported, and three
+obsolete automatic-operation assertions each fail in journal, report, and
+logging features.
+
+Route coder priority-00: add the missing exact total-house assertion handler;
+remove both remaining rent-gated/legacy operation branches; implement the
+settled scheduled treasury operation with actual player-account credits for
+loan repayment and equal dividends as well as treasury debits. Route specifier
+priority-00: update journal.feature, report.feature, and logging.feature
+legal-entity loan/repayment/dividend scenarios to set treasury funds and
+prebuilt streets consistent with build-before-repay-before-dividend. These are
+parallel, non-overlapping corrections; neither reopens the treasury design.
+
+## 2026-08-10T14:51:45Z — architect rejects incomplete treasury narration update
+
+Received specifier priority-00 handoff (commit `0ad9b80a06`, task
+`greedo-legal-entity`).
+
+Action: merged and reviewed. The update correctly prebuilds and funds the
+loan-repayment and dividend narration cases in journal, report, and logging.
+It does not update the paired loan-raised cases, which still require an
+automatic $150 loan from an empty, buildable-free treasury—the behavior the
+settled scheduled economy explicitly removes. Do not forward this partial
+fixture set to coder. Route priority-00 back to specifier to make the
+loan-raised narration scenarios exercise a permitted build shortfall (with
+the required ceiling/preconditions) or otherwise revise their expected
+behavior consistently; return one complete narration fixture update.
+
+## 2026-08-10T14:55:55Z — architect holds final treasury review for combined return
+
+Received coder priority-00 handoff (commit `69e97552ac`, task
+`greedo-legal-entity`).
+
+Action: merged. The coder removed the obsolete rent-gated operation branches,
+added the exact total-house assertion, and now transfers repayment and equal
+dividend cash from treasury to the shareholders' real accounts. The remaining
+production item is the already-settled loan-shortfall path: when treasury
+cannot fund the next balanced build, the entity must raise only the permitted
+per-share shortfall before considering repayment/dividend.
+
+Do not issue another partial coder review. The specifier has been asked for
+the matching loan-raised narration fixtures. Once that complete feature input
+returns, route one combined final implementation handoff to coder covering
+the shortfall loan and full acceptance, then send the resulting change to
+refactorer for structural review.
+
+## 2026-08-10T14:57:16Z — architect sends combined final treasury implementation
+
+Received specifier priority-00 handoff (commit `0c19c2a78c`, task
+`greedo-legal-entity`).
+
+Action: merged. All three narration feature suites now consistently describe
+a $50 treasury balance and $50 permitted loan shortfall to fund the next $100
+pink-house build. This completes the specifier-owned fixture work.
+
+Route one final priority-00 implementation handoff to coder: add the
+per-share-permitted $50 shortfall loan to the scheduled balanced build path,
+using the registered entity account and existing journal operation; retain
+the already-correct repayment/dividend account transfers and no-legacy-idle
+behavior. Run full acceptance (including journal, report, logging and
+legal-entity scenarios) and return the integrated production result for
+refactorer review. No further incremental architect review is expected unless
+the result introduces a genuinely new defect.
+
+## 2026-08-10T14:26:50Z — architect escalates entity-6 treasury precondition
+
+Received coder priority-00 handoff (commit `63e7e6e317`, task
+`greedo-legal-entity`).
+
+Action: accepted the coder's narrow finding. Entity-6 provides $105 treasury
+funds and expects a $105 loan repayment, but leaves the pink group buildable.
+Under the now-settled build-before-repay priority, that $100 must first build
+a house, so repayment cannot occur. Route priority-00 to specifier to make
+entity-6's preconditions consistent (for example, fully develop the group to
+isolate repayment, as entity-8/entity-11 already do), without changing the
+economy ordering. No production implementation is authorized until that
+single feature decision is returned.
+
+## 2026-08-10T14:28:48Z — architect routes unblocked treasury implementation
+
+Received specifier priority-00 handoff (commit `4659513f8f`, task
+`greedo-legal-entity`).
+
+Action: merged. Entity-6 now pre-builds all pink streets to four houses, so
+its $105 treasury fund legitimately tests repayment before dividend without
+competing with the settled build-first priority. The feature's treasury
+economy is now internally consistent. Route priority-00 to coder to implement
+the real registered entity-bank account and the complete canonical end-of-turn
+operate order already stated in `180bf448ce`; run full acceptance and return
+the production change for review.
+
+## 2026-08-10T14:24:37Z — coder reviews architect treasury reconciliation
+
+Received architect priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 180bf448ce
+```
+
+Action: merged the reconciled feature. Entity-7, entity-8, entity-11,
+entity-15, and entity-16 now have internally consistent funding fixtures.
+Entity-6 remains contradictory: with $105 in the treasury, no pre-built
+streets, and the settled build-before-repayment priority, the canonical result
+is a $100 house build, but the scenario still requires $105 loan repayment.
+Returning this architect review loop for resolution before implementing the
+real registered treasury and end-of-turn operation path.
+
+## 2026-08-10T13:07:08Z — architect completes greedo legal-entity phase
+
+Received refactorer priority-50 handoff (commit `9d2a062c86`, task
+`greedo-legal-entity`), carrying the specifier's entity-7 movement setup
+correction and the coder's missing loan assertion step.
+
+Action: merged and independently verified. Entity-7 is 17/17 green, and the
+full acceptance reports contain no failures or errors (550/550). The final
+scenario positions selected `racecar` ten spaces before each named pink street,
+so the existing deterministic turn roll genuinely collects entity rent. The
+canonical production path—rent collection, real capped shareholder
+contributions, payment ledger, and house reinvestment—remains unchanged; no
+CLI or test-only turn policy was introduced. The refactorer has no remaining
+structural findings. Send phase-complete priority-50 to specifier.
+
 ## 2026-08-10T12:54:07Z — refactorer sent greedo-legal-entity handoff to architect
 
 Handoff message sent:
@@ -27456,3 +27685,274 @@ fighting the queue, also catching that the renter pawn was never
 actually selected under its old name. This is the first fully
 acceptance-clean state across this task's whole history. Nothing
 outstanding on my side.
+
+## 2026-08-10T13:07:34Z — specifier accepts legal-entity phase completion
+
+Received architect priority-50 phase-complete sync (commit `68d1264bff`,
+task `greedo-legal-entity`). Merged; resolved the logbook conflict by
+taking the architect's reconciled chain (it already re-tells my specifier
+actions from the pipeline's perspective). The coder implemented the final
+`still owes` assertion handler, and the architect independently verified
+entity-7 17/17 green and full acceptance 550/550 with no failures. The
+production path — rent collection, capped shareholder contributions,
+payment ledger, house reinvestment — is unchanged, with no CLI or
+test-only turn policy introduced.
+
+The greedo-legal-entity task (3+ player Greedo stalemate via legal
+entities) is complete through the pipeline: spec written, redesigned
+economy, multi-player formation fixed, narration integrated, and all
+loops closed. Awaiting next feature to specify.
+
+## 2026-08-10T15:40:00Z — specifier: legal-entity operate loop defect + bank-account design (awaiting confirmation)
+
+Ran 8-player Greedo games with `--optional-greedo-stalemate-trading`
+and `--optional-greedo-legal-entity` and studied the logs. Found a
+serious entity-engine defect in the stalemate case.
+
+### Defect: unbounded loan->dividend spam with no real cash
+In games that reached a stalemate, the operate loop fired thousands of
+`<Entity> raises a loan of $150` followed immediately by
+`<Entity> pays each ... an equal dividend` events. One run showed Green
+Realty issuing 20,544 such pairs; runs ranged 41k-73k. Resolving/winning
+games were healthy (~178-208).
+
+Trace:
+- `Game.operateLegalEntities` runs every player turn
+  (Game.java:177). Each entity calls `operate(deeds)` once per turn.
+- `LegalEntity.operate(deeds)` (LegalEntity.java:115) only drives the
+  productive `HouseBuilt` path when a *tenant has landed and paid rent*
+  (`rentReceivedOn != null`). Otherwise it falls through to
+  `operate()` (105-110), the toggle: `loan==0 ? raise $150 + $50
+  dividend : repay $157`.
+- So while no tenant lands, the entity toggles loan-up -> dividend ->
+  repay forever, emitting spurious journal events every turn.
+
+Two consequences:
+1. Event explosion (log/report bloat) with no economic effect:
+   `Game.operateLegalEntities` (Game.java:193-204) only *journals*
+   the loan/dividend; it does not move cash. LegalEntity has no bank
+   reference.
+2. Entity rent is collected from a tenant (`Rent.java:43` withdraws
+   the tenant) but **deposited nowhere** — `receiveRent` only records
+   the street. The money vanishes.
+
+### Agreed design (user): give the entity a bank account
+`Bank.Simple` (Bank.java:74) already keys accounts by `Account.Owner`;
+the entity can own one (owner keyed by entity name). Money flows:
+- raising loans / collecting entity rent -> DEPOSIT into entity account;
+- repaying loans / paying dividends -> WITHDRAW from entity account.
+
+This makes rent land in a real treasury and debits loans/dividends from
+it, ending the free-money loop and grounding the cash circuit. Pending
+confirmation before routing to architect/coder.
+
+## 2026-08-10T16:00:00Z — specifier: correct entity build behaviour to end-of-turn scheduled building
+
+The previously-specified build behaviour — a legal entity only builds
+when a tenant lands on one of its streets and that street has zero
+houses (`LegalEntity.operate(Deeds)`, LegalEntity.java:115-137) — is
+**incorrect; it was not specified that way**. The correct model:
+
+### Entity build opportunity (end of every turn)
+At the **end of every turn**, **every existing legal entity gets an
+opportunity to build houses**. Funding sources, in order:
+1. rent already present in the entity's **bank account** (le-28);
+2. raising a **loan**, when needed and permitted.
+
+### Funding/build rules (as already agreed, le-20)
+- Build follows the **balanced build order** — lowest-level street
+  first, escalating toward hotels.
+- Loans are **capped per-share** at each member's personal building
+  ceiling; members do **not** top up a short partner's share.
+- **Cashflow priority (option 'a')**: build-next-available-first, then
+  repay loans, then pay dividends. Building is always preferred while a
+  buildable level remains.
+
+### Effect on the engine
+- Removes the rent-landing gating entirely: building is a scheduled
+  end-of-turn opportunity for all entities, not contingent on which
+  tenant happened to land.
+- Funded from the real treasury (bank account) and/or loans, closing
+  the free-money loop and grounding the entity economy.
+- Combined with the operate-loop fix, the stale stalemate spam should
+  stop: an entity that can neither build nor repay/pay becomes idle
+  (`NoAction`) instead of toggling loan-dividend forever.
+
+Awaiting confirmation before routing to architect/coder.
+
+## 2026-08-10T16:10:00Z — specifier: build-funding option 1 confirmed (drain rent first, loan only shortfall)
+
+On the two open questions for the end-of-turn entity build, the user
+confirmed **option 1**: when an entity builds, **drain rent from its
+bank account first**; raise a loan **only for any shortfall**. This
+keeps rent for later loan repayment / dividends, avoids needless debt,
+and aligns with "repay before dividend." An entity that already has
+enough rent in its account to cover the next build does not raise a new
+loan for it.
+
+Still holding for full confirmation before routing to architect/coder.
+
+## 2026-08-10T16:15:00Z — specifier: build volume confirmed (as many houses as affordable)
+
+On the remaining open point, the user confirmed: at the end-of-turn
+build opportunity, a legal entity builds **as many houses as it can
+afford** (not one per turn), in the balanced build order, up to what its
+funds (rent first, then loan shortfall) and per-share ceilings allow in
+a single end-of-turn pass.
+
+The entity-economy design is now fully specified: bank account (le-28),
+end-of-turn build for all entities (le-29), rent-first-then-loan funding
+(le-30), balanced build order with per-share ceilings (le-20), build-as-
+many-as-affordable (le-31), and operate-loop termination.
+PENDING confirmation to route to architect/coder.
+
+## 2026-08-10T13:57:54Z — coder receives bank-account economy handoff
+
+Received specifier priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier ae789f8ead
+```
+
+Action: merged the specifier feature update and began the coder-owned
+treasury seam. Entity accounts now receive collected rent; acceptance setup
+and assertions cover account balances, explicit loans, dividends, and idle
+operation. Domain tests remain green at 342/342.
+
+Acceptance exposes unresolved economic contradictions requiring architect
+resolution before canonical operation code can be completed: entity-7 and
+entity-15 request at least two pink houses from $100 although each pink house
+costs $100; entity-11 supplies $150 and expects dividends despite the stated
+build-before-dividend priority. Current acceptance is 547/554 with seven
+entity-scenario failures/errors, so this is not ready for refactorer review.
+
+## 2026-08-10T14:43:15Z — coder processes architect balanced-operation rejection
+
+Received architect priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect d4fd940747
+```
+
+Action: merged the review and corrected the treasury build loop to balanced
+round-robin order. Domain tests remain green at 342/342. The remaining legacy
+logging/report/journal scenarios request automatic loan, repayment, and
+dividend operations from an empty treasury, which is indistinguishable from
+the new entity-17 idle scenario under the canonical state. This requires
+specifier/architect resolution rather than a test-only condition.
+
+## 2026-08-10T14:47:05Z — coder processes architect operation-semantics route
+
+Received architect priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 22fdf6feff
+```
+
+Action: removed the rent-gated shareholder-contribution and legacy operation
+branches, added real shareholder credits for loan repayment and dividends,
+and added the exact total-house acceptance assertion. Domain tests pass
+342/342 and all 21 greedo legal-entity scenarios pass. The full suite has
+nine remaining legacy journal/report/logging failures, which the architect
+routed to specifier as a separate fixture update.
+
+## 2026-08-10T14:50:01Z — coder returns completed treasury operation
+
+Sent architect priority-00 handoff:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 69e97552ac
+```
+
+Returned the coder-owned implementation: registered treasury, balanced
+construction, actual repayment/dividend credits, idle behavior, and green
+domain plus legal-entity acceptance verification.
+
+## 2026-08-10T14:44:31Z — coder returns balanced-operation review
+
+Sent architect priority-00 handoff:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 8796dd4561
+```
+
+Returned the balanced build correction and the unresolved empty-treasury
+legacy-scenario conflict.
+
+## 2026-08-10T14:29:08Z — coder processes architect treasury implementation route
+
+Received architect priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect e6d6af7365
+```
+
+Action: merged the entity-6 fixture correction and implemented the registered
+entity treasury, rent deposits, scheduled balanced building, repayment,
+dividend, and idle-operation path. Domain tests pass 342/342. Acceptance now
+reaches all scenarios but has one entity-16 build assertion failure and nine
+legacy logging assertions that still expect the pre-treasury loan/dividend
+loop; the state is not ready for refactorer review.
+
+## 2026-08-10T14:29:08Z — coder returns treasury implementation review
+
+Sent architect priority-00 handoff:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 900011820c
+```
+
+The registered treasury and scheduled operation path are implemented and
+domain-green. Acceptance still reports the entity-16 build observation and
+the legacy logging expectations described above; architect direction is
+needed before further changes.
+
+## 2026-08-10T14:25:42Z — coder returns entity-6 priority review
+
+Sent architect priority-00 handoff:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 63e7e6e317
+```
+
+Returned the verified contradiction in entity-6; no coder-owned production
+implementation was applied during this review loop.
+
+## 2026-08-10T14:57:43Z — coder processes architect completion handoff
+
+Received architect priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 16f4421fb3
+```
+
+Action: merged the specifier-owned legacy treasury fixture updates. Added
+generic entity bank-account acceptance steps and canonical shortfall-loan
+funding before balanced construction. Domain tests pass 342/342 and the full
+acceptance pipeline passes 554/554.

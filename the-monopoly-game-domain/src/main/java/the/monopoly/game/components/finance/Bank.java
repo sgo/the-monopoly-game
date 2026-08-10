@@ -12,7 +12,14 @@ public interface Bank {
 
   void createAccountFor(Player.ID id);
 
+  default void createAccountFor(Account.Owner owner) {
+  }
+
   Account accountOf(Player.ID id);
+
+  default Account accountOf(Account.Owner owner) {
+    throw new IllegalArgumentException("No account for " + owner.name() + ".");
+  }
 
   record Account(Owner owner, Balance balance) {
     public void deposit(Money amount) {
@@ -86,10 +93,22 @@ public interface Bank {
     }
 
     @Override
+    public void createAccountFor(Account.Owner owner) {
+      accounts.putIfAbsent(owner, new Account(owner, Balance.of(0)));
+    }
+
+    @Override
     public Account accountOf(Player.ID id) {
       Account account = accounts.get(new Account.Owner(id.value()));
       if (account == null)
         throw new IllegalArgumentException("No account for player " + id.value() + ".");
+      return account;
+    }
+
+    @Override
+    public Account accountOf(Account.Owner owner) {
+      Account account = accounts.get(owner);
+      if (account == null) throw new IllegalArgumentException("No account for " + owner.name() + ".");
       return account;
     }
   }
