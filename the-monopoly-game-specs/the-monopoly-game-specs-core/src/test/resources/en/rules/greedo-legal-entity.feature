@@ -246,6 +246,23 @@ Feature: Greedo legal entity for a three-way colour-group split
       | scenario |
       | idle     |
 
+  # entity-22
+  Scenario Outline: an entity with an empty bank but funded shareholders raises a loan and develops one house on every street
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account is empty
+    And pawn "high hat" has a balance that allows only $<share> toward the entity
+    And pawn "iron box" has a balance that allows only $<share> toward the entity
+    And pawn "dog" has a balance that allows only $<share> toward the entity
+    When we play up to 1 round
+    Then Pink Realty raises a loan of $<loan>
+    And the <street_1>, the <street_2>, and the <street_3> each have a house built
+    And the pink colour group is developed up to <total_houses> houses
+
+    Examples:
+      | loan | street_1              | street_2       | street_3              | total_houses | share |
+      | 300  | Rue de Diekirch Arlon | Bruul Mechelen | Place Verte Verviers  | 3            | 100   |
+
   # entity-18
   Scenario Outline: no dividend is paid unless the last-capitalised shareholder grows a year older
     Given Pink Realty is formed
