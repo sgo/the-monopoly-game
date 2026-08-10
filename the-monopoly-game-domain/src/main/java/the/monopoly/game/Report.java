@@ -116,6 +116,15 @@ public final class Report {
       case Entry.Stalemate it -> "The game ends in a stalemate";
       case Entry.FinalBalance it -> name(it.player()) + "'s final balance is $" + it.balance().amount();
       case Entry.FinalAge it -> name(it.player()) + "'s final age is " + it.age() + " years";
+      case Entry.LegalEntityFormed it -> it.name() + " is formed, held in equal thirds by "
+          + it.shareholders().stream().map(Report::name).collect(java.util.stream.Collectors.joining(", "));
+      case Entry.LegalEntityLoanRaised it -> it.name() + " raises a loan of $" + it.amount().amount()
+          + " from " + it.shareholders().stream().map(Report::name).collect(java.util.stream.Collectors.joining(", "));
+      case Entry.LegalEntityLoanRepaid it -> it.name() + " repays " + name(it.shareholder()) + " $"
+          + it.repayment().amount() + " for the loan";
+      case Entry.LegalEntityDividendPaid it -> it.name() + " pays each of "
+          + it.shareholders().stream().map(Report::name).collect(java.util.stream.Collectors.joining(", "))
+          + " an equal dividend";
       case Entry.Won it -> name(it.player()) + " wins the game";
     };
   }

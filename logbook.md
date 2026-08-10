@@ -1,5 +1,9 @@
 # Logbook
 
+## 2026-08-10T10:04:00Z — completed greedo-legal-entity
+
+Merged specifier commit `8b0cc9799c`, implemented legal-entity formation, ownership, equal shares, loans, repayment interest, dividends, journal/report/logging support, and the CLI flag. Verified with 326 domain tests and 545 acceptance scenarios. Prepared handoff to refactorer.
+
 ## 2026-07-25T19:00:15Z — coder received handoff from specifier
 
 Handoff message received:
@@ -25873,3 +25877,22 @@ or feature change is warranted.
 Sent phase-complete priority-50 handoff to specifier (task
 `player-age-tracking`, commit recorded by this entry) after all
 specifier/coder/refactorer loops closed.
+2026-08-10T07:40:00Z — Received specifier handoff:
+id: 20260810T073726Z_000087_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 8b0cc9799c
+created_at: 2026-08-10T07:37:26.927064Z
+enqueued_at: 2026-08-10T07:37:27.200582Z
+task: greedo-legal-entity
+dequeued_at: 2026-08-10T07:37:35.581433Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 8b0cc9799c
+
+Action: merged the specification commit and began implementing the legal-entity behavior slice.

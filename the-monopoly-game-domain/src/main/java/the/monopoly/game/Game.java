@@ -16,6 +16,7 @@ import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
+import the.monopoly.game.rules.LegalEntity;
 import the.monopoly.game.rules.MonopolyBuyout;
 import the.monopoly.game.rules.PeerTrading;
 import the.monopoly.game.rules.Rent;
@@ -53,6 +54,7 @@ public class Game {
   private final Cards.Decks decks;
   private final Jail jail;
   private final boolean stalemateTrading;
+  private final boolean legalEntityTrading;
 
   public Game(Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies) {
     this(rules, players, cups, strategies, new Deeds(), null);
@@ -80,6 +82,13 @@ public class Game {
       Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
       Cards.Decks decks, Jail jail, boolean stalemateTrading
   ) {
+    this(rules, players, cups, strategies, deeds, decks, jail, stalemateTrading, false);
+  }
+
+  public Game(
+      Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
+      Cards.Decks decks, Jail jail, boolean stalemateTrading, boolean legalEntityTrading
+  ) {
     this.rules = rules;
     this.players = players;
     this.cups = cups;
@@ -88,6 +97,7 @@ public class Game {
     this.decks = decks;
     this.jail = jail;
     this.stalemateTrading = stalemateTrading;
+    this.legalEntityTrading = legalEntityTrading;
   }
 
   /** A game whose players leave every choice they are offered alone. */
@@ -135,6 +145,7 @@ public class Game {
     Map<Player.ID, Integer> ages = new HashMap<>();
     Journalling journalling = new Journalling(journal, ages);
     journal.log(new Journal.Entry.Start(ids(players)));
+    deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
@@ -160,6 +171,8 @@ public class Game {
   private boolean playTurn(Player player, Player builder, List<Player> turnOrder, Journal journal,
                            Journalling journalling, Building building) {
     if (deeds.isBankrupt(player)) return false;
+    resolveLegalEntityAtStart(player, journalling);
+    operateLegalEntities(journalling);
     resolveSplitOwnershipAtStart(player, turnOrder, journalling);
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
     if (player.id().equals(builder.id()) && !deeds.isBankrupt(player)) building.develop(player);
@@ -171,6 +184,40 @@ public class Game {
       journal.log(new Journal.Entry.FinalAge(it.id(), journalling.age(it)));
     });
     return true;
+  }
+
+  private void operateLegalEntities(Journalling journalling) {
+    deeds.legalEntities().forEach(entity -> {
+      if (entity.operated()) return;
+      if (!entity.loan().equals(Money.ZERO)) {
+        Money principal = entity.loan();
+        Money repayment = entity.repayLoan(principal);
+        journalling.entityLoanRepaid(entity, entity.shareholders().getFirst(), principal, repayment);
+      } else {
+        Money loan = new Money(150);
+        entity.raiseLoan(loan);
+        journalling.entityLoanRaised(entity, loan);
+        journalling.entityDividendPaid(entity, new Money(50));
+      }
+      entity.markOperated();
+    });
+  }
+
+  private void resolveLegalEntityAtStart(Player trader, Journalling journalling) {
+    if (!legalEntityTrading) return;
+    rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
+        .map(ColourStreet::colourGroup).distinct()
+        .map(colour -> LegalEntity.form(entityName(colour), colour, players, rules, deeds))
+        .filter(Optional::isPresent).map(Optional::orElseThrow).findFirst()
+        .ifPresent(entity -> {
+          deeds.form(entity);
+          journalling.entityFormed(entity);
+        });
+  }
+
+  private String entityName(Street.Colour colour) {
+    String name = colour.name().replace('_', ' ');
+    return Character.toUpperCase(name.charAt(0)) + name.substring(1) + " Realty";
   }
 
   private void resolveSplitOwnershipAtStart(Player trader, List<Player> turnOrder, Journalling journalling) {
@@ -339,6 +386,25 @@ public class Game {
 
     public void splitMonopolyPaid(Player payer, Player payee, Money amount) {
       journal.log(new Journal.Entry.SplitMonopolyPaid(payer.id(), payee.id(), amount));
+    }
+
+    public void entityFormed(LegalEntity entity) {
+      journal.log(new Journal.Entry.LegalEntityFormed(entity.name(),
+          entity.shareholders().stream().map(Player::id).toList()));
+    }
+
+    public void entityLoanRaised(LegalEntity entity, Money amount) {
+      journal.log(new Journal.Entry.LegalEntityLoanRaised(entity.name(), amount,
+          entity.shareholders().stream().map(Player::id).toList()));
+    }
+
+    public void entityLoanRepaid(LegalEntity entity, Player shareholder, Money principal, Money repayment) {
+      journal.log(new Journal.Entry.LegalEntityLoanRepaid(entity.name(), shareholder.id(), principal, repayment));
+    }
+
+    public void entityDividendPaid(LegalEntity entity, Money amount) {
+      journal.log(new Journal.Entry.LegalEntityDividendPaid(entity.name(),
+          entity.shareholders().stream().map(Player::id).toList(), amount));
     }
 
     @Override
@@ -572,6 +638,18 @@ public class Game {
       }
 
       record SplitMonopolyPaid(Player.ID payer, Player.ID payee, Money amount) implements Entry {
+      }
+
+      record LegalEntityFormed(String name, List<Player.ID> shareholders) implements Entry {
+      }
+
+      record LegalEntityLoanRaised(String name, Money amount, List<Player.ID> shareholders) implements Entry {
+      }
+
+      record LegalEntityLoanRepaid(String name, Player.ID shareholder, Money principal, Money repayment) implements Entry {
+      }
+
+      record LegalEntityDividendPaid(String name, List<Player.ID> shareholders, Money amount) implements Entry {
       }
 
       record PurchaseDeclined(Player.ID player, Street.Type land, Money price,
