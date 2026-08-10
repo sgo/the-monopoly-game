@@ -160,6 +160,62 @@ class RentTest {
     assertThat(owner.account().balance()).isEqualTo(Balance.of(1508));
   }
 
+  @Test
+  void aNonShareholderTenantPaysDoubleVacantRentToAnEntityOwnedStreet() {
+    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
+    LegalEntity entity = formEntityOwning(street);
+
+    rent().resolve(tenant, street, IRRELEVANT_ROLL);
+
+    Money doubleVacantRent = street.vacantRent().plus(street.vacantRent());
+    assertThat(tenant.account().balance()).isEqualTo(new Balance(new Money(1500).minus(doubleVacantRent)));
+    assertThat(entity.receivedRent()).isTrue();
+  }
+
+  @Test
+  void aShareholderPaysNoRentToTheirOwnEntity() {
+    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
+    LegalEntity entity = LegalEntity.formed("Test Realty", street.colourGroup(), List.of(tenant, owner,
+        playerWith("third")), rules);
+    deeds.form(entity);
+
+    rent().resolve(tenant, street, IRRELEVANT_ROLL);
+
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1500));
+    assertThat(entity.receivedRent()).isFalse();
+  }
+
+  @Test
+  void aMortgagedEntityOwnedStreetCollectsNoRent() {
+    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
+    LegalEntity entity = formEntityOwning(street);
+    deeds.arrangeMortgaged(street);
+
+    rent().resolve(tenant, street, IRRELEVANT_ROLL);
+
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1500));
+    assertThat(entity.receivedRent()).isFalse();
+  }
+
+  @Test
+  void aTenantWhoCannotAffordEntityRentPaysNothing() {
+    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
+    LegalEntity entity = formEntityOwning(street);
+    tenant.account().withdraw(new Money(1500));
+
+    rent().resolve(tenant, street, IRRELEVANT_ROLL);
+
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(0));
+    assertThat(entity.receivedRent()).isFalse();
+  }
+
+  private LegalEntity formEntityOwning(ColourStreet street) {
+    LegalEntity entity = LegalEntity.formed("Test Realty", street.colourGroup(),
+        List.of(owner, playerWith("second"), playerWith("third")), rules);
+    deeds.form(entity);
+    return entity;
+  }
+
   private Rent rent() {
     return new Rent(deeds, rules, List.of(tenant, owner), this::strategyFor, paid);
   }

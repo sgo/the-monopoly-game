@@ -26931,3 +26931,103 @@ The coder-owned payment-accounting change is committed at `8144c63d7c`.
 Domain tests pass (333 tests). Acceptance remains blocked only by the
 specifier-owned rent scenarios selecting three players while asking the
 unselected `ship` pawn to generate rent; the dividend matcher is corrected.
+
+## 2026-08-10T12:30:00Z — refactorer reviews the legal-entity economy redesign
+
+Received coder priority-50 handoff (commit `4220d32985`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 4220d32985
+```
+
+Action: merged (sixth instance of the recurring logbook sent/received
+conflict, resolved the same way as always). While reading through the
+merged history to understand what this handoff actually carries, found
+a second instance of the same auto-merge placement corruption I fixed
+last cycle — this time not just misplaced but with a chunk of text
+actually dropped: an upstream merge (`3a2b711`, already several
+commits back in this branch by the time I received it) had spliced the
+tail of a `98bf5a37dd` handoff entry directly onto an unrelated
+adjacent entry, silently deleting that entry's own header, its
+"Received specifier handoff" preamble, and the opening lines of its
+own code fence. Found the original intact wording at `ff3ced2b8e`
+(the commit where the entry was first written, before any merge had
+touched it) and restored it verbatim. Also not a `<<<<<<<` conflict —
+git's automatic merge considered this hunk unambiguous both times.
+
+This handoff carries the specifier's "build-then-repay-then-dividend"
+economy redesign (entity rent reinvests into houses before any loan
+repayment or dividend) and the coder's implementation: `Rent.java`
+gained entity-owned rent collection (a non-shareholder tenant pays
+double vacant rent to the entity, mortgage and afford-ability guarded),
+`LegalEntity` gained `receiveRent`/`receivedRent`, a `recordShareholderPayment`/
+`shareholderPayment` ledger, and a new `operate(Deeds)` overload that
+builds one house on the rented street when it has none, falling back
+to the original loan/dividend `operate()` otherwise. `Game.playTurn`
+no longer bundles entity resolution and operation together (my earlier
+`settleLegalEntities` extraction is gone) — `resolveLegalEntityAtStart`
+now runs before the turn, `operateLegalEntities` after, so a turn's own
+rent can be reinvested by the same turn's end-of-turn settlement.
+
+Independent verification caught two things the coder's own "domain
+tests pass" claim didn't cover, because domain tests don't include the
+specs-core module:
+
+1. **A genuine compile error.** `World.shareholderPaymentsWithin` calls
+   `money(ceiling)`, a package-private static helper on
+   `MonopolyStepHelpers` that `World.java` has never statically
+   imported — every other use of a `Money` literal in this ~900-line
+   file constructs `new Money(...)` directly instead. `specs-core`
+   would not compile at all. Fixed by matching the file's own
+   established convention (`new Money(ceiling)`) rather than adding an
+   import that nothing else in the file uses.
+
+2. **The already-escalated `ship`-pawn scenario mismatch is still
+   unresolved.** After the compile fix, 548/550 acceptance tests pass;
+   the 2 failures are exactly entity-7's two examples, both asserting
+   a house got built where none did — consistent with `ship` (asked to
+   roll and claim rent) never being in the 3-player turn order the
+   feature's Background selects. This is the same specifier-owned
+   defect the coder already escalated in this same commit chain; not
+   something for me to fix, and not new.
+
+Structural findings, both genuine coverage gaps from new methods never
+exercised by any test (the blocked entity-7 scenarios were the only
+path that would have reached them): `Rent`'s new `collect(LegalEntity,
+...)` overload was CRAP 20.0 (CC=4, 0% covered) and `LegalEntity.operate
+(Deeds)` was CRAP 12.0 (CC=3, 0% covered) — both over threshold. Added
+four focused `RentTest` cases (rent collected from a non-shareholder,
+none from a shareholder, none from a mortgaged street, none from an
+unaffordable tenant) and two `LegalEntityTest` cases (reinvestment
+builds a house and clears the pending flag, reinvestment is skipped
+when the street already has one) covering both branches directly
+against the domain code, independent of the blocked acceptance path.
+Both now CRAP 4.0 and 3.0 respectively, fully covered. No other
+threshold violations across `Game.java`, `LegalEntity.java`, `Rent.java`.
+
+Also independently chased down a `SimulatorTest.keepsPlayingUntilToldToStop`
+failure in the unrelated `the-monopoly-game-cli` module before trusting
+it was unrelated: reproduced it 3/3 times including in isolation, then
+built a temporary worktree at `0946961` (my last commit before any of
+this session's legal-entity-economy work) and got the identical
+failure there too — conclusively a pre-existing environmental flake
+(the test's own comments note it depends on real, unseeded dice
+finishing slower than a 1-second sleep; this machine has been under
+sustained load from this session's own repeated acceptance runs), not
+a regression from anything in this review. Worktree removed after
+comparison.
+
+`dry4java` across all changed files: only the pre-existing accepted
+`Game.java` event-adapter shape and one pre-existing, untouched
+duplication within `RentTest.java` itself (two early tests, present
+before this task, not something introduced here). `mutate4java --scan`:
+`Game.java` 73 sites, `LegalEntity.java` 34, `Rent.java` 11 — all well
+under the split threshold; all three manifests refreshed.
+
+Committed the domain/test fixes together. Handing back to the
+architect: the compile fix and coverage additions are done, but the
+task cannot be considered acceptance-clean until the specifier resolves
+the `ship`-pawn scenario mismatch already routed to them.

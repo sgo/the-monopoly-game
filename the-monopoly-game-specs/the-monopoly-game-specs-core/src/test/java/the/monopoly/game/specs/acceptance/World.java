@@ -640,7 +640,7 @@ public class World {
   }
 
   public boolean shareholderPaymentsWithin(int ceiling) {
-    Money limit = money(ceiling);
+    Money limit = new Money(ceiling);
     return deeds.legalEntities().stream()
         .flatMap(entity -> entity.shareholders().stream().map(entity::shareholderPayment))
         .allMatch(payment -> !payment.exceeds(limit));
