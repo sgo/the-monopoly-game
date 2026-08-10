@@ -21,6 +21,7 @@ import java.util.Optional;
  */
 public class Deeds {
   private final Map<Street.Type, Player.ID> owners = new HashMap<>();
+  private final Map<Street.Type, LegalEntity> entityOwners = new HashMap<>();
   private final Map<Street.Type, Improvement> improvements = new HashMap<>();
   private final Map<Street.Type, Mortgage> mortgages = new HashMap<>();
   private final Map<RetainedCard, Player.ID> retainedCards = new HashMap<>();
@@ -33,6 +34,21 @@ public class Deeds {
   /** Who holds the title to this land, if anyone does. */
   public Optional<Player.ID> ownerOf(Street.Type land) {
     return Optional.ofNullable(owners.get(land));
+  }
+
+  public Optional<LegalEntity> entityOwnerOf(Street.Type land) {
+    return Optional.ofNullable(entityOwners.get(land));
+  }
+
+  public void form(LegalEntity entity) {
+    entity.streets().forEach(street -> {
+      owners.remove(street.type());
+      entityOwners.put(street.type(), entity);
+    });
+  }
+
+  public List<LegalEntity> legalEntities() {
+    return entityOwners.values().stream().distinct().toList();
   }
 
   /** Whether buying this utility would deny another player, or complete this buyer's own, monopoly. */

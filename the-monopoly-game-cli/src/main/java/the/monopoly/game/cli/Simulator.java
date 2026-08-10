@@ -31,6 +31,8 @@ public final class Simulator {
   public static void main(String[] arguments) {
     if (List.of(arguments).contains("--optional-greedo-stalemate-trading"))
       System.out.println("Stalemate trading enabled");
+    if (List.of(arguments).contains("--optional-greedo-legal-entity"))
+      System.out.println("Legal entity trading enabled");
     Result result = execute(arguments);
     System.out.println(result.output());
     if (!result.succeeded()) System.exit(result.exitCode());
@@ -57,11 +59,13 @@ public final class Simulator {
   private static Result runSelected(String... arguments) {
     int playerCount = arguments.length == 0 ? 2 : Integer.parseInt(arguments[0]);
     boolean stalemateTrading = List.of(arguments).contains("--optional-greedo-stalemate-trading");
+    boolean legalEntityTrading = List.of(arguments).contains("--optional-greedo-legal-entity");
     List<String> strategyNames = List.of(arguments).subList(Math.min(1, arguments.length), arguments.length).stream()
-        .filter(argument -> !argument.equals("--optional-greedo-stalemate-trading")).toList();
+        .filter(argument -> !argument.equals("--optional-greedo-stalemate-trading")
+            && !argument.equals("--optional-greedo-legal-entity")).toList();
     if (!strategyNames.isEmpty() && strategyNames.size() != playerCount)
       return new Result(1, "Supply one strategy for each player. " + usage());
-    return run(playerCount, strategiesFor(playerCount, strategyNames), stalemateTrading);
+    return run(playerCount, strategiesFor(playerCount, strategyNames), stalemateTrading, legalEntityTrading);
   }
 
   static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames) {
@@ -89,7 +93,12 @@ public final class Simulator {
   }
 
   public static Result run(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading) {
-    return start(playerCount, strategies, stalemateTrading).awaitEnd();
+    return run(playerCount, strategies, stalemateTrading, false);
+  }
+
+  public static Result run(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading,
+                           boolean legalEntityTrading) {
+    return start(playerCount, strategies, stalemateTrading, legalEntityTrading).awaitEnd();
   }
 
   /**
@@ -103,6 +112,11 @@ public final class Simulator {
   }
 
   public static Running start(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading) {
+    return start(playerCount, strategies, stalemateTrading, false);
+  }
+
+  public static Running start(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading,
+                              boolean legalEntityTrading) {
     Result rejected = rejectOutOfRange(playerCount);
     if (rejected != null) return new Running(rejected);
 
@@ -110,7 +124,7 @@ public final class Simulator {
     List<Player> players = rules.players().select(playerCount).toList();
     Deeds deeds = new Deeds();
     return new Running(new Game(rules, players, player -> Cup.of(rules.dice().toList()), strategies, deeds,
-        Cards.Decks.official(deeds), new Jail(rules), stalemateTrading));
+        Cards.Decks.official(deeds), new Jail(rules), stalemateTrading, legalEntityTrading));
   }
 
   private static Result rejectOutOfRange(int playerCount) {

@@ -174,6 +174,51 @@ even with the flag on — but it measurably converts a large share of
 would-be stalemates into an ordinary, decisive bankruptcy ending, and does
 so more often in the trailing player's favor than not.
 
+### Player age
+
+Each player has an age: it starts at zero and increases by one every time
+they pass or land on Start, and by one every time they're sent to jail
+(landing there while "just visiting" doesn't count). It's shown alongside
+their balance at the start of every turn, and as a final figure for the
+winner, or for every remaining player if the game ends in a stalemate.
+
+Measured directly across 20 real 2-player Greedo games (real dice, played
+to a natural conclusion or a 3000-round safety cap):
+
+- **17 of 20 games ended in an ordinary win.** Average age reached: ~19
+  years (median 16), ranging from 6-9 in the fastest game (79 rolls) to
+  65-69 in the longest ordinary win (694 rolls).
+- **2 of 20 stalemated, and 1 was still running at the safety cap** — the
+  same long tail documented above. Those three games alone averaged
+  381-690 years, dragging the all-games average up to ~89; they're the
+  exception, not the typical outcome.
+
+So for a typical (non-stalemate) 2-player game, expect players to reach
+somewhere around their late teens to low twenties in age by the time
+someone goes bankrupt.
+
+The same measurement across 20 real 3-player Greedo games (real dice,
+played to a natural conclusion or a 3000-round safety cap):
+
+- **11 of 20 games ended in an ordinary win.** Average age reached: ~14
+  years (median 13, range 7-29) — noticeably lower than the 2-player
+  figure, since three players splitting rent income tends to bring on a
+  bankruptcy sooner relative to how many laps of the board have passed.
+- **9 of 20 stalemated** — matching the ~48% no-trading stalemate rate
+  already measured above — averaging ~266 years, the same long-tail
+  pattern as the 2-player case.
+
+The same measurement across 20 real 8-player Greedo games (real dice, up
+to a 3000-round safety cap — well over 20,000 rolls at 8 players):
+
+- **18 of 20 games stalemated**; the other 2 were still running at the
+  safety cap. **No game ended in an ordinary win.** Average final age
+  among the stalemated games: ~295 years (median 290, range 206-408).
+- Unlike the 2- and 3-player cases, there is no "typical quick game"
+  bucket to contrast this against — stalemate (or still running) *is*
+  the normal outcome at 8 players, consistent with the buyout mechanism's
+  blindness to 3+-way colour-group splits documented above.
+
 ### Journal and report
 
 As the game is played, game events should be written to a journal and included

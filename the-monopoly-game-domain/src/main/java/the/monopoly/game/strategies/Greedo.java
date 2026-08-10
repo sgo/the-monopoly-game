@@ -19,6 +19,7 @@ import java.util.Optional;
 public final class Greedo implements Strategy {
   private final Money reserve;
   private final boolean stalemateTrading;
+  private final boolean legalEntityTrading;
 
   public Greedo() {
     this(Money.ZERO, false);
@@ -29,12 +30,21 @@ public final class Greedo implements Strategy {
   }
 
   public Greedo(Money reserve, boolean stalemateTrading) {
+    this(reserve, stalemateTrading, false);
+  }
+
+  public Greedo(Money reserve, boolean stalemateTrading, boolean legalEntityTrading) {
     this.reserve = reserve;
     this.stalemateTrading = stalemateTrading;
+    this.legalEntityTrading = legalEntityTrading;
   }
 
   public boolean stalemateTradingEnabled() {
     return stalemateTrading;
+  }
+
+  public boolean legalEntityTradingEnabled() {
+    return legalEntityTrading;
   }
 
   @Override

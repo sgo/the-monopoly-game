@@ -103,6 +103,35 @@ final class GameLogStepHandlers {
 
   static List<StepHandler> handlers() {
     return List.of(
+        then("^the game log records that " + NAME + " is formed, held in equal thirds by pawn \"" + NAME
+                + "\", pawn \"" + NAME + "\", and pawn \"" + NAME + "\"$",
+            (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.LegalEntityFormed it
+                && it.name().equals(arguments.text(1)), "entity formed"))),
+        then("^the game log records that " + NAME + " raises a loan of \\$" + VALUE
+                + " from pawn \"" + NAME + "\", pawn \"" + NAME + "\", and pawn \"" + NAME + "\"$",
+            (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.LegalEntityLoanRaised it
+                && it.name().equals(arguments.text(1)) && it.amount().amount() == arguments.number(2), "loan raised"))),
+        then("^the game log records that " + NAME + " repays pawn \"" + NAME + "\" \\$" + VALUE
+                + " for the loan$",
+            (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.LegalEntityLoanRepaid it
+                && it.name().equals(arguments.text(1)) && it.repayment().amount() == arguments.number(3), "loan repaid"))),
+        then("^the game log records that " + NAME + " pays each of pawn \"" + NAME + "\", pawn \""
+                + NAME + "\", and pawn \"" + NAME + "\" an equal dividend$",
+            (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.LegalEntityDividendPaid it
+                && it.name().equals(arguments.text(1)), "equal dividend"))),
+        then("^the game report says that " + NAME + " is formed, held in equal thirds by pawn \"" + NAME
+                + "\", pawn \"" + NAME + "\", and pawn \"" + NAME + "\"$",
+            (world, arguments) -> says(world, arguments.text(1) + " is formed, held in equal thirds by")),
+        then("^the game report says that " + NAME + " raises a loan of \\$" + VALUE
+                + " from pawn \"" + NAME + "\", pawn \"" + NAME + "\", and pawn \"" + NAME + "\"$",
+            (world, arguments) -> says(world, arguments.text(1) + " raises a loan of $" + arguments.number(2))),
+        then("^the game report says that " + NAME + " pays pawn \"" + NAME + "\" \\$" + VALUE
+                + " for the loan$",
+            (world, arguments) -> says(world, arguments.text(1) + " repays " + arguments.text(2)
+                + " $" + arguments.number(3) + " for the loan")),
+        then("^the game report says that " + NAME + " pays each of pawn \"" + NAME + "\", pawn \""
+                + NAME + "\", and pawn \"" + NAME + "\" an equal dividend$",
+            (world, arguments) -> says(world, arguments.text(1) + " pays each of")),
         then("^the game log records that pawn \"" + NAME + "\" starts a turn aged " + VALUE
                 + " years before it records that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
             (world, arguments) -> logRecordsInOrder(world,

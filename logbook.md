@@ -1,5 +1,9 @@
 # Logbook
 
+## 2026-08-10T10:04:00Z — completed greedo-legal-entity
+
+Merged specifier commit `8b0cc9799c`, implemented legal-entity formation, ownership, equal shares, loans, repayment interest, dividends, journal/report/logging support, and the CLI flag. Verified with 326 domain tests and 545 acceptance scenarios. Prepared handoff to refactorer.
+
 ## 2026-07-25T19:00:15Z — coder received handoff from specifier
 
 Handoff message received:
@@ -25574,6 +25578,37 @@ affordability or majority-outcome class. Final verification passed:
 further coder or refactorer loop is warranted; sent the phase-complete
 state to the specifier.
 
+## 2026-08-09T14:16:04Z — specifier sends player age tracking to coder
+
+Handoff message sent:
+
+```
+id: 20260809T141604Z_000083_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: player-age-tracking
+commit: 2c9c37ebd3
+created_at: 2026-08-09T14:16:04.368894Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 2c9c37ebd3
+```
+
+Contents: new Gherkin (journal-59..62, mirrored in report/logging)
+specifying a per-player "age" counter, starting at 0 and incrementing
+by 1 each time a player passes/lands on Start or is sent to jail (not
+merely visiting). Covers the increment display at the start of a
+turn (a new "starts a turn aged N years" line alongside the existing
+balance/reserve line, not a change to it), the final age shown next
+to each remaining player's final balance on a stalemate ending, and
+the winner's final age on an ordinary bankruptcy-decided ending. Ran
+ir-dry-checker against all three changed files first; no accidental
+repeated steps within the new scenarios.
+
 ## 2026-08-09T16:36:00Z — refactorer reviews player-age-tracking
 
 Received coder priority-50 handoff (commit `fcfa17db89`, task
@@ -25655,3 +25690,233 @@ Game.java/Report.java. One mechanical DRY fix: a fully-qualified
 `MonopolyStepHelpers.jailEntered()` call in `JournalStepHandlers`
 switched to the file's existing static-import convention. Domain tests
 clean, acceptance 520/520.
+
+## 2026-08-09T14:39:35Z — architect reviews player-age-tracking
+
+Received refactorer priority-50 handoff (commit `bbc819657a`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer bbc819657a
+```
+
+Action: accepted the architecture of the implementation. Age state is
+encapsulated inside `Game.Journalling`, and the journal/report boundary
+is explicit through `TurnStarted.age` and `FinalAge`; no core rule or
+UI dependency leaks across modules. Differential Java mutation for
+`Game` and `Report` is current, and the DRY findings are existing
+event-adapter repetitions.
+
+Soft Gherkin mutation exposed a specification weakness in the new
+age-after-passing-start and age-after-jail scenarios: each queues a
+parameterized turn roll and then queues a second fixed `1 and 2` roll.
+Several roll mutations therefore survive without testing the stated
+age behavior. This acceptance-content finding is routed to the
+specifier; the task cannot close until that loop returns.
+
+## 2026-08-09T14:48:15Z — specifier resolves age scenario mutation gap
+
+Received architect priority-00 handoff (commit `2422aae24c`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 2422aae24c
+```
+
+Action: merged, then cross-checked the finding against each new
+scenario's entry in the acceptance-mutation manifest embedded in
+`journal.feature` rather than guessing from the prose alone. The
+jail scenario (`the journal records a player's age increasing after
+being sent to jail`) and the stalemate final-age scenario were both
+already fully killed (6/6, 0 survived) — jail landing requires an
+exact total, and 27 + 3 is the only non-double die pair that reaches
+position 30, so any mutated roll misses the space entirely and the
+assertion correctly fails. The passing-start scenario was absent from
+the manifest altogether: starting dog at position 37 meant the
+*minimum* possible roll (1 and 2, total 3) already crosses Start, so
+every larger mutated total also crosses it — the specific die values
+were unfalsifiable, which is exactly the "survives without testing
+the stated behavior" the architect described. The winner's-final-age
+scenario doesn't use a parameterized roll at all (it teleports via the
+"lands on" helper), so the finding doesn't apply there.
+
+Fixed only the passing-start scenario (journal/report/logging-59):
+moved the start position to 29, where crossing requires a roll total
+of 11 — the maximum reachable with two distinct dice (5 and 6) — so
+all but the trivial die-swap mutation now fails to cross and gets
+killed. Left the jail scenario's numbers untouched since they were
+already maximally constrained. Verified the fix with a full normal
+acceptance run (not mutation, per role restriction): 520/520 passing,
+confirming the new position/dice values still produce the asserted
+behavior against the real implementation. Committed as `4de8cdc6ba`
+(the architect merge plus this fix) and handed back to the architect
+under the same task name.
+
+## 2026-08-09T14:51:32Z — architect reviews corrected player-age-tracking fixtures
+
+Received specifier priority-50 handoff (commit `4de8cdc6ba`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 4de8cdc6ba
+```
+
+Action: accepted the corrected passing-Start fixture. Its primary roll
+now crosses Start, and the refreshed soft Gherkin mutation manifests
+kill all six mutations for each new age scenario in journal, logging,
+and report coverage.
+
+The full acceptance suite cannot close cleanly: CLI scenario `cli-1`
+requires a default two-player game to record 50 rolls before it is
+stopped, but this run legitimately completed after 47 rolls. The log
+ends with `Won` and `FinalAge`; the age implementation only records
+state and does not affect game decisions. This is an existing unstable
+acceptance contract, not grounds for a test-only turn policy or a
+gameplay change. Routed to the specifier for a durable specification
+of how the real CLI game is kept observable before stop.
+
+## 2026-08-09T15:05:38Z — architect reviews CLI roll-threshold resolution
+
+Received specifier priority-50 handoff (commit `692f29e7da`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 692f29e7da
+```
+
+Action: accepted the removal of the 50-roll completion flake. The
+specifier changed only the two two-player CLI examples to ten rolls;
+the eight-player check remains at fifty. Full acceptance is clean.
+
+Soft Gherkin mutation of `specs-cli:en/cli.feature` nevertheless
+survived three of six mutations: cli-1's threshold `10 -> 2`, cli-2's
+threshold `50 -> 55`, and cli-5's threshold `10 -> 18`. Each describes
+a tolerated amount of genuine progress, so the current feature has no
+assertion capable of distinguishing those changed values. This is a
+scenario-content coverage gap; route it to the specifier instead of
+altering CLI/gameplay behavior or editing the feature directly.
+
+## 2026-08-09T15:03:00Z — specifier lowers cli-1/cli-5 roll threshold
+
+Received architect priority-00 handoff (commit `929eb94721`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 929eb94721
+```
+
+Action: merged (second logbook conflict, same sent/received
+boilerplate-misalignment shape as before; spliced both entries back in
+by diffing against `git show <side>:logbook.md` for each parent rather
+than trusting the marker placement). Investigated the actual test
+harness (`World.awaitGameLog`, `MonopolyStepHandlers.java`) before
+deciding anything: it polls for N `Entry.Rolled` records with a 5s
+timeout and no awareness the game can conclude early, so a genuine
+47-roll win just times out with a real `AssertionError` — not a hang,
+not a silent pass, an honest but racy failure.
+
+Rather than guess a safer number, measured it: 2000 real (unseeded
+dice) 2-player Greedo games via `Game.playUpToRounds`, counting
+`Entry.Rolled` up to `Won`/`Stalemate`. Minimum rolls to conclusion was
+26; zero endings under 20; the old 50-roll threshold had 5/2000 (0.25%)
+endings under it, and a first, smaller batch reproduced the exact `47`
+the architect saw, confirming the model matches production. 8-player
+`cli-2` needed no change: minimum there was 269 rolls over 150 trials,
+nowhere near its threshold.
+
+Lowered `cli-1` and `cli-5`'s minimum-rolls example from 50 to 10 —
+still proves several genuine turns happened, but no observed trial
+came remotely close to violating it. Left `cli-2` untouched. Verified
+with a full acceptance run (not mutation, per role restriction):
+520/520. Committed as `b7b9347aae` and handed back to the architect
+under the same task name.
+
+## 2026-08-09T15:12:00Z — specifier declines further CLI threshold tightening
+
+Received architect priority-00 handoff (commit `302cd4cc6e`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 302cd4cc6e
+```
+
+Action: fast-forward merge, no conflict. Reviewed the finding: soft
+Gherkin mutation survives cli-1's `10 -> 2`, cli-2's `50 -> 55`, and
+cli-5's `10 -> 18`.
+
+Declining to narrow these further. The assertion is "at least N rolls"
+against a genuinely random, unbounded game — an inequality, not an
+equality. Decreasing N always trivially survives (a weaker bound the
+real run still clears). Increasing N survives too as long as the real
+run's headroom above N stays comfortable within the 5s poll timeout,
+which is exactly the property the previous fix (this same task, prior
+loop) spent 2000 real trials establishing on purpose: 2-player runs
+never concluded below 20 rolls, 8-player never below 269, against
+thresholds of 10 and 50. Tightening N toward that empirical floor to
+make nearby values distinguishable would recreate the exact real flake
+this task already fixed once (cli-1 genuinely failed at 47 rolls
+against a 50 threshold) — trading a just-closed reliability bug back
+for mutation score. No additional assertion closes the gap either:
+cli-5 already pairs its threshold with "the simulator is still playing
+when the game log has recorded N rolls," and that doesn't make the
+chosen N any more falsifiable than "no winner yet" already does.
+
+This is the same accepted category the refactorer named earlier in
+this task's own history for balance perturbations: an equivalent
+mutation the scenario cannot and should not be made to catch, because
+catching it requires giving up the safety margin that keeps the
+scenario from flaking against real randomness. No feature file change
+this round. Handing back to the architect under the same task name to
+close this loop on that basis.
+
+## 2026-08-09T15:09:06Z — architect closes player-age-tracking
+
+Received specifier priority-50 handoff (commit `8156e2706d`, task
+`player-age-tracking`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 8156e2706d
+```
+
+Action: accepted the specification decision. The three surviving soft
+mutations change lower bounds in intentionally tolerant, real-dice
+CLI scenarios; making nearby values distinguishable would reduce the
+safety margin and restore the genuine early-completion flake. No code
+or feature change is warranted.
+
+Sent phase-complete priority-50 handoff to specifier (task
+`player-age-tracking`, commit recorded by this entry) after all
+specifier/coder/refactorer loops closed.
+2026-08-10T07:40:00Z — Received specifier handoff:
+id: 20260810T073726Z_000087_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 8b0cc9799c
+created_at: 2026-08-10T07:37:26.927064Z
+enqueued_at: 2026-08-10T07:37:27.200582Z
+task: greedo-legal-entity
+dequeued_at: 2026-08-10T07:37:35.581433Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 8b0cc9799c
+
+Action: merged the specification commit and began implementing the legal-entity behavior slice.
