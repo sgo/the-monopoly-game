@@ -149,11 +149,11 @@ final class JournalStepHandlers {
             (world, arguments) -> assertThat(world.entityLoan("Pink Realty"))
                 .isEqualTo(money(arguments.number(1)))),
 
-        given("^pawn \"" + NAME + "\" has a balance that allows only \\$(<ceiling_share>) toward the entity$",
+        given("^pawn \"" + NAME + "\" has a balance that allows only \\$(<ceiling_share>|<share>) toward the entity$",
             (world, arguments) -> world.arrangePawnBalance(arguments.text(1), money(arguments.number(2)))),
 
-        given("^pawn \"" + NAME + "\" has a balance that allows only \\$(<share>) toward the entity$",
-            (world, arguments) -> world.arrangePawnBalance(arguments.text(1), money(arguments.number(2)))),
+        given("^each shareholder commits \\$(<share>) toward Pink Realty's build$",
+            (world, arguments) -> world.shareholdersCommitToBuild("Pink Realty", money(arguments.number(1)))),
 
         step("^pawn \"" + NAME + "\" considers forming a legal entity over the " + NAME + " colour group$",
             (world, arguments) -> world.considerFormingLegalEntity(arguments.text(1), arguments.text(2))),

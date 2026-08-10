@@ -631,6 +631,12 @@ public class World {
         .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).raiseLoan(amount);
   }
 
+  public void shareholdersCommitToBuild(String entityName, Money amount) {
+    LegalEntity entity = deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName));
+    entity.shareholders().forEach(shareholder -> entity.commitToBuild(shareholder, amount));
+  }
+
   public void entityLoanFullyRepaid(String entityName) {
     LegalEntity entity = deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
         .orElseThrow(() -> new AssertionError("Unknown entity " + entityName));
