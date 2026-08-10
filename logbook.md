@@ -26855,3 +26855,23 @@ The new rent-reinvestment scenarios remain blocked because their Background
 selects three players (`dog`, `high hat`, `iron box`) while the scenarios ask
 `ship` to roll and claim rent; `ship` is not in the selected turn order.
 Escalated this specification inconsistency to the architect for resolution.
+
+## 2026-08-10T12:08:10Z — architect rejects incomplete reinvestment coverage
+
+Received coder priority-50 handoff (commit `ff3ced2b8e`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder ff3ced2b8e
+```
+
+Action: merged the reinvestment implementation for review, but it is
+not advanceable. The new rent-reinvestment scenarios select only dog,
+high hat, and iron box while asking ship to roll/claim rent, so their
+acceptance setup cannot run. In addition, the new assertion helper
+`shareholderPaymentsWithin` only checks that balances are nonnegative;
+it does not record or validate amounts paid to the entity. Route the
+scenario-player inconsistency to specifier and the incomplete
+payment-accounting/assertion behavior to coder.
