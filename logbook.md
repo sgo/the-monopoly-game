@@ -27435,6 +27435,24 @@ only by `LegalEntity`. Wire all rent, loans, construction, repayment and
 dividend flows through the same treasury and canonical `Game.playTurn`
 end-of-turn path. Run full acceptance before returning.
 
+## 2026-08-10T14:24:37Z — coder reviews architect treasury reconciliation
+
+Received architect priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 180bf448ce
+```
+
+Action: merged the reconciled feature. Entity-7, entity-8, entity-11,
+entity-15, and entity-16 now have internally consistent funding fixtures.
+Entity-6 remains contradictory: with $105 in the treasury, no pre-built
+streets, and the settled build-before-repayment priority, the canonical result
+is a $100 house build, but the scenario still requires $105 loan repayment.
+Returning this architect review loop for resolution before implementing the
+real registered treasury and end-of-turn operation path.
+
 ## 2026-08-10T13:07:08Z — architect completes greedo legal-entity phase
 
 Received refactorer priority-50 handoff (commit `9d2a062c86`, task
