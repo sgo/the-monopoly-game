@@ -860,12 +860,13 @@ Feature: game report
   Scenario Outline: the report narrates that <entity_name> raises a loan to fund a build shortfall
     Given <entity_name> is formed
     And <entity_name>'s bank account holds $<rent>
+    And each shareholder commits $<commitment> toward Pink Realty's build
     When we play up to 1 round
     Then the game report says that <entity_name> raises a loan of $<shortfall> from pawn "dog", pawn "high hat", and pawn "iron box"
 
     Examples:
-      | entity_name | rent | shortfall |
-      | Pink Realty  | 50   | 50        |
+      | entity_name | rent | shortfall | commitment |
+      | Pink Realty  | 50   | 50        | 25         |
 
   # report-65
   Scenario Outline: the report narrates that <entity_name> repays a shareholder loan

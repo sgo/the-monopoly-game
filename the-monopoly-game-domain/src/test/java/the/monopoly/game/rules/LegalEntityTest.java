@@ -228,6 +228,9 @@ class LegalEntityTest {
     dog.account().deposit(new Money(50));
     highHat.account().deposit(new Money(50));
     ironBox.account().deposit(new Money(50));
+    entity.commitToBuild(dog, new Money(50));
+    entity.commitToBuild(highHat, new Money(50));
+    entity.commitToBuild(ironBox, new Money(50));
 
     LegalEntity.Operation operation = entity.operate(deeds);
 
@@ -251,6 +254,9 @@ class LegalEntityTest {
     dog.account().deposit(new Money(10));
     highHat.account().deposit(new Money(10));
     ironBox.account().deposit(new Money(10));
+    entity.commitToBuild(dog, new Money(10));
+    entity.commitToBuild(highHat, new Money(10));
+    entity.commitToBuild(ironBox, new Money(10));
 
     assertThat(entity.operate(deeds))
         .isEqualTo(new LegalEntity.Operation.LoanRaisedAndHouseBuilt(new Money(1), street));

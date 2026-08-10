@@ -95,6 +95,9 @@ final class JournalStepHandlers {
         given("^the last-capitalised shareholder of Pink Realty is pawn \"" + NAME + "\"$",
             (world, arguments) -> world.entityLastCapitalizedShareholder("Pink Realty", arguments.text(1))),
 
+        given("^the last-capitalised shareholder of Pink Realty grows a year older$",
+            (world, arguments) -> world.entityLastCapitalizedShareholderGrewOlder("Pink Realty")),
+
         then("^" + NAME + "'s bank account holds \\$" + VALUE + "$",
             (world, arguments) -> assertThat(world.entityBankBalance(arguments.text(1)))
                 .isEqualTo(money(arguments.number(2)))),
@@ -152,7 +155,7 @@ final class JournalStepHandlers {
         given("^pawn \"" + NAME + "\" has a balance that allows only \\$(<ceiling_share>|<share>) toward the entity$",
             (world, arguments) -> world.arrangePawnBalance(arguments.text(1), money(arguments.number(2)))),
 
-        given("^each shareholder commits \\$(<share>) toward Pink Realty's build$",
+        given("^each shareholder commits \\$(<share>|<commitment>) toward Pink Realty's build$",
             (world, arguments) -> world.shareholdersCommitToBuild("Pink Realty", money(arguments.number(1)))),
 
         step("^pawn \"" + NAME + "\" considers forming a legal entity over the " + NAME + " colour group$",
