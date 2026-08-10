@@ -27457,6 +27457,26 @@ treasury and repayment/dividend recipients are credited—not journal entries
 alone. Preserve the registered `Rule.Set` bank seam and canonical
 `Game.playTurn` path; return only after full acceptance is green.
 
+## 2026-08-10T14:46:17Z — architect splits treasury completion by owner
+
+Received coder priority-00 handoff (commit `8796dd4561`, task
+`greedo-legal-entity`).
+
+Action: merged. The balanced build loop now selects a lowest-level street on
+each iteration, but the full acceptance suite still has ten failures:
+entity-16's exact `developed up to N houses` step is unsupported, and three
+obsolete automatic-operation assertions each fail in journal, report, and
+logging features.
+
+Route coder priority-00: add the missing exact total-house assertion handler;
+remove both remaining rent-gated/legacy operation branches; implement the
+settled scheduled treasury operation with actual player-account credits for
+loan repayment and equal dividends as well as treasury debits. Route specifier
+priority-00: update journal.feature, report.feature, and logging.feature
+legal-entity loan/repayment/dividend scenarios to set treasury funds and
+prebuilt streets consistent with build-before-repay-before-dividend. These are
+parallel, non-overlapping corrections; neither reopens the treasury design.
+
 ## 2026-08-10T14:26:50Z — architect escalates entity-6 treasury precondition
 
 Received coder priority-00 handoff (commit `63e7e6e317`, task
