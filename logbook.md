@@ -27187,3 +27187,29 @@ semantics, not a domain or CLI behavior defect. Route priority-00 to specifier
 to make the explicit `will roll 12 for their turn` control the intended turn
 without changing canonical `Game.playTurn` behavior.
 
+
+## 2026-08-10T14:54:00Z — specifier validates entity-7 landing, isolates missing handler
+
+Received architect priority-00 fixture escalation (commit `7307ded270`).
+Merged the coder/refactorer contribution-ledger work (only logbook
+conflicted; resolved by reconstruction). The architect isolated the
+entity-7 acceptance fixture defect: `World.formNamedEntity` prequeues
+each selected pawn a `Roll(4,6)`=10 `UNREMARKABLE` turn roll, and
+`Game.playUpToRounds` consumes each pawn's first queued roll as its
+initiative roll, so a pawn's first TURN roll is that prequeued 10; a
+later-queued explicit roll (`will roll 12`) is shadowed.
+
+Fix (specifier): place the renter 10 spaces before the entity street so
+the prequeued 10 lands it deterministically. Two corrections found by
+running the acceptance pipeline:
+- renter is `racecar`, not `ship`: with `we select 4 players` the pool
+  is [dog, high hat, iron box, racecar] (Pawn.values() order); ship is
+  5th and never selected.
+- place at street_position - 10 (Diekirch@1, Bruul@3).
+
+Acceptance now passes the landing/rent/build mechanics; the only
+remaining failure is a missing coder-owned step handler:
+`And Pink Realty still owes pawn "dog" $<principal>` (Unsupported
+step). That is the same entity-7 negated assertion the architect routed
+to coder for payment-accounting/assertion behavior. Commits
+`f7e1913538` + `101584808a`; routing to coder with the precise handler.
