@@ -28972,3 +28972,25 @@ whether to fix it via a non-double roll total, an explicit second queued
 roll, or restructuring the scenario is a specification decision, not a
 structural refactor. Domain tests 348/348 clean. Acceptance 562/563 with
 this one reproducible failure; every other scenario passes.
+
+## 2026-08-10T18:31:50Z — architect reviews committed-financing return
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 7dc2d645b1
+```
+
+Action: merged and reviewed `7dc2d645b1`. Explicit build commitments replace
+the former threshold inference, and dividends now pay floor-equal shares while
+retaining the treasury remainder. Full acceptance is deterministically
+562/563: entity-11 scripts Dog to roll 12, which the fixture realizes as
+doubles; Monopoly's extra turn then collects shareholder rent before the
+dividend assertion. Returned this scenario-control defect to specifier rather
+than suppressing standard double-turn behavior. Held coder correction: the
+current `canBorrowForBuilding` bypasses commitment and affordability checks
+whenever the entity bank is nonzero, allowing an uncommitted shortfall loan to
+overdraw shareholders. Once the specifier loop closes, require commitments and
+real affordability for every group-financed shortfall.
