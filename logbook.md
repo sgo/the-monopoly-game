@@ -28688,3 +28688,22 @@ threshold. `dry4java`: no duplicate candidates found. `mutate4java --scan`:
 10 sites, manifest refreshed (hash-only diff, no functional changes
 needed on my side). Domain tests 347/347, full acceptance 557/557, run
 twice for confidence.
+
+## 2026-08-10T21:31:26+02:00 — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 2434d69fe8
+```
+
+Summary: reviewed the coder's shareholder entity-rent fix — removing the
+shareholder exemption from `Rent.collect(LegalEntity, ...)` so shareholders
+now pay the same rent as any other tenant on their entity's street,
+matching entity-21. Clean structural pass: no CRAP violations, no DRY
+issues, 10 mutation sites (manifest refreshed, hash-only diff). Domain and
+acceptance suites both verified green twice.
