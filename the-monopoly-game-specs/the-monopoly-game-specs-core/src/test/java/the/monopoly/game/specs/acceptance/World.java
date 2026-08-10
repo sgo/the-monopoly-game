@@ -583,7 +583,6 @@ public class World {
     for (int index = 0; index < players().size(); index++) {
       Player player = players().get(index);
       queuePawnRoll(player.id().value(), rollTotalling(3 + index));
-      queuePawnRoll(player.id().value(), UNREMARKABLE);
     }
     formEntity(Street.Colour.valueOf(name.substring(0, name.indexOf(' ')).toLowerCase()), true,
         players().stream().limit(3).toList());
