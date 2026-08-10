@@ -116,7 +116,7 @@ public final class LegalEntity {
   public Money shareholderPayment(Player shareholder) {
     return shareholderPayments.getOrDefault(shareholder.id(), Money.ZERO);
   }
-  Player lastCapitalizedShareholder() { return lastCapitalizedShareholder; }
+  public Player lastCapitalizedShareholder() { return lastCapitalizedShareholder; }
   public void recordCapitalization(Player shareholder) {
     if (!shareholders.contains(shareholder)) throw new IllegalArgumentException("Not a shareholder.");
     lastCapitalizedShareholder = shareholder;
@@ -211,7 +211,6 @@ public final class LegalEntity {
   private boolean canBorrowForBuilding(Money shortfall) {
     if (!loan.equals(Money.ZERO))
       return false;
-    if (bankBalance().amount() > 0) return true;
     List<Money> shares = sharesOf(shortfall);
     return java.util.stream.IntStream.range(0, shareholders.size()).allMatch(index ->
         shareholders.get(index).account().balance().amount().amount() >= shares.get(index).amount()

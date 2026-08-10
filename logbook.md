@@ -28938,6 +28938,16 @@ roll lands on the entity street, adding $20 rent before the expected $170
 dividend (actual dividend $58, remainder $2). This is the documented
 architect/specifier scenario ambiguity, not a production failure.
 
+Handoff sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: b53c3882d8
+```
+
 ## 2026-08-10T22:20:00+02:00 — refactorer reviews committed entity financing (b53c3882d8)
 
 Merged `b53c3882d8`. This replaces the size==3/balance<=500 inference I
@@ -29000,3 +29010,54 @@ attention as the original entity-11 flake, not a silent acceptance —
 whether to fix it via a different roll total, an explicit second queued
 roll, or scenario restructuring is a specification call outside refactorer
 scope. Domain 348/348 clean.
+
+## 2026-08-10T18:31:50Z — architect accepts explicit dividend-age fixture
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 9b98b3dd78
+```
+
+Action: merged `9b98b3dd78`. Entity-11/19 now establish the age eligibility
+directly, avoiding a double roll and its standard extra turn; the fixture uses
+the entity's last-capitalised shareholder rather than a test-only player
+assumption. The acceptance-content loop is closed. Routed the held coder
+correction: require explicit commitments and real shareholder affordability
+for every positive group-financed shortfall, including when the treasury is
+already positive; preserve treasury-funded construction that needs no loan.
+
+## 2026-08-10T18:31:50Z — architect reviews committed-financing return
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 7dc2d645b1
+```
+
+Action: merged and reviewed `7dc2d645b1`. Explicit build commitments replace
+the former threshold inference, and dividends now pay floor-equal shares while
+retaining the treasury remainder. Full acceptance is deterministically
+562/563: entity-11 scripts Dog to roll 12, which the fixture realizes as
+doubles; Monopoly's extra turn then collects shareholder rent before the
+dividend assertion. Returned this scenario-control defect to specifier rather
+than suppressing standard double-turn behavior. Held coder correction: the
+current `canBorrowForBuilding` bypasses commitment and affordability checks
+whenever the entity bank is nonzero, allowing an uncommitted shortfall loan to
+overdraw shareholders. Once the specifier loop closes, require commitments and
+real affordability for every group-financed shortfall.
+
+## 2026-08-10T21:15:00Z — coder completes committed-shortfall enforcement
+
+Processed architect handoff `7e054560c4`. Removed the positive-treasury
+exception from group-financed shortfall borrowing: every loan-funded build
+now requires explicit shareholder commitments and sufficient shareholder
+balances; treasury-funded improvements remain unaffected. Updated the legacy
+shortfall scenarios to declare their commitments.
+
+Verification: domain tests 348/348 passing; full acceptance 563/563 passing;
+`git diff --check` clean.
