@@ -26007,16 +26007,6 @@ prevents the fixture fallback from creating an unbreakable tie.
 
 Verification: domain tests 332/332 passing; full acceptance 545/545
 passing; `git diff --check` clean.
-
-Handoff sent to architect:
-
-```
-type: git_handoff
-to: architect
-priority: 00
-task: greedo-legal-entity
-commit: 1ca8540a13
-```
 2026-08-10T07:40:00Z — Received specifier handoff:
 id: 20260810T073726Z_000087_from_specifier
 from: specifier
@@ -26452,6 +26442,26 @@ turn path. Refactorer independently verified the legal-entity class
 12/12 and full acceptance 545/545. All coder/refactorer loops are
 closed; send the phase-complete priority-50 sync to specifier.
 
+## 2026-08-10T10:08:47Z — specifier routes multi-player entity fix to architect
+
+Sent architect priority-50 git_handoff (commit `095618e1ba`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 095618e1ba
+```
+
+Root cause (empirically verified by running the game): the legal-entity
+mechanism never forms for 4-8 player games. `Game.resolveLegalEntityAtStart`
+passes the whole player pool as shareholders, so `LegalEntity.form`'s
+exactly-three guard never fires outside a strict 3-player game. Added
+Gherkin entity-9 (entity forms from the three actual co-owners of a
+colour group even in 4- and 8-player games) and entity-10 (two-owner
+splits do not form). Feature parses cleanly. User requested the fix be
+routed to the architect first for agreement before implementation.
+
 ## 2026-08-10T10:10:17Z — architect reviews multi-player legal entities
 
 Received specifier priority-50 handoff (commit `095618e1ba`, task
@@ -26537,3 +26547,44 @@ priority: 00
 task: greedo-legal-entity
 commit: ac2415fbe2
 ```
+## 2026-08-10T10:52:00Z — specifier decides correct multi-player entity scenario
+
+Merged architect priority-00 follow-up (commit `ba439d6513`, task
+`greedo-legal-entity`), which carried the coder's `314dadf9ff`.
+
+Received message: merge_and_process architect ba439d6513
+
+Action (specifier decision, as deferred by architect): the coder's
+entity-10 setup — "every other ownable space outside the <group>
+colour group is owned" — tested an unowned-group case, not the stated
+two-owner split, because it left the candidate group's remaining street
+unowned. Corrected entity-10 to a genuine two-owner split on a
+fully-owned board: pawn "dog" owns one group street and pawn "high hat"
+owns the other two, with every remaining ownable space owned by pawn
+"racecar". Removed the coder's now-unused "outside the group" step
+handler and World.ownEveryOtherOwnableOutside method. Kept the coder's
+`we select (<player_count>) players` handler fix and the
+World.considerFormingLegalEntity shareholder derivation. Acknowledged
+the architect's note that production `Game` still passes its whole
+player list to `LegalEntity.form` — the real-game fix remains for the
+coder. Feature parses cleanly.
+
+Sent decision back to architect (priority-00).
+
+## 2026-08-10T10:52:00Z — architect accepts multi-player scenario correction
+
+Received specifier priority-00 handoff (commit `e9b292e39f`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier e9b292e39f
+```
+
+Action: accepted the restored entity-10 criterion: the candidate group
+is fully owned by exactly two players, while the remaining board belongs
+to the fourth/eighth player. The Gherkin content defect is closed. Send
+the corrected feature to coder with the still-outstanding requirement
+that `Game`, rather than only `World`, select the three owners of the
+candidate group in larger games.
