@@ -147,7 +147,7 @@ public final class LegalEntity {
     ColourStreet next = cheapestBuildableStreet(deeds);
     if (next == null) return Optional.empty();
     Money loanRaised = Money.ZERO;
-    if (needsLoanToAfford(next) && canBorrowForBuilding()) loanRaised = borrowShortfall(next);
+    if (needsLoanToAfford(next) && canBorrowForBuilding(next)) loanRaised = borrowShortfall(next);
     if (needsLoanToAfford(next)) return Optional.empty();
     buildOneHouse(deeds, next);
     return Optional.of(new BuildStep(next, loanRaised));
@@ -167,16 +167,30 @@ public final class LegalEntity {
     return bankBalance().amount() < street.houseConstructionCost().amount();
   }
 
-  private boolean canBorrowForBuilding() {
-    return loan.equals(Money.ZERO) && rentReceivedOn == null;
+  private boolean canBorrowForBuilding(ColourStreet street) {
+    if (!loan.equals(Money.ZERO)) return false;
+    Money shortfall = street.houseConstructionCost().minus(bankBalance());
+    int base = shortfall.amount() / shareholders.size();
+    int remainder = shortfall.amount() % shareholders.size();
+    for (int index = 0; index < shareholders.size(); index++) {
+      int share = base + (index < remainder ? 1 : 0);
+      if (shareholders.get(index).account().balance().amount().amount() < share) return false;
+    }
+    return true;
   }
 
   private Money borrowShortfall(ColourStreet street) {
     Money shortfall = street.houseConstructionCost().minus(bankBalance());
     recordLoan(shortfall);
     depositToBank(shortfall);
-    Money share = new Money((shortfall.amount() + shareholders.size() - 1) / shareholders.size());
-    shareholders.forEach(player -> player.account().withdraw(share));
+    int base = shortfall.amount() / shareholders.size();
+    int remainder = shortfall.amount() % shareholders.size();
+    for (int index = 0; index < shareholders.size(); index++) {
+      Money share = new Money(base + (index < remainder ? 1 : 0));
+      Player shareholder = shareholders.get(index);
+      shareholder.account().withdraw(share);
+      recordShareholderPayment(shareholder, share);
+    }
     return shortfall;
   }
 

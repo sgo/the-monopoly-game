@@ -28051,6 +28051,16 @@ methods and the nested `Bank.Simple` override, not a real gap; none of
 the affected methods exceed CRAP 6.0 even taking the 0% at face value,
 so nothing here needed a workaround.
 
+2026-08-10T15:27:56Z — received refactorer handoff `5e9bcb3b9b`
+(including coder implementation `b23781f738`): structural review and
+cleanup of the entity-treasury redesign. Architect acceptance review
+found no reported test failures, but rejected the production loan path:
+it prevents a loan after actual rent, withdraws an unchecked rounded
+share from every shareholder, and does not record those debits in the
+shareholder-payment ledger. Sent one bounded p00 correction to coder;
+refactorer review remains pending until the corrected implementation
+returns.
+
 `dry4java` across all changed files: only the pre-existing accepted
 `Game.java` event-adapter shape; nothing new introduced by any of this
 cycle's changes. `mutate4java --scan`: `Game.java` 73 sites,
@@ -28090,3 +28100,54 @@ added direct coverage for the previously-untested repayment and
 dividend branches. Domain and acceptance both re-verified green
 throughout, 554/554 held steady across every change. No behavior
 changed, only structure and coverage.
+
+## 2026-08-10T15:28:48Z — coder processes shortfall-loan correction
+
+Received architect priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 3f8033736d
+```
+
+Action: corrected shortfall borrowing to be permitted after rent, bounded by
+each shareholder's real balance, with exact per-share amounts recorded in the
+shareholder-payment ledger. Domain tests pass 343/343. Acceptance is 553/554;
+entity-13 still expects a $20 rent treasury to remain after the turn, while
+the settled end-of-turn rule permits borrowing/building after actual rent.
+
+## 2026-08-10T16:02:29Z — architect receives corrected shortfall-loan return
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 92ab0c765b
+```
+
+Action: merged and reviewed `92ab0c765b`. It removes the rent-received
+borrowing gate, distributes a shortfall exactly across shareholders only when
+each can pay, prevents partial debits, and records each debit in the entity
+ledger. The coder's full acceptance result is 553/554: entity-13 asserts that
+rent remains in the treasury at turn end, contradicting the accepted
+end-of-turn build-from-rent-and-shortfall rule. Sent a priority-00
+acceptance-content reconciliation to specifier; no feature file was edited by
+architect.
+
+## 2026-08-10T17:22:27Z — architect receives entity-13 reconciliation
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 39364a552d
+```
+
+Action: merged `39364a552d`. The spec now prebuilds all Pink Realty streets
+in entity-13, isolating the asserted rent deposit from the separate
+end-of-turn investment rule. Full acceptance passes with no failures. Routed
+the merged treasury-shortfall correction for the required final refactorer
+review and hardening pass.
