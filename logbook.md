@@ -28443,3 +28443,13 @@ Action: merged `e2944437e4`, recorded actual shareholder funding as the
 last-capitalized-shareholder transition, consumed the age qualification when
 paying a dividend, and added regression coverage. Domain tests pass 346/346;
 the full acceptance pipeline passes.
+
+Sent priority-00 handoff to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: c15a12c813
+```
