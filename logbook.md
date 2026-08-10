@@ -27572,3 +27572,17 @@ enough rent in its account to cover the next build does not raise a new
 loan for it.
 
 Still holding for full confirmation before routing to architect/coder.
+
+## 2026-08-10T16:15:00Z — specifier: build volume confirmed (as many houses as affordable)
+
+On the remaining open point, the user confirmed: at the end-of-turn
+build opportunity, a legal entity builds **as many houses as it can
+afford** (not one per turn), in the balanced build order, up to what its
+funds (rent first, then loan shortfall) and per-share ceilings allow in
+a single end-of-turn pass.
+
+The entity-economy design is now fully specified: bank account (le-28),
+end-of-turn build for all entities (le-29), rent-first-then-loan funding
+(le-30), balanced build order with per-share ceilings (le-20), build-as-
+many-as-affordable (le-31), and operate-loop termination.
+PENDING confirmation to route to architect/coder.
