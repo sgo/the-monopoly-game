@@ -26809,6 +26809,28 @@ Re-verified rather than trusting the inherited state: domain clean,
 full acceptance 549/549. No structural work needed — the code is
 exactly what I already reviewed. Handing back to the architect.
 
+## 2026-08-10T11:07:47Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 7bcae6c15d
+```
+
+Summary: re-confirmed the multi-player legal-entity support — this
+cycle carried no new code, only verification records on top of the
+implementation I already reviewed and fixed last cycle. Re-verified
+domain and acceptance green anyway. Also fixed a logbook-structure
+defect: git's automatic (non-conflicting) merge matched the wrong
+occurrence of a recurring verification-summary line and spliced one
+entry into the middle of an unrelated one, separating its narrative
+from its own handoff block; relocated it to its correct chronological
+position. No structural code changes needed.
+
 ## 2026-08-10T13:05:00Z — architect accepts redundant entity review
 
 Received refactorer priority-00 handoff (commit `7bcae6c15d`, task
@@ -26824,6 +26846,14 @@ Action: accepted the re-confirmation and preserved its logbook
 placement repair. It contains no new production or test code, and the
 phase-complete sync for this task was already sent to the specifier at
 `0f6a3ac515`; no duplicate phase handoff is warranted.
+
+## 2026-08-10T11:58:00Z — coder receives specifier economy handoff
+
+Received specifier priority-50 handoff (commit `98bf5a37dd`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
 merge_and_process specifier 98bf5a37dd
 ```
 
@@ -26911,6 +26941,106 @@ architect. Domain tests pass (333 tests). The payment ledger implementation
 is included; acceptance still reports two zero-house rent cases and one
 dividend-step matcher miss.
 
+## 2026-08-10T12:30:00Z — refactorer reviews the legal-entity economy redesign
+
+Received coder priority-50 handoff (commit `4220d32985`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 4220d32985
+```
+
+Action: merged (sixth instance of the recurring logbook sent/received
+conflict, resolved the same way as always). While reading through the
+merged history to understand what this handoff actually carries, found
+a second instance of the same auto-merge placement corruption I fixed
+last cycle — this time not just misplaced but with a chunk of text
+actually dropped: an upstream merge (`3a2b711`, already several
+commits back in this branch by the time I received it) had spliced the
+tail of a `98bf5a37dd` handoff entry directly onto an unrelated
+adjacent entry, silently deleting that entry's own header, its
+"Received specifier handoff" preamble, and the opening lines of its
+own code fence. Found the original intact wording at `ff3ced2b8e`
+(the commit where the entry was first written, before any merge had
+touched it) and restored it verbatim. Also not a `<<<<<<<` conflict —
+git's automatic merge considered this hunk unambiguous both times.
+
+This handoff carries the specifier's "build-then-repay-then-dividend"
+economy redesign (entity rent reinvests into houses before any loan
+repayment or dividend) and the coder's implementation: `Rent.java`
+gained entity-owned rent collection (a non-shareholder tenant pays
+double vacant rent to the entity, mortgage and afford-ability guarded),
+`LegalEntity` gained `receiveRent`/`receivedRent`, a `recordShareholderPayment`/
+`shareholderPayment` ledger, and a new `operate(Deeds)` overload that
+builds one house on the rented street when it has none, falling back
+to the original loan/dividend `operate()` otherwise. `Game.playTurn`
+no longer bundles entity resolution and operation together (my earlier
+`settleLegalEntities` extraction is gone) — `resolveLegalEntityAtStart`
+now runs before the turn, `operateLegalEntities` after, so a turn's own
+rent can be reinvested by the same turn's end-of-turn settlement.
+
+Independent verification caught two things the coder's own "domain
+tests pass" claim didn't cover, because domain tests don't include the
+specs-core module:
+
+1. **A genuine compile error.** `World.shareholderPaymentsWithin` calls
+   `money(ceiling)`, a package-private static helper on
+   `MonopolyStepHelpers` that `World.java` has never statically
+   imported — every other use of a `Money` literal in this ~900-line
+   file constructs `new Money(...)` directly instead. `specs-core`
+   would not compile at all. Fixed by matching the file's own
+   established convention (`new Money(ceiling)`) rather than adding an
+   import that nothing else in the file uses.
+
+2. **The already-escalated `ship`-pawn scenario mismatch is still
+   unresolved.** After the compile fix, 548/550 acceptance tests pass;
+   the 2 failures are exactly entity-7's two examples, both asserting
+   a house got built where none did — consistent with `ship` (asked to
+   roll and claim rent) never being in the 3-player turn order the
+   feature's Background selects. This is the same specifier-owned
+   defect the coder already escalated in this same commit chain; not
+   something for me to fix, and not new.
+
+Structural findings, both genuine coverage gaps from new methods never
+exercised by any test (the blocked entity-7 scenarios were the only
+path that would have reached them): `Rent`'s new `collect(LegalEntity,
+...)` overload was CRAP 20.0 (CC=4, 0% covered) and `LegalEntity.operate
+(Deeds)` was CRAP 12.0 (CC=3, 0% covered) — both over threshold. Added
+four focused `RentTest` cases (rent collected from a non-shareholder,
+none from a shareholder, none from a mortgaged street, none from an
+unaffordable tenant) and two `LegalEntityTest` cases (reinvestment
+builds a house and clears the pending flag, reinvestment is skipped
+when the street already has one) covering both branches directly
+against the domain code, independent of the blocked acceptance path.
+Both now CRAP 4.0 and 3.0 respectively, fully covered. No other
+threshold violations across `Game.java`, `LegalEntity.java`, `Rent.java`.
+
+Also independently chased down a `SimulatorTest.keepsPlayingUntilToldToStop`
+failure in the unrelated `the-monopoly-game-cli` module before trusting
+it was unrelated: reproduced it 3/3 times including in isolation, then
+built a temporary worktree at `0946961` (my last commit before any of
+this session's legal-entity-economy work) and got the identical
+failure there too — conclusively a pre-existing environmental flake
+(the test's own comments note it depends on real, unseeded dice
+finishing slower than a 1-second sleep; this machine has been under
+sustained load from this session's own repeated acceptance runs), not
+a regression from anything in this review. Worktree removed after
+comparison.
+
+`dry4java` across all changed files: only the pre-existing accepted
+`Game.java` event-adapter shape and one pre-existing, untouched
+duplication within `RentTest.java` itself (two early tests, present
+before this task, not something introduced here). `mutate4java --scan`:
+`Game.java` 73 sites, `LegalEntity.java` 34, `Rent.java` 11 — all well
+under the split threshold; all three manifests refreshed.
+
+Committed the domain/test fixes together. Handing back to the
+architect: the compile fix and coverage additions are done, but the
+task cannot be considered acceptance-clean until the specifier resolves
+the `ship`-pawn scenario mismatch already routed to them.
+
 ## 2026-08-10T12:20:23Z — architect rejects unintegrated payment ledger
 
 Received coder priority-00 handoff (commit `981011bf84`, task
@@ -26949,3 +27079,40 @@ partial payments. Focused coverage passes with 335 domain tests.
 Sent priority-00 git handoff for `greedo-legal-entity` at commit
 `986a53cb2d` to the refactorer. It contains the production contribution
 path, affordability guard, and focused unit coverage.
+
+## 2026-08-10T12:42:09Z — architect rejects incomplete legal-entity economy path
+
+Received refactorer priority-50 handoff (commit `5685c98f67`, task
+`greedo-legal-entity`).
+
+Action: merged the refactorer's specs-core compile correction and focused
+coverage tests, resolving the log-only merge conflict while preserving both
+handoff records. I then verified the production flow and reran acceptance:
+548/550 scenarios pass; both entity-7 examples still leave the rented
+street with zero houses. The corrected four-player feature is present, so
+this is no longer a spec setup issue.
+
+The production scan also confirms the ledger is still unintegrated:
+`recordShareholderPayment` has no non-test caller, and `operate(Deeds)`
+calls `deeds.arrangeHouses` without charging any shareholder. Therefore the
+entity-12 payment ceiling remains vacuous. Route a priority-00 rejection to
+coder: make rent collection, shareholder contributions, affordability, the
+ledger, and house construction one real canonical `Game.playTurn` path; do
+not add a test-only turn policy or a test helper shortcut. The coder must
+run the full acceptance suite and return only once entity-7 passes and the
+payment ceiling represents actual withdrawals.
+
+## 2026-08-10T12:44:00Z — coder receives architect economy rejection
+
+Received architect priority-00 handoff (commit `69c6a865d9`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+merge_and_process architect 69c6a865d9
+```
+
+Merged the review/refactor state and integrated canonical shareholder
+contributions. Removed the extra scripted roll that delayed explicit pawn
+rolls. Domain tests pass (335 tests); acceptance is 548/550 because entity-7
+roll 12 does not land either requested pink street from Start.

@@ -111,6 +111,35 @@ class LegalEntityTest {
   }
 
   @Test
+  void operatingAfterReceivingRentBuildsAHouseOnTheRentedStreetBeforeAnythingElse() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    ColourStreet street = entity.streets().getFirst();
+    entity.receiveRent(street);
+
+    LegalEntity.Operation operation = entity.operate(deeds);
+
+    assertThat(operation).isEqualTo(new LegalEntity.Operation.HouseBuilt(street));
+    assertThat(deeds.housesBuiltOn(street)).isEqualTo(1);
+    assertThat(entity.receivedRent()).isFalse();
+    assertThat(entity.operated()).isTrue();
+  }
+
+  @Test
+  void operatingSkipsReinvestmentWhenTheRentedStreetAlreadyHasAHouse() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    ColourStreet street = entity.streets().getFirst();
+    deeds.arrangeHouses(street, 1);
+    entity.receiveRent(street);
+
+    LegalEntity.Operation operation = entity.operate(deeds);
+
+    assertThat(operation).isEqualTo(new LegalEntity.Operation.LoanRaisedWithDividend(
+        new Money(150), new Money(50)));
+  }
+
+  @Test
   void recordsPaymentsMadeByShareholdersToTheEntity() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);

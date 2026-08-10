@@ -583,7 +583,6 @@ public class World {
     for (int index = 0; index < players().size(); index++) {
       Player player = players().get(index);
       queuePawnRoll(player.id().value(), rollTotalling(3 + index));
-      queuePawnRoll(player.id().value(), UNREMARKABLE);
     }
     formEntity(Street.Colour.valueOf(name.substring(0, name.indexOf(' ')).toLowerCase()), true,
         players().stream().limit(3).toList());
@@ -640,7 +639,7 @@ public class World {
   }
 
   public boolean shareholderPaymentsWithin(int ceiling) {
-    Money limit = money(ceiling);
+    Money limit = new Money(ceiling);
     return deeds.legalEntities().stream()
         .flatMap(entity -> entity.shareholders().stream().map(entity::shareholderPayment))
         .allMatch(payment -> !payment.exceeds(limit));
