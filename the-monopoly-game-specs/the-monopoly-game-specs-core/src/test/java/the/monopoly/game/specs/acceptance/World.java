@@ -625,6 +625,27 @@ public class World {
         .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).raiseLoan(principal);
   }
 
+  public void entityLoanFullyRepaid(String entityName) {
+    LegalEntity entity = deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName));
+    entity.repayLoan(entity.loan());
+  }
+
+  public int housesBuilt(Street.Type land) {
+    return deeds.housesBuiltOn((ColourStreet) ruleSet.create(land));
+  }
+
+  public int totalHouses(Street.Colour colour) {
+    return LegalEntity.streetsOf(colour, ruleSet).stream().mapToInt(deeds::housesBuiltOn).sum();
+  }
+
+  public boolean shareholderPaymentsWithin(int ceiling) {
+    Money limit = money(ceiling);
+    return deeds.legalEntities().stream()
+        .flatMap(entity -> entity.shareholders().stream().map(entity::shareholderPayment))
+        .allMatch(payment -> !payment.exceeds(limit));
+  }
+
   public void ownEveryOtherOwnableAlternately(String firstPawn, String secondPawn) {
     if (deeds == null) deeds = new Deeds();
     List<Ownable> ownables = ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast).toList();

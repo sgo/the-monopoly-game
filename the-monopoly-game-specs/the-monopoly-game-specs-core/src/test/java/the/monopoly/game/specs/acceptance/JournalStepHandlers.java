@@ -1,6 +1,7 @@
 package the.monopoly.game.specs.acceptance;
 
 import the.monopoly.game.Game.Journal.Entry;
+import the.monopoly.game.components.streets.Street;
 
 import java.util.List;
 
@@ -62,9 +63,9 @@ final class JournalStepHandlers {
         step("^we select (<player_count>) players$",
             (world, arguments) -> world.selectPlayers(arguments.number(1))),
 
-        given("^Pink Realty owes pawn \"dog\" \\$<principal>$",
+        given("^Pink Realty owes pawn \"dog\" \\$(<principal>|<loan>)$",
             (world, arguments) -> {
-              world.entityOwes("Pink Realty", money(100));
+              world.entityOwes("Pink Realty", money(arguments.number(1)));
               world.letTheOthersRollWhatTheyLike();
             }),
 
@@ -82,6 +83,12 @@ final class JournalStepHandlers {
         given("^" + NAME + " is formed$",
             (world, arguments) -> world.formNamedEntity(arguments.text(1))),
 
+        given("^Pink Realty's loan has been fully repaid$",
+            (world, arguments) -> world.entityLoanFullyRepaid("Pink Realty")),
+
+        given("^pawn \"" + NAME + "\" has a balance that allows only \\$(<ceiling_share>) toward the entity$",
+            (world, arguments) -> world.arrangePawnBalance(arguments.text(1), money(arguments.number(2)))),
+
         step("^pawn \"" + NAME + "\" considers forming a legal entity over the " + NAME + " colour group$",
             (world, arguments) -> world.considerFormingLegalEntity(arguments.text(1), arguments.text(2))),
 
@@ -95,7 +102,7 @@ final class JournalStepHandlers {
             (world, arguments) -> assertThat(world.colourGroupOwnedByEntity("pink")).isFalse()),
 
         then("^each of pawn \"" + NAME + "\", pawn \"" + NAME + "\", and pawn \"" + NAME
-                + "\" receives a dividend from <entity_name>$",
+                + "\" receives a dividend from " + NAME + "$",
             (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityDividendPaid,
                 "entity dividend"))),
 
@@ -428,6 +435,15 @@ final class JournalStepHandlers {
 
         given("^the street \"" + NAME + "\" has " + VALUE + " house\\(s\\) built$",
             (world, arguments) -> world.arrangeHouses(SpaceNames.of(arguments.text(1)), arguments.number(2))),
+
+        then("^the street \"" + NAME + "\" has " + VALUE + " houses built$",
+            (world, arguments) -> assertThat(world.housesBuilt(SpaceNames.of(arguments.text(1)))).isEqualTo(arguments.number(2))),
+
+        then("^the pink colour group is developed up to no more than (<total_houses>) houses$",
+            (world, arguments) -> assertThat(world.totalHouses(Street.Colour.pink)).isLessThanOrEqualTo(arguments.number(1))),
+
+        then("^no shareholder has paid more than \\$(<ceiling_share>) to the entity$",
+            (world, arguments) -> assertThat(world.shareholderPaymentsWithin(arguments.number(1))).isTrue()),
 
         given("^the street \"" + NAME + "\" has a hotel built$",
             (world, arguments) -> world.arrangeHotel(SpaceNames.of(arguments.text(1)))),

@@ -82,6 +82,7 @@ Feature: Greedo legal entity for a three-way colour-group split
   Scenario Outline: the entity repays a shareholder loan with five percent interest on top before paying any dividend
     Given Pink Realty is formed
     And Pink Realty owes pawn "dog" $<principal>
+    And every other ownable space is owned by pawn "racecar"
     When we play up to 1 round
     Then Pink Realty repays pawn "dog" $<repayment> for the loan
     And pawn "dog" receives no dividend
@@ -91,28 +92,59 @@ Feature: Greedo legal entity for a three-way colour-group split
       | 100       | 105       |
 
   # entity-7
-  Scenario Outline: a dividend is paid equally to every shareholder once their age advances
-    Given <entity_name> is formed
-    And pawn "dog" will roll 12 for their turn
+  Scenario Outline: the entity's rent is reinvested into further houses before the loan is repaid
+    Given Pink Realty is formed
+    And Pink Realty owes pawn "dog" $<principal>
+    And pawn "<renter>" will roll 12 for their turn
+    And pawn "<renter>" will claim rent for "<renter_street>"
     When we play up to 1 round
-    Then each of pawn "dog", pawn "high hat", and pawn "iron box" receives a dividend from <entity_name>
+    Then the street "<renter_street>" has <houses_after> houses built
+    And Pink Realty still owes pawn "dog" $<principal>
 
     Examples:
-      | entity_name  |
-      | Pink Realty  |
-      | Yellow Realty |
-      | Green Realty |
+      | principal | renter | renter_street          | houses_after |
+      | 200       | ship   | Rue de Diekirch Arlon  | 1            |
+      | 200       | ship   | Bruul Mechelen         | 1            |
 
   # entity-8
   Scenario Outline: no dividend is paid while any shareholder loan to the entity is still outstanding
     Given Pink Realty is formed
     And Pink Realty owes pawn "dog" $<principal>
+    And every other ownable space is owned by pawn "racecar"
     When we play up to 1 round
     Then pawn "dog" receives no dividend from Pink Realty
 
     Examples:
       | principal |
       | 100       |
+
+  # entity-11
+  Scenario Outline: a dividend is paid only after the entire loan plus interest has been repaid
+    Given Pink Realty is formed
+    And Pink Realty owes pawn "dog" $<principal>
+    And Pink Realty's loan has been fully repaid
+    And pawn "dog" will roll 12 for their turn
+    When we play up to 1 round
+    Then each of pawn "dog", pawn "high hat", and pawn "iron box" receives a dividend from Pink Realty
+
+    Examples:
+      | principal |
+      | 100       |
+
+  # entity-12
+  Scenario Outline: the entity cannot build beyond a shareholder's personal affordability ceiling
+    Given Pink Realty is formed
+    And Pink Realty owes pawn "dog" $<loan>
+    And pawn "high hat" has a balance that allows only $<ceiling_share> toward the entity
+    And pawn "iron box" has a balance that allows only $<ceiling_share> toward the entity
+    And pawn "dog" will roll 12 for their turn
+    When we play up to 1 round
+    Then the pink colour group is developed up to no more than <total_houses> houses
+    And no shareholder has paid more than $<ceiling_share> to the entity
+
+    Examples:
+      | loan | ceiling_share | total_houses |
+      | 90   | 30            | 1            |
 
   # entity-9
   Scenario Outline: the entity forms from exactly the three co-owners of a colour group even when the game has more than three players

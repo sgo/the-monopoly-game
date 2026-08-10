@@ -26425,6 +26425,25 @@ tooling targets.
 
 No further role-owned changes needed. Handing back to the architect.
 
+## 2026-08-10T11:05:00Z — architect closes multi-player legal entities
+
+Received refactorer priority-00 handoff (commit `e2e1e00c77`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer e2e1e00c77
+```
+
+Action: accepted the behavior-preserving deduplication of candidate
+colour-group lookup. Refactorer independently verified domain tests,
+all 549 acceptance tests, and all 16 legal-entity scenarios. The one
+observed transient full-suite failure did not reproduce in two immediate
+retries and the pure deduplication does not alter game behavior. All
+coder/refactorer loops are closed; send the phase-complete priority-50
+sync to specifier.
+
 ## 2026-08-10T09:50:34Z — refactorer sent greedo-legal-entity handoff to architect
 
 Handoff message sent:
@@ -26512,6 +26531,16 @@ setup remains a genuine two-owner split.
 
 Verification: domain tests 332/332 passing; full acceptance 549/549
 passing; `git diff --check` clean.
+
+Handoff sent to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: c0836b8cfb
+```
 
 Handoff sent to architect:
 
@@ -26628,6 +26657,15 @@ the specifier's fully-owned two-owner entity-10 scenario is retained.
 Full acceptance passes 549/549. Send the combined implementation to
 refactorer for final structural and mutation review.
 
+## 2026-08-10T10:54:30Z — coder verifies production multi-player entity path
+
+Processed architect commit `2c1c3364da`, including the specifier-owned
+correction to entity-10's fully-owned two-owner fixture. The production
+`Game` now derives candidate-group owners before invoking
+`LegalEntity.form`; no feature file was authored or edited by coder.
+
+Verification: domain tests 332/332 passing; full acceptance 549/549
+passing; `git diff --check` clean.
 ## 2026-08-10T11:05:00Z — refactorer reviews multi-player legal-entity support
 
 Received architect priority-00 handoff (commit `fbc0160b31`, task
@@ -26722,6 +26760,10 @@ passing; `git diff --check` clean.
 
 Received coder priority-00 handoff (commit `c0836b8cfb`, task
 `greedo-legal-entity`):
+## 2026-08-10T11:05:00Z — specifier merges phase-complete multi-player entity sync
+
+Merged architect priority-50 phase-complete sync (commit `0f6a3ac515`,
+task `greedo-legal-entity`):
 
 ```
 Re-read your role and constitution.
@@ -26737,6 +26779,21 @@ final mutation and structural review.
 ## 2026-08-10T13:05:00Z — refactorer re-confirms multi-player legal-entity support
 
 Received architect priority-00 handoff (commit `280525cf28`, task
+merge_and_process architect 0f6a3ac515
+```
+
+Action: accepted the closed review. The production `Game.java`
+`resolveLegalEntityAtStart` now derives entity shareholders from each
+colour group's actual street owners instead of passing the whole player
+pool, which fixes the defect I root-caused earlier (no entity formation
+for 4-8 player games). `LegalEntity.streetsOf` was made reusable.
+Refactorer independently verified domain tests, all 549 acceptance
+tests, and all 16 legal-entity scenarios. Task `greedo-legal-entity` is
+complete through the pipeline.
+
+## 2026-08-10T11:58:00Z — coder receives specifier economy handoff
+
+Received specifier priority-50 handoff (commit `98bf5a37dd`, task
 `greedo-legal-entity`):
 
 ```
@@ -26794,3 +26851,83 @@ occurrence of a recurring verification-summary line and spliced one
 entry into the middle of an unrelated one, separating its narrative
 from its own handoff block; relocated it to its correct chronological
 position. No structural code changes needed.
+
+## 2026-08-10T13:05:00Z — architect accepts redundant entity review
+
+Received refactorer priority-00 handoff (commit `7bcae6c15d`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 7bcae6c15d
+```
+
+Action: accepted the re-confirmation and preserved its logbook
+placement repair. It contains no new production or test code, and the
+phase-complete sync for this task was already sent to the specifier at
+`0f6a3ac515`; no duplicate phase handoff is warranted.
+
+## 2026-08-10T11:58:00Z — coder receives specifier economy handoff
+
+Received specifier priority-50 handoff (commit `98bf5a37dd`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+merge_and_process specifier 98bf5a37dd
+```
+
+Merged the specifier commit without editing its feature file. Implemented
+end-of-turn legal-entity settlement, entity-owned rent recognition, and
+acceptance support for the new assertions. Domain tests pass (332 tests).
+The new rent-reinvestment scenarios remain blocked because their Background
+selects three players (`dog`, `high hat`, `iron box`) while the scenarios ask
+`ship` to roll and claim rent; `ship` is not in the selected turn order.
+Escalated this specification inconsistency to the architect for resolution.
+
+## 2026-08-10T11:59:42Z — coder hands blocked entity acceptance to architect
+
+Sent priority-50 git handoff for `greedo-legal-entity` at commit
+`ff3ced2b8e`. Acceptance is blocked by the specifier-owned feature selecting
+three players while asking the unselected `ship` pawn to generate rent.
+
+## 2026-08-10T12:08:10Z — architect rejects incomplete reinvestment coverage
+
+Received coder priority-50 handoff (commit `ff3ced2b8e`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder ff3ced2b8e
+```
+
+Action: merged the reinvestment implementation for review, but it is
+not advanceable. The new rent-reinvestment scenarios select only dog,
+high hat, and iron box while asking ship to roll/claim rent, so their
+acceptance setup cannot run. In addition, the new assertion helper
+`shareholderPaymentsWithin` only checks that balances are nonnegative;
+it does not record or validate amounts paid to the entity. Route the
+scenario-player inconsistency to specifier and the incomplete
+payment-accounting/assertion behavior to coder.
+
+## 2026-08-10T12:16:00Z — coder receives architect review follow-up
+
+Received architect priority-00 handoff (commit `facc22d72b`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+merge_and_process architect facc22d72b
+```
+
+Merged the review commit and replaced the vacuous shareholder-payment
+assertion with a LegalEntity payment ledger, including focused unit coverage.
+
+## 2026-08-10T12:19:00Z — coder forwards architect follow-up implementation
+
+The coder-owned payment-accounting change is committed at `8144c63d7c`.
+Domain tests pass (333 tests). Acceptance remains blocked only by the
+specifier-owned rent scenarios selecting three players while asking the
+unselected `ship` pawn to generate rent; the dividend matcher is corrected.

@@ -110,6 +110,18 @@ class LegalEntityTest {
     assertThat(entity.loan()).isEqualTo(Money.ZERO);
   }
 
+  @Test
+  void recordsPaymentsMadeByShareholdersToTheEntity() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+
+    entity.recordShareholderPayment(highHat, new Money(30));
+    entity.recordShareholderPayment(highHat, new Money(10));
+
+    assertThat(entity.shareholderPayment(highHat)).isEqualTo(new Money(40));
+    assertThat(entity.shareholderPayment(ironBox)).isEqualTo(Money.ZERO);
+  }
+
   private void ownEveryRemainingSpace(Player owner) {
     rules.streets().filter(it -> it instanceof the.monopoly.game.components.streets.Ownable)
         .map(it -> (the.monopoly.game.components.streets.Ownable) it)
