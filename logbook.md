@@ -26500,6 +26500,16 @@ type: git_handoff
 to: architect
 priority: 00
 task: greedo-legal-entity
+commit: c0836b8cfb
+```
+
+Handoff sent to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
 commit: 314dadf9ff
 ```
 
