@@ -28357,6 +28357,25 @@ later rent-triggered dividend without a new qualifying age increase. Those
 implementation findings remain in this log for the coder correction after the
 specifier loop closes.
 
+## 2026-08-10T19:36:54+02:00 — architect reviews corrected dividend qualification
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder c15a12c813
+```
+
+Action: merged and reviewed `c15a12c813`. It records funding and consumes the
+qualification after dividend payment, with passing domain and full acceptance
+reported. Rejected one remaining production edge: `borrowShortfall` calls
+`recordCapitalization` even for a zero-value remainder share, so a shareholder
+who did not fund a $1/$2 shortfall can become the last-capitalised shareholder.
+Sent one bounded coder correction: record the transition only for a positive
+actual debit and add focused coverage for the remainder case. Refactorer review
+waits for that correction.
+
 ## 2026-08-10T19:36:54+02:00 — architect accepts entity-19 salary setup repair
 
 Received specifier priority-00 handoff:
