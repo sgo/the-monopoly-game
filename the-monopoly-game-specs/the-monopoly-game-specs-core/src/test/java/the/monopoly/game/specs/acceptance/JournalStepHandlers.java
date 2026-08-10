@@ -102,7 +102,7 @@ final class JournalStepHandlers {
             (world, arguments) -> assertThat(world.colourGroupOwnedByEntity("pink")).isFalse()),
 
         then("^each of pawn \"" + NAME + "\", pawn \"" + NAME + "\", and pawn \"" + NAME
-                + "\" receives a dividend from (<entity_name>)$",
+                + "\" receives a dividend from " + NAME + "$",
             (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityDividendPaid,
                 "entity dividend"))),
 

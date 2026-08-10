@@ -7,6 +7,8 @@ import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -18,6 +20,7 @@ public final class LegalEntity {
   private final List<ColourStreet> streets;
   private Money loan = Money.ZERO;
   private ColourStreet rentReceivedOn;
+  private final Map<Player.ID, Money> shareholderPayments = new HashMap<>();
   private boolean operated;
 
   private LegalEntity(String name, Street.Colour colour, List<Player> shareholders,
@@ -86,6 +89,13 @@ public final class LegalEntity {
   public void raiseLoan(Money amount) { loan = loan.plus(amount); }
   public void receiveRent(ColourStreet street) { rentReceivedOn = street; }
   public boolean receivedRent() { return rentReceivedOn != null; }
+  public void recordShareholderPayment(Player shareholder, Money amount) {
+    if (!shareholders.contains(shareholder)) throw new IllegalArgumentException("Not a shareholder.");
+    shareholderPayments.merge(shareholder.id(), amount, Money::plus);
+  }
+  public Money shareholderPayment(Player shareholder) {
+    return shareholderPayments.getOrDefault(shareholder.id(), Money.ZERO);
+  }
   public Money repayLoan(Money principal) {
     Money repayment = new Money(principal.amount() + principal.amount() * 5 / 100);
     loan = loan.minus(principal);

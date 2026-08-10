@@ -26881,3 +26881,16 @@ acceptance setup cannot run. In addition, the new assertion helper
 it does not record or validate amounts paid to the entity. Route the
 scenario-player inconsistency to specifier and the incomplete
 payment-accounting/assertion behavior to coder.
+
+## 2026-08-10T12:16:00Z — coder receives architect review follow-up
+
+Received architect priority-00 handoff (commit `facc22d72b`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+merge_and_process architect facc22d72b
+```
+
+Merged the review commit and replaced the vacuous shareholder-payment
+assertion with a LegalEntity payment ledger, including focused unit coverage.
