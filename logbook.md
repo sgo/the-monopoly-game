@@ -26588,3 +26588,13 @@ to the fourth/eighth player. The Gherkin content defect is closed. Send
 the corrected feature to coder with the still-outstanding requirement
 that `Game`, rather than only `World`, select the three owners of the
 candidate group in larger games.
+
+## 2026-08-10T10:54:30Z — coder verifies production multi-player entity path
+
+Processed architect commit `2c1c3364da`, including the specifier-owned
+correction to entity-10's fully-owned two-owner fixture. The production
+`Game` now derives candidate-group owners before invoking
+`LegalEntity.form`; no feature file was authored or edited by coder.
+
+Verification: domain tests 332/332 passing; full acceptance 549/549
+passing; `git diff --check` clean.
