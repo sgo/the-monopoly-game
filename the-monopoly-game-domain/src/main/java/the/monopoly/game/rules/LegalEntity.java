@@ -5,6 +5,7 @@ import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.strategies.Greedo;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +59,8 @@ public final class LegalEntity {
 
   /** Empty, or led by a street the Greedo priority always trades toward rather than split. */
   private static boolean colourGroupIneligible(List<ColourStreet> streets) {
-    return streets.isEmpty() || streets.stream().anyMatch(it -> new GreedoPriority().isHighest(it));
+    return streets.isEmpty() || streets.stream().anyMatch(it -> Greedo.priorityOf(it) ==
+        the.monopoly.game.strategies.Strategy.Priority.HIGHEST);
   }
 
   private static boolean splitAcrossThreeDistinctOwners(List<ColourStreet> streets, Deeds deeds) {
@@ -109,12 +111,6 @@ public final class LegalEntity {
     }
   }
 
-  private static final class GreedoPriority {
-    private final the.monopoly.game.strategies.Greedo greedo = new the.monopoly.game.strategies.Greedo();
-    boolean isHighest(ColourStreet street) {
-      return greedo.priority(street) == the.monopoly.game.strategies.Strategy.Priority.HIGHEST;
-    }
-  }
 }
 
 /* mutate4java-manifest

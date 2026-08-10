@@ -375,24 +375,6 @@ public class World {
   }
 
   public void playUpToRounds(int rounds) {
-    if (legalEntityTrading && deeds != null && !deeds.legalEntities().isEmpty()) {
-      Journal events = new Journal();
-      deeds.legalEntities().forEach(entity -> {
-        events.log(new Entry.LegalEntityFormed(entity.name(), entity.shareholders().stream().map(Player::id).toList()));
-        switch (entity.operate()) {
-          case LegalEntity.Operation.LoanRepaid it -> events.log(new Entry.LegalEntityLoanRepaid(
-              entity.name(), it.shareholder().id(), it.principal(), it.repayment()));
-          case LegalEntity.Operation.LoanRaisedWithDividend it -> {
-            events.log(new Entry.LegalEntityLoanRaised(entity.name(), it.loan(),
-                entity.shareholders().stream().map(Player::id).toList()));
-            events.log(new Entry.LegalEntityDividendPaid(entity.name(),
-                entity.shareholders().stream().map(Player::id).toList(), it.dividend()));
-          }
-        }
-      });
-      journal = events.entries();
-      return;
-    }
     playAndCapture(game -> game.playUpToRounds(rounds));
   }
 
@@ -592,6 +574,7 @@ public class World {
 
   public void formNamedEntity(String name) {
     legalEntityTrading = true;
+    othersRollWhatTheyLike = true;
     players().forEach(player -> queuePawnRoll(player.id().value(), UNREMARKABLE));
     formEntity(Street.Colour.valueOf(name.substring(0, name.indexOf(' ')).toLowerCase()), true);
   }
