@@ -29091,3 +29091,26 @@ threshold, `canBorrowForBuilding` now CC=3, simpler than before). `dry4java`:
 none. `mutate4java --scan`: 92 sites, manifest refreshed. No functional
 changes needed on my side — purely verification and a manifest refresh.
 Domain tests 348/348. Acceptance 563/563, confirmed clean across 4 runs.
+
+## 2026-08-10T23:20:13+02:00 — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: b325657b2d
+```
+
+Summary: verified both fixes land cleanly. Entity-11's dice-driven dividend
+trigger is replaced with an explicit age-step, confirmed clean across 4
+acceptance runs (the deterministic doubles/extra-turn issue I traced last
+cycle is gone, not worked around). `canBorrowForBuilding`'s treasury-
+positive bypass is removed, closing the same gap I'd found and reverted two
+cycles ago out of caution — the architect caught it independently and the
+coder's fix is correct and complete, with journal/logging/report.feature's
+shared shortfall scenario updated in step. Clean structural pass: all
+methods CRAP<=6, no DRY issues, 92 mutation sites, manifest refreshed, no
+functional changes needed. Domain 348/348, acceptance 563/563.
