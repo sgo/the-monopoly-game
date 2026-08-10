@@ -28864,3 +28864,23 @@ guessing.
 
 Domain tests 347/347. Full acceptance 562/562, run five times across this
 review for confidence given the flake above.
+
+## 2026-08-10T18:31:50Z — architect accepts floor-share dividend allocation
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier df84250c20
+```
+
+Action: merged `df84250c20`. Entity dividends now allocate the floor of the
+current treasury divided by three to every shareholder and retain the exact
+integer remainder in the entity bank ($150 -> $50/$0; $170 -> $56/$2).
+Together with explicit group-build commitments, this closes the acceptance
+content loops. Routed one consolidated coder correction: replace all
+three-shareholder/$500 threshold recognition with explicit commitment state,
+require real committed shareholder affordability before any debit, implement
+the full balanced house/hotel build plan, and apply the specified floor-share
+dividend/remainder transfer.
