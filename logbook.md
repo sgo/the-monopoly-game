@@ -27058,3 +27058,25 @@ only by its unit test—no production game/rent/building path records an
 actual payment. Thus every payment remains zero and the cap assertion
 passes vacuously. Route to coder to wire real shareholder contributions
 and their ledger entries into the entity's reinvestment behavior.
+
+## 2026-08-10T12:42:09Z — architect rejects incomplete legal-entity economy path
+
+Received refactorer priority-50 handoff (commit `5685c98f67`, task
+`greedo-legal-entity`).
+
+Action: merged the refactorer's specs-core compile correction and focused
+coverage tests, resolving the log-only merge conflict while preserving both
+handoff records. I then verified the production flow and reran acceptance:
+548/550 scenarios pass; both entity-7 examples still leave the rented
+street with zero houses. The corrected four-player feature is present, so
+this is no longer a spec setup issue.
+
+The production scan also confirms the ledger is still unintegrated:
+`recordShareholderPayment` has no non-test caller, and `operate(Deeds)`
+calls `deeds.arrangeHouses` without charging any shareholder. Therefore the
+entity-12 payment ceiling remains vacuous. Route a priority-00 rejection to
+coder: make rent collection, shareholder contributions, affordability, the
+ledger, and house construction one real canonical `Game.playTurn` path; do
+not add a test-only turn policy or a test helper shortcut. The coder must
+run the full acceptance suite and return only once entity-7 passes and the
+payment ceiling represents actual withdrawals.
