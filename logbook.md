@@ -26538,6 +26538,15 @@ only entity-10's two scenarios failing because the stated setup assigns
 the third group street to `racecar`, creating three owners; that scenario
 decision is routed to the specifier.
 
+Handoff sent to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: ac2415fbe2
+```
 ## 2026-08-10T10:52:00Z — specifier decides correct multi-player entity scenario
 
 Merged architect priority-00 follow-up (commit `ba439d6513`, task
@@ -26597,3 +26606,13 @@ candidate colour group's actual owners before calling `LegalEntity.form`;
 the specifier's fully-owned two-owner entity-10 scenario is retained.
 Full acceptance passes 549/549. Send the combined implementation to
 refactorer for final structural and mutation review.
+
+## 2026-08-10T10:54:30Z — coder verifies production multi-player entity path
+
+Processed architect commit `2c1c3364da`, including the specifier-owned
+correction to entity-10's fully-owned two-owner fixture. The production
+`Game` now derives candidate-group owners before invoking
+`LegalEntity.form`; no feature file was authored or edited by coder.
+
+Verification: domain tests 332/332 passing; full acceptance 549/549
+passing; `git diff --check` clean.
