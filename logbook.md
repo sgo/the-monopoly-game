@@ -26775,3 +26775,9 @@ The new rent-reinvestment scenarios remain blocked because their Background
 selects three players (`dog`, `high hat`, `iron box`) while the scenarios ask
 `ship` to roll and claim rent; `ship` is not in the selected turn order.
 Escalated this specification inconsistency to the architect for resolution.
+
+## 2026-08-10T11:59:42Z — coder hands blocked entity acceptance to architect
+
+Sent priority-50 git handoff for `greedo-legal-entity` at commit
+`ff3ced2b8e`. Acceptance is blocked by the specifier-owned feature selecting
+three players while asking the unselected `ship` pawn to generate rent.
