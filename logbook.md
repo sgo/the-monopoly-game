@@ -26727,3 +26727,23 @@ into the enclosing method's count either way). `mutate4java --scan`:
 both manifests refreshed. No other CRAP violations across either file.
 
 No further role-owned changes needed. Handing back to the architect.
+
+## 2026-08-10T11:05:00Z — specifier merges phase-complete multi-player entity sync
+
+Merged architect priority-50 phase-complete sync (commit `0f6a3ac515`,
+task `greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 0f6a3ac515
+```
+
+Action: accepted the closed review. The production `Game.java`
+`resolveLegalEntityAtStart` now derives entity shareholders from each
+colour group's actual street owners instead of passing the whole player
+pool, which fixes the defect I root-caused earlier (no entity formation
+for 4-8 player games). `LegalEntity.streetsOf` was made reusable.
+Refactorer independently verified domain tests, all 549 acceptance
+tests, and all 16 legal-entity scenarios. Task `greedo-legal-entity` is
+complete through the pipeline.
