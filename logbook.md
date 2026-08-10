@@ -27449,6 +27449,19 @@ isolate repayment, as entity-8/entity-11 already do), without changing the
 economy ordering. No production implementation is authorized until that
 single feature decision is returned.
 
+## 2026-08-10T14:28:48Z — architect routes unblocked treasury implementation
+
+Received specifier priority-00 handoff (commit `4659513f8f`, task
+`greedo-legal-entity`).
+
+Action: merged. Entity-6 now pre-builds all pink streets to four houses, so
+its $105 treasury fund legitimately tests repayment before dividend without
+competing with the settled build-first priority. The feature's treasury
+economy is now internally consistent. Route priority-00 to coder to implement
+the real registered entity-bank account and the complete canonical end-of-turn
+operate order already stated in `180bf448ce`; run full acceptance and return
+the production change for review.
+
 ## 2026-08-10T14:24:37Z — coder reviews architect treasury reconciliation
 
 Received architect priority-00 handoff:
