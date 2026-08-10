@@ -215,7 +215,8 @@ public class Game {
     if (!legalEntityTrading) return;
     rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
         .map(ColourStreet::colourGroup).distinct()
-        .map(colour -> LegalEntity.form(entityName(colour), colour, players, rules, deeds))
+        .map(colour -> LegalEntity.form(entityName(colour), colour, players, rules, deeds,
+            street -> Strategy.priorityOf(street) == Strategy.Priority.HIGHEST))
         .filter(Optional::isPresent).map(Optional::orElseThrow).findFirst()
         .ifPresent(entity -> {
           deeds.form(entity);

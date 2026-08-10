@@ -593,7 +593,8 @@ public class World {
     String name = Character.toUpperCase(colour.name().charAt(0)) + colour.name().substring(1) + " Realty";
     LegalEntity entity = seedBoard
         ? LegalEntity.formed(name, colour, shareholders, ruleSet)
-        : LegalEntity.form(name, colour, shareholders, ruleSet, deeds).orElse(null);
+        : LegalEntity.form(name, colour, shareholders, ruleSet, deeds,
+            street -> Strategy.priorityOf(street) == Strategy.Priority.HIGHEST).orElse(null);
     if (entity != null) deeds.form(entity);
   }
 

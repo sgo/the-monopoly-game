@@ -25995,6 +25995,26 @@ into the canonical turn loop. The rules package also still imports
 Route to coder for one integrated turn-start policy with rules-owned
 priority knowledge (or an inward-facing abstraction), without early
 returning from the game/turn loop.
+
+## 2026-08-10T08:58:52Z — architect accepts canonical legal-entity turn path
+
+Received coder priority-00 handoff (commit `ddbcd3ced2`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder ddbcd3ced2
+```
+
+Action: accepted removal of the early-return path: entity settlement
+now precedes, but does not replace, the normal initiative and turn
+flow. Completed a behavior-preserving boundary correction: `LegalEntity`
+now receives its highest-priority eligibility predicate from `Game` and
+test setup, so rules no longer import the strategy layer. Focused
+LegalEntity tests, full acceptance, Java mutation (23/23 covered
+mutants killed), DRY review, soft Gherkin mutation, and 22 property
+tests are clean.
 2026-08-10T07:40:00Z — Received specifier handoff:
 id: 20260810T073726Z_000087_from_specifier
 from: specifier

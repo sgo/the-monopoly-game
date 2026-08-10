@@ -6,6 +6,7 @@ import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ class LegalEntityTest {
     ownEveryRemainingSpace(highHat);
 
     LegalEntity entity = LegalEntity.form("Pink Realty", Street.Colour.pink,
-        List.of(dog, highHat, ironBox), rules, deeds).orElseThrow();
+        List.of(dog, highHat, ironBox), rules, deeds, LegalEntityTest::highestPriority).orElseThrow();
 
     assertThat(entity.shareholders()).containsExactly(dog, highHat, ironBox);
     assertThat(entity.shareOf(dog)).isEqualTo(1.0 / 3.0);
@@ -40,13 +41,13 @@ class LegalEntityTest {
     own(Street.Type.PlaceVerteVerviers, ironBox);
 
     assertThat(LegalEntity.form("Pink Realty", Street.Colour.pink,
-        List.of(dog, highHat, ironBox), rules, deeds)).isEmpty();
+        List.of(dog, highHat, ironBox), rules, deeds, LegalEntityTest::highestPriority)).isEmpty();
   }
 
   @Test
   void fewerThanThreeDistinctShareholdersPreventsFormation() {
     assertThat(LegalEntity.form("Pink Realty", Street.Colour.pink,
-        List.of(dog, dog, highHat), rules, deeds)).isEmpty();
+        List.of(dog, dog, highHat), rules, deeds, LegalEntityTest::highestPriority)).isEmpty();
   }
 
   @Test
@@ -57,7 +58,7 @@ class LegalEntityTest {
     ownEveryRemainingSpace(highHat);
 
     assertThat(LegalEntity.form("Orange Realty", Street.Colour.orange,
-        List.of(dog, highHat, ironBox), rules, deeds)).isEmpty();
+        List.of(dog, highHat, ironBox), rules, deeds, LegalEntityTest::highestPriority)).isEmpty();
   }
 
   @Test
@@ -68,7 +69,7 @@ class LegalEntityTest {
     ownEveryRemainingSpace(highHat);
 
     assertThat(LegalEntity.form("Pink Realty", Street.Colour.pink,
-        List.of(dog, highHat, ironBox), rules, deeds)).isEmpty();
+        List.of(dog, highHat, ironBox), rules, deeds, LegalEntityTest::highestPriority)).isEmpty();
   }
 
   @Test
@@ -80,7 +81,7 @@ class LegalEntityTest {
     Player outsider = player("outsider");
 
     assertThat(LegalEntity.form("Pink Realty", Street.Colour.pink,
-        List.of(dog, highHat, outsider), rules, deeds)).isEmpty();
+        List.of(dog, highHat, outsider), rules, deeds, LegalEntityTest::highestPriority)).isEmpty();
   }
 
   @Test
@@ -114,6 +115,10 @@ class LegalEntityTest {
         .map(it -> (the.monopoly.game.components.streets.Ownable) it)
         .filter(it -> deeds.isUnowned(it.type()))
         .forEach(it -> deeds.sell(it, owner, Money.ZERO));
+  }
+
+  private static boolean highestPriority(ColourStreet street) {
+    return Strategy.priorityOf(street) == Strategy.Priority.HIGHEST;
   }
 
   private void own(Street.Type type, Player owner) {
