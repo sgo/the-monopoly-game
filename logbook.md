@@ -26733,3 +26733,42 @@ Action: accepted the coder's verification record; it adds no code
 beyond the already merged production owner-selection fix. The combined
 implementation and corrected feature still require the refactorer's
 final mutation and structural review.
+
+## 2026-08-10T13:05:00Z — refactorer re-confirms multi-player legal-entity support
+
+Received architect priority-00 handoff (commit `280525cf28`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 280525cf28
+```
+
+Action: merged (fifth instance of the recurring logbook conflict,
+same shape as before, resolved the same way). This cycle carries no
+new production or test code beyond `ac2415fbe2`, which I already
+reviewed and fixed last cycle — just coder/architect verification
+records confirming the same state. Confirmed via `git diff --stat --
+'*.java'` between my prior commit and this merge tip: zero Java files
+changed.
+
+Also found and fixed a genuine logbook-structure defect from this
+merge's automatic (non-conflicting) portion: git's line-based 3-way
+merge matched the wrong occurrence of an identical "domain tests
+332/332... acceptance 549/549... git diff --check clean" line (it
+recurs verbatim across two different entries) and spliced the
+"architect accepts verified multi-player entity path" entry into the
+middle of an unrelated earlier entry, separating its narrative from
+its own handoff block. Relocated it to its correct position,
+chronologically right after the entry it was actually responding to.
+This is a new failure mode for the recurring conflict pattern — not a
+`<<<<<<<`/`=======`/`>>>>>>>` conflict at all, since git considered
+this hunk unambiguous, but the same underlying repeated-boilerplate
+cause. Worth remembering: verify the *placement* of auto-merged
+content near duplicate-looking text, not just the presence of
+conflict markers.
+
+Re-verified rather than trusting the inherited state: domain clean,
+full acceptance 549/549. No structural work needed — the code is
+exactly what I already reviewed. Handing back to the architect.
