@@ -28151,3 +28151,65 @@ in entity-13, isolating the asserted rent deposit from the separate
 end-of-turn investment rule. Full acceptance passes with no failures. Routed
 the merged treasury-shortfall correction for the required final refactorer
 review and hardening pass.
+
+## 2026-08-10T17:35:00Z — refactorer reviews the corrected treasury shortfall-loan rule
+
+Received architect priority-00 handoff (commit `89a6b817de`, task
+`correct-entity-treasury-shortfall-loans`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 89a6b817de
+```
+
+Action: merged (tenth instance of the recurring logbook conflict,
+resolved the same way as always). New task name — the specifier gave
+this follow-up its own handoff name rather than folding it back into
+`greedo-legal-entity`.
+
+The correction: `canBorrowForBuilding`'s `rentReceivedOn == null` gate
+— the "don't borrow the same turn rent arrived" rule I wrote a
+dedicated unit test for two cycles ago — has been removed entirely and
+replaced with a real per-shareholder affordability check, plus an
+exact remainder-aware split (`base + 1` for as many shareholders as
+the remainder covers, instead of the old blanket ceiling-division
+share that could over-charge everyone equally and was never checked
+against actual balance at all before withdrawing).
+
+This directly broke the accuracy of my own
+`operatingDoesNotBorrowToTopUpRentReceivedThisSameTurn` test: it kept
+*passing*, but only because its shareholders had zero balance (an
+unrelated reason), not because of the rule it named and existed to
+prove — which no longer exists. Confirmed this by hand-tracing before
+touching anything, then verified empirically. Replaced it with
+`borrowsAnExactRemainderAwareShortfallWhenEveryShareholderCanAffordTheirShare`,
+which actually exercises the new split (a $97 shortfall over 3
+shareholders splits 33/32/32) and the borrow succeeding — my first
+attempt got this wrong too, forgetting that `buildAsMuchAsAffordable`'s
+outer loop still requires `bankBalance() > 0` to ever enter (the same
+zero-entry idle guard behind entity-17, confirmed a few cycles back);
+seeded the bank with $3 first so the loop actually runs. Also dropped
+a now-pointless `receiveRent()` call from an adjacent, still-accurate
+coder test (`doesNotTakePartialShareholderContributionsWhenHouseIsUnaffordable`)
+that no longer does anything now that the gate is gone.
+
+While rewriting, found `canBorrowForBuilding` and `borrowShortfall`
+independently computing the identical base/remainder split formula —
+`dry4java` didn't flag it (below its similarity threshold against the
+surrounding code), but it's the same business rule duplicated in two
+places, exactly the kind of drift risk a refactorer should catch by
+reading rather than waiting on a tool. Extracted `sharesOf(Money)` as
+the one place that formula lives now; both callers just look their
+shares up by index. `canBorrowForBuilding` dropped from CC=5 to CC=2
+as a side effect of expressing the affordability check as a stream
+`allMatch` instead of an imperative loop once the split moved out.
+
+Domain and acceptance both re-verified green throughout — 554/554,
+run twice — including through my own two rounds of test corrections.
+No CRAP violations anywhere in `LegalEntity.java` after this change.
+`mutate4java --scan`: 64 sites, manifest refreshed. The one CLI
+`SimulatorTest` failure seen mid-cycle is the same pre-existing
+environmental flake already confirmed unrelated via an A/B worktree
+comparison earlier in this task; domain-scoped runs stayed clean
+throughout.

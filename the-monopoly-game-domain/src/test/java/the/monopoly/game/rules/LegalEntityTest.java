@@ -162,19 +162,26 @@ class LegalEntityTest {
   }
 
   @Test
-  void operatingDoesNotBorrowToTopUpRentReceivedThisSameTurn() {
+  void borrowsAnExactRemainderAwareShortfallWhenEveryShareholderCanAffordTheirShare() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
     ColourStreet street = entity.streets().getFirst();
-    entity.depositToBank(new Money(30));
-    entity.receiveRent(street);
+    entity.depositToBank(new Money(3));
+    dog.account().deposit(new Money(50));
+    highHat.account().deposit(new Money(50));
+    ironBox.account().deposit(new Money(50));
 
     LegalEntity.Operation operation = entity.operate(deeds);
 
-    assertThat(operation).isEqualTo(new LegalEntity.Operation.NoAction());
-    assertThat(deeds.housesBuiltOn(street)).isZero();
-    assertThat(entity.loan()).isEqualTo(Money.ZERO);
-    assertThat(entity.bankBalance()).isEqualTo(new Money(30));
+    assertThat(operation).isEqualTo(new LegalEntity.Operation.LoanRaisedAndHouseBuilt(new Money(97), street));
+    assertThat(deeds.housesBuiltOn(street)).isEqualTo(1);
+    assertThat(entity.loan()).isEqualTo(new Money(97));
+    assertThat(entity.shareholderPayment(dog)).isEqualTo(new Money(33));
+    assertThat(entity.shareholderPayment(highHat)).isEqualTo(new Money(32));
+    assertThat(entity.shareholderPayment(ironBox)).isEqualTo(new Money(32));
+    assertThat(dog.account().balance().amount()).isEqualTo(new Money(17));
+    assertThat(highHat.account().balance().amount()).isEqualTo(new Money(18));
+    assertThat(ironBox.account().balance().amount()).isEqualTo(new Money(18));
   }
 
   @Test
@@ -213,7 +220,6 @@ class LegalEntityTest {
     highHat.account().deposit(new Money(30));
     ironBox.account().deposit(new Money(30));
     ColourStreet street = (ColourStreet) rules.create(Street.Type.RueDeDiekirchArlon);
-    entity.receiveRent(street);
 
     entity.operate(deeds);
 
