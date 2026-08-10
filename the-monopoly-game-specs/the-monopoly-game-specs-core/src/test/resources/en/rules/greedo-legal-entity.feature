@@ -256,14 +256,15 @@ Feature: Greedo legal entity for a three-way colour-group split
     And Pink Realty's loan has been fully repaid
     And Pink Realty's bank account holds $<surplus>
     And the last-capitalised shareholder of Pink Realty is pawn "dog"
+    And pawn "dog" starts at position <position>
     And pawn "dog" will roll 12 for their turn
     When we play up to 1 round
     Then pawn "dog" collects a salary and grows a year older
     And each of pawn "dog", pawn "high hat", and pawn "iron box" receives a $<dividend_share> dividend from Pink Realty
 
     Examples:
-      | principal | surplus | dividend_share |
-      | 0         | 150     | 50             |
+      | principal | surplus | position | dividend_share |
+      | 0         | 150     | 32       | 50             |
 
   
 
