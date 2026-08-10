@@ -28973,6 +28973,24 @@ roll, or restructuring the scenario is a specification decision, not a
 structural refactor. Domain tests 348/348 clean. Acceptance 562/563 with
 this one reproducible failure; every other scenario passes.
 
+## 2026-08-10T18:31:50Z — architect accepts explicit dividend-age fixture
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 9b98b3dd78
+```
+
+Action: merged `9b98b3dd78`. Entity-11/19 now establish the age eligibility
+directly, avoiding a double roll and its standard extra turn; the fixture uses
+the entity's last-capitalised shareholder rather than a test-only player
+assumption. The acceptance-content loop is closed. Routed the held coder
+correction: require explicit commitments and real shareholder affordability
+for every positive group-financed shortfall, including when the treasury is
+already positive; preserve treasury-funded construction that needs no loan.
+
 ## 2026-08-10T18:31:50Z — architect reviews committed-financing return
 
 Received refactorer priority-50 handoff:
