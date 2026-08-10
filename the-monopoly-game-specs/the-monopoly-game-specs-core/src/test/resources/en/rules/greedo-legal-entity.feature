@@ -103,9 +103,9 @@ Feature: Greedo legal entity for a three-way colour-group split
     And Pink Realty still owes pawn "dog" $<principal>
 
     Examples:
-      | principal | renter | renter_position | renter_street          | houses_after |
-      | 200       | ship   | 1               | Rue de Diekirch Arlon  | 1            |
-      | 200       | ship   | 3               | Bruul Mechelen         | 1            |
+      | principal | renter  | renter_position | renter_street          | houses_after |
+      | 200       | racecar | 1               | Rue de Diekirch Arlon  | 1            |
+      | 200       | racecar | 3               | Bruul Mechelen         | 1            |
 
   # entity-8
   Scenario Outline: no dividend is paid while any shareholder loan to the entity is still outstanding
