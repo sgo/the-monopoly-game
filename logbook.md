@@ -27376,6 +27376,21 @@ movement setup so the tenant actually lands on the named entity street, while
 preserving the canonical game/CLI turn loop and the real shareholder-payment
 path. Send priority-00 follow-up to specifier with this narrowed evidence.
 
+## 2026-08-10T13:07:08Z — architect completes greedo legal-entity phase
+
+Received refactorer priority-50 handoff (commit `9d2a062c86`, task
+`greedo-legal-entity`), carrying the specifier's entity-7 movement setup
+correction and the coder's missing loan assertion step.
+
+Action: merged and independently verified. Entity-7 is 17/17 green, and the
+full acceptance reports contain no failures or errors (550/550). The final
+scenario positions selected `racecar` ten spaces before each named pink street,
+so the existing deterministic turn roll genuinely collects entity rent. The
+canonical production path—rent collection, real capped shareholder
+contributions, payment ledger, and house reinvestment—remains unchanged; no
+CLI or test-only turn policy was introduced. The refactorer has no remaining
+structural findings. Send phase-complete priority-50 to specifier.
+
 ## 2026-08-10T12:54:07Z — refactorer sent greedo-legal-entity handoff to architect
 
 Handoff message sent:
