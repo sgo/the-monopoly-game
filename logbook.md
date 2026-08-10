@@ -26442,3 +26442,21 @@ turn path. Refactorer independently verified the legal-entity class
 12/12 and full acceptance 545/545. All coder/refactorer loops are
 closed; send the phase-complete priority-50 sync to specifier.
 
+## 2026-08-10T10:10:17Z — architect reviews multi-player legal entities
+
+Received specifier priority-50 handoff (commit `095618e1ba`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 095618e1ba
+```
+
+Action: accepted the new 4- and 8-player acceptance criteria. Current
+implementation cannot satisfy them: `Game` passes all players to
+`LegalEntity.form`, which requires exactly three shareholders, and
+`World.considerFormingLegalEntity` explicitly returns unless there are
+exactly three players. Route to coder to derive the three co-owners of
+the candidate colour group from the larger game and to exercise that
+same real-game policy through acceptance support.
