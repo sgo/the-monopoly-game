@@ -26442,3 +26442,23 @@ turn path. Refactorer independently verified the legal-entity class
 12/12 and full acceptance 545/545. All coder/refactorer loops are
 closed; send the phase-complete priority-50 sync to specifier.
 
+
+## 2026-08-10T10:08:47Z — specifier routes multi-player entity fix to architect
+
+Sent architect priority-50 git_handoff (commit `095618e1ba`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 095618e1ba
+```
+
+Root cause (empirically verified by running the game): the legal-entity
+mechanism never forms for 4-8 player games. `Game.resolveLegalEntityAtStart`
+passes the whole player pool as shareholders, so `LegalEntity.form`'s
+exactly-three guard never fires outside a strict 3-player game. Added
+Gherkin entity-9 (entity forms from the three actual co-owners of a
+colour group even in 4- and 8-player games) and entity-10 (two-owner
+splits do not form). Feature parses cleanly. User requested the fix be
+routed to the architect first for agreement before implementation.
