@@ -59,8 +59,8 @@ final class JournalStepHandlers {
         given("^<enabled_flag> trading is enabled for the \"" + NAME + "\" strategy$",
             (world, arguments) -> world.enableStalemateTrading(arguments.text(1))),
 
-        step("^we select <player_count> players$",
-            (world, arguments) -> world.selectPlayers(2)),
+        step("^we select (<player_count>) players$",
+            (world, arguments) -> world.selectPlayers(arguments.number(1))),
 
         given("^Pink Realty owes pawn \"dog\" \\$<principal>$",
             (world, arguments) -> {

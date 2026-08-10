@@ -26470,3 +26470,15 @@ implementation cannot satisfy them: `Game` passes all players to
 exactly three players. Route to coder to derive the three co-owners of
 the candidate colour group from the larger game and to exercise that
 same real-game policy through acceptance support.
+
+## 2026-08-10T10:18:28Z — coder implements multi-player legal entities
+
+Derived legal-entity shareholders from the candidate colour group's
+actual owners instead of limiting the game to three players. Updated
+the acceptance fixture's placeholder player-count handler to select the
+specified 4 or 8 players. Made the two-owner negative scenarios exclude
+the candidate colour group when assigning remaining deeds, so their
+setup remains a genuine two-owner split.
+
+Verification: domain tests 332/332 passing; full acceptance 549/549
+passing; `git diff --check` clean.

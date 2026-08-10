@@ -566,10 +566,16 @@ public class World {
   public void considerFormingLegalEntity(String pawnName, String colourName) {
     if (!legalEntityTrading) return;
     Street.Colour colour = Street.Colour.valueOf(colourName.replace(' ', '_'));
-    if (players().size() != 3 || colour == Street.Colour.orange) return;
+    if (colour == Street.Colour.orange) return;
     if (ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
         .anyMatch(it -> deeds == null || deeds.isUnowned(it.type()))) return;
-    formEntity(colour, false);
+    List<ColourStreet> group = ruleSet.streets().filter(ColourStreet.class::isInstance)
+        .map(ColourStreet.class::cast).filter(it -> it.colourGroup() == colour).toList();
+    List<Player> shareholders = players().stream()
+        .filter(player -> group.stream().anyMatch(street -> deeds.ownerOf(street.type())
+            .filter(player.id()::equals).isPresent()))
+        .toList();
+    formEntity(colour, false, shareholders);
   }
 
   public void formNamedEntity(String name) {
@@ -579,12 +585,12 @@ public class World {
       queuePawnRoll(player.id().value(), rollTotalling(3 + index));
       queuePawnRoll(player.id().value(), UNREMARKABLE);
     }
-    formEntity(Street.Colour.valueOf(name.substring(0, name.indexOf(' ')).toLowerCase()), true);
+    formEntity(Street.Colour.valueOf(name.substring(0, name.indexOf(' ')).toLowerCase()), true,
+        players().stream().limit(3).toList());
   }
 
-  private void formEntity(Street.Colour colour, boolean seedBoard) {
+  private void formEntity(Street.Colour colour, boolean seedBoard, List<Player> shareholders) {
     if (deeds == null) deeds = new Deeds();
-    List<Player> shareholders = players().stream().limit(3).toList();
     if (seedBoard) {
       List<ColourStreet> group = ruleSet.streets().filter(ColourStreet.class::isInstance)
           .map(ColourStreet.class::cast).filter(it -> it.colourGroup() == colour).toList();
@@ -630,6 +636,15 @@ public class World {
   public void ownEveryOtherOwnable(String pawnName) {
     if (deeds == null) deeds = new Deeds();
     ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
+        .filter(ownable -> deeds.isUnowned(ownable.type()))
+        .forEach(ownable -> deeds.sell(ownable, pawn(pawnName), Money.ZERO));
+  }
+
+  public void ownEveryOtherOwnableOutside(String pawnName, String colourName) {
+    if (deeds == null) deeds = new Deeds();
+    Street.Colour colour = Street.Colour.valueOf(colourName);
+    ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
+        .filter(ownable -> !(ownable instanceof ColourStreet street && street.colourGroup() == colour))
         .filter(ownable -> deeds.isUnowned(ownable.type()))
         .forEach(ownable -> deeds.sell(ownable, pawn(pawnName), Money.ZERO));
   }
