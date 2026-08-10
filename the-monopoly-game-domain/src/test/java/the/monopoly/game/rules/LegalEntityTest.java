@@ -23,10 +23,7 @@ class LegalEntityTest {
     own(Street.Type.RueDeDiekirchArlon, dog);
     own(Street.Type.BruulMechelen, highHat);
     own(Street.Type.PlaceVerteVerviers, ironBox);
-    rules.streets().filter(it -> it instanceof the.monopoly.game.components.streets.Ownable)
-        .map(it -> (the.monopoly.game.components.streets.Ownable) it)
-        .filter(it -> deeds.isUnowned(it.type()))
-        .forEach(it -> deeds.sell(it, highHat, Money.ZERO));
+    ownEveryRemainingSpace(highHat);
 
     LegalEntity entity = LegalEntity.form("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules, deeds).orElseThrow();
@@ -44,6 +41,79 @@ class LegalEntityTest {
 
     assertThat(LegalEntity.form("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules, deeds)).isEmpty();
+  }
+
+  @Test
+  void fewerThanThreeDistinctShareholdersPreventsFormation() {
+    assertThat(LegalEntity.form("Pink Realty", Street.Colour.pink,
+        List.of(dog, dog, highHat), rules, deeds)).isEmpty();
+  }
+
+  @Test
+  void aColourGroupLedByTheHighestPriorityStreetNeverConsolidates() {
+    own(Street.Type.LippenslaanKnokke, dog);
+    own(Street.Type.RueRoyaleTournai, highHat);
+    own(Street.Type.GroenplaatsAntwerpen, ironBox);
+    ownEveryRemainingSpace(highHat);
+
+    assertThat(LegalEntity.form("Orange Realty", Street.Colour.orange,
+        List.of(dog, highHat, ironBox), rules, deeds)).isEmpty();
+  }
+
+  @Test
+  void aGroupNotSplitAcrossThreeOwnersPreventsFormation() {
+    own(Street.Type.RueDeDiekirchArlon, dog);
+    own(Street.Type.BruulMechelen, dog);
+    own(Street.Type.PlaceVerteVerviers, highHat);
+    ownEveryRemainingSpace(highHat);
+
+    assertThat(LegalEntity.form("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules, deeds)).isEmpty();
+  }
+
+  @Test
+  void aShareholderWhoOwnsNoStreetInTheGroupPreventsFormation() {
+    own(Street.Type.RueDeDiekirchArlon, dog);
+    own(Street.Type.BruulMechelen, highHat);
+    own(Street.Type.PlaceVerteVerviers, ironBox);
+    ownEveryRemainingSpace(highHat);
+    Player outsider = player("outsider");
+
+    assertThat(LegalEntity.form("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, outsider), rules, deeds)).isEmpty();
+  }
+
+  @Test
+  void operatingWithNoOutstandingLoanRaisesOneAndPaysADividend() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+
+    LegalEntity.Operation operation = entity.operate();
+
+    assertThat(operation).isEqualTo(new LegalEntity.Operation.LoanRaisedWithDividend(
+        new Money(150), new Money(50)));
+    assertThat(entity.loan()).isEqualTo(new Money(150));
+    assertThat(entity.operated()).isTrue();
+  }
+
+  @Test
+  void operatingWithAnOutstandingLoanRepaysItWithFivePercentInterest() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    entity.raiseLoan(new Money(100));
+
+    LegalEntity.Operation operation = entity.operate();
+
+    assertThat(operation).isEqualTo(new LegalEntity.Operation.LoanRepaid(
+        dog, new Money(100), new Money(105)));
+    assertThat(entity.loan()).isEqualTo(Money.ZERO);
+  }
+
+  private void ownEveryRemainingSpace(Player owner) {
+    rules.streets().filter(it -> it instanceof the.monopoly.game.components.streets.Ownable)
+        .map(it -> (the.monopoly.game.components.streets.Ownable) it)
+        .filter(it -> deeds.isUnowned(it.type()))
+        .forEach(it -> deeds.sell(it, owner, Money.ZERO));
   }
 
   private void own(Street.Type type, Player owner) {

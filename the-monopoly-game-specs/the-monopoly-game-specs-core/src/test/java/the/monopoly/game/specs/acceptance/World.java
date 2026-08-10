@@ -379,14 +379,15 @@ public class World {
       Journal events = new Journal();
       deeds.legalEntities().forEach(entity -> {
         events.log(new Entry.LegalEntityFormed(entity.name(), entity.shareholders().stream().map(Player::id).toList()));
-        if (entity.loan().equals(Money.ZERO)) {
-          events.log(new Entry.LegalEntityLoanRaised(entity.name(), new Money(150),
-              entity.shareholders().stream().map(Player::id).toList()));
-          events.log(new Entry.LegalEntityDividendPaid(entity.name(),
-              entity.shareholders().stream().map(Player::id).toList(), new Money(50)));
-        } else {
-          events.log(new Entry.LegalEntityLoanRepaid(entity.name(), entity.shareholders().getFirst().id(),
-              entity.loan(), new Money(entity.loan().amount() + entity.loan().amount() * 5 / 100)));
+        switch (entity.operate()) {
+          case LegalEntity.Operation.LoanRepaid it -> events.log(new Entry.LegalEntityLoanRepaid(
+              entity.name(), it.shareholder().id(), it.principal(), it.repayment()));
+          case LegalEntity.Operation.LoanRaisedWithDividend it -> {
+            events.log(new Entry.LegalEntityLoanRaised(entity.name(), it.loan(),
+                entity.shareholders().stream().map(Player::id).toList()));
+            events.log(new Entry.LegalEntityDividendPaid(entity.name(),
+                entity.shareholders().stream().map(Player::id).toList(), it.dividend()));
+          }
         }
       });
       journal = events.entries();

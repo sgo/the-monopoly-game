@@ -25920,3 +25920,115 @@ Re-read your role and constitution.
 merge_and_process specifier 8b0cc9799c
 
 Action: merged the specification commit and began implementing the legal-entity behavior slice.
+
+## 2026-08-10T08:12:00Z — refactorer reviews greedo-legal-entity
+
+Received coder priority-50 handoff (commit `4c5615b277`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 4c5615b277
+```
+
+Action: merged (third instance of the recurring logbook sent/received
+boilerplate-misalignment conflict; resolved by keeping my own
+"sent player-age-tracking handoff" entry and splicing the incoming
+branch's full downstream chain after it in the order presented —
+architect review, a Gherkin-mutation gap on the age scenarios routed
+to and resolved by the specifier, two rounds of CLI roll-threshold
+flake fixes, task closure, and the start of this task). Verified zero
+remaining conflict markers and no `git diff --check` whitespace
+issues. Committed the merge as `3bd658e`.
+
+Reviewed the diff (`LegalEntity` domain type, `Deeds.form`/
+`entityOwnerOf`/`legalEntities`, `Game.resolveLegalEntityAtStart`/
+`operateLegalEntities`, `Greedo`'s new `legalEntityTrading` flag
+following its existing `stalemateTrading` telescoping-constructor
+convention, `Report.line` cases). Semantically sound and narrowly
+scoped: three-way colour-group splits consolidate into a company once
+the whole board is owned, excluded from Greedo's always-highest-
+priority group, holding equal thirds; it then raises a $150 loan with
+a $50 dividend, or repays an outstanding loan at 5% interest, once per
+entity for the rest of the game (`operated` never resets — confirmed
+this is the entire lifetime cycle, not a per-round one, by grep; no
+scenario exercises more than one round so this is unverified beyond
+what's specified, not something I changed or would decide unilaterally).
+
+Two refactors, both behavior-preserving and verified by full domain
+(`mvn -q -o test`) and acceptance (`./acceptance/run-acceptance.sh`,
+545/545 both before and after) re-runs:
+
+1. `LegalEntity.form` was CC=9, CRAP=9.1, over both the tool's own 8.0
+   warning and this role's 6.0 policy threshold. Extracted its six
+   guard clauses into named predicate methods
+   (`hasThreeDistinctShareholders`, `boardFullyOwned`, `streetsOf`,
+   `colourGroupIneligible`, `splitAcrossThreeDistinctOwners`,
+   `everyShareholderOwnsAStreet`). One of the original six checks
+   (colour-group streets individually unowned) was provably redundant
+   with the whole-board-owned check that already runs first —
+   `ColourStreet implements Ownable`, so if every `Ownable` is owned
+   the subset is too — and folded into `colourGroupIneligible` instead
+   of kept as a dead branch. Also deduplicated the colour-group street
+   lookup between `form` and `formed` into the shared `streetsOf`.
+   Result: CC=6, and after adding unit test coverage for the branches
+   no existing test reached (see below), CRAP=6.0 at 100% coverage —
+   exactly at the policy threshold. `streets.isEmpty()` inside
+   `colourGroupIneligible` is unreachable with the only `Rule.Set`
+   this project has (`official`, which has all eight colours); did not
+   chase covering it with a hand-built fake `Rule.Set` for a branch
+   that can't occur against real project state — judged not
+   "reasonable" coverage-chasing under this role's mandate.
+
+2. The $150 loan / $50 dividend / 5%-interest-repayment decision was
+   duplicated almost verbatim between `Game.operateLegalEntities` and
+   the acceptance test harness's `World.playUpToRounds` — and not just
+   duplicated but diverged: `World.java`'s copy recomputed the
+   repayment formula by hand instead of calling `LegalEntity.repayLoan`,
+   and never called `raiseLoan`/`repayLoan`/`markOperated` at all, so
+   it logged what operating would produce without the entity's own
+   state ever actually changing. Extracted the decision into a single
+   new `LegalEntity.operate()` returning a sealed `Operation`
+   (`LoanRaisedWithDividend`/`LoanRepaid`), and pointed both
+   `Game.operateLegalEntities` and `World.playUpToRounds` at it. Same
+   numbers, same target shareholder, same journal entries — confirmed
+   by the unchanged 545/545 acceptance result — but now one formula
+   instead of two, and the test harness actually mutates the entity it
+   claims to have operated.
+
+Added six unit tests to `LegalEntityTest` (one per guard clause
+`form` rejects on, plus both `operate()` branches) to close the
+coverage gap the CC reduction exposed, and deduplicated the existing
+success-path test's manual "own everything else" loop against a new
+`ownEveryRemainingSpace` helper shared with the new tests.
+
+`mutate4java --scan` on every file this touched (`Game.java` 14 sites,
+`LegalEntity.java` 13, `Report.java` 3, `Deeds.java` 14, `Greedo.java`
+14) — all far under the 100-site split threshold. All five manifests
+were stale (`LegalEntity.java` had none yet) and refreshed via
+`--update-manifest`; diffed each afterward to confirm only the
+embedded comment block changed, no functional lines. `dry4java` across
+the same files found only the pre-existing `Journalling` event-adapter
+repetition shape the architect already accepted in an earlier cycle
+(logged 2026-08-09T14:39:35Z); my four new `entityFormed`/
+`entityLoanRaised`/`entityLoanRepaid`/`entityDividendPaid` adapters
+fit that same accepted shape and weren't separately flagged.
+
+One finding I'm not acting on, flagging for the architect instead:
+`World.playUpToRounds` still bypasses `Game.play()` entirely whenever
+legal entities are in play, calling `entity.operate()` directly rather
+than driving it through `resolveLegalEntityAtStart`/`playTurn`. That
+means `Game.resolveLegalEntityAtStart` sits at 11.4% domain-test
+coverage and neither it nor the real per-turn `operateLegalEntities`
+invocation path is exercised by any acceptance scenario — entity-6/7/8
+in `greedo-legal-entity.feature` test the *outcome* of operating
+faithfully (same code, now, after the dedup above) but never the
+*timing* decision of when a real game triggers it. Redesigning that
+timing so the fixture can drive real gameplay is a specification/
+behavior question (how "Given ... owes ... $X" as a precondition
+should compose with actually playing turns), not a structure-preserving
+refactor, so I'm leaving it for the architect to route to the
+specifier if it's judged worth closing.
+
+Committed the LegalEntity/Game/World changes and this entry together.
