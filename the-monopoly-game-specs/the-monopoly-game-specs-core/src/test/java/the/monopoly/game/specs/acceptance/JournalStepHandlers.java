@@ -106,6 +106,10 @@ final class JournalStepHandlers {
             (world, arguments) -> assertThat(world.totalHouses(Street.Colour.pink))
                 .isGreaterThanOrEqualTo(arguments.number(1))),
 
+        then("^the pink colour group is developed up to (<total_houses>) houses$",
+            (world, arguments) -> assertThat(world.totalHouses(Street.Colour.pink))
+                .isEqualTo(arguments.number(1))),
+
         then("^Pink Realty raises no more than \\$(<max_loan>) in loans$",
             (world, arguments) -> assertThat(world.gameLog().stream()
                 .filter(Entry.LegalEntityLoanRaised.class::isInstance)
