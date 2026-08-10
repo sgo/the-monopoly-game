@@ -143,6 +143,8 @@ class LegalEntityTest {
         List.of(dog, highHat, ironBox), rules);
     entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
     entity.depositToBank(new Money(150));
+    entity.recordCapitalization(dog);
+    entity.shareholderGrewOlder(dog);
 
     LegalEntity.Operation operation = entity.operate(deeds);
 
@@ -151,6 +153,39 @@ class LegalEntityTest {
     assertThat(dog.account().balance().amount()).isEqualTo(new Money(50));
     assertThat(highHat.account().balance().amount()).isEqualTo(new Money(50));
     assertThat(ironBox.account().balance().amount()).isEqualTo(new Money(50));
+  }
+
+  @Test
+  void operatingDoesNotPayADividendBeforeTheLastCapitalizedShareholderGrowsOlder() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.depositToBank(new Money(150));
+    entity.recordCapitalization(dog);
+
+    assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.NoAction());
+    assertThat(entity.bankBalance()).isEqualTo(new Money(150));
+  }
+
+  @Test
+  void onlyTheLastCapitalizedShareholdersAgeIncreaseEnablesADividend() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.depositToBank(new Money(150));
+    entity.recordCapitalization(dog);
+    entity.shareholderGrewOlder(highHat);
+
+    assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.NoAction());
+
+    LegalEntity eligible = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    eligible.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    eligible.depositToBank(new Money(150));
+    eligible.recordCapitalization(dog);
+    eligible.shareholderGrewOlder(dog);
+
+    assertThat(eligible.operate(deeds)).isEqualTo(new LegalEntity.Operation.DividendPaid(new Money(50)));
   }
 
   @Test

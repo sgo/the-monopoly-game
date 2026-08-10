@@ -24,6 +24,8 @@ public final class LegalEntity {
   private final Account bankAccount;
   private ColourStreet rentReceivedOn;
   private final Map<Player.ID, Money> shareholderPayments = new HashMap<>();
+  private Player lastCapitalizedShareholder;
+  private boolean lastCapitalizedShareholderGrewOlder;
   private boolean operated;
 
   private LegalEntity(String name, Street.Colour colour, List<Player> shareholders,
@@ -108,6 +110,18 @@ public final class LegalEntity {
   }
   public Money shareholderPayment(Player shareholder) {
     return shareholderPayments.getOrDefault(shareholder.id(), Money.ZERO);
+  }
+  public void recordCapitalization(Player shareholder) {
+    if (!shareholders.contains(shareholder)) throw new IllegalArgumentException("Not a shareholder.");
+    lastCapitalizedShareholder = shareholder;
+    lastCapitalizedShareholderGrewOlder = false;
+  }
+  public void shareholderGrewOlder(Player shareholder) {
+    if (lastCapitalizedShareholder != null
+        && lastCapitalizedShareholder.id().equals(shareholder.id())) {
+      lastCapitalizedShareholderGrewOlder = true;
+      operated = false;
+    }
   }
   public Money repayLoan(Money principal) {
     Money repayment = new Money(principal.amount() + principal.amount() * 5 / 100);
@@ -205,7 +219,9 @@ public final class LegalEntity {
 
   private Operation repayLoanOrPayDividend() {
     if (!loan.equals(Money.ZERO)) return repayLoanIfAffordable();
-    return bankBalance().amount() >= 150 ? payDividend() : null;
+    return bankBalance().amount() >= 150
+        && (lastCapitalizedShareholder == null || lastCapitalizedShareholderGrewOlder)
+        ? payDividend() : null;
   }
 
   private Operation repayLoanIfAffordable() {

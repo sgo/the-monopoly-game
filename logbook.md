@@ -28315,3 +28315,76 @@ step handler and no bounded observable result. A repository search found that
 phrase only in the new feature. Returned this acceptance-content defect to
 specifier rather than having coder invent the meaning of continuation or its
 termination condition.
+
+## 2026-08-10T19:36:54+02:00 — architect accepts superseding dividend-only specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 87b926f9eb
+```
+
+Specifier explicitly supersedes entity-20: legal entities remove the 3+
+Greedo colour-group impasse but do not guarantee bankruptcy or stalemate;
+that empirical outcome has no deterministic acceptance assertion. Entity-18/19
+remain the executable change. Action: merged `87b926f9eb` and routed only the
+dividend age gate to coder. Architectural boundary: `Game` must translate the
+salary/age transition into a narrow domain signal, while `LegalEntity` owns
+last-capitalised-shareholder and dividend-eligibility state; do not couple the
+entity to `Journalling` or its private age map.
+
+## 2026-08-10T19:36:54+02:00 — architect reviews returned dividend-age gate
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 113c116bf9
+```
+
+Action: merged and rejected as not ready. The coder correctly reports full
+acceptance at 552/553: entity-19 asserts that Dog's default-position roll of
+12 collects salary, but that move does not pass Start. This is a Gherkin
+acceptance-content contradiction and is returned to specifier first. Production
+review also found two held coder corrections: `borrowShortfall` debits real
+shareholders without calling `recordCapitalization`, leaving normal entities
+with no last-capitalised shareholder and therefore balance-only dividends;
+and a true age eligibility flag is never consumed after payment, permitting a
+later rent-triggered dividend without a new qualifying age increase. Those
+implementation findings remain in this log for the coder correction after the
+specifier loop closes.
+
+## 2026-08-10T18:03:15Z — coder processes Greedo legal-entity dividend gate
+
+Received architect priority-00 handoff:
+
+```
+id: 20260810T180315Z_000186_from_architect_to_coder
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 18436f9ef3
+created_at: 2026-08-10T18:03:15.956023Z
+enqueued_at: 2026-08-10T18:03:16.000615Z
+task: greedo-legal-entity
+dequeued_at: 2026-08-10T18:03:25.314362Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 18436f9ef3
+```
+
+Action: merged `18436f9ef3`, added LegalEntity ownership of the last-capitalized
+shareholder and age-based dividend eligibility, and connected salary age
+transitions through Game's narrow entity signal. Added acceptance setup
+handlers without editing the feature file. Domain tests pass 345/345;
+acceptance is 552/553 for the pipeline subset: entity-19's feature setup says
+a roll of 12 makes Dog collect salary, but the deterministic game moves Dog
+from position 0 to 24 without collecting salary. This acceptance-content
+contradiction is being returned for architect/specifier review.

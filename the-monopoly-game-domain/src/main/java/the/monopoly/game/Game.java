@@ -143,7 +143,7 @@ public class Game {
   private Result play(boolean untilComplete, BooleanSupplier keepPlaying) {
     var journal = new Journal();
     Map<Player.ID, Integer> ages = new HashMap<>();
-    Journalling journalling = new Journalling(journal, ages);
+    Journalling journalling = new Journalling(journal, ages, deeds);
     journal.log(new Journal.Entry.Start(ids(players)));
     deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
@@ -341,7 +341,7 @@ public class Game {
   }
 
   /** Writes down what a turn and a sale say they did, as the game's account of it. */
-  private record Journalling(Journal journal, Map<Player.ID, Integer> ages)
+  private record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds)
       implements Turn.Events, LandSale.Events, Rent.Events, Building.Events, Cards.Events, Taxes.Events, Jail.Events, Bankruptcy.Events {
     private int age(Player player) {
       return ages.getOrDefault(player.id(), 0);
@@ -364,6 +364,7 @@ public class Game {
     @Override
     public void collectedSalary(Player player, Money salary) {
       ageAfter(player);
+      deeds.legalEntities().forEach(entity -> entity.shareholderGrewOlder(player));
       journal.log(new Journal.Entry.SalaryCollected(player.id(), salary));
     }
 
