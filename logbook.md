@@ -27254,3 +27254,63 @@ Merged the review/refactor state and integrated canonical shareholder
 contributions. Removed the extra scripted roll that delayed explicit pawn
 rolls. Domain tests pass (335 tests); acceptance is 548/550 because entity-7
 roll 12 does not land either requested pink street from Start.
+
+## 2026-08-10T13:20:00Z — refactorer confirms entity-7 is now a pure roll-arithmetic gap
+
+Received coder priority-00 handoff (commit `7713889b17`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 7713889b17
+```
+
+Action: merged (eighth instance of the recurring logbook conflict —
+five separate hunks this time, the most yet, since this branch and
+mine had independently resolved the same architect-rejection-and-fix
+cycle in parallel and reconverged; resolved by keeping my own already-
+verified reconstruction throughout and appending only the incoming
+branch's genuinely new tail content after it). Also found and fixed a
+fourth instance of the auto-merge placement bug, this time already
+sitting in my own prior commits rather than introduced by this merge:
+an entry titled "coder receives specifier economy handoff" had the
+wrong body attached — actually my own `refactorer re-confirms multi-
+player legal-entity support` entry's text (referencing my commit
+`7bcae6c15d`), while the real "coder receives specifier economy
+handoff" entry existed correctly, separately, further down. Confirmed
+via `git show 91d723d:logbook.md` that this predates the current
+merge, then found the authoritative original header at `7bcae6c15d`
+itself (the commit where I first wrote it) and restored it. Continuing
+to treat "auto-merge produced no conflict markers" as no guarantee of
+correctness for this file — worth remembering as a standing practice
+for this task, not a one-off.
+
+The incoming branch's unique content: while I was reviewing the
+shareholder-contribution wiring, the architect had independently
+reviewed my earlier `5685c98f67` handoff directly and found the same
+"ledger has no non-test caller" gap I would go on to have the coder
+fix anyway, plus a fresh finding — `operate(Deeds)` called
+`deeds.arrangeHouses` without charging anyone at that point in the
+history. Routed to coder, who (via `69c6a865d9`) integrated the
+canonical path and separately fixed a real fixture bug: `World
+.formNamedEntity` queued two rolls per player (an initiative total,
+then a leftover `UNREMARKABLE`), so a scenario's own explicit queued
+roll — like entity-7's `ship` will roll 12 — landed third, on a turn
+that doesn't exist within "we play up to 1 round." Removed the
+redundant second queue entry. Verified this genuinely lands: domain
+335/335, acceptance 548/550, `git diff --stat -- '*.java' '*.feature'`
+against my prior review shows only that one line removed from
+`World.java` — no other production or test code changed, so my last
+cycle's CRAP/DRY/mutation review still stands as-is.
+
+Entity-7 is now blocked by a narrower, more precise gap than either of
+the two I've reported before: no crash, no timing race, just "a roll
+of 12 does not reach either candidate pink street from Start" — a pure
+board-arithmetic question about which die total the scenario should
+specify, squarely the specifier's call (the same category as the
+already-logged CLI roll-threshold and Greedo balance-perturbation
+decisions this task's history keeps deferring to specifier judgment).
+Not something I'll guess at or fix myself. No structural changes
+needed this cycle since no domain code changed; handing back to the
+architect with the narrowed diagnosis.
