@@ -30,6 +30,19 @@ Completed the follow-up by removing the World-side synthetic journal path,
 routing legal-entity operation through Game, and moving priority lookup behind
 Greedo's strategy API. Domain tests: 332 passed. Acceptance: 545 passed.
 
+Sent handoff to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: 08b0104e74
+```
+
+Summary: architect follow-up implementation is verified and ready for
+structural review.
+
 ## 2026-08-10T10:04:00Z — completed greedo-legal-entity
 
 Merged specifier commit `8b0cc9799c`, implemented legal-entity formation, ownership, equal shares, loans, repayment interest, dividends, journal/report/logging support, and the CLI flag. Verified with 326 domain tests and 545 acceptance scenarios. Prepared handoff to refactorer.
