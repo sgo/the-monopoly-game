@@ -28594,6 +28594,15 @@ Action: merged `aba659c065` and corrected shortfall funding so zero-value
 share allocations do not become the last-capitalized shareholder. Added a
 remainder-specific regression test; the focused LegalEntity tests pass 19/19.
 
+Sent priority-00 handoff to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 1d8911fedf
+```
 ## 2026-08-10T20:10:00Z — refactorer reviews the dividend age-eligibility gate
 
 Received architect priority-00 handoff (commit `dfdf28bde9`, task
@@ -28652,3 +28661,51 @@ after payment) — matches this file's existing convention for test
 shape, not real duplication. `mutate4java --scan`: `Game.java` 73
 sites, `LegalEntity.java` 75 — both manifests refreshed, no functional
 changes needed on my side this cycle.
+
+## 2026-08-10T18:27:45Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 6fbab3965e
+```
+
+Summary: reviewed the dividend age-eligibility gate the specifier's
+real 8-player playtesting drove (a dividend firing on a pure money
+threshold with no age trigger — 1,184 dividends over 26,850 turns in
+one run). The fix gives `LegalEntity` ownership of last-capitalized-
+shareholder/age-eligibility state, wired through one narrow `Game`
+signal with no age-map exposure, matching the architect's stated
+boundary. Independently re-verified: domain clean, acceptance 556/556,
+run twice. No CRAP violations, no real DRY issues — first fully clean
+structural pass this task has had. Both manifests refreshed. The
+specifier's separate finding that the 3+ Greedo stalemate isn't
+actually guaranteed to resolve was explicitly descoped as an accepted
+characteristic, not something requiring a fix.
+
+## 2026-08-10T19:25:09Z — coder implements shareholder entity rent
+
+Removed the shareholder exemption from `Rent.collect(LegalEntity, ...)`;
+shareholders now pay the same double vacant rent as other tenants when
+landing on their entity's street, while mortgaged streets remain exempt.
+Updated the stale unit assertion to the accepted rule.
+
+Verification: domain tests 347/347 passing; full acceptance 557/557
+passing; `git diff --check` clean.
+
+## 2026-08-10T21:31:00+02:00 — refactorer reviews shareholder entity rent (95a5e1d0ab)
+
+Merged `95a5e1d0ab`. The change is a one-line rule removal in
+`Rent.collect(LegalEntity, ...)`: dropped the shareholder exemption so a
+shareholder now pays the same double vacant rent as any other tenant when
+landing on their own entity's street, matching entity-21. `crap4java` on
+`Rent.java`: highest is `colourStreetRent` at CC=5/CRAP=5.0, the touched
+`collect(LegalEntity, ...)` overload is CC=4/CRAP=4.0 — nothing near the
+threshold. `dry4java`: no duplicate candidates found. `mutate4java --scan`:
+10 sites, manifest refreshed (hash-only diff, no functional changes
+needed on my side). Domain tests 347/347, full acceptance 557/557, run
+twice for confidence.

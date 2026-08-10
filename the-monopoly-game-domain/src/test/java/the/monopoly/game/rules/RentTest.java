@@ -173,7 +173,7 @@ class RentTest {
   }
 
   @Test
-  void aShareholderPaysNoRentToTheirOwnEntity() {
+  void aShareholderPaysRentToTheirOwnEntity() {
     ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
     LegalEntity entity = LegalEntity.formed("Test Realty", street.colourGroup(), List.of(tenant, owner,
         playerWith("third")), rules);
@@ -181,8 +181,8 @@ class RentTest {
 
     rent().resolve(tenant, street, IRRELEVANT_ROLL);
 
-    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1500));
-    assertThat(entity.receivedRent()).isFalse();
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1492));
+    assertThat(entity.receivedRent()).isTrue();
   }
 
   @Test

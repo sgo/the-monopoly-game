@@ -37,7 +37,7 @@ public class Rent implements Landings {
   }
 
   private void collect(LegalEntity entity, Player tenant, ColourStreet land) {
-    if (entity.shareholders().contains(tenant) || deeds.isMortgaged(land)) return;
+    if (deeds.isMortgaged(land)) return;
     Money rent = land.vacantRent().plus(land.vacantRent());
     if (tenant.account().balance().amount().amount() >= rent.amount()) {
       tenant.account().withdraw(rent);
@@ -94,12 +94,12 @@ public class Rent implements Landings {
 
 /* mutate4java-manifest
 version=1
-moduleHash=1c0df230c8de7ee40339e1b8ddef579992e8cbaddd41c39adc13242a5c3fe810
+moduleHash=f0ed51864b4e7b4baa3e98f1a5954c3ea7261961a94c5f3898289d2eab8ad461
 scope.0.id=Y2xhc3M6UmVudCNSZW50OjE3
 scope.0.kind=class
 scope.0.startLine=17
 scope.0.endLine=93
-scope.0.semanticHash=394bf52fc04d15660cff8f93b4f6c27bf33705f2bfacf31e5d1172a7a8dc9df3
+scope.0.semanticHash=19923081477849d891a394016c1966954a9b0d3e7170e375d2aa2131aa7b206f
 scope.1.id=Y2xhc3M6UmVudC5FdmVudHMjRXZlbnRzOjkw
 scope.1.kind=class
 scope.1.startLine=90
@@ -134,7 +134,7 @@ scope.7.id=bWV0aG9kOlJlbnQjY29sbGVjdCgzKTozOQ
 scope.7.kind=method
 scope.7.startLine=39
 scope.7.endLine=47
-scope.7.semanticHash=2e40980aebbd4c6a35490c96b1b6271adfa8bce8ed1699bb2030eb946a8e8cfe
+scope.7.semanticHash=193436d664c5c5d974c8def99848a17133235103d180397ab1d539f69ba9ae84
 scope.8.id=bWV0aG9kOlJlbnQjY29sbGVjdCg0KTo0OQ
 scope.8.kind=method
 scope.8.startLine=49
