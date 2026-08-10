@@ -27213,6 +27213,32 @@ task: greedo-legal-entity
 commit: 03a9339063
 ```
 
+Summary: reviewed the wired shareholder-contribution fix that closed
+the architect's "vacuous payment ledger" rejection. `LegalEntity
+.operate(Deeds)` now funds house reinvestment from real, individually-
+capped equal shareholder contributions, aborting cleanly via a new
+`NoAction` result when the group can't collectively afford it. Fixed
+a CRAP regression the merge introduced (`operateLegalEntities` CC=7)
+via the usual guard-extraction pattern, not the sealed-switch
+exemption. Updated my own now-stale unit test for the new
+affordability check and added coverage for the `NoAction` branch.
+Domain clean, acceptance 548/550 — the specifier's four-player
+entity-7 fix genuinely stops the earlier crash, but the two examples
+still fail on a different assertion now (0 houses built, not a
+missing-pawn error). Reporting the precise current failure mode since
+it changed; not chasing it further myself as it's acceptance-wiring
+behavior, not structure.
+
+## 2026-08-10T12:49:29Z — architect isolates entity-7 acceptance fixture defect
+
+Received refactorer priority-00 handoff (commit `03a9339063`, task
+`greedo-legal-entity`), which includes coder commit `986a53cb2d`.
+
+Action: merged. The contribution ledger is now on the real production path:
+`LegalEntity.operate(Deeds)` withdraws actual equal shareholder
+contributions, records each payment, and builds only when the total house
+cost is affordable. No test-only game policy was introduced.
+
 Acceptance remains 548/550, both failures entity-7. Trace found the exact
 fixture cause: `World.formNamedEntity` queues each selected pawn's initiative
 roll and an unremarkable turn roll. Entity-7 later appends ship's requested
@@ -27221,7 +27247,6 @@ and ship never lands on the entity street. This is acceptance setup/queue
 semantics, not a domain or CLI behavior defect. Route priority-00 to specifier
 to make the explicit `will roll 12 for their turn` control the intended turn
 without changing canonical `Game.playTurn` behavior.
-
 
 ## 2026-08-10T14:54:00Z — specifier validates entity-7 landing, isolates missing handler
 
@@ -27249,59 +27274,15 @@ step). That is the same entity-7 negated assertion the architect routed
 to coder for payment-accounting/assertion behavior. Commits
 `f7e1913538` + `101584808a`; routing to coder with the precise handler.
 
-## 2026-08-10T12:53:50Z — specifier sends entity-7 fix + remaining handler to coder
+## 2026-08-10T12:53:50Z — coder processes specifier landing correction
 
-Sent coder priority-50 git_handoff (commit `7db21a2ad6`, task
-`greedo-legal-entity`). Carries the validated entity-7 landing fix
-(renter = racecar, placed 10-short so the prequeued roll lands on the
-entity street) and the precise remaining coder-owned work: implement
-the step handler for `And Pink Realty still owes pawn "dog" $<principal>`
-so entity-7 can assert the loan stays outstanding after rent is
-reinvested into building.
+Received specifier priority-50 handoff for `greedo-legal-entity`:
+`merge_and_process specifier 7db21a2ad6`.
 
-Summary: reviewed the wired shareholder-contribution fix that closed
-the architect's "vacuous payment ledger" rejection. `LegalEntity
-.operate(Deeds)` now funds house reinvestment from real, individually-
-capped equal shareholder contributions, aborting cleanly via a new
-`NoAction` result when the group can't collectively afford it. Fixed
-a CRAP regression the merge introduced (`operateLegalEntities` CC=7)
-via the usual guard-extraction pattern, not the sealed-switch
-exemption. Updated my own now-stale unit test for the new
-affordability check and added coverage for the `NoAction` branch.
-Domain clean, acceptance 548/550 — the specifier's four-player
-entity-7 fix genuinely stops the earlier crash, but the two examples
-still fail on a different assertion now (0 houses built, not a
-missing-pawn error). Reporting the precise current failure mode since
-it changed; not chasing it further myself as it's acceptance-wiring
-behavior, not structure.
-
-## 2026-08-10T12:23:41Z — coder forwards contribution implementation
-
-Sent priority-00 git handoff for `greedo-legal-entity` at commit
-`986a53cb2d` to the refactorer. It contains the production contribution
-path, affordability guard, and focused unit coverage.
-
-## 2026-08-10T12:42:09Z — architect rejects incomplete legal-entity economy path
-
-Received refactorer priority-50 handoff (commit `5685c98f67`, task
-`greedo-legal-entity`).
-
-Action: merged the refactorer's specs-core compile correction and focused
-coverage tests, resolving the log-only merge conflict while preserving both
-handoff records. I then verified the production flow and reran acceptance:
-548/550 scenarios pass; both entity-7 examples still leave the rented
-street with zero houses. The corrected four-player feature is present, so
-this is no longer a spec setup issue.
-
-The production scan also confirms the ledger is still unintegrated:
-`recordShareholderPayment` has no non-test caller, and `operate(Deeds)`
-calls `deeds.arrangeHouses` without charging any shareholder. Therefore the
-entity-12 payment ceiling remains vacuous. Route a priority-00 rejection to
-coder: make rent collection, shareholder contributions, affordability, the
-ledger, and house construction one real canonical `Game.playTurn` path; do
-not add a test-only turn policy or a test helper shortcut. The coder must
-run the full acceptance suite and return only once entity-7 passes and the
-payment ceiling represents actual withdrawals.
+Action: merged the specifier correction, preserving the feature as
+specifier-owned. Added the missing Pink Realty shareholder-loan assertion
+handler and verified the complete acceptance suite: 550 tests, 0 failures,
+0 errors. Domain tests are rerun before forwarding the completed task.
 
 ## 2026-08-10T12:44:00Z — coder receives architect economy rejection
 
@@ -27395,31 +27376,93 @@ movement setup so the tenant actually lands on the named entity street, while
 preserving the canonical game/CLI turn loop and the real shareholder-payment
 path. Send priority-00 follow-up to specifier with this narrowed evidence.
 
+## 2026-08-10T13:07:08Z — architect completes greedo legal-entity phase
 
-## 2026-08-10T15:01:00Z — specifier confirms entity-7 movement resolved; only handler remains
+Received refactorer priority-50 handoff (commit `9d2a062c86`, task
+`greedo-legal-entity`), carrying the specifier's entity-7 movement setup
+correction and the coder's missing loan assertion step.
 
-Received architect priority-00 handoff (commit `77740da259`, task
-`greedo-legal-entity`) routing entity-7 movement setup to specifier.
-Merged the refactorer's `World.java` change (removed the redundant
-`UNREMARKABLE` turn-roll from `formNamedEntity`; only logbook conflicted,
-resolved by reconstruction).
+Action: merged and independently verified. Entity-7 is 17/17 green, and the
+full acceptance reports contain no failures or errors (550/550). The final
+scenario positions selected `racecar` ten spaces before each named pink street,
+so the existing deterministic turn roll genuinely collects entity rent. The
+canonical production path—rent collection, real capped shareholder
+contributions, payment ledger, and house reinvestment—remains unchanged; no
+CLI or test-only turn policy was introduced. The refactorer has no remaining
+structural findings. Send phase-complete priority-50 to specifier.
 
-Re-ran acceptance: entity-7 now passes through landing/rent/build with
-no position or house errors. My placement fix holds under the new
-fixture: with `othersRollWhatTheyLike=true` (set by `formNamedEntity`),
-the renter's unqueued first-turn roll falls back to the prequeued
-`UNREMARKABLE` (10), which from the placed position lands it on the
-entity street (Diekirch@1, Bruul@3, racecar as the 4th selected pawn).
+## 2026-08-10T12:54:07Z — refactorer sent greedo-legal-entity handoff to architect
 
-The only remaining failure is the coder-owned missing step handler:
-`And Pink Realty still owes pawn "dog" $<principal>` (Unsupported step).
-This is now an isolated coder task; routed priority-00 to coder.
+Handoff message sent:
 
-## 2026-08-10T13:00:30Z — specifier sends isolated handler task to coder
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 6f3d49a710
+```
 
-Sent coder priority-50 git_handoff (commit `7f87462f79`, task
-`greedo-legal-entity`). The entity-7 movement setup is resolved; the
-coder's remaining task is to implement the step handler for
-`And Pink Realty still owes pawn "dog" $<principal>` (assert the loan
-stays outstanding after rent is reinvested into building) and confirm
-acceptance is green.
+Summary: confirmed the coder's roll-ordering fix (`69c6a865d9`) is
+real and narrows entity-7's remaining failure precisely: no crash, no
+timing race, just a roll of 12 not reaching either candidate pink
+street from Start. No domain code changed this cycle — only
+`World.formNamedEntity` dropped a redundant queued roll — so last
+cycle's structural review still stands. This is a die-value question
+for the specifier, not something to fix here. Also fixed a fourth
+instance of the recurring auto-merge placement bug, this one already
+present in my own prior commits from an earlier cycle rather than
+newly introduced by this merge.
+
+## 2026-08-10T13:30:00Z — refactorer confirms greedo-legal-entity is acceptance-clean
+
+Received coder priority-50 handoff (commit `9c5d101c57`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 9c5d101c57
+```
+
+Action: merged (ninth instance of the recurring logbook conflict,
+three hunks this time — resolved the same way as always, keeping my
+own verified content and threading the incoming branch's genuinely new
+entries in without duplicating what I already had). This carries the
+specifier's actual root-cause fix and the coder's completion: the
+specifier traced the fixture bug precisely — `World.formNamedEntity`
+prequeues every selected pawn an `UNREMARKABLE`=10 roll, and
+`Game.playUpToRounds` consumes each pawn's *first* queued roll as
+their *initiative* roll, not their turn roll, so a later explicit
+`will roll 12` queued entry was always shadowed by that prequeued 10
+landing as the turn roll instead. Rather than fight the queue, the
+specifier rewrote entity-7 to place the renter by explicit board
+position 10 spaces before the target street (so the deterministic
+prequeued 10 lands them there directly) and corrected the renter's
+identity from `ship` to `racecar` — with `we select 4 players`, the
+pool follows `Pawn.values()` order (`dog`, `high hat`, `iron box`,
+`racecar`), and `ship` was never actually selected at all, a second,
+independent bug hiding under the first. The coder added the one
+missing step handler this exposed (`Then Pink Realty still owes pawn
+"dog" $<principal>`, mirroring the existing `entityLoanFullyRepaid`
+lookup shape) and reported the full suite green.
+
+Independently re-verified rather than trusting that claim: domain
+clean, full acceptance **550/550**, run twice for confidence given
+this session's earlier transient-flake history —
+`EnRulesGreedoLegalEntityAcceptanceTest` itself at 17/17. No domain
+code changed this cycle (`Game.java`/`LegalEntity.java`/`Rent.java`
+are untouched since my last structural review, which still stands);
+the only production-adjacent change is the new `World.entityLoan`
+lookup, which duplicates `entityLoanFullyRepaid`'s find-or-throw shape
+at two call sites — matching this file's existing convention of many
+similar small per-entity lookups, not worth extracting.
+
+`greedo-legal-entity` is genuinely acceptance-clean for the first time
+across this whole multi-cycle task: legal-entity formation (3- and
+4/8-player), loan raise/repay with interest, dividends gated on a
+clear loan, rent-funded house reinvestment with equal capped
+shareholder contributions and a clean abort when unaffordable, and the
+now-fixed entity-7 reinvestment-before-loan-repayment scenario all
+pass together. No further structural work needed. Handing back to the
+architect with nothing outstanding on my side.
