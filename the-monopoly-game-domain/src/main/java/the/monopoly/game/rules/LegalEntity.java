@@ -24,6 +24,7 @@ public final class LegalEntity {
   private final Account bankAccount;
   private ColourStreet rentReceivedOn;
   private final Map<Player.ID, Money> shareholderPayments = new HashMap<>();
+  private final Map<Player.ID, Money> buildCommitments = new HashMap<>();
   private Player lastCapitalizedShareholder;
   private boolean lastCapitalizedShareholderGrewOlder;
   private boolean operated;
@@ -108,6 +109,10 @@ public final class LegalEntity {
     if (!shareholders.contains(shareholder)) throw new IllegalArgumentException("Not a shareholder.");
     shareholderPayments.merge(shareholder.id(), amount, Money::plus);
   }
+  public void commitToBuild(Player shareholder, Money amount) {
+    if (!shareholders.contains(shareholder)) throw new IllegalArgumentException("Not a shareholder.");
+    buildCommitments.put(shareholder.id(), amount);
+  }
   public Money shareholderPayment(Player shareholder) {
     return shareholderPayments.getOrDefault(shareholder.id(), Money.ZERO);
   }
@@ -163,7 +168,8 @@ public final class LegalEntity {
     List<ColourStreet> plan = new java.util.ArrayList<>();
     Money totalCost = Money.ZERO;
     boolean startedWithTreasuryFunds = bankBalance().amount() > 0;
-    boolean canReachHotels = bankBalance().equals(Money.ZERO) && loan.equals(Money.ZERO);
+    boolean canReachHotels = bankBalance().equals(Money.ZERO) && loan.equals(Money.ZERO)
+        && !buildCommitments.isEmpty();
     while (true) {
       ColourStreet next = cheapestBuildableStreet(deeds, plan, canReachHotels);
       if (next == null) break;
@@ -206,12 +212,11 @@ public final class LegalEntity {
     if (!loan.equals(Money.ZERO))
       return false;
     if (bankBalance().amount() > 0) return true;
-    if (shareholders.size() != 3
-        || shareholders.stream().anyMatch(it -> it.account().balance().amount().amount() > 500))
-      return false;
     List<Money> shares = sharesOf(shortfall);
     return java.util.stream.IntStream.range(0, shareholders.size()).allMatch(index ->
-        shareholders.get(index).account().balance().amount().amount() >= shares.get(index).amount());
+        shareholders.get(index).account().balance().amount().amount() >= shares.get(index).amount()
+            && buildCommitments.getOrDefault(shareholders.get(index).id(), Money.ZERO).amount()
+                >= shares.get(index).amount());
   }
 
   private Money borrowShortfall(Money shortfall) {
@@ -225,6 +230,7 @@ public final class LegalEntity {
       recordShareholderPayment(shareholder, share);
       if (!share.equals(Money.ZERO)) recordCapitalization(shareholder);
     }
+    buildCommitments.clear();
     return shortfall;
   }
 
@@ -262,8 +268,8 @@ public final class LegalEntity {
   }
 
   private Operation payDividend() {
-    Money dividend = new Money(50);
-    withdrawFromBank(new Money(150));
+    Money dividend = new Money(bankBalance().amount() / shareholders.size());
+    withdrawFromBank(new Money(dividend.amount() * shareholders.size()));
     shareholders.forEach(player -> player.account().deposit(dividend));
     lastCapitalizedShareholderGrewOlder = false;
     return new Operation.DividendPaid(dividend);

@@ -185,7 +185,7 @@ class LegalEntityTest {
     eligible.recordCapitalization(dog);
     eligible.shareholderGrewOlder(dog);
 
-    assertThat(eligible.operate(deeds)).isEqualTo(new LegalEntity.Operation.DividendPaid(new Money(50)));
+    assertThat(eligible.operate(deeds)).isEqualTo(new LegalEntity.Operation.DividendPaid(new Money(100)));
   }
 
   @Test
@@ -197,10 +197,26 @@ class LegalEntityTest {
     entity.recordCapitalization(dog);
     entity.shareholderGrewOlder(dog);
 
-    assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.DividendPaid(new Money(50)));
+    assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.DividendPaid(new Money(100)));
     entity.markOperated();
     assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.NoAction());
-    assertThat(entity.bankBalance()).isEqualTo(new Money(150));
+    assertThat(entity.bankBalance()).isEqualTo(Money.ZERO);
+  }
+
+  @Test
+  void aDividendKeepsAnIntegerRemainderInTheEntityBank() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.depositToBank(new Money(170));
+    entity.recordCapitalization(dog);
+    entity.shareholderGrewOlder(dog);
+
+    assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.DividendPaid(new Money(56)));
+    assertThat(entity.bankBalance()).isEqualTo(new Money(2));
+    assertThat(dog.account().balance().amount()).isEqualTo(new Money(56));
+    assertThat(highHat.account().balance().amount()).isEqualTo(new Money(56));
+    assertThat(ironBox.account().balance().amount()).isEqualTo(new Money(56));
   }
 
   @Test

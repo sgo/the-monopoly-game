@@ -28710,6 +28710,68 @@ threshold. `dry4java`: no duplicate candidates found. `mutate4java --scan`:
 needed on my side). Domain tests 347/347, full acceptance 557/557, run
 twice for confidence.
 
+## 2026-08-10T18:31:50Z — architect reviews entity-development refactorer return
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 9062c398ad
+```
+
+Action: merged the return for review but did not accept the development policy.
+`LegalEntity.canBorrowForBuilding` contains test-specific gates
+(`shareholders.size() == 3` and every balance `<= $500`) that merely recognise
+entity-22/23's examples, while a second hotel gate carries related special
+case policy. The domain has no specified concept of a shareholder authorizing
+or committing a group loan, so account balance alone cannot distinguish the
+new deliberately funded group from ordinary default-fund shareholders; the
+refactorer's own attempt to remove these constants exposed contradictions with
+older entity scenarios. The code also permits a treasury-positive shortfall
+loan without checking actual shareholder affordability before debiting it.
+Additionally, entity-11 can observe incidental shareholder rent during the
+round and then fail its fixed remaining-bank assertion. Returned these
+acceptance-content ambiguities to specifier; no test-threshold policy will be
+accepted as the production rule.
+
+## 2026-08-10T18:31:50Z — architect reviews group-commitment reconciliation
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 5daaf9caae
+```
+
+Action: merged `5daaf9caae`. Explicit per-shareholder group-build commitments
+resolve the prior test-threshold policy problem and provide the domain signal
+needed for deliberate group financing. The entity-11 treasury-drain revision
+leaves one acceptance-content ambiguity: incidental entity rent can produce,
+for example, a $170 treasury, which cannot be both emptied and divided equally
+among three integer-money shareholders. The phrase “remainder deterministically
+zero” does not define the recipient/allocation of a non-zero indivisible
+remainder. Returned that allocation rule to specifier rather than choosing a
+rounding beneficiary in production code; implementation remains blocked on
+this final criterion.
+
+## 2026-08-10T18:31:50Z — architect accepts shareholder-rent refactorer return
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 2434d69fe8
+```
+
+Action: merged and accepted `2434d69fe8`. The rent policy change is limited to
+removing the entity-shareholder exemption while preserving the mortgaged-street
+exemption; refactorer verification reports full acceptance 557/557 twice.
+This closes the earlier narrow shareholder-rent slice only. The superseding
+group-loan/development-ladder implementation remains outstanding with coder,
+so no phase-complete handoff was sent.
 ## 2026-08-10T21:31:26+02:00 — refactorer sent greedo-legal-entity handoff to architect
 
 Handoff message sent:
@@ -28749,6 +28811,16 @@ shareholder-affordability behavior remains bounded.
 
 Verification: domain tests 347/347 passing; full acceptance 562/562 passing;
 `git diff --check` clean.
+
+Handoff sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: 05f44c91c2
+```
 
 ## 2026-08-10T22:10:00+02:00 — refactorer reviews entity development ladder (05f44c91c2)
 
@@ -28831,3 +28903,37 @@ $150 dividend withdrawal vs. actual balance, interacting with incidental
 same-turn rent from an unconstrained shareholder's roll) — not fixed, since
 resolving it means a behavior decision outside refactorer's remit. Domain
 347/347, acceptance 562/562 run five times.
+
+## 2026-08-10T18:31:50Z — architect accepts floor-share dividend allocation
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier df84250c20
+```
+
+Action: merged `df84250c20`. Entity dividends now allocate the floor of the
+current treasury divided by three to every shareholder and retain the exact
+integer remainder in the entity bank ($150 -> $50/$0; $170 -> $56/$2).
+Together with explicit group-build commitments, this closes the acceptance
+content loops. Routed one consolidated coder correction: replace all
+three-shareholder/$500 threshold recognition with explicit commitment state,
+require real committed shareholder affordability before any debit, implement
+the full balanced house/hotel build plan, and apply the specified floor-share
+dividend/remainder transfer.
+
+## 2026-08-10T20:32:30Z — coder processes architect committed-financing follow-up
+
+Merged architect handoff `062f8c4ed5`. Replaced inferred shareholder balance
+thresholds with explicit per-shareholder build commitments, added the
+acceptance step adapter and world fixture, and implemented floor-share
+dividends with an integer remainder retained by the entity. Added focused unit
+coverage for the remainder case and updated the treasury-dividend expectation.
+
+Verification: domain tests 348/348 passing. Full acceptance reaches 563
+scenarios; 562 pass and entity-23 fails because its unconstrained default dog
+roll lands on the entity street, adding $20 rent before the expected $170
+dividend (actual dividend $58, remainder $2). This is the documented
+architect/specifier scenario ambiguity, not a production failure.
