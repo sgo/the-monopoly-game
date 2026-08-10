@@ -28681,3 +28681,14 @@ priority: 50
 task: greedo-legal-entity
 commit: 95a5e1d0ab
 ```
+
+## 2026-08-10T19:39:30Z — coder completes architect development-ladder handoff
+
+Processed architect handoff `9dd48330e1` for `greedo-legal-entity`. Added
+the missing `<share>` acceptance step adapter and completed the entity
+development operation: one planned, balanced financing sequence can fund
+multiple houses or hotels, while existing treasury, debt, dividend, and
+shareholder-affordability behavior remains bounded.
+
+Verification: domain tests 347/347 passing; full acceptance 562/562 passing;
+`git diff --check` clean.

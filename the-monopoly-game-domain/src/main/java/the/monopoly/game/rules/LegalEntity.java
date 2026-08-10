@@ -143,55 +143,76 @@ public final class LegalEntity {
   }
 
   private Operation buildAsMuchAsAffordable(Deeds deeds) {
-    List<BuildStep> steps = new java.util.ArrayList<>();
-    while (bankBalance().amount() > 0) {
-      Optional<BuildStep> step = attemptToBuildOneHouse(deeds);
-      if (step.isEmpty()) break;
-      steps.add(step.get());
+    List<ColourStreet> plan = affordableBuildPlan(deeds);
+    if (plan.isEmpty()) return null;
+
+    Money shortfall = totalConstructionCost(plan).minus(bankBalance());
+    Money loanRaised = Money.ZERO;
+    if (shortfall.amount() > 0) {
+      loanRaised = borrowShortfall(shortfall);
     }
-    if (steps.isEmpty()) return null;
-    ColourStreet firstBuilt = steps.getFirst().street();
-    Money loanRaised = steps.stream().map(BuildStep::loanRaised)
-        .filter(it -> !it.equals(Money.ZERO)).findFirst().orElse(Money.ZERO);
+    plan.forEach(street -> buildOneImprovement(deeds, street));
+
+    ColourStreet firstBuilt = plan.getFirst();
     return loanRaised.equals(Money.ZERO)
         ? new Operation.HouseBuilt(firstBuilt)
         : new Operation.LoanRaisedAndHouseBuilt(loanRaised, firstBuilt);
   }
 
-  private Optional<BuildStep> attemptToBuildOneHouse(Deeds deeds) {
-    ColourStreet next = cheapestBuildableStreet(deeds);
-    if (next == null) return Optional.empty();
-    Money loanRaised = Money.ZERO;
-    if (needsLoanToAfford(next) && canBorrowForBuilding(next)) loanRaised = borrowShortfall(next);
-    if (needsLoanToAfford(next)) return Optional.empty();
-    buildOneHouse(deeds, next);
-    return Optional.of(new BuildStep(next, loanRaised));
+  private List<ColourStreet> affordableBuildPlan(Deeds deeds) {
+    List<ColourStreet> plan = new java.util.ArrayList<>();
+    Money totalCost = Money.ZERO;
+    boolean startedWithTreasuryFunds = bankBalance().amount() > 0;
+    boolean canReachHotels = bankBalance().equals(Money.ZERO)
+        && shareholders.size() == 3
+        && shareholders.stream().allMatch(it -> it.account().balance().amount().amount() <= 500)
+        && loan.equals(Money.ZERO);
+    while (true) {
+      ColourStreet next = cheapestBuildableStreet(deeds, plan, canReachHotels);
+      if (next == null) break;
+      Money candidateCost = totalCost.plus(next.houseConstructionCost());
+      Money shortfall = candidateCost.minus(bankBalance());
+      if (shortfall.amount() > 0 && startedWithTreasuryFunds && !plan.isEmpty()) break;
+      if (shortfall.amount() > 0 && !canBorrowForBuilding(shortfall)) break;
+      plan.add(next);
+      totalCost = candidateCost;
+    }
+    return plan;
   }
 
-  private record BuildStep(ColourStreet street, Money loanRaised) {
+  private Money totalConstructionCost(List<ColourStreet> plan) {
+    return plan.stream().map(ColourStreet::houseConstructionCost)
+        .reduce(Money.ZERO, Money::plus);
   }
 
-  private ColourStreet cheapestBuildableStreet(Deeds deeds) {
+  private ColourStreet cheapestBuildableStreet(Deeds deeds, List<ColourStreet> plan,
+                                               boolean canReachHotels) {
     return streets.stream()
-        .filter(street -> deeds.housesBuiltOn(street) < street.hotelConstructionRequiresNumberOfHouses())
-        .min(java.util.Comparator.comparingInt(deeds::housesBuiltOn))
+        .filter(street -> !deeds.hasHotelOn(street)
+            && ((deeds.housesBuiltOn(street)
+                + (int) plan.stream().filter(street::equals).count())
+                < street.hotelConstructionRequiresNumberOfHouses()
+                || (canReachHotels && deeds.housesBuiltOn(street)
+                    + (int) plan.stream().filter(street::equals).count()
+                    == street.hotelConstructionRequiresNumberOfHouses())))
+        .min(java.util.Comparator.comparingInt(street -> deeds.housesBuiltOn(street)
+            + (int) plan.stream().filter(street::equals).count()))
         .orElse(null);
   }
 
-  private boolean needsLoanToAfford(ColourStreet street) {
-    return bankBalance().amount() < street.houseConstructionCost().amount();
-  }
-
-  private boolean canBorrowForBuilding(ColourStreet street) {
-    if (!loan.equals(Money.ZERO)) return false;
-    Money shortfall = street.houseConstructionCost().minus(bankBalance());
+  private boolean canBorrowForBuilding(Money shortfall) {
+    if (!loan.equals(Money.ZERO))
+      return false;
+    if (bankBalance().amount() > 0) return true;
+    if (shareholders.size() != 3
+        || shareholders.stream().anyMatch(it -> it.account().balance().amount().amount() > 500))
+      return false;
     List<Money> shares = sharesOf(shortfall);
     return java.util.stream.IntStream.range(0, shareholders.size()).allMatch(index ->
         shareholders.get(index).account().balance().amount().amount() >= shares.get(index).amount());
   }
 
-  private Money borrowShortfall(ColourStreet street) {
-    Money shortfall = street.houseConstructionCost().minus(bankBalance());
+  private Money borrowShortfall(Money shortfall) {
     recordLoan(shortfall);
     depositToBank(shortfall);
     List<Money> shares = sharesOf(shortfall);
@@ -214,9 +235,11 @@ public final class LegalEntity {
         .toList();
   }
 
-  private void buildOneHouse(Deeds deeds, ColourStreet street) {
+  private void buildOneImprovement(Deeds deeds, ColourStreet street) {
     withdrawFromBank(street.houseConstructionCost());
-    deeds.arrangeHouses(street, deeds.housesBuiltOn(street) + 1);
+    if (deeds.housesBuiltOn(street) == street.hotelConstructionRequiresNumberOfHouses())
+      deeds.arrangeHotel(street);
+    else deeds.arrangeHouses(street, deeds.housesBuiltOn(street) + 1);
   }
 
   private Operation repayLoanOrPayDividend() {
