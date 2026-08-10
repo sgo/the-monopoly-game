@@ -26484,3 +26484,23 @@ for-loop), not a `src/main/java` file this role's CRAP threshold
 tooling targets.
 
 No further role-owned changes needed. Handing back to the architect.
+
+## 2026-08-10T09:50:34Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: e2f6b9f830
+```
+
+Summary: confirmed, independently, that the coder's initiative-fixture
+fix genuinely resolves the OOM I reported last cycle — domain clean,
+acceptance 545/545 in ~31s, `EnRulesGreedoLegalEntityAcceptanceTest`
+back to its 12/12 baseline. The four-line diff (`formNamedEntity`
+queuing distinct deterministic initiative rolls ahead of the existing
+ordinary-turn roll) is minimal, correct, and idiomatic; no CRAP or DRY
+concerns from this change. No structural work needed on my side.
