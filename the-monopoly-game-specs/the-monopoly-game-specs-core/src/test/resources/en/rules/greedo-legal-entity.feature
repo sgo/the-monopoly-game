@@ -92,20 +92,18 @@ Feature: Greedo legal entity for a three-way colour-group split
       | 100       | 105       |
 
   # entity-7
-  Scenario Outline: the entity's rent is reinvested into further houses before the loan is repaid
+  Scenario Outline: the entity builds houses from rent at the end of the turn before repaying its loan
     Given we select 4 players
     And Pink Realty is formed
+    And Pink Realty's bank account holds $<rent>
     And Pink Realty owes pawn "dog" $<principal>
-    And pawn "<renter>" starts at position <renter_position>
-    And pawn "<renter>" will claim rent for "<renter_street>"
     When we play up to 1 round
-    Then the street "<renter_street>" has <houses_after> houses built
+    Then the pink colour group is developed up to at least <houses_at_least> houses
     And Pink Realty still owes pawn "dog" $<principal>
 
     Examples:
-      | principal | renter  | renter_position | renter_street          | houses_after |
-      | 200       | racecar | 1               | Rue de Diekirch Arlon  | 1            |
-      | 200       | racecar | 3               | Bruul Mechelen         | 1            |
+      | principal | rent | houses_at_least |
+      | 200       | 500  | 1               |
 
   # entity-8
   Scenario Outline: no dividend is paid while any shareholder loan to the entity is still outstanding
@@ -146,6 +144,66 @@ Feature: Greedo legal entity for a three-way colour-group split
     Examples:
       | loan | ceiling_share | total_houses |
       | 90   | 30            | 1            |
+
+  # entity-13
+  Scenario Outline: rent collected from a tenant is deposited into the entity's bank account
+    Given we select 4 players
+    And Pink Realty is formed
+    And pawn "<renter>" starts at position <renter_position>
+    And pawn "<renter>" will claim rent for "<renter_street>"
+    When pawn "<renter>" lands on "<renter_street>"
+    Then Pink Realty's bank account holds $<rent>
+    And pawn "<renter>" has paid $<rent> in rent
+
+    Examples:
+      | renter  | renter_position | renter_street          | rent |
+      | racecar | 3               | Bruul Mechelen         | 20   |
+
+  # entity-14
+  Scenario Outline: a raised loan is deposited into the entity's bank account
+    Given Pink Realty is formed
+    When Pink Realty raises a loan of $<loan>
+    Then Pink Realty's bank account holds $<loan>
+
+    Examples:
+      | loan |
+      | 150  |
+
+  # entity-15
+  Scenario Outline: the entity uses its rent before raising a loan to build
+    Given Pink Realty is formed
+    And Pink Realty's bank account holds $<rent>
+    When we play up to 1 round
+    Then Pink Realty raises no more than $<max_loan> in loans
+    And the pink colour group is developed up to at least <houses_at_least> houses
+
+    Examples:
+      | rent | max_loan | houses_at_least |
+      | 500  | 0        | 1               |
+
+  # entity-16
+  Scenario Outline: the entity builds as many houses as it can afford at the end of the turn
+    Given Pink Realty is formed
+    And Pink Realty's bank account holds $<rent>
+    When we play up to 1 round
+    Then the <street_1> and the <street_2> each have a house built
+    And the pink colour group is developed up to <total_houses> houses
+
+    Examples:
+      | rent | street_1              | street_2               | total_houses |
+      | 1000 | Rue de Diekirch Arlon | Bruul Mechelen          | 2            |
+
+  # entity-17
+  Scenario Outline: an entity with nothing to build, repay, or pay becomes idle instead of spinning
+    Given Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty's bank account is empty
+    When we play up to 1 round
+    Then Pink Realty issues no loan, repayment, or dividend
+
+    Examples:
+      | scenario |
+      | idle     |
 
   # entity-9
   Scenario Outline: the entity forms from exactly the three co-owners of a colour group even when the game has more than three players
