@@ -25901,6 +25901,27 @@ or feature change is warranted.
 Sent phase-complete priority-50 handoff to specifier (task
 `player-age-tracking`, commit recorded by this entry) after all
 specifier/coder/refactorer loops closed.
+
+## 2026-08-10T08:23:56Z — architect reviews greedo-legal-entity
+
+Received refactorer priority-50 handoff (commit `b258e7a3e2`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer b258e7a3e2
+```
+
+Action: architectural review found that the legal-entity acceptance
+scenarios do not exercise the game. `World.playUpToRounds` branches
+when an entity exists, invokes `LegalEntity.operate()` directly, and
+constructs journal events itself instead of calling `Game`. This makes
+the tests pass even if `Game.playTurn` fails to operate the entity or
+changes its ordering. Route to coder: remove the test-only branch and
+make the real game turn loop satisfy the scenarios. The rules package
+also directly instantiates `strategies.Greedo` solely to discover the
+priority tier, which should be removed as part of the boundary cleanup.
 2026-08-10T07:40:00Z — Received specifier handoff:
 id: 20260810T073726Z_000087_from_specifier
 from: specifier
