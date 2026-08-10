@@ -28231,3 +28231,31 @@ No CRAP violations anywhere in `LegalEntity.java` after this change.
 environmental flake already confirmed unrelated via an A/B worktree
 comparison earlier in this task; domain-scoped runs stayed clean
 throughout.
+
+## %s — specifier studies 8-player Greedo entity logs, flags abnormal activity
+
+Ran five 8-player Greedo games with --optional-greedo-stalemate-trading
+--optional-greedo-legal-entity against the merged treasury-shortfall build.
+
+Abnormal activity #1 — entity is a dividend machine, not age-gated.
+LegalEntity.repayLoanOrPayDividend pays a $50 dividend to each shareholder
+whenever bankBalance() >= 150, with no shareholder-age-increase trigger
+(agreed trigger: 'each time the last capitalized shareholder grows a year
+older'). Game.operateLegalEntities calls operate() every turn with no age
+gate. Quantified (run2): 26,850 turns, ages to 402 years, yet 1,184
+dividends fire (~once per 23 turns) purely on the money threshold.
+
+Abnormal activity #2 — the Greedo stalemate is NOT broken. 4 of 5 runs
+never terminate via stalemate-break; they grind to 240-514 player-years.
+The only ending run (run3) ended via bankruptcy, not the entity. The
+feature adds a dividend machine to a centuries-long grind instead of
+resolving the 3+ Greedo stalemate.
+
+Acceptance scenarios (entity-6/8/11) pass because they drive LegalEntity
+via the harness and check money/loan state, but do not exercise the missing
+age-trigger, so the bug ships unnoticed in the CLI path.
+
+Request: architect to investigate and decide whether this is a code fix
+(code fix: gate dividend on shareholder age-increase; also stalemate not
+breaking) or a specification gap.
+
