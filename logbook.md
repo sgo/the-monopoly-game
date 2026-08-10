@@ -28472,3 +28472,30 @@ priority: 00
 task: greedo-legal-entity
 commit: c15a12c813
 ```
+
+## 2026-08-10T18:17:27Z — coder processes zero-share capitalization correction
+
+Received architect priority-00 handoff:
+
+```
+id: 20260810T181727Z_000189_from_architect_to_coder
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: aba659c065
+created_at: 2026-08-10T18:17:27.310264Z
+enqueued_at: 2026-08-10T18:17:27.926032Z
+task: greedo-legal-entity
+dequeued_at: 2026-08-10T18:17:33.075803Z
+
+Re-read your role and constitution.
+
+merge_and_process architect aba659c065
+```
+
+Action: merged `aba659c065` and corrected shortfall funding so zero-value
+share allocations do not become the last-capitalized shareholder. Added a
+remainder-specific regression test; the focused LegalEntity tests pass 19/19.

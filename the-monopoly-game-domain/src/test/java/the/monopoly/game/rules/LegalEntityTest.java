@@ -227,6 +227,24 @@ class LegalEntityTest {
   }
 
   @Test
+  void zeroRemainderSharesDoNotBecomeTheLastCapitalizedShareholder() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    ColourStreet street = entity.streets().getFirst();
+    entity.depositToBank(new Money(99));
+    dog.account().deposit(new Money(10));
+    highHat.account().deposit(new Money(10));
+    ironBox.account().deposit(new Money(10));
+
+    assertThat(entity.operate(deeds))
+        .isEqualTo(new LegalEntity.Operation.LoanRaisedAndHouseBuilt(new Money(1), street));
+    assertThat(entity.lastCapitalizedShareholder()).isEqualTo(dog);
+    assertThat(entity.shareholderPayment(dog)).isEqualTo(new Money(1));
+    assertThat(entity.shareholderPayment(highHat)).isEqualTo(Money.ZERO);
+    assertThat(entity.shareholderPayment(ironBox)).isEqualTo(Money.ZERO);
+  }
+
+  @Test
   void recordsPaymentsMadeByShareholdersToTheEntity() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
