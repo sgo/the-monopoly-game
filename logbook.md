@@ -28279,3 +28279,21 @@ existing stalemate feature specifies the cash-threshold terminal condition,
 but no deterministic legal-entity/stalemate-resolution outcome for a 3+
 Greedo game. Returned both missing criteria to specifier rather than inventing
 policy in production code.
+
+## 2026-08-10T19:36:54+02:00 — architect reviews dividend age-gating criteria
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 091179f71b
+```
+
+Action: merged `091179f71b`. Entity-18/19 now define a deterministic dividend
+gate: no dividend before the last-capitalised shareholder's next age increase,
+then an equal dividend after that shareholder collects salary. The return does
+not add any Gherkin criterion for the separately reported 3+ Greedo
+legal-entity stalemate failure, so that portion remains unspecified. Returned
+the remaining stalemate acceptance-content gap to specifier; task is not
+advanced to implementation until the specifier loop closes.
