@@ -28972,3 +28972,31 @@ whether to fix it via a non-double roll total, an explicit second queued
 roll, or restructuring the scenario is a specification decision, not a
 structural refactor. Domain tests 348/348 clean. Acceptance 562/563 with
 this one reproducible failure; every other scenario passes.
+
+## 2026-08-10T22:42:43+02:00 — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 7dc2d645b1
+```
+
+Summary: reviewed the coder's committed-financing implementation, which
+correctly replaces the size==3/balance<=500 inference with real
+`buildCommitments` state and a floor-share dividend that drains the bank
+deterministically. Clean structural pass: all methods CRAP<=6, no DRY
+issues, 95 mutation sites, manifest refreshed, no functional changes
+needed. IMPORTANT: acceptance is not fully green — entity-11's new second
+example row (170/56/2) reproduces 6/6 runs, not intermittently. Root cause
+is deterministic, not incidental: "pawn dog will roll 12" can only resolve
+to a (6,6) roll under `World.rollTotalling`, and doubles grant dog an
+unscripted extra turn that lands on Pink Realty's own street, adding rent
+before the dividend fires. This needs the same specifier/architect
+attention as the original entity-11 flake, not a silent acceptance —
+whether to fix it via a different roll total, an explicit second queued
+roll, or scenario restructuring is a specification call outside refactorer
+scope. Domain 348/348 clean.
