@@ -28107,3 +28107,19 @@ rent remains in the treasury at turn end, contradicting the accepted
 end-of-turn build-from-rent-and-shortfall rule. Sent a priority-00
 acceptance-content reconciliation to specifier; no feature file was edited by
 architect.
+
+## 2026-08-10T17:22:27Z — architect receives entity-13 reconciliation
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 39364a552d
+```
+
+Action: merged `39364a552d`. The spec now prebuilds all Pink Realty streets
+in entity-13, isolating the asserted rent deposit from the separate
+end-of-turn investment rule. Full acceptance passes with no failures. Routed
+the merged treasury-shortfall correction for the required final refactorer
+review and hardening pass.
