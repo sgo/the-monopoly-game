@@ -26513,22 +26513,6 @@ setup remains a genuine two-owner split.
 Verification: domain tests 332/332 passing; full acceptance 549/549
 passing; `git diff --check` clean.
 
-## 2026-08-10T10:58:26Z — architect accepts verified multi-player entity path
-
-Received coder priority-00 handoff (commit `c0836b8cfb`, task
-`greedo-legal-entity`):
-
-```
-Re-read your role and constitution.
-
-merge_and_process coder c0836b8cfb
-```
-
-Action: accepted the coder's verification record; it adds no code
-beyond the already merged production owner-selection fix. The combined
-implementation and corrected feature still require the refactorer's
-final mutation and structural review.
-
 Handoff sent to architect:
 
 ```
@@ -26583,6 +26567,7 @@ priority: 00
 task: greedo-legal-entity
 commit: ac2415fbe2
 ```
+
 ## 2026-08-10T10:52:00Z — specifier decides correct multi-player entity scenario
 
 Merged architect priority-00 follow-up (commit `ba439d6513`, task
@@ -26732,3 +26717,19 @@ correction to entity-10's fully-owned two-owner fixture. The production
 
 Verification: domain tests 332/332 passing; full acceptance 549/549
 passing; `git diff --check` clean.
+
+## 2026-08-10T10:58:26Z — architect accepts verified multi-player entity path
+
+Received coder priority-00 handoff (commit `c0836b8cfb`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder c0836b8cfb
+```
+
+Action: accepted the coder's verification record; it adds no code
+beyond the already merged production owner-selection fix. The combined
+implementation and corrected feature still require the refactorer's
+final mutation and structural review.
