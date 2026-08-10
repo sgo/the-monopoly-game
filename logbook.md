@@ -28062,3 +28062,31 @@ domain green throughout, full acceptance 554/554 held steady across
 the dead-code removal, the `operate(Deeds)` decomposition, and each
 new test addition — nothing here changed observable behavior, only
 which code produces it and how well that code is covered.
+
+## 2026-08-10T15:24:47Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: 5e9bcb3b9b
+```
+
+Summary: reviewed the entity bank-account treasury redesign the
+specifier's playtesting drove (unbounded loan/dividend spam with no
+real cash behind it, rent money deposited nowhere). Found and removed
+genuinely dead code — the old no-arg `operate()`, its private helper,
+and two `Operation` record types with zero producers anywhere,
+confirmed by a whole-tree grep and cross-checked against test code
+too. My own two oldest unit tests turned out to be testing that dead
+method — the same vacuous-test shape the architect caught me on before,
+this time self-inflicted. Decomposed the resulting `operate(Deeds)`
+from CRAP 41.6 (CC=13) into six methods each ≤CC 5, fixed a stale test
+whose fixture passed for the wrong reason under the new model, and
+added direct coverage for the previously-untested repayment and
+dividend branches. Domain and acceptance both re-verified green
+throughout, 554/554 held steady across every change. No behavior
+changed, only structure and coverage.
