@@ -26673,3 +26673,27 @@ into the enclosing method's count either way). `mutate4java --scan`:
 both manifests refreshed. No other CRAP violations across either file.
 
 No further role-owned changes needed. Handing back to the architect.
+
+## 2026-08-10T11:01:56Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: e2e1e00c77
+```
+
+Summary: reviewed the multi-player (4/8-player) legal-entity support.
+Independently re-verified domain clean and acceptance 549/549
+(`EnRulesGreedoLegalEntityAcceptanceTest` 16/16), after one transient
+acceptance flake that two immediate retries didn't reproduce —
+treating it as the same known category as the documented
+Greedo-vs-Greedo real-dice runaway characteristic, not a regression
+from this change. One dedup: `Game.resolveLegalEntityAtStart`'s new
+shareholder-derivation lambda recomputed `LegalEntity`'s private
+`streetsOf` filter chain inline; made it public and reused it instead.
+No CRAP violations, mutation site counts down slightly on both files
+after the dedup. No further structural work needed.
