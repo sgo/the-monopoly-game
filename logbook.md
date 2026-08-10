@@ -26484,3 +26484,20 @@ for-loop), not a `src/main/java` file this role's CRAP threshold
 tooling targets.
 
 No further role-owned changes needed. Handing back to the architect.
+
+## 2026-08-10T09:51:35Z — architect closes greedo-legal-entity
+
+Received refactorer priority-00 handoff (commit `e2f6b9f830`, task
+`greedo-legal-entity`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer e2f6b9f830
+```
+
+Action: accepted final review. The deterministic distinct initiative
+rolls remove the former OOM while preserving the real canonical game
+turn path. Refactorer independently verified the legal-entity class
+12/12 and full acceptance 545/545. All coder/refactorer loops are
+closed; send the phase-complete priority-50 sync to specifier.
