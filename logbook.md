@@ -27526,3 +27526,37 @@ the entity can own one (owner keyed by entity name). Money flows:
 This makes rent land in a real treasury and debits loans/dividends from
 it, ending the free-money loop and grounding the cash circuit. Pending
 confirmation before routing to architect/coder.
+
+## 2026-08-10T16:00:00Z — specifier: correct entity build behaviour to end-of-turn scheduled building
+
+The previously-specified build behaviour — a legal entity only builds
+when a tenant lands on one of its streets and that street has zero
+houses (`LegalEntity.operate(Deeds)`, LegalEntity.java:115-137) — is
+**incorrect; it was not specified that way**. The correct model:
+
+### Entity build opportunity (end of every turn)
+At the **end of every turn**, **every existing legal entity gets an
+opportunity to build houses**. Funding sources, in order:
+1. rent already present in the entity's **bank account** (le-28);
+2. raising a **loan**, when needed and permitted.
+
+### Funding/build rules (as already agreed, le-20)
+- Build follows the **balanced build order** — lowest-level street
+  first, escalating toward hotels.
+- Loans are **capped per-share** at each member's personal building
+  ceiling; members do **not** top up a short partner's share.
+- **Cashflow priority (option 'a')**: build-next-available-first, then
+  repay loans, then pay dividends. Building is always preferred while a
+  buildable level remains.
+
+### Effect on the engine
+- Removes the rent-landing gating entirely: building is a scheduled
+  end-of-turn opportunity for all entities, not contingent on which
+  tenant happened to land.
+- Funded from the real treasury (bank account) and/or loans, closing
+  the free-money loop and grounding the entity economy.
+- Combined with the operate-loop fix, the stale stalemate spam should
+  stop: an entity that can neither build nor repay/pay becomes idle
+  (`NoAction`) instead of toggling loan-dividend forever.
+
+Awaiting confirmation before routing to architect/coder.
