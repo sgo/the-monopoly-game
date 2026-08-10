@@ -229,6 +229,42 @@ Feature: Greedo legal entity for a three-way colour-group split
       | scenario |
       | idle     |
 
+  # entity-18
+  Scenario Outline: no dividend is paid unless the last-capitalised shareholder grows a year older
+    Given Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has 4 houses built
+    And the street "Bruul Mechelen" has 4 houses built
+    And the street "Place Verte Verviers" has 4 houses built
+    And Pink Realty owes pawn "dog" $<principal>
+    And Pink Realty's loan has been fully repaid
+    And Pink Realty's bank account holds $<surplus>
+    And the last-capitalised shareholder of Pink Realty has not aged since funding a build
+    When we play up to 1 round
+    Then pawn "dog" receives no dividend from Pink Realty
+
+    Examples:
+      | principal | surplus |
+      | 0         | 150     |
+
+  # entity-19
+  Scenario Outline: the entity pays an equal dividend when the last-capitalised shareholder grows a year older
+    Given Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has 4 houses built
+    And the street "Bruul Mechelen" has 4 houses built
+    And the street "Place Verte Verviers" has 4 houses built
+    And Pink Realty owes pawn "dog" $<principal>
+    And Pink Realty's loan has been fully repaid
+    And Pink Realty's bank account holds $<surplus>
+    And the last-capitalised shareholder of Pink Realty is pawn "dog"
+    And pawn "dog" will roll 12 for their turn
+    When we play up to 1 round
+    Then pawn "dog" collects a salary and grows a year older
+    And each of pawn "dog", pawn "high hat", and pawn "iron box" receives a $<dividend_share> dividend from Pink Realty
+
+    Examples:
+      | principal | surplus | dividend_share |
+      | 0         | 150     | 50             |
+
   # entity-9
   Scenario Outline: the entity forms from exactly the three co-owners of a colour group even when the game has more than three players
     Given legal-entity trading is enabled for the "Greedo" strategy
