@@ -28088,3 +28088,13 @@ each shareholder's real balance, with exact per-share amounts recorded in the
 shareholder-payment ledger. Domain tests pass 343/343. Acceptance is 553/554;
 entity-13 still expects a $20 rent treasury to remain after the turn, while
 the settled end-of-turn rule permits borrowing/building after actual rent.
+
+Sent priority-00 handoff to architect:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: correct-entity-treasury-shortfall-loans
+commit: 92ab0c765b
+```
