@@ -247,7 +247,7 @@ Feature: Greedo legal entity for a three-way colour-group split
       | idle     |
 
   # entity-22
-  Scenario Outline: an entity with an empty bank but funded shareholders raises a loan and develops one house on every street
+  Scenario Outline: an entity with an empty bank but funded shareholders raises a loan and develops up to hotels when a loan can cover it
     Given we select 4 players
     And Pink Realty is formed
     And Pink Realty's bank account is empty
@@ -256,12 +256,34 @@ Feature: Greedo legal entity for a three-way colour-group split
     And pawn "dog" has a balance that allows only $<share> toward the entity
     When we play up to 1 round
     Then Pink Realty raises a loan of $<loan>
-    And the <street_1>, the <street_2>, and the <street_3> each have a house built
-    And the pink colour group is developed up to <total_houses> houses
+    And the street "<street_1>" has <houses_per_street> houses built
+    And the street "<street_2>" has <houses_per_street> houses built
+    And the street "<street_3>" has <houses_per_street> houses built
 
     Examples:
-      | loan | street_1              | street_2       | street_3              | total_houses | share |
-      | 300  | Rue de Diekirch Arlon | Bruul Mechelen | Place Verte Verviers  | 3            | 100   |
+      | loan | street_1              | street_2       | street_3              | houses_per_street | share |
+      | 300  | Rue de Diekirch Arlon | Bruul Mechelen | Place Verte Verviers  | 1                 | 100   |
+      | 600  | Rue de Diekirch Arlon | Bruul Mechelen | Place Verte Verviers  | 2                 | 200   |
+      | 900  | Rue de Diekirch Arlon | Bruul Mechelen | Place Verte Verviers  | 3                 | 300   |
+      | 1200 | Rue de Diekirch Arlon | Bruul Mechelen | Place Verte Verviers  | 4                 | 400   |
+
+  # entity-23
+  Scenario Outline: an entity builds a hotel on every street when a loan can cover the hotels
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account is empty
+    And pawn "high hat" has a balance that allows only $<share> toward the entity
+    And pawn "iron box" has a balance that allows only $<share> toward the entity
+    And pawn "dog" has a balance that allows only $<share> toward the entity
+    When we play up to 1 round
+    Then Pink Realty raises a loan of $<loan>
+    And the street "<street_1>" has a hotel built
+    And the street "<street_2>" has a hotel built
+    And the street "<street_3>" has a hotel built
+
+    Examples:
+      | loan | street_1              | street_2       | street_3              | share |
+      | 1500 | Rue de Diekirch Arlon | Bruul Mechelen | Place Verte Verviers  | 500   |
 
   # entity-18
   Scenario Outline: no dividend is paid unless the last-capitalised shareholder grows a year older
