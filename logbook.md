@@ -28709,3 +28709,20 @@ threshold. `dry4java`: no duplicate candidates found. `mutate4java --scan`:
 10 sites, manifest refreshed (hash-only diff, no functional changes
 needed on my side). Domain tests 347/347, full acceptance 557/557, run
 twice for confidence.
+
+## 2026-08-10T18:31:50Z — architect accepts shareholder-rent refactorer return
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 2434d69fe8
+```
+
+Action: merged and accepted `2434d69fe8`. The rent policy change is limited to
+removing the entity-shareholder exemption while preserving the mortgaged-street
+exemption; refactorer verification reports full acceptance 557/557 twice.
+This closes the earlier narrow shareholder-rent slice only. The superseding
+group-loan/development-ladder implementation remains outstanding with coder,
+so no phase-complete handoff was sent.
