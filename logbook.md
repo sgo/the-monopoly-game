@@ -27477,6 +27477,57 @@ legal-entity loan/repayment/dividend scenarios to set treasury funds and
 prebuilt streets consistent with build-before-repay-before-dividend. These are
 parallel, non-overlapping corrections; neither reopens the treasury design.
 
+## 2026-08-10T14:51:45Z — architect rejects incomplete treasury narration update
+
+Received specifier priority-00 handoff (commit `0ad9b80a06`, task
+`greedo-legal-entity`).
+
+Action: merged and reviewed. The update correctly prebuilds and funds the
+loan-repayment and dividend narration cases in journal, report, and logging.
+It does not update the paired loan-raised cases, which still require an
+automatic $150 loan from an empty, buildable-free treasury—the behavior the
+settled scheduled economy explicitly removes. Do not forward this partial
+fixture set to coder. Route priority-00 back to specifier to make the
+loan-raised narration scenarios exercise a permitted build shortfall (with
+the required ceiling/preconditions) or otherwise revise their expected
+behavior consistently; return one complete narration fixture update.
+
+## 2026-08-10T14:55:55Z — architect holds final treasury review for combined return
+
+Received coder priority-00 handoff (commit `69e97552ac`, task
+`greedo-legal-entity`).
+
+Action: merged. The coder removed the obsolete rent-gated operation branches,
+added the exact total-house assertion, and now transfers repayment and equal
+dividend cash from treasury to the shareholders' real accounts. The remaining
+production item is the already-settled loan-shortfall path: when treasury
+cannot fund the next balanced build, the entity must raise only the permitted
+per-share shortfall before considering repayment/dividend.
+
+Do not issue another partial coder review. The specifier has been asked for
+the matching loan-raised narration fixtures. Once that complete feature input
+returns, route one combined final implementation handoff to coder covering
+the shortfall loan and full acceptance, then send the resulting change to
+refactorer for structural review.
+
+## 2026-08-10T14:57:16Z — architect sends combined final treasury implementation
+
+Received specifier priority-00 handoff (commit `0c19c2a78c`, task
+`greedo-legal-entity`).
+
+Action: merged. All three narration feature suites now consistently describe
+a $50 treasury balance and $50 permitted loan shortfall to fund the next $100
+pink-house build. This completes the specifier-owned fixture work.
+
+Route one final priority-00 implementation handoff to coder: add the
+per-share-permitted $50 shortfall loan to the scheduled balanced build path,
+using the registered entity account and existing journal operation; retain
+the already-correct repayment/dividend account transfers and no-legacy-idle
+behavior. Run full acceptance (including journal, report, logging and
+legal-entity scenarios) and return the integrated production result for
+refactorer review. No further incremental architect review is expected unless
+the result introduces a genuinely new defect.
+
 ## 2026-08-10T14:26:50Z — architect escalates entity-6 treasury precondition
 
 Received coder priority-00 handoff (commit `63e7e6e317`, task
