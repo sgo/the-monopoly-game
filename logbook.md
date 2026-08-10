@@ -27510,6 +27510,24 @@ returns, route one combined final implementation handoff to coder covering
 the shortfall loan and full acceptance, then send the resulting change to
 refactorer for structural review.
 
+## 2026-08-10T14:57:16Z — architect sends combined final treasury implementation
+
+Received specifier priority-00 handoff (commit `0c19c2a78c`, task
+`greedo-legal-entity`).
+
+Action: merged. All three narration feature suites now consistently describe
+a $50 treasury balance and $50 permitted loan shortfall to fund the next $100
+pink-house build. This completes the specifier-owned fixture work.
+
+Route one final priority-00 implementation handoff to coder: add the
+per-share-permitted $50 shortfall loan to the scheduled balanced build path,
+using the registered entity account and existing journal operation; retain
+the already-correct repayment/dividend account transfers and no-legacy-idle
+behavior. Run full acceptance (including journal, report, logging and
+legal-entity scenarios) and return the integrated production result for
+refactorer review. No further incremental architect review is expected unless
+the result introduces a genuinely new defect.
+
 ## 2026-08-10T14:26:50Z — architect escalates entity-6 treasury precondition
 
 Received coder priority-00 handoff (commit `63e7e6e317`, task
