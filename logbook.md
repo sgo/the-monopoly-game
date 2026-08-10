@@ -28692,3 +28692,13 @@ shareholder-affordability behavior remains bounded.
 
 Verification: domain tests 347/347 passing; full acceptance 562/562 passing;
 `git diff --check` clean.
+
+Handoff sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: 05f44c91c2
+```
