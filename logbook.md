@@ -29171,3 +29171,19 @@ the normal hotel/houses/monopoly ladder. The scenarios consistently require the
 entity to apply that same developed ladder, so this is a production rule defect,
 not an acceptance harness workaround. Routing the observable behavior change to
 the coder.
+
+## 2026-08-11T07:15:10Z — architect routes entity-developed-rent correction
+
+Sent coder priority-00 handoff:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: 4c4e5d2838
+```
+
+Summary: accepted specification correction requiring entity-owned developed
+streets to charge the normal developed-rent ladder; coder owns the `Rent`
+production change and verification.
