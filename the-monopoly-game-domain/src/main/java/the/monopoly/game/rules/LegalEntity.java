@@ -9,6 +9,7 @@ import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public final class LegalEntity {
                       List<ColourStreet> streets, Bank bank) {
     this.name = name;
     this.colour = colour;
-    this.shareholders = List.copyOf(shareholders);
+    this.shareholders = new ArrayList<>(shareholders);
     this.streets = List.copyOf(streets);
     Account.Owner owner = new Account.Owner(name);
     bank.createAccountFor(owner);
@@ -88,9 +89,30 @@ public final class LegalEntity {
 
   public String name() { return name; }
   public Street.Colour colour() { return colour; }
-  public List<Player> shareholders() { return shareholders; }
+  public List<Player> shareholders() { return List.copyOf(shareholders); }
   public List<ColourStreet> streets() { return streets; }
-  public double shareOf(Player shareholder) { return shareholders.contains(shareholder) ? 1.0 / shareholders.size() : 0.0; }
+  public double shareOf(Player shareholder) {
+    return shareholders.stream().filter(shareholder::equals).count() / (double) shareholders.size();
+  }
+
+  /** The value of one share, based on the maximum developed rent of every entity street. */
+  public Money shareValue() {
+    int total = streets.stream().mapToInt(street -> street.rentForOneHotel().amount()).sum();
+    return new Money(total / shareholders.size());
+  }
+
+  /** Transfers exactly one share from a distressed shareholder to a fellow shareholder. */
+  public void sellShare(Player seller, Player buyer, Money price) {
+    int share = shareholders.indexOf(seller);
+    if (share < 0 || !shareholders.contains(buyer)) throw new IllegalArgumentException("Share sale requires two shareholders.");
+    seller.account().deposit(price);
+    buyer.account().withdraw(price);
+    shareholders.set(share, buyer);
+  }
+
+  public void removeShares(Player shareholder) {
+    shareholders.removeIf(shareholder::equals);
+  }
 
   public Money loan() { return loan; }
   public Money bankBalance() { return bankAccount.balance().amount(); }

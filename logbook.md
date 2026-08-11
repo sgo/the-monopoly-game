@@ -29145,6 +29145,485 @@ Removed DRY-reported duplicate test setup. Verification: full acceptance
 DRY clean; soft legal-entity Gherkin mutation 71 killed/28 survived/0 errors;
 property tests 22/22.
 
+## 2026-08-11T09:28:00Z — coder verifies resolved share-sale policy
+
+Processed architect handoff `fe0fe960c5`. Aligned share auctions with the
+resolved policy: fellow shareholders bid up to 35% of their own balance, the
+highest bidder wins, and the winner pays the runner-up ceiling plus $5.
+Updated explicit share assertions and acceptance captures.
+
+Verification: domain tests 350/350; full acceptance 570/570; diff check clean.
+
+## 2026-08-11T08:56:00Z — coder reviews corrected share-sale triggers
+
+Processed architect handoff `d5fe0e219b`. Added share-auction bid ceilings,
+$5 competition pricing, journal/report coverage, and removal of a bankrupt
+holder's entity shares. Domain tests pass 350/350. Full acceptance reaches
+567/570; all existing features pass. Remaining failures are specification
+contradictions: Iron Box necessarily retains its original Pink share after
+Dog sells one share to High Hat, and share-sale-5 row 3 expects $560 despite
+the stated max($800 share value, 35% of $1600) ceiling being $800.
+
+## 2026-08-11T08:45:00Z — coder implements legal-entity share liquidation
+
+Processed architect handoff `fc1b8ed392`. Implemented three-share entity
+ownership with one-share transfer, maximum-developed-rent valuation, and
+Greedo-only fellow-shareholder bidding after personal liquidation. Added the
+acceptance assertions and ownership vocabulary.
+
+Domain verification: 350/350 passing. Existing acceptance scenarios pass. The
+new feature exposes a fixture mismatch: official Extra Belasting is $100, so a
+pawn given exactly $100 is solvent at zero and cannot sell a share or become
+bankrupt. Sent architect note for commit `1ca987e` requesting corrected debt
+or balance values.
+
+## 2026-08-11T08:45:00Z — coder implements legal-entity share liquidation
+
+Processed architect handoff `fc1b8ed392`. Implemented three-share entity
+ownership with one-share transfer, valuation at one-third of the entity
+streets' maximum developed rents, and Greedo-only fellow-shareholder bidding
+after personal liquidation and mortgages. Added acceptance assertions for
+share ownership and the missing ownership vocabulary.
+
+Domain verification: 350/350 passing. Acceptance compilation and all existing
+features pass; the new feature exposed a specification fixture mismatch: the
+official Extra Belasting tax is $100, so a pawn holding exactly $100 is not in
+distress and cannot sell a share or become bankrupt. The share-sale scenarios
+therefore remain red until the architect/specifier resolves the stated
+balances or tax-debt setup.
+
+## 2026-08-11T07:41:57Z — architect sends phase-complete developed-rent sync
+
+Sent specifier priority-50 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-legal-entity
+commit: 98b9c40cb3
+```
+
+Summary: phase complete after acceptance of developed entity rent, including
+the final architectural test-fixture cleanup and verification record.
+
+## 2026-08-11T08:31:21Z — architect reviews legal-entity share-sale specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier c7e9251
+
+New specification: selling legal-entity shares to avoid bankruptcy.
+
+WHY: Entity streets are moved out of the shareholder's personal ownership into
+the entity, so they cannot be liquidated when the shareholder faces bankruptcy.
+There is currently no share-sale path, so an entity shareholder has no way to
+convert their entity stake into cash to avoid going under.
+
+DECIDED SEMANTICS (user-confirmed):
+- Exactly 3 shares per entity, 1 per shareholder (share-splitting/bundling not
+  yet implemented this round; a shareholder could later hold 2 or 3).
+- Share value = (entity total developed value) / 3 x shares held.
+  Entity developed value mirrors the board-valuation convention the user pointed
+  to, Stalemate.threshold(Rule.Set): the sum of the entity streets' MAXIMUM
+  developed rent. Worked example: pink group with hotels rents 750+750+900 =
+  2400, so one (1/3) share = 800.
+- Legal-entity shares are NOT publicly tradeable. Only the OTHER shareholders of
+  that same entity may bid on a share.
+- Bidding follows the same rules as other distressed assets (minimum bid,
+  ascending auction).
+- A distress seller values their share, compares it to the shortfall, and must
+  exhaust cheaper sellable personal assets BEFORE offering their share.
+
+WHAT I COMMITTED (spec-only): greedo-share-sale.feature (4 Scenario Outlines)
++ acceptance/pipeline-features.txt registration. Scenarios:
+  1. distress -> offers share to fellow shareholder instead of bankrupting
+  2. share value covers the tax debt so the shareholder avoids bankruptcy
+  3. a cheaper personal asset is sold before the share
+  4. no willing fellow shareholder -> share stays with entity, seller bankrupts
+
+SCOPING NOTE: The scenarios use some step verbs that do NOT exist yet in the
+harness (share holding/sale assertions). Coder-domain work and harness steps are
+pending. Feature is parse-valid but not yet executable.
+
+REQUEST: route to coder. Implementation expected (proposal):
+- LegalEntity: value of a share (sum streets' max developed rent / shares total
+  x sharesHeld), and a share-sale/transfer of equity between shareholders.
+- DistressedSale/Liquidation: include a shareholder's entity share as a
+  sellable candidate, valued as above, ordered after cheaper personal assets,
+  biddable only by fellow shareholders.
+- Harness steps for the new assertions in the feature.
+Please review and decide whether this goes to the coder or needs rework.
+```
+
+Action: merged `c7e9251` and reviewed the new boundary. The valuation and
+bidder restrictions are coherent, but `share-sale-3` is contradictory: its
+title requires Dog to sell the cheaper personal asset before offering a share,
+while its assertion says Dog still owns `Rue Grande Dinant`. Returned this
+Gherkin-content ambiguity to the specifier; production implementation must not
+choose between mutually exclusive outcomes.
+
+## 2026-08-11T08:32:26Z — architect returns share-sale scenario contradiction
+
+Sent specifier priority-00 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: be2a4cb467
+```
+
+Summary: `share-sale-3` must resolve whether the cheaper personal asset is sold
+or retained before the share-sale production work can safely begin.
+
+## 2026-08-11T08:32:46Z — architect accepts corrected share-sale scenario
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 936bf69
+
+Response to your escalation (be2a4cb467) of the share-sale-3 contradiction.
+
+You were right: the scenario was internally inconsistent. Title required the
+debtor to sell the cheaper personal asset (Rue Grande Dinant) before offering a
+legal-entity share, yet the assertion kept "dog owns Rue Grande Dinant".
+
+FIX (936bf69): share-sale-3 now asserts the consistent outcome:
+  - pawn "dog" no longer owns "Rue Grande Dinant"        (sold it)
+  - pawn "high hat" owns "Rue Grande Dinant"             (the fellow buyer)
+  - pawn "dog" still holds a share of Pink Realty         (share NOT sold first)
+  - pawn "dog" is not bankrupt
+
+This encodes the ruled order: cheaper personal assets are liquidated first; the
+entity share is retained because the asset sale covered the shortfall. Dog has
+$10 and lands on Extra Belasting; Rue Grande Dinant (brown, price $60) is the
+cheaper liquidatable asset, consistent with it being sold before the share.
+
+The other share-sale scenarios (1/2/4) are unchanged. Feature re-parses cleanly.
+Please re-review and, if consistent, route to the coder for implementation
+(LegalEntity share valuation/sale, DistressedSale/Liquidation share handling,
+and the harness steps noted previously).
+```
+
+Action: merged `936bf69` and accepted the correction. `share-sale-3` now
+unambiguously requires the cheaper personal asset to transfer first, preserves
+the debtor's entity share, and avoids bankruptcy; it is consistent with the
+specified liquidation order. Routing the observable share-sale behavior to the
+coder.
+
+## 2026-08-11T08:33:47Z — architect routes legal-entity share sale
+
+Sent coder priority-00 handoff:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: fc1b8ed392
+```
+
+Summary: accepted legal-entity share valuation, restricted fellow-shareholder
+auction, ordered distressed liquidation, and the associated acceptance-harness
+behavior for implementation.
+
+## 2026-08-11T08:44:35Z — architect verifies share-sale distress trigger
+
+Received coder priority-00 note:
+
+```
+Re-read your role and constitution.
+
+Share sale is in 1ca987e; $100 tax leaves Dog solvent at $0 when given $100.
+```
+
+Action: inspected the named commit and the current tax rule. Luxury Tax is a
+fixed $100, so `share-sale-1` and `share-sale-2` give Dog exactly enough cash
+to pay it and produce no shortfall; no bankruptcy liquidation or share auction
+can validly occur. Returned this acceptance-example defect to the specifier.
+
+## 2026-08-11T08:48:38Z — architect returns share-sale distress examples
+
+Sent specifier priority-00 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: e0ca33e1d4
+```
+
+Summary: `share-sale-1` and `share-sale-2` must give Dog less than the $100
+Luxury Tax to create the required distress trigger before share liquidation can
+be implemented or accepted.
+
+## 2026-08-11T08:45:01Z — architect rechecks consolidated share-sale specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier d5949b6
+
+Updated legal-entity share-sale specification (supersedes the earlier c7e9251
+handoff). The prioritising commit is d5949b6; it carries all prior share-sale
+content. Diff from c7e9251 to d5949b6:
+  - 936bf69  fix share-sale-3 contradiction (per your be2a4cb467 escalation)
+  - b94377a  add share-sale-5 bid-ceiling scenario
+  - c5dc652  add share-sale-5 example (35% exceeds share value)
+  - d5949b6  add share-sale-5 example (seller accepts highest 35% below value)
+
+FULL DECIDED SEMANTICS (user-confirmed):
+- Exactly 3 shares per entity, 1 per shareholder (no splitting/bundling this
+  round; a shareholder could later hold 2 or 3).
+- Share value = (sum of the entity's streets' maximum developed rent, mirroring
+  Stalemate.threshold) / 3 x shares held. Pink group with hotels = 750+750+900
+  = 2400, so one share = 800.
+- Legal-entity shares are NOT publicly tradeable. Only the OTHER shareholders
+  of that entity may bid.
+- Bid ceiling: a fellow shareholder bids up to max(share's total value, 35% of
+  their own bank balance) -- the higher of the two. Bids ascend incrementally
+  (+5, matching DistressedSale.bidRound) so the winner pays the lowest price.
+- If no fellow shareholder will bid, the share stays with the entity and the
+  seller goes bankrupt.
+- Distress seller must exhaust cheaper sellable personal assets BEFORE offering
+  the share.
+- If neither bidder's ceiling reaches the share value and the seller has no
+  other way to settle the debt, the seller accepts the highest offer the
+  bidders can make (the highest 35% ceiling, still below share value).
+
+share-sale-5 examples encode the bid matrix:
+  row1 high_hat=1200, iron_box=900  -> share value caps both -> win 800
+  row2 high_hat=3000, iron_box=2600 -> 35% (1050/910) exceeds 800, higher wins -> 915 (910+5)
+  row3 high_hat=1600, iron_box=1500 -> 35% (560/525) below 800, seller accepts highest -> 560
+
+SCOPING NOTE (unchanged): feature parses but the harness steps (share holding /
+sale / winning-bid assertions) and the field steps ("owns no mortgaged
+property", the share-bid strategy) do not yet exist. Coder-domain work: share
+valuation on LegalEntity, a share-sale/equity-transfer between shareholders,
+DistressedSale/Liquidation candidate + bidder-pool handling for shares, and the
+bid-ceiling strategy.
+
+REQUEST: review and route to the coder.
+```
+
+Action: merged `d5949b6` and rechecked the consolidated feature. The new
+bid-ceiling rows as well as `share-sale-1`, `share-sale-2`, and `share-sale-4`
+still give Dog exactly $100, equal to the fixed $100 Luxury Tax; none produces
+a distress shortfall. Returned the unresolved scenario-data defect to the
+specifier rather than accepting a bypass of normal bankruptcy triggering.
+
+## 2026-08-11T08:49:52Z — architect returns consolidated share-sale examples
+
+Sent specifier priority-00 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: d7728c6d41
+```
+
+Summary: all scenarios intended to auction a share must reduce Dog's starting
+cash below the $100 Luxury Tax; the new bid-ceiling rows inherit the same
+missing distress trigger.
+
+## 2026-08-11T08:49:37Z — architect accepts corrected share-sale triggers
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 6cbec89
+
+Response to your escalation (e0ca33e1d4, echoed by the coder note): the
+share-sale examples gave Dog exactly $100 while Luxury Tax is a fixed $100, so
+no shortfall arose and no liquidation/share auction could trigger.
+
+FIX (6cbec89): set dog_balance to $40 in share-sale-1/2/4/5, so Dog is $60 in
+debt after landing on Extra Belasting (tax $100, Street.java:61) - a genuine
+shortfall that fires the distress liquidation and share-auction path.
+share-sale-3 keeps $10 (smaller shortfall, covered by the cheaper Rue Grande
+asset the scenario sells first).
+
+All other semantics are unchanged (share valuation per Stalemate threshold,
+fellow-shareholder-only bidding, max(shareValue, 35% bank) bid ceiling,
+ascending +5 increment, cheaper-assets-first, seller-accepts-highest-offer
+fallback). Feature re-parses cleanly.
+
+Please re-review and, if consistent, route to the coder for implementation
+(LegalEntity share valuation/sale, DistressedSale/Liquidation share handling,
+bid-ceiling strategy, and harness steps).
+```
+
+Action: merged and accepted `6cbec89`. All share-auction examples now create a
+real $60 shortfall under the fixed $100 Luxury Tax; `share-sale-3` remains the
+cheaper-asset-first case with its own smaller shortfall. The full specified
+share-sale implementation is coherent and is routed to the coder.
+
+## 2026-08-11T08:50:58Z — architect routes corrected share-sale implementation
+
+Sent coder priority-00 handoff:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: d5fe0e219b
+```
+
+Summary: accepted the triggered share-sale scenarios and their valuation,
+restricted bidding, auction-ceiling, fallback, liquidation-order, and harness
+requirements for coder implementation.
+
+## 2026-08-11T08:54:08Z — architect confirms corrected share-sale state
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 6cbec89
+
+Re: your re-escalation d7728c6d41.
+
+The re-escalation reviewed d5949b6, the consolidated spec BEFORE the shortfall
+fix. The issue it flags (share-sale-1/2/4/5 giving Dog exactly $100, equal to
+the fixed $100 Luxury Tax, so no distress shortfall) is already resolved at HEAD
+by 6cbec89, delivered to you as handoff 000134.
+
+Verify by reading the feature at 6cbec89:
+- share-sale-1  dog_balance = 40
+- share-sale-2  dog_balance = 40
+- share-sale-4  dog_balance = 40
+- share-sale-5  all three examples use dog_balance = 40
+  (Dog is $60 short after the $100 Luxury Tax -> genuine distress trigger.)
+- share-sale-3  dog_balance = 10 (smaller shortfall, covered by the cheaper Rue
+  Grande asset sold first)
+
+No new defect. Please re-review against 6cbec89 and, if consistent, route to
+the coder for implementation (LegalEntity share valuation/sale,
+DistressedSale/Liquidation share handling, bid-ceiling strategy, harness steps).
+```
+
+Action: verified `6cbec89` is already an ancestor of architect `HEAD` and all
+five share-auction rows have the corrected $40 trigger (with the personal-asset
+case at $10). The identical implementation handoff was already sent to the
+coder, so no duplicate forwarding was warranted.
+
+## 2026-08-11T08:57:06Z — architect verifies returned share-sale implementation
+
+Received coder priority-00 note:
+
+```
+Re-read your role and constitution.
+
+b6931f5: 350/350 domain; 567/570 acceptance; two spec contradictions remain.
+```
+
+Action: merged and reviewed `b6931f5`, then independently ran the full
+acceptance suite (567/570). The two failing share-sale examples are
+specification-content conflicts:
+
+1. `share-sale-1` requires both Iron Box and Ship not to hold Pink Realty
+shares after Dog sells one. Iron Box is a founding shareholder of the
+three-share entity and must retain its original share; only Dog's share moves
+to High Hat.
+
+2. `share-sale-5` defines a bid ceiling as
+`max(share value, 35% of bank balance)`, which always reaches at least the $800
+share value. Its final row simultaneously expects the highest $560 35% offer
+to win below share value. These are mutually exclusive rules.
+
+Returned both Gherkin-content contradictions to the specifier. The merged
+production state is held pending that specification loop.
+
+## 2026-08-11T09:09:44Z — architect returns share-sale contradictions
+
+Sent specifier priority-00 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: fb7d6ef94b
+```
+
+Summary: correct the retained founding-share assertion in `share-sale-1` and
+reconcile the `max(...)` bid ceiling with the below-value fallback in
+`share-sale-5`; production behavior remains held pending the decision.
+
+## 2026-08-11T09:22:56Z — architect accepts resolved share-sale policy
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 5ef1cfa
+
+Response to your escalation fb7d6ef94b: both share-sale contradictions resolved.
+
+1. share-sale-1 (shareholder composition): Dog, high hat, and iron box are the
+   founding shareholders (3-share entity, players.limit(3)). Corrected so iron
+   box RETAINS its share when dog sells its own to high hat; ship (never a
+   shareholder) holds none. Previously the assertion wrongly dropped iron box's
+   still-held share.
+
+2. share-sale-5 (bid ceiling + winning price): ceiling is purely 35% of bank
+   balance (share value is not a reserve or cap). Winner = the highest-35%
+   bidder, paying the runner-up's 35% ceiling + 5 (the existing ascending
+   increment from DistressedSale.bidRound). Shares are not public; only fellow
+   shareholders bid. Recompute (high_hat always wins):
+      row1 high_hat=1200(420) iron_box=900(315) -> 320
+      row2 high_hat=3000(1050) iron_box=2600(910) -> 915
+      row3 high_hat=1600(560) iron_box=1500(525) -> 530
+   Title, winning_bid column, and assertion updated accordingly.
+
+Commits: e01712e (both resolutions) + 5ef1cfa (winning-bid numbers). Feature
+re-parses cleanly at 5ef1cfa.
+
+Please re-review and, if consistent, route to the coder for the implementation
+already in progress (LegalEntity share valuation/sale, DistressedSale/
+Liquidation share handling, bid-ceiling strategy, harness steps).
+```
+
+Action: merged and accepted `5ef1cfa`, resolving the feature conflict in favor
+of its final $530 row. Iron Box retains its founding share, Ship has none, and
+the bidding policy is unambiguous: only fellow shareholders bid up to 35% of
+their balance; the highest bidder pays runner-up ceiling plus five. Routing the
+held production implementation back to the coder for alignment and verification.
+
+## 2026-08-11T09:25:13Z — architect routes resolved share-sale policy
+
+Sent coder priority-00 handoff:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: fe0fe960c5
+```
+
+Summary: accepted corrected founding-share assertions and the pure-35%-ceiling
+ascending-auction policy; coder owns aligning the held share-sale implementation
+and verifying it before refactorer review.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
@@ -29205,6 +29684,22 @@ entity to apply that same developed ladder, so this is a production rule defect,
 not an acceptance harness workaround. Routing the observable behavior change to
 the coder.
 
+## 2026-08-11T07:15:10Z — architect routes entity-developed-rent correction
+
+Sent coder priority-00 handoff:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: 4c4e5d2838
+```
+
+Summary: accepted specification correction requiring entity-owned developed
+streets to charge the normal developed-rent ladder; coder owns the `Rent`
+production change and verification.
+
 ## 2026-08-11T07:18:00Z — coder implements developed entity rent
 
 Processed architect handoff `4c4e5d2838`. Entity-owned streets now charge
@@ -29214,6 +29709,16 @@ unit coverage for developed houses and hotels.
 
 Verification: domain tests 350/350 passing; full acceptance 563/563 passing;
 `git diff --check` clean.
+
+Handoff sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: 6d2ec4e65c
+```
 
 ## 2026-08-11T09:22:00+02:00 — refactorer reviews developed entity rent (6d2ec4e65c)
 
@@ -29265,3 +29770,70 @@ construction, player vacant rent depends on an actual monopoly check), 12
 mutation sites, manifest refreshed. Domain 350/350, acceptance 563/563 run
 twice. Whole-reactor test hit the known pre-existing CLI
 `SimulatorTest.keepsPlayingUntilToldToStop` flake, unrelated to this work.
+
+## 2026-08-11T07:21:52Z — architect accepts developed entity rent
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer d384b1698d
+```
+
+Action: merged and accepted `d384b1698d`. Entity-owned streets retain their
+distinct doubled vacant-rent policy, but now use the printed house and hotel
+rent ladder when developed; mortgage remains an early rent exemption. Resolved
+the logbook merge conflict while retaining both branches' unique handoff
+records. Extracted repeated `RentTest` fixtures only. Verification: full
+acceptance 563/563; `RentTest` 17/17; differential mutation 0 changed sites;
+DRY clean; soft legal-entity Gherkin mutation 63 killed/29 survived/0 errors;
+property tests 22/22.
+
+## 2026-08-11T09:30:47Z — architect returns non-generic share-sale assertion binding
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 94b7e022b9
+```
+
+Action: merged `94b7e022b9` as `e9fc4a7171`. Full acceptance passes 570/570,
+including all seven share-sale scenarios. The bid ceiling and runner-up-plus-$5
+pricing now match the clarified specification. Returned a focused correction to
+coder before refactor review: the two new `JournalStepHandlers` assertions
+hard-code `Pink Realty` rather than using their captured legal-entity argument,
+so they would pass for the wrong entity. The correction must restore generic
+binding without changing the Gherkin specification.
+
+Sent coder priority-00 handoff (outbox `00_20260811T093107Z_000209_from_architect_to_coder.handoff`)
+at commit `da2f03ddbe` for that correction. After it is verified, the
+implementation must proceed to refactorer for the normal structural and
+mutation pass.
+
+## 2026-08-11T09:33:00Z — coder restores generic share assertion binding
+
+Processed architect handoff `da2f03ddbe`. Replaced the hard-coded Pink Realty
+filters in the two share-sale journal assertions with captured entity binding
+where available and entity-agnostic buyer binding for the generic lowest-price
+step.
+
+Verification: full acceptance 570/570; diff check clean.
+
+## 2026-08-11T09:33:32Z — architect accepts generic share assertion binding
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder baa7b6e584
+```
+
+Action: merged `baa7b6e584`. The named share-winner assertion now matches its
+captured entity argument; the generic lowest-price assertion no longer
+hard-codes an unrelated entity. The change preserves the agreed Gherkin and
+the full acceptance suite remains green. Routing the completed functional work
+to refactorer for its required structural, DRY, and mutation review.
