@@ -110,6 +110,10 @@ public final class LegalEntity {
     shareholders.set(share, buyer);
   }
 
+  public void removeShares(Player shareholder) {
+    shareholders.removeIf(shareholder::equals);
+  }
+
   public Money loan() { return loan; }
   public Money bankBalance() { return bankAccount.balance().amount(); }
   public void depositToBank(Money amount) { bankAccount.deposit(amount); }

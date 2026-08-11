@@ -388,6 +388,11 @@ public class Game {
       journal.log(new Journal.Entry.LandSold(seller.id(), land.type(), buyer.id(), price));
     }
 
+    @Override
+    public void soldEntityShare(Player seller, LegalEntity entity, Player buyer, Money price) {
+      journal.log(new Journal.Entry.LegalEntityShareSold(entity.name(), seller.id(), buyer.id(), price));
+    }
+
     public void peerTrade(Player trader, Ownable offered, Player partner, Ownable wanted) {
       journal.log(new Journal.Entry.PeerTrade(trader.id(), offered.type(), partner.id(), wanted.type()));
     }
@@ -666,6 +671,9 @@ public class Game {
       }
 
       record LegalEntityDividendPaid(String name, List<Player.ID> shareholders, Money amount) implements Entry {
+      }
+
+      record LegalEntityShareSold(String name, Player.ID seller, Player.ID buyer, Money price) implements Entry {
       }
 
       record PurchaseDeclined(Player.ID player, Street.Type land, Money price,

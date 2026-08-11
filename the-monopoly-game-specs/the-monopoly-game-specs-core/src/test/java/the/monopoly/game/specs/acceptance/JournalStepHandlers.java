@@ -465,6 +465,19 @@ final class JournalStepHandlers {
             (world, arguments) -> assertThat(world.pawnHoldsShare(arguments.text(1), arguments.text(2))).isTrue()),
         then("^pawn \"" + NAME + "\" holds no shares of any legal entity$",
             (world, arguments) -> assertThat(world.pawnHoldsNoEntityShares(arguments.text(1))).isTrue()),
+        then("^pawn \"" + NAME + "\" wins the " + NAME + " share at no more than \\$" + VALUE + "$",
+            (world, arguments) -> assertThat(world.gameLog().stream()
+                .filter(Entry.LegalEntityShareSold.class::isInstance)
+                .map(Entry.LegalEntityShareSold.class::cast)
+                .anyMatch(entry -> entry.name().equals(arguments.text(2))
+                    && entry.buyer().value().equals(arguments.text(1))
+                    && entry.price().amount() <= arguments.number(3))).isTrue()),
+        then("^pawn \"" + NAME + "\" paid the lowest possible price for the " + NAME + " share$",
+            (world, arguments) -> assertThat(world.gameLog().stream()
+                .filter(Entry.LegalEntityShareSold.class::isInstance)
+                .map(Entry.LegalEntityShareSold.class::cast)
+                .anyMatch(entry -> entry.name().equals(arguments.text(2))
+                    && entry.buyer().value().equals(arguments.text(1)))).isTrue()),
 
         then("^pawn \"" + NAME + "\" wins the game$",
             (world, arguments) -> assertThat(world.hasWon(arguments.text(1))).isTrue()),

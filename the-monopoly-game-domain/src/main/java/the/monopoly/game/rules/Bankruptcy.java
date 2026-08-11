@@ -39,6 +39,7 @@ public final class Bankruptcy {
 
     Money remaining = debtor.account().balance().amount();
     debtor.account().deposit(new Money(-remaining.amount()));
+    deeds.legalEntities().forEach(entity -> entity.removeShares(debtor));
     deeds.bankrupt(debtor);
     if (creditor == null) bankruptToBank(debtor);
     else bankruptToPlayer(debtor, creditor);
@@ -86,23 +87,38 @@ public final class Bankruptcy {
       Money value = entity.shareValue();
       int shortfall = -debtor.account().balance().amount().amount();
       int minimumBid = Math.min(value.amount(), shortfall);
-      Player buyer = null;
-      Money maximumBid = Money.ZERO;
+      List<Player> bidders = new java.util.ArrayList<>();
+      List<Money> maximums = new java.util.ArrayList<>();
       for (Player candidate : players) {
         if (candidate.id().equals(debtor.id()) || deeds.isBankrupt(candidate)
             || entity.shareOf(candidate) == 0.0
             || !(strategies.forPlayer(candidate) instanceof Greedo greedo)
             || !greedo.legalEntityTradingEnabled()) continue;
-        int available = candidate.account().balance().amount().amount()
-            - greedo.cashReserve(candidate, rules, deeds).amount();
-        Money offered = new Money(Math.min(value.amount(), Math.max(0, available)));
-        if (offered.amount() >= minimumBid && offered.exceeds(maximumBid)) {
-          buyer = candidate;
-          maximumBid = offered;
+        int available = candidate.account().balance().amount().amount();
+        int ceiling = Math.max(value.amount(), available * 35 / 100);
+        Money offered = new Money(Math.min(available, ceiling));
+        if (offered.amount() >= minimumBid) {
+          bidders.add(candidate);
+          maximums.add(offered);
         }
       }
-      if (buyer == null) continue;
-      Money price = new Money(minimumBid);
+      if (bidders.isEmpty()) continue;
+      int winnerIndex = 0;
+      for (int index = 1; index < bidders.size(); index++) {
+        if (maximums.get(index).exceeds(maximums.get(winnerIndex))) winnerIndex = index;
+      }
+      Player buyer = bidders.get(winnerIndex);
+      Money maximumBid = maximums.get(winnerIndex);
+      Money price;
+      if (maximumBid.amount() < value.amount()) {
+        price = maximumBid;
+      } else {
+        int second = 0;
+        for (int index = 0; index < maximums.size(); index++) {
+          if (index != winnerIndex) second = Math.max(second, maximums.get(index).amount());
+        }
+        price = new Money(Math.min(maximumBid.amount(), Math.max(minimumBid, second + 5)));
+      }
       entity.sellShare(debtor, buyer, price);
       events.soldEntityShare(debtor, entity, buyer, price);
     }
