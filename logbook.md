@@ -30895,3 +30895,27 @@ approved mutation tool refreshed the feature manifest and success stamp.
 
 Sent priority-50 git handoff to specifier for `6846b3aaa9`, the completed
 bankruptcy-boundary specification and mutation verification.
+
+## 2026-08-11T13:30:44Z — architect answers share-sale ordering question
+
+Received specifier priority-00 question handoff:
+
+```
+Re-read your role and constitution.
+
+QUESTION - NOT A FIX. Seeking role-responsibility guidance before any work.
+
+Does dropping/reordering the bankruptcy resolution order need to be FORCED
+through a specification change, or is catching-and-fixing such an order
+mistake part of architect/coder work independently of a spec change?
+```
+
+Action: confirmed that the current order is distressed sale, house sale,
+mortgage, then entity-share sale. Moving shares earlier changes observable
+economic priority (whether a shareholder sells a share versus a house or
+mortgages property), so it is a product-policy change and requires specifier
+acceptance criteria. The architect may diagnose and propose the boundary, but
+must not reorder it independently. The specification should state a concrete
+multi-shareholder case with a mortgageable/potentially liquidatable personal
+asset and assert that the fellow-shareholder offer occurs first, including the
+expected result if the offer cannot settle the debt.
