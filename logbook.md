@@ -30234,3 +30234,11 @@ task can advance. The new `pawnReceivedEntityBankBalance` adapter is also
 invalid: it only checks that a stored balance exists and the entity dissolved,
 not that the pawn received the stored amount. Returned that adapter correction
 to coder and the feature decision to specifier; no refactorer pass yet.
+
+Sent specifier priority-00 handoff (outbox `00_20260811T104757Z_000216_from_architect_to_specifier.handoff`)
+at commit `5267637f40` to approve, revise, or decline the newly added
+share-sale-6 setup criteria.
+
+Sent coder priority-00 handoff (outbox `00_20260811T104800Z_000217_from_architect_to_coder.handoff`)
+at commit `5267637f40` to make the entity-bank transfer assertion verify the
+actual pre-liquidation amount and recipient balance change.
