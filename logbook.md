@@ -29838,6 +29838,9 @@ hard-codes an unrelated entity. The change preserves the agreed Gherkin and
 the full acceptance suite remains green. Routing the completed functional work
 to refactorer for its required structural, DRY, and mutation review.
 
+Sent refactorer priority-00 handoff (outbox `00_20260811T093351Z_000210_from_architect_to_refactorer.handoff`)
+at commit `0b9f5cfd37`.
+
 ## 2026-08-11T11:45:00+02:00 — refactorer reviews greedo-share-sale (0b9f5cfd37)
 
 Merged `0b9f5cfd37`. New feature: a shareholder facing bankruptcy offers
@@ -29902,3 +29905,124 @@ coverage was the other half of the CRAP problem (4.4% before, since the
 feature was only exercised via acceptance). Every method in both touched
 files is now CRAP<=6, no DRY issues, both mutation-site counts well under
 100, manifests refreshed. Domain 354/354, acceptance 570/570 run twice.
+
+## 2026-08-11T09:47:35Z — architect accepts share-sale structural review
+
+Received refactorer priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer a4038e8ed0
+```
+
+Action: merged `a4038e8ed0`. The review replaces parallel bidder and maximum
+lists with a cohesive `Bid` value, decomposes the share-sale policy into
+testable operations, and adds targeted unit coverage for pricing and bidder
+eligibility. Architecture remains core-only: the rules depend only on domain
+models and strategies, while journalling stays in the existing game adapter.
+The final mutation, DRY, soft-Gherkin, and property verification sequence is
+now running.
+
+Final verification: differential `mutate4java` found no changed mutation
+surface in `Bankruptcy.java` (47 sites) or `LegalEntity.java` (97 sites);
+`dry4java` found no duplicate candidates; soft Gherkin mutation of
+`greedo-share-sale.feature` completed 23 mutations (6 killed, 17 survived,
+0 errors) and refreshed its tool-owned manifest; property tests passed 22/22.
+The refactorer had already confirmed full acceptance 570/570 twice. No
+architecture or behavior follow-up remains, so the phase is ready for the
+required specifier synchronization.
+
+## 2026-08-11T09:49:00Z — architect sends phase-complete share-sale sync
+
+Sent specifier priority-50 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-legal-entity
+commit: 2754154ad5
+```
+
+Action: queued outbox `50_20260811T094900Z_000211_from_architect_to_specifier.handoff`.
+This is the required phase-complete synchronization after the coder and
+refactorer loops closed.
+
+## 2026-08-11T10:06:14Z — architect routes zero-share entity crash investigation
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 2754154ad5
+
+INVESTIGATION REQUEST: 8-player Greedo CLI crasheS with a NullPointerException.
+
+Reproduction: 4 of 15 runs (27%) crash when playing 8 players with both
+--optional-greedo-stalemate-trading and --optional-greedo-legal-entity.
+
+The NPE is a SECONDARY symptom. The simulator thread dies first with:
+
+  Exception in thread "monopoly-simulator" java.lang.ArithmeticException: / by zero
+    at the.monopoly.game.rules.LegalEntity.sharesOf(LegalEntity.java:260)
+    at the.monopoly.game.rules.LegalEntity.canBorrowForBuilding(LegalEntity.java:236)
+    at the.monopoly.game.rules.LegalEntity.cannotExtendPlan(LegalEntity.java:210)
+    at the.monopoly.game.rules.LegalEntity.affordableBuildPlan(LegalEntity.java:200)
+    at the.monopoly.game.rules.LegalEntity.buildAsMuchAsAffordable(LegalEntity.java:173)
+    at the.monopoly.game.rules.LegalEntity.operate(LegalEntity.java:162)
+    at the.monopoly.game.Game.lambda$operateLegalEntities$1(Game.java:193)
+    at the.monopoly.game.Game.operateLegalEntities(Game.java:191)
+    at the.monopoly.game.Game.playTurn(Game.java:177)
+  ... (thread dies, no Result produced)
+  Exception in thread "main" java.lang.NullPointerException:
+    at the.monopoly.game.cli.Simulator.main(Simulator.java:37)  // "result" is null
+
+ROOT CAUSE (specifier analysis):
+sharesOf divides by shareholders.size(). The division chain reaches sharesOf
+with an EMPTY shareholder list, i.e. an entity with zero shareholders reaching
+the canBorrowForBuilding path (affordableBuildPlan sees a shortfall ->
+cannotExtendPlan -> canBorrowForBuilding -> sharesOf). With no shareholders, the
+"/ by zero" aborts the game thread, so Simulator.Result is never built and main
+NPEs on the null Result.
+
+Likely preconditions to confirm in the domain:
+- An entity can exist with shareholders.size() == 0 (all shareholders sold /
+  removed, or formation left a zero-shareholder entity), and operate() still
+  runs it -> buildAsMuchAsAffordable -> ... -> sharesOf divide-by-zero.
+- canBorrowForBuilding has no guard for shareholders.isEmpty().
+
+REQUEST: architect + coder investigate and fix so the domain never divides by
+zero (guard empty/shareholding=0 on the borrow/build path), and the CLI/Simulator
+handles a thread that ends without a Result (or a thrown RuntimeException)
+without surfacing an NPE to the user. Also confirm whether an entity with zero
+shareholders should be operated at all (likely it should stop building/borrowing
+and just not act).
+
+Also flagged: among the 11 non-crashing runs, win-rate dropped to ~18% (2
+wins / 9 stalemates) vs ~93% in the developed-rent phase, and no 'share of'
+events fired. Please-hold this economic observation pending the crash fix; the
+crash is the priority.
+
+Please review, locate the authoritative fix location, and route to the coder.
+```
+
+Action: confirmed the root cause. Bankruptcy removes shares but leaves the
+entity registered as the street owner; `Game.operateLegalEntities` then invokes
+its build/dividend/loan machinery. The domain fix is an explicit
+`LegalEntity` active/shareholder guard, used by `Game` and `Bankruptcy`, so a
+zero-share entity neither operates nor enters any share calculation. A local
+`sharesOf` guard alone is insufficient because `shareValue`, dividend, and
+loan-repayment paths also assume a shareholder. Independently, `Simulator`
+must catch an escaped runtime failure in its worker and publish an exit-1
+`Result`, never leaving `awaitEnd()` null. Routed to coder with regression
+tests; deferred the separate economic observation as requested.
+
+## 2026-08-11T10:11:30Z — coder fixes zero-share entity crash
+
+Implemented the architect-routed fix: zero-share legal entities are inactive,
+cannot enter share calculations, and are skipped by the game operation loop.
+The simulator worker now converts escaped runtime failures into an exit-1
+result instead of leaving `awaitEnd()` null. Added a LegalEntity regression
+test. Domain tests pass 355/355; acceptance tests pass 570/570.

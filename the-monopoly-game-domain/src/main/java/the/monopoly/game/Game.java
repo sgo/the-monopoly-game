@@ -187,8 +187,11 @@ public class Game {
   }
 
   private boolean operateLegalEntities(Journalling journalling) {
-    boolean operated = deeds.legalEntities().stream().anyMatch(entity -> !entity.operated());
+    boolean operated = deeds.legalEntities().stream()
+        .filter(LegalEntity::hasShareholders)
+        .anyMatch(entity -> !entity.operated());
     deeds.legalEntities().forEach(entity -> {
+      if (!entity.hasShareholders()) return;
       if (doneOperatingForNow(entity)) return;
       switch (entity.operate(deeds)) {
         case LegalEntity.Operation.LoanRepaid it ->

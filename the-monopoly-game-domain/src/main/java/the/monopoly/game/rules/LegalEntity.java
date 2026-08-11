@@ -90,13 +90,16 @@ public final class LegalEntity {
   public String name() { return name; }
   public Street.Colour colour() { return colour; }
   public List<Player> shareholders() { return List.copyOf(shareholders); }
+  public boolean hasShareholders() { return !shareholders.isEmpty(); }
   public List<ColourStreet> streets() { return streets; }
   public double shareOf(Player shareholder) {
+    if (!hasShareholders()) return 0.0;
     return shareholders.stream().filter(shareholder::equals).count() / (double) shareholders.size();
   }
 
   /** The value of one share, based on the maximum developed rent of every entity street. */
   public Money shareValue() {
+    if (!hasShareholders()) return Money.ZERO;
     int total = streets.stream().mapToInt(street -> street.rentForOneHotel().amount()).sum();
     return new Money(total / shareholders.size());
   }
@@ -159,6 +162,7 @@ public final class LegalEntity {
 
   /** Applies the entity's end-of-turn priority: build as much as affordable, then service debt, then pay a dividend. */
   public Operation operate(Deeds deeds) {
+    if (!hasShareholders()) return new Operation.NoAction();
     Operation building = buildAsMuchAsAffordable(deeds);
     if (building != null) {
       markOperated();
@@ -231,7 +235,7 @@ public final class LegalEntity {
   }
 
   private boolean canBorrowForBuilding(Money shortfall) {
-    if (!loan.equals(Money.ZERO))
+    if (!hasShareholders() || !loan.equals(Money.ZERO))
       return false;
     List<Money> shares = sharesOf(shortfall);
     return java.util.stream.IntStream.range(0, shareholders.size()).allMatch(index ->
@@ -257,6 +261,7 @@ public final class LegalEntity {
 
   /** Splits an amount across shareholders as evenly as possible; earlier shareholders absorb any remainder. */
   private List<Money> sharesOf(Money amount) {
+    if (!hasShareholders()) return List.of();
     int base = amount.amount() / shareholders.size();
     int remainder = amount.amount() % shareholders.size();
     return java.util.stream.IntStream.range(0, shareholders.size())
@@ -279,6 +284,7 @@ public final class LegalEntity {
   }
 
   private Operation repayLoanIfAffordable() {
+    if (!hasShareholders()) return new Operation.NoAction();
     Money repayment = new Money(loan.amount() + loan.amount() * 5 / 100);
     if (bankBalance().amount() < repayment.amount()) return null;
     withdrawFromBank(repayment);
@@ -289,6 +295,7 @@ public final class LegalEntity {
   }
 
   private Operation payDividend() {
+    if (!hasShareholders()) return new Operation.NoAction();
     Money dividend = new Money(bankBalance().amount() / shareholders.size());
     withdrawFromBank(new Money(dividend.amount() * shareholders.size()));
     shareholders.forEach(player -> player.account().deposit(dividend));
