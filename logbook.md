@@ -29996,3 +29996,6 @@ loan-repayment paths also assume a shareholder. Independently, `Simulator`
 must catch an escaped runtime failure in its worker and publish an exit-1
 `Result`, never leaving `awaitEnd()` null. Routed to coder with regression
 tests; deferred the separate economic observation as requested.
+
+Sent coder priority-00 handoff (outbox `00_20260811T100736Z_000212_from_architect_to_coder.handoff`)
+at commit `e965949af9` for the domain lifecycle and simulator-boundary fix.
