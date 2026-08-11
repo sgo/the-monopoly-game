@@ -29127,3 +29127,47 @@ commit: de92c08f2e
 Summary: phase complete after acceptance of the coder/refactorer loop for
 committed entity shortfall financing; the commit also includes the final
 architect verification record and mutation manifest refresh.
+
+## 2026-08-11T07:14:13Z — architect accepts entity-developed-rent specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier c1faa50
+
+Specification correction for entity-owned street rent, pending your review to
+route to the coder or reject.
+
+CONTEXT: Empirical 8-player Greedo runs (both optional flags) showed entity rent
+never escalated (always 2x vacant), so entity-developed streets charged a tiny
+$20 (Bruul Mechelen, 4 houses) instead of the developed $625. This suppressed
+downward pressure/stalemate resolution. Root cause is a spec-vs-impl gap in the
+entity rent path.
+
+SPEC CHANGE (spec-only, coder's production change left to you):
+- entity-13 & entity-21: correct entity-owned street rent expectation $20 -> 
+  $625 (developed rent for a 4-house Bruul Mechelen), asserting the tenant's
+  account balance (robust to the full-game harness) instead of the unreliable
+  post-game entity bank.
+- entity-21: seeds Pink Realty treasury ($5000) + sets 'last-capitalised
+  shareholder has not aged' so the shareholder's rent payment is deterministically
+  observable. The empty-bank borrow-to-build mechanic is still enforced by
+  entity-22/23 (green).
+- ARTIFACT: with production Rent.java unmodified the feature is RED on these two
+  scenarios. They encode the rule that an entity-owned street charges the same
+  developed-rent ladder as a player-owned monopoly (hotel -> hotel rent,
+  houses>0 -> rentForHouses, else 2x vacant).
+
+REQUEST: please review and decide whether this goes to the coder (implement
+developed entity rent in Rent.java so entity-13/21 turn green) or reject. Domain
+tests 348/348 pass on unmodified code.
+```
+
+Action: merged `c1faa50` and accepted the correction. The current entity rent
+path unconditionally uses double vacant rent, while the player-owned path uses
+the normal hotel/houses/monopoly ladder. The scenarios consistently require the
+entity to apply that same developed ladder, so this is a production rule defect,
+not an acceptance harness workaround. Routing the observable behavior change to
+the coder.
