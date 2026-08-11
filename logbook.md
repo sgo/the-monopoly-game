@@ -30435,30 +30435,6 @@ coder: capture the pawn balance before liquidation and require the final pawn
 balance to equal that captured balance plus the recorded pre-liquidation entity
 treasury. The specifier scenario-setup decision remains outstanding.
 
-Sent coder priority-00 handoff (outbox `00_20260811T105246Z_000218_from_architect_to_coder.handoff`)
-at commit `614dc2e337` for the still-unimplemented transfer assertion.
-
-## 2026-08-11T11:10:00Z — architect accepts deterministic liquidation specification
-
-Received specifier priority-00 handoff:
-
-```
-Re-read your role and constitution.
-
-merge_and_process specifier ba05037
-```
-
-Action: merged `ba05037`, resolving the feature conflict in favor of the
-approved specification. The final-shareholder setup is approved, while the
-nonzero treasury transfer is now proved by explicit inputs and dog's exact
-post-tax balance ($40 + $500 - $100 = $440), not a weak adapter. The prior
-coder-added `$100`/already-operated setup is removed. Full acceptance passed
-on the consolidated branch; routing to coder for normal verification and
-refactorer follow-through.
-
-Sent coder priority-00 handoff (outbox `00_20260811T111043Z_000219_from_architect_to_coder.handoff`)
-at commit `4cf3ec7fa4` for the consolidated deterministic liquidation state.
-
 ## 2026-08-11T11:07:20Z — coder corrects liquidation transfer assertion
 
 Merged architect priority-00 handoff `614dc2e337`. Corrected the acceptance
@@ -30515,6 +30491,82 @@ duplication shape, not a new concern. `LegalEntity.java` back to exactly
 Domain and acceptance both verified clean; full acceptance 572/572, run
 twice.
 
+## 2026-08-11T11:18:36Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: ee58b5e8ba
+```
+
+Summary: the coder's fix for the weak `pawnReceivedEntityBankBalance`
+assertion added test-only snapshot fields directly to `LegalEntity`,
+violating the core-only domain boundary. Root cause was a missing journal
+event — `Bankruptcy.liquidateEntity` never journalled anything, unlike
+every other significant domain action. Added the missing
+`Bankruptcy.Events.entityLiquidated` hook feeding a new
+`Journal.Entry.LegalEntityLiquidated` record, rewrote the acceptance
+adapter to query the journal (matching the existing pattern used
+everywhere else), and removed the domain-object fields entirely. No CRAP
+or DRY issues, manifests refreshed across all four touched files. Domain
+clean, acceptance 572/572 run twice.
+
+Sent coder priority-00 handoff (outbox `00_20260811T105246Z_000218_from_architect_to_coder.handoff`)
+at commit `614dc2e337` for the still-unimplemented transfer assertion.
+
+## 2026-08-11T11:10:00Z — architect accepts deterministic liquidation specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier ba05037
+```
+
+Action: merged `ba05037`, resolving the feature conflict in favor of the
+approved specification. The final-shareholder setup is approved, while the
+nonzero treasury transfer is now proved by explicit inputs and dog's exact
+post-tax balance ($40 + $500 - $100 = $440), not a weak adapter. The prior
+coder-added `$100`/already-operated setup is removed. Full acceptance passed
+on the consolidated branch; routing to coder for normal verification and
+refactorer follow-through.
+
+## 2026-08-11T11:21:10Z — coder verifies deterministic liquidation specification
+
+Merged architect priority-00 handoff `4cf3ec7fa4`. Resolved the logbook
+conflict, removed the duplicate bankruptcy setup handler, and retained the
+liquidation setup's deterministic operated-entity and distressed-sale bidder
+configuration. Full acceptance passes 572/572 and `git diff --check` is clean.
+Ready for refactorer review.
+
+## 2026-08-11T13:25:00+02:00 — refactorer reviews deterministic liquidation specification (9204e41c62)
+
+Merged `9204e41c62`. Production domain code is byte-identical to my last
+commit (`ee58b5e8ba`) — the large `Game.java`/`Bankruptcy.java`/
+`LegalEntity.java`/`Report.java` diffs in the raw commit range were
+manifest-line-number churn from divergent branch tips, not real changes,
+confirmed by a direct diff against my tree showing zero output.
+
+The actual change: share-sale-6 (the sufficient-cash liquidation path, no
+distressed sale needed) now asserts dog's exact post-liquidation balance
+via a new `pawnFinalBalanceIs` step, replacing the fault-tolerant "received
+the bank balance" check for that specific scenario — stronger and fully
+deterministic where the ending balance is fully computable. My
+journal-based `pawnReceivedEntityBankBalance` fix from last cycle stays in
+place and still backs share-sale-7 (the insufficient-cash cascading
+distressed-sale path), where the exact ending balance depends on auction
+dynamics and can't be pinned down the same way — the specifier's split is
+the right call, not a redundant duplicate check. `bankruptPawns` also
+generalized from a fixed two-pawn signature to varargs, used identically
+elsewhere. `dry4java` clean on `JournalStepHandlers.java`.
+
+Domain clean, full acceptance 572/572, run twice.
+
 ## 2026-08-11T11:20:00Z — architect accepts journalled liquidation transfer
 
 Received refactorer priority-50 handoff:
@@ -30525,24 +30577,29 @@ Re-read your role and constitution.
 merge_and_process refactorer ee58b5e8ba
 ```
 
-Action: merged `ee58b5e8ba`. Liquidation is now observable via a core
-`Bankruptcy.Events` event, game journal entry, and report adapter; the
-acceptance world verifies that journal event rather than leaking test snapshot
-state into `LegalEntity`. This restores the core/acceptance boundary and closes
-the transfer-assertion defect. Final mutation, DRY, soft-Gherkin, and property
-verification now follows.
+Action: merged `ee58b5e8ba`. Liquidation is observable through a core
+bankruptcy event, a game-journal entry, and a report adapter; the acceptance
+world no longer reads test-only state from `LegalEntity`.
 
-## 2026-08-11T11:28:11Z — architect final verification
+## 2026-08-11T11:28:11Z — architect final verification and phase sync
 
-Action: completed the required verification for the merged liquidation design.
-Differential mutation had no changed mutation surface in `Bankruptcy.java`
-(49 sites), `Game.java` (75), or `Report.java` (3). DRY reported only the
-standing, sealed `Game` journal-adapter one-line event duplication. Soft
-Gherkin mutation for `greedo-share-sale.feature` killed all 29 mutants with
-zero survivors or errors; its managed manifest and mutation stamp were
-refreshed. Domain property tests passed 22/22, and `git diff --check` passed.
+Action: differential mutation had no changed mutation surface in
+`Bankruptcy.java` (49 sites), `Game.java` (75), or `Report.java` (3). DRY
+reported only the standing sealed journal-adapter repetition. Soft Gherkin
+mutation killed 29/29 with zero survivors or errors; the managed manifest was
+refreshed. Property tests passed 22/22 and `git diff --check` passed.
 
-## 2026-08-11T11:28:46Z — architect sends phase completion to specifier
+Sent priority-50 git handoff to specifier for commit `4799b24042`.
 
-Sent priority-50 git handoff to specifier for commit `4799b24042`, the
-verified journalled-liquidation integration and its refreshed mutation record.
+## 2026-08-11T11:28:55Z — architect receives refactorer follow-up
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer c02f997ed7
+```
+
+Action: merging `c02f997ed7` and reviewing its deterministic acceptance
+assertion consolidation and resulting test-boundary changes.
