@@ -1,5 +1,5 @@
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-10T18:31:42.095562Z","feature_name":"Greedo legal entity for a three-way colour-group split","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/greedo-legal-entity.feature","background_hash":"fd82b050e2caf6974e2f44e0c1ce996c7bd99ce3d3e5d035db5a75223654814e","implementation_hash":"unknown","scenarios":[{"index":0,"name":"three Greedo co-owners of a colour group coalesce into a legal entity holding equal shares","scenario_hash":"2ef5e96b2ea70f8ff71751ea4b35eae5952a85776b607e56ec76b4482675c459","mutation_count":15,"result":{"Total":15,"Killed":15,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":3,"name":"the entity never consolidates a highest-priority colour group","scenario_hash":"072ba692ad338f0bcd5a482bf5606f8b18a5d2a4d1062bd8c5f03beed450891f","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":4,"name":"a two-player split of an eligible colour group does not form an entity","scenario_hash":"afc4ab1a1890586142a97b70d380ecac4e4354146c8064aa6e08fc415602c178","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":13,"name":"the entity builds as many houses as it can afford at the end of the turn","scenario_hash":"2fb2bcce463e71807420f255baea8b84f75d80be4d796e4d29d0e1e70d9b84e4","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"}]}
+# {"version":1,"tested_at":"2026-08-11T04:46:20.046607Z","feature_name":"Greedo legal entity for a three-way colour-group split","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/greedo-legal-entity.feature","background_hash":"fd82b050e2caf6974e2f44e0c1ce996c7bd99ce3d3e5d035db5a75223654814e","implementation_hash":"unknown","scenarios":[{"index":13,"name":"the entity uses its rent before raising a loan to build","scenario_hash":"e3e0887ccd66ac4600387b38de334101acf5378e669a26e8a5e7aa11baa68d51","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-11T04:46:20.046607Z"},{"index":14,"name":"the entity builds as many houses as it can afford at the end of the turn","scenario_hash":"2fb2bcce463e71807420f255baea8b84f75d80be4d796e4d29d0e1e70d9b84e4","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-11T04:46:20.046607Z"},{"index":0,"name":"three Greedo co-owners of a colour group coalesce into a legal entity holding equal shares","scenario_hash":"2ef5e96b2ea70f8ff71751ea4b35eae5952a85776b607e56ec76b4482675c459","mutation_count":15,"result":{"Total":15,"Killed":15,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":3,"name":"the entity never consolidates a highest-priority colour group","scenario_hash":"072ba692ad338f0bcd5a482bf5606f8b18a5d2a4d1062bd8c5f03beed450891f","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":4,"name":"a two-player split of an eligible colour group does not form an entity","scenario_hash":"afc4ab1a1890586142a97b70d380ecac4e4354146c8064aa6e08fc415602c178","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -176,29 +176,31 @@ Feature: Greedo legal entity for a three-way colour-group split
     And pawn "<renter>" starts at position <renter_position>
     And pawn "<renter>" will claim rent for "<renter_street>"
     When pawn "<renter>" lands on "<renter_street>"
-    Then Pink Realty's bank account holds $<rent>
-    And pawn "<renter>" has paid $<rent> in rent
+    Then pawn "<renter>" has paid $<rent> in rent
+    And pawn "<renter>"'s account balance is $<tenant_balance>
 
     Examples:
-      | renter  | renter_position | renter_street          | rent |
-      | racecar | 3               | Bruul Mechelen         | 20   |
+      | renter  | renter_position | renter_street          | rent | tenant_balance |
+      | racecar | 3               | Bruul Mechelen         | 625  | 875           |
 
   # entity-21
   Scenario Outline: a shareholder pays rent when landing on their own legal entity's street
     Given we select 4 players
     And Pink Realty is formed
+    And Pink Realty's bank account holds $<treasury>
+    And the last-capitalised shareholder of Pink Realty has not aged since funding a build
     And the street "Rue de Diekirch Arlon" has 4 houses built
     And the street "Bruul Mechelen" has 4 houses built
     And the street "Place Verte Verviers" has 4 houses built
     And pawn "<renter>" starts at position <renter_position>
     And pawn "<renter>" will claim rent for "<renter_street>"
     When pawn "<renter>" lands on "<renter_street>"
-    Then Pink Realty's bank account holds $<rent>
-    And pawn "<renter>" has paid $<rent> in rent
+    Then pawn "<renter>" has paid $<rent> in rent
+    And pawn "<renter>"'s account balance is $<tenant_balance>
 
     Examples:
-      | renter    | renter_position | renter_street          | rent |
-      | iron box  | 3               | Bruul Mechelen         | 20   |
+      | treasury | renter    | renter_position | renter_street          | rent | tenant_balance |
+      | 5000     | iron box  | 3               | Bruul Mechelen         | 625  | 875           |
 
   # entity-14
   Scenario Outline: a raised loan is deposited into the entity's bank account

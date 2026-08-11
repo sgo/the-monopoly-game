@@ -38,12 +38,19 @@ public class Rent implements Landings {
 
   private void collect(LegalEntity entity, Player tenant, ColourStreet land) {
     if (deeds.isMortgaged(land)) return;
-    Money rent = land.vacantRent().plus(land.vacantRent());
+    Money rent = entityRent(land);
     if (tenant.account().balance().amount().amount() >= rent.amount()) {
       tenant.account().withdraw(rent);
       entity.depositToBank(rent);
       entity.receiveRent(land);
     }
+  }
+
+  private Money entityRent(ColourStreet street) {
+    if (deeds.hasHotelOn(street)) return street.rentForOneHotel();
+    int houses = deeds.housesBuiltOn(street);
+    return houses > 0 ? street.rentForHouses(houses)
+        : street.vacantRent().plus(street.vacantRent());
   }
 
   private void collect(Player owner, Player tenant, Ownable land, Roll roll) {
