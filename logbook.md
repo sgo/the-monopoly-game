@@ -31190,3 +31190,20 @@ $1000 starting balance; the new bankrupt share-sale-9 row likewise does not
 observe High Hat's $50 starting balance (mutating it to $43 still yields -$5).
 These are Gherkin acceptance-criteria gaps, so they are returned to the
 specifier for an explicit scenario decision rather than changed by architect.
+
+## 2026-08-11T16:58:35Z — architect returns mutation observability gaps
+
+Sent priority-00 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: 8cfdb1823c
+```
+
+The commit records the three soft-mutation survivors: High Hat's two
+share-sale-8 starting-balance inputs and share-sale-9's bankrupt-row
+starting-balance input are not semantically observed. Awaiting the
+specifier's acceptance-criteria decision.
