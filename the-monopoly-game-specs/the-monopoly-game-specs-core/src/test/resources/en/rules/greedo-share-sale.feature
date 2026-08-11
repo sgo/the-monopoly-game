@@ -176,8 +176,10 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "high hat" wins the Pink Realty share at $<winning_bid>
     And Pink Realty is not dissolved
     And pawn "dog"'s bankrupt state is <bankrupt_state>
+    And pawn "dog"'s final balance is $<dog_ending>
+    And pawn "high hat"'s final balance is $<high_hat_ending>
 
     Examples:
-      | dog_balance | high_hat_balance | racecar_balance | winning_bid | bankrupt_state |
-      | 45          | 50               | 50              | 5           | not bankrupt   |
-      | 40          | 50               | 50              | 5           | bankrupt       |
+      | dog_balance | high_hat_balance | racecar_balance | winning_bid | bankrupt_state | dog_ending | high_hat_ending |
+      | 45          | 50               | 50              | 5           | not bankrupt   | 0          | 45              |
+      | 40          | 50               | 50              | 5           | bankrupt       | -5         | 45              |
