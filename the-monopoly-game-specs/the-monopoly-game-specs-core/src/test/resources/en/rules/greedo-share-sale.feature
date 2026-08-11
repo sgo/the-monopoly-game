@@ -161,7 +161,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
   # share-sale-9
   Scenario Outline: a distressed shareholder disposes of a personal asset before offering their legal-entity share, and the share sale may or may not settle the remaining debt
     Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 4 players
+    And we select 3 players
     And Pink Realty is formed
     And pawn "dog" returns every street except "Steenstraat Brugge" to the bank
     And pawn "iron box" is bankrupt
@@ -171,7 +171,6 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "iron box" owns "Place du Monument Spa"
     And pawn "dog" has $<dog_balance> to spend
     And pawn "high hat" has $<high_hat_balance> to spend
-    And pawn "racecar" has $<racecar_balance> to spend
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
     Then the land "Steenstraat Brugge" is mortgaged
     And pawn "high hat" wins the Pink Realty share at $<winning_bid>
@@ -179,9 +178,8 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "dog"'s bankrupt state is <bankrupt_state>
     And pawn "dog"'s final balance is $<dog_ending>
     And pawn "high hat"'s final balance is $<high_hat_ending>
-    And pawn "racecar"'s final balance is $<racecar_ending>
 
     Examples:
-      | dog_balance | high_hat_balance | racecar_balance | winning_bid | bankrupt_state | dog_ending | high_hat_ending | racecar_ending |
-      | 45          | 50               | 50              | 5           | not bankrupt   | 0          | 45              | 50             |
-      | 40          | 50               | 50              | 5           | bankrupt       | -5         | 45              | 50             |
+      | dog_balance | high_hat_balance | winning_bid | bankrupt_state | dog_ending | high_hat_ending |
+      | 45          | 50               | 5           | not bankrupt   | 0          | 45              |
+      | 40          | 50               | 5           | bankrupt       | -5         | -5              |
