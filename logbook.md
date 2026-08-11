@@ -29376,6 +29376,22 @@ still give Dog exactly $100, equal to the fixed $100 Luxury Tax; none produces
 a distress shortfall. Returned the unresolved scenario-data defect to the
 specifier rather than accepting a bypass of normal bankruptcy triggering.
 
+## 2026-08-11T08:49:52Z — architect returns consolidated share-sale examples
+
+Sent specifier priority-00 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: d7728c6d41
+```
+
+Summary: all scenarios intended to auction a share must reduce Dog's starting
+cash below the $100 Luxury Tax; the new bid-ceiling rows inherit the same
+missing distress trigger.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
