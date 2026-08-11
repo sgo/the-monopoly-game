@@ -30092,3 +30092,31 @@ shape" pattern noted repeatedly across this task; none of it touches the
 lines this commit changed.
 
 Domain 355/355. Full acceptance 570/570, run twice.
+
+## 2026-08-11T10:26:03Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 50e4a87274
+```
+
+Summary: verified the zero-share entity crash fix (a fully-liquidated
+entity dividing by zero shareholders, found via 8-player playtesting).
+Kept the coder's defense-in-depth guards even where some are currently
+unreachable, given the bug's own root cause was "this can't happen from
+here" reasoning proven wrong once already. `LegalEntity.java` crossed the
+100-mutation-site split threshold for the first time this task; extracted
+formation eligibility into a new `LegalEntityFormation` class (94/9 sites,
+public API unchanged). Split `Game.operateLegalEntities`'s new CC=8
+violation into the exempt sealed switch and an ordinary guard clause,
+documented why both still show high CRAP figures (long-standing
+acceptance-only coverage on Game.java's dispatch layer, confirmed via
+JaCoCo HTML, predating this commit — not something worth retrofitting full
+GameTest scaffolding for here). First review of the CLI module
+(Simulator.java): clean except pre-existing untested main() shim, unrelated
+to this diff. Domain 355/355, acceptance 570/570 run twice.
