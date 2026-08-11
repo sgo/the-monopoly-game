@@ -30531,3 +30531,13 @@ acceptance world verifies that journal event rather than leaking test snapshot
 state into `LegalEntity`. This restores the core/acceptance boundary and closes
 the transfer-assertion defect. Final mutation, DRY, soft-Gherkin, and property
 verification now follows.
+
+## 2026-08-11T11:28:11Z — architect final verification
+
+Action: completed the required verification for the merged liquidation design.
+Differential mutation had no changed mutation surface in `Bankruptcy.java`
+(49 sites), `Game.java` (75), or `Report.java` (3). DRY reported only the
+standing, sealed `Game` journal-adapter one-line event duplication. Soft
+Gherkin mutation for `greedo-share-sale.feature` killed all 29 mutants with
+zero survivors or errors; its managed manifest and mutation stamp were
+refreshed. Domain property tests passed 22/22, and `git diff --check` passed.
