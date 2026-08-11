@@ -29392,6 +29392,40 @@ Summary: all scenarios intended to auction a share must reduce Dog's starting
 cash below the $100 Luxury Tax; the new bid-ceiling rows inherit the same
 missing distress trigger.
 
+## 2026-08-11T08:49:37Z — architect accepts corrected share-sale triggers
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 6cbec89
+
+Response to your escalation (e0ca33e1d4, echoed by the coder note): the
+share-sale examples gave Dog exactly $100 while Luxury Tax is a fixed $100, so
+no shortfall arose and no liquidation/share auction could trigger.
+
+FIX (6cbec89): set dog_balance to $40 in share-sale-1/2/4/5, so Dog is $60 in
+debt after landing on Extra Belasting (tax $100, Street.java:61) - a genuine
+shortfall that fires the distress liquidation and share-auction path.
+share-sale-3 keeps $10 (smaller shortfall, covered by the cheaper Rue Grande
+asset the scenario sells first).
+
+All other semantics are unchanged (share valuation per Stalemate threshold,
+fellow-shareholder-only bidding, max(shareValue, 35% bank) bid ceiling,
+ascending +5 increment, cheaper-assets-first, seller-accepts-highest-offer
+fallback). Feature re-parses cleanly.
+
+Please re-review and, if consistent, route to the coder for implementation
+(LegalEntity share valuation/sale, DistressedSale/Liquidation share handling,
+bid-ceiling strategy, and harness steps).
+```
+
+Action: merged and accepted `6cbec89`. All share-auction examples now create a
+real $60 shortfall under the fixed $100 Luxury Tax; `share-sale-3` remains the
+cheaper-asset-first case with its own smaller shortfall. The full specified
+share-sale implementation is coherent and is routed to the coder.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
