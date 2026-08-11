@@ -89,6 +89,10 @@ final class JournalStepHandlers {
         given("^pawn \"" + NAME + "\" is bankrupt$",
             (world, arguments) -> world.bankruptPawns(arguments.text(1))),
 
+        given("^pawn \"" + NAME + "\" returns every street except \"" + NAME
+                + "\" to the bank$",
+            (world, arguments) -> world.returnEveryStreetExcept(arguments.text(1), arguments.text(2))),
+
         given("^Pink Realty's loan has been fully repaid$",
             (world, arguments) -> world.entityLoanFullyRepaid("Pink Realty")),
 

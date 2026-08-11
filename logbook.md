@@ -30660,6 +30660,13 @@ now win at the nominal $5 price; zero-capacity bidders remain ineligible, and
 street distressed-sale minimums are unchanged. Domain tests pass 359/359;
 share-sale acceptance passes 10/10; full acceptance passes successfully.
 
+## 2026-08-11T18:03:40Z — coder verifies deterministic share-sale setup
+
+Merged architect handoff `b9e62f51d7`. Added the missing return-to-bank setup
+step, preserved legal-entity bidding for high hat, and prevented unrelated
+racecar distressed bidding in share-sale-9. Domain tests pass 359/359; full
+acceptance passes successfully; `git diff --check` is clean.
+
 ## 2026-08-11T14:30:00+02:00 — refactorer reviews no-minimum-bid share sales (6029b5fa72) — BLOCKING FINDING
 
 Merged `6029b5fa72`. The specifier's request (removing the incorrect
@@ -30830,6 +30837,23 @@ literal (including typos) as "not bankrupt," silently masking a malformed
 scenario. Replaced with an explicit two-case switch that throws on
 anything else. Test-infra only, no production code touched. `dry4java`
 clean. Domain unaffected (unchanged), full acceptance 574/574 run twice.
+
+## 2026-08-11T13:12:24Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: c6142adc45
+```
+
+Summary: verified the bankrupt-state literal hardening. Small, self-
+contained acceptance-harness fix (typos no longer silently pass as "not
+bankrupt"), no production code touched. Clean, no CRAP/DRY concerns.
+Acceptance 574/574 run twice.
 
 ## 2026-08-11T13:09:07Z — architect sends assertion-boundary review
 
@@ -31058,8 +31082,55 @@ distress state explicit and observes racecar's capped balance. Routing the
 new acceptance step and corresponding `World` support to coder as a
 test-harness-only implementation.
 
+## 2026-08-11T18:08:00+02:00 — refactorer reviews deterministic share-sale setup (db8fa63e1c)
+
+Merged `db8fa63e1c`, closing out a long specifier/architect/coder loop
+(share-sale-8's exact bankruptcy boundary, share-sale-9's "entity stays
+formed" ordering case, racecar/high-hat determinism). No production domain
+code touched across the whole chain — confirmed via `git diff --stat`
+against my last review point (`c6142adc45`): only
+`JournalStepHandlers.java`, `World.java`, and the feature file changed.
+`pawnFinalBalanceIs` now throws a descriptive `AssertionError` instead of
+silently returning `false` on mismatch — better failure diagnostics, no
+behavior change for passing cases. New `returnEveryStreetExcept`/
+`streetTypeNamed` setup helpers are clean, test-infra-only, no domain-
+boundary concerns this time (unlike the `liquidationRecipientBalance`
+episode a few cycles back — everything here stays properly confined to
+`World`). `dry4java` clean.
+
+Domain unaffected (unchanged). Full acceptance 575/575, run twice.
+
 ## 2026-08-11T14:36:31Z — architect sends deterministic setup to coder
 
 Sent priority-00 git handoff to coder for `b9e62f51d7`, the accepted
-share-sale-9 scenario requiring only the ownership-strip and racecar-balance
-acceptance harness support.
+share-sale-9 scenario requiring ownership-strip and racecar-balance acceptance
+harness support.
+
+## 2026-08-11T16:08:04Z — architect receives deterministic setup review
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 925e7a8ee5
+```
+
+Action: merged `925e7a8ee5`. The ownership-strip step is accepted, but its
+initial implementation also replaced High Hat and Racecar strategies as an
+unrelated side effect. Removed those hidden strategy overrides so this helper
+has its single stated responsibility: returning the named pawn's other streets
+to the bank. The scenario's existing Greedo setup and explicit balances remain
+the sole determinants of bidding behavior; final verification follows.
+
+## 2026-08-11T16:12:00Z — architect finds racecar outcome contradiction
+
+Action: full acceptance after separating the helper's responsibilities fails
+only in share-sale-9's bankrupt row: the feature expects Racecar to finish at
+$50, while real Greedo gameplay finishes at -$5. The prior passing value was
+created by the ownership-strip helper secretly replacing Racecar's strategy
+with a zero bidder. A generic ownership step must not alter participant
+strategies. The feature needs an explicit, separately named scenario setup
+that specifies Racecar's intended participation/turn behavior, or revised
+expected outcome under normal Greedo gameplay. Escalating this Gherkin setup
+policy to the specifier; no hidden harness override will be retained.

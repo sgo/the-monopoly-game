@@ -427,7 +427,10 @@ public class World {
   }
 
   public boolean pawnFinalBalanceIs(String pawnName, Money amount) {
-    return pawn(pawnName).account().balance().amount().equals(amount);
+    Money actual = pawn(pawnName).account().balance().amount();
+    if (!actual.equals(amount))
+      throw new AssertionError(pawnName + " expected " + amount.amount() + " but was " + actual.amount());
+    return true;
   }
 
   /** Marks each named pawn bankrupt and strips their shares from any legal entities (setup helper). */
@@ -528,6 +531,18 @@ public class World {
     if (deeds == null)
       throw new AssertionError("No game has been played yet.");
     return deeds.ownerOf(land).filter(it -> it.value().equals(pawnName)).isPresent();
+  }
+
+  public void returnEveryStreetExcept(String pawnName, String excludedName) {
+    Street.Type excluded = streetTypeNamed(excludedName);
+    Player owner = pawn(pawnName);
+    deeds.landOwnedBy(owner).stream()
+        .filter(type -> type != excluded)
+        .map(ruleSet::create)
+        .filter(Ownable.class::isInstance)
+        .map(Ownable.class::cast)
+        .toList()
+        .forEach(land -> deeds.returnToBank(land, owner));
   }
 
   /** Gives a pawn a title without changing the scenario's stated starting money. */
@@ -1313,6 +1328,14 @@ public class World {
     if (!(space instanceof Ownable ownable))
       throw new AssertionError(land + " is not ownable land.");
     return ownable;
+  }
+
+  private Street.Type streetTypeNamed(String name) {
+    String normalized = name.replaceAll("[^A-Za-z0-9]", "").toLowerCase();
+    return java.util.Arrays.stream(Street.Type.values())
+        .filter(type -> type.name().replaceAll("[^A-Za-z0-9]", "").toLowerCase().equals(normalized))
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown street \"" + name + "\"."));
   }
 
   /**
