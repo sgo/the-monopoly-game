@@ -30955,3 +30955,29 @@ Gherkin example/policy defect to the specifier; no coder handoff is safe yet.
 
 Sent priority-00 git handoff to specifier for `94300c1d9c`, identifying the
 $50 mortgage versus $10 shortfall contradiction in the $90 example.
+
+## 2026-08-11T14:19:14Z — architect accepts corrected share-sale-9 spec
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+FORWARDING for verification: corrected share-sale-9 ordering spec. Please
+verify mutation coverage and confirm the ordering requirement.
+```
+
+Action: merged `36f3fdf`. The corrected examples leave a $5 residual after
+the $50 mortgage, so the existing core order mortgages the personal street
+before it considers the still-distressed share sale. Full acceptance and
+property tests pass.
+
+## 2026-08-11T14:22:00Z — architect finds share-sale-9 mutation gaps
+
+Action: soft Gherkin mutation exercised 20 mutations but left 7 survivors.
+The scenario does not prove all of its setup values: perturbations of the
+insufficient row's `dog_balance` retain the same bankrupt outcome, and capped
+rival balances can change while retaining the same mortgage, winning-share,
+entity, and bankrupt-state assertions. This is an acceptance-criteria gap;
+returning it to the specifier for revised examples/assertions. The mutation
+tool withdrew the stale feature success stamp.
