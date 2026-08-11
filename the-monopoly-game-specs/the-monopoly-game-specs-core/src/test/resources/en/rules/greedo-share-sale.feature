@@ -152,11 +152,12 @@ Feature: selling legal-entity shares to avoid bankruptcy
     Then pawn "high hat" wins the Pink Realty share at $<winning_bid>
     And pawn "dog"'s bankrupt state is <bankrupt_state>
     And pawn "dog"'s final balance is $<dog_ending>
+    And pawn "high hat"'s final balance is $<high_hat_ending>
 
     Examples:
-      | dog_balance | high_hat_balance | winning_bid | bankrupt_state | dog_ending |
-      | 94          | 1000             | 5           | bankrupt       | -1         |
-      | 95          | 1000             | 5           | not bankrupt   | 0          |
+      | dog_balance | high_hat_balance | winning_bid | bankrupt_state | dog_ending | high_hat_ending |
+      | 94          | 1000             | 5           | bankrupt       | -1         | 995             |
+      | 95          | 1000             | 5           | not bankrupt   | 0          | 995             |
 
   # share-sale-9
   Scenario Outline: a distressed shareholder disposes of a personal asset before offering their legal-entity share, and the share sale may or may not settle the remaining debt
