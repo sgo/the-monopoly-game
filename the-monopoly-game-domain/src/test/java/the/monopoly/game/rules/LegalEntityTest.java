@@ -51,6 +51,16 @@ class LegalEntityTest {
   }
 
   @Test
+  void anEntityWithoutShareholdersIsInactiveAndHasNoShareValue() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, List.of(), rules);
+
+    assertThat(entity.hasShareholders()).isFalse();
+    assertThat(entity.shareOf(dog)).isZero();
+    assertThat(entity.shareValue()).isEqualTo(Money.ZERO);
+    assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.NoAction());
+  }
+
+  @Test
   void aColourGroupLedByTheHighestPriorityStreetNeverConsolidates() {
     assertFormationIsImpossible("Orange Realty", Street.Colour.orange,
         List.of(Street.Type.LippenslaanKnokke, Street.Type.RueRoyaleTournai, Street.Type.GroenplaatsAntwerpen),
