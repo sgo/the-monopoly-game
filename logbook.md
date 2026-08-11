@@ -30830,3 +30830,20 @@ literal (including typos) as "not bankrupt," silently masking a malformed
 scenario. Replaced with an explicit two-case switch that throws on
 anything else. Test-infra only, no production code touched. `dry4java`
 clean. Domain unaffected (unchanged), full acceptance 574/574 run twice.
+
+## 2026-08-11T13:12:24Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: c6142adc45
+```
+
+Summary: verified the bankrupt-state literal hardening. Small, self-
+contained acceptance-harness fix (typos no longer silently pass as "not
+bankrupt"), no production code touched. Clean, no CRAP/DRY concerns.
+Acceptance 574/574 run twice.
