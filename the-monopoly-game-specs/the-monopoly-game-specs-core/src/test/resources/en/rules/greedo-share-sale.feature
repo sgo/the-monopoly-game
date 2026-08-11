@@ -163,6 +163,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
     Given legal-entity trading is enabled for the "Greedo" strategy
     And we select 4 players
     And Pink Realty is formed
+    And pawn "dog" returns every street except "Steenstraat Brugge" to the bank
     And pawn "iron box" is bankrupt
     And pawn "dog" owns "Steenstraat Brugge"
     And pawn "iron box" owns "Rue Grande Dinant"
@@ -178,8 +179,9 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "dog"'s bankrupt state is <bankrupt_state>
     And pawn "dog"'s final balance is $<dog_ending>
     And pawn "high hat"'s final balance is $<high_hat_ending>
+    And pawn "racecar"'s final balance is $<racecar_ending>
 
     Examples:
-      | dog_balance | high_hat_balance | racecar_balance | winning_bid | bankrupt_state | dog_ending | high_hat_ending |
-      | 45          | 50               | 50              | 5           | not bankrupt   | 0          | 45              |
-      | 40          | 50               | 50              | 5           | bankrupt       | -5         | 45              |
+      | dog_balance | high_hat_balance | racecar_balance | winning_bid | bankrupt_state | dog_ending | high_hat_ending | racecar_ending |
+      | 45          | 50               | 50              | 5           | not bankrupt   | 0          | 45              | 50             |
+      | 40          | 50               | 50              | 5           | bankrupt       | -5         | 45              | 50             |
