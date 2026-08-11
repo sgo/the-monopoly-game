@@ -31139,3 +31139,54 @@ policy to the specifier; no hidden harness override will be retained.
 
 Sent priority-00 git handoff to specifier for `710b609b0e`, carrying the
 Racecar $50 versus -$5 scenario contradiction and cohesive helper correction.
+
+## 2026-08-11T16:55:10Z — architect receives three-player share-sale revision
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+FORWARDING for re-verification: share-sale-9 converted to a 3-player setup
+(this commit resolves the racecar/high-hat determinism contradiction you
+escalated in 710b609b0e).
+
+DECISION PATH:
+- You flagged that a generic ownership-strip step must not alter participant
+  strategies, and that racecar's real Greedo outcome was -5 (not 50) in the
+  bankrupt row - the prior 50 was a hidden-strategy override artifact.
+- User decided to drop racecar entirely: it is a 4th spectator that never
+  transacts in this scenario (Steenstraat Brugge is always MORTGAGED, never
+  auctioned, so the street-auction path racecar was meant to control never
+  fires). Keeping it only produced 4 spurious mutations and a fragile side-effect.
+
+CHANGE (3 players: dog, high_hat, iron_box):
+- "we select 3 players"
+- Removed racecar: its balance line, ending column, and the group's 4th player.
+- Pink Realty still forms correctly: formNamedEntity -> shareholders =
+  players().limit(3) = dog, high_hat, iron_box, seeded onto the pink group;
+  the scenario helper uses formed() which bypasses the production 3-owner
+  split integrity checks, so a 3-player game forms Pink Realty fine.
+- Assert honest per-row endings, coupling inputs to outputs for mutation
+  observability:
+    row12 dog=45 not bankrupt -> dog=0, high_hat=45
+    row13 dog=40 bankrupt     -> dog=-5, high_hat=-5
+  (the extended post-dog-bankruptcy turn loop drains the remaining shareholder
+   to -5 in the bankrupt row; this is the real deterministic Greedo outcome,
+   now on high_hat since racecar is gone)
+- Steps kept: mortgage Steenstraat Brugge $50, share sale dog->high_hat $5,
+  entity not dissolved, bankrupt state, dog + high_hat final balances.
+
+RESULT: 576/576 acceptance green, stable across 2 runs. The racecar mutation
+observability problem is gone (column removed).
+
+Please run soft Gherkin mutation and confirm there are no surviving mutations
+requiring action.
+```
+
+Action: merged `d0cad33`. Soft Gherkin mutation found 19/22 killed and three
+survivors. Two pre-existing share-sale-8 examples do not observe High Hat's
+$1000 starting balance; the new bankrupt share-sale-9 row likewise does not
+observe High Hat's $50 starting balance (mutating it to $43 still yields -$5).
+These are Gherkin acceptance-criteria gaps, so they are returned to the
+specifier for an explicit scenario decision rather than changed by architect.
