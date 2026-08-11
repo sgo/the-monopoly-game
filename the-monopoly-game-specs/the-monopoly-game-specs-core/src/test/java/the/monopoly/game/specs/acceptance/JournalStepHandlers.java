@@ -471,15 +471,14 @@ final class JournalStepHandlers {
             (world, arguments) -> assertThat(world.gameLog().stream()
                 .filter(Entry.LegalEntityShareSold.class::isInstance)
                 .map(Entry.LegalEntityShareSold.class::cast)
-                .anyMatch(entry -> entry.name().equals("Pink Realty")
+                .anyMatch(entry -> entry.name().equals(arguments.text(2))
                     && entry.buyer().value().equals(arguments.text(1))
                     && entry.price().amount() == arguments.number(3))).isTrue()),
         then("^pawn \"" + NAME + "\" paid the lowest possible price within a third of bank balance$",
             (world, arguments) -> assertThat(world.gameLog().stream()
                 .filter(Entry.LegalEntityShareSold.class::isInstance)
                 .map(Entry.LegalEntityShareSold.class::cast)
-                .anyMatch(entry -> entry.name().equals("Pink Realty")
-                    && entry.buyer().value().equals(arguments.text(1)))).isTrue()),
+                .anyMatch(entry -> entry.buyer().value().equals(arguments.text(1)))).isTrue()),
 
         then("^pawn \"" + NAME + "\" wins the game$",
             (world, arguments) -> assertThat(world.hasWon(arguments.text(1))).isTrue()),

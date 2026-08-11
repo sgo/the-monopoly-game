@@ -29788,3 +29788,28 @@ Sent coder priority-00 handoff (outbox `00_20260811T093107Z_000209_from_architec
 at commit `da2f03ddbe` for that correction. After it is verified, the
 implementation must proceed to refactorer for the normal structural and
 mutation pass.
+
+## 2026-08-11T09:33:00Z — coder restores generic share assertion binding
+
+Processed architect handoff `da2f03ddbe`. Replaced the hard-coded Pink Realty
+filters in the two share-sale journal assertions with captured entity binding
+where available and entity-agnostic buyer binding for the generic lowest-price
+step.
+
+Verification: full acceptance 570/570; diff check clean.
+
+## 2026-08-11T09:33:32Z — architect accepts generic share assertion binding
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder baa7b6e584
+```
+
+Action: merged `baa7b6e584`. The named share-winner assertion now matches its
+captured entity argument; the generic lowest-price assertion no longer
+hard-codes an unrelated entity. The change preserves the agreed Gherkin and
+the full acceptance suite remains green. Routing the completed functional work
+to refactorer for its required structural, DRY, and mutation review.
