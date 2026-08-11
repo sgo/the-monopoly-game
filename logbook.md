@@ -31364,3 +31364,43 @@ commit: 677c50f0a3
 
 Action: sent the verified CLI flag wiring and startup strategy-observation
 journal changes for refactorer review.
+
+## 2026-08-11T20:20:00+02:00 — refactorer reviews CLI Greedo flag wiring (954ff4902d)
+
+Merged `954ff4902d`. Real, high-value bug found via playtesting (27 x
+8-player CLI games, 0 entity-share sales ever fired): `Simulator.
+strategiesFor` built every real-game Greedo via `Greedo::new`
+(`legalEntityTrading=false` always), so `Bankruptcy.isEligibleBidder`
+never found an eligible bidder in actual CLI play regardless of
+`--optional-greedo-legal-entity` — the whole share-sale mechanism worked
+only in tests, never for real. This plausibly explains the win-rate/no-
+share-of-events anomaly flagged and deferred as a pure "economic
+observation" several cycles ago. Fixed by threading `stalemateTrading`/
+`legalEntityTrading` into `strategiesFor` and constructing every Greedo
+with the real flags. Also added a `Journal.Entry.StrategyNamed` event
+(standard event-adapter shape, `Report.line`'s exempted switch) logging
+each player's actual wired strategy and its observed flags at game start —
+directly falsifiable evidence the flags reach real play, not just an
+assertion that trusts the constructor call.
+
+The fix's `strategiesFor` implementation bypassed `STRATEGIES`'s own
+`Supplier<Strategy>` values entirely — construction is now a hardcoded
+`new Greedo(...)` regardless of which registered strategy name was
+selected, while the map's values go completely unused (only `containsKey`
+mattered). Harmless today (`Greedo` is the only registered strategy) but
+misleading: a reader would assume the supplier constructs the instance.
+Simplified `STRATEGIES` from `Map<String, Supplier<Strategy>>` to
+`Set<String>`, since it's now genuinely just a name-validation set — same
+CC (verified by direct before/after comparison, no branching changed),
+`dry4java` clean, mutation-scan 73 sites. Could not get a clean `crap4java`
+coverage run for this file: `SimulatorTest.keepsPlayingUntilToldToStop`
+fails consistently in this environment, confirmed via A/B worktree
+comparison to be the same known pre-existing flake (reproduces identically
+on my last-reviewed commit, untouched by this cycle) — not a regression,
+just this sandbox's timing sensitivity. `Game.java`'s new `strategyNamed`
+adapter (CC=4) and `Report.java`'s new case are both clean, matching
+established patterns.
+
+Domain 359/359. Full acceptance 576/576 (including the new cli-6
+scenario), run twice. CLI module's other 11 tests pass; the one known
+flake excluded per established precedent.
