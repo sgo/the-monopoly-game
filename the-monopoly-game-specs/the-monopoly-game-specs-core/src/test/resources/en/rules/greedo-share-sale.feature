@@ -75,3 +75,22 @@ Feature: selling legal-entity shares to avoid bankruptcy
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance |
       | 100         | 0                | 0                |
+
+  # share-sale-5
+  Scenario Outline: a fellow shareholder bids up to the higher of the share value and a third of their bank balance, and wins at the lowest price
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And we select 4 players
+    And Pink Realty is formed
+    And pawn "dog" owns no mortgaged property
+    And pawn "dog" has $<dog_balance> to spend
+    And pawn "high hat" has $<high_hat_balance> to spend
+    And pawn "iron box" has $<iron_box_balance> to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then pawn "high hat" wins the Pink Realty share at no more than $<winning_bid>
+    And pawn "high hat" paid the lowest possible price for the Pink Realty share
+
+    Examples:
+      | dog_balance | high_hat_balance | iron_box_balance | winning_bid |
+      | 100         | 1200             | 900              | 800         |
+      | 100         | 3000             | 2600             | 915         |
+      | 100         | 1600             | 1500             | 560         |
