@@ -29542,6 +29542,22 @@ to win below share value. These are mutually exclusive rules.
 Returned both Gherkin-content contradictions to the specifier. The merged
 production state is held pending that specification loop.
 
+## 2026-08-11T09:09:44Z — architect returns share-sale contradictions
+
+Sent specifier priority-00 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: fb7d6ef94b
+```
+
+Summary: correct the retained founding-share assertion in `share-sale-1` and
+reconcile the `max(...)` bid ceiling with the below-value fallback in
+`share-sale-5`; production behavior remains held pending the decision.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
