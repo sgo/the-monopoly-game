@@ -30778,3 +30778,26 @@ factor — still valid, no update needed.
 
 Domain 359/359 (clean rebuild after removing stray probe artifacts from
 target/). Full acceptance 574/574, run twice.
+
+## 2026-08-11T13:02:05Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: f7a5c98793
+```
+
+Summary: verified the share-sale bankruptcy refinement resolves my prior
+escalation correctly (explicit `preserveNegativeBalance` flag replaces the
+bare early-return I flagged). Also correcting my own prior handoff: my
+hand-built reproduction of share-sale-8 wasn't faithful to how
+`World.landPawnOn` actually plays a full game via `Game.play()`, not a
+single event — confirmed via direct instrumentation and the real
+per-scenario surefire XML that the genuine share-sale-8 case passes
+legitimately (dog reaches solvency, never hits `finalizeBankruptcy`). No
+CRAP/DRY issues, 56 mutation sites. Domain 359/359, acceptance 574/574 run
+twice.
