@@ -30026,3 +30026,69 @@ cannot enter share calculations, and are skipped by the game operation loop.
 The simulator worker now converts escaped runtime failures into an exit-1
 result instead of leaving `awaitEnd()` null. Added a LegalEntity regression
 test. Domain tests pass 355/355; acceptance tests pass 570/570.
+
+## 2026-08-11T12:26:00+02:00 — refactorer reviews zero-share entity crash fix (fd2b2f4e02)
+
+Merged `fd2b2f4e02`. Real crash found via 8-player playtesting (27% of
+15-player-count-8 runs): a fully-liquidated legal entity (every shareholder
+sold or removed) still reached `operate()`, and division by
+`shareholders.size()` in `sharesOf` threw `ArithmeticException: / by zero`,
+killing the simulator thread and leaving `Simulator.main` NPEing on a null
+`Result`. Fixed with a `hasShareholders()` guard applied at every division
+point (`shareOf`, `shareValue`, `operate`, `canBorrowForBuilding`,
+`sharesOf`, `repayLoanIfAffordable`, `payDividend`) plus a `Simulator`
+worker try-catch converting any escaped `RuntimeException` into an exit-1
+`Result` instead of leaving `awaitEnd()` null.
+
+The private-method guards (`canBorrowForBuilding`/`sharesOf`/
+`repayLoanIfAffordable`/`payDividend`) are unreachable given the current
+call graph — `operate()`'s own guard already short-circuits before any of
+them can run with an empty shareholder list. I traced this and confirmed
+it, but left the redundant guards in place rather than removing them:
+defense-in-depth immediately after a real production crash caused by
+exactly this "it can't happen from here" reasoning is worth more than the
+minor clarity gain from trimming them, and `crap4java` doesn't flag any of
+them as violations either way.
+
+`mutate4java --scan` on `LegalEntity.java` came back at 109 sites — over
+the 100-site split threshold for the first time this task. Extracted the
+formation-eligibility predicates (`hasThreeDistinctShareholders`,
+`boardFullyOwned`, `colourGroupIneligible`, `splitAcrossThreeDistinctOwners`,
+`everyShareholderOwnsAStreet`) plus `form()`'s own gate-checking body into a
+new `LegalEntityFormation` class, leaving `form()` on `LegalEntity` as a
+one-line delegate (preserves the public API — `streetsOf`/`form`/`formed`
+all keep their existing call sites). This is a natural boundary: formation
+is a pure eligibility question over `Deeds`/`Rule.Set`, structurally
+separate from an already-formed entity's ongoing operation. Verified
+behavior-preserving via the full suite before and after.
+`LegalEntity.java` now 94 sites, `LegalEntityFormation.java` 9 sites, both
+under the threshold. `crap4java`/`dry4java` clean on both.
+
+`Game.operateLegalEntities` picked up a new CC=8/CRAP=8.0 from the added
+zero-share filter (was CC=7, already at the standing sealed-switch
+exemption). Split the sealed switch itself (still exempt, now isolated in
+`journalOperation`) from the ordinary shareholder/idle guard (extracted
+into `operateEntity`) — this doesn't reduce total complexity, but it
+separates the irreducible exempt piece from the reducible one, and lowers
+the aggregate CRAP burden (54 vs. the combined method's 72). Both pieces
+still show a high CRAP figure because `Game.java`'s legal-entity dispatch
+has never had direct `GameTest` unit coverage — confirmed via the JaCoCo
+HTML report this is a genuine, long-standing characteristic (acceptance-
+only tested) predating this commit, not something this fix introduced.
+Building full `GameTest` scaffolding for the whole dispatch subsystem is
+out of proportion for a defensive two-line guard; documenting rather than
+forcing it here, consistent with how `doneOperatingForNow` has sat
+uncovered at CRAP=6.0 through every prior cycle without action.
+
+`Simulator.java` (first review of the CLI module this task): `main()`
+shows CRAP=20.0 from 0% coverage, but it's untouched by this diff — a
+classic untested CLI entry-point shim, pre-existing debt out of this
+review's scope. The actually-changed `Running` constructor's try-catch adds
+no CRAP violation. `dry4java` clean, 70 mutation sites.
+
+`Game.java`'s large pile of `dry4java` duplicate candidates (lines
+379-513) is the same pre-existing, already-accepted "Game event-adapter
+shape" pattern noted repeatedly across this task; none of it touches the
+lines this commit changed.
+
+Domain 355/355. Full acceptance 570/570, run twice.
