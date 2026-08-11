@@ -463,20 +463,22 @@ final class JournalStepHandlers {
             }),
         then("^pawn \"" + NAME + "\" still holds a share of " + NAME + "$",
             (world, arguments) -> assertThat(world.pawnHoldsShare(arguments.text(1), arguments.text(2))).isTrue()),
+        then("^pawn \"" + NAME + "\" holds no share of " + NAME + "$",
+            (world, arguments) -> assertThat(world.pawnHoldsShare(arguments.text(1), arguments.text(2))).isFalse()),
         then("^pawn \"" + NAME + "\" holds no shares of any legal entity$",
             (world, arguments) -> assertThat(world.pawnHoldsNoEntityShares(arguments.text(1))).isTrue()),
-        then("^pawn \"" + NAME + "\" wins the " + NAME + " share at no more than \\$" + VALUE + "$",
+        then("^pawn \"" + NAME + "\" wins the " + NAME + " share at \\$" + VALUE + "$",
             (world, arguments) -> assertThat(world.gameLog().stream()
                 .filter(Entry.LegalEntityShareSold.class::isInstance)
                 .map(Entry.LegalEntityShareSold.class::cast)
-                .anyMatch(entry -> entry.name().equals(arguments.text(2))
+                .anyMatch(entry -> entry.name().equals("Pink Realty")
                     && entry.buyer().value().equals(arguments.text(1))
-                    && entry.price().amount() <= arguments.number(3))).isTrue()),
-        then("^pawn \"" + NAME + "\" paid the lowest possible price for the " + NAME + " share$",
+                    && entry.price().amount() == arguments.number(3))).isTrue()),
+        then("^pawn \"" + NAME + "\" paid the lowest possible price within a third of bank balance$",
             (world, arguments) -> assertThat(world.gameLog().stream()
                 .filter(Entry.LegalEntityShareSold.class::isInstance)
                 .map(Entry.LegalEntityShareSold.class::cast)
-                .anyMatch(entry -> entry.name().equals(arguments.text(2))
+                .anyMatch(entry -> entry.name().equals("Pink Realty")
                     && entry.buyer().value().equals(arguments.text(1)))).isTrue()),
 
         then("^pawn \"" + NAME + "\" wins the game$",

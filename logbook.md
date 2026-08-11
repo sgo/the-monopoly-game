@@ -29145,6 +29145,15 @@ Removed DRY-reported duplicate test setup. Verification: full acceptance
 DRY clean; soft legal-entity Gherkin mutation 71 killed/28 survived/0 errors;
 property tests 22/22.
 
+## 2026-08-11T09:28:00Z — coder verifies resolved share-sale policy
+
+Processed architect handoff `fe0fe960c5`. Aligned share auctions with the
+resolved policy: fellow shareholders bid up to 35% of their own balance, the
+highest bidder wins, and the winner pays the runner-up ceiling plus $5.
+Updated explicit share assertions and acceptance captures.
+
+Verification: domain tests 350/350; full acceptance 570/570; diff check clean.
+
 ## 2026-08-11T08:56:00Z — coder reviews corrected share-sale triggers
 
 Processed architect handoff `d5fe0e219b`. Added share-auction bid ceilings,
