@@ -129,6 +129,9 @@ final class JournalStepHandlers {
         then("^" + NAME + " is dissolved$",
             (world, arguments) -> assertThat(world.entityIsDissolved(arguments.text(1))).isTrue()),
 
+        then("^" + NAME + " is not dissolved$",
+            (world, arguments) -> assertThat(world.entityIsNotDissolved(arguments.text(1))).isTrue()),
+
         then("^pawn \"" + NAME + "\" owns every street previously held by " + NAME + "$",
             (world, arguments) -> assertThat(world.pawnOwnsEveryFormerEntityStreet(
                 arguments.text(1), arguments.text(2))).isTrue()),

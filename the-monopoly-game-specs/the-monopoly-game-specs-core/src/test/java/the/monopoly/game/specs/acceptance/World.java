@@ -644,6 +644,10 @@ public class World {
     return deeds.legalEntities().stream().noneMatch(entity -> entity.name().equals(name));
   }
 
+  public boolean entityIsNotDissolved(String name) {
+    return deeds.legalEntities().stream().anyMatch(entity -> entity.name().equals(name));
+  }
+
   public boolean pawnOwnsEveryFormerEntityStreet(String pawnName, String entityName) {
     Street.Colour colour = Street.Colour.valueOf(entityName.substring(0, entityName.indexOf(' ')).toLowerCase());
     Player owner = pawn(pawnName);

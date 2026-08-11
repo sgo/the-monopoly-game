@@ -156,5 +156,25 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
     Examples:
       | dog_balance | high_hat_balance | winning_bid | bankrupt_state | dog_ending |
-      | 94          | 1000             | 5           | bankrupt       | 0          |
+      | 94          | 1000             | 5           | bankrupt       | -1         |
       | 95          | 1000             | 5           | not bankrupt   | 0          |
+
+  # share-sale-9
+  Scenario Outline: a distressed shareholder disposes of a personal asset before offering their legal-entity share, and the share sale may or may not settle the remaining debt
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And we select 4 players
+    And Pink Realty is formed
+    And pawn "iron box" is bankrupt
+    And pawn "dog" owns "Steenstraat Brugge"
+    And pawn "dog" has $<dog_balance> to spend
+    And pawn "high hat" has $<high_hat_balance> to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then pawn "dog" no longer owns "Steenstraat Brugge"
+    And pawn "high hat" wins the Pink Realty share at $<winning_bid>
+    And Pink Realty is not dissolved
+    And pawn "dog"'s bankrupt state is <bankrupt_state>
+
+    Examples:
+      | dog_balance | high_hat_balance | winning_bid | bankrupt_state |
+      | 90          | 1000             | 5           | not bankrupt   |
+      | 50          | 1000             | 5           | bankrupt       |
