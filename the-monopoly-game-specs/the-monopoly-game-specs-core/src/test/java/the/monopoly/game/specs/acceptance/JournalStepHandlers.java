@@ -481,7 +481,7 @@ final class JournalStepHandlers {
 
         then("^pawn \"" + NAME + "\"'s bankrupt state is (<bankrupt_state>)$",
             (world, arguments) -> assertThat(world.isBankrupt(arguments.text(1)))
-                .isEqualTo(arguments.text(2).equals("bankrupt"))),
+                .isEqualTo(expectedBankruptState(arguments.text(2)))),
 
         then("^pawn \"" + NAME + "\" no longer holds a share of " + NAME + "$",
             (world, arguments) -> assertThat(world.pawnHoldsShare(arguments.text(1), arguments.text(2))).isFalse()),
@@ -688,24 +688,37 @@ final class JournalStepHandlers {
                 bankReceived(arguments.text(3), arguments.number(4))))
     );
   }
+
+  private static boolean expectedBankruptState(String state) {
+    return switch (state) {
+      case "bankrupt" -> true;
+      case "not bankrupt" -> false;
+      default -> throw new IllegalArgumentException("Unknown bankrupt state: " + state);
+    };
+  }
 }
 
 /* mutate4java-manifest
 version=1
-moduleHash=c8dd9158ef92863629dc8a408c89e1f11c8641b420f2af238eb934bcdd940eb3
+moduleHash=077f5f4ed435ecde324938580751c9a91f07d6825bccf1afafea77f2e26567b2
 scope.0.id=Y2xhc3M6Sm91cm5hbFN0ZXBIYW5kbGVycyNKb3VybmFsU3RlcEhhbmRsZXJzOjQ4
 scope.0.kind=class
 scope.0.startLine=48
-scope.0.endLine=684
-scope.0.semanticHash=1ad17d1abde67e053346368e6977464926106bef576d62a51f64625c5f4936e9
+scope.0.endLine=699
+scope.0.semanticHash=6df79d220188840573182ad7f8fa2b156fab1b63e9b24b54c99c225d2f9a74df
 scope.1.id=bWV0aG9kOkpvdXJuYWxTdGVwSGFuZGxlcnMjY3RvcigwKTo0OQ
 scope.1.kind=method
 scope.1.startLine=49
 scope.1.endLine=50
 scope.1.semanticHash=a7330247d1ba0ccc6eb267a7aaafe651c1edf65f9251ec84a0dadaa9c074a1ae
-scope.2.id=bWV0aG9kOkpvdXJuYWxTdGVwSGFuZGxlcnMjaGFuZGxlcnMoMCk6NTI
+scope.2.id=bWV0aG9kOkpvdXJuYWxTdGVwSGFuZGxlcnMjZXhwZWN0ZWRCYW5rcnVwdFN0YXRlKDEpOjY5Mg
 scope.2.kind=method
-scope.2.startLine=52
-scope.2.endLine=683
-scope.2.semanticHash=9353b799f4b58e487d25ec51fb6866ca677ddc14eb45529ff0f0bab84afb77c6
+scope.2.startLine=692
+scope.2.endLine=698
+scope.2.semanticHash=b20d3dbc4be360fe08c388e538d417ec4ea9ef295c9575b87bbcc843eb365b0a
+scope.3.id=bWV0aG9kOkpvdXJuYWxTdGVwSGFuZGxlcnMjaGFuZGxlcnMoMCk6NTI
+scope.3.kind=method
+scope.3.startLine=52
+scope.3.endLine=690
+scope.3.semanticHash=48ff61c569ef5ba6cf9ac8c61ed483d58013d8e48419f008509010ff96de3acd
 */

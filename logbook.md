@@ -30801,3 +30801,23 @@ per-scenario surefire XML that the genuine share-sale-8 case passes
 legitimately (dog reaches solvency, never hits `finalizeBankruptcy`). No
 CRAP/DRY issues, 56 mutation sites. Domain 359/359, acceptance 574/574 run
 twice.
+
+## 2026-08-11T13:02:10Z — architect receives share-sale refinement review
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer f7a5c98793
+```
+
+Action: merging `f7a5c98793` and reviewing the approved partial-share-sale
+bankruptcy policy, its core state handling, and its explicit acceptance cases.
+
+## 2026-08-11T13:05:00Z — architect tightens bankrupt-state assertion parsing
+
+Action: changed the acceptance adapter so `pawn ... bankrupt state is ...`
+accepts only the feature's two literals, `bankrupt` and `not bankrupt`.
+Previously any typo was interpreted as `not bankrupt`, allowing malformed
+state mutations to survive. The adapter change does not alter game behavior.
