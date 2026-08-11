@@ -29748,6 +29748,29 @@ flake (unrelated to legal-entity work, previously confirmed via A/B
 worktree comparison); domain-module-scoped run is clean. No functional
 changes needed on my side.
 
+## 2026-08-11T09:21:52+02:00 — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: d384b1698d
+```
+
+Summary: verified the developed-entity-rent fix — entity-owned streets now
+charge the printed house/hotel rent ladder instead of a flat 2x vacant,
+closing the economic gap the specifier's playtesting traced to suppressed
+downward cash pressure. Clean structural pass: `entityRent` CC=3, no DRY
+issues (the similarity to `colourStreetRent` is domain-real, not
+duplication — entity vacant rent is unconditionally doubled by
+construction, player vacant rent depends on an actual monopoly check), 12
+mutation sites, manifest refreshed. Domain 350/350, acceptance 563/563 run
+twice. Whole-reactor test hit the known pre-existing CLI
+`SimulatorTest.keepsPlayingUntilToldToStop` flake, unrelated to this work.
+
 ## 2026-08-11T07:21:52Z — architect accepts developed entity rent
 
 Received refactorer priority-50 handoff:
@@ -29766,6 +29789,7 @@ records. Extracted repeated `RentTest` fixtures only. Verification: full
 acceptance 563/563; `RentTest` 17/17; differential mutation 0 changed sites;
 DRY clean; soft legal-entity Gherkin mutation 63 killed/29 survived/0 errors;
 property tests 22/22.
+
 ## 2026-08-11T09:30:47Z — architect returns non-generic share-sale assertion binding
 
 Received coder priority-00 handoff:
@@ -29816,3 +29840,64 @@ to refactorer for its required structural, DRY, and mutation review.
 
 Sent refactorer priority-00 handoff (outbox `00_20260811T093351Z_000210_from_architect_to_refactorer.handoff`)
 at commit `0b9f5cfd37`.
+
+## 2026-08-11T11:45:00+02:00 — refactorer reviews greedo-share-sale (0b9f5cfd37)
+
+Merged `0b9f5cfd37`. New feature: a shareholder facing bankruptcy offers
+their legal-entity share to fellow shareholders as a last-resort liquidation
+step, priced at second-price-plus-$5 clamped between a minimum bid (share
+value or shortfall, whichever is less) and the winner's own 35%-of-balance
+ceiling.
+
+`crap4java` on `Bankruptcy.java` found the real violation:
+`sellEntitySharesUntilSolvent` at CC=16/CRAP=239.9 (4.4% coverage — only
+exercised via acceptance, never unit-tested directly). Decomposed into
+`sellShareToHighestBidder`, `minimumShareBid`, `bidsFor`,
+`isEligibleBidder`, `highestBid`, `shareSalePrice`, plus a small `Bid`
+record replacing the original's two parallel `List<Player>`/`List<Money>`
+arrays — pure extraction, verified behavior-preserving via the full suite
+before and after. Also found `resolve()` itself sitting at a pre-existing
+CRAP=7.0 (predates this task; untouched by the coder's diff, which only
+slotted two new call-sites into its existing linear sequence) — extracted
+`finalizeBankruptcy` since I was already in the file, bringing it to
+CRAP=6.0.
+
+Complexity reduction alone wasn't enough given the near-zero coverage
+(CRAP stays high even at low CC when coverage is 0%), so added four
+focused `BankruptcyTest` cases: highest-bidder-wins with second-price-plus-5
+pricing, price clamped to the winner's own ceiling (second+5 exceeding the
+winner's max), non-shareholders excluded regardless of funds, and
+shareholders without `legalEntityTradingEnabled` excluded regardless of
+solvency. These also gave `LegalEntity.sellShare`/`shareValue`/`removeShares`
+real coverage for free (sellShare was its own CRAP=12.0 violation before
+this, now CRAP=3.0). Every method in both files now CRAP<=6.
+`dry4java`: none on either file. `mutate4java --scan`: `Bankruptcy.java` 47
+sites, `LegalEntity.java` 97 sites (both under 100, both manifests
+refreshed).
+
+Reviewed `Game.java`/`Report.java` (standard event-adapter case, matches
+the sealed-switch pattern), `World.java`/`JournalStepHandlers.java`
+(clean new additions; the pre-existing large-scale step-handler
+duplication in `World.java` that `dry4java` flags predates this commit and
+is out of this task's scope, consistent with how I've treated this file
+all session) — no edits needed there.
+
+Domain 354/354. Full acceptance 570/570, run twice.
+
+## 2026-08-11T09:47:35Z — architect accepts share-sale structural review
+
+Received refactorer priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer a4038e8ed0
+```
+
+Action: merged `a4038e8ed0`. The review replaces parallel bidder and maximum
+lists with a cohesive `Bid` value, decomposes the share-sale policy into
+testable operations, and adds targeted unit coverage for pricing and bidder
+eligibility. Architecture remains core-only: the rules depend only on domain
+models and strategies, while journalling stays in the existing game adapter.
+The final mutation, DRY, soft-Gherkin, and property verification sequence is
+now running.

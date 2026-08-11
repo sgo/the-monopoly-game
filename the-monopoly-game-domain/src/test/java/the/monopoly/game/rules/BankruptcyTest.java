@@ -252,6 +252,92 @@ class BankruptcyTest {
     assertThat(deeds.holdsGetOutOfJailFreeCard(highHat)).isTrue();
   }
 
+  @Test
+  void theEntitySellsADistressedShareholdersShareToTheHighestBidder() {
+    Deeds deeds = new Deeds();
+    Player ironBox = player("iron box");
+    List<Player> table = List.of(dog, highHat, ironBox);
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, table, rules);
+    deeds.form(entity);
+    dog.account().withdraw(new Money(2000));
+    highHat.account().deposit(new Money(500));
+    ironBox.account().deposit(new Money(1500));
+    Strategy.OfPlayers strategies = player -> player.equals(dog)
+        ? Strategy.UNDECIDED : new the.monopoly.game.strategies.Greedo(Money.ZERO, false, true);
+    Events events = new Events();
+
+    new Bankruptcy(deeds, rules, table, strategies, events).resolve(dog, null);
+
+    assertThat(entity.shareOf(dog)).isZero();
+    assertThat(entity.shareOf(ironBox)).isEqualTo(2.0 / 3.0);
+    assertThat(dog.account().balance().amount().amount()).isEqualTo(205);
+    assertThat(deeds.isBankrupt(dog)).isFalse();
+    assertThat(events.soldShareBuyer).isEqualTo(ironBox);
+    assertThat(events.soldSharePrice).isEqualTo(new Money(705));
+  }
+
+  @Test
+  void theShareSalePriceNeverExceedsTheWinningBiddersOwnCeiling() {
+    Deeds deeds = new Deeds();
+    Player ironBox = player("iron box");
+    List<Player> table = List.of(dog, highHat, ironBox);
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, table, rules);
+    deeds.form(entity);
+    dog.account().withdraw(new Money(2000));
+    highHat.account().deposit(new Money(500));
+    ironBox.account().deposit(new Money(489));
+    Strategy.OfPlayers strategies = player -> player.equals(dog)
+        ? Strategy.UNDECIDED : new the.monopoly.game.strategies.Greedo(Money.ZERO, false, true);
+    Events events = new Events();
+
+    new Bankruptcy(deeds, rules, table, strategies, events).resolve(dog, null);
+
+    assertThat(entity.shareOf(highHat)).isEqualTo(2.0 / 3.0);
+    assertThat(events.soldShareBuyer).isEqualTo(highHat);
+    assertThat(events.soldSharePrice).isEqualTo(new Money(700));
+  }
+
+  @Test
+  void onlyFellowShareholdersMayBidOnADistressedShare() {
+    Deeds deeds = new Deeds();
+    Player ironBox = player("iron box");
+    Player racecar = player("racecar");
+    racecar.account().deposit(new Money(10000));
+    List<Player> table = List.of(dog, highHat, ironBox, racecar);
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    deeds.form(entity);
+    dog.account().withdraw(new Money(2000));
+    Strategy.OfPlayers strategies = player -> player.equals(racecar)
+        ? new the.monopoly.game.strategies.Greedo(Money.ZERO, false, true) : Strategy.UNDECIDED;
+    Events events = new Events();
+
+    new Bankruptcy(deeds, rules, table, strategies, events).resolve(dog, null);
+
+    assertThat(events.soldShareBuyer).isNull();
+    assertThat(deeds.isBankrupt(dog)).isTrue();
+    assertThat(entity.shareOf(dog)).isZero();
+  }
+
+  @Test
+  void aShareholderWithoutLegalEntityTradingEnabledCannotBid() {
+    Deeds deeds = new Deeds();
+    Player ironBox = player("iron box");
+    List<Player> table = List.of(dog, highHat, ironBox);
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, table, rules);
+    deeds.form(entity);
+    dog.account().withdraw(new Money(2000));
+    highHat.account().deposit(new Money(500));
+    ironBox.account().deposit(new Money(1500));
+    Events events = new Events();
+
+    new Bankruptcy(deeds, rules, table, Strategy.OfPlayers.NOBODY_DECIDES, events).resolve(dog, null);
+
+    assertThat(events.soldShareBuyer).isNull();
+    assertThat(deeds.isBankrupt(dog)).isTrue();
+    assertThat(entity.shareOf(dog)).isZero();
+  }
+
   private void give(Deeds deeds, Ownable land, Player owner) {
     deeds.sell(land, owner, land.price());
     owner.account().deposit(land.price());
@@ -289,6 +375,8 @@ class BankruptcyTest {
     private boolean bankrupt;
     private Player winner;
     private boolean noBidder;
+    private Player soldShareBuyer;
+    private Money soldSharePrice;
 
     @Override
     public void bankrupt(Player debtor, Player creditor) {
@@ -303,6 +391,12 @@ class BankruptcyTest {
     @Override
     public void distressedSaleNoBidder(Player seller, Ownable land) {
       noBidder = true;
+    }
+
+    @Override
+    public void soldEntityShare(Player seller, LegalEntity entity, Player buyer, Money price) {
+      soldShareBuyer = buyer;
+      soldSharePrice = price;
     }
   }
 }
