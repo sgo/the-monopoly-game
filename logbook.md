@@ -31134,3 +31134,8 @@ strategies. The feature needs an explicit, separately named scenario setup
 that specifies Racecar's intended participation/turn behavior, or revised
 expected outcome under normal Greedo gameplay. Escalating this Gherkin setup
 policy to the specifier; no hidden harness override will be retained.
+
+## 2026-08-11T16:10:08Z — architect escalates racecar setup policy
+
+Sent priority-00 git handoff to specifier for `710b609b0e`, carrying the
+Racecar $50 versus -$5 scenario contradiction and cohesive helper correction.
