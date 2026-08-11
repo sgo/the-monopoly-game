@@ -30543,3 +30543,26 @@ conflict, removed the duplicate bankruptcy setup handler, and retained the
 liquidation setup's deterministic operated-entity and distressed-sale bidder
 configuration. Full acceptance passes 572/572 and `git diff --check` is clean.
 Ready for refactorer review.
+
+## 2026-08-11T13:25:00+02:00 — refactorer reviews deterministic liquidation specification (9204e41c62)
+
+Merged `9204e41c62`. Production domain code is byte-identical to my last
+commit (`ee58b5e8ba`) — the large `Game.java`/`Bankruptcy.java`/
+`LegalEntity.java`/`Report.java` diffs in the raw commit range were
+manifest-line-number churn from divergent branch tips, not real changes,
+confirmed by a direct diff against my tree showing zero output.
+
+The actual change: share-sale-6 (the sufficient-cash liquidation path, no
+distressed sale needed) now asserts dog's exact post-liquidation balance
+via a new `pawnFinalBalanceIs` step, replacing the fault-tolerant "received
+the bank balance" check for that specific scenario — stronger and fully
+deterministic where the ending balance is fully computable. My
+journal-based `pawnReceivedEntityBankBalance` fix from last cycle stays in
+place and still backs share-sale-7 (the insufficient-cash cascading
+distressed-sale path), where the exact ending balance depends on auction
+dynamics and can't be pinned down the same way — the specifier's split is
+the right call, not a redundant duplicate check. `bankruptPawns` also
+generalized from a fixed two-pawn signature to varargs, used identically
+elsewhere. `dry4java` clean on `JournalStepHandlers.java`.
+
+Domain clean, full acceptance 572/572, run twice.
