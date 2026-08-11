@@ -166,15 +166,19 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And Pink Realty is formed
     And pawn "iron box" is bankrupt
     And pawn "dog" owns "Steenstraat Brugge"
+    And pawn "iron box" owns "Rue Grande Dinant"
+    And pawn "iron box" owns "Diestsestraat Leuven"
+    And pawn "iron box" owns "Place du Monument Spa"
     And pawn "dog" has $<dog_balance> to spend
     And pawn "high hat" has $<high_hat_balance> to spend
+    And pawn "racecar" has $<racecar_balance> to spend
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
-    Then pawn "dog" no longer owns "Steenstraat Brugge"
+    Then the land "Steenstraat Brugge" is mortgaged
     And pawn "high hat" wins the Pink Realty share at $<winning_bid>
     And Pink Realty is not dissolved
     And pawn "dog"'s bankrupt state is <bankrupt_state>
 
     Examples:
-      | dog_balance | high_hat_balance | winning_bid | bankrupt_state |
-      | 90          | 1000             | 5           | not bankrupt   |
-      | 50          | 1000             | 5           | bankrupt       |
+      | dog_balance | high_hat_balance | racecar_balance | winning_bid | bankrupt_state |
+      | 45          | 50               | 50              | 5           | not bankrupt   |
+      | 40          | 50               | 50              | 5           | bankrupt       |
