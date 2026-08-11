@@ -29783,3 +29783,8 @@ coder before refactor review: the two new `JournalStepHandlers` assertions
 hard-code `Pink Realty` rather than using their captured legal-entity argument,
 so they would pass for the wrong entity. The correction must restore generic
 binding without changing the Gherkin specification.
+
+Sent coder priority-00 handoff (outbox `00_20260811T093107Z_000209_from_architect_to_coder.handoff`)
+at commit `da2f03ddbe` for that correction. After it is verified, the
+implementation must proceed to refactorer for the normal structural and
+mutation pass.
