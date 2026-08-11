@@ -29145,6 +29145,21 @@ Removed DRY-reported duplicate test setup. Verification: full acceptance
 DRY clean; soft legal-entity Gherkin mutation 71 killed/28 survived/0 errors;
 property tests 22/22.
 
+## 2026-08-11T07:41:57Z — architect sends phase-complete developed-rent sync
+
+Sent specifier priority-50 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-legal-entity
+commit: 98b9c40cb3
+```
+
+Summary: phase complete after acceptance of developed entity rent, including
+the final architectural test-fixture cleanup and verification record.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
