@@ -99,3 +99,21 @@ Feature: selling legal-entity shares to avoid bankruptcy
       | 40          | 1200             | 900              | 320         |
       | 40          | 3000             | 2600             | 915         |
       | 40          | 1600             | 1500             | 530         |
+
+  # share-sale-6
+  Scenario Outline: the final shareholder may liquidate the legal entity to settle their debt
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And we select 4 players
+    And Pink Realty is formed
+    And pawn "high hat" and pawn "iron box" have both gone bankrupt
+    And pawn "dog" owns no mortgaged property
+    And pawn "dog" has $<dog_balance> to spend
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then pawn "dog" is not bankrupt
+    And Pink Realty is dissolved
+    And pawn "dog" owns every street previously held by Pink Realty
+    And pawn "dog" received the Pink Realty bank balance
+
+    Examples:
+      | dog_balance |
+      | 40          |
