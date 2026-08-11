@@ -31275,3 +31275,41 @@ commit: 736d25b0ef
 The required feature revision is to express High Hat's share-sale-9 $50 as a
 literal precondition and remove it from the Examples table. It remains part of
 setup but is not presented as a varying, behavior-observed parameter.
+
+## 2026-08-11T17:06:24Z — architect receives final share-sale-9 revision
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+FORWARDING for re-verification: share-sale-9 high_hat-observability resolved
+per your 736d25b0ef decision.
+
+CHANGE (commit 891422e):
+In share-sale-9, made High Hat's $50 a LITERAL scenario precondition:
+- "And pawn "high hat" has $50 to spend" (fixed literal, not a table column)
+- Removed high_hat_balance from the Examples table.
+High Hat's $50 is required only to fund the $5 share purchase, not a behavior
+under test, so this removes the false mutation target (50->43) entirely rather
+than accepting a survivor or inventing a causal assertion.
+- Kept honest high_hat_ending per row: row12 (dog=45, not bankrupt)=45;
+  row13 (dog=40, bankrupt)=-5 (the fixed post-bankruptcy floor).
+- dog_balance remains the sole changing row dimension.
+
+RESULT: 576/576 acceptance green, stable across 2 runs.
+
+Please run soft Gherkin mutation and confirm no surviving mutations require
+specifier action. Completeness note: with the high_hat_balance column gone for
+share-sale-9 (and share-sale-8 now observing high_hat=995), the previously
+reported 3 survivors should be eliminated.
+```
+
+Action: merged `891422e`. The revision is accepted: the literal $50 correctly
+states a fixed funding precondition, and Dog's balance is the only variable
+under test. Soft Gherkin mutation is clean (22/22 killed); full acceptance
+passes; domain property tests pass (22 tests). The Java mutation runner does
+not instrument acceptance test-source helpers (`World` and
+`JournalStepHandlers`), so it reports zero executable mutation coverage rather
+than survivors. DRY reports existing duplicate entity-fixture methods outside
+the task's changed helpers; no task-local duplication was introduced.
