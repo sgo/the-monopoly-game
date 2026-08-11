@@ -95,8 +95,7 @@ public final class Bankruptcy {
             || !(strategies.forPlayer(candidate) instanceof Greedo greedo)
             || !greedo.legalEntityTradingEnabled()) continue;
         int available = candidate.account().balance().amount().amount();
-        int ceiling = Math.max(value.amount(), available * 35 / 100);
-        Money offered = new Money(Math.min(available, ceiling));
+        Money offered = new Money(Math.min(available, available * 35 / 100));
         if (offered.amount() >= minimumBid) {
           bidders.add(candidate);
           maximums.add(offered);
@@ -110,15 +109,11 @@ public final class Bankruptcy {
       Player buyer = bidders.get(winnerIndex);
       Money maximumBid = maximums.get(winnerIndex);
       Money price;
-      if (maximumBid.amount() < value.amount()) {
-        price = maximumBid;
-      } else {
-        int second = 0;
-        for (int index = 0; index < maximums.size(); index++) {
-          if (index != winnerIndex) second = Math.max(second, maximums.get(index).amount());
-        }
-        price = new Money(Math.min(maximumBid.amount(), Math.max(minimumBid, second + 5)));
+      int second = 0;
+      for (int index = 0; index < maximums.size(); index++) {
+        if (index != winnerIndex) second = Math.max(second, maximums.get(index).amount());
       }
+      price = new Money(Math.min(maximumBid.amount(), Math.max(minimumBid, second + 5)));
       entity.sellShare(debtor, buyer, price);
       events.soldEntityShare(debtor, entity, buyer, price);
     }
