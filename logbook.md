@@ -29783,3 +29783,12 @@ coder before refactor review: the two new `JournalStepHandlers` assertions
 hard-code `Pink Realty` rather than using their captured legal-entity argument,
 so they would pass for the wrong entity. The correction must restore generic
 binding without changing the Gherkin specification.
+
+## 2026-08-11T09:33:00Z — coder restores generic share assertion binding
+
+Processed architect handoff `da2f03ddbe`. Replaced the hard-coded Pink Realty
+filters in the two share-sale journal assertions with captured entity binding
+where available and entity-agnostic buyer binding for the generic lowest-price
+step.
+
+Verification: full acceptance 570/570; diff check clean.
