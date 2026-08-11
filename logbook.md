@@ -30490,3 +30490,27 @@ duplication shape, not a new concern. `LegalEntity.java` back to exactly
 
 Domain and acceptance both verified clean; full acceptance 572/572, run
 twice.
+
+## 2026-08-11T11:18:36Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: ee58b5e8ba
+```
+
+Summary: the coder's fix for the weak `pawnReceivedEntityBankBalance`
+assertion added test-only snapshot fields directly to `LegalEntity`,
+violating the core-only domain boundary. Root cause was a missing journal
+event — `Bankruptcy.liquidateEntity` never journalled anything, unlike
+every other significant domain action. Added the missing
+`Bankruptcy.Events.entityLiquidated` hook feeding a new
+`Journal.Entry.LegalEntityLiquidated` record, rewrote the acceptance
+adapter to query the journal (matching the existing pattern used
+everywhere else), and removed the domain-object fields entirely. No CRAP
+or DRY issues, manifests refreshed across all four touched files. Domain
+clean, acceptance 572/572 run twice.
