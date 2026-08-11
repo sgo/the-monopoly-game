@@ -30236,3 +30236,26 @@ mutation sites (not over, no further split needed). `dry4java` clean on
 every touched file.
 
 Domain 358/358. Full acceptance 572/572, run twice.
+
+## 2026-08-11T10:50:50Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 2c365cc78b
+```
+
+Summary: verified the final-shareholder liquidation policy that properly
+closes the zero-shareholder crash path (streets and treasury transfer to
+the last shareholder, then distressed sale of the newly-acquired streets
+if still insolvent). Confirmed my `LegalEntityFormation` split from last
+cycle survived the merge correctly despite a diverged-tips diff briefly
+suggesting otherwise. Added unit coverage for two previously-untested new
+methods (`LegalEntity.liquidateTo`, `Deeds.dissolve`) plus one integration-
+level `BankruptcyTest` case for the full liquidation flow — both now clean
+under CRAP, `LegalEntity.java` sits at exactly 100 mutation sites (not
+over). Domain 358/358, acceptance 572/572 run twice.
