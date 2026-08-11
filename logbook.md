@@ -29303,6 +29303,22 @@ fixed $100, so `share-sale-1` and `share-sale-2` give Dog exactly enough cash
 to pay it and produce no shortfall; no bankruptcy liquidation or share auction
 can validly occur. Returned this acceptance-example defect to the specifier.
 
+## 2026-08-11T08:48:38Z — architect returns share-sale distress examples
+
+Sent specifier priority-00 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: e0ca33e1d4
+```
+
+Summary: `share-sale-1` and `share-sale-2` must give Dog less than the $100
+Luxury Tax to create the required distress trigger before share liquidation can
+be implemented or accepted.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
