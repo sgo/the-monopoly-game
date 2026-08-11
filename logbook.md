@@ -30812,3 +30812,8 @@ specified result. The scenario therefore does not prove that its stated
 starting balances participate in the intended bankruptcy boundary. This is a
 feature acceptance-criteria gap, not a production implementation decision;
 escalating it to the specifier.
+
+## 2026-08-11T13:09:37Z — architect escalates share-sale input coverage
+
+Sent priority-00 git handoff to specifier for `c6a7620746`, carrying the two
+surviving balance-input mutations for `greedo-legal-entity`.
