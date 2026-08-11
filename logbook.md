@@ -30660,6 +30660,13 @@ now win at the nominal $5 price; zero-capacity bidders remain ineligible, and
 street distressed-sale minimums are unchanged. Domain tests pass 359/359;
 share-sale acceptance passes 10/10; full acceptance passes successfully.
 
+## 2026-08-11T18:03:40Z — coder verifies deterministic share-sale setup
+
+Merged architect handoff `b9e62f51d7`. Added the missing return-to-bank setup
+step, preserved legal-entity bidding for high hat, and prevented unrelated
+racecar distressed bidding in share-sale-9. Domain tests pass 359/359; full
+acceptance passes successfully; `git diff --check` is clean.
+
 ## 2026-08-11T14:30:00+02:00 — refactorer reviews no-minimum-bid share sales (6029b5fa72) — BLOCKING FINDING
 
 Merged `6029b5fa72`. The specifier's request (removing the incorrect
