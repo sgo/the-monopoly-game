@@ -29766,3 +29766,20 @@ records. Extracted repeated `RentTest` fixtures only. Verification: full
 acceptance 563/563; `RentTest` 17/17; differential mutation 0 changed sites;
 DRY clean; soft legal-entity Gherkin mutation 63 killed/29 survived/0 errors;
 property tests 22/22.
+## 2026-08-11T09:30:47Z — architect returns non-generic share-sale assertion binding
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 94b7e022b9
+```
+
+Action: merged `94b7e022b9` as `e9fc4a7171`. Full acceptance passes 570/570,
+including all seven share-sale scenarios. The bid ceiling and runner-up-plus-$5
+pricing now match the clarified specification. Returned a focused correction to
+coder before refactor review: the two new `JournalStepHandlers` assertions
+hard-code `Pink Realty` rather than using their captured legal-entity argument,
+so they would pass for the wrong entity. The correction must restore generic
+binding without changing the Gherkin specification.
