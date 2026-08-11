@@ -87,11 +87,11 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "high hat" has $<high_hat_balance> to spend
     And pawn "iron box" has $<iron_box_balance> to spend
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
-    Then pawn "high hat" wins the Pink Realty share at no more than $<winning_bid>
-    And pawn "high hat" holds the highest bid within a third of bank balance
+    Then pawn "high hat" wins the Pink Realty share at $<winning_bid>
+    And pawn "high hat" paid the lowest possible price within a third of bank balance
 
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance | winning_bid |
-      | 40          | 1200             | 900              | 420         |
-      | 40          | 3000             | 2600             | 1050        |
-      | 40          | 1600             | 1500             | 560         |
+      | 40          | 1200             | 900              | 320         |
+      | 40          | 3000             | 2600             | 915         |
+      | 40          | 1600             | 1500             | 530         |
