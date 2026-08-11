@@ -29091,3 +29091,23 @@ threshold, `canBorrowForBuilding` now CC=3, simpler than before). `dry4java`:
 none. `mutate4java --scan`: 92 sites, manifest refreshed. No functional
 changes needed on my side — purely verification and a manifest refresh.
 Domain tests 348/348. Acceptance 563/563, confirmed clean across 4 runs.
+
+## 2026-08-11T04:46:30Z — architect accepts committed-shortfall enforcement
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer b325657b2d
+```
+
+Action: merged and accepted `b325657b2d`. The group-financed build rule now
+requires an explicit commitment and actual available funds from every
+shareholder for every positive shortfall, even when the entity already has
+treasury funds. Construction fully covered by the treasury still needs no
+commitment or loan. No test-specific threshold or player-count policy remains.
+Removed DRY-reported duplicate test setup. Verification: full acceptance
+563/563; `LegalEntityTest` 20/20; differential mutation 0 changed sites;
+DRY clean; soft legal-entity Gherkin mutation 71 killed/28 survived/0 errors;
+property tests 22/22.
