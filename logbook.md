@@ -30821,3 +30821,12 @@ Action: changed the acceptance adapter so `pawn ... bankrupt state is ...`
 accepts only the feature's two literals, `bankrupt` and `not bankrupt`.
 Previously any typo was interpreted as `not bankrupt`, allowing malformed
 state mutations to survive. The adapter change does not alter game behavior.
+
+## 2026-08-11T15:12:00+02:00 — refactorer reviews bankrupt-state literal validation (fc8b520919)
+
+Merged `fc8b520919`. Small, well-scoped acceptance-harness hardening: the
+`bankrupt state is <X>` step handler used to interpret any non-"bankrupt"
+literal (including typos) as "not bankrupt," silently masking a malformed
+scenario. Replaced with an explicit two-case switch that throws on
+anything else. Test-infra only, no production code touched. `dry4java`
+clean. Domain unaffected (unchanged), full acceptance 574/574 run twice.
