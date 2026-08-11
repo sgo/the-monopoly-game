@@ -30924,3 +30924,29 @@ expected result if the offer cannot settle the debt.
 
 Sent priority-00 git handoff to specifier for `9793e71aba`, documenting that
 share-sale reordering requires an explicit behavioral specification.
+
+## 2026-08-11T13:55:50Z — architect accepts share-sale-9 specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+FORWARDING for implementation: share-sale-9 full distressed-sale ordering
+specification. Please implement the ordering so this spec passes, resolving
+the claimed harness strategy-override defect.
+```
+
+Action: merged `9b38cc0` and ran acceptance. Both new examples fail at the
+expected share-sale event. Inspection confirms `givePawnOwnership` uses
+`putIfAbsent`, so it preserves the previously configured Greedo strategy; the
+claimed strategy override is not present in the current code.
+
+## 2026-08-11T13:58:00Z — architect finds share-sale-9 example contradiction
+
+Action: `Steenstraat Brugge` has a $50 mortgage value. In the $90 example,
+Dog's $100 tax shortfall is only $10, so mortgage-first resolution leaves Dog
+at +$40 and must stop before any residual debt or distressed share sale.
+Requiring the share sale would instead specify a voluntary sale after
+solvency, a different behavior not stated in the scenario. Escalating this
+Gherkin example/policy defect to the specifier; no coder handoff is safe yet.
