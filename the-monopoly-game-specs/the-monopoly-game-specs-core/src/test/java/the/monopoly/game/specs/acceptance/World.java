@@ -96,7 +96,6 @@ public class World {
   private int packagedCliExitCode;
   private Boolean tradeAccepted;
   private final Map<String, Money> entityBalances = new HashMap<>();
-  private final Map<String, LegalEntity> formedEntities = new HashMap<>();
   private MonopolyBuyout.Outcome buyout;
   private boolean stalemateTrading;
   private boolean legalEntityTrading;
@@ -612,10 +611,7 @@ public class World {
         : LegalEntity.form(name, colour, shareholders, ruleSet, deeds,
             street -> Strategy.priorityOf(street) == Strategy.Priority.HIGHEST).orElse(null);
     if (entity != null) deeds.form(entity);
-    if (entity != null) {
-      entityBalances.put(entity.name(), entity.bankBalance());
-      formedEntities.put(entity.name(), entity);
-    }
+    if (entity != null) entityBalances.put(entity.name(), entity.bankBalance());
   }
 
   public void bankruptPawns(String first, String second) {
@@ -651,12 +647,10 @@ public class World {
 
   public boolean pawnReceivedEntityBankBalance(String pawnName, String entityName) {
     Money entityBalance = entityBalances.get(entityName);
-    LegalEntity entity = formedEntities.get(entityName);
-    if (entityBalance == null || entity == null || entity.liquidationRecipientBalance() == null
-        || entity.liquidationRecipientBalanceAfter() == null
-        || !entityIsDissolved(entityName)) return false;
-    return entity.liquidationRecipientBalanceAfter()
-        .equals(entity.liquidationRecipientBalance().plus(entityBalance));
+    if (entityBalance == null) return false;
+    Player.ID recipient = pawn(pawnName).id();
+    return gameLog().stream().anyMatch(entry -> entry instanceof Entry.LegalEntityLiquidated it
+        && it.name().equals(entityName) && it.recipient().equals(recipient) && it.amount().equals(entityBalance));
   }
 
   public long transferredEntityStreetsSold(String pawnName, String entityName) {

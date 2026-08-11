@@ -127,6 +127,8 @@ public final class Report {
           + " an equal dividend";
       case Entry.LegalEntityShareSold it -> name(it.seller()) + " sells a share of " + it.name()
           + " to " + name(it.buyer()) + " for $" + it.price().amount();
+      case Entry.LegalEntityLiquidated it -> name(it.recipient()) + " liquidates " + it.name()
+          + " and receives $" + it.amount().amount();
       case Entry.Won it -> name(it.player()) + " wins the game";
     };
   }
@@ -197,55 +199,55 @@ public final class Report {
 
 /* mutate4java-manifest
 version=1
-moduleHash=2853d30c86526e2905c86186be12e2e76e24200fbf65f40b93bbff2a1977645c
+moduleHash=5b25eb7c90ad88535d16c9b64ad085913591104507679d5b707ad3cc1bbf93b9
 scope.0.id=Y2xhc3M6UmVwb3J0I1JlcG9ydDoxOQ
 scope.0.kind=class
 scope.0.startLine=19
-scope.0.endLine=194
-scope.0.semanticHash=5506d674b6cb57fc05394425e22f645e854edd8fa4c84fabf2e743e4e134e3e5
-scope.1.id=ZmllbGQ6UmVwb3J0I0JPQVJEX1NQQUNFX05BTUVfT1ZFUlJJREVTOjE1OQ
+scope.0.endLine=198
+scope.0.semanticHash=780f2784d741d0a9521c2c378245b8b9579143e7c954898e89adfc0438283fd9
+scope.1.id=ZmllbGQ6UmVwb3J0I0JPQVJEX1NQQUNFX05BTUVfT1ZFUlJJREVTOjE2Mw
 scope.1.kind=field
-scope.1.startLine=159
-scope.1.endLine=181
+scope.1.startLine=163
+scope.1.endLine=185
 scope.1.semanticHash=6eb67eaa69a04e25ac5429d119e7ade52b31b349bfbef41507f8ce1692daff1b
-scope.2.id=bWV0aG9kOlJlcG9ydCNib2FyZFNwYWNlTmFtZSgxKToxODM
+scope.2.id=bWV0aG9kOlJlcG9ydCNib2FyZFNwYWNlTmFtZSgxKToxODc
 scope.2.kind=method
-scope.2.startLine=183
-scope.2.endLine=185
+scope.2.startLine=187
+scope.2.endLine=189
 scope.2.semanticHash=7dcc143fee9458236e6143cec91f4c98d4b78c3de1afb24170abc26433f492c9
 scope.3.id=bWV0aG9kOlJlcG9ydCNjdG9yKDApOjIw
 scope.3.kind=method
 scope.3.startLine=20
 scope.3.endLine=21
 scope.3.semanticHash=fa4ab1d8c774b5a49e26e7b36ba0ec25ba0d7069b207d38eb37beccb7d02dc9c
-scope.4.id=bWV0aG9kOlJlcG9ydCNkZWNsaW5lTGluZSgxKToxMzI
+scope.4.id=bWV0aG9kOlJlcG9ydCNkZWNsaW5lTGluZSgxKToxMzY
 scope.4.kind=method
-scope.4.startLine=132
-scope.4.endLine=140
+scope.4.startLine=136
+scope.4.endLine=144
 scope.4.semanticHash=f8e93f31787af3801c915ba44f5de44f38ccb43e2a127b1f3987d720e4722a8c
 scope.5.id=bWV0aG9kOlJlcG9ydCNsaW5lKDEpOjQ0
 scope.5.kind=method
 scope.5.startLine=44
-scope.5.endLine=130
-scope.5.semanticHash=725f13dafe51d24cc67119433784fa8059fdf934cd8e30759bf9d524b58dcd2b
-scope.6.id=bWV0aG9kOlJlcG9ydCNuYW1lKDEpOjE5MQ
+scope.5.endLine=134
+scope.5.semanticHash=cc13b98cce5bf77fbea6d15d3b257b003336390b0db4493e40e855a783cbc524
+scope.6.id=bWV0aG9kOlJlcG9ydCNuYW1lKDEpOjE5NQ
 scope.6.kind=method
-scope.6.startLine=191
-scope.6.endLine=193
+scope.6.startLine=195
+scope.6.endLine=197
 scope.6.semanticHash=cd39b08d1576cbc2e9d2ae25bb54b6b608f1219509ee3d03086e8f3ab4c238fa
-scope.7.id=bWV0aG9kOlJlcG9ydCNuYW1lcygxKToxODc
+scope.7.id=bWV0aG9kOlJlcG9ydCNuYW1lcygxKToxOTE
 scope.7.kind=method
-scope.7.startLine=187
-scope.7.endLine=189
+scope.7.startLine=191
+scope.7.endLine=193
 scope.7.semanticHash=7baca973d9baa23bf1205536bbfd229d494b1e2c863e02f6e50c5ce7dcb42959
 scope.8.id=bWV0aG9kOlJlcG9ydCNvZigxKToyMw
 scope.8.kind=method
 scope.8.startLine=23
 scope.8.endLine=25
 scope.8.semanticHash=3bddf559e6362200e39e3d2024808e23da1e3da3deb262e8b89f1402e9edd25e
-scope.9.id=bWV0aG9kOlJlcG9ydCNzcGFjZU5hbWUoMSk6MTQ4
+scope.9.id=bWV0aG9kOlJlcG9ydCNzcGFjZU5hbWUoMSk6MTUy
 scope.9.kind=method
-scope.9.startLine=148
-scope.9.endLine=150
+scope.9.startLine=152
+scope.9.endLine=154
 scope.9.semanticHash=56eb8b748063de6798efd6f1a96d5a30f07cf019c0478f7f004006d2fe61eaf8
 */
