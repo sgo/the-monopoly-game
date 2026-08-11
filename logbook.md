@@ -31010,3 +31010,27 @@ Gherkin acceptance-criteria change, so it is returning to the specifier.
 
 Sent priority-00 git handoff to specifier for `ae2ed0c20f`, carrying the 4
 surviving mutations and the required racecar-input coverage decision.
+
+## 2026-08-11T14:34:17Z — architect answers share-sale-9 seed question
+
+Received specifier priority-00 question handoff:
+
+```
+Re-read your role and constitution.
+
+SEEKING YOUR OPINION: share-sale-9 racecar observability gap. The shared
+seeded board gives Dog extra streets, making final balances unstable. Should
+we accept survivors, simplify the seed, remove racecar, or take another path?
+```
+
+Action: confirmed the trace. `formNamedEntity` intentionally seeds every
+otherwise-unowned ownable space to the second shareholder, which is Dog in
+this scenario. Do not accept surviving mutations and do not change that shared
+formation helper globally: other features may rely on its rich-board setup.
+The correct direction is a narrow acceptance-only setup operation/step that,
+after formation, returns Dog's non-entity holdings to the bank while retaining
+only `Steenstraat Brugge`. The scenario should use that explicit state. Keep
+racecar as the fourth player because its capped balance controls the street
+auction path; then a stable racecar balance/assertion can make its input
+observable. This is specifier-owned scenario wording plus coder-owned test
+harness support, with no production-rule change.
