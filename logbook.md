@@ -29426,6 +29426,22 @@ real $60 shortfall under the fixed $100 Luxury Tax; `share-sale-3` remains the
 cheaper-asset-first case with its own smaller shortfall. The full specified
 share-sale implementation is coherent and is routed to the coder.
 
+## 2026-08-11T08:50:58Z — architect routes corrected share-sale implementation
+
+Sent coder priority-00 handoff:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: d5fe0e219b
+```
+
+Summary: accepted the triggered share-sale scenarios and their valuation,
+restricted bidding, auction-ceiling, fallback, liquidation-order, and harness
+requirements for coder implementation.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
