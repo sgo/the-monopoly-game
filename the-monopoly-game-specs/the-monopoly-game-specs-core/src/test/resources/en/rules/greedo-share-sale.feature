@@ -141,7 +141,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
       | 40          | 0              | 1               |
 
   # share-sale-8
-  Scenario Outline: a legal-entity share sells for a nominal amount when only one shareholder will bid, because shares have no bank minimum-bid
+  Scenario Outline: a legal-entity share sells for a nominal amount when only one shareholder will bid, because shares have no bank minimum-bid; the debtor is saved from bankruptcy but may remain insolvent
     Given legal-entity trading is enabled for the "Greedo" strategy
     And we select 4 players
     And Pink Realty is formed
@@ -151,8 +151,9 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "high hat" has $<high_hat_balance> to spend
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
     Then pawn "dog" is not bankrupt
+    And pawn "dog"'s final balance is $<dog_ending>
     And pawn "high hat" wins the Pink Realty share at $<winning_bid>
 
     Examples:
-      | dog_balance | high_hat_balance | winning_bid |
-      | 40          | 1000             | 5           |
+      | dog_balance | high_hat_balance | winning_bid | dog_ending |
+      | 40          | 1000             | 5           | -55        |
