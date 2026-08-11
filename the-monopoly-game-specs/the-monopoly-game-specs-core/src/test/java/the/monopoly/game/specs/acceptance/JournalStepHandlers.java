@@ -486,6 +486,9 @@ final class JournalStepHandlers {
         then("^pawn \"" + NAME + "\" wins the game$",
             (world, arguments) -> assertThat(world.hasWon(arguments.text(1))).isTrue()),
 
+        then("^pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> assertThat(world.pawnFinalBalanceIs(arguments.text(1), money(arguments.number(2)))).isTrue()),
+
         then("^the game journal records that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
             (world, arguments) -> records(world, finalBalance(arguments.text(1), arguments.number(2)))),
 

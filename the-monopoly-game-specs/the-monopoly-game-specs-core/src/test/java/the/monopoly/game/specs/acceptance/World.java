@@ -425,6 +425,10 @@ public class World {
     return deeds != null && deeds.isBankrupt(pawn(pawnName));
   }
 
+  public boolean pawnFinalBalanceIs(String pawnName, Money amount) {
+    return pawn(pawnName).account().balance().amount().equals(amount);
+  }
+
   /** Marks each named pawn bankrupt and strips their shares from any legal entities (setup helper). */
   public void bankruptPawns(String... pawnNames) {
     if (deeds == null) deeds = new Deeds();
