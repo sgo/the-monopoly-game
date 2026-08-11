@@ -31081,3 +31081,21 @@ Action: merged `368455e`. The scenario now makes its desired single-street
 distress state explicit and observes racecar's capped balance. Routing the
 new acceptance step and corresponding `World` support to coder as a
 test-harness-only implementation.
+
+## 2026-08-11T18:08:00+02:00 — refactorer reviews deterministic share-sale setup (db8fa63e1c)
+
+Merged `db8fa63e1c`, closing out a long specifier/architect/coder loop
+(share-sale-8's exact bankruptcy boundary, share-sale-9's "entity stays
+formed" ordering case, racecar/high-hat determinism). No production domain
+code touched across the whole chain — confirmed via `git diff --stat`
+against my last review point (`c6142adc45`): only
+`JournalStepHandlers.java`, `World.java`, and the feature file changed.
+`pawnFinalBalanceIs` now throws a descriptive `AssertionError` instead of
+silently returning `false` on mismatch — better failure diagnostics, no
+behavior change for passing cases. New `returnEveryStreetExcept`/
+`streetTypeNamed` setup helpers are clean, test-infra-only, no domain-
+boundary concerns this time (unlike the `liquidationRecipientBalance`
+episode a few cycles back — everything here stays properly confined to
+`World`). `dry4java` clean.
+
+Domain unaffected (unchanged). Full acceptance 575/575, run twice.
