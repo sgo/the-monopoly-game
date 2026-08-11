@@ -30414,3 +30414,21 @@ treasury. The specifier scenario-setup decision remains outstanding.
 
 Sent coder priority-00 handoff (outbox `00_20260811T105246Z_000218_from_architect_to_coder.handoff`)
 at commit `614dc2e337` for the still-unimplemented transfer assertion.
+
+## 2026-08-11T11:10:00Z — architect accepts deterministic liquidation specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier ba05037
+```
+
+Action: merged `ba05037`, resolving the feature conflict in favor of the
+approved specification. The final-shareholder setup is approved, while the
+nonzero treasury transfer is now proved by explicit inputs and dog's exact
+post-tax balance ($40 + $500 - $100 = $440), not a weak adapter. The prior
+coder-added `$100`/already-operated setup is removed. Full acceptance passed
+on the consolidated branch; routing to coder for normal verification and
+refactorer follow-through.
