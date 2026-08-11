@@ -30189,3 +30189,7 @@ This handoff was prepared before the subsequent final-shareholder-liquidation
 specification; that observable liquidation work is already outstanding with
 coder at `6a9db62f68`. Therefore this is accepted hardening, not a
 phase-complete sync.
+
+Sent coder priority-00 handoff (outbox `00_20260811T102732Z_000215_from_architect_to_coder.handoff`)
+at commit `588bc6e51c`, superseding the earlier implementation base with the
+accepted zero-share safeguards plus the liquidation specification.
