@@ -30411,3 +30411,11 @@ when a stored entity balance exists and the entity is dissolved. Returned to
 coder: capture the pawn balance before liquidation and require the final pawn
 balance to equal that captured balance plus the recorded pre-liquidation entity
 treasury. The specifier scenario-setup decision remains outstanding.
+
+## 2026-08-11T11:07:20Z — coder corrects liquidation transfer assertion
+
+Merged architect priority-00 handoff `614dc2e337`. Corrected the acceptance
+adapter to retain the formed entity and verify its recorded shareholder balance
+before and after liquidation, requiring the exact treasury increase. Domain
+tests pass 359/359; full acceptance passes 572/572; `git diff --check` is clean.
+The correction is ready for refactorer review.

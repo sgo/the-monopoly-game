@@ -22,6 +22,8 @@ public final class LegalEntity {
   private final List<ColourStreet> streets;
   private Money loan = Money.ZERO;
   private final Account bankAccount;
+  private Money liquidationRecipientBalance;
+  private Money liquidationRecipientBalanceAfter;
   private ColourStreet rentReceivedOn;
   private final Map<Player.ID, Money> shareholderPayments = new HashMap<>();
   private final Map<Player.ID, Money> buildCommitments = new HashMap<>();
@@ -92,13 +94,18 @@ public final class LegalEntity {
     if (shareholders.size() != 1 || !shareholders.contains(shareholder))
       throw new IllegalArgumentException("Liquidation requires the final shareholder.");
     Money balance = bankAccount.balance().amount();
+    liquidationRecipientBalance = shareholder.account().balance().amount();
     if (balance.amount() > 0) {
       bankAccount.withdraw(balance);
       shareholder.account().deposit(balance);
     }
+    liquidationRecipientBalanceAfter = shareholder.account().balance().amount();
     shareholders.clear();
     return balance;
   }
+
+  public Money liquidationRecipientBalance() { return liquidationRecipientBalance; }
+  public Money liquidationRecipientBalanceAfter() { return liquidationRecipientBalanceAfter; }
 
   public Money loan() { return loan; }
   public Money bankBalance() { return bankAccount.balance().amount(); }
