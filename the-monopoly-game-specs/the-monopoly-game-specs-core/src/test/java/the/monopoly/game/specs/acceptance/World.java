@@ -440,6 +440,7 @@ public class World {
         entity.removeShares(player);
     }
     deeds.legalEntities().forEach(LegalEntity::markOperated);
+    if (pawnNames.length < 2) return;
     players.stream().filter(candidate -> !deeds.isBankrupt(candidate))
         .filter(candidate -> !candidate.id().equals(pawn("dog").id()))
         .findFirst().ifPresent(candidate -> pawnStrategies.put(candidate.id().value(), new Strategy() {

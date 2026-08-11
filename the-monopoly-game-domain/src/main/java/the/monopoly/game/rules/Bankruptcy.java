@@ -34,7 +34,7 @@ public final class Bankruptcy {
     if (distressedSale.resolve(debtor)) return;
     sellHousesUntilSolvent(debtor);
     mortgageUntilSolvent(debtor);
-    sellEntitySharesUntilSolvent(debtor);
+    if (sellEntitySharesUntilSolvent(debtor)) return;
     if (debtor.account().balance().amount().amount() >= 0) return;
     finalizeBankruptcy(debtor, creditor);
   }
@@ -83,17 +83,18 @@ public final class Bankruptcy {
     }
   }
 
-  private void sellEntitySharesUntilSolvent(Player debtor) {
+  private boolean sellEntitySharesUntilSolvent(Player debtor) {
     for (LegalEntity entity : deeds.legalEntities()) {
-      if (!Money.ZERO.exceeds(debtor.account().balance().amount())) return;
+      if (!Money.ZERO.exceeds(debtor.account().balance().amount())) return false;
       if (entity.shareOf(debtor) == 0.0) continue;
       if (entity.shareholders().size() == 1) {
         liquidateEntity(debtor, entity);
         distressedSale.resolve(debtor);
         continue;
       }
-      sellShareToHighestBidder(debtor, entity);
+      if (sellShareToHighestBidder(debtor, entity)) return true;
     }
+    return false;
   }
 
   private void liquidateEntity(Player debtor, LegalEntity entity) {
@@ -102,28 +103,23 @@ public final class Bankruptcy {
     events.entityLiquidated(debtor, entity, transferred);
   }
 
-  private void sellShareToHighestBidder(Player debtor, LegalEntity entity) {
-    int minimumBid = minimumShareBid(debtor, entity);
-    List<Bid> bids = bidsFor(debtor, entity, minimumBid);
-    if (bids.isEmpty()) return;
+  private boolean sellShareToHighestBidder(Player debtor, LegalEntity entity) {
+    List<Bid> bids = bidsFor(debtor, entity);
+    if (bids.isEmpty()) return false;
     Bid winner = highestBid(bids);
-    Money price = shareSalePrice(winner, bids, minimumBid);
+    Money price = shareSalePrice(winner, bids);
     entity.sellShare(debtor, winner.bidder(), price);
     events.soldEntityShare(debtor, entity, winner.bidder(), price);
+    return true;
   }
 
-  private int minimumShareBid(Player debtor, LegalEntity entity) {
-    int shortfall = -debtor.account().balance().amount().amount();
-    return Math.min(entity.shareValue().amount(), shortfall);
-  }
-
-  private List<Bid> bidsFor(Player debtor, LegalEntity entity, int minimumBid) {
+  private List<Bid> bidsFor(Player debtor, LegalEntity entity) {
     List<Bid> bids = new java.util.ArrayList<>();
     for (Player candidate : players) {
       if (!isEligibleBidder(debtor, entity, candidate)) continue;
       int available = candidate.account().balance().amount().amount();
       Money offered = new Money(Math.min(available, available * 35 / 100));
-      if (offered.amount() >= minimumBid) bids.add(new Bid(candidate, offered));
+      if (offered.amount() > 0) bids.add(new Bid(candidate, offered));
     }
     return bids;
   }
@@ -141,10 +137,10 @@ public final class Bankruptcy {
     return winner;
   }
 
-  private Money shareSalePrice(Bid winner, List<Bid> bids, int minimumBid) {
+  private Money shareSalePrice(Bid winner, List<Bid> bids) {
     int second = bids.stream().filter(bid -> bid != winner)
         .mapToInt(bid -> bid.maximum().amount()).max().orElse(0);
-    return new Money(Math.min(winner.maximum().amount(), Math.max(minimumBid, second + 5)));
+    return new Money(Math.min(winner.maximum().amount(), second + 5));
   }
 
   private record Bid(Player bidder, Money maximum) {

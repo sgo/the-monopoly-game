@@ -30622,3 +30622,11 @@ including 9 share-sale tests, property tests passed 22/22, and
 
 Sent priority-50 git handoff to specifier for `3e1e03fc68`, which supersedes
 the earlier phase sync with the completed deterministic-assertion review.
+
+## 2026-08-11T14:24:10Z — coder removes legal-entity share bid floor
+
+Merged specifier handoff `191affc` and removed the share-value/shortfall floor
+from distressed legal-entity share sales. Positive-capacity fellow bidders can
+now win at the nominal $5 price; zero-capacity bidders remain ineligible, and
+street distressed-sale minimums are unchanged. Domain tests pass 359/359;
+share-sale acceptance passes 10/10; full acceptance passes successfully.
