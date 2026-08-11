@@ -30734,3 +30734,47 @@ a structural call on my part. `resolve()`/`sellEntitySharesUntilSolvent`
 picked up CRAP violations from the added branching; left alone pending the
 real fix. Domain 359/359, acceptance 572/572 — green but not proof of
 safety here.
+
+## 2026-08-11T15:01:00+02:00 — refactorer reviews share sale bankruptcy refinement (242b6d09b5) — corrects my prior finding
+
+Merged `242b6d09b5`. This resolves my "BLOCKING FINDING" from last cycle
+correctly: `resolve()` now always evaluates the share sale and checks real
+solvency afterward (the erroneous early-return is gone), and
+`finalizeBankruptcy` gained a `preserveNegativeBalance` flag — when a share
+sale happened but didn't fully cover the debt, the debtor's negative
+balance is intentionally left as-is (not zeroed) while `deeds.bankrupt`
+still runs normally for genuinely-unresolved cases. This matches the
+user's explicit, confirmed design decision (a distressed share sale defers
+bankruptcy without requiring solvency) captured in the specifier's
+`a78660a` commit.
+
+Correcting the record on my own last handoff: I need to walk back part of
+what I escalated. My reproduction of share-sale-8 (an isolated `Bankruptcy`
+call built by hand from the scenario's numbers) was not faithful to the
+real scenario — `World.landPawnOn` plays the *entire* game to completion
+via `Game.play()`, not a single landing event, so a hand-rolled one-shot
+`resolve()` call doesn't reproduce the real sequence of turns. I confirmed
+this today by instrumenting the actual code path during a real acceptance
+run and reading the per-scenario surefire XML directly: the genuine
+share-sale-8 test case shows `dog` reaching solvency legitimately, with
+`isBankrupt=false` and no `finalizeBankruptcy` call at all — the
+"-55/never-bankrupted" state I reproduced belonged to a *different*,
+earlier scenario in the same feature file that don't have that assertion
+shape, not share-sale-8. The underlying control-flow concern I raised was
+real and worth escalating (the coder's `242b6d09b5` fix confirms it — an
+explicit `preserveNegativeBalance` flag replacing a bare early-return is a
+real, deliberate fix, not a no-op), but my specific claim that share-sale-8
+itself was failing silently was not accurate. Removed all temporary debug
+instrumentation before finishing this review; `git status` is clean.
+
+`crap4java`: all methods CRAP<=6 (`sellEntitySharesUntilSolvent` and
+`resolve` both at exactly 6.0, matching my structural expectations for
+this method shape). `dry4java`: none. `mutate4java --scan`: 56 sites,
+well under the split threshold. My existing `BankruptcyTest` share-price
+cases (`theEntitySellsADistressedShareholdersShareToTheHighestBidder`,
+`theShareSalePriceNeverExceedsTheWinningBiddersOwnCeiling`) both use
+multiple competing bidders, so the removed floor was never their deciding
+factor — still valid, no update needed.
+
+Domain 359/359 (clean rebuild after removing stray probe artifacts from
+target/). Full acceptance 574/574, run twice.
