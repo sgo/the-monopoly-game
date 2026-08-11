@@ -186,6 +186,30 @@ class RentTest {
   }
 
   @Test
+  void aDevelopedEntityOwnedStreetChargesItsPrintedHouseRent() {
+    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
+    LegalEntity entity = formEntityOwning(street);
+    deeds.arrangeHouses(street, 2);
+
+    rent().resolve(tenant, street, IRRELEVANT_ROLL);
+
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1440));
+    assertThat(entity.receivedRent()).isTrue();
+  }
+
+  @Test
+  void anEntityOwnedHotelChargesItsPrintedHotelRent() {
+    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
+    LegalEntity entity = formEntityOwning(street);
+    deeds.arrangeHotel(street);
+
+    rent().resolve(tenant, street, IRRELEVANT_ROLL);
+
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1050));
+    assertThat(entity.receivedRent()).isTrue();
+  }
+
+  @Test
   void aMortgagedEntityOwnedStreetCollectsNoRent() {
     ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
     LegalEntity entity = formEntityOwning(street);

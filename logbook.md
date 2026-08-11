@@ -29062,6 +29062,16 @@ shortfall scenarios to declare their commitments.
 Verification: domain tests 348/348 passing; full acceptance 563/563 passing;
 `git diff --check` clean.
 
+Handoff sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: 97bf9ae1a6
+```
+
 ## 2026-08-10T23:20:00+02:00 — refactorer reviews committed shortfall enforcement (97bf9ae1a6)
 
 Merged `97bf9ae1a6`. Two fixes land together, both closing loops I raised or
@@ -29091,6 +29101,29 @@ threshold, `canBorrowForBuilding` now CC=3, simpler than before). `dry4java`:
 none. `mutate4java --scan`: 92 sites, manifest refreshed. No functional
 changes needed on my side — purely verification and a manifest refresh.
 Domain tests 348/348. Acceptance 563/563, confirmed clean across 4 runs.
+
+## 2026-08-10T23:20:13+02:00 — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: b325657b2d
+```
+
+Summary: verified both fixes land cleanly. Entity-11's dice-driven dividend
+trigger is replaced with an explicit age-step, confirmed clean across 4
+acceptance runs (the deterministic doubles/extra-turn issue I traced last
+cycle is gone, not worked around). `canBorrowForBuilding`'s treasury-
+positive bypass is removed, closing the same gap I'd found and reverted two
+cycles ago out of caution — the architect caught it independently and the
+coder's fix is correct and complete, with journal/logging/report.feature's
+shared shortfall scenario updated in step. Clean structural pass: all
+methods CRAP<=6, no DRY issues, 92 mutation sites, manifest refreshed, no
+functional changes needed. Domain 348/348, acceptance 563/563.
 
 ## 2026-08-11T04:46:30Z — architect accepts committed-shortfall enforcement
 
@@ -29147,7 +29180,7 @@ downward pressure/stalemate resolution. Root cause is a spec-vs-impl gap in the
 entity rent path.
 
 SPEC CHANGE (spec-only, coder's production change left to you):
-- entity-13 & entity-21: correct entity-owned street rent expectation $20 -> 
+- entity-13 & entity-21: correct entity-owned street rent expectation $20 ->
   $625 (developed rent for a 4-house Bruul Mechelen), asserting the tenant's
   account balance (robust to the full-game harness) instead of the unreliable
   post-game entity bank.
@@ -29187,3 +29220,41 @@ commit: 4c4e5d2838
 Summary: accepted specification correction requiring entity-owned developed
 streets to charge the normal developed-rent ladder; coder owns the `Rent`
 production change and verification.
+
+## 2026-08-11T07:18:00Z — coder implements developed entity rent
+
+Processed architect handoff `4c4e5d2838`. Entity-owned streets now charge
+printed house or hotel rent when developed, while unimproved streets continue
+to charge double vacant rent and mortgaged streets remain exempt. Added focused
+unit coverage for developed houses and hotels.
+
+Verification: domain tests 350/350 passing; full acceptance 563/563 passing;
+`git diff --check` clean.
+
+## 2026-08-11T09:22:00+02:00 — refactorer reviews developed entity rent (6d2ec4e65c)
+
+Merged `6d2ec4e65c`. Fixes a real economic bug the specifier's 8-player
+Greedo playtesting caught: entity-owned streets charged a flat 2x vacant
+rent regardless of houses/hotel, so a fully-developed Bruul Mechelen (4
+houses) charged $20 instead of $625 — suppressing the downward cash
+pressure the whole entity-dividend/loan mechanism depends on. `Rent.java`
+gained `entityRent(ColourStreet)`: hotel -> `rentForOneHotel()`,
+houses>0 -> `rentForHouses(houses)`, else double vacant rent (an entity
+inherently owns its whole colour group by construction, so no monopoly
+check is needed the way `colourStreetRent` needs one for player-owned
+streets). `crap4java`: `entityRent` CC=3/CRAP=3.0, `colourStreetRent`
+unchanged at CC=5; nothing near the threshold. `dry4java`: no duplicate
+candidates — despite visible structural similarity to `colourStreetRent`,
+the two differ in a real domain sense (entity vacant rent is always
+doubled; player vacant rent depends on an actual cross-player monopoly
+check), so I left them separate rather than force a shared extraction.
+`mutate4java --scan`: 12 sites, manifest refreshed. `LegalEntityTest.java`'s
+duplicate setup was already extracted into `dividendEligibleEntity` by the
+architect's own DRY pass in a prior commit; `RentTest.java` gained two
+focused new tests (2-house and hotel rent) that I verified are correct.
+
+Domain 350/350. Full acceptance 563/563, run twice. Whole-reactor `mvn test`
+hit the known pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` CLI
+flake (unrelated to legal-entity work, previously confirmed via A/B
+worktree comparison); domain-module-scoped run is clean. No functional
+changes needed on my side.
