@@ -31453,3 +31453,20 @@ one-second liveness assertion because a naturally completed game is permitted
 by the `Running` contract; a focused retry reproduced this known timing test
 failure. The new CLI acceptance scenario independently verifies the actual
 optional-flag wiring.
+
+## 2026-08-11T19:04:43Z — architect returns CLI threshold criteria gap
+
+Sent priority-00 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: d21a0fa209
+```
+
+The specifier must make cli-1's 10-roll, cli-2's 50-roll, and cli-5's 10-roll
+thresholds literal steps rather than single-row Examples values. They are fixed
+minimum observations, not scenario variables; doing so removes the remaining
+three false soft-mutation targets.
