@@ -30587,3 +30587,67 @@ computable, while share-sale-7 correctly keeps my journal-based check from
 last cycle since its ending balance depends on non-deterministic distress-
 sale auction dynamics. No CRAP/DRY concerns. Domain clean, acceptance
 572/572 run twice.
+
+## 2026-08-11T11:20:00Z — architect accepts journalled liquidation transfer
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer ee58b5e8ba
+```
+
+Action: merged `ee58b5e8ba`. Liquidation is observable through a core
+bankruptcy event, a game-journal entry, and a report adapter; the acceptance
+world no longer reads test-only state from `LegalEntity`.
+
+## 2026-08-11T11:28:11Z — architect final verification and phase sync
+
+Action: differential mutation had no changed mutation surface in
+`Bankruptcy.java` (49 sites), `Game.java` (75), or `Report.java` (3). DRY
+reported only the standing sealed journal-adapter repetition. Soft Gherkin
+mutation killed 29/29 with zero survivors or errors; the managed manifest was
+refreshed. Property tests passed 22/22 and `git diff --check` passed.
+
+Sent priority-50 git handoff to specifier for commit `4799b24042`.
+
+## 2026-08-11T11:28:55Z — architect receives refactorer follow-up
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer c02f997ed7
+```
+
+Action: merging `c02f997ed7` and reviewing its deterministic acceptance
+assertion consolidation and resulting test-boundary changes.
+
+## 2026-08-11T11:31:57Z — architect completes deterministic-assertion review
+
+Action: accepted the refactorer consolidation. The sufficient-cash scenario
+asserts Dog's exact final $440 balance; the insufficient-cash scenario retains
+the journal-based transfer assertion because subsequent distressed-sale
+auctioning makes an exact final balance intentionally variable. The general
+setup helper remains confined to acceptance infrastructure.
+
+Differential mutation found no changed unit-covered surface in the acceptance
+helpers. DRY reported only standing `World` helper duplication. The soft
+Gherkin manifest skipped all seven unchanged scenarios; full acceptance passed
+including 9 share-sale tests, property tests passed 22/22, and
+`git diff --check` passed. Tool-managed mutation manifests were refreshed.
+
+## 2026-08-11T11:32:26Z — architect sends final phase sync to specifier
+
+Sent priority-50 git handoff to specifier for `3e1e03fc68`, which supersedes
+the earlier phase sync with the completed deterministic-assertion review.
+
+## 2026-08-11T14:24:10Z — coder removes legal-entity share bid floor
+
+Merged specifier handoff `191affc` and removed the share-value/shortfall floor
+from distressed legal-entity share sales. Positive-capacity fellow bidders can
+now win at the nominal $5 price; zero-capacity bidders remain ineligible, and
+street distressed-sale minimums are unchanged. Domain tests pass 359/359;
+share-sale acceptance passes 10/10; full acceptance passes successfully.
