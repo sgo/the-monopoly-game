@@ -29880,3 +29880,25 @@ is out of this task's scope, consistent with how I've treated this file
 all session) — no edits needed there.
 
 Domain 354/354. Full acceptance 570/570, run twice.
+
+## 2026-08-11T09:46:53Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-legal-entity
+commit: a4038e8ed0
+```
+
+Summary: reviewed the share-sale liquidation feature. Decomposed
+`Bankruptcy.sellEntitySharesUntilSolvent` from CC=16/CRAP=239.9 into seven
+small methods plus a `Bid` record, extracted `finalizeBankruptcy` to bring
+the pre-existing `resolve()` CRAP=7.0 down to 6.0, and added four focused
+unit tests covering the auction's winner/pricing/eligibility logic —
+coverage was the other half of the CRAP problem (4.4% before, since the
+feature was only exercised via acceptance). Every method in both touched
+files is now CRAP<=6, no DRY issues, both mutation-site counts well under
+100, manifests refreshed. Domain 354/354, acceptance 570/570 run twice.
