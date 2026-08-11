@@ -30651,3 +30651,48 @@ from distressed legal-entity share sales. Positive-capacity fellow bidders can
 now win at the nominal $5 price; zero-capacity bidders remain ineligible, and
 street distressed-sale minimums are unchanged. Domain tests pass 359/359;
 share-sale acceptance passes 10/10; full acceptance passes successfully.
+
+## 2026-08-11T14:30:00+02:00 — refactorer reviews no-minimum-bid share sales (6029b5fa72) — BLOCKING FINDING
+
+Merged `6029b5fa72`. The specifier's request (removing the incorrect
+share-value/shortfall floor on distressed legal-entity share bids, since
+shares can't fall back to a bank auction the way street sales can) is
+implemented correctly in `bidsFor`/`shareSalePrice`. But the commit also
+made an unrequested control-flow change that I believe is a real bug:
+`sellEntitySharesUntilSolvent` now returns `boolean` and
+`sellShareToHighestBidder` returns `true` the instant ANY share sale
+completes; `resolve()` changed from an unconditional call followed by a
+real solvency check to `if (sellEntitySharesUntilSolvent(debtor)) return;`
+(confirmed via `git blame` — this exact line was introduced in this
+commit, not before). This bypasses `finalizeBankruptcy` entirely whenever
+a share sells for ANY amount, even one nowhere near covering the debt.
+
+Reproduced directly (isolated `Bankruptcy` call matching share-sale-8's
+exact setup: Pink Realty formed, iron box's share stripped, dog's balance
+$40, high hat's $1000, $100 luxury tax): dog's balance goes -60 (post-tax)
+→ high hat's only bid sells the share for the nominal $5 → **dog ends the
+turn at -55, `deeds.isBankrupt(dog)` is false**. Nobody ever calls
+`deeds.bankrupt(dog)`, so dog is left permanently insolvent — not
+resolved, not bankrupted — for the rest of the game. Full acceptance
+passes 572/572 because share-sale-8 only asserts "pawn dog is not
+bankrupt" and the winning bid amount; it never checks dog's ending
+balance, so this defect is invisible to the current scenario.
+
+I did not fix this myself. Reverting the control-flow change back to
+`resolve()`'s previous unconditional-check structure would make dog
+`finalizeBankruptcy` instead (contradicting share-sale-8's explicit "not
+bankrupt" expectation) — so simply restoring my prior structure isn't a
+safe fix either; it just trades one wrong outcome for a different one the
+specifier didn't ask for. Whether a partial, insufficient share sale
+should still count as "resolved," or the debtor should fall through to
+further resolution (other entities, then bankruptcy) when a sale doesn't
+cover the shortfall, is a genuine specification question I'm not
+positioned to answer — flagging for architect/specifier decision rather
+than guessing. `resolve()` also picked up a CRAP=7.0 (one over threshold)
+and `sellEntitySharesUntilSolvent` CRAP=6.0 (at threshold) from the added
+branching; left both alone since fixing the CRAP shape on code with
+disputed correctness would likely be thrown away once the real fix lands.
+
+Domain 359/359, full acceptance 572/572 (both green, but 572/572 does not
+mean this is safe — see above). No commit from me this cycle; sending this
+finding up without a code change.
