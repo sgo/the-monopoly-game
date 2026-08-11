@@ -30443,6 +30443,14 @@ before and after liquidation, requiring the exact treasury increase. Domain
 tests pass 359/359; full acceptance passes 572/572; `git diff --check` is clean.
 The correction is ready for refactorer review.
 
+## 2026-08-11T14:47:45Z — coder applies share-sale bankruptcy refinement
+
+Merged specifier refinement `5c2ea95`. Restored the negative-balance check after
+share sales: a successful $5 share sale no longer skips bankruptcy finalization.
+The failed-sale row preserves the specified `-55` balance, while the `$99 + $5`
+row remains solvent at `$4`. Domain tests pass 359/359; share-sale acceptance
+passes 11/11; full acceptance passes successfully.
+
 ## 2026-08-11T13:18:00+02:00 — refactorer reviews liquidation transfer assertion (9ce4e19d00)
 
 Merged `9ce4e19d00`. This fixed the weak `pawnReceivedEntityBankBalance`
