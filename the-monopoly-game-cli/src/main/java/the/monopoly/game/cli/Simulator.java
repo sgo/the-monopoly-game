@@ -3,6 +3,7 @@ package the.monopoly.game.cli;
 import the.monopoly.game.Game;
 import the.monopoly.game.Report;
 import the.monopoly.game.components.dice.Cup;
+import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Pawn;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.rules.Rule;
@@ -65,19 +66,24 @@ public final class Simulator {
             && !argument.equals("--optional-greedo-legal-entity")).toList();
     if (!strategyNames.isEmpty() && strategyNames.size() != playerCount)
       return new Result(1, "Supply one strategy for each player. " + usage());
-    return run(playerCount, strategiesFor(playerCount, strategyNames), stalemateTrading, legalEntityTrading);
+    return run(playerCount, strategiesFor(playerCount, strategyNames, stalemateTrading, legalEntityTrading),
+        stalemateTrading, legalEntityTrading);
   }
 
   static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames) {
+    return strategiesFor(playerCount, strategyNames, false, false);
+  }
+
+  static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames,
+                                          boolean stalemateTrading, boolean legalEntityTrading) {
     List<String> names = strategyNames.isEmpty()
         ? java.util.Collections.nCopies(playerCount, "greedo")
         : strategyNames;
     Map<Player.ID, Strategy> selections = new HashMap<>();
     for (int index = 0; index < playerCount; index++) {
       String name = names.get(index);
-      Supplier<Strategy> strategy = STRATEGIES.get(name);
-      if (strategy == null) throw new IllegalArgumentException("Unknown strategy: " + name + ".");
-      selections.put(Pawn.values()[index].id(), strategy.get());
+      if (!STRATEGIES.containsKey(name)) throw new IllegalArgumentException("Unknown strategy: " + name + ".");
+      selections.put(Pawn.values()[index].id(), new Greedo(Money.ZERO, stalemateTrading, legalEntityTrading));
     }
     return player -> selections.get(player.id());
   }

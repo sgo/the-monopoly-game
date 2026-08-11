@@ -100,6 +100,7 @@ public class World {
   private boolean stalemateTrading;
   private boolean legalEntityTrading;
   private boolean simulatorStalemateTrading;
+  private boolean simulatorLegalEntityTrading;
   private Entry selectedEvent;
   private String renderedEventText;
   private String loggedEventText;
@@ -219,10 +220,16 @@ public class World {
     return simulatorResult;
   }
 
+  public int simulatorPlayerCount() {
+    if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
+    return simulatorPlayers;
+  }
+
   /** Starts the simulator playing in the background, so the game log fills as it goes. */
   public void startSimulator() {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
-    runningSimulator = Simulator.start(simulatorPlayers, simulatorStrategies, simulatorStalemateTrading);
+    runningSimulator = Simulator.start(simulatorPlayers, simulatorStrategies, simulatorStalemateTrading,
+        simulatorLegalEntityTrading);
   }
 
   public void stopSimulator() {
@@ -282,6 +289,9 @@ public class World {
     simulatorPlayers = Integer.parseInt(arguments.getFirst());
     simulatorStrategies = player -> new the.monopoly.game.strategies.Greedo();
     simulatorStalemateTrading = arguments.contains("--optional-greedo-stalemate-trading");
+    simulatorLegalEntityTrading = arguments.contains("--optional-greedo-legal-entity");
+    simulatorStrategies = player -> new the.monopoly.game.strategies.Greedo(
+        the.monopoly.game.components.finance.Money.ZERO, simulatorStalemateTrading, simulatorLegalEntityTrading);
   }
 
   public void resolveSplitMonopoly(String firstPawn, String secondPawn) {

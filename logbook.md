@@ -31313,3 +31313,22 @@ not instrument acceptance test-source helpers (`World` and
 `JournalStepHandlers`), so it reports zero executable mutation coverage rather
 than survivors. DRY reports existing duplicate entity-fixture methods outside
 the task's changed helpers; no task-local duplication was introduced.
+
+## 2026-08-11T18:09:19Z — specifier handoff received
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 37b26c0
+
+DIAGNOSIS: CLI Greedo instances were built with Greedo::new, so both optional
+trading flags were false and real CLI games could not sell legal-entity shares.
+The handoff also required startup logging of each player's strategy and observed
+configuration, with cli-6 as the regression.
+```
+
+Action: merged `37b26c0`. Threaded both optional flags into CLI Greedo instances,
+added per-player `StrategyNamed` journal/report entries, wired raw-argument
+acceptance setup, and added a focused `SimulatorTest` guard. Acceptance handlers
+wait for all startup observations. Domain tests pass (359), acceptance passes
+(577).
