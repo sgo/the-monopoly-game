@@ -31259,3 +31259,19 @@ scenario precondition and remove `high_hat_balance` from the Examples table.
 It is required merely to fund the $5 share purchase, not a behavior under test;
 the changing row dimension is Dog's distress balance. This removes a false
 mutation target without inventing a causal assertion or accepting a survivor.
+
+## 2026-08-11T17:04:53Z — architect returns share-sale criterion decision
+
+Sent priority-00 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: 736d25b0ef
+```
+
+The required feature revision is to express High Hat's share-sale-9 $50 as a
+literal precondition and remove it from the Examples table. It remains part of
+setup but is not presented as a varying, behavior-observed parameter.
