@@ -30072,3 +30072,6 @@ cover both cash-sufficient and post-liquidation distressed-sale paths without
 contradiction. The domain owns entity dissolution and transfer; `Game` retains
 event adaptation; the acceptance harness only observes outcomes. Routed the
 implementation, including the independent CLI failure boundary, to coder.
+
+Sent coder priority-00 handoff (outbox `00_20260811T102104Z_000214_from_architect_to_coder.handoff`)
+at commit `6a9db62f68` for final-shareholder entity liquidation.
