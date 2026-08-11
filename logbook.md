@@ -29837,3 +29837,46 @@ captured entity argument; the generic lowest-price assertion no longer
 hard-codes an unrelated entity. The change preserves the agreed Gherkin and
 the full acceptance suite remains green. Routing the completed functional work
 to refactorer for its required structural, DRY, and mutation review.
+
+## 2026-08-11T11:45:00+02:00 — refactorer reviews greedo-share-sale (0b9f5cfd37)
+
+Merged `0b9f5cfd37`. New feature: a shareholder facing bankruptcy offers
+their legal-entity share to fellow shareholders as a last-resort liquidation
+step, priced at second-price-plus-$5 clamped between a minimum bid (share
+value or shortfall, whichever is less) and the winner's own 35%-of-balance
+ceiling.
+
+`crap4java` on `Bankruptcy.java` found the real violation:
+`sellEntitySharesUntilSolvent` at CC=16/CRAP=239.9 (4.4% coverage — only
+exercised via acceptance, never unit-tested directly). Decomposed into
+`sellShareToHighestBidder`, `minimumShareBid`, `bidsFor`,
+`isEligibleBidder`, `highestBid`, `shareSalePrice`, plus a small `Bid`
+record replacing the original's two parallel `List<Player>`/`List<Money>`
+arrays — pure extraction, verified behavior-preserving via the full suite
+before and after. Also found `resolve()` itself sitting at a pre-existing
+CRAP=7.0 (predates this task; untouched by the coder's diff, which only
+slotted two new call-sites into its existing linear sequence) — extracted
+`finalizeBankruptcy` since I was already in the file, bringing it to
+CRAP=6.0.
+
+Complexity reduction alone wasn't enough given the near-zero coverage
+(CRAP stays high even at low CC when coverage is 0%), so added four
+focused `BankruptcyTest` cases: highest-bidder-wins with second-price-plus-5
+pricing, price clamped to the winner's own ceiling (second+5 exceeding the
+winner's max), non-shareholders excluded regardless of funds, and
+shareholders without `legalEntityTradingEnabled` excluded regardless of
+solvency. These also gave `LegalEntity.sellShare`/`shareValue`/`removeShares`
+real coverage for free (sellShare was its own CRAP=12.0 violation before
+this, now CRAP=3.0). Every method in both files now CRAP<=6.
+`dry4java`: none on either file. `mutate4java --scan`: `Bankruptcy.java` 47
+sites, `LegalEntity.java` 97 sites (both under 100, both manifests
+refreshed).
+
+Reviewed `Game.java`/`Report.java` (standard event-adapter case, matches
+the sealed-switch pattern), `World.java`/`JournalStepHandlers.java`
+(clean new additions; the pre-existing large-scale step-handler
+duplication in `World.java` that `dry4java` flags predates this commit and
+is out of this task's scope, consistent with how I've treated this file
+all session) — no edits needed there.
+
+Domain 354/354. Full acceptance 570/570, run twice.
