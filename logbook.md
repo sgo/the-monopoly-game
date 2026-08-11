@@ -30009,3 +30009,6 @@ fix must prevent division by zero, but the observable policy remains open:
 whether the entity is dormant, dissolved with streets returned/auctioned, or
 otherwise disposed. This is a specification decision and must not be inferred
 by the implementation.
+
+Sent specifier priority-00 handoff (outbox `00_20260811T100920Z_000213_from_architect_to_specifier.handoff`)
+at commit `403095bf8a` for that policy decision.
