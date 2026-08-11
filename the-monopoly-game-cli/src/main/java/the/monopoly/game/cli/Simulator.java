@@ -146,8 +146,14 @@ public final class Simulator {
 
     private Running(Game game) {
       thread = new Thread(() -> {
-        Game.Result outcome = game.playUntilStopped(() -> !stopRequested.get());
-        result = new Result(0, Report.of(outcome.journal()));
+        try {
+          Game.Result outcome = game.playUntilStopped(() -> !stopRequested.get());
+          result = new Result(0, Report.of(outcome.journal()));
+        } catch (RuntimeException cause) {
+          String message = cause.getMessage() == null
+              ? cause.getClass().getSimpleName() : cause.getMessage();
+          result = new Result(1, "Simulation failed: " + message);
+        }
       }, "monopoly-simulator");
       thread.setDaemon(true);
       thread.start();

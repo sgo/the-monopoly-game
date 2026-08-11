@@ -29996,3 +29996,11 @@ loan-repayment paths also assume a shareholder. Independently, `Simulator`
 must catch an escaped runtime failure in its worker and publish an exit-1
 `Result`, never leaving `awaitEnd()` null. Routed to coder with regression
 tests; deferred the separate economic observation as requested.
+
+## 2026-08-11T10:11:30Z — coder fixes zero-share entity crash
+
+Implemented the architect-routed fix: zero-share legal entities are inactive,
+cannot enter share calculations, and are skipped by the game operation loop.
+The simulator worker now converts escaped runtime failures into an exit-1
+result instead of leaving `awaitEnd()` null. Added a LegalEntity regression
+test. Domain tests pass 355/355; acceptance tests pass 570/570.
