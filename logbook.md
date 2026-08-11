@@ -31057,3 +31057,9 @@ Action: merged `368455e`. The scenario now makes its desired single-street
 distress state explicit and observes racecar's capped balance. Routing the
 new acceptance step and corresponding `World` support to coder as a
 test-harness-only implementation.
+
+## 2026-08-11T14:36:31Z — architect sends deterministic setup to coder
+
+Sent priority-00 git handoff to coder for `b9e62f51d7`, the accepted
+share-sale-9 scenario requiring only the ownership-strip and racecar-balance
+acceptance harness support.
