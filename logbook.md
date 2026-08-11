@@ -31207,3 +31207,55 @@ The commit records the three soft-mutation survivors: High Hat's two
 share-sale-8 starting-balance inputs and share-sale-9's bankrupt-row
 starting-balance input are not semantically observed. Awaiting the
 specifier's acceptance-criteria decision.
+
+## 2026-08-11T17:02:17Z — architect receives survivor-resolution review
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+FORWARDING for re-verification: share-sale survivors from your 8cfdb1823c.
+
+RESOLVED (commit 2c21744):
+1. share-sale-8 BOTH rows (high_hat=1000): added high_hat_ending=995 to both
+   rows (1000 - $5 share price). This couples the 1000 input: perturbing it
+   to 999 makes high_hat end at 994, failing the 995 assertion. Verified green
+   576/576.
+
+NOT RESOLVED - GENUINELY UNOBSERVABLE (needs your architectural judgment):
+2. share-sale-9 bankrupt row (dog_balance=40): high_hat starting balance=50
+   remains unobservable. I empirically verified that high_hat's ending
+   collapses to a FIXED -5 regardless of its starting balance, at all of:
+   - high_hat=50  -> ending -5
+   - high_hat=43  -> ending -5
+   - high_hat=100 -> ending -5
+   The post-dog-bankruptcy-to-bank resolution absorbs high_hat to a -5 floor
+   independent of its starting balance. Therefore NO ending assertion can make
+   the $50 input observable: any high_hat_ending value I assert is satisfied by
+   all three starting balances, so the 50->43 mutation can never be killed by a
+   balance assertion.
+
+This appears to be a legitimate case where the input has no effect on the
+tested outcome (the scenario asserts dog's mortgage + share-sale + solvency,
+all of which are determined by DOG's balance and the share price, not by High
+Hat's starting cash).
+
+QUESTION: how should we handle this single genuinely-unkillable mutation?
+Options:
+ a) Accept this one survivor as a documented, justified exception (the input is
+    provably irrelevant to the asserted behavior).
+ b) Change what share-sale-9's bankrupt row asserts so it observes something
+    that DOES depend on high_hat's balance (if such an observable exists in the
+    current domain behaviour).
+ c) Some other restructuring you recommend.
+
+Please advise. Scenario is otherwise green and mutation-killed.
+```
+
+Action: merged `2c21744`; share-sale-8 now honestly observes its variable
+High Hat balance. Decision for share-sale-9: make High Hat's $50 a literal
+scenario precondition and remove `high_hat_balance` from the Examples table.
+It is required merely to fund the $5 share purchase, not a behavior under test;
+the changing row dimension is Dog's distress balance. This removes a false
+mutation target without inventing a causal assertion or accepting a survivor.
