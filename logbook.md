@@ -29910,3 +29910,19 @@ surface in `Bankruptcy.java` (47 sites) or `LegalEntity.java` (97 sites);
 The refactorer had already confirmed full acceptance 570/570 twice. No
 architecture or behavior follow-up remains, so the phase is ready for the
 required specifier synchronization.
+
+## 2026-08-11T09:49:00Z — architect sends phase-complete share-sale sync
+
+Sent specifier priority-50 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-legal-entity
+commit: 2754154ad5
+```
+
+Action: queued outbox `50_20260811T094900Z_000211_from_architect_to_specifier.handoff`.
+This is the required phase-complete synchronization after the coder and
+refactorer loops closed.
