@@ -141,7 +141,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
       | 40          | 0              | 1               |
 
   # share-sale-8
-  Scenario Outline: a lone bidder buys a legal-entity share for a nominal $5, but the seller still goes bankrupt if the proceeds do not cover the remaining debt
+  Scenario Outline: a lone bidder buys a legal-entity share for a nominal $5; whether the seller avoids bankruptcy depends on whether the proceeds cover the remaining debt
     Given legal-entity trading is enabled for the "Greedo" strategy
     And we select 4 players
     And Pink Realty is formed
@@ -151,27 +151,10 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "high hat" has $<high_hat_balance> to spend
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
     Then pawn "high hat" wins the Pink Realty share at $<winning_bid>
-    And pawn "dog" is bankrupt
+    And pawn "dog"'s bankrupt state is <bankrupt_state>
     And pawn "dog"'s final balance is $<dog_ending>
 
     Examples:
-      | dog_balance | high_hat_balance | winning_bid | dog_ending |
-      | 40          | 1000             | 5           | -55        |
-
-  # share-sale-9
-  Scenario Outline: a lone bidder buys a legal-entity share for a nominal $5, and the proceeds cover enough of the debt that the seller avoids bankruptcy
-    Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 4 players
-    And Pink Realty is formed
-    And pawn "iron box" is bankrupt
-    And pawn "dog" owns no mortgaged property
-    And pawn "dog" has $<dog_balance> to spend
-    And pawn "high hat" has $<high_hat_balance> to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
-    Then pawn "high hat" wins the Pink Realty share at $<winning_bid>
-    And pawn "dog" is not bankrupt
-    And pawn "dog"'s final balance is $<dog_ending>
-
-    Examples:
-      | dog_balance | high_hat_balance | winning_bid | dog_ending |
-      | 99          | 1000             | 5           | 4          |
+      | dog_balance | high_hat_balance | winning_bid | bankrupt_state | dog_ending |
+      | 40          | 1000             | 5           | bankrupt       | -55        |
+      | 99          | 1000             | 5           | not bankrupt   | 4          |
