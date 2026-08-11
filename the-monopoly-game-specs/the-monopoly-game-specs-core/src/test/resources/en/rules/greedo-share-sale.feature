@@ -23,7 +23,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance | ship_balance |
-      | 100         | 1000             | 200              | 200          |
+      | 40          | 1000             | 200              | 200          |
 
   # share-sale-2
   Scenario Outline: a shareholder does not go bankrupt because the share's value covers the tax debt
@@ -39,7 +39,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
     Examples:
       | dog_balance | high_hat_balance |
-      | 100         | 1000             |
+      | 40          | 1000             |
 
   # share-sale-3
   Scenario Outline: a shareholder sells a cheaper personal asset before offering their legal-entity share
@@ -74,7 +74,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance |
-      | 100         | 0                | 0                |
+      | 40          | 0                | 0                |
 
   # share-sale-5
   Scenario Outline: a fellow shareholder bids up to the higher of the share value and a third of their bank balance, and wins at the lowest price
@@ -91,6 +91,6 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance | winning_bid |
-      | 100         | 1200             | 900              | 800         |
-      | 100         | 3000             | 2600             | 915         |
-      | 100         | 1600             | 1500             | 560         |
+      | 40          | 1200             | 900              | 800         |
+      | 40          | 3000             | 2600             | 915         |
+      | 40          | 1600             | 1500             | 560         |
