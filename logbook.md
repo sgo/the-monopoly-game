@@ -29148,6 +29148,19 @@ property tests 22/22.
 ## 2026-08-11T08:45:00Z — coder implements legal-entity share liquidation
 
 Processed architect handoff `fc1b8ed392`. Implemented three-share entity
+ownership with one-share transfer, maximum-developed-rent valuation, and
+Greedo-only fellow-shareholder bidding after personal liquidation. Added the
+acceptance assertions and ownership vocabulary.
+
+Domain verification: 350/350 passing. Existing acceptance scenarios pass. The
+new feature exposes a fixture mismatch: official Extra Belasting is $100, so a
+pawn given exactly $100 is solvent at zero and cannot sell a share or become
+bankrupt. Sent architect note for commit `1ca987e` requesting corrected debt
+or balance values.
+
+## 2026-08-11T08:45:00Z — coder implements legal-entity share liquidation
+
+Processed architect handoff `fc1b8ed392`. Implemented three-share entity
 ownership with one-share transfer, valuation at one-third of the entity
 streets' maximum developed rents, and Greedo-only fellow-shareholder bidding
 after personal liquidation and mortgages. Added acceptance assertions for
