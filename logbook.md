@@ -30012,3 +30012,63 @@ by the implementation.
 
 Sent specifier priority-00 handoff (outbox `00_20260811T100920Z_000213_from_architect_to_specifier.handoff`)
 at commit `403095bf8a` for that policy decision.
+
+## 2026-08-11T10:20:08Z — architect accepts final-shareholder liquidation specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier bee938f
+
+Final-shareholder legal-entity liquidation is now specified (resolves your
+shareholderless-entity policy question from 403095bf8a, and the / by zero crash
+path it sits on).
+
+POLICY (user-confirmed): when the FINAL shareholder of a legal entity must
+settle debt to avoid bankruptcy, they may LIQUIDATE the entity:
+1. all entity property transfers to that shareholder
+2. the entity's bank balance transfers to that shareholder
+3. the shareholder uses the received cash to settle the debt
+4. if the cash is insufficient, they sell the newly-acquired assets per the
+   existing distressed-sale rules until solvent.
+
+SCENARIOS (added to greedo-share-sale.feature):
+- share-sale-6: sufficient-cash path. Final shareholder (dog) liquidates Pink
+  Realty; entity dissolves; dog owns every formerly-entity street and received
+  the entity bank balance; dog is not bankrupt. Example dog_balance=40.
+- share-sale-7: insufficiency path (step 4). dog_balance=40, entity bank
+  balance=$0 (dog is $60 short of the $100 Luxury Tax after liquidation gives
+  no cash). Dog receives $0, then sells 1 of the transferred Pink Realty
+  streets to settle the remaining debt; dog's debt is settled. Adds
+  entity_balance + streets_to_sell example columns.
+
+CONTEXT (so the coder fixes the whole crash): the NPE in
+the.monopoly.game.cli.Simulator.main (Simulator.java:37) is secondary to an
+ArithmeticException "/ by zero" at LegalEntity.sharesOf (LegalEntity.java:260),
+reached from the build path (operate -> buildAsMuchAsAffordable ->
+affordableBuildPlan -> cannotExtendPlan -> canBorrowForBuilding -> sharesOf)
+when shareholders.size()==0. shareOf (L95), shareValue (L101), sharesOf (L260)
+all divide by the shareholder count.
+
+REQUEST: review both scenarios and route the implementation to the coder:
+- LegalEntity/sharesOf etc. must never divide by zero (guard empty shareholder
+  list; liquidation now provides the intended endgame so a zero-shareholder
+  entity should dissolve via this policy, not linger).
+- Implement entity liquidation (transfer streets + bank balance to final
+  shareholder; then distressed sale of newly-acquired streets if insufficient).
+- Simulator must not NPE when the game thread ends without a Result (or a
+  RuntimeException).
+- Add the harness steps these scenarios need (dissolve, owns every street
+  previously held, received the entity bank balance, sold N transferred
+  streets, debt is settled).
+
+Commits: 14a487a (share-sale-6) + bee938f (share-sale-7). Feature parses cleanly.
+```
+
+Action: merged `bee938f` as `0e7f29be82` and reviewed the two scenarios. They
+cover both cash-sufficient and post-liquidation distressed-sale paths without
+contradiction. The domain owns entity dissolution and transfer; `Game` retains
+event adaptation; the acceptance harness only observes outcomes. Routed the
+implementation, including the independent CLI failure boundary, to coder.
