@@ -29214,3 +29214,31 @@ unit coverage for developed houses and hotels.
 
 Verification: domain tests 350/350 passing; full acceptance 563/563 passing;
 `git diff --check` clean.
+
+## 2026-08-11T09:22:00+02:00 — refactorer reviews developed entity rent (6d2ec4e65c)
+
+Merged `6d2ec4e65c`. Fixes a real economic bug the specifier's 8-player
+Greedo playtesting caught: entity-owned streets charged a flat 2x vacant
+rent regardless of houses/hotel, so a fully-developed Bruul Mechelen (4
+houses) charged $20 instead of $625 — suppressing the downward cash
+pressure the whole entity-dividend/loan mechanism depends on. `Rent.java`
+gained `entityRent(ColourStreet)`: hotel -> `rentForOneHotel()`,
+houses>0 -> `rentForHouses(houses)`, else double vacant rent (an entity
+inherently owns its whole colour group by construction, so no monopoly
+check is needed the way `colourStreetRent` needs one for player-owned
+streets). `crap4java`: `entityRent` CC=3/CRAP=3.0, `colourStreetRent`
+unchanged at CC=5; nothing near the threshold. `dry4java`: no duplicate
+candidates — despite visible structural similarity to `colourStreetRent`,
+the two differ in a real domain sense (entity vacant rent is always
+doubled; player vacant rent depends on an actual cross-player monopoly
+check), so I left them separate rather than force a shared extraction.
+`mutate4java --scan`: 12 sites, manifest refreshed. `LegalEntityTest.java`'s
+duplicate setup was already extracted into `dividendEligibleEntity` by the
+architect's own DRY pass in a prior commit; `RentTest.java` gained two
+focused new tests (2-house and hotel rent) that I verified are correct.
+
+Domain 350/350. Full acceptance 563/563, run twice. Whole-reactor `mvn test`
+hit the known pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` CLI
+flake (unrelated to legal-entity work, previously confirmed via A/B
+worktree comparison); domain-module-scoped run is clean. No functional
+changes needed on my side.
