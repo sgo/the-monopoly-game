@@ -30870,3 +30870,23 @@ Action: committed the mutation tool's managed manifest update that withdraws
 the stale passing stamp while share-sale-8 has surviving input mutations. It
 will be refreshed by the approved tool once the specifier returns the revised
 acceptance criteria.
+
+## 2026-08-11T13:13:36Z — architect accepts boundary specification revision
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier cb60d38
+```
+
+Action: merged `cb60d38`. Share-sale-8 now brackets the $95 boundary: $94
+leaves Dog bankrupt after the nominal sale and $95 leaves Dog solvent.
+
+## 2026-08-11T13:15:00Z — architect verifies boundary mutation coverage
+
+Action: soft Gherkin mutation killed all 10 exercised mutations with zero
+survivors or errors, including both formerly surviving `dog_balance` changes.
+Full acceptance and property tests passed; `git diff --check` passed. The
+approved mutation tool refreshed the feature manifest and success stamp.
