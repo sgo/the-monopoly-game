@@ -30443,6 +30443,14 @@ before and after liquidation, requiring the exact treasury increase. Domain
 tests pass 359/359; full acceptance passes 572/572; `git diff --check` is clean.
 The correction is ready for refactorer review.
 
+## 2026-08-11T14:47:45Z — coder applies share-sale bankruptcy refinement
+
+Merged specifier refinement `5c2ea95`. Restored the negative-balance check after
+share sales: a successful $5 share sale no longer skips bankruptcy finalization.
+The failed-sale row preserves the specified `-55` balance, while the `$99 + $5`
+row remains solvent at `$4`. Domain tests pass 359/359; share-sale acceptance
+passes 11/11; full acceptance passes successfully.
+
 ## 2026-08-11T13:18:00+02:00 — refactorer reviews liquidation transfer assertion (9ce4e19d00)
 
 Merged `9ce4e19d00`. This fixed the weak `pawnReceivedEntityBankBalance`
@@ -30697,24 +30705,89 @@ Domain 359/359, full acceptance 572/572 (both green, but 572/572 does not
 mean this is safe — see above). No commit from me this cycle; sending this
 finding up without a code change.
 
-## 2026-08-11T12:31:19Z — architect receives no-minimum-bid review
+## 2026-08-11T12:31:11Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 0fa0c3da3b
+```
+
+Summary: BLOCKING FINDING, no code change applied. The minimum-bid-floor
+removal itself is correct and matches the specifier's request, but the
+commit also changed `resolve()`'s control flow (confirmed via `git blame`
+as new in this commit, not requested by the specifier) to return
+immediately after any successful share sale, skipping the real solvency
+check. Reproduced directly: replaying share-sale-8's exact numbers leaves
+the debtor at a permanent -$55 balance, never marked bankrupt — a resource-
+integrity bug invisible to the current scenario since it only asserts
+"not bankrupt" and the winning bid, never the ending balance. Did not fix
+it myself: reverting the control flow would flip the outcome to bankrupt,
+contradicting the scenario's explicit expectation, so this needs a
+specification decision (does a partial share sale count as "resolved," or
+should insolvent debtors fall through to further resolution?) rather than
+a structural call on my part. `resolve()`/`sellEntitySharesUntilSolvent`
+picked up CRAP violations from the added branching; left alone pending the
+real fix. Domain 359/359, acceptance 572/572 — green but not proof of
+safety here.
+
+## 2026-08-11T15:01:00+02:00 — refactorer reviews share sale bankruptcy refinement (242b6d09b5) — corrects my prior finding
+
+Merged `242b6d09b5`. This resolves my "BLOCKING FINDING" from last cycle
+correctly: `resolve()` now always evaluates the share sale and checks real
+solvency afterward (the erroneous early-return is gone), and
+`finalizeBankruptcy` gained a `preserveNegativeBalance` flag — when a share
+sale happened but didn't fully cover the debt, the debtor's negative
+balance is intentionally left as-is (not zeroed) while `deeds.bankrupt`
+still runs normally for genuinely-unresolved cases. This matches the
+user's explicit, confirmed design decision (a distressed share sale defers
+bankruptcy without requiring solvency) captured in the specifier's
+`a78660a` commit.
+
+Correcting the record on my own last handoff: I need to walk back part of
+what I escalated. My reproduction of share-sale-8 (an isolated `Bankruptcy`
+call built by hand from the scenario's numbers) was not faithful to the
+real scenario — `World.landPawnOn` plays the *entire* game to completion
+via `Game.play()`, not a single landing event, so a hand-rolled one-shot
+`resolve()` call doesn't reproduce the real sequence of turns. I confirmed
+this today by instrumenting the actual code path during a real acceptance
+run and reading the per-scenario surefire XML directly: the genuine
+share-sale-8 test case shows `dog` reaching solvency legitimately, with
+`isBankrupt=false` and no `finalizeBankruptcy` call at all — the
+"-55/never-bankrupted" state I reproduced belonged to a *different*,
+earlier scenario in the same feature file that don't have that assertion
+shape, not share-sale-8. The underlying control-flow concern I raised was
+real and worth escalating (the coder's `242b6d09b5` fix confirms it — an
+explicit `preserveNegativeBalance` flag replacing a bare early-return is a
+real, deliberate fix, not a no-op), but my specific claim that share-sale-8
+itself was failing silently was not accurate. Removed all temporary debug
+instrumentation before finishing this review; `git status` is clean.
+
+`crap4java`: all methods CRAP<=6 (`sellEntitySharesUntilSolvent` and
+`resolve` both at exactly 6.0, matching my structural expectations for
+this method shape). `dry4java`: none. `mutate4java --scan`: 56 sites,
+well under the split threshold. My existing `BankruptcyTest` share-price
+cases (`theEntitySellsADistressedShareholdersShareToTheHighestBidder`,
+`theShareSalePriceNeverExceedsTheWinningBiddersOwnCeiling`) both use
+multiple competing bidders, so the removed floor was never their deciding
+factor — still valid, no update needed.
+
+Domain 359/359 (clean rebuild after removing stray probe artifacts from
+target/). Full acceptance 574/574, run twice.
+
+## 2026-08-11T13:02:10Z — architect receives share-sale refinement review
 
 Received refactorer priority-50 handoff:
 
 ```
 Re-read your role and constitution.
 
-merge_and_process refactorer 0fa0c3da3b
+merge_and_process refactorer f7a5c98793
 ```
 
-Action: merged `0fa0c3da3b` and confirmed the finding. A nominal successful
-share sale currently returns from bankruptcy resolution even when it leaves the
-debtor insolvent. The new feature says the debtor is not bankrupt but does not
-state whether remaining debt must be settled, so the required resolution policy
-is ambiguous. Escalating the acceptance-criteria decision to the specifier;
-no production-flow change is safe without it.
-
-## 2026-08-11T12:32:15Z — architect escalates partial share-sale resolution
-
-Sent priority-00 git handoff to specifier for `41a6c9df4f`, carrying the
-ambiguous partial-settlement finding for `greedo-legal-entity`.
+Action: merging `f7a5c98793` and reviewing the approved partial-share-sale
+bankruptcy policy, its core state handling, and its explicit acceptance cases.

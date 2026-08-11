@@ -34,14 +34,14 @@ public final class Bankruptcy {
     if (distressedSale.resolve(debtor)) return;
     sellHousesUntilSolvent(debtor);
     mortgageUntilSolvent(debtor);
-    if (sellEntitySharesUntilSolvent(debtor)) return;
+    boolean shareSold = sellEntitySharesUntilSolvent(debtor);
     if (debtor.account().balance().amount().amount() >= 0) return;
-    finalizeBankruptcy(debtor, creditor);
+    finalizeBankruptcy(debtor, creditor, shareSold);
   }
 
-  private void finalizeBankruptcy(Player debtor, Player creditor) {
+  private void finalizeBankruptcy(Player debtor, Player creditor, boolean preserveNegativeBalance) {
     Money remaining = debtor.account().balance().amount();
-    debtor.account().deposit(new Money(-remaining.amount()));
+    if (!preserveNegativeBalance) debtor.account().deposit(new Money(-remaining.amount()));
     deeds.legalEntities().forEach(entity -> entity.removeShares(debtor));
     deeds.bankrupt(debtor);
     if (creditor == null) bankruptToBank(debtor);
