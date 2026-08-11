@@ -30385,3 +30385,29 @@ zero treasury transfers, invalid liquidator rejection, and the
 is structurally sound, but acceptance corrections remain outstanding with
 specifier (scenario setup) and coder (actual transfer assertion); this is not
 phase completion and final verification is deferred until those loops close.
+
+## 2026-08-11T10:50:20Z — coder verifies architect liquidation integration
+
+Merged architect priority-00 handoff `5267637f40` for `greedo-legal-entity`.
+The merge integrates the final-shareholder liquidation flow, treasury transfer,
+street dissolution, and acceptance assertions. Domain tests pass 355/355 and
+full acceptance passes 572/572. `git diff --check` is clean. No additional
+coder implementation was required; returning the verified integration to the
+architect for phase routing.
+
+## 2026-08-11T10:52:30Z — architect returns uncorrected bank-transfer assertion
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 33c2422772
+```
+
+Action: merged `33c2422772`; it contains no production or acceptance-adapter
+correction. `World.pawnReceivedEntityBankBalance` still returns true merely
+when a stored entity balance exists and the entity is dissolved. Returned to
+coder: capture the pawn balance before liquidation and require the final pawn
+balance to equal that captured balance plus the recorded pre-liquidation entity
+treasury. The specifier scenario-setup decision remains outstanding.
