@@ -306,6 +306,39 @@ final class JournalStepHandlers {
         then("^the game journal records that stalemate trading is " + NAME + "$",
             (world, arguments) -> records(world, stalemateTrading(arguments.text(1)))),
 
+        then("^the game journal records that every player uses the \"Greedo\" strategy$",
+            (world, arguments) -> {
+              world.awaitGameLog(world.simulatorPlayerCount(), Entry.StrategyNamed.class::isInstance,
+                  "strategy observations");
+              assertThat(world.gameLog().stream()
+                  .filter(Entry.StrategyNamed.class::isInstance)
+                  .map(Entry.StrategyNamed.class::cast)
+                  .filter(entry -> entry.name().equals("Greedo"))
+                  .count()).isEqualTo(world.simulatorPlayerCount());
+            }),
+
+        then("^the game journal records that the \"Greedo\" strategy observes legal-entity trading as "
+                + NAME + "$",
+            (world, arguments) -> {
+              world.awaitGameLog(world.simulatorPlayerCount(), Entry.StrategyNamed.class::isInstance,
+                  "strategy observations");
+              assertThat(world.gameLog().stream()
+                  .filter(Entry.StrategyNamed.class::isInstance)
+                  .map(Entry.StrategyNamed.class::cast)
+                  .allMatch(entry -> entry.legalEntityEnabled() == arguments.text(1).equals("enabled"))).isTrue();
+            }),
+
+        then("^the game journal records that the \"Greedo\" strategy observes stalemate trading as "
+                + NAME + "$",
+            (world, arguments) -> {
+              world.awaitGameLog(world.simulatorPlayerCount(), Entry.StrategyNamed.class::isInstance,
+                  "strategy observations");
+              assertThat(world.gameLog().stream()
+                  .filter(Entry.StrategyNamed.class::isInstance)
+                  .map(Entry.StrategyNamed.class::cast)
+                  .allMatch(entry -> entry.stalemateEnabled() == arguments.text(1).equals("enabled"))).isTrue();
+            }),
+
         then("^the game journal records that pawn \"" + NAME + "\" rolls " + VALUE + " for initiative$",
             (world, arguments) -> records(world, initiativeRoll(arguments.text(1), arguments.number(2)))),
 
