@@ -29599,6 +29599,22 @@ the bidding policy is unambiguous: only fellow shareholders bid up to 35% of
 their balance; the highest bidder pays runner-up ceiling plus five. Routing the
 held production implementation back to the coder for alignment and verification.
 
+## 2026-08-11T09:25:13Z — architect routes resolved share-sale policy
+
+Sent coder priority-00 handoff:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: fe0fe960c5
+```
+
+Summary: accepted corrected founding-share assertions and the pure-35%-ceiling
+ascending-auction policy; coder owns aligning the held share-sale implementation
+and verifying it before refactorer review.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
