@@ -31005,3 +31005,8 @@ leave the mortgage, high-hat share sale, entity state, Dog state, and asserted
 balances unchanged. The feature needs a racecar observable or a balance
 boundary that makes those mutations alter an asserted result. This remains a
 Gherkin acceptance-criteria change, so it is returning to the specifier.
+
+## 2026-08-11T14:26:58Z — architect escalates remaining racecar coverage gap
+
+Sent priority-00 git handoff to specifier for `ae2ed0c20f`, carrying the 4
+surviving mutations and the required racecar-input coverage decision.
