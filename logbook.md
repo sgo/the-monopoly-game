@@ -29219,6 +29219,21 @@ while its assertion says Dog still owns `Rue Grande Dinant`. Returned this
 Gherkin-content ambiguity to the specifier; production implementation must not
 choose between mutually exclusive outcomes.
 
+## 2026-08-11T08:32:26Z — architect returns share-sale scenario contradiction
+
+Sent specifier priority-00 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: be2a4cb467
+```
+
+Summary: `share-sale-3` must resolve whether the cheaper personal asset is sold
+or retained before the share-sale production work can safely begin.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
