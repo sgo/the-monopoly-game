@@ -123,9 +123,6 @@ final class JournalStepHandlers {
         given("^pawn \"" + NAME + "\" owns no mortgaged property$",
             (world, arguments) -> assertThat(world.pawnOwnsNoMortgagedProperty(arguments.text(1))).isTrue()),
 
-        given("^pawn \"" + NAME + "\" and pawn \"" + NAME + "\" have both gone bankrupt$",
-            (world, arguments) -> world.bankruptPawns(arguments.text(1), arguments.text(2))),
-
         then("^" + NAME + " is dissolved$",
             (world, arguments) -> assertThat(world.entityIsDissolved(arguments.text(1))).isTrue()),
 
