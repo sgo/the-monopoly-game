@@ -30411,3 +30411,6 @@ when a stored entity balance exists and the entity is dissolved. Returned to
 coder: capture the pawn balance before liquidation and require the final pawn
 balance to equal that captured balance plus the recorded pre-liquidation entity
 treasury. The specifier scenario-setup decision remains outstanding.
+
+Sent coder priority-00 handoff (outbox `00_20260811T105246Z_000218_from_architect_to_coder.handoff`)
+at commit `614dc2e337` for the still-unimplemented transfer assertion.
