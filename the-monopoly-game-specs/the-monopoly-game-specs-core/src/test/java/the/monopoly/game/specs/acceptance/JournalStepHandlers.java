@@ -479,6 +479,10 @@ final class JournalStepHandlers {
         then("^pawn \"" + NAME + "\" is not bankrupt$",
             (world, arguments) -> assertThat(world.isBankrupt(arguments.text(1))).isFalse()),
 
+        then("^pawn \"" + NAME + "\"'s bankrupt state is (<bankrupt_state>)$",
+            (world, arguments) -> assertThat(world.isBankrupt(arguments.text(1)))
+                .isEqualTo(arguments.text(2).equals("bankrupt"))),
+
         then("^pawn \"" + NAME + "\" no longer holds a share of " + NAME + "$",
             (world, arguments) -> assertThat(world.pawnHoldsShare(arguments.text(1), arguments.text(2))).isFalse()),
         then("^pawn \"" + NAME + "\" holds that " + NAME + " share$",
