@@ -29272,6 +29272,22 @@ the debtor's entity share, and avoids bankruptcy; it is consistent with the
 specified liquidation order. Routing the observable share-sale behavior to the
 coder.
 
+## 2026-08-11T08:33:47Z — architect routes legal-entity share sale
+
+Sent coder priority-00 handoff:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: fc1b8ed392
+```
+
+Summary: accepted legal-entity share valuation, restricted fellow-shareholder
+auction, ordered distressed liquidation, and the associated acceptance-harness
+behavior for implementation.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
