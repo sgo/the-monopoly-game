@@ -111,6 +111,9 @@ final class JournalStepHandlers {
         given("^" + NAME + "'s bank account is empty$",
             (world, arguments) -> world.entityBankHolds(arguments.text(1), money(0))),
 
+        given("^pawn \"" + NAME + "\" owns no mortgaged property$",
+            (world, arguments) -> assertThat(world.pawnOwnsNoMortgagedProperty(arguments.text(1))).isTrue()),
+
         then("^the pink colour group is developed up to at least (<houses_at_least>) houses$",
             (world, arguments) -> assertThat(world.totalHouses(Street.Colour.pink))
                 .isGreaterThanOrEqualTo(arguments.number(1))),
@@ -445,6 +448,37 @@ final class JournalStepHandlers {
         then("^pawn \"" + NAME + "\" is not bankrupt$",
             (world, arguments) -> assertThat(world.isBankrupt(arguments.text(1))).isFalse()),
 
+        then("^pawn \"" + NAME + "\" no longer holds a share of " + NAME + "$",
+            (world, arguments) -> assertThat(world.pawnHoldsShare(arguments.text(1), arguments.text(2))).isFalse()),
+        then("^pawn \"" + NAME + "\" holds that " + NAME + " share$",
+            (world, arguments) -> assertThat(world.pawnHoldsShare(arguments.text(1), arguments.text(2))).isTrue()),
+        then("^pawn \"" + NAME + "\" and pawn \"" + NAME + "\" do not hold shares of " + NAME + "$",
+            (world, arguments) -> {
+              assertThat(world.pawnHoldsShare(arguments.text(1), arguments.text(3))).isFalse();
+              assertThat(world.pawnHoldsShare(arguments.text(2), arguments.text(3))).isFalse();
+            }),
+        then("^pawn \"" + NAME + "\" holds the " + NAME + " share sold by pawn \"" + NAME + "\"$",
+            (world, arguments) -> {
+              assertThat(world.pawnHoldsShare(arguments.text(1), arguments.text(2))).isTrue();
+            }),
+        then("^pawn \"" + NAME + "\" still holds a share of " + NAME + "$",
+            (world, arguments) -> assertThat(world.pawnHoldsShare(arguments.text(1), arguments.text(2))).isTrue()),
+        then("^pawn \"" + NAME + "\" holds no shares of any legal entity$",
+            (world, arguments) -> assertThat(world.pawnHoldsNoEntityShares(arguments.text(1))).isTrue()),
+        then("^pawn \"" + NAME + "\" wins the " + NAME + " share at no more than \\$" + VALUE + "$",
+            (world, arguments) -> assertThat(world.gameLog().stream()
+                .filter(Entry.LegalEntityShareSold.class::isInstance)
+                .map(Entry.LegalEntityShareSold.class::cast)
+                .anyMatch(entry -> entry.name().equals(arguments.text(2))
+                    && entry.buyer().value().equals(arguments.text(1))
+                    && entry.price().amount() <= arguments.number(3))).isTrue()),
+        then("^pawn \"" + NAME + "\" paid the lowest possible price for the " + NAME + " share$",
+            (world, arguments) -> assertThat(world.gameLog().stream()
+                .filter(Entry.LegalEntityShareSold.class::isInstance)
+                .map(Entry.LegalEntityShareSold.class::cast)
+                .anyMatch(entry -> entry.name().equals(arguments.text(2))
+                    && entry.buyer().value().equals(arguments.text(1)))).isTrue()),
+
         then("^pawn \"" + NAME + "\" wins the game$",
             (world, arguments) -> assertThat(world.hasWon(arguments.text(1))).isTrue()),
 
@@ -573,6 +607,11 @@ final class JournalStepHandlers {
             (world, arguments) -> assertThat(world.pawnOwns(arguments.text(1), SpaceNames.of(arguments.text(2))))
                 .as("pawn \"%s\" owns \"%s\"", arguments.text(1), arguments.text(2))
                 .isTrue()),
+
+        then("^pawn \"" + NAME + "\" no longer owns \"" + NAME + "\"$",
+            (world, arguments) -> assertThat(world.pawnOwns(arguments.text(1), SpaceNames.of(arguments.text(2))))
+                .as("pawn \"%s\" owns \"%s\"", arguments.text(1), arguments.text(2))
+                .isFalse()),
 
         then("^pawn \"" + NAME + "\" does not own \"" + NAME + "\"$",
             (world, arguments) -> assertThat(world.pawnOwns(arguments.text(1), SpaceNames.of(arguments.text(2))))

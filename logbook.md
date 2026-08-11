@@ -29145,6 +29145,44 @@ Removed DRY-reported duplicate test setup. Verification: full acceptance
 DRY clean; soft legal-entity Gherkin mutation 71 killed/28 survived/0 errors;
 property tests 22/22.
 
+## 2026-08-11T08:56:00Z — coder reviews corrected share-sale triggers
+
+Processed architect handoff `d5fe0e219b`. Added share-auction bid ceilings,
+$5 competition pricing, journal/report coverage, and removal of a bankrupt
+holder's entity shares. Domain tests pass 350/350. Full acceptance reaches
+567/570; all existing features pass. Remaining failures are specification
+contradictions: Iron Box necessarily retains its original Pink share after
+Dog sells one share to High Hat, and share-sale-5 row 3 expects $560 despite
+the stated max($800 share value, 35% of $1600) ceiling being $800.
+
+## 2026-08-11T08:45:00Z — coder implements legal-entity share liquidation
+
+Processed architect handoff `fc1b8ed392`. Implemented three-share entity
+ownership with one-share transfer, maximum-developed-rent valuation, and
+Greedo-only fellow-shareholder bidding after personal liquidation. Added the
+acceptance assertions and ownership vocabulary.
+
+Domain verification: 350/350 passing. Existing acceptance scenarios pass. The
+new feature exposes a fixture mismatch: official Extra Belasting is $100, so a
+pawn given exactly $100 is solvent at zero and cannot sell a share or become
+bankrupt. Sent architect note for commit `1ca987e` requesting corrected debt
+or balance values.
+
+## 2026-08-11T08:45:00Z — coder implements legal-entity share liquidation
+
+Processed architect handoff `fc1b8ed392`. Implemented three-share entity
+ownership with one-share transfer, valuation at one-third of the entity
+streets' maximum developed rents, and Greedo-only fellow-shareholder bidding
+after personal liquidation and mortgages. Added acceptance assertions for
+share ownership and the missing ownership vocabulary.
+
+Domain verification: 350/350 passing. Acceptance compilation and all existing
+features pass; the new feature exposed a specification fixture mismatch: the
+official Extra Belasting tax is $100, so a pawn holding exactly $100 is not in
+distress and cannot sell a share or become bankrupt. The share-sale scenarios
+therefore remain red until the architect/specifier resolves the stated
+balances or tax-debt setup.
+
 ## 2026-08-11T07:41:57Z — architect sends phase-complete developed-rent sync
 
 Sent specifier priority-50 handoff:
@@ -29562,6 +29600,16 @@ unit coverage for developed houses and hotels.
 
 Verification: domain tests 350/350 passing; full acceptance 563/563 passing;
 `git diff --check` clean.
+
+Handoff sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: 6d2ec4e65c
+```
 
 ## 2026-08-11T09:22:00+02:00 — refactorer reviews developed entity rent (6d2ec4e65c)
 

@@ -8,7 +8,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
   # share-sale-1
   Scenario Outline: a shareholder in distress offers their legal-entity share to a fellow shareholder instead of going bankrupt
     Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 4 players
+    And we select 5 players
     And Pink Realty is formed
     And pawn "dog" owns no mortgaged property
     And pawn "dog" has $<dog_balance> to spend
@@ -28,7 +28,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
   # share-sale-2
   Scenario Outline: a shareholder does not go bankrupt because the share's value covers the tax debt
     Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 4 players
+    And we select 5 players
     And Pink Realty is formed
     And pawn "dog" owns no mortgaged property
     And pawn "dog" has $<dog_balance> to spend
@@ -44,7 +44,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
   # share-sale-3
   Scenario Outline: a shareholder sells a cheaper personal asset before offering their legal-entity share
     Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 4 players
+    And we select 5 players
     And Pink Realty is formed
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<dog_balance> to spend
@@ -62,7 +62,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
   # share-sale-4
   Scenario Outline: a legal-entity share does not change hands when no fellow shareholder will bid
     Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 4 players
+    And we select 5 players
     And Pink Realty is formed
     And pawn "dog" owns no mortgaged property
     And pawn "dog" has $<dog_balance> to spend

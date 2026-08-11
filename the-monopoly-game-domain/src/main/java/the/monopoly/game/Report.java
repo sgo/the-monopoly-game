@@ -125,6 +125,8 @@ public final class Report {
       case Entry.LegalEntityDividendPaid it -> it.name() + " pays each of "
           + it.shareholders().stream().map(Report::name).collect(java.util.stream.Collectors.joining(", "))
           + " an equal dividend";
+      case Entry.LegalEntityShareSold it -> name(it.seller()) + " sells a share of " + it.name()
+          + " to " + name(it.buyer()) + " for $" + it.price().amount();
       case Entry.Won it -> name(it.player()) + " wins the game";
     };
   }

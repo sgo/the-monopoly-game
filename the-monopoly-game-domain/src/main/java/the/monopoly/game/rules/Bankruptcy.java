@@ -34,10 +34,12 @@ public final class Bankruptcy {
     if (distressedSale.resolve(debtor)) return;
     sellHousesUntilSolvent(debtor);
     mortgageUntilSolvent(debtor);
+    sellEntitySharesUntilSolvent(debtor);
     if (debtor.account().balance().amount().amount() >= 0) return;
 
     Money remaining = debtor.account().balance().amount();
     debtor.account().deposit(new Money(-remaining.amount()));
+    deeds.legalEntities().forEach(entity -> entity.removeShares(debtor));
     deeds.bankrupt(debtor);
     if (creditor == null) bankruptToBank(debtor);
     else bankruptToPlayer(debtor, creditor);
@@ -75,6 +77,50 @@ public final class Bankruptcy {
         Money value = deeds.mortgage(land, debtor);
         events.mortgaged(debtor, land, value);
       }
+    }
+  }
+
+  private void sellEntitySharesUntilSolvent(Player debtor) {
+    for (LegalEntity entity : deeds.legalEntities()) {
+      if (!Money.ZERO.exceeds(debtor.account().balance().amount())) return;
+      if (entity.shareOf(debtor) == 0.0) continue;
+      Money value = entity.shareValue();
+      int shortfall = -debtor.account().balance().amount().amount();
+      int minimumBid = Math.min(value.amount(), shortfall);
+      List<Player> bidders = new java.util.ArrayList<>();
+      List<Money> maximums = new java.util.ArrayList<>();
+      for (Player candidate : players) {
+        if (candidate.id().equals(debtor.id()) || deeds.isBankrupt(candidate)
+            || entity.shareOf(candidate) == 0.0
+            || !(strategies.forPlayer(candidate) instanceof Greedo greedo)
+            || !greedo.legalEntityTradingEnabled()) continue;
+        int available = candidate.account().balance().amount().amount();
+        int ceiling = Math.max(value.amount(), available * 35 / 100);
+        Money offered = new Money(Math.min(available, ceiling));
+        if (offered.amount() >= minimumBid) {
+          bidders.add(candidate);
+          maximums.add(offered);
+        }
+      }
+      if (bidders.isEmpty()) continue;
+      int winnerIndex = 0;
+      for (int index = 1; index < bidders.size(); index++) {
+        if (maximums.get(index).exceeds(maximums.get(winnerIndex))) winnerIndex = index;
+      }
+      Player buyer = bidders.get(winnerIndex);
+      Money maximumBid = maximums.get(winnerIndex);
+      Money price;
+      if (maximumBid.amount() < value.amount()) {
+        price = maximumBid;
+      } else {
+        int second = 0;
+        for (int index = 0; index < maximums.size(); index++) {
+          if (index != winnerIndex) second = Math.max(second, maximums.get(index).amount());
+        }
+        price = new Money(Math.min(maximumBid.amount(), Math.max(minimumBid, second + 5)));
+      }
+      entity.sellShare(debtor, buyer, price);
+      events.soldEntityShare(debtor, entity, buyer, price);
     }
   }
 
@@ -153,6 +199,9 @@ public final class Bankruptcy {
     }
 
     default void soldToPeer(Player seller, Ownable land, Player buyer, Money price) {
+    }
+
+    default void soldEntityShare(Player seller, LegalEntity entity, Player buyer, Money price) {
     }
 
     default void distressedSaleStarted(Player seller, Ownable land) {
