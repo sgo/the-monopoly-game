@@ -30803,3 +30803,12 @@ state mutations to survive. The adapter change does not alter game behavior.
 
 Sent priority-00 git handoff to refactorer for `fc8b520919`, containing only
 the strict acceptance-adapter state parser.
+
+## 2026-08-11T13:09:30Z — architect finds unproved balance inputs
+
+Action: after the adapter fix, soft Gherkin mutation still has two survivors:
+share-sale-8 accepts `dog_balance` 40→49 and 99→91 without changing either
+specified result. The scenario therefore does not prove that its stated
+starting balances participate in the intended bankruptcy boundary. This is a
+feature acceptance-criteria gap, not a production implementation decision;
+escalating it to the specifier.
