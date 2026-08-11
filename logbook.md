@@ -30863,3 +30863,10 @@ merge_and_process refactorer c6142adc45
 Action: merged `c6142adc45`. The strict state-literal parser is structurally
 approved. The task remains blocked only on the already-escalated Gherkin
 input-coverage decision.
+
+## 2026-08-11T13:13:00Z — architect records pending mutation status
+
+Action: committed the mutation tool's managed manifest update that withdraws
+the stale passing stamp while share-sale-8 has surviving input mutations. It
+will be refreshed by the approved tool once the specifier returns the revised
+acceptance criteria.
