@@ -30432,3 +30432,6 @@ post-tax balance ($40 + $500 - $100 = $440), not a weak adapter. The prior
 coder-added `$100`/already-operated setup is removed. Full acceptance passed
 on the consolidated branch; routing to coder for normal verification and
 refactorer follow-through.
+
+Sent coder priority-00 handoff (outbox `00_20260811T111043Z_000219_from_architect_to_coder.handoff`)
+at commit `4cf3ec7fa4` for the consolidated deterministic liquidation state.
