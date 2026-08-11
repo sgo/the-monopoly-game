@@ -29901,3 +29901,12 @@ eligibility. Architecture remains core-only: the rules depend only on domain
 models and strategies, while journalling stays in the existing game adapter.
 The final mutation, DRY, soft-Gherkin, and property verification sequence is
 now running.
+
+Final verification: differential `mutate4java` found no changed mutation
+surface in `Bankruptcy.java` (47 sites) or `LegalEntity.java` (97 sites);
+`dry4java` found no duplicate candidates; soft Gherkin mutation of
+`greedo-share-sale.feature` completed 23 mutations (6 killed, 17 survived,
+0 errors) and refreshed its tool-owned manifest; property tests passed 22/22.
+The refactorer had already confirmed full acceptance 570/570 twice. No
+architecture or behavior follow-up remains, so the phase is ready for the
+required specifier synchronization.
