@@ -160,7 +160,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
       | 95          | 1000             | 5           | not bankrupt   | 0          |
 
   # share-sale-9
-  Scenario Outline: a distressed shareholder sells their legal-entity share to a fellow shareholder while the entity stays formed (not dissolved) because more than one shareholder remains
+  Scenario Outline: a distressed shareholder avoids bankruptcy by selling their legal-entity share to a fellow shareholder before being declared bankrupt, and the entity stays formed
     Given legal-entity trading is enabled for the "Greedo" strategy
     And we select 4 players
     And Pink Realty is formed
@@ -174,4 +174,4 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
     Examples:
       | dog_balance | high_hat_balance | winning_bid | bankrupt_state |
-      | 94          | 1000             | 5           | bankrupt       |
+      | 95          | 1000             | 5           | not bankrupt   |
