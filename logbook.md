@@ -31313,3 +31313,19 @@ not instrument acceptance test-source helpers (`World` and
 `JournalStepHandlers`), so it reports zero executable mutation coverage rather
 than survivors. DRY reports existing duplicate entity-fixture methods outside
 the task's changed helpers; no task-local duplication was introduced.
+
+## 2026-08-11T17:09:15Z — architect completes legal-entity share-sale review
+
+Sent phase-complete priority-50 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-legal-entity
+commit: 692bfc36db
+```
+
+All review loops are closed. The scenario has no artificial participant policy,
+the fixed High Hat funding precondition is no longer an Examples mutation
+target, and soft Gherkin mutation is fully killed.
