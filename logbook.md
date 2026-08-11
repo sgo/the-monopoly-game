@@ -29288,6 +29288,21 @@ Summary: accepted legal-entity share valuation, restricted fellow-shareholder
 auction, ordered distressed liquidation, and the associated acceptance-harness
 behavior for implementation.
 
+## 2026-08-11T08:44:35Z — architect verifies share-sale distress trigger
+
+Received coder priority-00 note:
+
+```
+Re-read your role and constitution.
+
+Share sale is in 1ca987e; $100 tax leaves Dog solvent at $0 when given $100.
+```
+
+Action: inspected the named commit and the current tax rule. Luxury Tax is a
+fixed $100, so `share-sale-1` and `share-sale-2` give Dog exactly enough cash
+to pay it and produce no shortfall; no bankruptcy liquidation or share auction
+can validly occur. Returned this acceptance-example defect to the specifier.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
