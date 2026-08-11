@@ -31404,3 +31404,27 @@ established patterns.
 Domain 359/359. Full acceptance 576/576 (including the new cli-6
 scenario), run twice. CLI module's other 11 tests pass; the one known
 flake excluded per established precedent.
+
+## 2026-08-11T18:20:41Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: fc01eaff44
+```
+
+Summary: verified the CLI Greedo flag-wiring fix — a real, high-value bug
+where real CLI games never actually enabled legal-entity trading in player
+strategies regardless of the flag, explaining zero share sales across 27
+real playtests. Simplified `Simulator.STRATEGIES` from a now-partially-dead
+`Map<String, Supplier<Strategy>>` to `Set<String>` since construction
+bypasses the supplier entirely now (same CC, verified by direct
+comparison). Could not get a clean `crap4java` coverage run for
+`Simulator.java` due to the known pre-existing `SimulatorTest.
+keepsPlayingUntilToldToStop` flake (confirmed via A/B worktree against my
+last commit — reproduces identically, not a regression); `dry4java` and
+mutation-scan both clean. Domain 359/359, acceptance 576/576 run twice.
