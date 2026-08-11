@@ -29319,6 +29319,63 @@ Summary: `share-sale-1` and `share-sale-2` must give Dog less than the $100
 Luxury Tax to create the required distress trigger before share liquidation can
 be implemented or accepted.
 
+## 2026-08-11T08:45:01Z — architect rechecks consolidated share-sale specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier d5949b6
+
+Updated legal-entity share-sale specification (supersedes the earlier c7e9251
+handoff). The prioritising commit is d5949b6; it carries all prior share-sale
+content. Diff from c7e9251 to d5949b6:
+  - 936bf69  fix share-sale-3 contradiction (per your be2a4cb467 escalation)
+  - b94377a  add share-sale-5 bid-ceiling scenario
+  - c5dc652  add share-sale-5 example (35% exceeds share value)
+  - d5949b6  add share-sale-5 example (seller accepts highest 35% below value)
+
+FULL DECIDED SEMANTICS (user-confirmed):
+- Exactly 3 shares per entity, 1 per shareholder (no splitting/bundling this
+  round; a shareholder could later hold 2 or 3).
+- Share value = (sum of the entity's streets' maximum developed rent, mirroring
+  Stalemate.threshold) / 3 x shares held. Pink group with hotels = 750+750+900
+  = 2400, so one share = 800.
+- Legal-entity shares are NOT publicly tradeable. Only the OTHER shareholders
+  of that entity may bid.
+- Bid ceiling: a fellow shareholder bids up to max(share's total value, 35% of
+  their own bank balance) -- the higher of the two. Bids ascend incrementally
+  (+5, matching DistressedSale.bidRound) so the winner pays the lowest price.
+- If no fellow shareholder will bid, the share stays with the entity and the
+  seller goes bankrupt.
+- Distress seller must exhaust cheaper sellable personal assets BEFORE offering
+  the share.
+- If neither bidder's ceiling reaches the share value and the seller has no
+  other way to settle the debt, the seller accepts the highest offer the
+  bidders can make (the highest 35% ceiling, still below share value).
+
+share-sale-5 examples encode the bid matrix:
+  row1 high_hat=1200, iron_box=900  -> share value caps both -> win 800
+  row2 high_hat=3000, iron_box=2600 -> 35% (1050/910) exceeds 800, higher wins -> 915 (910+5)
+  row3 high_hat=1600, iron_box=1500 -> 35% (560/525) below 800, seller accepts highest -> 560
+
+SCOPING NOTE (unchanged): feature parses but the harness steps (share holding /
+sale / winning-bid assertions) and the field steps ("owns no mortgaged
+property", the share-bid strategy) do not yet exist. Coder-domain work: share
+valuation on LegalEntity, a share-sale/equity-transfer between shareholders,
+DistressedSale/Liquidation candidate + bidder-pool handling for shares, and the
+bid-ceiling strategy.
+
+REQUEST: review and route to the coder.
+```
+
+Action: merged `d5949b6` and rechecked the consolidated feature. The new
+bid-ceiling rows as well as `share-sale-1`, `share-sale-2`, and `share-sale-4`
+still give Dog exactly $100, equal to the fixed $100 Luxury Tax; none produces
+a distress shortfall. Returned the unresolved scenario-data defect to the
+specifier rather than accepting a bypass of normal bankruptcy triggering.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
