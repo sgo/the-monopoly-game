@@ -682,3 +682,23 @@ final class JournalStepHandlers {
     );
   }
 }
+
+/* mutate4java-manifest
+version=1
+moduleHash=c8dd9158ef92863629dc8a408c89e1f11c8641b420f2af238eb934bcdd940eb3
+scope.0.id=Y2xhc3M6Sm91cm5hbFN0ZXBIYW5kbGVycyNKb3VybmFsU3RlcEhhbmRsZXJzOjQ4
+scope.0.kind=class
+scope.0.startLine=48
+scope.0.endLine=684
+scope.0.semanticHash=1ad17d1abde67e053346368e6977464926106bef576d62a51f64625c5f4936e9
+scope.1.id=bWV0aG9kOkpvdXJuYWxTdGVwSGFuZGxlcnMjY3RvcigwKTo0OQ
+scope.1.kind=method
+scope.1.startLine=49
+scope.1.endLine=50
+scope.1.semanticHash=a7330247d1ba0ccc6eb267a7aaafe651c1edf65f9251ec84a0dadaa9c074a1ae
+scope.2.id=bWV0aG9kOkpvdXJuYWxTdGVwSGFuZGxlcnMjaGFuZGxlcnMoMCk6NTI
+scope.2.kind=method
+scope.2.startLine=52
+scope.2.endLine=683
+scope.2.semanticHash=9353b799f4b58e487d25ec51fb6866ca677ddc14eb45529ff0f0bab84afb77c6
+*/
