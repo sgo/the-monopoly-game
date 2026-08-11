@@ -29258,3 +29258,22 @@ hit the known pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` CLI
 flake (unrelated to legal-entity work, previously confirmed via A/B
 worktree comparison); domain-module-scoped run is clean. No functional
 changes needed on my side.
+
+## 2026-08-11T07:21:52Z — architect accepts developed entity rent
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer d384b1698d
+```
+
+Action: merged and accepted `d384b1698d`. Entity-owned streets retain their
+distinct doubled vacant-rent policy, but now use the printed house and hotel
+rent ladder when developed; mortgage remains an early rent exemption. Resolved
+the logbook merge conflict while retaining both branches' unique handoff
+records. Extracted repeated `RentTest` fixtures only. Verification: full
+acceptance 563/563; `RentTest` 17/17; differential mutation 0 changed sites;
+DRY clean; soft legal-entity Gherkin mutation 63 killed/29 survived/0 errors;
+property tests 22/22.
