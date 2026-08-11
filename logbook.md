@@ -29242,3 +29242,26 @@ hit the known pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` CLI
 flake (unrelated to legal-entity work, previously confirmed via A/B
 worktree comparison); domain-module-scoped run is clean. No functional
 changes needed on my side.
+
+## 2026-08-11T09:21:52+02:00 — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: d384b1698d
+```
+
+Summary: verified the developed-entity-rent fix — entity-owned streets now
+charge the printed house/hotel rent ladder instead of a flat 2x vacant,
+closing the economic gap the specifier's playtesting traced to suppressed
+downward cash pressure. Clean structural pass: `entityRent` CC=3, no DRY
+issues (the similarity to `colourStreetRent` is domain-real, not
+duplication — entity vacant rent is unconditionally doubled by
+construction, player vacant rent depends on an actual monopoly check), 12
+mutation sites, manifest refreshed. Domain 350/350, acceptance 563/563 run
+twice. Whole-reactor test hit the known pre-existing CLI
+`SimulatorTest.keepsPlayingUntilToldToStop` flake, unrelated to this work.
