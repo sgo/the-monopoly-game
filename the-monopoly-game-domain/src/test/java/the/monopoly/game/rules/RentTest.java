@@ -30,13 +30,9 @@ class RentTest {
   @Test
   void aTenantPaysTheVacantRentToTheOwnerWhoClaimsIt() {
     sell(Street.Type.DiestsestraatLeuven);
-    strategies.put(owner.id(), new Claiming());
+    claimRent(street(Street.Type.DiestsestraatLeuven), IRRELEVANT_ROLL);
 
-    rent().resolve(tenant, street(Street.Type.DiestsestraatLeuven), IRRELEVANT_ROLL);
-
-    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1496));
-    assertThat(owner.account().balance()).isEqualTo(Balance.of(1504));
-    assertThat(paid.amount).isEqualTo(new Money(4));
+    assertClaimedRent(1496, 1504, 4);
   }
 
   @Test
@@ -65,13 +61,9 @@ class RentTest {
   void stationRentDependsOnHowManyStationsTheOwnerHolds() {
     sell(Street.Type.NoordStation);
     sell(Street.Type.CentraalStation);
-    strategies.put(owner.id(), new Claiming());
+    claimRent(rules.create(Street.Type.NoordStation), IRRELEVANT_ROLL);
 
-    rent().resolve(tenant, rules.create(Street.Type.NoordStation), IRRELEVANT_ROLL);
-
-    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1450));
-    assertThat(owner.account().balance()).isEqualTo(Balance.of(1550));
-    assertThat(paid.amount).isEqualTo(new Money(50));
+    assertClaimedRent(1450, 1550, 50);
   }
 
   @Test
@@ -89,11 +81,7 @@ class RentTest {
 
   @Test
   void housesChargeTheirPrintedRent() {
-    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
-    deeds.arrangeHouses(street, 2);
-    strategies.put(owner.id(), new Claiming());
-
-    rent().resolve(tenant, street, IRRELEVANT_ROLL);
+    resolveClaimedRentOnDiestsestraat(street -> deeds.arrangeHouses(street, 2));
 
     assertThat(tenant.account().balance()).isEqualTo(Balance.of(1440));
     assertThat(owner.account().balance()).isEqualTo(Balance.of(1560));
@@ -101,22 +89,14 @@ class RentTest {
 
   @Test
   void oneHouseChargesItsPrintedRent() {
-    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
-    deeds.arrangeHouses(street, 1);
-    strategies.put(owner.id(), new Claiming());
-
-    rent().resolve(tenant, street, IRRELEVANT_ROLL);
+    ColourStreet street = resolveClaimedRentOnDiestsestraat(it -> deeds.arrangeHouses(it, 1));
 
     assertThat(paid.amount).isEqualTo(street.rentForHouses(1));
   }
 
   @Test
   void aHotelChargesItsPrintedRent() {
-    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
-    deeds.arrangeHotel(street);
-    strategies.put(owner.id(), new Claiming());
-
-    rent().resolve(tenant, street, IRRELEVANT_ROLL);
+    resolveClaimedRentOnDiestsestraat(deeds::arrangeHotel);
 
     assertThat(tenant.account().balance()).isEqualTo(Balance.of(1050));
     assertThat(owner.account().balance()).isEqualTo(Balance.of(1950));
@@ -187,35 +167,21 @@ class RentTest {
 
   @Test
   void aDevelopedEntityOwnedStreetChargesItsPrintedHouseRent() {
-    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
-    LegalEntity entity = formEntityOwning(street);
-    deeds.arrangeHouses(street, 2);
+    LegalEntity entity = resolveEntityRentOnDiestsestraat(street -> deeds.arrangeHouses(street, 2));
 
-    rent().resolve(tenant, street, IRRELEVANT_ROLL);
-
-    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1440));
-    assertThat(entity.receivedRent()).isTrue();
+    assertEntityReceivedRent(entity, 1440);
   }
 
   @Test
   void anEntityOwnedHotelChargesItsPrintedHotelRent() {
-    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
-    LegalEntity entity = formEntityOwning(street);
-    deeds.arrangeHotel(street);
+    LegalEntity entity = resolveEntityRentOnDiestsestraat(deeds::arrangeHotel);
 
-    rent().resolve(tenant, street, IRRELEVANT_ROLL);
-
-    assertThat(tenant.account().balance()).isEqualTo(Balance.of(1050));
-    assertThat(entity.receivedRent()).isTrue();
+    assertEntityReceivedRent(entity, 1050);
   }
 
   @Test
   void aMortgagedEntityOwnedStreetCollectsNoRent() {
-    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
-    LegalEntity entity = formEntityOwning(street);
-    deeds.arrangeMortgaged(street);
-
-    rent().resolve(tenant, street, IRRELEVANT_ROLL);
+    LegalEntity entity = resolveEntityRentOnDiestsestraat(deeds::arrangeMortgaged);
 
     assertThat(tenant.account().balance()).isEqualTo(Balance.of(1500));
     assertThat(entity.receivedRent()).isFalse();
@@ -238,6 +204,40 @@ class RentTest {
         List.of(owner, playerWith("second"), playerWith("third")), rules);
     deeds.form(entity);
     return entity;
+  }
+
+  private ColourStreet resolveClaimedRentOnDiestsestraat(
+      java.util.function.Consumer<ColourStreet> arrange) {
+    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
+    arrange.accept(street);
+    strategies.put(owner.id(), new Claiming());
+    rent().resolve(tenant, street, IRRELEVANT_ROLL);
+    return street;
+  }
+
+  private LegalEntity resolveEntityRentOnDiestsestraat(
+      java.util.function.Consumer<ColourStreet> arrange) {
+    ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
+    LegalEntity entity = formEntityOwning(street);
+    arrange.accept(street);
+    rent().resolve(tenant, street, IRRELEVANT_ROLL);
+    return entity;
+  }
+
+  private void claimRent(Street land, Roll roll) {
+    strategies.put(owner.id(), new Claiming());
+    rent().resolve(tenant, land, roll);
+  }
+
+  private void assertEntityReceivedRent(LegalEntity entity, int tenantBalance) {
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(tenantBalance));
+    assertThat(entity.receivedRent()).isTrue();
+  }
+
+  private void assertClaimedRent(int tenantBalance, int ownerBalance, int rent) {
+    assertThat(tenant.account().balance()).isEqualTo(Balance.of(tenantBalance));
+    assertThat(owner.account().balance()).isEqualTo(Balance.of(ownerBalance));
+    assertThat(paid.amount).isEqualTo(new Money(rent));
   }
 
   private Rent rent() {

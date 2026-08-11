@@ -145,6 +145,8 @@ public class World {
       if (current.exceeds(startingCapital)) player.account().withdraw(current.minus(startingCapital));
       else if (startingCapital.exceeds(current)) player.account().deposit(startingCapital.minus(current));
     }
+    if (legalEntityTrading) players.forEach(player -> pawnStrategies.put(player.id().value(),
+        new the.monopoly.game.strategies.Greedo(Money.ZERO, false, true)));
   }
 
   public void selectStandardGameSetup() {
@@ -562,7 +564,8 @@ public class World {
   public void enableLegalEntityTrading(String strategyName) {
     if (!strategyName.equals("Greedo")) throw new AssertionError("Unknown strategy \"" + strategyName + "\".");
     legalEntityTrading = true;
-    pawnStrategies.put("dog", new the.monopoly.game.strategies.Greedo(Money.ZERO, false, true));
+    if (players != null) players.forEach(player -> pawnStrategies.put(player.id().value(),
+        new the.monopoly.game.strategies.Greedo(Money.ZERO, false, true)));
   }
 
   public void considerFormingLegalEntity(String pawnName, String colourName) {
@@ -619,6 +622,26 @@ public class World {
   public boolean shareholdersHoldEqualThirds(String entityName) {
     LegalEntity entity = deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst().orElse(null);
     return entity != null && entity.shareholders().stream().allMatch(player -> entity.shareOf(player) == 1.0 / 3.0);
+  }
+
+  public boolean pawnOwnsNoMortgagedProperty(String pawnName) {
+    Player player = pawn(pawnName);
+    return deeds.landOwnedBy(player).stream()
+        .noneMatch(type -> deeds.isMortgaged((Ownable) ruleSet.create(type)));
+  }
+
+  public boolean pawnHoldsShare(String pawnName, String entityName) {
+    return legalEntity(entityName).shareOf(pawn(pawnName)) > 0.0;
+  }
+
+  public boolean pawnHoldsNoEntityShares(String pawnName) {
+    Player player = pawn(pawnName);
+    return deeds.legalEntities().stream().noneMatch(entity -> entity.shareOf(player) > 0.0);
+  }
+
+  private LegalEntity legalEntity(String name) {
+    return deeds.legalEntities().stream().filter(entity -> entity.name().equals(name)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + name));
   }
 
   public void entityOwes(String entityName, Money principal) {

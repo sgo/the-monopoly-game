@@ -34,6 +34,7 @@ public final class Bankruptcy {
     if (distressedSale.resolve(debtor)) return;
     sellHousesUntilSolvent(debtor);
     mortgageUntilSolvent(debtor);
+    sellEntitySharesUntilSolvent(debtor);
     if (debtor.account().balance().amount().amount() >= 0) return;
 
     Money remaining = debtor.account().balance().amount();
@@ -75,6 +76,35 @@ public final class Bankruptcy {
         Money value = deeds.mortgage(land, debtor);
         events.mortgaged(debtor, land, value);
       }
+    }
+  }
+
+  private void sellEntitySharesUntilSolvent(Player debtor) {
+    for (LegalEntity entity : deeds.legalEntities()) {
+      if (!Money.ZERO.exceeds(debtor.account().balance().amount())) return;
+      if (entity.shareOf(debtor) == 0.0) continue;
+      Money value = entity.shareValue();
+      int shortfall = -debtor.account().balance().amount().amount();
+      int minimumBid = Math.min(value.amount(), shortfall);
+      Player buyer = null;
+      Money maximumBid = Money.ZERO;
+      for (Player candidate : players) {
+        if (candidate.id().equals(debtor.id()) || deeds.isBankrupt(candidate)
+            || entity.shareOf(candidate) == 0.0
+            || !(strategies.forPlayer(candidate) instanceof Greedo greedo)
+            || !greedo.legalEntityTradingEnabled()) continue;
+        int available = candidate.account().balance().amount().amount()
+            - greedo.cashReserve(candidate, rules, deeds).amount();
+        Money offered = new Money(Math.min(value.amount(), Math.max(0, available)));
+        if (offered.amount() >= minimumBid && offered.exceeds(maximumBid)) {
+          buyer = candidate;
+          maximumBid = offered;
+        }
+      }
+      if (buyer == null) continue;
+      Money price = new Money(minimumBid);
+      entity.sellShare(debtor, buyer, price);
+      events.soldEntityShare(debtor, entity, buyer, price);
     }
   }
 
@@ -153,6 +183,9 @@ public final class Bankruptcy {
     }
 
     default void soldToPeer(Player seller, Ownable land, Player buyer, Money price) {
+    }
+
+    default void soldEntityShare(Player seller, LegalEntity entity, Player buyer, Money price) {
     }
 
     default void distressedSaleStarted(Player seller, Ownable land) {

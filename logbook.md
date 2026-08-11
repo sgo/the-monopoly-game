@@ -29102,6 +29102,29 @@ none. `mutate4java --scan`: 92 sites, manifest refreshed. No functional
 changes needed on my side — purely verification and a manifest refresh.
 Domain tests 348/348. Acceptance 563/563, confirmed clean across 4 runs.
 
+## 2026-08-10T23:20:13+02:00 — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: b325657b2d
+```
+
+Summary: verified both fixes land cleanly. Entity-11's dice-driven dividend
+trigger is replaced with an explicit age-step, confirmed clean across 4
+acceptance runs (the deterministic doubles/extra-turn issue I traced last
+cycle is gone, not worked around). `canBorrowForBuilding`'s treasury-
+positive bypass is removed, closing the same gap I'd found and reverted two
+cycles ago out of caution — the architect caught it independently and the
+coder's fix is correct and complete, with journal/logging/report.feature's
+shared shortfall scenario updated in step. Clean structural pass: all
+methods CRAP<=6, no DRY issues, 92 mutation sites, manifest refreshed, no
+functional changes needed. Domain 348/348, acceptance 563/563.
+
 ## 2026-08-11T04:46:30Z — architect accepts committed-shortfall enforcement
 
 Received refactorer priority-50 handoff:
@@ -29121,6 +29144,148 @@ Removed DRY-reported duplicate test setup. Verification: full acceptance
 563/563; `LegalEntityTest` 20/20; differential mutation 0 changed sites;
 DRY clean; soft legal-entity Gherkin mutation 71 killed/28 survived/0 errors;
 property tests 22/22.
+
+## 2026-08-11T08:45:00Z — coder implements legal-entity share liquidation
+
+Processed architect handoff `fc1b8ed392`. Implemented three-share entity
+ownership with one-share transfer, valuation at one-third of the entity
+streets' maximum developed rents, and Greedo-only fellow-shareholder bidding
+after personal liquidation and mortgages. Added acceptance assertions for
+share ownership and the missing ownership vocabulary.
+
+Domain verification: 350/350 passing. Acceptance compilation and all existing
+features pass; the new feature exposed a specification fixture mismatch: the
+official Extra Belasting tax is $100, so a pawn holding exactly $100 is not in
+distress and cannot sell a share or become bankrupt. The share-sale scenarios
+therefore remain red until the architect/specifier resolves the stated
+balances or tax-debt setup.
+
+## 2026-08-11T07:41:57Z — architect sends phase-complete developed-rent sync
+
+Sent specifier priority-50 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-legal-entity
+commit: 98b9c40cb3
+```
+
+Summary: phase complete after acceptance of developed entity rent, including
+the final architectural test-fixture cleanup and verification record.
+
+## 2026-08-11T08:31:21Z — architect reviews legal-entity share-sale specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier c7e9251
+
+New specification: selling legal-entity shares to avoid bankruptcy.
+
+WHY: Entity streets are moved out of the shareholder's personal ownership into
+the entity, so they cannot be liquidated when the shareholder faces bankruptcy.
+There is currently no share-sale path, so an entity shareholder has no way to
+convert their entity stake into cash to avoid going under.
+
+DECIDED SEMANTICS (user-confirmed):
+- Exactly 3 shares per entity, 1 per shareholder (share-splitting/bundling not
+  yet implemented this round; a shareholder could later hold 2 or 3).
+- Share value = (entity total developed value) / 3 x shares held.
+  Entity developed value mirrors the board-valuation convention the user pointed
+  to, Stalemate.threshold(Rule.Set): the sum of the entity streets' MAXIMUM
+  developed rent. Worked example: pink group with hotels rents 750+750+900 =
+  2400, so one (1/3) share = 800.
+- Legal-entity shares are NOT publicly tradeable. Only the OTHER shareholders of
+  that same entity may bid on a share.
+- Bidding follows the same rules as other distressed assets (minimum bid,
+  ascending auction).
+- A distress seller values their share, compares it to the shortfall, and must
+  exhaust cheaper sellable personal assets BEFORE offering their share.
+
+WHAT I COMMITTED (spec-only): greedo-share-sale.feature (4 Scenario Outlines)
++ acceptance/pipeline-features.txt registration. Scenarios:
+  1. distress -> offers share to fellow shareholder instead of bankrupting
+  2. share value covers the tax debt so the shareholder avoids bankruptcy
+  3. a cheaper personal asset is sold before the share
+  4. no willing fellow shareholder -> share stays with entity, seller bankrupts
+
+SCOPING NOTE: The scenarios use some step verbs that do NOT exist yet in the
+harness (share holding/sale assertions). Coder-domain work and harness steps are
+pending. Feature is parse-valid but not yet executable.
+
+REQUEST: route to coder. Implementation expected (proposal):
+- LegalEntity: value of a share (sum streets' max developed rent / shares total
+  x sharesHeld), and a share-sale/transfer of equity between shareholders.
+- DistressedSale/Liquidation: include a shareholder's entity share as a
+  sellable candidate, valued as above, ordered after cheaper personal assets,
+  biddable only by fellow shareholders.
+- Harness steps for the new assertions in the feature.
+Please review and decide whether this goes to the coder or needs rework.
+```
+
+Action: merged `c7e9251` and reviewed the new boundary. The valuation and
+bidder restrictions are coherent, but `share-sale-3` is contradictory: its
+title requires Dog to sell the cheaper personal asset before offering a share,
+while its assertion says Dog still owns `Rue Grande Dinant`. Returned this
+Gherkin-content ambiguity to the specifier; production implementation must not
+choose between mutually exclusive outcomes.
+
+## 2026-08-11T08:32:26Z — architect returns share-sale scenario contradiction
+
+Sent specifier priority-00 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: be2a4cb467
+```
+
+Summary: `share-sale-3` must resolve whether the cheaper personal asset is sold
+or retained before the share-sale production work can safely begin.
+
+## 2026-08-11T08:32:46Z — architect accepts corrected share-sale scenario
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 936bf69
+
+Response to your escalation (be2a4cb467) of the share-sale-3 contradiction.
+
+You were right: the scenario was internally inconsistent. Title required the
+debtor to sell the cheaper personal asset (Rue Grande Dinant) before offering a
+legal-entity share, yet the assertion kept "dog owns Rue Grande Dinant".
+
+FIX (936bf69): share-sale-3 now asserts the consistent outcome:
+  - pawn "dog" no longer owns "Rue Grande Dinant"        (sold it)
+  - pawn "high hat" owns "Rue Grande Dinant"             (the fellow buyer)
+  - pawn "dog" still holds a share of Pink Realty         (share NOT sold first)
+  - pawn "dog" is not bankrupt
+
+This encodes the ruled order: cheaper personal assets are liquidated first; the
+entity share is retained because the asset sale covered the shortfall. Dog has
+$10 and lands on Extra Belasting; Rue Grande Dinant (brown, price $60) is the
+cheaper liquidatable asset, consistent with it being sold before the share.
+
+The other share-sale scenarios (1/2/4) are unchanged. Feature re-parses cleanly.
+Please re-review and, if consistent, route to the coder for implementation
+(LegalEntity share valuation/sale, DistressedSale/Liquidation share handling,
+and the harness steps noted previously).
+```
+
+Action: merged `936bf69` and accepted the correction. `share-sale-3` now
+unambiguously requires the cheaper personal asset to transfer first, preserves
+the debtor's entity share, and avoids bankruptcy; it is consistent with the
+specified liquidation order. Routing the observable share-sale behavior to the
+coder.
 
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
@@ -29182,6 +29347,22 @@ entity to apply that same developed ladder, so this is a production rule defect,
 not an acceptance harness workaround. Routing the observable behavior change to
 the coder.
 
+## 2026-08-11T07:15:10Z — architect routes entity-developed-rent correction
+
+Sent coder priority-00 handoff:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: 4c4e5d2838
+```
+
+Summary: accepted specification correction requiring entity-owned developed
+streets to charge the normal developed-rent ladder; coder owns the `Rent`
+production change and verification.
+
 ## 2026-08-11T07:18:00Z — coder implements developed entity rent
 
 Processed architect handoff `4c4e5d2838`. Entity-owned streets now charge
@@ -29201,3 +29382,50 @@ priority: 50
 task: greedo-legal-entity
 commit: 6d2ec4e65c
 ```
+
+## 2026-08-11T09:22:00+02:00 — refactorer reviews developed entity rent (6d2ec4e65c)
+
+Merged `6d2ec4e65c`. Fixes a real economic bug the specifier's 8-player
+Greedo playtesting caught: entity-owned streets charged a flat 2x vacant
+rent regardless of houses/hotel, so a fully-developed Bruul Mechelen (4
+houses) charged $20 instead of $625 — suppressing the downward cash
+pressure the whole entity-dividend/loan mechanism depends on. `Rent.java`
+gained `entityRent(ColourStreet)`: hotel -> `rentForOneHotel()`,
+houses>0 -> `rentForHouses(houses)`, else double vacant rent (an entity
+inherently owns its whole colour group by construction, so no monopoly
+check is needed the way `colourStreetRent` needs one for player-owned
+streets). `crap4java`: `entityRent` CC=3/CRAP=3.0, `colourStreetRent`
+unchanged at CC=5; nothing near the threshold. `dry4java`: no duplicate
+candidates — despite visible structural similarity to `colourStreetRent`,
+the two differ in a real domain sense (entity vacant rent is always
+doubled; player vacant rent depends on an actual cross-player monopoly
+check), so I left them separate rather than force a shared extraction.
+`mutate4java --scan`: 12 sites, manifest refreshed. `LegalEntityTest.java`'s
+duplicate setup was already extracted into `dividendEligibleEntity` by the
+architect's own DRY pass in a prior commit; `RentTest.java` gained two
+focused new tests (2-house and hotel rent) that I verified are correct.
+
+Domain 350/350. Full acceptance 563/563, run twice. Whole-reactor `mvn test`
+hit the known pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` CLI
+flake (unrelated to legal-entity work, previously confirmed via A/B
+worktree comparison); domain-module-scoped run is clean. No functional
+changes needed on my side.
+
+## 2026-08-11T07:21:52Z — architect accepts developed entity rent
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer d384b1698d
+```
+
+Action: merged and accepted `d384b1698d`. Entity-owned streets retain their
+distinct doubled vacant-rent policy, but now use the printed house and hotel
+rent ladder when developed; mortgage remains an early rent exemption. Resolved
+the logbook merge conflict while retaining both branches' unique handoff
+records. Extracted repeated `RentTest` fixtures only. Verification: full
+acceptance 563/563; `RentTest` 17/17; differential mutation 0 changed sites;
+DRY clean; soft legal-entity Gherkin mutation 63 killed/29 survived/0 errors;
+property tests 22/22.
