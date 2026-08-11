@@ -427,6 +427,31 @@ public class World {
     return deeds != null && deeds.isBankrupt(pawn(pawnName));
   }
 
+  public boolean pawnFinalBalanceIs(String pawnName, Money amount) {
+    return pawn(pawnName).account().balance().amount().equals(amount);
+  }
+
+  /** Marks each named pawn bankrupt and strips their shares from any legal entities (setup helper). */
+  public void bankruptPawns(String... pawnNames) {
+    if (deeds == null) deeds = new Deeds();
+    for (String pawnName : pawnNames) {
+      Player player = pawn(pawnName);
+      deeds.bankrupt(player);
+      for (LegalEntity entity : deeds.legalEntities())
+        entity.removeShares(player);
+    }
+    deeds.legalEntities().forEach(LegalEntity::markOperated);
+    players.stream().filter(candidate -> !deeds.isBankrupt(candidate))
+        .filter(candidate -> !candidate.id().equals(pawn("dog").id()))
+        .findFirst().ifPresent(candidate -> pawnStrategies.put(candidate.id().value(), new Strategy() {
+          @Override
+          public Money bidForDistressed(Offer offer, Player bidder, Player debtor,
+                                        List<Player> players, Rule.Set rules, Deeds deeds) {
+            return offer.available();
+          }
+        }));
+  }
+
   public boolean hasWon(String pawnName) {
     return journal != null && journal.contains(new Entry.Won(pawn(pawnName).id()));
   }
@@ -616,26 +641,6 @@ public class World {
       entityBalances.put(entity.name(), entity.bankBalance());
       formedEntities.put(entity.name(), entity);
     }
-  }
-
-  public void bankruptPawns(String first, String second) {
-    Player firstPawn = pawn(first);
-    Player secondPawn = pawn(second);
-    deeds.legalEntities().forEach(entity -> {
-      entity.removeShares(firstPawn);
-      entity.removeShares(secondPawn);
-    });
-    deeds.bankrupt(firstPawn);
-    deeds.bankrupt(secondPawn);
-    players.stream().filter(candidate -> !deeds.isBankrupt(candidate))
-        .filter(candidate -> !candidate.id().equals(pawn("dog").id()))
-        .findFirst().ifPresent(candidate -> pawnStrategies.put(candidate.id().value(), new Strategy() {
-          @Override
-          public Money bidForDistressed(Offer offer, Player bidder, Player debtor,
-                                        List<Player> players, Rule.Set rules, Deeds deeds) {
-            return offer.available();
-          }
-        }));
   }
 
   public boolean entityIsDissolved(String name) {
