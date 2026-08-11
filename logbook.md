@@ -31099,3 +31099,22 @@ episode a few cycles back — everything here stays properly confined to
 `World`). `dry4java` clean.
 
 Domain unaffected (unchanged). Full acceptance 575/575, run twice.
+
+## 2026-08-11T16:07:56Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 925e7a8ee5
+```
+
+Summary: verified the deterministic share-sale setup closing out the
+share-sale-8/9 boundary-condition loop. No production domain code touched
+across the whole chain (confirmed via diff against my last review point) —
+entirely acceptance-harness work, and properly confined to `World.java`
+this time (no repeat of the earlier domain-boundary leak). No CRAP/DRY
+concerns. Acceptance 575/575 run twice.
