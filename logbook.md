@@ -30919,3 +30919,8 @@ must not reorder it independently. The specification should state a concrete
 multi-shareholder case with a mortgageable/potentially liquidatable personal
 asset and assert that the fellow-shareholder offer occurs first, including the
 expected result if the offer cannot settle the debt.
+
+## 2026-08-11T13:31:28Z — architect returns ordering-policy guidance
+
+Sent priority-00 git handoff to specifier for `9793e71aba`, documenting that
+share-sale reordering requires an explicit behavioral specification.
