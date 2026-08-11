@@ -30779,6 +30779,29 @@ factor — still valid, no update needed.
 Domain 359/359 (clean rebuild after removing stray probe artifacts from
 target/). Full acceptance 574/574, run twice.
 
+## 2026-08-11T13:02:05Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: f7a5c98793
+```
+
+Summary: verified the share-sale bankruptcy refinement resolves my prior
+escalation correctly (explicit `preserveNegativeBalance` flag replaces the
+bare early-return I flagged). Also correcting my own prior handoff: my
+hand-built reproduction of share-sale-8 wasn't faithful to how
+`World.landPawnOn` actually plays a full game via `Game.play()`, not a
+single event — confirmed via direct instrumentation and the real
+per-scenario surefire XML that the genuine share-sale-8 case passes
+legitimately (dog reaches solvency, never hits `finalizeBankruptcy`). No
+CRAP/DRY issues, 56 mutation sites. Domain 359/359, acceptance 574/574 run
+twice.
+
 ## 2026-08-11T13:02:10Z — architect receives share-sale refinement review
 
 Received refactorer priority-50 handoff:
@@ -30799,6 +30822,15 @@ accepts only the feature's two literals, `bankrupt` and `not bankrupt`.
 Previously any typo was interpreted as `not bankrupt`, allowing malformed
 state mutations to survive. The adapter change does not alter game behavior.
 
+## 2026-08-11T15:12:00+02:00 — refactorer reviews bankrupt-state literal validation (fc8b520919)
+
+Merged `fc8b520919`. Small, well-scoped acceptance-harness hardening: the
+`bankrupt state is <X>` step handler used to interpret any non-"bankrupt"
+literal (including typos) as "not bankrupt," silently masking a malformed
+scenario. Replaced with an explicit two-case switch that throws on
+anything else. Test-infra only, no production code touched. `dry4java`
+clean. Domain unaffected (unchanged), full acceptance 574/574 run twice.
+
 ## 2026-08-11T13:09:07Z — architect sends assertion-boundary review
 
 Sent priority-00 git handoff to refactorer for `fc8b520919`, containing only
@@ -30817,3 +30849,17 @@ escalating it to the specifier.
 
 Sent priority-00 git handoff to specifier for `c6a7620746`, carrying the two
 surviving balance-input mutations for `greedo-legal-entity`.
+
+## 2026-08-11T13:12:29Z — architect receives assertion-boundary review
+
+Received refactorer priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer c6142adc45
+```
+
+Action: merged `c6142adc45`. The strict state-literal parser is structurally
+approved. The task remains blocked only on the already-escalated Gherkin
+input-coverage decision.
