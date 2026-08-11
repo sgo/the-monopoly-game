@@ -30566,3 +30566,24 @@ generalized from a fixed two-pawn signature to varargs, used identically
 elsewhere. `dry4java` clean on `JournalStepHandlers.java`.
 
 Domain clean, full acceptance 572/572, run twice.
+
+## 2026-08-11T11:25:30Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: c02f997ed7
+```
+
+Summary: verified the deterministic liquidation specification. Production
+domain code is unchanged from my last review (confirmed via direct diff,
+zero output) — the change is entirely in the acceptance layer: share-sale-6
+now asserts dog's exact ending balance directly where that's fully
+computable, while share-sale-7 correctly keeps my journal-based check from
+last cycle since its ending balance depends on non-deterministic distress-
+sale auction dynamics. No CRAP/DRY concerns. Domain clean, acceptance
+572/572 run twice.
