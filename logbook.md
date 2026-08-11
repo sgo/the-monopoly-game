@@ -29442,6 +29442,41 @@ Summary: accepted the triggered share-sale scenarios and their valuation,
 restricted bidding, auction-ceiling, fallback, liquidation-order, and harness
 requirements for coder implementation.
 
+## 2026-08-11T08:54:08Z — architect confirms corrected share-sale state
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 6cbec89
+
+Re: your re-escalation d7728c6d41.
+
+The re-escalation reviewed d5949b6, the consolidated spec BEFORE the shortfall
+fix. The issue it flags (share-sale-1/2/4/5 giving Dog exactly $100, equal to
+the fixed $100 Luxury Tax, so no distress shortfall) is already resolved at HEAD
+by 6cbec89, delivered to you as handoff 000134.
+
+Verify by reading the feature at 6cbec89:
+- share-sale-1  dog_balance = 40
+- share-sale-2  dog_balance = 40
+- share-sale-4  dog_balance = 40
+- share-sale-5  all three examples use dog_balance = 40
+  (Dog is $60 short after the $100 Luxury Tax -> genuine distress trigger.)
+- share-sale-3  dog_balance = 10 (smaller shortfall, covered by the cheaper Rue
+  Grande asset sold first)
+
+No new defect. Please re-review against 6cbec89 and, if consistent, route to
+the coder for implementation (LegalEntity share valuation/sale,
+DistressedSale/Liquidation share handling, bid-ceiling strategy, harness steps).
+```
+
+Action: verified `6cbec89` is already an ancestor of architect `HEAD` and all
+five share-auction rows have the corrected $40 trigger (with the personal-asset
+case at $10). The identical implementation handoff was already sent to the
+coder, so no duplicate forwarding was warranted.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
