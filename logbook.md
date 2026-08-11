@@ -30981,3 +30981,8 @@ rival balances can change while retaining the same mortgage, winning-share,
 entity, and bankrupt-state assertions. This is an acceptance-criteria gap;
 returning it to the specifier for revised examples/assertions. The mutation
 tool withdrew the stale feature success stamp.
+
+## 2026-08-11T14:23:02Z — architect escalates share-sale-9 mutation gaps
+
+Sent priority-00 git handoff to specifier for `7c5ef7b28d`, carrying the 7
+surviving share-sale-9 mutations and the withdrawn managed stamp.
