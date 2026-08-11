@@ -11,6 +11,7 @@ import the.monopoly.game.strategies.Strategy;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class LegalEntityTest {
   private final Rule.Set rules = Rule.Set.Type.official.create();
@@ -58,6 +59,38 @@ class LegalEntityTest {
     assertThat(entity.shareOf(dog)).isZero();
     assertThat(entity.shareValue()).isEqualTo(Money.ZERO);
     assertThat(entity.operate(deeds)).isEqualTo(new LegalEntity.Operation.NoAction());
+  }
+
+  @Test
+  void liquidationTransfersTheEntitysBankBalanceToItsFinalShareholderAndClearsItsShareholders() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, List.of(dog), rules);
+    entity.depositToBank(new Money(250));
+
+    Money transferred = entity.liquidateTo(dog);
+
+    assertThat(transferred).isEqualTo(new Money(250));
+    assertThat(entity.bankBalance()).isEqualTo(Money.ZERO);
+    assertThat(dog.account().balance().amount()).isEqualTo(new Money(250));
+    assertThat(entity.hasShareholders()).isFalse();
+  }
+
+  @Test
+  void liquidationOfAnEmptyTreasuryTransfersNothingButStillClearsShareholders() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, List.of(dog), rules);
+
+    Money transferred = entity.liquidateTo(dog);
+
+    assertThat(transferred).isEqualTo(Money.ZERO);
+    assertThat(dog.account().balance().amount()).isEqualTo(Money.ZERO);
+    assertThat(entity.hasShareholders()).isFalse();
+  }
+
+  @Test
+  void liquidationRejectsAnyoneButTheSoleRemainingShareholder() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+
+    assertThatThrownBy(() -> entity.liquidateTo(dog)).isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test

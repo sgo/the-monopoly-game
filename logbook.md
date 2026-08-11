@@ -30204,3 +30204,35 @@ liquidation: entity streets and treasury transfer to the debtor, the entity is
 dissolved, and newly acquired streets enter the existing distressed-sale path.
 Added the acceptance harness steps for dissolution, transfer, and debt
 settlement. Domain tests pass 355/355; full acceptance passes 572/572.
+
+## 2026-08-11T12:50:00+02:00 — refactorer reviews final-shareholder liquidation (1858823648)
+
+Merged `1858823648`. This closes the zero-shareholder crash path properly:
+rather than leaving a dissolved-in-place entity dormant, the final
+shareholder facing bankruptcy liquidates it — its streets and treasury
+transfer to them, and if that's still not enough they distress-sell the
+newly-acquired streets via the existing mechanism. `LegalEntity.liquidateTo`
+and `Deeds.dissolve` are small and correctly scoped; `Bankruptcy` branches
+on `shareholders().size() == 1` before falling into the normal bid auction.
+
+The merge itself briefly looked like it reverted my `LegalEntityFormation`
+split from last cycle (`git diff` against the coder's tip showed the
+formation predicates back inline) — that was comparing two diverged branch
+tips directly, not the actual merge result; git's 3-way merge correctly
+kept my extraction (my side deleted those methods, the coder's side never
+touched them) and layered `liquidateTo` on top cleanly. Verified the
+working tree directly to confirm.
+
+`crap4java` found two real gaps, both from zero unit coverage on brand-new
+domain methods (only exercised by the share-sale-6/7 acceptance scenarios):
+`LegalEntity.liquidateTo` (CC=4/CRAP=20.0) and `Deeds.dissolve` (CC=2,
+CRAP=6.0, at but not over threshold). Added three focused `LegalEntityTest`
+cases (positive-balance transfer, zero-balance transfer, and the
+not-the-sole-shareholder guard) plus one `BankruptcyTest` case driving the
+full `Bankruptcy.resolve` → `liquidateEntity` → `dissolve` integration end
+to end. `liquidateTo` now 100% covered/CRAP=4.0; `dissolve` no longer
+registers as a concern at all. `LegalEntity.java` sits at exactly 100
+mutation sites (not over, no further split needed). `dry4java` clean on
+every touched file.
+
+Domain 358/358. Full acceptance 572/572, run twice.

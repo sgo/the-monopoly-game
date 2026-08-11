@@ -338,6 +338,25 @@ class BankruptcyTest {
     assertThat(entity.shareOf(dog)).isZero();
   }
 
+  @Test
+  void theFinalShareholderLiquidatesTheEntityToCoverTheirDebt() {
+    Deeds deeds = new Deeds();
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, List.of(dog), rules);
+    deeds.form(entity);
+    entity.depositToBank(new Money(200));
+    dog.account().withdraw(new Money(1600));
+
+    new Bankruptcy(deeds, rules, players, Strategy.OfPlayers.NOBODY_DECIDES, new Events())
+        .resolve(dog, null);
+
+    assertThat(deeds.isBankrupt(dog)).isFalse();
+    assertThat(dog.account().balance().amount().amount()).isEqualTo(100);
+    assertThat(deeds.ownerOf(Street.Type.RueDeDiekirchArlon)).contains(dog.id());
+    assertThat(deeds.ownerOf(Street.Type.BruulMechelen)).contains(dog.id());
+    assertThat(deeds.ownerOf(Street.Type.PlaceVerteVerviers)).contains(dog.id());
+    assertThat(deeds.legalEntities()).isEmpty();
+  }
+
   private void give(Deeds deeds, Ownable land, Player owner) {
     deeds.sell(land, owner, land.price());
     owner.account().deposit(land.price());
