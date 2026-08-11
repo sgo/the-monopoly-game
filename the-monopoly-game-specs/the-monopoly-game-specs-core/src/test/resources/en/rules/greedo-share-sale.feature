@@ -171,7 +171,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "iron box" owns "Diestsestraat Leuven"
     And pawn "iron box" owns "Place du Monument Spa"
     And pawn "dog" has $<dog_balance> to spend
-    And pawn "high hat" has $<high_hat_balance> to spend
+    And pawn "high hat" has $50 to spend
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
     Then the land "Steenstraat Brugge" is mortgaged
     And pawn "high hat" wins the Pink Realty share at $<winning_bid>
@@ -181,6 +181,6 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "high hat"'s final balance is $<high_hat_ending>
 
     Examples:
-      | dog_balance | high_hat_balance | winning_bid | bankrupt_state | dog_ending | high_hat_ending |
-      | 45          | 50               | 5           | not bankrupt   | 0          | 45              |
-      | 40          | 50               | 5           | bankrupt       | -5         | -5              |
+      | dog_balance | winning_bid | bankrupt_state | dog_ending | high_hat_ending |
+      | 45          | 5           | not bankrupt   | 0          | 45              |
+      | 40          | 5           | bankrupt       | -5         | -5              |
