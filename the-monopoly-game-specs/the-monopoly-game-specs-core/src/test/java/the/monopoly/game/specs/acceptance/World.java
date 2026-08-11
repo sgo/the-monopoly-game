@@ -426,6 +426,21 @@ public class World {
     return deeds != null && deeds.isBankrupt(pawn(pawnName));
   }
 
+  public boolean pawnFinalBalanceIs(String pawnName, Money amount) {
+    return pawn(pawnName).account().balance().amount().equals(amount);
+  }
+
+  /** Marks each named pawn bankrupt and strips their shares from any legal entities (setup helper). */
+  public void bankruptPawns(String... pawnNames) {
+    if (deeds == null) deeds = new Deeds();
+    for (String pawnName : pawnNames) {
+      Player player = pawn(pawnName);
+      deeds.bankrupt(player);
+      for (LegalEntity entity : deeds.legalEntities())
+        entity.removeShares(player);
+    }
+  }
+
   public boolean hasWon(String pawnName) {
     return journal != null && journal.contains(new Entry.Won(pawn(pawnName).id()));
   }

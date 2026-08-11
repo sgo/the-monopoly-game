@@ -83,6 +83,9 @@ final class JournalStepHandlers {
         given("^" + NAME + " is formed$",
             (world, arguments) -> world.formNamedEntity(arguments.text(1))),
 
+        given("^pawn \"" + NAME + "\" and pawn \"" + NAME + "\" have both gone bankrupt$",
+            (world, arguments) -> world.bankruptPawns(arguments.text(1), arguments.text(2))),
+
         given("^Pink Realty's loan has been fully repaid$",
             (world, arguments) -> world.entityLoanFullyRepaid("Pink Realty")),
 
@@ -510,6 +513,9 @@ final class JournalStepHandlers {
 
         then("^pawn \"" + NAME + "\" wins the game$",
             (world, arguments) -> assertThat(world.hasWon(arguments.text(1))).isTrue()),
+
+        then("^pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> assertThat(world.pawnFinalBalanceIs(arguments.text(1), money(arguments.number(2)))).isTrue()),
 
         then("^the game journal records that pawn \"" + NAME + "\"'s final balance is \\$" + VALUE + "$",
             (world, arguments) -> records(world, finalBalance(arguments.text(1), arguments.number(2)))),

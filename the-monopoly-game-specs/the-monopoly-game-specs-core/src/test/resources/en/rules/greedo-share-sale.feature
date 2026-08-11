@@ -107,18 +107,17 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And Pink Realty is formed
     And pawn "high hat" and pawn "iron box" have both gone bankrupt
     And pawn "dog" owns no mortgaged property
-    And the Pink Realty bank balance is $100
-    And Pink Realty has already operated
+    And Pink Realty's bank account holds $<entity_balance>
     And pawn "dog" has $<dog_balance> to spend
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
     Then pawn "dog" is not bankrupt
+    And pawn "dog"'s final balance is $<dog_ending>
     And Pink Realty is dissolved
     And pawn "dog" owns every street previously held by Pink Realty
-    And pawn "dog" received the Pink Realty bank balance
 
     Examples:
-      | dog_balance |
-      | 40          |
+      | dog_balance | entity_balance | dog_ending |
+      | 40          | 500            | 440        |
 
   # share-sale-7
   Scenario Outline: the final shareholder sells newly-acquired entity assets when liquidation cash is insufficient
@@ -128,8 +127,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "high hat" and pawn "iron box" have both gone bankrupt
     And pawn "dog" owns no mortgaged property
     And pawn "dog" has $<dog_balance> to spend
-    And the Pink Realty bank balance is $<entity_balance>
-    And Pink Realty has already operated
+    And Pink Realty's bank account holds $<entity_balance>
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
     Then pawn "dog" is not bankrupt
     And Pink Realty is dissolved
