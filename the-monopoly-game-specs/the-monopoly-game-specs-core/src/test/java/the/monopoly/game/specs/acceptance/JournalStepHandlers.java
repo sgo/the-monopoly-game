@@ -86,6 +86,9 @@ final class JournalStepHandlers {
         given("^pawn \"" + NAME + "\" and pawn \"" + NAME + "\" have both gone bankrupt$",
             (world, arguments) -> world.bankruptPawns(arguments.text(1), arguments.text(2))),
 
+        given("^pawn \"" + NAME + "\" is bankrupt$",
+            (world, arguments) -> world.bankruptPawns(arguments.text(1))),
+
         given("^Pink Realty's loan has been fully repaid$",
             (world, arguments) -> world.entityLoanFullyRepaid("Pink Realty")),
 
