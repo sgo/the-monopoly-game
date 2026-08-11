@@ -50,7 +50,9 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "dog" has $<dog_balance> to spend
     And pawn "high hat" has $<high_hat_balance> to spend
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
-    Then pawn "dog" owns "Rue Grande Dinant"
+    Then pawn "dog" no longer owns "Rue Grande Dinant"
+    And pawn "high hat" owns "Rue Grande Dinant"
+    And pawn "dog" still holds a share of Pink Realty
     And pawn "dog" is not bankrupt
 
     Examples:
