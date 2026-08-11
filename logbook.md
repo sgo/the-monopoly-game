@@ -29813,3 +29813,6 @@ captured entity argument; the generic lowest-price assertion no longer
 hard-codes an unrelated entity. The change preserves the agreed Gherkin and
 the full acceptance suite remains green. Routing the completed functional work
 to refactorer for its required structural, DRY, and mutation review.
+
+Sent refactorer priority-00 handoff (outbox `00_20260811T093351Z_000210_from_architect_to_refactorer.handoff`)
+at commit `0b9f5cfd37`.
