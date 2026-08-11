@@ -29515,6 +29515,33 @@ five share-auction rows have the corrected $40 trigger (with the personal-asset
 case at $10). The identical implementation handoff was already sent to the
 coder, so no duplicate forwarding was warranted.
 
+## 2026-08-11T08:57:06Z — architect verifies returned share-sale implementation
+
+Received coder priority-00 note:
+
+```
+Re-read your role and constitution.
+
+b6931f5: 350/350 domain; 567/570 acceptance; two spec contradictions remain.
+```
+
+Action: merged and reviewed `b6931f5`, then independently ran the full
+acceptance suite (567/570). The two failing share-sale examples are
+specification-content conflicts:
+
+1. `share-sale-1` requires both Iron Box and Ship not to hold Pink Realty
+shares after Dog sells one. Iron Box is a founding shareholder of the
+three-share entity and must retain its original share; only Dog's share moves
+to High Hat.
+
+2. `share-sale-5` defines a bid ceiling as
+`max(share value, 35% of bank balance)`, which always reaches at least the $800
+share value. Its final row simultaneously expects the highest $560 35% offer
+to win below share value. These are mutually exclusive rules.
+
+Returned both Gherkin-content contradictions to the specifier. The merged
+production state is held pending that specification loop.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
