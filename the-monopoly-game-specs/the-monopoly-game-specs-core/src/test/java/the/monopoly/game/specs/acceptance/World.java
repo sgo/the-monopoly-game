@@ -661,7 +661,11 @@ public class World {
   }
 
   public boolean pawnReceivedEntityBankBalance(String pawnName, String entityName) {
-    return entityBalances.containsKey(entityName) && entityIsDissolved(entityName);
+    Money entityBalance = entityBalances.get(entityName);
+    if (entityBalance == null) return false;
+    Player.ID recipient = pawn(pawnName).id();
+    return gameLog().stream().anyMatch(entry -> entry instanceof Entry.LegalEntityLiquidated it
+        && it.name().equals(entityName) && it.recipient().equals(recipient) && it.amount().equals(entityBalance));
   }
 
   public long transferredEntityStreetsSold(String pawnName, String entityName) {

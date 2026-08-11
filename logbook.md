@@ -30369,6 +30369,29 @@ every touched file.
 
 Domain 358/358. Full acceptance 572/572, run twice.
 
+## 2026-08-11T10:50:50Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 2c365cc78b
+```
+
+Summary: verified the final-shareholder liquidation policy that properly
+closes the zero-shareholder crash path (streets and treasury transfer to
+the last shareholder, then distressed sale of the newly-acquired streets
+if still insolvent). Confirmed my `LegalEntityFormation` split from last
+cycle survived the merge correctly despite a diverged-tips diff briefly
+suggesting otherwise. Added unit coverage for two previously-untested new
+methods (`LegalEntity.liquidateTo`, `Deeds.dissolve`) plus one integration-
+level `BankruptcyTest` case for the full liquidation flow — both now clean
+under CRAP, `LegalEntity.java` sits at exactly 100 mutation sites (not
+over). Domain 358/358, acceptance 572/572 run twice.
+
 ## 2026-08-11T10:51:44Z — architect accepts liquidation unit coverage
 
 Received refactorer priority-50 handoff:
@@ -30435,3 +30458,76 @@ refactorer follow-through.
 
 Sent coder priority-00 handoff (outbox `00_20260811T111043Z_000219_from_architect_to_coder.handoff`)
 at commit `4cf3ec7fa4` for the consolidated deterministic liquidation state.
+
+## 2026-08-11T11:07:20Z — coder corrects liquidation transfer assertion
+
+Merged architect priority-00 handoff `614dc2e337`. Corrected the acceptance
+adapter to retain the formed entity and verify its recorded shareholder balance
+before and after liquidation, requiring the exact treasury increase. Domain
+tests pass 359/359; full acceptance passes 572/572; `git diff --check` is clean.
+The correction is ready for refactorer review.
+
+## 2026-08-11T13:18:00+02:00 — refactorer reviews liquidation transfer assertion (9ce4e19d00)
+
+Merged `9ce4e19d00`. This fixed the weak `pawnReceivedEntityBankBalance`
+assertion the architect flagged (it only checked a stored balance existed
+and the entity dissolved, never that the pawn actually received it) — but
+the fix added `liquidationRecipientBalance`/`liquidationRecipientBalanceAfter`
+fields directly to `LegalEntity`, purely so the acceptance harness could
+snapshot a shareholder's balance before/after transfer. This is test-only
+instrumentation leaking into the domain model — the same "architecture
+remains core-only" boundary the architect stated explicitly during the
+share-sale structural review two cycles ago (rules depend only on domain
+models and strategies; journalling stays in the Game adapter).
+
+Root cause: `Bankruptcy.liquidateEntity` never journalled anything, unlike
+every other significant domain action in this codebase (`soldHouse`,
+`mortgaged`, `soldEntityShare`, the four distressed-sale events all have a
+`Bankruptcy.Events` hook feeding a `Journal.Entry`). Without a journal
+entry to query, the acceptance layer had no way to observe the transferred
+amount except by asking the domain object to remember it — hence the
+coder's fields. Added the missing piece instead: `Bankruptcy.Events
+.entityLiquidated(Player, LegalEntity, Money)`, wired through `Game`'s
+adapter to a new `Journal.Entry.LegalEntityLiquidated` record (matching
+`LegalEntityShareSold`'s exact shape) and a `Report.line` case (the
+standing sealed-switch exemption, one more accepted case). Rewrote
+`World.pawnReceivedEntityBankBalance` to check the journal for that entry
+instead of peeking at domain-object state, matching how
+`transferredEntityStreetsSold` already queries the journal for
+`DistressedSaleWon` entries. Removed the two fields and their getters from
+`LegalEntity` entirely, restoring `liquidateTo` to its original, clean
+shape from two cycles ago.
+
+This is worth noting for next time: I'd already seen `pawnReceivedEntity
+BankBalance` two cycles ago and flagged its unused `pawnName` parameter as
+a minor smell, but categorized it as out-of-scope test-infra style rather
+than recognizing it as a genuine assertion-validity bug — an unused
+parameter in a step-handler assertion is a real signal the check isn't
+verifying what its name claims, not just cosmetic.
+
+`crap4java`: no new violations (`Bankruptcy.entityLiquidated`/`Game`'s
+adapter case both trivial; `Report.line` picked up one more case, already
+covered by the standing exemption). `dry4java`: the new `entityLiquidated`
+Game-adapter method joins the same already-accepted one-line event-adapter
+duplication shape, not a new concern. `LegalEntity.java` back to exactly
+100 mutation sites. All four touched files' manifests refreshed.
+
+Domain and acceptance both verified clean; full acceptance 572/572, run
+twice.
+
+## 2026-08-11T11:20:00Z — architect accepts journalled liquidation transfer
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer ee58b5e8ba
+```
+
+Action: merged `ee58b5e8ba`. Liquidation is now observable via a core
+`Bankruptcy.Events` event, game journal entry, and report adapter; the
+acceptance world verifies that journal event rather than leaking test snapshot
+state into `LegalEntity`. This restores the core/acceptance boundary and closes
+the transfer-assertion defect. Final mutation, DRY, soft-Gherkin, and property
+verification now follows.
