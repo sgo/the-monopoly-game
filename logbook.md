@@ -29999,3 +29999,13 @@ tests; deferred the separate economic observation as requested.
 
 Sent coder priority-00 handoff (outbox `00_20260811T100736Z_000212_from_architect_to_coder.handoff`)
 at commit `e965949af9` for the domain lifecycle and simulator-boundary fix.
+
+## 2026-08-11T10:08:56Z — architect requests shareholderless-entity policy
+
+Action: requested a specifier decision for the state in which every
+shareholder of a legal entity has gone bankrupt. The current implementation
+removes the shares while retaining entity street ownership. The immediate coder
+fix must prevent division by zero, but the observable policy remains open:
+whether the entity is dormant, dissolved with streets returned/auctioned, or
+otherwise disposed. This is a specification decision and must not be inferred
+by the implementation.
