@@ -28983,6 +28983,34 @@ roll, or restructuring the scenario is a specification decision, not a
 structural refactor. Domain tests 348/348 clean. Acceptance 562/563 with
 this one reproducible failure; every other scenario passes.
 
+## 2026-08-10T22:42:43+02:00 — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 7dc2d645b1
+```
+
+Summary: reviewed the coder's committed-financing implementation, which
+correctly replaces the size==3/balance<=500 inference with real
+`buildCommitments` state and a floor-share dividend that drains the bank
+deterministically. Clean structural pass: all methods CRAP<=6, no DRY
+issues, 95 mutation sites, manifest refreshed, no functional changes
+needed. IMPORTANT: acceptance is not fully green — entity-11's new second
+example row (170/56/2) reproduces 6/6 runs, not intermittently. Root cause
+is deterministic, not incidental: "pawn dog will roll 12" can only resolve
+to a (6,6) roll under `World.rollTotalling`, and doubles grant dog an
+unscripted extra turn that lands on Pink Realty's own street, adding rent
+before the dividend fires. This needs the same specifier/architect
+attention as the original entity-11 flake, not a silent acceptance —
+whether to fix it via a different roll total, an explicit second queued
+roll, or scenario restructuring is a specification call outside refactorer
+scope. Domain 348/348 clean.
+
 ## 2026-08-10T18:31:50Z — architect accepts explicit dividend-age fixture
 
 Received specifier priority-00 handoff:
@@ -29043,3 +29071,123 @@ priority: 50
 task: greedo-legal-entity
 commit: 97bf9ae1a6
 ```
+
+## 2026-08-10T23:20:00+02:00 — refactorer reviews committed shortfall enforcement (97bf9ae1a6)
+
+Merged `97bf9ae1a6`. Two fixes land together, both closing loops I raised or
+the architect independently caught last cycle:
+
+1. Entity-11's dice-driven dividend trigger is gone — replaced with an
+   explicit "the last-capitalised shareholder of <Entity> grows a year
+   older" step (`World.entityLastCapitalizedShareholderGrewOlder`,
+   `LegalEntity.lastCapitalizedShareholder()` made public). Re-verified: 4
+   consecutive clean acceptance runs, matching my root-cause diagnosis last
+   cycle (the roll-12-implies-doubles-implies-extra-turn mechanism is now
+   entirely removed from the scenario rather than worked around).
+
+2. `canBorrowForBuilding`'s `bankBalance().amount() > 0 → return true`
+   bypass is removed outright — every group-financed shortfall now requires
+   real shareholder commitment and affordability, whether or not the
+   treasury already holds funds. This is the same bypass I found and
+   reverted two cycles ago when I couldn't independently confirm it was
+   safe to remove; the architect caught it structurally and routed it to
+   the coder. journal.feature/logging.feature/report.feature's shared
+   "raises a loan to fund a build shortfall" scenarios were updated in
+   step with explicit commitment amounts, so nothing was left relying on
+   the removed bypass.
+
+`crap4java`: every method <=6 (`affordableBuildPlan`/`form` at the
+threshold, `canBorrowForBuilding` now CC=3, simpler than before). `dry4java`:
+none. `mutate4java --scan`: 92 sites, manifest refreshed. No functional
+changes needed on my side — purely verification and a manifest refresh.
+Domain tests 348/348. Acceptance 563/563, confirmed clean across 4 runs.
+
+## 2026-08-11T04:46:30Z — architect accepts committed-shortfall enforcement
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer b325657b2d
+```
+
+Action: merged and accepted `b325657b2d`. The group-financed build rule now
+requires an explicit commitment and actual available funds from every
+shareholder for every positive shortfall, even when the entity already has
+treasury funds. Construction fully covered by the treasury still needs no
+commitment or loan. No test-specific threshold or player-count policy remains.
+Removed DRY-reported duplicate test setup. Verification: full acceptance
+563/563; `LegalEntityTest` 20/20; differential mutation 0 changed sites;
+DRY clean; soft legal-entity Gherkin mutation 71 killed/28 survived/0 errors;
+property tests 22/22.
+
+## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
+
+Sent specifier priority-50 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-legal-entity
+commit: de92c08f2e
+```
+
+Summary: phase complete after acceptance of the coder/refactorer loop for
+committed entity shortfall financing; the commit also includes the final
+architect verification record and mutation manifest refresh.
+
+## 2026-08-11T07:14:13Z — architect accepts entity-developed-rent specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier c1faa50
+
+Specification correction for entity-owned street rent, pending your review to
+route to the coder or reject.
+
+CONTEXT: Empirical 8-player Greedo runs (both optional flags) showed entity rent
+never escalated (always 2x vacant), so entity-developed streets charged a tiny
+$20 (Bruul Mechelen, 4 houses) instead of the developed $625. This suppressed
+downward pressure/stalemate resolution. Root cause is a spec-vs-impl gap in the
+entity rent path.
+
+SPEC CHANGE (spec-only, coder's production change left to you):
+- entity-13 & entity-21: correct entity-owned street rent expectation $20 ->
+  $625 (developed rent for a 4-house Bruul Mechelen), asserting the tenant's
+  account balance (robust to the full-game harness) instead of the unreliable
+  post-game entity bank.
+- entity-21: seeds Pink Realty treasury ($5000) + sets 'last-capitalised
+  shareholder has not aged' so the shareholder's rent payment is deterministically
+  observable. The empty-bank borrow-to-build mechanic is still enforced by
+  entity-22/23 (green).
+- ARTIFACT: with production Rent.java unmodified the feature is RED on these two
+  scenarios. They encode the rule that an entity-owned street charges the same
+  developed-rent ladder as a player-owned monopoly (hotel -> hotel rent,
+  houses>0 -> rentForHouses, else 2x vacant).
+
+REQUEST: please review and decide whether this goes to the coder (implement
+developed entity rent in Rent.java so entity-13/21 turn green) or reject. Domain
+tests 348/348 pass on unmodified code.
+```
+
+Action: merged `c1faa50` and accepted the correction. The current entity rent
+path unconditionally uses double vacant rent, while the player-owned path uses
+the normal hotel/houses/monopoly ladder. The scenarios consistently require the
+entity to apply that same developed ladder, so this is a production rule defect,
+not an acceptance harness workaround. Routing the observable behavior change to
+the coder.
+
+## 2026-08-11T07:18:00Z — coder implements developed entity rent
+
+Processed architect handoff `4c4e5d2838`. Entity-owned streets now charge
+printed house or hotel rent when developed, while unimproved streets continue
+to charge double vacant rent and mortgaged streets remain exempt. Added focused
+unit coverage for developed houses and hotels.
+
+Verification: domain tests 350/350 passing; full acceptance 563/563 passing;
+`git diff --check` clean.
