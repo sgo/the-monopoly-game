@@ -29111,3 +29111,19 @@ Removed DRY-reported duplicate test setup. Verification: full acceptance
 563/563; `LegalEntityTest` 20/20; differential mutation 0 changed sites;
 DRY clean; soft legal-entity Gherkin mutation 71 killed/28 survived/0 errors;
 property tests 22/22.
+
+## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
+
+Sent specifier priority-50 handoff:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-legal-entity
+commit: de92c08f2e
+```
+
+Summary: phase complete after acceptance of the coder/refactorer loop for
+committed entity shortfall financing; the commit also includes the final
+architect verification record and mutation manifest refresh.
