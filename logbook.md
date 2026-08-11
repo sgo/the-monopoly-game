@@ -31332,3 +31332,16 @@ added per-player `StrategyNamed` journal/report entries, wired raw-argument
 acceptance setup, and added a focused `SimulatorTest` guard. Acceptance handlers
 wait for all startup observations. Domain tests pass (359), acceptance passes
 (577).
+
+## 2026-08-11T18:09:19Z — handoff sent to refactorer
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: 677c50f0a3
+```
+
+Action: sent the verified CLI flag wiring and startup strategy-observation
+journal changes for refactorer review.
