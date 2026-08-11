@@ -31118,3 +31118,249 @@ across the whole chain (confirmed via diff against my last review point) —
 entirely acceptance-harness work, and properly confined to `World.java`
 this time (no repeat of the earlier domain-boundary leak). No CRAP/DRY
 concerns. Acceptance 575/575 run twice.
+
+## 2026-08-11T14:36:31Z — architect sends deterministic setup to coder
+
+Sent priority-00 git handoff to coder for `b9e62f51d7`, the accepted
+share-sale-9 scenario requiring ownership-strip and racecar-balance acceptance
+harness support.
+
+## 2026-08-11T16:08:04Z — architect receives deterministic setup review
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 925e7a8ee5
+```
+
+Action: merged `925e7a8ee5`. The ownership-strip step is accepted, but its
+initial implementation also replaced High Hat and Racecar strategies as an
+unrelated side effect. Removed those hidden strategy overrides so this helper
+has its single stated responsibility: returning the named pawn's other streets
+to the bank. The scenario's existing Greedo setup and explicit balances remain
+the sole determinants of bidding behavior; final verification follows.
+
+## 2026-08-11T16:12:00Z — architect finds racecar outcome contradiction
+
+Action: full acceptance after separating the helper's responsibilities fails
+only in share-sale-9's bankrupt row: the feature expects Racecar to finish at
+$50, while real Greedo gameplay finishes at -$5. The prior passing value was
+created by the ownership-strip helper secretly replacing Racecar's strategy
+with a zero bidder. A generic ownership step must not alter participant
+strategies. The feature needs an explicit, separately named scenario setup
+that specifies Racecar's intended participation/turn behavior, or revised
+expected outcome under normal Greedo gameplay. Escalating this Gherkin setup
+policy to the specifier; no hidden harness override will be retained.
+
+## 2026-08-11T16:10:08Z — architect escalates racecar setup policy
+
+Sent priority-00 git handoff to specifier for `710b609b0e`, carrying the
+Racecar $50 versus -$5 scenario contradiction and cohesive helper correction.
+
+## 2026-08-11T16:55:10Z — architect receives three-player share-sale revision
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+FORWARDING for re-verification: share-sale-9 converted to a 3-player setup
+(this commit resolves the racecar/high-hat determinism contradiction you
+escalated in 710b609b0e).
+
+DECISION PATH:
+- You flagged that a generic ownership-strip step must not alter participant
+  strategies, and that racecar's real Greedo outcome was -5 (not 50) in the
+  bankrupt row - the prior 50 was a hidden-strategy override artifact.
+- User decided to drop racecar entirely: it is a 4th spectator that never
+  transacts in this scenario (Steenstraat Brugge is always MORTGAGED, never
+  auctioned, so the street-auction path racecar was meant to control never
+  fires). Keeping it only produced 4 spurious mutations and a fragile side-effect.
+
+CHANGE (3 players: dog, high_hat, iron_box):
+- "we select 3 players"
+- Removed racecar: its balance line, ending column, and the group's 4th player.
+- Pink Realty still forms correctly: formNamedEntity -> shareholders =
+  players().limit(3) = dog, high_hat, iron_box, seeded onto the pink group;
+  the scenario helper uses formed() which bypasses the production 3-owner
+  split integrity checks, so a 3-player game forms Pink Realty fine.
+- Assert honest per-row endings, coupling inputs to outputs for mutation
+  observability:
+    row12 dog=45 not bankrupt -> dog=0, high_hat=45
+    row13 dog=40 bankrupt     -> dog=-5, high_hat=-5
+  (the extended post-dog-bankruptcy turn loop drains the remaining shareholder
+   to -5 in the bankrupt row; this is the real deterministic Greedo outcome,
+   now on high_hat since racecar is gone)
+- Steps kept: mortgage Steenstraat Brugge $50, share sale dog->high_hat $5,
+  entity not dissolved, bankrupt state, dog + high_hat final balances.
+
+RESULT: 576/576 acceptance green, stable across 2 runs. The racecar mutation
+observability problem is gone (column removed).
+
+Please run soft Gherkin mutation and confirm there are no surviving mutations
+requiring action.
+```
+
+Action: merged `d0cad33`. Soft Gherkin mutation found 19/22 killed and three
+survivors. Two pre-existing share-sale-8 examples do not observe High Hat's
+$1000 starting balance; the new bankrupt share-sale-9 row likewise does not
+observe High Hat's $50 starting balance (mutating it to $43 still yields -$5).
+These are Gherkin acceptance-criteria gaps, so they are returned to the
+specifier for an explicit scenario decision rather than changed by architect.
+
+## 2026-08-11T16:58:35Z — architect returns mutation observability gaps
+
+Sent priority-00 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: 8cfdb1823c
+```
+
+The commit records the three soft-mutation survivors: High Hat's two
+share-sale-8 starting-balance inputs and share-sale-9's bankrupt-row
+starting-balance input are not semantically observed. Awaiting the
+specifier's acceptance-criteria decision.
+
+## 2026-08-11T17:02:17Z — architect receives survivor-resolution review
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+FORWARDING for re-verification: share-sale survivors from your 8cfdb1823c.
+
+RESOLVED (commit 2c21744):
+1. share-sale-8 BOTH rows (high_hat=1000): added high_hat_ending=995 to both
+   rows (1000 - $5 share price). This couples the 1000 input: perturbing it
+   to 999 makes high_hat end at 994, failing the 995 assertion. Verified green
+   576/576.
+
+NOT RESOLVED - GENUINELY UNOBSERVABLE (needs your architectural judgment):
+2. share-sale-9 bankrupt row (dog_balance=40): high_hat starting balance=50
+   remains unobservable. I empirically verified that high_hat's ending
+   collapses to a FIXED -5 regardless of its starting balance, at all of:
+   - high_hat=50  -> ending -5
+   - high_hat=43  -> ending -5
+   - high_hat=100 -> ending -5
+   The post-dog-bankruptcy-to-bank resolution absorbs high_hat to a -5 floor
+   independent of its starting balance. Therefore NO ending assertion can make
+   the $50 input observable: any high_hat_ending value I assert is satisfied by
+   all three starting balances, so the 50->43 mutation can never be killed by a
+   balance assertion.
+
+This appears to be a legitimate case where the input has no effect on the
+tested outcome (the scenario asserts dog's mortgage + share-sale + solvency,
+all of which are determined by DOG's balance and the share price, not by High
+Hat's starting cash).
+
+QUESTION: how should we handle this single genuinely-unkillable mutation?
+Options:
+ a) Accept this one survivor as a documented, justified exception (the input is
+    provably irrelevant to the asserted behavior).
+ b) Change what share-sale-9's bankrupt row asserts so it observes something
+    that DOES depend on high_hat's balance (if such an observable exists in the
+    current domain behaviour).
+ c) Some other restructuring you recommend.
+
+Please advise. Scenario is otherwise green and mutation-killed.
+```
+
+Action: merged `2c21744`; share-sale-8 now honestly observes its variable
+High Hat balance. Decision for share-sale-9: make High Hat's $50 a literal
+scenario precondition and remove `high_hat_balance` from the Examples table.
+It is required merely to fund the $5 share purchase, not a behavior under test;
+the changing row dimension is Dog's distress balance. This removes a false
+mutation target without inventing a causal assertion or accepting a survivor.
+
+## 2026-08-11T17:04:53Z — architect returns share-sale criterion decision
+
+Sent priority-00 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: 736d25b0ef
+```
+
+The required feature revision is to express High Hat's share-sale-9 $50 as a
+literal precondition and remove it from the Examples table. It remains part of
+setup but is not presented as a varying, behavior-observed parameter.
+
+## 2026-08-11T17:06:24Z — architect receives final share-sale-9 revision
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+FORWARDING for re-verification: share-sale-9 high_hat-observability resolved
+per your 736d25b0ef decision.
+
+CHANGE (commit 891422e):
+In share-sale-9, made High Hat's $50 a LITERAL scenario precondition:
+- "And pawn "high hat" has $50 to spend" (fixed literal, not a table column)
+- Removed high_hat_balance from the Examples table.
+High Hat's $50 is required only to fund the $5 share purchase, not a behavior
+under test, so this removes the false mutation target (50->43) entirely rather
+than accepting a survivor or inventing a causal assertion.
+- Kept honest high_hat_ending per row: row12 (dog=45, not bankrupt)=45;
+  row13 (dog=40, bankrupt)=-5 (the fixed post-bankruptcy floor).
+- dog_balance remains the sole changing row dimension.
+
+RESULT: 576/576 acceptance green, stable across 2 runs.
+
+Please run soft Gherkin mutation and confirm no surviving mutations require
+specifier action. Completeness note: with the high_hat_balance column gone for
+share-sale-9 (and share-sale-8 now observing high_hat=995), the previously
+reported 3 survivors should be eliminated.
+```
+
+Action: merged `891422e`. The revision is accepted: the literal $50 correctly
+states a fixed funding precondition, and Dog's balance is the only variable
+under test. Soft Gherkin mutation is clean (22/22 killed); full acceptance
+passes; domain property tests pass (22 tests). The Java mutation runner does
+not instrument acceptance test-source helpers (`World` and
+`JournalStepHandlers`), so it reports zero executable mutation coverage rather
+than survivors. DRY reports existing duplicate entity-fixture methods outside
+the task's changed helpers; no task-local duplication was introduced.
+
+## 2026-08-11T18:09:19Z — specifier handoff received
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 37b26c0
+
+DIAGNOSIS: CLI Greedo instances were built with Greedo::new, so both optional
+trading flags were false and real CLI games could not sell legal-entity shares.
+The handoff also required startup logging of each player's strategy and observed
+configuration, with cli-6 as the regression.
+```
+
+Action: merged `37b26c0`. Threaded both optional flags into CLI Greedo instances,
+added per-player `StrategyNamed` journal/report entries, wired raw-argument
+acceptance setup, and added a focused `SimulatorTest` guard. Acceptance handlers
+wait for all startup observations. Domain tests pass (359), acceptance passes
+(577).
+
+## 2026-08-11T18:09:19Z — handoff sent to refactorer
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: 677c50f0a3
+```
+
+Action: sent the verified CLI flag wiring and startup strategy-observation
+journal changes for refactorer review.

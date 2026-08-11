@@ -147,6 +147,7 @@ public class Game {
     journal.log(new Journal.Entry.Start(ids(players)));
     deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
+    players.forEach(player -> journalling.strategyNamed(player, strategies.forPlayer(player)));
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
 
@@ -414,6 +415,14 @@ public class Game {
       journal.log(new Journal.Entry.StalemateTrading(enabled));
     }
 
+    public void strategyNamed(Player player, Strategy strategy) {
+      boolean legalEntityEnabled = strategy instanceof Greedo greedo && greedo.legalEntityTradingEnabled();
+      boolean stalemateEnabled = strategy instanceof Greedo greedo && greedo.stalemateTradingEnabled();
+      String name = strategy == Strategy.UNDECIDED ? "undecided" : strategy.getClass().getSimpleName();
+      journal.log(new Journal.Entry.StrategyNamed(player.id(), name,
+          legalEntityEnabled, stalemateEnabled));
+    }
+
     public void splitMonopolyWon(Player winner, Player loser) {
       journal.log(new Journal.Entry.SplitMonopolyWon(winner.id(), loser.id()));
     }
@@ -666,6 +675,10 @@ public class Game {
       }
 
       record StalemateTrading(boolean enabled) implements Entry {
+      }
+
+      record StrategyNamed(Player.ID player, String name, boolean legalEntityEnabled,
+                           boolean stalemateEnabled) implements Entry {
       }
 
       record SplitMonopolyWon(Player.ID winner, Player.ID loser) implements Entry {

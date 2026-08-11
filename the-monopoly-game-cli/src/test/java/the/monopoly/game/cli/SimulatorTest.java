@@ -55,6 +55,17 @@ class SimulatorTest {
   }
 
   @Test
+  void wiresOptionalTradingFlagsIntoEveryGreedoStrategy() {
+    List<Player> players = Rule.Set.Type.official.create().players().select(2).toList();
+    Strategy.OfPlayers strategies = Simulator.strategiesFor(2, List.of(), true, true);
+
+    assertThat(((Greedo) strategies.forPlayer(players.get(0))).stalemateTradingEnabled()).isTrue();
+    assertThat(((Greedo) strategies.forPlayer(players.get(0))).legalEntityTradingEnabled()).isTrue();
+    assertThat(((Greedo) strategies.forPlayer(players.get(1))).stalemateTradingEnabled()).isTrue();
+    assertThat(((Greedo) strategies.forPlayer(players.get(1))).legalEntityTradingEnabled()).isTrue();
+  }
+
+  @Test
   void rejectsPartialStrategySelections() {
     Simulator.Result result = Simulator.execute("2", "greedo");
 

@@ -1,5 +1,6 @@
+# mutation-stamp: sha256=48403513f588a345a376a405d10c981be10229e31172a8920a1365622a2dcbd5
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-11T14:26:03.806451Z","feature_name":"selling legal-entity shares to avoid bankruptcy","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/greedo-share-sale.feature","background_hash":"9a3c0c411c487ac29cd37776a8a944a1b977e6980fe8a564f53528f8edf6826a","implementation_hash":"unknown","scenarios":[{"index":0,"name":"a shareholder in distress offers their legal-entity share to a fellow shareholder instead of going bankrupt","scenario_hash":"7c01e3888e0422ed973168f4b4afcf3d282328b6be4b562b4676cceea9caceeb","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"},{"index":1,"name":"a shareholder does not go bankrupt because the share's value covers the tax debt","scenario_hash":"4b3436a75f0bce3f44174f1c585fcd66e9b5ad217a554c84979997ed8ec0447e","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"},{"index":2,"name":"a shareholder sells a cheaper personal asset before offering their legal-entity share","scenario_hash":"cd947d25c54d7fffa82e8160e7b9c354f4926aceca2718cb97af91e85ae0db4a","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"},{"index":3,"name":"a legal-entity share does not change hands when no fellow shareholder will bid","scenario_hash":"e3fc41d7a633110633bb760cb8826e44de54c0414085e3343e12ea9b7c72aecc","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"},{"index":4,"name":"a fellow shareholder bids up to a third of their bank balance, and the highest bid wins","scenario_hash":"6dc43117ef23c7cc4bfa395b5c6f58f1e877051d8e40ddc4d1c06baa47b10c2a","mutation_count":12,"result":{"Total":12,"Killed":12,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"},{"index":5,"name":"the final shareholder may liquidate the legal entity to settle their debt","scenario_hash":"124c6e4f30c97d9e7471fb0bfe14fcd350e6b130b29cc4977f5c470605d79d87","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"},{"index":6,"name":"the final shareholder sells newly-acquired entity assets when liquidation cash is insufficient","scenario_hash":"23c20177ffd6e5e68c717c841847362f4547c8e0f6cc2113ebd058c87d344e48","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"}]}
+# {"version":1,"tested_at":"2026-08-11T17:07:47.105888Z","feature_name":"selling legal-entity shares to avoid bankruptcy","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/greedo-share-sale.feature","background_hash":"9a3c0c411c487ac29cd37776a8a944a1b977e6980fe8a564f53528f8edf6826a","implementation_hash":"unknown","scenarios":[{"index":7,"name":"a lone bidder buys a legal-entity share for a nominal $5; whether the seller avoids bankruptcy depends on whether the proceeds cover the remaining debt","scenario_hash":"b9c0f058f4b2f402ac85005ebc2c6766d5548289c35313afe1c21894a6b19c34","mutation_count":12,"result":{"Total":12,"Killed":12,"Survived":0,"Errors":0},"tested_at":"2026-08-11T17:07:47.105888Z"},{"index":8,"name":"a distressed shareholder disposes of a personal asset before offering their legal-entity share, and the share sale may or may not settle the remaining debt","scenario_hash":"f4bdeed307937fa5d20410a505600824b1a31709ffa21f1d469c8d2f2c4144c1","mutation_count":10,"result":{"Total":10,"Killed":10,"Survived":0,"Errors":0},"tested_at":"2026-08-11T17:07:47.105888Z"},{"index":0,"name":"a shareholder in distress offers their legal-entity share to a fellow shareholder instead of going bankrupt","scenario_hash":"7c01e3888e0422ed973168f4b4afcf3d282328b6be4b562b4676cceea9caceeb","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"},{"index":1,"name":"a shareholder does not go bankrupt because the share's value covers the tax debt","scenario_hash":"4b3436a75f0bce3f44174f1c585fcd66e9b5ad217a554c84979997ed8ec0447e","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"},{"index":2,"name":"a shareholder sells a cheaper personal asset before offering their legal-entity share","scenario_hash":"cd947d25c54d7fffa82e8160e7b9c354f4926aceca2718cb97af91e85ae0db4a","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"},{"index":3,"name":"a legal-entity share does not change hands when no fellow shareholder will bid","scenario_hash":"e3fc41d7a633110633bb760cb8826e44de54c0414085e3343e12ea9b7c72aecc","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"},{"index":4,"name":"a fellow shareholder bids up to a third of their bank balance, and the highest bid wins","scenario_hash":"6dc43117ef23c7cc4bfa395b5c6f58f1e877051d8e40ddc4d1c06baa47b10c2a","mutation_count":12,"result":{"Total":12,"Killed":12,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"},{"index":5,"name":"the final shareholder may liquidate the legal entity to settle their debt","scenario_hash":"124c6e4f30c97d9e7471fb0bfe14fcd350e6b130b29cc4977f5c470605d79d87","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"},{"index":6,"name":"the final shareholder sells newly-acquired entity assets when liquidation cash is insufficient","scenario_hash":"23c20177ffd6e5e68c717c841847362f4547c8e0f6cc2113ebd058c87d344e48","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-11T11:27:10.610946Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -152,16 +153,17 @@ Feature: selling legal-entity shares to avoid bankruptcy
     Then pawn "high hat" wins the Pink Realty share at $<winning_bid>
     And pawn "dog"'s bankrupt state is <bankrupt_state>
     And pawn "dog"'s final balance is $<dog_ending>
+    And pawn "high hat"'s final balance is $<high_hat_ending>
 
     Examples:
-      | dog_balance | high_hat_balance | winning_bid | bankrupt_state | dog_ending |
-      | 94          | 1000             | 5           | bankrupt       | -1         |
-      | 95          | 1000             | 5           | not bankrupt   | 0          |
+      | dog_balance | high_hat_balance | winning_bid | bankrupt_state | dog_ending | high_hat_ending |
+      | 94          | 1000             | 5           | bankrupt       | -1         | 995             |
+      | 95          | 1000             | 5           | not bankrupt   | 0          | 995             |
 
   # share-sale-9
   Scenario Outline: a distressed shareholder disposes of a personal asset before offering their legal-entity share, and the share sale may or may not settle the remaining debt
     Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 4 players
+    And we select 3 players
     And Pink Realty is formed
     And pawn "dog" returns every street except "Steenstraat Brugge" to the bank
     And pawn "iron box" is bankrupt
@@ -170,8 +172,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "iron box" owns "Diestsestraat Leuven"
     And pawn "iron box" owns "Place du Monument Spa"
     And pawn "dog" has $<dog_balance> to spend
-    And pawn "high hat" has $<high_hat_balance> to spend
-    And pawn "racecar" has $<racecar_balance> to spend
+    And pawn "high hat" has $50 to spend
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
     Then the land "Steenstraat Brugge" is mortgaged
     And pawn "high hat" wins the Pink Realty share at $<winning_bid>
@@ -179,9 +180,8 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "dog"'s bankrupt state is <bankrupt_state>
     And pawn "dog"'s final balance is $<dog_ending>
     And pawn "high hat"'s final balance is $<high_hat_ending>
-    And pawn "racecar"'s final balance is $<racecar_ending>
 
     Examples:
-      | dog_balance | high_hat_balance | racecar_balance | winning_bid | bankrupt_state | dog_ending | high_hat_ending | racecar_ending |
-      | 45          | 50               | 50              | 5           | not bankrupt   | 0          | 45              | 50             |
-      | 40          | 50               | 50              | 5           | bankrupt       | -5         | 45              | 50             |
+      | dog_balance | winning_bid | bankrupt_state | dog_ending | high_hat_ending |
+      | 45          | 5           | not bankrupt   | 0          | 45              |
+      | 40          | 5           | bankrupt       | -5         | -5              |

@@ -86,3 +86,17 @@ Feature: Monopoly command line interface
     Examples:
       | players | minimum rolls |
       | 2       | 10             |
+
+  # cli-6
+  Scenario Outline: the CLI wires the legal-entity flag the Greedo strategies observe
+    Given the simulator is configured with the raw arguments "<raw arguments>"
+    When I start the simulator
+    Then the game journal records that every player uses the "Greedo" strategy
+    And the game journal records that the "Greedo" strategy observes legal-entity trading as <legal entity state>
+    And the game journal records that the "Greedo" strategy observes stalemate trading as <stalemate state>
+    When I stop the simulator before the game ends
+    Then the simulator process ends
+
+    Examples:
+      | raw arguments                                           | legal entity state | stalemate state |
+      | 8 greedo greedo greedo greedo greedo greedo greedo greedo --optional-greedo-legal-entity | enabled            | disabled        |
