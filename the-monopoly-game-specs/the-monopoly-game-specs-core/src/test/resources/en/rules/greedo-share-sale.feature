@@ -19,7 +19,8 @@ Feature: selling legal-entity shares to avoid bankruptcy
     Then pawn "dog" is not bankrupt
     And pawn "dog" no longer holds a share of Pink Realty
     And pawn "high hat" holds that Pink Realty share
-    And pawn "iron box" and pawn "ship" do not hold shares of Pink Realty
+    And pawn "iron box" still holds a share of Pink Realty
+    And pawn "ship" holds no share of Pink Realty
 
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance | ship_balance |
@@ -77,7 +78,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
       | 40          | 0                | 0                |
 
   # share-sale-5
-  Scenario Outline: a fellow shareholder bids up to the higher of the share value and a third of their bank balance, and wins at the lowest price
+  Scenario Outline: a fellow shareholder bids up to a third of their bank balance, and the highest bid wins
     Given legal-entity trading is enabled for the "Greedo" strategy
     And we select 4 players
     And Pink Realty is formed
@@ -86,11 +87,11 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "high hat" has $<high_hat_balance> to spend
     And pawn "iron box" has $<iron_box_balance> to spend
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
-    Then pawn "high hat" wins the Pink Realty share at no more than $<winning_bid>
-    And pawn "high hat" paid the lowest possible price for the Pink Realty share
+    Then pawn "high hat" wins the Pink Realty share at $<winning_bid>
+    And pawn "high hat" paid the lowest possible price within a third of bank balance
 
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance | winning_bid |
-      | 40          | 1200             | 900              | 800         |
+      | 40          | 1200             | 900              | 320         |
       | 40          | 3000             | 2600             | 915         |
-      | 40          | 1600             | 1500             | 560         |
+      | 40          | 1600             | 1500             | 530         |

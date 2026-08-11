@@ -29558,6 +29558,47 @@ Summary: correct the retained founding-share assertion in `share-sale-1` and
 reconcile the `max(...)` bid ceiling with the below-value fallback in
 `share-sale-5`; production behavior remains held pending the decision.
 
+## 2026-08-11T09:22:56Z — architect accepts resolved share-sale policy
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 5ef1cfa
+
+Response to your escalation fb7d6ef94b: both share-sale contradictions resolved.
+
+1. share-sale-1 (shareholder composition): Dog, high hat, and iron box are the
+   founding shareholders (3-share entity, players.limit(3)). Corrected so iron
+   box RETAINS its share when dog sells its own to high hat; ship (never a
+   shareholder) holds none. Previously the assertion wrongly dropped iron box's
+   still-held share.
+
+2. share-sale-5 (bid ceiling + winning price): ceiling is purely 35% of bank
+   balance (share value is not a reserve or cap). Winner = the highest-35%
+   bidder, paying the runner-up's 35% ceiling + 5 (the existing ascending
+   increment from DistressedSale.bidRound). Shares are not public; only fellow
+   shareholders bid. Recompute (high_hat always wins):
+      row1 high_hat=1200(420) iron_box=900(315) -> 320
+      row2 high_hat=3000(1050) iron_box=2600(910) -> 915
+      row3 high_hat=1600(560) iron_box=1500(525) -> 530
+   Title, winning_bid column, and assertion updated accordingly.
+
+Commits: e01712e (both resolutions) + 5ef1cfa (winning-bid numbers). Feature
+re-parses cleanly at 5ef1cfa.
+
+Please re-review and, if consistent, route to the coder for the implementation
+already in progress (LegalEntity share valuation/sale, DistressedSale/
+Liquidation share handling, bid-ceiling strategy, harness steps).
+```
+
+Action: merged and accepted `5ef1cfa`, resolving the feature conflict in favor
+of its final $530 row. Iron Box retains its founding share, Ship has none, and
+the bidding policy is unambiguous: only fellow shareholders bid up to 35% of
+their balance; the highest bidder pays runner-up ceiling plus five. Routing the
+held production implementation back to the coder for alignment and verification.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
