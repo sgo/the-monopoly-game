@@ -31436,3 +31436,20 @@ contains the real CLI Greedo optional-trading flag wiring and startup strategy
 observation boundary, then simplifies the now-dead strategy supplier map to
 the name-validation set it actually is. A logbook-only conflict was resolved
 by retaining both the refactorer history and this architect phase record.
+
+## 2026-08-11T21:03:00Z — architect hardens CLI strategy-state assertions
+
+Action: soft mutation of `specs-cli:en/cli.feature` exposed that the new
+strategy-state handlers treated every token except exactly `enabled` as false;
+the `disabled -> diSabled` mutation therefore survived. Replaced that implicit
+boolean conversion with a closed `enabled`/`disabled` parser, making malformed
+criteria fail. The rerun kills that mutation (6/9 killed); its three remaining
+survivors are pre-existing one-row `<minimum rolls>` thresholds in cli-1,
+cli-2, and cli-5. Each is a fixed criterion, not a varying scenario dimension,
+and must be made literal by the specifier to remove its false mutation target.
+
+The CLI module's `keepsPlayingUntilToldToStop` unit test still fails its fixed
+one-second liveness assertion because a naturally completed game is permitted
+by the `Running` contract; a focused retry reproduced this known timing test
+failure. The new CLI acceptance scenario independently verifies the actual
+optional-flag wiring.

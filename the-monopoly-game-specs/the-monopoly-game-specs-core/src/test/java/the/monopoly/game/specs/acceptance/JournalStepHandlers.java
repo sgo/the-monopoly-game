@@ -320,23 +320,25 @@ final class JournalStepHandlers {
         then("^the game journal records that the \"Greedo\" strategy observes legal-entity trading as "
                 + NAME + "$",
             (world, arguments) -> {
+              boolean expected = expectedTradingState(arguments.text(1));
               world.awaitGameLog(world.simulatorPlayerCount(), Entry.StrategyNamed.class::isInstance,
                   "strategy observations");
               assertThat(world.gameLog().stream()
                   .filter(Entry.StrategyNamed.class::isInstance)
                   .map(Entry.StrategyNamed.class::cast)
-                  .allMatch(entry -> entry.legalEntityEnabled() == arguments.text(1).equals("enabled"))).isTrue();
+                  .allMatch(entry -> entry.legalEntityEnabled() == expected)).isTrue();
             }),
 
         then("^the game journal records that the \"Greedo\" strategy observes stalemate trading as "
                 + NAME + "$",
             (world, arguments) -> {
+              boolean expected = expectedTradingState(arguments.text(1));
               world.awaitGameLog(world.simulatorPlayerCount(), Entry.StrategyNamed.class::isInstance,
                   "strategy observations");
               assertThat(world.gameLog().stream()
                   .filter(Entry.StrategyNamed.class::isInstance)
                   .map(Entry.StrategyNamed.class::cast)
-                  .allMatch(entry -> entry.stalemateEnabled() == arguments.text(1).equals("enabled"))).isTrue();
+                  .allMatch(entry -> entry.stalemateEnabled() == expected)).isTrue();
             }),
 
         then("^the game journal records that pawn \"" + NAME + "\" rolls " + VALUE + " for initiative$",
@@ -734,6 +736,14 @@ final class JournalStepHandlers {
       case "bankrupt" -> true;
       case "not bankrupt" -> false;
       default -> throw new IllegalArgumentException("Unknown bankrupt state: " + state);
+    };
+  }
+
+  private static boolean expectedTradingState(String state) {
+    return switch (state) {
+      case "enabled" -> true;
+      case "disabled" -> false;
+      default -> throw new IllegalArgumentException("Unknown trading state: " + state);
     };
   }
 }
