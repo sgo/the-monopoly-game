@@ -30234,3 +30234,12 @@ task can advance. The new `pawnReceivedEntityBankBalance` adapter is also
 invalid: it only checks that a stored balance exists and the entity dissolved,
 not that the pawn received the stored amount. Returned that adapter correction
 to coder and the feature decision to specifier; no refactorer pass yet.
+
+## 2026-08-11T10:50:20Z — coder verifies architect liquidation integration
+
+Merged architect priority-00 handoff `5267637f40` for `greedo-legal-entity`.
+The merge integrates the final-shareholder liquidation flow, treasury transfer,
+street dissolution, and acceptance assertions. Domain tests pass 355/355 and
+full acceptance passes 572/572. `git diff --check` is clean. No additional
+coder implementation was required; returning the verified integration to the
+architect for phase routing.
