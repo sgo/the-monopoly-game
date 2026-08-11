@@ -117,6 +117,19 @@ public final class LegalEntity {
     shareholders.removeIf(shareholder::equals);
   }
 
+  /** Dissolves this entity and transfers its remaining treasury to its final shareholder. */
+  public Money liquidateTo(Player shareholder) {
+    if (shareholders.size() != 1 || !shareholders.contains(shareholder))
+      throw new IllegalArgumentException("Liquidation requires the final shareholder.");
+    Money balance = bankAccount.balance().amount();
+    if (balance.amount() > 0) {
+      bankAccount.withdraw(balance);
+      shareholder.account().deposit(balance);
+    }
+    shareholders.clear();
+    return balance;
+  }
+
   public Money loan() { return loan; }
   public Money bankBalance() { return bankAccount.balance().amount(); }
   public void depositToBank(Money amount) { bankAccount.deposit(amount); }

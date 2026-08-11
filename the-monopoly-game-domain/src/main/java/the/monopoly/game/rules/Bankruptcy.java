@@ -87,8 +87,18 @@ public final class Bankruptcy {
     for (LegalEntity entity : deeds.legalEntities()) {
       if (!Money.ZERO.exceeds(debtor.account().balance().amount())) return;
       if (entity.shareOf(debtor) == 0.0) continue;
+      if (entity.shareholders().size() == 1) {
+        liquidateEntity(debtor, entity);
+        distressedSale.resolve(debtor);
+        continue;
+      }
       sellShareToHighestBidder(debtor, entity);
     }
+  }
+
+  private void liquidateEntity(Player debtor, LegalEntity entity) {
+    entity.liquidateTo(debtor);
+    deeds.dissolve(entity, debtor);
   }
 
   private void sellShareToHighestBidder(Player debtor, LegalEntity entity) {

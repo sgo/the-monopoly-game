@@ -47,6 +47,15 @@ public class Deeds {
     });
   }
 
+  /** Dissolves an entity, transferring each of its streets to the shareholder. */
+  public void dissolve(LegalEntity entity, Player shareholder) {
+    entity.streets().forEach(street -> {
+      if (entityOwnerOf(street.type()).filter(entity::equals).isPresent())
+        owners.put(street.type(), shareholder.id());
+    });
+    entityOwners.entrySet().removeIf(entry -> entry.getValue().equals(entity));
+  }
+
   public List<LegalEntity> legalEntities() {
     return entityOwners.values().stream().distinct().toList();
   }

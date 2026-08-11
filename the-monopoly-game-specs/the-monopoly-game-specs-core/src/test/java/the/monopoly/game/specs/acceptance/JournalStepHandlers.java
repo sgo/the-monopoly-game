@@ -89,6 +89,12 @@ final class JournalStepHandlers {
         given("^" + NAME + "'s bank account holds \\$" + VALUE + "$",
             (world, arguments) -> world.entityBankHolds(arguments.text(1), money(arguments.number(2)))),
 
+        given("^the Pink Realty bank balance is \\$" + VALUE + "$",
+            (world, arguments) -> world.entityBankHolds("Pink Realty", money(arguments.number(1)))),
+
+        given("^Pink Realty has already operated$",
+            (world, arguments) -> world.entityHasAlreadyOperated("Pink Realty")),
+
         given("^the last-capitalised shareholder of Pink Realty has not aged since funding a build$",
             (world, arguments) -> world.entityLastCapitalizedShareholderHasNotAged("Pink Realty")),
 
@@ -113,6 +119,28 @@ final class JournalStepHandlers {
 
         given("^pawn \"" + NAME + "\" owns no mortgaged property$",
             (world, arguments) -> assertThat(world.pawnOwnsNoMortgagedProperty(arguments.text(1))).isTrue()),
+
+        given("^pawn \"" + NAME + "\" and pawn \"" + NAME + "\" have both gone bankrupt$",
+            (world, arguments) -> world.bankruptPawns(arguments.text(1), arguments.text(2))),
+
+        then("^" + NAME + " is dissolved$",
+            (world, arguments) -> assertThat(world.entityIsDissolved(arguments.text(1))).isTrue()),
+
+        then("^pawn \"" + NAME + "\" owns every street previously held by " + NAME + "$",
+            (world, arguments) -> assertThat(world.pawnOwnsEveryFormerEntityStreet(
+                arguments.text(1), arguments.text(2))).isTrue()),
+
+        then("^pawn \"" + NAME + "\" received the " + NAME + " bank balance$",
+            (world, arguments) -> assertThat(world.pawnReceivedEntityBankBalance(
+                arguments.text(1), arguments.text(2))).isTrue()),
+
+        then("^pawn \"" + NAME + "\" sold (<streets_to_sell>) of the transferred " + NAME
+                + " streets to settle the remaining debt$",
+            (world, arguments) -> assertThat(world.transferredEntityStreetsSold(
+                arguments.text(1), arguments.text(3))).isEqualTo(arguments.number(2))),
+
+        then("^pawn \"" + NAME + "\"'s debt is settled$",
+            (world, arguments) -> assertThat(world.pawnDebtIsSettled(arguments.text(1))).isTrue()),
 
         then("^the pink colour group is developed up to at least (<houses_at_least>) houses$",
             (world, arguments) -> assertThat(world.totalHouses(Street.Colour.pink))
