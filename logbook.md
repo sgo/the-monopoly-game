@@ -30950,3 +30950,8 @@ at +$40 and must stop before any residual debt or distressed share sale.
 Requiring the share sale would instead specify a voluntary sale after
 solvency, a different behavior not stated in the scenario. Escalating this
 Gherkin example/policy defect to the specifier; no coder handoff is safe yet.
+
+## 2026-08-11T13:57:43Z — architect escalates share-sale-9 contradiction
+
+Sent priority-00 git handoff to specifier for `94300c1d9c`, identifying the
+$50 mortgage versus $10 shortfall contradiction in the $90 example.
