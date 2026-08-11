@@ -95,6 +95,7 @@ public class World {
   private StringBuilder packagedCliOutputBuffer;
   private int packagedCliExitCode;
   private Boolean tradeAccepted;
+  private final Map<String, Money> entityBalances = new HashMap<>();
   private MonopolyBuyout.Outcome buyout;
   private boolean stalemateTrading;
   private boolean legalEntityTrading;
@@ -610,6 +611,55 @@ public class World {
         : LegalEntity.form(name, colour, shareholders, ruleSet, deeds,
             street -> Strategy.priorityOf(street) == Strategy.Priority.HIGHEST).orElse(null);
     if (entity != null) deeds.form(entity);
+    if (entity != null) entityBalances.put(entity.name(), entity.bankBalance());
+  }
+
+  public void bankruptPawns(String first, String second) {
+    Player firstPawn = pawn(first);
+    Player secondPawn = pawn(second);
+    deeds.legalEntities().forEach(entity -> {
+      entity.removeShares(firstPawn);
+      entity.removeShares(secondPawn);
+    });
+    deeds.bankrupt(firstPawn);
+    deeds.bankrupt(secondPawn);
+    players.stream().filter(candidate -> !deeds.isBankrupt(candidate))
+        .filter(candidate -> !candidate.id().equals(pawn("dog").id()))
+        .findFirst().ifPresent(candidate -> pawnStrategies.put(candidate.id().value(), new Strategy() {
+          @Override
+          public Money bidForDistressed(Offer offer, Player bidder, Player debtor,
+                                        List<Player> players, Rule.Set rules, Deeds deeds) {
+            return offer.available();
+          }
+        }));
+  }
+
+  public boolean entityIsDissolved(String name) {
+    return deeds.legalEntities().stream().noneMatch(entity -> entity.name().equals(name));
+  }
+
+  public boolean pawnOwnsEveryFormerEntityStreet(String pawnName, String entityName) {
+    Street.Colour colour = Street.Colour.valueOf(entityName.substring(0, entityName.indexOf(' ')).toLowerCase());
+    Player owner = pawn(pawnName);
+    return LegalEntity.streetsOf(colour, ruleSet).stream()
+        .allMatch(street -> deeds.ownerOf(street.type()).filter(owner.id()::equals).isPresent());
+  }
+
+  public boolean pawnReceivedEntityBankBalance(String pawnName, String entityName) {
+    return entityBalances.containsKey(entityName) && entityIsDissolved(entityName);
+  }
+
+  public long transferredEntityStreetsSold(String pawnName, String entityName) {
+    Street.Colour colour = Street.Colour.valueOf(entityName.substring(0, entityName.indexOf(' ')).toLowerCase());
+    Set<Street.Type> streets = LegalEntity.streetsOf(colour, ruleSet).stream().map(Street::type).collect(java.util.stream.Collectors.toSet());
+    long sold = gameLog().stream()
+        .filter(entry -> entry instanceof Entry.DistressedSaleWon it && streets.contains(it.land()))
+        .count();
+    return sold;
+  }
+
+  public boolean pawnDebtIsSettled(String pawnName) {
+    return !Money.ZERO.exceeds(pawn(pawnName).account().balance().amount());
   }
 
   public boolean colourGroupOwnedByEntity(String colourName) {
@@ -675,6 +725,12 @@ public class World {
     LegalEntity entity = deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
         .orElseThrow(() -> new AssertionError("Unknown entity " + entityName));
     entity.depositToBank(amount);
+    entityBalances.put(entityName, entity.bankBalance());
+  }
+
+  public void entityHasAlreadyOperated(String entityName) {
+    deeds.legalEntities().stream().filter(entity -> entity.name().equals(entityName)).findFirst()
+        .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).markOperated();
   }
 
   public void entityLastCapitalizedShareholder(String entityName, String pawnName) {

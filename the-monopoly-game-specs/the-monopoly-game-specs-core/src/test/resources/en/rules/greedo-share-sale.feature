@@ -107,6 +107,8 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And Pink Realty is formed
     And pawn "high hat" and pawn "iron box" have both gone bankrupt
     And pawn "dog" owns no mortgaged property
+    And the Pink Realty bank balance is $100
+    And Pink Realty has already operated
     And pawn "dog" has $<dog_balance> to spend
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
     Then pawn "dog" is not bankrupt
@@ -127,6 +129,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "dog" owns no mortgaged property
     And pawn "dog" has $<dog_balance> to spend
     And the Pink Realty bank balance is $<entity_balance>
+    And Pink Realty has already operated
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
     Then pawn "dog" is not bankrupt
     And Pink Realty is dissolved

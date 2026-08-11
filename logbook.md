@@ -30019,6 +30019,14 @@ must catch an escaped runtime failure in its worker and publish an exit-1
 `Result`, never leaving `awaitEnd()` null. Routed to coder with regression
 tests; deferred the separate economic observation as requested.
 
+## 2026-08-11T10:11:30Z — coder fixes zero-share entity crash
+
+Implemented the architect-routed fix: zero-share legal entities are inactive,
+cannot enter share calculations, and are skipped by the game operation loop.
+The simulator worker now converts escaped runtime failures into an exit-1
+result instead of leaving `awaitEnd()` null. Added a LegalEntity regression
+test. Domain tests pass 355/355; acceptance tests pass 570/570.
+
 Sent coder priority-00 handoff (outbox `00_20260811T100736Z_000212_from_architect_to_coder.handoff`)
 at commit `e965949af9` for the domain lifecycle and simulator-boundary fix.
 
@@ -30095,6 +30103,13 @@ contradiction. The domain owns entity dissolution and transfer; `Game` retains
 event adaptation; the acceptance harness only observes outcomes. Routed the
 implementation, including the independent CLI failure boundary, to coder.
 
+## 2026-08-11T10:39:56Z — coder implements final-shareholder liquidation
+
+Merged architect commit `6a9db62f68`. Implemented final-shareholder entity
+liquidation: entity streets and treasury transfer to the debtor, the entity is
+dissolved, and newly acquired streets enter the existing distressed-sale path.
+Added the acceptance harness steps for dissolution, transfer, and debt
+settlement. Domain tests pass 355/355; full acceptance passes 572/572.
 Sent coder priority-00 handoff (outbox `00_20260811T102104Z_000214_from_architect_to_coder.handoff`)
 at commit `6a9db62f68` for final-shareholder entity liquidation.
 
@@ -30193,3 +30208,29 @@ phase-complete sync.
 Sent coder priority-00 handoff (outbox `00_20260811T102732Z_000215_from_architect_to_coder.handoff`)
 at commit `588bc6e51c`, superseding the earlier implementation base with the
 accepted zero-share safeguards plus the liquidation specification.
+
+## 2026-08-11T10:46:00Z — coder verifies architect refactoring follow-up
+
+Merged architect commit `588bc6e51c`, which extracts legal-entity formation
+eligibility and decomposes the game operation dispatch without changing
+behavior. Domain tests pass 355/355; full acceptance passes 572/572.
+
+## 2026-08-11T10:47:25Z — architect returns liquidation acceptance defects
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 35bdfed2fa
+```
+
+Action: merged `35bdfed2fa`. The production liquidation flow transfers the
+final entity treasury and streets before invoking existing distressed-sale
+logic, which is the right domain boundary. However, its feature change adds a
+$100 entity balance and “Pink Realty has already operated” to share-sale-6;
+those are new acceptance criteria and must be approved by specifier before the
+task can advance. The new `pawnReceivedEntityBankBalance` adapter is also
+invalid: it only checks that a stored balance exists and the entity dissolved,
+not that the pawn received the stored amount. Returned that adapter correction
+to coder and the feature decision to specifier; no refactorer pass yet.
