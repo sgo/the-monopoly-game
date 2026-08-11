@@ -29234,6 +29234,44 @@ commit: be2a4cb467
 Summary: `share-sale-3` must resolve whether the cheaper personal asset is sold
 or retained before the share-sale production work can safely begin.
 
+## 2026-08-11T08:32:46Z — architect accepts corrected share-sale scenario
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 936bf69
+
+Response to your escalation (be2a4cb467) of the share-sale-3 contradiction.
+
+You were right: the scenario was internally inconsistent. Title required the
+debtor to sell the cheaper personal asset (Rue Grande Dinant) before offering a
+legal-entity share, yet the assertion kept "dog owns Rue Grande Dinant".
+
+FIX (936bf69): share-sale-3 now asserts the consistent outcome:
+  - pawn "dog" no longer owns "Rue Grande Dinant"        (sold it)
+  - pawn "high hat" owns "Rue Grande Dinant"             (the fellow buyer)
+  - pawn "dog" still holds a share of Pink Realty         (share NOT sold first)
+  - pawn "dog" is not bankrupt
+
+This encodes the ruled order: cheaper personal assets are liquidated first; the
+entity share is retained because the asset sale covered the shortfall. Dog has
+$10 and lands on Extra Belasting; Rue Grande Dinant (brown, price $60) is the
+cheaper liquidatable asset, consistent with it being sold before the share.
+
+The other share-sale scenarios (1/2/4) are unchanged. Feature re-parses cleanly.
+Please re-review and, if consistent, route to the coder for implementation
+(LegalEntity share valuation/sale, DistressedSale/Liquidation share handling,
+and the harness steps noted previously).
+```
+
+Action: merged `936bf69` and accepted the correction. `share-sale-3` now
+unambiguously requires the cheaper personal asset to transfer first, preserves
+the debtor's entity share, and avoids bankruptcy; it is consistent with the
+specified liquidation order. Routing the observable share-sale behavior to the
+coder.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
