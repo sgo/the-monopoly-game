@@ -31034,3 +31034,9 @@ racecar as the fourth player because its capped balance controls the street
 auction path; then a stable racecar balance/assertion can make its input
 observable. This is specifier-owned scenario wording plus coder-owned test
 harness support, with no production-rule change.
+
+## 2026-08-11T14:35:09Z — architect returns deterministic-seed guidance
+
+Sent priority-00 git handoff to specifier for `73cd82c2c3`, recommending a
+narrow scenario setup that leaves Dog only `Steenstraat Brugge` while retaining
+racecar and the shared board-seeding helper.
