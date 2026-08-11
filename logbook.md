@@ -30660,6 +30660,13 @@ now win at the nominal $5 price; zero-capacity bidders remain ineligible, and
 street distressed-sale minimums are unchanged. Domain tests pass 359/359;
 share-sale acceptance passes 10/10; full acceptance passes successfully.
 
+## 2026-08-11T18:03:40Z — coder verifies deterministic share-sale setup
+
+Merged architect handoff `b9e62f51d7`. Added the missing return-to-bank setup
+step, preserved legal-entity bidding for high hat, and prevented unrelated
+racecar distressed bidding in share-sale-9. Domain tests pass 359/359; full
+acceptance passes successfully; `git diff --check` is clean.
+
 ## 2026-08-11T14:30:00+02:00 — refactorer reviews no-minimum-bid share sales (6029b5fa72) — BLOCKING FINDING
 
 Merged `6029b5fa72`. The specifier's request (removing the incorrect
@@ -30847,3 +30854,230 @@ Summary: verified the bankrupt-state literal hardening. Small, self-
 contained acceptance-harness fix (typos no longer silently pass as "not
 bankrupt"), no production code touched. Clean, no CRAP/DRY concerns.
 Acceptance 574/574 run twice.
+
+## 2026-08-11T13:09:07Z — architect sends assertion-boundary review
+
+Sent priority-00 git handoff to refactorer for `fc8b520919`, containing only
+the strict acceptance-adapter state parser.
+
+## 2026-08-11T13:09:30Z — architect finds unproved balance inputs
+
+Action: after the adapter fix, soft Gherkin mutation still has two survivors:
+share-sale-8 accepts `dog_balance` 40→49 and 99→91 without changing either
+specified result. The scenario therefore does not prove that its stated
+starting balances participate in the intended bankruptcy boundary. This is a
+feature acceptance-criteria gap, not a production implementation decision;
+escalating it to the specifier.
+
+## 2026-08-11T13:09:37Z — architect escalates share-sale input coverage
+
+Sent priority-00 git handoff to specifier for `c6a7620746`, carrying the two
+surviving balance-input mutations for `greedo-legal-entity`.
+
+## 2026-08-11T13:12:29Z — architect receives assertion-boundary review
+
+Received refactorer priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer c6142adc45
+```
+
+Action: merged `c6142adc45`. The strict state-literal parser is structurally
+approved. The task remains blocked only on the already-escalated Gherkin
+input-coverage decision.
+
+## 2026-08-11T13:13:00Z — architect records pending mutation status
+
+Action: committed the mutation tool's managed manifest update that withdraws
+the stale passing stamp while share-sale-8 has surviving input mutations. It
+will be refreshed by the approved tool once the specifier returns the revised
+acceptance criteria.
+
+## 2026-08-11T13:13:36Z — architect accepts boundary specification revision
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier cb60d38
+```
+
+Action: merged `cb60d38`. Share-sale-8 now brackets the $95 boundary: $94
+leaves Dog bankrupt after the nominal sale and $95 leaves Dog solvent.
+
+## 2026-08-11T13:15:00Z — architect verifies boundary mutation coverage
+
+Action: soft Gherkin mutation killed all 10 exercised mutations with zero
+survivors or errors, including both formerly surviving `dog_balance` changes.
+Full acceptance and property tests passed; `git diff --check` passed. The
+approved mutation tool refreshed the feature manifest and success stamp.
+
+## 2026-08-11T13:15:52Z — architect sends resolved phase sync to specifier
+
+Sent priority-50 git handoff to specifier for `6846b3aaa9`, the completed
+bankruptcy-boundary specification and mutation verification.
+
+## 2026-08-11T13:30:44Z — architect answers share-sale ordering question
+
+Received specifier priority-00 question handoff:
+
+```
+Re-read your role and constitution.
+
+QUESTION - NOT A FIX. Seeking role-responsibility guidance before any work.
+
+Does dropping/reordering the bankruptcy resolution order need to be FORCED
+through a specification change, or is catching-and-fixing such an order
+mistake part of architect/coder work independently of a spec change?
+```
+
+Action: confirmed that the current order is distressed sale, house sale,
+mortgage, then entity-share sale. Moving shares earlier changes observable
+economic priority (whether a shareholder sells a share versus a house or
+mortgages property), so it is a product-policy change and requires specifier
+acceptance criteria. The architect may diagnose and propose the boundary, but
+must not reorder it independently. The specification should state a concrete
+multi-shareholder case with a mortgageable/potentially liquidatable personal
+asset and assert that the fellow-shareholder offer occurs first, including the
+expected result if the offer cannot settle the debt.
+
+## 2026-08-11T13:31:28Z — architect returns ordering-policy guidance
+
+Sent priority-00 git handoff to specifier for `9793e71aba`, documenting that
+share-sale reordering requires an explicit behavioral specification.
+
+## 2026-08-11T13:55:50Z — architect accepts share-sale-9 specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+FORWARDING for implementation: share-sale-9 full distressed-sale ordering
+specification. Please implement the ordering so this spec passes, resolving
+the claimed harness strategy-override defect.
+```
+
+Action: merged `9b38cc0` and ran acceptance. Both new examples fail at the
+expected share-sale event. Inspection confirms `givePawnOwnership` uses
+`putIfAbsent`, so it preserves the previously configured Greedo strategy; the
+claimed strategy override is not present in the current code.
+
+## 2026-08-11T13:58:00Z — architect finds share-sale-9 example contradiction
+
+Action: `Steenstraat Brugge` has a $50 mortgage value. In the $90 example,
+Dog's $100 tax shortfall is only $10, so mortgage-first resolution leaves Dog
+at +$40 and must stop before any residual debt or distressed share sale.
+Requiring the share sale would instead specify a voluntary sale after
+solvency, a different behavior not stated in the scenario. Escalating this
+Gherkin example/policy defect to the specifier; no coder handoff is safe yet.
+
+## 2026-08-11T13:57:43Z — architect escalates share-sale-9 contradiction
+
+Sent priority-00 git handoff to specifier for `94300c1d9c`, identifying the
+$50 mortgage versus $10 shortfall contradiction in the $90 example.
+
+## 2026-08-11T14:19:14Z — architect accepts corrected share-sale-9 spec
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+FORWARDING for verification: corrected share-sale-9 ordering spec. Please
+verify mutation coverage and confirm the ordering requirement.
+```
+
+Action: merged `36f3fdf`. The corrected examples leave a $5 residual after
+the $50 mortgage, so the existing core order mortgages the personal street
+before it considers the still-distressed share sale. Full acceptance and
+property tests pass.
+
+## 2026-08-11T14:22:00Z — architect finds share-sale-9 mutation gaps
+
+Action: soft Gherkin mutation exercised 20 mutations but left 7 survivors.
+The scenario does not prove all of its setup values: perturbations of the
+insufficient row's `dog_balance` retain the same bankrupt outcome, and capped
+rival balances can change while retaining the same mortgage, winning-share,
+entity, and bankrupt-state assertions. This is an acceptance-criteria gap;
+returning it to the specifier for revised examples/assertions. The mutation
+tool withdrew the stale feature success stamp.
+
+## 2026-08-11T14:23:02Z — architect escalates share-sale-9 mutation gaps
+
+Sent priority-00 git handoff to specifier for `7c5ef7b28d`, carrying the 7
+surviving share-sale-9 mutations and the withdrawn managed stamp.
+
+## 2026-08-11T14:24:55Z — architect receives share-sale-9 re-verification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+FORWARDING for re-verification: share-sale-9 mutation-gap resolution. Added
+exact Dog and high-hat final-balance assertions; please rerun soft mutation.
+```
+
+Action: merged `18b50c7` and ran direct soft Gherkin mutation. The added
+balances reduce the gap, but 4 of 24 mutations still survive. In particular,
+the scenario does not observe the capped `racecar_balance`: 50→47 and 50→57
+leave the mortgage, high-hat share sale, entity state, Dog state, and asserted
+balances unchanged. The feature needs a racecar observable or a balance
+boundary that makes those mutations alter an asserted result. This remains a
+Gherkin acceptance-criteria change, so it is returning to the specifier.
+
+## 2026-08-11T14:26:58Z — architect escalates remaining racecar coverage gap
+
+Sent priority-00 git handoff to specifier for `ae2ed0c20f`, carrying the 4
+surviving mutations and the required racecar-input coverage decision.
+
+## 2026-08-11T14:34:17Z — architect answers share-sale-9 seed question
+
+Received specifier priority-00 question handoff:
+
+```
+Re-read your role and constitution.
+
+SEEKING YOUR OPINION: share-sale-9 racecar observability gap. The shared
+seeded board gives Dog extra streets, making final balances unstable. Should
+we accept survivors, simplify the seed, remove racecar, or take another path?
+```
+
+Action: confirmed the trace. `formNamedEntity` intentionally seeds every
+otherwise-unowned ownable space to the second shareholder, which is Dog in
+this scenario. Do not accept surviving mutations and do not change that shared
+formation helper globally: other features may rely on its rich-board setup.
+The correct direction is a narrow acceptance-only setup operation/step that,
+after formation, returns Dog's non-entity holdings to the bank while retaining
+only `Steenstraat Brugge`. The scenario should use that explicit state. Keep
+racecar as the fourth player because its capped balance controls the street
+auction path; then a stable racecar balance/assertion can make its input
+observable. This is specifier-owned scenario wording plus coder-owned test
+harness support, with no production-rule change.
+
+## 2026-08-11T14:35:09Z — architect returns deterministic-seed guidance
+
+Sent priority-00 git handoff to specifier for `73cd82c2c3`, recommending a
+narrow scenario setup that leaves Dog only `Steenstraat Brugge` while retaining
+racecar and the shared board-seeding helper.
+
+## 2026-08-11T14:35:41Z — architect accepts deterministic share-sale setup spec
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+FORWARDING for implementation: share-sale-9 adds Dog's narrow street-return
+step and a racecar final-balance assertion. Implement the test-harness support
+only; do not change production rules.
+```
+
+Action: merged `368455e`. The scenario now makes its desired single-street
+distress state explicit and observes racecar's capped balance. Routing the
+new acceptance step and corresponding `World` support to coder as a
+test-harness-only implementation.
