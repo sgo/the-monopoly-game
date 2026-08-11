@@ -29160,6 +29160,65 @@ commit: 98b9c40cb3
 Summary: phase complete after acceptance of developed entity rent, including
 the final architectural test-fixture cleanup and verification record.
 
+## 2026-08-11T08:31:21Z — architect reviews legal-entity share-sale specification
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier c7e9251
+
+New specification: selling legal-entity shares to avoid bankruptcy.
+
+WHY: Entity streets are moved out of the shareholder's personal ownership into
+the entity, so they cannot be liquidated when the shareholder faces bankruptcy.
+There is currently no share-sale path, so an entity shareholder has no way to
+convert their entity stake into cash to avoid going under.
+
+DECIDED SEMANTICS (user-confirmed):
+- Exactly 3 shares per entity, 1 per shareholder (share-splitting/bundling not
+  yet implemented this round; a shareholder could later hold 2 or 3).
+- Share value = (entity total developed value) / 3 x shares held.
+  Entity developed value mirrors the board-valuation convention the user pointed
+  to, Stalemate.threshold(Rule.Set): the sum of the entity streets' MAXIMUM
+  developed rent. Worked example: pink group with hotels rents 750+750+900 =
+  2400, so one (1/3) share = 800.
+- Legal-entity shares are NOT publicly tradeable. Only the OTHER shareholders of
+  that same entity may bid on a share.
+- Bidding follows the same rules as other distressed assets (minimum bid,
+  ascending auction).
+- A distress seller values their share, compares it to the shortfall, and must
+  exhaust cheaper sellable personal assets BEFORE offering their share.
+
+WHAT I COMMITTED (spec-only): greedo-share-sale.feature (4 Scenario Outlines)
++ acceptance/pipeline-features.txt registration. Scenarios:
+  1. distress -> offers share to fellow shareholder instead of bankrupting
+  2. share value covers the tax debt so the shareholder avoids bankruptcy
+  3. a cheaper personal asset is sold before the share
+  4. no willing fellow shareholder -> share stays with entity, seller bankrupts
+
+SCOPING NOTE: The scenarios use some step verbs that do NOT exist yet in the
+harness (share holding/sale assertions). Coder-domain work and harness steps are
+pending. Feature is parse-valid but not yet executable.
+
+REQUEST: route to coder. Implementation expected (proposal):
+- LegalEntity: value of a share (sum streets' max developed rent / shares total
+  x sharesHeld), and a share-sale/transfer of equity between shareholders.
+- DistressedSale/Liquidation: include a shareholder's entity share as a
+  sellable candidate, valued as above, ordered after cheaper personal assets,
+  biddable only by fellow shareholders.
+- Harness steps for the new assertions in the feature.
+Please review and decide whether this goes to the coder or needs rework.
+```
+
+Action: merged `c7e9251` and reviewed the new boundary. The valuation and
+bidder restrictions are coherent, but `share-sale-3` is contradictory: its
+title requires Dog to sell the cheaper personal asset before offering a share,
+while its assertion says Dog still owns `Rue Grande Dinant`. Returned this
+Gherkin-content ambiguity to the specifier; production implementation must not
+choose between mutually exclusive outcomes.
+
 ## 2026-08-11T04:47:09Z — architect sends phase-complete legal-entity sync
 
 Sent specifier priority-50 handoff:
