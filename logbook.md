@@ -30696,3 +30696,33 @@ disputed correctness would likely be thrown away once the real fix lands.
 Domain 359/359, full acceptance 572/572 (both green, but 572/572 does not
 mean this is safe — see above). No commit from me this cycle; sending this
 finding up without a code change.
+
+## 2026-08-11T12:31:11Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 0fa0c3da3b
+```
+
+Summary: BLOCKING FINDING, no code change applied. The minimum-bid-floor
+removal itself is correct and matches the specifier's request, but the
+commit also changed `resolve()`'s control flow (confirmed via `git blame`
+as new in this commit, not requested by the specifier) to return
+immediately after any successful share sale, skipping the real solvency
+check. Reproduced directly: replaying share-sale-8's exact numbers leaves
+the debtor at a permanent -$55 balance, never marked bankrupt — a resource-
+integrity bug invisible to the current scenario since it only asserts
+"not bankrupt" and the winning bid, never the ending balance. Did not fix
+it myself: reverting the control flow would flip the outcome to bankrupt,
+contradicting the scenario's explicit expectation, so this needs a
+specification decision (does a partial share sale count as "resolved," or
+should insolvent debtors fall through to further resolution?) rather than
+a structural call on my part. `resolve()`/`sellEntitySharesUntilSolvent`
+picked up CRAP violations from the added branching; left alone pending the
+real fix. Domain 359/359, acceptance 572/572 — green but not proof of
+safety here.
