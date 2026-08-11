@@ -31040,3 +31040,20 @@ harness support, with no production-rule change.
 Sent priority-00 git handoff to specifier for `73cd82c2c3`, recommending a
 narrow scenario setup that leaves Dog only `Steenstraat Brugge` while retaining
 racecar and the shared board-seeding helper.
+
+## 2026-08-11T14:35:41Z — architect accepts deterministic share-sale setup spec
+
+Received specifier priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+FORWARDING for implementation: share-sale-9 adds Dog's narrow street-return
+step and a racecar final-balance assertion. Implement the test-harness support
+only; do not change production rules.
+```
+
+Action: merged `368455e`. The scenario now makes its desired single-street
+distress state explicit and observes racecar's capped balance. Routing the
+new acceptance step and corresponding `World` support to coder as a
+test-harness-only implementation.
