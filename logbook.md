@@ -30713,3 +30713,8 @@ debtor insolvent. The new feature says the debtor is not bankrupt but does not
 state whether remaining debt must be settled, so the required resolution policy
 is ambiguous. Escalating the acceptance-criteria decision to the specifier;
 no production-flow change is safe without it.
+
+## 2026-08-11T12:32:15Z — architect escalates partial share-sale resolution
+
+Sent priority-00 git handoff to specifier for `41a6c9df4f`, carrying the
+ambiguous partial-settlement finding for `greedo-legal-entity`.
