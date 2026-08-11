@@ -29191,3 +29191,13 @@ unit coverage for developed houses and hotels.
 
 Verification: domain tests 350/350 passing; full acceptance 563/563 passing;
 `git diff --check` clean.
+
+Handoff sent to refactorer:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: greedo-legal-entity
+commit: 6d2ec4e65c
+```
