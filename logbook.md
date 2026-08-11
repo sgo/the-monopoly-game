@@ -30798,3 +30798,8 @@ Action: changed the acceptance adapter so `pawn ... bankrupt state is ...`
 accepts only the feature's two literals, `bankrupt` and `not bankrupt`.
 Previously any typo was interpreted as `not bankrupt`, allowing malformed
 state mutations to survive. The adapter change does not alter game behavior.
+
+## 2026-08-11T13:09:07Z — architect sends assertion-boundary review
+
+Sent priority-00 git handoff to refactorer for `fc8b520919`, containing only
+the strict acceptance-adapter state parser.
