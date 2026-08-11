@@ -92,3 +92,4 @@ Feature: selling legal-entity shares to avoid bankruptcy
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance | winning_bid |
       | 100         | 1200             | 900              | 800         |
+      | 100         | 3000             | 2600             | 915         |
