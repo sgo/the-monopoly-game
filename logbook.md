@@ -30440,3 +30440,11 @@ post-tax balance ($40 + $500 - $100 = $440), not a weak adapter. The prior
 coder-added `$100`/already-operated setup is removed. Full acceptance passed
 on the consolidated branch; routing to coder for normal verification and
 refactorer follow-through.
+
+## 2026-08-11T11:21:10Z — coder verifies deterministic liquidation specification
+
+Merged architect priority-00 handoff `4cf3ec7fa4`. Resolved the logbook
+conflict, removed the duplicate bankruptcy setup handler, and retained the
+liquidation setup's deterministic operated-entity and distressed-sale bidder
+configuration. Full acceptance passes 572/572 and `git diff --check` is clean.
+Ready for refactorer review.
