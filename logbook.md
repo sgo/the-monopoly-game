@@ -31345,3 +31345,6 @@ commit: 677c50f0a3
 
 Action: sent the verified CLI flag wiring and startup strategy-observation
 journal changes for refactorer review.
+
+Correction: the first local send attempt used an invalid abbreviated commit;
+the actual handoff commit is `954ff4902d`.
