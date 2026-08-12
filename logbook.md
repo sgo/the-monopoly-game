@@ -33236,3 +33236,15 @@ priority: 50
 task: greedo-market-deadlock-trigger
 commit: e4ccac04e0
 ```
+
+The soft mutation runner refreshed its checked-in acceptance-mutation manifest
+for the corrected scenario wording. Delivered that generated verification
+artifact as follow-up handoff 000260:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 7b92f93064
+```
