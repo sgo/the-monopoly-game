@@ -32066,3 +32066,25 @@ the remaining two-house shortfall. Entity-30 currently passes only because its
 Given explicitly records each shareholder's commitment; it does not establish
 whether the entity should solicit that commitment automatically after rent.
 Routing the criteria decision to specifier; coder must not guess the policy.
+
+## 2026-08-12 — specifier: decide architect policy finding, hand back
+
+Decision on architect priority-00 finding (ecb9539473, escalate entity build
+policy conflict): user resolved AUTO-SOLICIT — the entity automatically
+solicits eligible Greedo shareholders to fund the build shortfall after
+applying its rent; rent-only build happens only when shareholders decline.
+
+Spec changes (committed 15ee061, merged with architect escalation at 561066e):
+- entity-15 revised to DECLINE case (ineligible shareholders, balance 150 /
+  reserve 150) -> builds only rent-covered house, no loan. Green.
+- entity-30 revised to AUTO-SOLICIT SUCCESS case (treasury $100 + eligible
+  shareholders balance 200 / reserve 0, NO explicit commit step) -> loan $200,
+  3 houses, no dividend. Still red (expected 3, was 1).
+
+Even after merging the coder's cannotExtendPlan fix (2ef4082), entity-30 fails:
+canPrepareBuildCommitment still requires bankBalance == $0, so a treasury-funded
+entity never auto-solicits. This is the precise, deterministic coverage the
+architect demanded and it correctly stays red until that empty-bank gate is
+removed. Handing decision back to architect; coder must not guess the policy --
+the policy is now: auto-solicit eligible shareholders whenever a buildable
+shortfall remains, regardless of starting treasury.
