@@ -32338,3 +32338,15 @@ scenario passing.
 
 This is an economic-rule decision, not a safe wiring correction: weakening the
 consent or reserve policy here would contradict current accepted behavior.
+
+## 2026-08-12T20:06:50Z — architect routes entity-development policy decision
+
+Decision required: define an entity-investment policy that makes both
+treasury/rent-funded and loan-funded development attainable in ordinary
+eight-player games while retaining the accepted all-shareholder/no-free-rider
+guarantee. In particular, decide whether an entity contribution uses a
+different reserve policy from a shareholder's individual monopoly/station
+strategy reserve, whether the offer should be sized differently, or whether
+formation/another stated rule governs this. Add observable coverage using
+non-artificial shareholder reserves; the present zero-reserve scenario alone
+does not represent the real-game failure.
