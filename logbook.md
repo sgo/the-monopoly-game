@@ -32725,6 +32725,9 @@ harness delegates to that production decision instead of calling `formEntity`
 directly. The m-scenario fixtures remain isolated from unrelated scenarios.
 Domain tests pass 365/365 and full acceptance passes 597/597.
 
+Queued priority-00 handoff `000158` to refactorer at commit `96ae7bc6da` for
+review of the quiet-round tracking.
+
 Queued priority-00 handoff `000157` to refactorer at commit `254fd869c8` for
 review of the production market-deadlock trigger.
 ## 2026-08-12T21:42:57Z — refactorer receives market-deadlock trigger for review
