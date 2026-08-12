@@ -31914,6 +31914,18 @@ review loop; the result flows coder -> refactorer -> back to ARCHITECT, not to
 specifier. The specifier re-engages only when the architect sends a phase-complete
 sync. No specifier action pending; holding for the loop to close.
 
+## 2026-08-12 — architect review exposes entity-15 semantic conflict
+
+Merged architect review `6da1499e8e` as `1c31209`. The requested removal of the
+zero-treasury gate was tested, but full acceptance then produced four failures:
+entity-15 raised `$200` from a `$100` treasury where the existing scenario
+requires no loan; the same automatic-financing change also prevented the
+established entity-66 dividend journal/log/report scenarios. Restoring the gate
+returns the verified 591/591 baseline and leaves entity-30's explicit-commitment
+fix green. Sent the contradiction to architect for a decision on whether
+entity-15/dividend criteria or automatic nonzero-treasury commitment semantics
+should change.
+
 ## 2026-08-12 — specifier: add entity-30 spec per architect directive, route to coder
 
 Responding to architect directive (c20c7e9eba / review loop greedo-entity-build-
