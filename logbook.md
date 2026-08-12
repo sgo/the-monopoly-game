@@ -32898,3 +32898,13 @@ so real ownership-consolidating actions never block formation. Coder must track
 trades/buyouts, bankruptcy transfers, and individual development across each
 completed round and pass the derived quiet-round result to the real
 round-boundary formation path. The harness must exercise that derived path.
+
+Delivered as handoff 000255:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 6256b39217
+```
