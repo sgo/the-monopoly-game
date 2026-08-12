@@ -201,7 +201,7 @@ public class Game {
   }
 
   private void journalOperation(LegalEntity entity, Journalling journalling) {
-    switch (entity.operate(deeds)) {
+    switch (entity.operate(deeds, strategies, rules)) {
       case LegalEntity.Operation.LoanRepaid it ->
           journalling.entityLoanRepaid(entity, it.shareholder(), it.principal(), it.repayment());
       case LegalEntity.Operation.HouseBuilt ignored -> { }
