@@ -33030,3 +33030,58 @@ still bypasses automatic detection entirely via
 `GameTest` integration scenario for this given the session's own precedent
 on reproduction fidelity; this needs either new Gherkin coverage or a
 harness change, both outside refactorer scope.
+
+## 2026-08-12T22:44:20Z — refactorer receives harness-exercises-real-path fix for review
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 4901105201
+```
+
+Action: merged `4901105201` (clean, no conflict). This adds
+`Game.configureMarketDeadlockRound(quietRound, collectiveFunding)`, an
+override pair consumed and cleared by the next automatic round-boundary
+check, and reorders the `entity-m7`/`entity-m8` scenarios so "the round
+completes with <action> ownership-consolidating action" runs *before* "we
+play up to 1 round" instead of after (every other m-scenario keeps the
+original order). `World` no longer calls `disableAutomaticMarketDeadlock()`.
+
+My first read of this looked like a bug: `World.playAndCapture` configures
+the override from `pendingMarketDeadlockAction`, which is only ever
+populated by `completeMarketDeadlockRound` when `lastGame` is still null —
+i.e., only when that step runs *before* game construction. Reading the
+Gherkin scenarios in file order made it look like the "round completes" step
+always comes after "we play up to 1 round" for every m-scenario, which would
+make the override always resolve to a stale default. I verified this
+properly rather than trust that read: added temporary instrumentation
+(`System.err` prints in `Game.resolveMarketDeadlockAtRoundBoundary`,
+`configureMarketDeadlockRound`, `World.completeMarketDeadlockRound`, and
+`AcceptanceRuntime.run`, all fully removed afterward) and traced the actual
+execution order per scenario. `entity-m7` and `entity-m8` deliberately place
+"the round completes..." *first* specifically so the override is populated
+before construction; the other seven scenarios keep it after, relying on
+the override's null-default (quiet=true, funding=true) since their intended
+outcome is the quiet/funded case anyway. Confirmed correct, not a bug.
+
+Net effect, more precisely stated than my last two logbook entries: the
+formation/gating call path — `resolveMarketDeadlockAtRoundBoundary`,
+`canFormAtMarketDeadlock`, `fundableEntityAtMarketDeadlock`,
+`canFundNextImprovement` — is now genuinely exercised through the real
+automatic round-boundary call in all nine scenarios, closing that part of
+the architect's directive. The four *detectors* that compute
+`roundHadConsolidatingAction` in real play (`completeTrade`, `applyBuyout`,
+the bankruptcy journal scan, the `totalDevelopments` delta) are still never
+exercised by anything: the override always wins over real detection
+whenever `marketDeadlockScenario` is true, which it is for every
+market-deadlock scenario. This is a narrower, more accurate version of the
+gap I flagged last cycle, not a new one.
+
+Cleanup: fixed an indentation slip in the new `completeRound` block (8
+spaces instead of 6) and simplified `funding == null ? true : funding` to
+`funding == null || funding`. CRAP, DRY, mutation-scan (96 sites — still
+under the split threshold, but this file is close enough now that the next
+addition should get a hard look) all clean. Domain 365/365, property tests
+green, full acceptance 597/597 run twice.
