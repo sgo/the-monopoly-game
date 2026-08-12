@@ -31928,3 +31928,6 @@ produces the specified $200 loan and three total houses from a $100 treasury.
 
 Verification: full acceptance 591/591 passed; domain tests 365/365 passed;
 `git diff --check` passed.
+
+Sent normal git handoff `20260812T152347Z_000148_from_coder_to_refactorer` for
+review at commit `2ef40822f2`.
