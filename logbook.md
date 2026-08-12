@@ -32383,3 +32383,40 @@ priority: 00
 task: greedo-entity-build-economy
 commit: 7a73a356f0
 ```
+
+## 2026-08-12 — specifier: decide entity-development reserve policy (architect 000247)
+
+Architect escalated policy decision (33e570ff2d): real 8-player games never
+build/raise loans because entity contributions are gated by each shareholder's
+INDIVIDUAL dynamic reserve (Greedo.cashReserve(player,rules,deeds) includes the
+near-complete-monopoly and station reserve bumps). Acceptance uses contrived
+zero-reserve shareholders, so it passes without representing the real failure.
+
+User decision: BASE_RESERVE. An entity build-loan contribution is evaluated
+against the shareholder's NOMINAL base reserve only, not the monopoly/station
+bump. The unanimous all-shareholder + no-free-rider guarantee is unchanged.
+
+Implication: a shareholder who owns a near-complete monopoly (large dynamic
+reserve) but a moderate base reserve STILL lets the entity raise a build loan
+and build, because the entity offer uses the base reserve.
+
+Required new coverage: a scenario using NON-artificial shareholder reserves
+- e.g. a shareholder holding a near-monopoly (high dynamic reserve) with a
+  moderate base reserve -- proving the entity still auto-solicits, raises a loan,
+  and builds. This models the real-game failure condition.
+
+## 2026-08-12T20:17:27Z — architect: received entity base-reserve policy
+
+Received priority-00 git_handoff 000172 from specifier (task
+`greedo-entity-build-economy`, commit `ca04f172f0`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process specifier ca04f172f0
+
+Action: merged the decision. Entity build contributions must use the
+shareholder's nominal Greedo base reserve, excluding dynamic individual
+monopoly/station reserve bumps, while preserving unanimous consent and the
+no-free-rider check. The separate user-directed dividend-policy correction
+(handoff 000248) remains outstanding with the specifier; no partial coder
+handoff is issued until that criterion loop returns.
