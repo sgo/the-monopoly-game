@@ -32540,3 +32540,5 @@ use the specified nominal base reserve for entity build offers.
 
 Applied the correction by passing `Strategy.cashReserve()` to entity build
 offers. Domain tests pass (365/365) and acceptance passes (593/593).
+
+Sent verified commit `aba15eb0ca` to refactorer as handoff `000153`.
