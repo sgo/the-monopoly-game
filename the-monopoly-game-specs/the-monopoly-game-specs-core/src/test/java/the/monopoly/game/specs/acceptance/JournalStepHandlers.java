@@ -160,7 +160,7 @@ final class JournalStepHandlers {
             (world, arguments) -> assertThat(world.totalHouses(Street.Colour.pink))
                 .isEqualTo(arguments.number(1))),
 
-        then("^Pink Realty raises no more than \\$(-?[0-9,]+) in loans$",
+        then("^Pink Realty raises no more than \\$" + VALUE + " in loans$",
             (world, arguments) -> assertThat(world.gameLog().stream()
                 .filter(Entry.LegalEntityLoanRaised.class::isInstance)
                 .map(Entry.LegalEntityLoanRaised.class::cast)

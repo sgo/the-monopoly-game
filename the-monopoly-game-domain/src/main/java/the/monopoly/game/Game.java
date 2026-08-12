@@ -166,6 +166,16 @@ public class Game {
       for (Player player : turnOrder) {
         if (playTurn(player, builder, turnOrder, journal, journalling, building)) return;
       }
+      operateLegalEntities(journalling);
+      if (remainingPlayers().size() <= 1) return;
+      if (Stalemate.reached(rules, players, deeds)) {
+        journal.log(new Journal.Entry.Stalemate());
+        remainingPlayers().forEach(it -> {
+          journal.log(new Journal.Entry.FinalBalance(it.id(), it.account().balance().amount()));
+          journal.log(new Journal.Entry.FinalAge(it.id(), journalling.age(it)));
+        });
+        return;
+      }
     } while (untilComplete && keepPlaying.getAsBoolean() && remainingPlayers().size() > 1);
   }
 
@@ -175,7 +185,6 @@ public class Game {
     resolveLegalEntityAtStart(player, journalling);
     resolveSplitOwnershipAtStart(player, turnOrder, journalling);
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
-    operateLegalEntities(journalling);
     if (isBuilderStillSolvent(player, builder)) building.develop(player);
     if (remainingPlayers().size() <= 1) return true;
     if (!Stalemate.reached(rules, players, deeds)) return false;
@@ -188,15 +197,12 @@ public class Game {
   }
 
   private boolean operateLegalEntities(Journalling journalling) {
-    boolean operated = deeds.legalEntities().stream()
-        .filter(LegalEntity::hasShareholders)
-        .anyMatch(entity -> !entity.operated());
     deeds.legalEntities().forEach(entity -> operateEntity(entity, journalling));
-    return operated;
+    return true;
   }
 
   private void operateEntity(LegalEntity entity, Journalling journalling) {
-    if (!entity.hasShareholders() || doneOperatingForNow(entity)) return;
+    if (!entity.hasShareholders()) return;
     journalOperation(entity, journalling);
   }
 
@@ -209,10 +215,6 @@ public class Game {
       case LegalEntity.Operation.DividendPaid it -> journalling.entityDividendPaid(entity, it.amount());
       case LegalEntity.Operation.NoAction ignored -> { }
     }
-  }
-
-  private boolean doneOperatingForNow(LegalEntity entity) {
-    return entity.operated() && !entity.receivedRent();
   }
 
   private boolean isBuilderStillSolvent(Player player, Player builder) {

@@ -31511,3 +31511,23 @@ flag. Thus the current per-player `operateLegalEntities` call and its
 `receivedRent()` bypass do not implement once-per-round semantics. Entity
 formation/shareholder changes take effect at the next operation boundary;
 zero-shareholder entities are skipped.
+
+## 2026-08-12T13:25:00Z — architect follow-up requested
+
+Sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Round-boundary merge done; acceptance still shows entity-25/27 loan guards and entity-30/31 timing failures.
+```
+
+The round-boundary implementation passes domain tests (359/359), but focused
+acceptance still reports loan suppression and one-round repayment/dividend
+criteria that need architectural/specification resolution.
+
+Follow-up verification: restoring terminal-turn checks reduced acceptance to
+six failures, all in legal-entity/share-sale scenarios. The domain suite remains
+green (359/359); acceptance failures are the loan commitment guard, one-round
+repayment/dividend expectations, and two share-sale balance expectations.
