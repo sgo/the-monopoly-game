@@ -32896,6 +32896,9 @@ The m7/m8 scenario conditions are now supplied before the round, allowing the
 real `Game` boundary trigger to evaluate quiet-round and collective-funding
 state. Full acceptance passes 597/597 and domain tests pass 365/365.
 
+Queued priority-00 handoff `000159` to refactorer at commit `4901105201` for
+review of the exercised production path.
+
 ## 2026-08-13T00:40:32Z — architect: routes derived-path acceptance coverage
 
 Received priority-00 git_handoff 000137 from refactorer (task
@@ -33086,6 +33089,29 @@ under the split threshold, but this file is close enough now that the next
 addition should get a hard look) all clean. Domain 365/365, property tests
 green, full acceptance 597/597 run twice.
 
+## 2026-08-12T22:58:44Z — refactorer returns harness-exercises-real-path fix to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: ab0fdfcf32
+```
+
+Priority 00, architect review loop. Summary: verified the new override
+mechanism is correct (not the timing bug it initially looked like — traced
+with temporary instrumentation, fully removed). The formation/gating call
+path now genuinely runs through the real automatic round-boundary check for
+all nine scenarios. Refined finding for the architect: the four detectors
+that compute `roundHadConsolidatingAction` from real play are still never
+exercised, since the override always wins when a scenario configures one —
+narrower than my prior two entries stated, not a new gap. Minor structural
+cleanup (indentation, one ternary). Domain 365/365, property tests green,
+acceptance 597/597 run twice.
+
 ## 2026-08-13T00:58:49Z — architect: rejects override-based detector coverage
 
 Received priority-00 git_handoff 000138 from refactorer (task
@@ -33103,12 +33129,54 @@ not configure a market-deadlock override and demonstrates a real consolidating
 action prevents formation; remove test-only override machinery if it becomes
 unnecessary.
 
-Delivered as handoff 000257:
+## 2026-08-13T01:03:35Z — coder: remove market-deadlock scenario overrides
+
+Processed architect handoff 000257 (`317b28eb4c`). Removed the test-only quiet
+round and funding overrides from `Game` and stopped acceptance `World` from
+injecting them. Market-deadlock formation now uses the production quiet-round
+detector and `LegalEntity.canFundNextImprovement`; the cannot-fund fixture
+arranges zero balances instead. Replaced m7's synthetic action marker with a
+real scripted house build by high hat on its orange monopoly, exercising the
+development detector.
+
+Verification: domain 365/365 and full acceptance 597/597.
+
+## 2026-08-13T01:04:52Z — refactorer receives detector-exercising fix for review
+
+Received coder priority-00 handoff:
 
 ```
-type: git_handoff
-to: coder
-priority: 00
-task: greedo-market-deadlock-trigger
-commit: 317b28eb4c
+Re-read your role and constitution.
+
+merge_and_process coder bec60e1547
 ```
+
+Action: merged `bec60e1547` (clean, no conflict). This is a genuinely clean
+resolution of the gap I refined last cycle: `marketDeadlockQuietOverride`/
+`marketDeadlockFundingOverride`/`configureMarketDeadlockRound`/
+`disableAutomaticMarketDeadlock` are all removed from `Game` entirely — no
+override machinery left to shadow real detection. `completeRound`'s
+automatic call now unconditionally uses `!roundHadConsolidatingAction` and
+the real per-entity funding check. `World`'s market-deadlock helper methods
+lost their bookkeeping fields and now either do nothing beyond the existing
+`letTheOthersRollWhatTheyLike()` or arrange real state:
+`marketDeadlockCannotFund` zeroes every shareholder's balance instead of
+setting a synthetic flag. `entity-m7`'s Given steps replaced the "round
+completes with a ownership-consolidating action" marker with a real `pawn
+"high hat" will build a house on "Lippenslaan Knokke"` step — an actual
+individual-development event on an unrelated (orange) group, reusing the
+existing `pawnWillBuildHouseOn` step handler rather than inventing new
+test-only machinery, so it's the real `developAndTrackConsolidation`
+detector that blocks formation, not a stand-in.
+
+Minor, not fixed: `entity-m6`/`m8`/`m9` still carry "the round completes
+with <action> ownership-consolidating action" as a step; with the override
+removed, `completeMarketDeadlockRound` no longer does anything but the
+already-redundant `letTheOthersRollWhatTheyLike()`. The step name now
+overstates what it does. This is Gherkin scenario content, not pipeline or
+manifest housekeeping, so it's the specifier's call, not mine — noting it
+for whoever picks up the next pass rather than editing the feature file.
+
+CRAP dropped further (mutation-scan 93, down from 96, from the removed
+override plumbing); DRY clean; nothing else to update. Domain 365/365,
+property tests green, full acceptance 597/597 run twice.
