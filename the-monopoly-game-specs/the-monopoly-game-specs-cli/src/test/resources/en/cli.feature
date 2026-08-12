@@ -1,5 +1,6 @@
+# mutation-stamp: sha256=a322713093ca2eff5cc5cbc8ee6551ac80f5f52f56361a41c5894c38636b3784
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-11T19:04:08.825027Z","feature_name":"Monopoly command line interface","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-cli/src/test/resources/en/cli.feature","background_hash":"74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b","implementation_hash":"unknown","scenarios":[{"index":4,"name":"the CLI wires the legal-entity flag the Greedo strategies observe","scenario_hash":"fa7b2d00bbcfa77407f79402e4cc256d8b3aed4397c2f84e916bdbba6824a51e","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-11T19:04:08.825027Z"},{"index":2,"name":"the CLI rejects a player count outside the official range","scenario_hash":"8220cf97c61e66a72d6f7c66614fea3b6320a646e80c5ab1d72317d4a02edc75","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-07-29T13:45:46.154201Z"}]}
+# {"version":1,"tested_at":"2026-08-11T19:06:08.990862Z","feature_name":"Monopoly command line interface","feature_path":"/Users/sgo/sgo/the-monopoly-game/the-monopoly-game-specs/the-monopoly-game-specs-cli/src/test/resources/en/cli.feature","background_hash":"74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b","implementation_hash":"unknown","scenarios":[{"index":0,"name":"the CLI runs a real game with the default strategy until it is stopped","scenario_hash":"5b28837a4e52b84c786116cc54ab039f349d2fe3cd4f17fdf7c571bcd6847383","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-11T19:06:08.990862Z"},{"index":1,"name":"the CLI runs a real game with selected player strategies until it is stopped","scenario_hash":"b0b35ff6007acfa4af43bf0de59ff74d74f86edf76adc20f7930dc7dbe4bbd35","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-11T19:06:08.990862Z"},{"index":2,"name":"the CLI rejects a player count outside the official range","scenario_hash":"8220cf97c61e66a72d6f7c66614fea3b6320a646e80c5ab1d72317d4a02edc75","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-11T19:06:08.990862Z"},{"index":3,"name":"the CLI plays with real dice without a turn limit or synthetic winner","scenario_hash":"c9847c447f060f7f33635524f4290e883fcf13f64c1884d82ece34f336f98de8","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-11T19:06:08.990862Z"},{"index":4,"name":"the CLI wires the legal-entity flag the Greedo strategies observe","scenario_hash":"fa7b2d00bbcfa77407f79402e4cc256d8b3aed4397c2f84e916bdbba6824a51e","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-11T19:06:08.990862Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -11,14 +12,14 @@ Feature: Monopoly command line interface
     Given the simulator is configured for <players> players without strategy choices
     When I start the simulator
     Then the game log records that the game starts
-    And the game log records at least <minimum rolls> rolls
+    And the game log records at least 10 rolls
     When I stop the simulator before the game ends
     Then the simulator process ends
     And the game log records no winner
 
     Examples:
-      | players | minimum rolls |
-      | 2       | 10             |
+      | players |
+      | 2       |
 
   # cli-2
   Scenario Outline: the CLI runs a real game with selected player strategies until it is stopped
@@ -26,14 +27,14 @@ Feature: Monopoly command line interface
     And every player selects the "Greedo" strategy
     When I start the simulator
     Then the game log records that the game starts
-    And the game log records at least <minimum rolls> rolls
+    And the game log records at least 50 rolls
     When I stop the simulator before the game ends
     Then the simulator process ends
     And the game log records no winner
 
     Examples:
-      | players | minimum rolls |
-      | 8       | 50             |
+      | players |
+      | 8       |
 
   # cli-3
   Scenario Outline: the CLI rejects a player count outside the official range
@@ -76,16 +77,16 @@ Feature: Monopoly command line interface
   Scenario Outline: the CLI plays with real dice without a turn limit or synthetic winner
     Given the simulator is configured for <players> players without strategy choices
     When I start the simulator
-    Then the game log records at least <minimum rolls> rolls of a total between 2 and 12
+    Then the game log records at least 10 rolls of a total between 2 and 12
     And the game log records at least two different roll totals
     And the game log records no winner
-    And the simulator is still playing when the game log has recorded <minimum rolls> rolls
+    And the simulator is still playing when the game log has recorded 10 rolls
     When I stop the simulator before the game ends
     Then the simulator process ends
 
     Examples:
-      | players | minimum rolls |
-      | 2       | 10             |
+      | players |
+      | 2       |
 
   # cli-6
   Scenario Outline: the CLI wires the legal-entity flag the Greedo strategies observe

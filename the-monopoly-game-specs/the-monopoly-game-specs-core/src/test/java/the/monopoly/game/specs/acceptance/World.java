@@ -604,7 +604,7 @@ public class World {
   }
 
   public void pawnFollowsGreedoWithReserve(String pawnName, Money reserve) {
-    pawnStrategies.put(pawnName, new the.monopoly.game.strategies.Greedo(reserve));
+    pawnStrategies.put(pawnName, new the.monopoly.game.strategies.Greedo(reserve, false, legalEntityTrading));
   }
 
   public void enableStalemateTrading(String strategyName) {
@@ -636,6 +636,9 @@ public class World {
   }
 
   public void formNamedEntity(String name) {
+    legalEntityTrading = true;
+    players().forEach(player -> pawnStrategies.put(player.id().value(),
+        new the.monopoly.game.strategies.Greedo(Money.ZERO, false, true)));
     othersRollWhatTheyLike = true;
     for (int index = 0; index < players().size(); index++) {
       Player player = players().get(index);
