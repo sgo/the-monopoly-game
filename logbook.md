@@ -31365,6 +31365,8 @@ commit: 677c50f0a3
 Action: sent the verified CLI flag wiring and startup strategy-observation
 journal changes for refactorer review.
 
+Correction: the first local send attempt used an invalid abbreviated commit;
+the actual handoff commit is `954ff4902d`.
 ## 2026-08-11T20:20:00+02:00 — refactorer reviews CLI Greedo flag wiring (954ff4902d)
 
 Merged `954ff4902d`. Real, high-value bug found via playtesting (27 x
@@ -31488,3 +31490,155 @@ rent-funded builds, and loan-funded builds. Root observability gap: Rent.java
 entity path never fires events, Game.java:207 ignores HouseBuilt, no
 LegalEntityRentPaid/entity-build Entry types. Delivered to coder via outbox root
 (id 000002).
+## 2026-08-12T12:45:00Z — clarification requested from architect
+
+Sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Clarify entity-30/31 timing: one-round scenarios expect repayment/dividend after build loan, but current entity operates once with treasury consumed by construction.
+```
+
+The coder implementation wires Greedo's legal-entity build-loan decision and
+passes the domain suite, but entity-30/31 acceptance criteria conflict with the
+current once-per-round entity operating semantics.
+
+Correction: the initial note exceeded the handoff message limit; the concise
+message above is the one being sent.
+
+## 2026-08-12T11:19:01Z — architect clarifies entity-30/31 operation timing
+
+Received coder priority-00 note:
+
+```
+Re-read your role and constitution.
+
+Clarify entity-30/31 timing versus the once-per-round entity operation.
+```
+
+Action: clarified the architectural invariant. An entity operation occurs once
+per completed game round, after every eligible player has taken that round's
+turn, and exactly once for each eligible entity. Rent, capitalization, or any
+other event during that round may change the operation's inputs but must not
+trigger another operation in the same round. The round boundary belongs in
+`Game`'s turn-loop coordination, not in a permanent per-entity `operated`
+flag. Thus the current per-player `operateLegalEntities` call and its
+`receivedRent()` bypass do not implement once-per-round semantics. Entity
+formation/shareholder changes take effect at the next operation boundary;
+zero-shareholder entities are skipped.
+
+## 2026-08-12T13:25:00Z — architect follow-up requested
+
+Sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Round-boundary merge done; acceptance still shows entity-25/27 loan guards and entity-30/31 timing failures.
+```
+
+The round-boundary implementation passes domain tests (359/359), but focused
+acceptance still reports loan suppression and one-round repayment/dividend
+criteria that need architectural/specification resolution.
+
+Follow-up verification: restoring terminal-turn checks reduced acceptance to
+six failures, all in legal-entity/share-sale scenarios. The domain suite remains
+green (359/359); acceptance failures are the loan commitment guard, one-round
+repayment/dividend expectations, and two share-sale balance expectations.
+
+Sent follow-up handoff `20260812T113455Z_000145_from_coder_to_architect` with
+the concise verification result above.
+## 2026-08-12T11:20:17Z — architect sends entity-operation timing clarification
+
+Sent priority-00 git handoff to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: 210f0cebaf
+```
+
+The implementation direction is a `Game` round-boundary operation phase,
+without rent-triggered repeat operations and without relying on the permanent
+entity `operated` flag as the round clock.
+
+## 2026-08-12T11:34:55Z — architect directs round-boundary failure triage
+
+Received coder priority-00 note:
+
+```
+Re-read your role and constitution.
+
+Round-boundary merge done; six entity/share-sale acceptance failures remain.
+```
+
+Action: directed coder not to restore per-player operation to satisfy the
+failures. The invariant remains one operation per eligible entity after the
+full player round. Coder must classify every failure: a mismatch with that
+invariant is a production defect for coder; an assertion that encoded the old
+per-turn timing is a Gherkin acceptance-criteria change for specifier. Return
+the concrete failing scenario names, actual/expected values, and the round
+boundary implementation commit through a normal git handoff for review.
+
+Coder classification after verification:
+
+- entity-17 (`an entity with nothing to build...`): expected no action; actual
+  `LegalEntityLoanRaised($300)` at the completed-round operation boundary.
+- entity-26 (`...shareholder is in distress`): expected no loan; actual loan
+  `$300`. The distressed shareholder's share is resolved before the boundary,
+  so the remaining shareholders pass the automatic Greedo commitment policy.
+- entity-30: expected a loan and same-round repayment; no repayment is possible
+  after the single operation has already raised the loan.
+- entity-31: expected same-round dividend; no dividend is possible after the
+  single operation has already built/raised the loan.
+- share-sale-8, both examples: expected high-hat balance `$995`; actual
+  `-$505`, because the post-round entity operation charges the new shareholder
+  their build-loan share.
+
+These six failures are acceptance/specification consequences of the new
+automatic commitment and once-per-round semantics; no per-player operation
+was restored. Domain tests remain 359/359; implementation commit is `1614d0a`.
+
+## 2026-08-12T11:35:48Z — architect sends round-boundary triage direction
+
+Sent priority-00 git handoff to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: cfcada1e68
+```
+
+The coder is to preserve once-per-round semantics, separate implementation
+failures from superseded Gherkin timing expectations, and return the concrete
+failure evidence in the next normal handoff.
+
+## 2026-08-12T11:52:37Z — architect receives round-boundary implementation
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 234da6408c
+```
+
+Action: merged `234da6408c`, resolving a logbook-only conflict by retaining
+both histories. The round-loop owns a single entity-operation phase after all
+players take their turns; individual turns no longer operate entities and the
+former rent bypass is removed. This implements the once-per-round boundary.
+
+The six acceptance failures are Gherkin timing mismatches, not implementation
+defects: entity-17 expects an old pre-operation idle state; entity-26's debt is
+settled before the operation boundary; entity-30 and entity-31 require a
+settlement operation in the following round; and both share-sale-8 examples
+assert balances before the new shareholder's end-of-round entity-build
+commitment. Returning these criteria decisions to specifier; no per-turn
+operation will be reintroduced.

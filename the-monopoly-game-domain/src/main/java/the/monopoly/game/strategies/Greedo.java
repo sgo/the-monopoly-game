@@ -55,6 +55,14 @@ public final class Greedo implements Strategy {
   }
 
   @Override
+  public boolean commitToEntityBuild(EntityBuildOffer offer) {
+    return legalEntityTrading
+        && offer.available().amount() >= 0
+        && offer.available().covers(offer.share())
+        && offer.available().minus(offer.share()).covers(offer.reserve());
+  }
+
+  @Override
   public boolean accepts(TradeOffer offer, Rule.Set rules, Deeds deeds) {
     if (deeds.ownerOf(offer.offered().type()).filter(offer.trader().id()::equals).isEmpty()) return false;
     if (deeds.ownerOf(offer.wanted().type()).filter(offer.partner().id()::equals).isEmpty()) return false;
