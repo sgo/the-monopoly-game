@@ -32459,7 +32459,6 @@ construction cost it falls through to `repayLoanOrPayDividend`, which distribute
 any treasury of at least $150. That contradicts the user direction and can drain
 rent before it reaches the next construction cost. Routed to specifier for an
 acceptance-criterion correction before implementation.
-<<<<<<< HEAD
 
 ## 2026-08-12 — specifier: reconcile entity-32 vs auto-solicit policy (architect 000250)
 
