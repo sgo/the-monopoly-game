@@ -109,6 +109,7 @@ public class World {
   private String marketDeadlockGroup;
   private boolean marketDeadlockScenario;
   private Game lastGame;
+  private String pendingMarketDeadlockAction;
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
@@ -420,7 +421,9 @@ public class World {
         legalEntityTrading
     );
     lastGame = game;
-    if (marketDeadlockScenario) game.disableAutomaticMarketDeadlock();
+    if (marketDeadlockScenario) {
+      game.configureMarketDeadlockRound(!"a".equals(pendingMarketDeadlockAction), marketDeadlockFunding);
+    }
     Game.Result result = play.apply(game);
     turnOrder = result.turnOrder();
     journal = result.journal();
@@ -1133,6 +1136,12 @@ public class World {
     letTheOthersRollWhatTheyLike();
   }
 
+  public void marketDeadlockCannotFund(String group) {
+    marketDeadlockScenario = true;
+    marketDeadlockFunding = false;
+    letTheOthersRollWhatTheyLike();
+  }
+
   public void marketDeadlockEligible(String group) {
     marketDeadlockScenario = true;
     marketDeadlockEligible = true;
@@ -1142,8 +1151,11 @@ public class World {
 
   public void completeMarketDeadlockRound(String action) {
     letTheOthersRollWhatTheyLike();
-    if (lastGame != null) lastGame.resolveMarketDeadlockAtRoundBoundary(
-        "no".equals(action), marketDeadlockFunding);
+    if (lastGame == null) {
+      pendingMarketDeadlockAction = action;
+      return;
+    }
+    lastGame.resolveMarketDeadlockAtRoundBoundary("no".equals(action), marketDeadlockFunding);
   }
 
   private Roll nextQueuedPawnRoll(Player player) {

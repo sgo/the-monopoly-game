@@ -139,8 +139,8 @@ Feature: Greedo legal entity for a three-way colour-group split
     And every other ownable space is owned by pawn "high hat"
     And the <group> split is an eligible three-owner split
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
-    When we play up to 1 round
     And the round completes with <action> ownership-consolidating action
+    When we play up to 1 round
     Then the <group> colour group is not owned by a legal entity
 
     Examples:

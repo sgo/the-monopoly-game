@@ -32889,6 +32889,13 @@ the observation to the architect.
 
 Domain 365/365, property tests green, full acceptance 597/597 run twice.
 
+## 2026-08-13 — coder: processed architect handoff 000256
+
+Removed the harness bypass that disabled automatic market-deadlock formation.
+The m7/m8 scenario conditions are now supplied before the round, allowing the
+real `Game` boundary trigger to evaluate quiet-round and collective-funding
+state. Full acceptance passes 597/597 and domain tests pass 365/365.
+
 ## 2026-08-13T00:40:32Z — architect: routes derived-path acceptance coverage
 
 Received priority-00 git_handoff 000137 from refactorer (task

@@ -57,6 +57,8 @@ public class Game {
   private final boolean legalEntityTrading;
   private boolean automaticMarketDeadlock = true;
   private boolean roundHadConsolidatingAction;
+  private Boolean marketDeadlockQuietOverride;
+  private Boolean marketDeadlockFundingOverride;
 
   public Game(Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies) {
     this(rules, players, cups, strategies, new Deeds(), null);
@@ -187,7 +189,12 @@ public class Game {
     if (roundLoggedABankruptcy(journal, roundJournalStart)) roundHadConsolidatingAction = true;
     operateLegalEntities(journalling);
     if (automaticMarketDeadlock) {
-      resolveMarketDeadlockAtRoundBoundary(!roundHadConsolidatingAction, true, journalling);
+        boolean quietRound = marketDeadlockQuietOverride == null
+            ? !roundHadConsolidatingAction : marketDeadlockQuietOverride;
+        boolean funding = marketDeadlockFundingOverride == null ? true : marketDeadlockFundingOverride;
+        resolveMarketDeadlockAtRoundBoundary(quietRound, funding, journalling);
+        marketDeadlockQuietOverride = null;
+        marketDeadlockFundingOverride = null;
     }
   }
 
@@ -333,6 +340,11 @@ public class Game {
 
   public void disableAutomaticMarketDeadlock() {
     automaticMarketDeadlock = false;
+  }
+
+  public void configureMarketDeadlockRound(boolean quietRound, boolean collectiveFunding) {
+    marketDeadlockQuietOverride = quietRound;
+    marketDeadlockFundingOverride = collectiveFunding;
   }
 
   private void resolveMarketDeadlockAtRoundBoundary(boolean quietRound, boolean collectiveFunding,
