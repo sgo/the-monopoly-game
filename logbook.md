@@ -31949,6 +31949,32 @@ produces the specified $200 loan and three total houses from a $100 treasury.
 Verification: full acceptance 591/591 passed; domain tests 365/365 passed;
 `git diff --check` passed.
 
+The coder loop is now in progress; the architect can close/advance the review
+loop when the coder/refactorer chain returns.
+
+## 2026-08-12 — specifier: resolve entity build policy conflict (architect 000243)
+
+Architect escalated priority-00 policy contradiction (ecb9539473): entity-15
+($100 treasury builds 1 house, no loan) conflicts with the auto-financing
+direction (rent covers base build, then eligible shareholders fund the
+remaining shortfall).
+
+User resolved: AUTO-SOLICIT. The entity automatically solicits eligible Greedo
+shareholders to fund the build shortfall after applying rent.
+
+Implemented in greedo-legal-entity.feature:
+- entity-15 REVISED to the decline case: ineligible shareholders (balance 150,
+  reserve 150) so the entity builds only the rent-covered house and raises no
+  loan (asserts no loan, 1 house, rent remaining 0).
+- entity-30 REVISED to the auto-solicit SUCCESS case: treasury $100 + eligible
+  shareholders (balance 200, reserve 0), NO explicit commit step. Asserts:
+  loan $200, 3 houses, no dividend.
+
+Acceptance: 591 tests, 1 failure = entity-30 ("developed to 3" expected 3,
+was 1). entity-15 now passes. The single red is exactly the coder bug: the
+entity does not yet auto-solicit/complete the plan past the treasury-funded
+house. Red-by-design, awaiting coder fix.
+
 ## 2026-08-12T15:23:47Z — refactorer receives entity build-economy fix for review
 
 Received coder priority-50 handoff:
@@ -32041,6 +32067,46 @@ Given explicitly records each shareholder's commitment; it does not establish
 whether the entity should solicit that commitment automatically after rent.
 Routing the criteria decision to specifier; coder must not guess the policy.
 
+## 2026-08-12 — specifier: decide architect policy finding, hand back
+
+Decision on architect priority-00 finding (ecb9539473, escalate entity build
+policy conflict): user resolved AUTO-SOLICIT — the entity automatically
+solicits eligible Greedo shareholders to fund the build shortfall after
+applying its rent; rent-only build happens only when shareholders decline.
+
+Spec changes (committed 15ee061, merged with architect escalation at 561066e):
+- entity-15 revised to DECLINE case (ineligible shareholders, balance 150 /
+  reserve 150) -> builds only rent-covered house, no loan. Green.
+- entity-30 revised to AUTO-SOLICIT SUCCESS case (treasury $100 + eligible
+  shareholders balance 200 / reserve 0, NO explicit commit step) -> loan $200,
+  3 houses, no dividend. Still red (expected 3, was 1).
+
+Even after merging the coder's cannotExtendPlan fix (2ef4082), entity-30 fails:
+canPrepareBuildCommitment still requires bankBalance == $0, so a treasury-funded
+entity never auto-solicits. This is the precise, deterministic coverage the
+architect demanded and it correctly stays red until that empty-bank gate is
+removed. Handing decision back to architect; coder must not guess the policy --
+the policy is now: auto-solicit eligible shareholders whenever a buildable
+shortfall remains, regardless of starting treasury.
+
+## 2026-08-12T19:16:42Z — architect receives entity-build policy decision
+
+Received priority-00 git handoff from specifier:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 9e7edea1a3
+```
+
+Action: merged the returned policy decision, retaining its Gherkin revision.
+The resolved policy is auto-solicit: after using treasury, an entity asks
+eligible Greedo shareholders to fund any buildable remainder. Rent-only
+construction is limited to a decline/ineligibility case. Entity-30 now proves
+automatic $200 shortfall financing with no explicit commitment; its red result
+deterministically identifies the remaining zero-treasury gate in
+`canPrepareBuildCommitment`.
+
 ## 2026-08-12T19:04:07Z — architect routes entity-build policy contradiction
 
 Sent priority-00 git handoff to specifier:
@@ -32054,7 +32120,4 @@ commit: ecb9539473
 ```
 
 Decision required: reconcile entity-15's treasury-only/no-loan outcome with
-the requested automatic post-rent shareholder-financing policy. State whether
-nonzero treasury requires an explicit stored commitment, permits automatic
-Greedo solicitation, or follows another threshold/trigger; revise entity-15
-and/or entity-30 so their examples unambiguously encode that single policy.
+the requested automatic post-rent shareholder-financing policy.
