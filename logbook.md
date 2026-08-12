@@ -32680,3 +32680,12 @@ Sent note `000155` to architect: the queued specifier task was stale because
 `fcecc76c8c` is already merged; domain tests are green, while acceptance still
 has five legacy legal-entity failures. Requested direction on whether coder
 should repair those failures.
+
+## 2026-08-13 — coder: repaired all-or-nothing entity borrowing
+
+Corrected `LegalEntityBuilding` so a failed shareholder commitment blocks the
+loan instead of borrowing unconditionally. Also changed automatic solicitation
+to request only the next standard build shortfall; explicit full-build
+commitments remain available for hotel scenarios. Domain tests pass 365/365.
+Acceptance failures reduced from five to four; remaining failures are isolated
+to legal-entity rent/setup and two build-loan scenario expectations.
