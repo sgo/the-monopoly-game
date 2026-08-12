@@ -31852,3 +31852,30 @@ scenarios now each have a mutation entry and all are killed).
 
 Verified: acceptance pipeline BUILD SUCCESS, 590 tests, 0 failures (previously
 9). All timing reworks + narration are green.
+
+## 2026-08-12 — specifier: entity build-economy finding routed to architect
+
+Finding (asked user, user approved: "yes ask the architect to evaluate this and
+perhaps run his own games to confirm and give suggestions").
+
+Empirical (3 x 8p CLI runs, LE + stalemate trading on): entities form + pay
+dividends (2000+/game) but raise 0 loans, build 0 houses, collect 0 rent.
+Tracing the code:
+
+- Shareholders paying rent into the entity does NOT block construction: rent
+  goes to the treasury and is reinvested by buildAsMuchAsAffordable before any
+  dividend.
+- Real cause: canPrepareBuildCommitment (LegalEntityBuilding.java:26) only fires
+  when bankBalance == $0. Once non-loan cash (e.g. rent) pushes the bank above
+  $0, the entity stops attempting a build-loan commitment. At bank >= 150,
+  repayLoanOrPayDividend pays a DIVIDEND instead of building, even while streets
+  are undeveloped. So moderate rent is diverted to dividends, not construction.
+- prepareBuildCommitment tries maximumHotelCost then falls back to
+  standardBuildCost (1 house/street), but allAgreeToBuild (ALL-OR-NOTHING,
+  reserve-gated per confirmed policy) can fail both when a shareholder's reserve
+  exceeds balance.
+
+This is a spec-relevant economic finding (not a redundant toggle). Routed to
+architect for evaluation, independent runs, and suggestions.
+
+Action: see handoff <NEXT>.
