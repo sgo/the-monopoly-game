@@ -32779,3 +32779,18 @@ commit `7fea0b421a` (shared Background fixtures leaking into unrelated entity
 scenarios); it verified 597/597 acceptance tests. This note is obsolete. The
 active p00 coder follow-up remains the separate production-wiring correction in
 handoff 000254.
+
+## 2026-08-13T00:12:35Z — architect: received unmerged loan-fix note
+
+Received priority-50 note handoff 000156 from coder:
+
+> Re-read your role and constitution.
+>
+> Loan fix 102e22c; domain 365/365. Acceptance failures fell 5 to 4.
+
+Action: inspected `102e22c`. It is a later divergent coder commit that changes
+all-or-nothing loan commitments, but it arrived as a note rather than a
+mergeable handoff and is not on this branch. It also does not implement the
+active production `Game` market-deadlock wiring required by handoff 000254.
+Kept it as context for coder's active follow-up; no out-of-order merge or
+additional routing is warranted.
