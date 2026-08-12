@@ -31567,3 +31567,22 @@ invariant is a production defect for coder; an assertion that encoded the old
 per-turn timing is a Gherkin acceptance-criteria change for specifier. Return
 the concrete failing scenario names, actual/expected values, and the round
 boundary implementation commit through a normal git handoff for review.
+
+Coder classification after verification:
+
+- entity-17 (`an entity with nothing to build...`): expected no action; actual
+  `LegalEntityLoanRaised($300)` at the completed-round operation boundary.
+- entity-26 (`...shareholder is in distress`): expected no loan; actual loan
+  `$300`. The distressed shareholder's share is resolved before the boundary,
+  so the remaining shareholders pass the automatic Greedo commitment policy.
+- entity-30: expected a loan and same-round repayment; no repayment is possible
+  after the single operation has already raised the loan.
+- entity-31: expected same-round dividend; no dividend is possible after the
+  single operation has already built/raised the loan.
+- share-sale-8, both examples: expected high-hat balance `$995`; actual
+  `-$505`, because the post-round entity operation charges the new shareholder
+  their build-loan share.
+
+These six failures are acceptance/specification consequences of the new
+automatic commitment and once-per-round semantics; no per-player operation
+was restored. Domain tests remain 359/359; implementation commit is `1614d0a`.
