@@ -32747,3 +32747,10 @@ harness-only implementation as completion. The approved automatic formation
 policy must be wired into `Game` at the production round boundary; tests must
 drive that path rather than calling `World.formEntity` directly. Routing this
 observable behavior defect back to coder.
+
+Required correction: move automatic formation out of
+`World.completeMarketDeadlockRound` and into the real `Game` round-boundary
+flow. Preserve the approved full-board, quiet-round, eligibility, and
+collective-base-reserve rules; make the m-scenarios execute the production
+path. Retain the isolated m-scenario fixtures so unrelated entity scenarios
+remain unaffected.
