@@ -32270,19 +32270,71 @@ Independent verification: property profile 23/23; acceptance suite 591 with
 no failures; differential mutation clean (70 sites); DRY clean; and soft
 Gherkin mutation completed for `greedo-legal-entity.feature`.
 
-## 2026-08-12T19:42:53Z — architect closes entity build-economy phase
+## 2026-08-12 — specifier: merged phase-complete sync (architect 000246)
 
-Sent priority-50 git handoff to specifier:
+Received priority-50 git_handoff 000246 from architect (task greedo-entity-
+build-economy, commit e25fe80696, "Merge final entity economy review").
 
-```
-type: git_handoff
-to: specifier
-priority: 50
-task: greedo-entity-build-economy
-commit: e25fe80696
-```
+Action: fast-forward merged e25fe80696. The merged implementation fixes the
+flagged empty-bank gate:
+- canPrepareBuildCommitment no longer requires bankBalance == $0.
+- New solicitCommitmentIfNeeded: after a treasury-only plan, if a buildable
+  street remains unfunded beyond treasury, prepare the unanimous reserve-safe
+  commitment and recompute the plan to complete construction (auto-solicit).
+- leavesABuildableStreetUnfunded detects the remaining shortfall.
 
-Summary: accepted automatic unanimous Greedo financing only for an actual
-treasury shortfall with an additional buildable improvement. Fully developed
-entities remain on their original debt/dividend settlement path. All
-coder/refactorer review loops are closed.
+Verified: acceptance BUILD SUCCESS, 591 tests, 0 failures. My entity-30
+(auto-solicit success, treasury $100 --> loan $200, 3 houses, no dividend) and
+entity-15 (decline case) are both GREEN. The entity build-economy correction is
+closed.
+
+## 2026-08-12 — specifier: empirical regression - entity building (rent AND loan) absent in real play; route to architect
+
+User requested new 8-player empirical runs after the build-economy fix merge
+(e25fe80696/closing 000246). Rebuilt jar, ran 10 LE-on + 10 LE-off control games.
+
+Results (10 games each):
+- LE ON : 9/10 bankruptcy end, 1/10 stalemate. Entity loans=0, builds=0, rent=0.
+  Entities only form, pay dividends, and sell shares.
+- LE OFF: 1/10 bankruptcy end, 9/10 stalemate. (control)
+
+So legal entities DO break stalemates (via share concentration + dividends +
+inheritance -> bankruptcy), but entity DEVELOPMENT is entirely absent in real
+play: 0 loans raised, 0 houses built, 0 rent collected.
+
+This is a REGRESSION vs the earlier empirical observation (le-122, before the
+narration/build refactors): entities used to build rent-funded houses (27 builds
+per game observed). Now rent-funded building AND loan-funded building are both
+absent. The acceptance suite is green (entity-30 auto-solicit passes) but the
+real 8-player loop never exercises it - likely the unanimous ALL-OR-NOTHING
+reserve/affordability gate fails on near-complete-monopoly co-owners in real
+games, and/or rent is diverted to dividends before it reaches a build.
+
+User direction: send to architect for investigation. We want to see building
+BOTH with rent funds AND via loans. Routing priority-00 to architect.
+
+## 2026-08-12T20:06:50Z — architect: received empirical entity-development regression
+
+Received priority-00 git_handoff 000171 from specifier (task
+`greedo-entity-build-economy`, commit `5eab2f6da9`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process specifier 5eab2f6da9
+
+Action: merged the report, rebuilt the simulator, and independently ran ten
+eight-player legal-entity-enabled games. All ten again produced zero entity
+loans, zero entity house builds, and zero entity rent events.
+
+Code trace: automatic solicitation is wired through `LegalEntityBuilding` when
+the entity treasury cannot fund the next build. It still requires unanimous
+`Greedo` shareholder consent. Each offer is checked against that shareholder's
+dynamic individual reserve, including reserves for a near-complete monopoly or
+stations. In real play at least one shareholder consequently declines the
+maximum-hotel and fallback one-house-per-street commitment. The explicit
+all-or-nothing/no-free-rider policy therefore prevents both rent-funded and
+loan-funded entity development, despite the artificial zero-reserve acceptance
+scenario passing.
+
+This is an economic-rule decision, not a safe wiring correction: weakening the
+consent or reserve policy here would contradict current accepted behavior.
