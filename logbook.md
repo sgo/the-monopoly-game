@@ -33196,3 +33196,13 @@ block formation. Found a Gherkin content defect in entity-m6/m8/m9: their
 "round completes with <action> ownership-consolidating action" step now has no
 effect and overstates what the scenario does. Routed to specifier for criteria
 cleanup; no production change is needed for this finding.
+
+Delivered as handoff 000258:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 86f99a3ae8
+```
