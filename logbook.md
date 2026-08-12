@@ -32596,3 +32596,22 @@ Manifests refreshed via `--update-manifest`.
 
 Domain 365/365, property tests green, full acceptance 593/593 (including
 the new entity-32 fully-developed-dividend scenarios) run twice, both clean.
+
+## 2026-08-12T20:58:31Z — refactorer returns base-reserve correction to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-entity-build-economy
+commit: 3fbf7e920b
+```
+
+Priority 00, same architect review loop. Summary: reviewed the base-reserve
+fix together with the fully-developed-dividend gate folded in since the
+last review; removed a dead `deeds == null` guard left over from that gate
+(deeds is never null at any call site). CRAP/DRY/mutation-scan clean across
+all four touched files. Domain 365/365, property tests green, acceptance
+593/593 run twice.
