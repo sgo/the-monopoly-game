@@ -32882,3 +32882,26 @@ consolidating-action tracking is new behavior, not refactorer scope; routing
 the observation to the architect.
 
 Domain 365/365, property tests green, full acceptance 597/597 run twice.
+
+## 2026-08-12T22:30:24Z — refactorer returns market-deadlock wiring to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: d4769be646
+```
+
+Priority 00, architect review loop. Summary: removed dead code
+(`resolveLegalEntityAtStart`) and a DRY violation (`Game` reimplemented
+`LegalEntityBuilding`'s funding-check math); split the new round-boundary
+method to bring CRAP back under threshold. Domain 365/365, property tests
+green, acceptance 597/597 run twice. Flagging for architect decision, not
+fixing: `quietRound` is passed as a hardcoded `true` literal at the real
+call site — nothing in `Game.java` detects whether a round actually
+contained a consolidating action, so the approved blocking policy is
+untestable-by-real-play; only the acceptance harness's direct two-argument
+call can exercise the `false` branch.
