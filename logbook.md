@@ -20052,6 +20052,29 @@ repeat shape). Ran `./acceptance/run-acceptance.sh`: 433 tests, 0
 failures — both scenarios pass against the already-merged, already-fixed
 implementation.
 
+## 2026-08-12T20:27:20Z — architect routes combined entity-economy implementation
+
+The merged criteria require two coordinated behavioral changes:
+
+- Entity build offers evaluate a shareholder against Greedo's nominal base
+  reserve, not individual dynamic monopoly/station reserve bumps; unanimous
+  approval and the no-free-rider affordability check remain mandatory.
+- Dividends require every entity street to have a hotel. Under-developed
+  entities retain rent and treasury surplus for construction; entity-32 is the
+  red acceptance coverage for this rule.
+
+Routing the observable behavior to coder for implementation and verification.
+
+Delivered as handoff 000249:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-entity-build-economy
+commit: fd12c20098
+```
+
 Committed as `e0cb12bedc` "Retune distressed-sale-17 to the mortgage-floor
 boundary, add distressed-sale-18" (2 files, 85 insertions).
 
@@ -31963,6 +31986,9 @@ produces the specified $200 loan and three total houses from a $100 treasury.
 Verification: full acceptance 591/591 passed; domain tests 365/365 passed;
 `git diff --check` passed.
 
+Sent priority-00 git handoff `20260812T193029Z_000151_from_coder_to_refactorer`
+for review at commit `155e6f95c0`.
+
 The coder loop is now in progress; the architect can close/advance the review
 loop when the coder/refactorer chain returns.
 
@@ -32395,6 +32421,22 @@ Acceptance: 593 tests, 2 failures, BOTH entity-32 examples failing at
 under-developed dividend (dividend-drain bug). entity-8/11/18/19 + all others
 green. Red-by-design, implementation (fully-developed gate in
 repayLoanOrPayDividend) is coder/architect scope. Routing to architect.
+
+## 2026-08-12T20:27:20Z — architect: received fully-developed dividend criteria
+
+Received priority-00 git_handoff 000173 from specifier (task
+`greedo-entity-build-economy`, commit `ded702d237`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process specifier ded702d237
+
+Action: accepted the complete policy. A legal entity may pay a dividend only
+when every entity street has a hotel; an entity with zero through four houses
+on any street retains its treasury and uses it for building. The new
+red-by-design entity-32 scenarios establish the missing behavior. Together
+with the returned base-reserve decision, the criteria are now ready for coder
+implementation.
 Delivered as handoff 000247:
 
 ```
@@ -32417,6 +32459,7 @@ construction cost it falls through to `repayLoanOrPayDividend`, which distribute
 any treasury of at least $150. That contradicts the user direction and can drain
 rent before it reaches the next construction cost. Routed to specifier for an
 acceptance-criterion correction before implementation.
+<<<<<<< HEAD
 
 ## 2026-08-12 — specifier: reconcile entity-32 vs auto-solicit policy (architect 000250)
 
@@ -32441,3 +32484,30 @@ no-dividend asserts; entity-30 green.
 There remains the coder/architect task: allAgreeToBuild still passes
 cashReserve(player,rules,deeds) (dynamic monopoly/station reserve) rather than
 the specified BASE_RESERVE -- unresolved implementation follow-up.
+
+## 2026-08-12T22:45:20Z — coder reports entity-32 policy conflict
+
+Processed architect handoff `fd12c20098`. Implemented the fully-developed hotel
+gate for dividends, preserved construction before settlement, added the
+`developed_total` acceptance handler, and updated dividend fixtures to use
+hotels. Domain tests pass (365/365); acceptance is 592/593 with entity-32
+expecting one treasury-funded house from $150 while automatic shortfall
+solicitation develops three houses. This requires architect policy clarification.
+
+## 2026-08-12T20:46:20Z — architect: received coder implementation review
+
+Received priority-00 git_handoff 000152 from coder (task
+`greedo-entity-build-economy`, commit `42d53f19a4`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process coder 42d53f19a4
+
+Action: reviewed the already-merged implementation. The hotel-only dividend
+gate is present, but two blockers remain. First, `allAgreeToBuild` still passes
+`strategy.cashReserve(player, rules, deeds)` to each entity offer, so it retains
+the forbidden dynamic monopoly/station reserve rather than the specified base
+reserve. Second, entity-32 specifies that a $150 treasury builds one house,
+whereas the existing auto-solicitation rule treats a further buildable street as
+permission to solicit and produces three. This is an acceptance-policy conflict,
+so it is routed to specifier before further coder changes.
