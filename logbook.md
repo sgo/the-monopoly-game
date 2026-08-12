@@ -32657,3 +32657,10 @@ approved full-board, quiet-round, three-owner, collectively-funded trigger.
 Added deterministic initiative setup and handlers for the new scenario language.
 Domain tests pass 365/365. The full acceptance run reaches 597 tests but still
 reports five legacy legal-entity scenario failures for refactorer review.
+
+## 2026-08-12T21:42:57Z — coder: handed off to refactorer
+
+Queued priority-00 git handoff `000154` for `greedo-market-deadlock-trigger`
+at commit `fbd37e8c90`, including the acceptance coverage and implementation
+notes above. Refactorer review is requested for the five legacy acceptance
+failures.
