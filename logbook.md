@@ -32040,3 +32040,21 @@ the remaining two-house shortfall. Entity-30 currently passes only because its
 Given explicitly records each shareholder's commitment; it does not establish
 whether the entity should solicit that commitment automatically after rent.
 Routing the criteria decision to specifier; coder must not guess the policy.
+
+## 2026-08-12T19:04:07Z — architect routes entity-build policy contradiction
+
+Sent priority-00 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-entity-build-economy
+commit: ecb9539473
+```
+
+Decision required: reconcile entity-15's treasury-only/no-loan outcome with
+the requested automatic post-rent shareholder-financing policy. State whether
+nonzero treasury requires an explicit stored commitment, permits automatic
+Greedo solicitation, or follows another threshold/trigger; revise entity-15
+and/or entity-30 so their examples unambiguously encode that single policy.
