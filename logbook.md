@@ -32981,3 +32981,26 @@ back to the architect rather than guessing at scenario construction that's
 normally specifier/coder territory.
 
 Domain 365/365, property tests green, full acceptance 597/597 run twice.
+
+## 2026-08-12T22:40:28Z — refactorer returns quiet-round tracking to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: f2219085af
+```
+
+Priority 00, architect review loop. Summary: reduced CRAP on `playTurns`/
+`playTurn` back under threshold after the new tracking calls pushed them
+over. Domain 365/365, property tests green, acceptance 597/597 run twice.
+Flagging, not fixing: the directive's second half — "the harness must
+exercise that derived path" — is not yet satisfied; the acceptance harness
+still bypasses automatic detection entirely via
+`disableAutomaticMarketDeadlock()`. Declined to build a hand-rolled
+`GameTest` integration scenario for this given the session's own precedent
+on reproduction fidelity; this needs either new Gherkin coverage or a
+harness change, both outside refactorer scope.
