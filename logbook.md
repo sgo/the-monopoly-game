@@ -32754,3 +32754,13 @@ flow. Preserve the approved full-board, quiet-round, eligibility, and
 collective-base-reserve rules; make the m-scenarios execute the production
 path. Retain the isolated m-scenario fixtures so unrelated entity scenarios
 remain unaffected.
+
+Delivered as handoff 000254:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: d17eaf0311
+```
