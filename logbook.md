@@ -33211,3 +33211,18 @@ Criteria cleanup: removed the effectless step from entity-m1..m6, m8, m9
 <action> column from entity-m6's Examples. entity-m7 already drives blocking via
 a genuine player development event (pawn "high hat" will build a house on
 "Lippenslaan Knokke") and correctly omits the step. No production change needed.
+
+## 2026-08-13T01:14:00Z — architect: closes market-deadlock criteria cleanup
+
+Received priority-00 git_handoff 000176 from specifier (task
+`greedo-market-deadlock-trigger`, commit `cdaa3266d8`): the approved criteria
+cleanup removes the obsolete, effectless round-completion steps and the unused
+entity-m6 example column. Merged as `73457e1b67`; this neither adds a test-only
+control path nor changes production logic.
+
+Verification after merge: full acceptance passed (597 tests, including 41
+Greedo legal-entity scenarios); the soft Gherkin mutation check for
+`greedo-legal-entity.feature` passed; and the domain property profile passed
+(23 tests). The prior refactorer closeout had already recorded clean mutation
+and DRY scans for the production detector. The market-deadlock phase is ready
+for specification closeout.
