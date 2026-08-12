@@ -32557,3 +32557,13 @@ transfer, or individual development), and an eligible three-owner split whose
 shareholders can collectively fund the next improvement after their base
 reserves. The final `Stalemate.reached` condition remains separate. No coder or
 refactorer handoff is authorized until the user approves the returned spec.
+
+Delivered as handoff 000252:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-entity-build-economy
+commit: 58e253a2a1
+```
