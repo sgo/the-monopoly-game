@@ -32121,3 +32121,21 @@ commit: ecb9539473
 
 Decision required: reconcile entity-15's treasury-only/no-loan outcome with
 the requested automatic post-rent shareholder-financing policy.
+
+## 2026-08-12T19:17:21Z — architect routes resolved entity-build policy
+
+Sent priority-00 git handoff to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-entity-build-economy
+commit: a091d4753b
+```
+
+Implement the settled auto-solicit policy: remove the empty-treasury
+restriction from automatic commitment preparation, while retaining unanimous
+affordability and reserve checks. Entity-15 is now the shareholder-decline
+case; entity-30 is the automatic-success case and must pass without an
+explicit commitment setup.
