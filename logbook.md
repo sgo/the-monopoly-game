@@ -31525,3 +31525,19 @@ invariant is a production defect for coder; an assertion that encoded the old
 per-turn timing is a Gherkin acceptance-criteria change for specifier. Return
 the concrete failing scenario names, actual/expected values, and the round
 boundary implementation commit through a normal git handoff for review.
+
+## 2026-08-12T11:35:48Z — architect sends round-boundary triage direction
+
+Sent priority-00 git handoff to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: cfcada1e68
+```
+
+The coder is to preserve once-per-round semantics, separate implementation
+failures from superseded Gherkin timing expectations, and return the concrete
+failure evidence in the next normal handoff.
