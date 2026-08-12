@@ -32645,3 +32645,13 @@ User approval received. The automatic pre-stalemate market-deadlock formation
 criteria are released for coder implementation: full board, a quiet completed
 round, eligible three-owner split, and collective next-improvement funding after
 nominal base reserves; final cash-threshold stalemate remains independent.
+
+Delivered as handoff 000253:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: ed46d5203e
+```
