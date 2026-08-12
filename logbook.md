@@ -32715,6 +32715,15 @@ to legal-entity rent/setup and two build-loan scenario expectations.
 ## 2026-08-13 — coder: notified architect of loan fix
 
 Queued note `000156` with commit `102e22c` and the updated test status.
+
+## 2026-08-13 — coder: processed architect handoff 000254
+
+Merged architect commit `d17eaf0311` and completed the requested production
+wiring. `Game` now evaluates the approved market-deadlock formation policy at
+the completed round boundary, journals entity formation, and the acceptance
+harness delegates to that production decision instead of calling `formEntity`
+directly. The m-scenario fixtures remain isolated from unrelated scenarios.
+Domain tests pass 365/365 and full acceptance passes 597/597.
 ## 2026-08-12T21:42:57Z — refactorer receives market-deadlock trigger for review
 
 Received coder priority-00 handoff:

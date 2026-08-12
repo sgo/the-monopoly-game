@@ -47,11 +47,7 @@ final class LegalEntityBuilding {
   }
 
   private static Money amountNeededToContinue(LegalEntity entity, Deeds deeds, List<ColourStreet> plan) {
-    boolean canReachHotels = canReachHotels(entity);
-    if (plan.isEmpty()) return standardBuildCost(entity);
-    ColourStreet next = cheapestBuildableStreet(entity, deeds, plan, canReachHotels);
-    if (next == null) return Money.ZERO;
-    Money required = totalConstructionCost(plan).plus(next.houseConstructionCost());
+    Money required = standardBuildCost(entity);
     return required.exceeds(entity.bankBalance()) ? required.minus(entity.bankBalance()) : Money.ZERO;
   }
 

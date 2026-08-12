@@ -55,6 +55,7 @@ public class Game {
   private final Jail jail;
   private final boolean stalemateTrading;
   private final boolean legalEntityTrading;
+  private boolean automaticMarketDeadlock = true;
 
   public Game(Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies) {
     this(rules, players, cups, strategies, new Deeds(), null);
@@ -167,6 +168,7 @@ public class Game {
         if (playTurn(player, builder, turnOrder, journal, journalling, building)) return;
       }
       operateLegalEntities(journalling);
+      if (automaticMarketDeadlock) resolveMarketDeadlockAtRoundBoundary(true, true, journalling);
       if (remainingPlayers().size() <= 1) return;
       if (Stalemate.reached(rules, players, deeds)) {
         logStalemate(journal, journalling);
@@ -182,7 +184,6 @@ public class Game {
   private boolean playTurn(Player player, Player builder, List<Player> turnOrder, Journal journal,
                            Journalling journalling, Building building) {
     if (deeds.isBankrupt(player)) return false;
-    resolveLegalEntityAtStart(player, journalling);
     resolveSplitOwnershipAtStart(player, turnOrder, journalling);
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
     if (isBuilderStillSolvent(player, builder)) building.develop(player);
@@ -314,6 +315,53 @@ public class Game {
   private boolean allOwnableSpacesOwned() {
     return rules.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
         .allMatch(it -> !deeds.isUnowned(it.type()));
+  }
+
+  /** Applies the automatic legal-entity formation check at a completed quiet round boundary. */
+  public void resolveMarketDeadlockAtRoundBoundary(boolean quietRound, boolean collectiveFunding) {
+    resolveMarketDeadlockAtRoundBoundary(quietRound, collectiveFunding, null);
+  }
+
+  public void disableAutomaticMarketDeadlock() {
+    automaticMarketDeadlock = false;
+  }
+
+  private void resolveMarketDeadlockAtRoundBoundary(boolean quietRound, boolean collectiveFunding,
+                                                    Journalling journalling) {
+    if (!quietRound || !collectiveFunding || !legalEntityTrading || !allOwnableSpacesOwned()) return;
+    rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
+        .map(ColourStreet::colourGroup).distinct()
+        .map(colour -> {
+          List<ColourStreet> streets = LegalEntity.streetsOf(colour, rules);
+          List<Player> shareholders = players.stream()
+              .filter(player -> streets.stream().anyMatch(street -> deeds.ownerOf(street.type())
+                  .filter(player.id()::equals).isPresent()))
+              .toList();
+          return LegalEntity.form(entityName(colour), colour, shareholders, rules, deeds,
+              street -> Strategy.priorityOf(street) == Strategy.Priority.HIGHEST)
+              .filter(entity -> collectivelyFundNextImprovement(entity));
+        })
+        .filter(Optional::isPresent).map(Optional::orElseThrow).findFirst()
+        .ifPresent(entity -> {
+          deeds.form(entity);
+          if (journalling != null) journalling.entityFormed(entity);
+        });
+  }
+
+  private boolean collectivelyFundNextImprovement(LegalEntity entity) {
+    Money cost = entity.streets().stream().map(ColourStreet::houseConstructionCost)
+        .reduce(Money.ZERO, Money::plus);
+    List<Player> shareholders = entity.shareholders();
+    int base = cost.amount() / shareholders.size();
+    int remainder = cost.amount() % shareholders.size();
+    return java.util.stream.IntStream.range(0, shareholders.size()).allMatch(index -> {
+      Player shareholder = shareholders.get(index);
+      Money share = new Money(base + (index < remainder ? 1 : 0));
+      Strategy strategy = strategies.forPlayer(shareholder);
+      return strategy.commitToEntityBuild(new Strategy.EntityBuildOffer(
+          share, shareholder.account().balance().amount(),
+          strategy.cashReserve(shareholder, rules, deeds)));
+    });
   }
 
   private List<Player> remainingPlayers() {
