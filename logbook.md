@@ -20065,6 +20065,16 @@ The merged criteria require two coordinated behavioral changes:
 
 Routing the observable behavior to coder for implementation and verification.
 
+Delivered as handoff 000249:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-entity-build-economy
+commit: fd12c20098
+```
+
 Committed as `e0cb12bedc` "Retune distressed-sale-17 to the mortgage-floor
 boundary, add distressed-sale-18" (2 files, 85 insertions).
 
@@ -32449,6 +32459,31 @@ construction cost it falls through to `repayLoanOrPayDividend`, which distribute
 any treasury of at least $150. That contradicts the user direction and can drain
 rent before it reaches the next construction cost. Routed to specifier for an
 acceptance-criterion correction before implementation.
+
+## 2026-08-12 — specifier: reconcile entity-32 vs auto-solicit policy (architect 000250)
+
+Architect flagged a real acceptance-policy conflict (ff2a4f8185) in my entity-32:
+I specified a $150 treasury builds ONE house (dividend-gate test), but the
+accepted auto-solicitation rule treats any further buildable street as permission
+to solicit, so eligible default shareholders would cover the shortfall and build
+THREE (as in entity-30). The two under-developed-treasury scenarios disagreed.
+
+Reconciliation: entity-32 now sets the non-dividend shareholders to DECLINE
+("has a balance that allows only $<ceiling_share>" = 0), so no auto-solicited
+loan bridges the gap: the entity builds only with its own treasury and, being
+under-developed, pays no dividend. Examples: 0 houses/150 -> builds 1, no
+dividend; 0 houses/300 -> builds 3, no dividend.
+
+This isolates the develop-before-dividend rule from the auto-solicit behaviour
+(entity-30 still proves loans fire when shareholders finance the shortfall).
+entity-32 stays red-by-design only at the dividend gate (current code still pays
+an under-developed dividend). Benchmarked: 593 tests, 2 failures = entity-32's
+no-dividend asserts; entity-30 green.
+
+There remains the coder/architect task: allAgreeToBuild still passes
+cashReserve(player,rules,deeds) (dynamic monopoly/station reserve) rather than
+the specified BASE_RESERVE -- unresolved implementation follow-up.
+
 ## 2026-08-12T22:45:20Z — coder reports entity-32 policy conflict
 
 Processed architect handoff `fd12c20098`. Implemented the fully-developed hotel
@@ -32460,3 +32495,45 @@ solicitation develops three houses. This requires architect policy clarification
 
 Sent priority-00 commit `42d53f19a4` to architect as handoff `000152` for that
 policy decision.
+## 2026-08-12T20:46:20Z — architect: received coder implementation review
+
+Received priority-00 git_handoff 000152 from coder (task
+`greedo-entity-build-economy`, commit `42d53f19a4`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process coder 42d53f19a4
+
+Action: reviewed the already-merged implementation. The hotel-only dividend
+gate is present, but two blockers remain. First, `allAgreeToBuild` still passes
+`strategy.cashReserve(player, rules, deeds)` to each entity offer, so it retains
+the forbidden dynamic monopoly/station reserve rather than the specified base
+reserve. Second, entity-32 specifies that a $150 treasury builds one house,
+whereas the existing auto-solicitation rule treats a further buildable street as
+permission to solicit and produces three. This is an acceptance-policy conflict,
+so it is routed to specifier before further coder changes.
+
+Delivered as handoff 000250:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-entity-build-economy
+commit: ff2a4f8185
+```
+
+## 2026-08-12T20:50:34Z — architect: received entity-32 reconciliation
+
+Received priority-00 git_handoff 000174 from specifier (task
+`greedo-entity-build-economy`, commit `022c9e8f79`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process specifier 022c9e8f79
+
+Action: merged the revised entity-32 acceptance criterion. It now explicitly
+uses shareholders who decline financing, so a $150 treasury builds one house
+without a loan and is retained rather than paid as a dividend. Auto-solicitation
+remains covered separately by entity-30. The remaining coder correction is to
+use the specified nominal base reserve for entity build offers.

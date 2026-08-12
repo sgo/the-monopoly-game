@@ -453,7 +453,7 @@ Feature: Greedo legal entity for a three-way colour-group split
       | 100  | 200     | 0       | 200  | 3            |
 
   # entity-32
-  Scenario Outline: an under-developed entity spends its treasury on building rather than paying a dividend, even when the treasury exceeds the dividend threshold and the last-capitalised shareholder has aged
+  Scenario Outline: an under-developed entity whose shareholders decline to finance a build loan spends its treasury on building rather than paying a dividend, even when the treasury exceeds the dividend threshold and the last-capitalised shareholder has aged
     Given we select 4 players
     And Pink Realty is formed
     And the street "Rue de Diekirch Arlon" has <houses> house(s) built
@@ -463,15 +463,17 @@ Feature: Greedo legal entity for a three-way colour-group split
     And Pink Realty's bank account holds $<surplus>
     And the last-capitalised shareholder of Pink Realty is pawn "dog"
     And the last-capitalised shareholder of Pink Realty grows a year older
+    And pawn "high hat" has a balance that allows only $<ceiling_share> toward the entity
+    And pawn "iron box" has a balance that allows only $<ceiling_share> toward the entity
     When we play up to 1 round
     Then pawn "dog" receives no dividend from Pink Realty
     And the pink colour group is developed up to <developed_total> houses
     And Pink Realty's bank account holds $<surplus_remaining>
 
     Examples:
-      | houses | surplus | developed_total | surplus_remaining |
-      | 0      | 150     | 1               | 50                 |
-      | 0      | 300     | 3               | 0                  |
+      | houses | surplus | ceiling_share | developed_total | surplus_remaining |
+      | 0      | 150     | 0             | 1               | 50                 |
+      | 0      | 300     | 0             | 3               | 0                  |
 
   # Commentary: harness steps required to drive the Greedo entity-build-commit scenarios.
   # The strategy decision point (entity build loan commitment) and these steps are new.
