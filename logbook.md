@@ -31914,6 +31914,20 @@ review loop; the result flows coder -> refactorer -> back to ARCHITECT, not to
 specifier. The specifier re-engages only when the architect sends a phase-complete
 sync. No specifier action pending; holding for the loop to close.
 
+## 2026-08-12 — architect review exposes entity-15 semantic conflict
+
+Merged architect review `6da1499e8e` as `1c31209`. The requested removal of the
+zero-treasury gate was tested, but full acceptance then produced four failures:
+entity-15 raised `$200` from a `$100` treasury where the existing scenario
+requires no loan; the same automatic-financing change also prevented the
+established entity-66 dividend journal/log/report scenarios. Restoring the gate
+returns the verified 591/591 baseline and leaves entity-30's explicit-commitment
+fix green. Sent the contradiction to architect for a decision on whether
+entity-15/dividend criteria or automatic nonzero-treasury commitment semantics
+should change.
+
+Sent corrected note `20260812T190312Z_000149_from_coder_to_architect`.
+
 ## 2026-08-12 — specifier: add entity-30 spec per architect directive, route to coder
 
 Responding to architect directive (c20c7e9eba / review loop greedo-entity-build-
@@ -31948,6 +31962,32 @@ produces the specified $200 loan and three total houses from a $100 treasury.
 
 Verification: full acceptance 591/591 passed; domain tests 365/365 passed;
 `git diff --check` passed.
+
+The coder loop is now in progress; the architect can close/advance the review
+loop when the coder/refactorer chain returns.
+
+## 2026-08-12 — specifier: resolve entity build policy conflict (architect 000243)
+
+Architect escalated priority-00 policy contradiction (ecb9539473): entity-15
+($100 treasury builds 1 house, no loan) conflicts with the auto-financing
+direction (rent covers base build, then eligible shareholders fund the
+remaining shortfall).
+
+User resolved: AUTO-SOLICIT. The entity automatically solicits eligible Greedo
+shareholders to fund the build shortfall after applying rent.
+
+Implemented in greedo-legal-entity.feature:
+- entity-15 REVISED to the decline case: ineligible shareholders (balance 150,
+  reserve 150) so the entity builds only the rent-covered house and raises no
+  loan (asserts no loan, 1 house, rent remaining 0).
+- entity-30 REVISED to the auto-solicit SUCCESS case: treasury $100 + eligible
+  shareholders (balance 200, reserve 0), NO explicit commit step. Asserts:
+  loan $200, 3 houses, no dividend.
+
+Acceptance: 591 tests, 1 failure = entity-30 ("developed to 3" expected 3,
+was 1). entity-15 now passes. The single red is exactly the coder bug: the
+entity does not yet auto-solicit/complete the plan past the treasury-funded
+house. Red-by-design, awaiting coder fix.
 
 ## 2026-08-12T15:23:47Z — refactorer receives entity build-economy fix for review
 
@@ -32002,3 +32042,170 @@ priority-00 architect->coder handoff for this task). Summary: reviewed the
 `cannotExtendPlan` fix for correctness and termination, confirmed CRAP/DRY/
 mutation-scan clean, domain 365/365, property tests green, acceptance
 591/591 run twice. No structural changes made.
+
+## 2026-08-12T15:28:06Z — architect receives entity build-economy refactorer review
+
+Received priority-00 git handoff from refactorer:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 61b3376255
+```
+
+Action: merged the returned review, preserving the prior histories in the
+logbook conflict. Rejected the functional result on architectural review:
+`cannotExtendPlan` now honours a commitment that already exists, but
+`canPrepareBuildCommitment` still requires `bankBalance == $0`. Therefore an
+entity receiving rent before its first operation still never asks its Greedo
+shareholders for unanimous reserve-safe financing, and can dividend instead of
+building. The returned entity-30 manually pre-commits shares and cannot prove
+the required automatic decision path.
+
+## 2026-08-12T15:30:51Z — architect rejects incomplete entity build-economy correction
+
+Sent priority-00 git handoff to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-entity-build-economy
+commit: 6da1499e8e
+```
+
+Required correction: remove the zero-treasury precondition from the automatic
+commitment decision. For a nonzero treasury with a buildable remaining
+shortfall, the entity must solicit the same unanimous, reserve-safe Greedo
+commitment and use that commitment to complete the plan before dividend. Add a
+scenario that starts only with treasury/rent (no manually recorded shareholder
+commitment) and proves automatic loan, construction, and no dividend.
+
+## 2026-08-12T19:03:48Z — architect receives coder criterion-conflict query
+
+Received priority-00 note from coder:
+
+```
+Re-read your role and constitution.
+
+Auto-commit conflicts with entity-15 and dividend criteria; advise.
+```
+
+Action: confirmed a real Gherkin-policy contradiction. Entity-15 requires a
+$100 treasury to build one house and raise no loan, while the architect's
+automatic-financing direction would make eligible Greedo shareholders finance
+the remaining two-house shortfall. Entity-30 currently passes only because its
+Given explicitly records each shareholder's commitment; it does not establish
+whether the entity should solicit that commitment automatically after rent.
+Routing the criteria decision to specifier; coder must not guess the policy.
+
+## 2026-08-12 — specifier: decide architect policy finding, hand back
+
+Decision on architect priority-00 finding (ecb9539473, escalate entity build
+policy conflict): user resolved AUTO-SOLICIT — the entity automatically
+solicits eligible Greedo shareholders to fund the build shortfall after
+applying its rent; rent-only build happens only when shareholders decline.
+
+Spec changes (committed 15ee061, merged with architect escalation at 561066e):
+- entity-15 revised to DECLINE case (ineligible shareholders, balance 150 /
+  reserve 150) -> builds only rent-covered house, no loan. Green.
+- entity-30 revised to AUTO-SOLICIT SUCCESS case (treasury $100 + eligible
+  shareholders balance 200 / reserve 0, NO explicit commit step) -> loan $200,
+  3 houses, no dividend. Still red (expected 3, was 1).
+
+Even after merging the coder's cannotExtendPlan fix (2ef4082), entity-30 fails:
+canPrepareBuildCommitment still requires bankBalance == $0, so a treasury-funded
+entity never auto-solicits. This is the precise, deterministic coverage the
+architect demanded and it correctly stays red until that empty-bank gate is
+removed. Handing decision back to architect; coder must not guess the policy --
+the policy is now: auto-solicit eligible shareholders whenever a buildable
+shortfall remains, regardless of starting treasury.
+
+## 2026-08-12T19:16:42Z — architect receives entity-build policy decision
+
+Received priority-00 git handoff from specifier:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 9e7edea1a3
+```
+
+Action: merged the returned policy decision, retaining its Gherkin revision.
+The resolved policy is auto-solicit: after using treasury, an entity asks
+eligible Greedo shareholders to fund any buildable remainder. Rent-only
+construction is limited to a decline/ineligibility case. Entity-30 now proves
+automatic $200 shortfall financing with no explicit commitment; its red result
+deterministically identifies the remaining zero-treasury gate in
+`canPrepareBuildCommitment`.
+
+## 2026-08-12T19:04:07Z — architect routes entity-build policy contradiction
+
+Sent priority-00 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-entity-build-economy
+commit: ecb9539473
+```
+
+Decision required: reconcile entity-15's treasury-only/no-loan outcome with
+the requested automatic post-rent shareholder-financing policy.
+
+## 2026-08-12 — auto-solicit boundary implemented
+
+Processed architect handoff `bcb2d22928` (merged as `812bc90`). Commitment
+solicitation now occurs only when an initial build plan exists with a remaining
+treasury shortfall, or when an unaffordable buildable street exists at zero
+treasury. Fully developed entities therefore proceed directly to debt/dividend
+settlement. The plan is recomputed after commitments so mixed treasury-plus-loan
+builds reach all eligible streets.
+
+Verification: full acceptance 591/591 passed; domain tests 365/365 passed;
+`git diff --check` passed.
+
+Coder verification after applying the resolved auto-solicit policy: entity-30 is
+covered, but full acceptance has three failures, all in legacy journal-66,
+report-66, and logging-66 equal-dividend scenarios. They form Pink Realty with
+the two-player background, seed four houses, and hold $150; automatic solicitation
+raises a $150 loan and builds a house instead of paying the expected dividend.
+Restoring the gate returns the prior 591/591 acceptance baseline. This concrete
+policy/spec conflict requires architect direction on revising the dividend
+criteria or defining an additional auto-solicitation boundary.
+## 2026-08-12T19:17:21Z — architect routes resolved entity-build policy
+
+Sent priority-00 git handoff to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-entity-build-economy
+commit: a091d4753b
+```
+
+Implement the settled auto-solicit policy: remove the empty-treasury
+restriction from automatic commitment preparation, while retaining unanimous
+affordability and reserve checks. Entity-15 is now the shareholder-decline
+case; entity-30 is the automatic-success case and must pass without an
+explicit commitment setup.
+
+## 2026-08-12T19:26:38Z — architect receives dividend-66 boundary query
+
+Received priority-00 note from coder:
+
+```
+Re-read your role and constitution.
+
+Auto-solicit breaks legacy dividend-66 criteria; advise boundary or spec update.
+```
+
+Action: inspected journal-66. It deliberately gives Pink Realty three streets
+with four houses each, so no improvement remains buildable; its $150 must reach
+the existing dividend settlement. This is not a Gherkin-policy conflict. The
+implementation boundary is that automatic shareholder solicitation occurs only
+after a buildable plan exists and its cost exceeds treasury. An entity with no
+buildable improvement must not create a commitment and must continue directly
+to debt/dividend settlement.
