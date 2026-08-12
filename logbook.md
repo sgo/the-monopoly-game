@@ -33266,3 +33266,13 @@ being inactive, but do not say that automatic market-deadlock formation must
 choose a split with a real next improvement. This is a Gherkin-content gap,
 not a test-harness issue. Routed to specifier for the intended policy and
 acceptance coverage; no production code changed.
+
+Delivered as handoff 000261:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 75d9eec4fc
+```
