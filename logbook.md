@@ -32467,3 +32467,21 @@ gate for dividends, preserved construction before settlement, added the
 hotels. Domain tests pass (365/365); acceptance is 592/593 with entity-32
 expecting one treasury-funded house from $150 while automatic shortfall
 solicitation develops three houses. This requires architect policy clarification.
+
+## 2026-08-12T20:46:20Z — architect: received coder implementation review
+
+Received priority-00 git_handoff 000152 from coder (task
+`greedo-entity-build-economy`, commit `42d53f19a4`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process coder 42d53f19a4
+
+Action: reviewed the already-merged implementation. The hotel-only dividend
+gate is present, but two blockers remain. First, `allAgreeToBuild` still passes
+`strategy.cashReserve(player, rules, deeds)` to each entity offer, so it retains
+the forbidden dynamic monopoly/station reserve rather than the specified base
+reserve. Second, entity-32 specifies that a $150 treasury builds one house,
+whereas the existing auto-solicitation rule treats a further buildable street as
+permission to solicit and produces three. This is an acceptance-policy conflict,
+so it is routed to specifier before further coder changes.
