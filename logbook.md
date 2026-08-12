@@ -31491,3 +31491,19 @@ flag. Thus the current per-player `operateLegalEntities` call and its
 `receivedRent()` bypass do not implement once-per-round semantics. Entity
 formation/shareholder changes take effect at the next operation boundary;
 zero-shareholder entities are skipped.
+
+## 2026-08-12T11:20:17Z — architect sends entity-operation timing clarification
+
+Sent priority-00 git handoff to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: 210f0cebaf
+```
+
+The implementation direction is a `Game` round-boundary operation phase,
+without rent-triggered repeat operations and without relying on the permanent
+entity `operated` flag as the round clock.
