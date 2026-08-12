@@ -32367,11 +32367,6 @@ Implication: a shareholder who owns a near-complete monopoly (large dynamic
 reserve) but a moderate base reserve STILL lets the entity raise a build loan
 and build, because the entity offer uses the base reserve.
 
-Required new coverage: a scenario using NON-artificial shareholder reserves
-- e.g. a shareholder holding a near-monopoly (high dynamic reserve) with a
-  moderate base reserve -- proving the entity still auto-solicits, raises a loan,
-  and builds. This models the real-game failure condition.
-
 ## 2026-08-12 — specifier: decide entity dividend "fully developed" policy (architect 000248)
 
 Architect routed policy correction (7a73a356f0) from user direction: "Dividends
@@ -32400,3 +32395,25 @@ Acceptance: 593 tests, 2 failures, BOTH entity-32 examples failing at
 under-developed dividend (dividend-drain bug). entity-8/11/18/19 + all others
 green. Red-by-design, implementation (fully-developed gate in
 repayLoanOrPayDividend) is coder/architect scope. Routing to architect.
+Delivered as handoff 000247:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-entity-build-economy
+commit: 33e570ff2d
+```
+
+## 2026-08-12T20:15:53Z — architect: user resolves entity dividend policy
+
+User direction: "Dividends should never be paid out unless the property is
+fully developed."
+
+Action: traced the entity rent and settlement paths. Undeveloped entity streets
+do collect double vacant rent into the entity treasury. `operate` attempts a
+treasury-only build before settlement, but when the balance is below the next
+construction cost it falls through to `repayLoanOrPayDividend`, which distributes
+any treasury of at least $150. That contradicts the user direction and can drain
+rent before it reaches the next construction cost. Routed to specifier for an
+acceptance-criterion correction before implementation.
