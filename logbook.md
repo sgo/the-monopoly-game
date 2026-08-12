@@ -32664,3 +32664,12 @@ Queued priority-00 git handoff `000154` for `greedo-market-deadlock-trigger`
 at commit `fbd37e8c90`, including the acceptance coverage and implementation
 notes above. Refactorer review is requested for the five legacy acceptance
 failures.
+
+## 2026-08-13 — coder: processed stale specifier handoff 000001
+
+The queued `greedo-legal-entity` coding task references commit `50e90de`,
+which was already merged into this worktree. Its requested implementation is
+present in ancestor commit `fcecc76c8c` (Strategy entity-build decision,
+Greedo policy, and LegalEntity financing wiring), so no duplicate code change
+was made. Domain tests remain green at 365/365; acceptance remains at 597
+tests with the five previously recorded legacy legal-entity failures.
