@@ -33085,3 +33085,26 @@ spaces instead of 6) and simplified `funding == null ? true : funding` to
 under the split threshold, but this file is close enough now that the next
 addition should get a hard look) all clean. Domain 365/365, property tests
 green, full acceptance 597/597 run twice.
+
+## 2026-08-12T22:58:44Z — refactorer returns harness-exercises-real-path fix to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: ab0fdfcf32
+```
+
+Priority 00, architect review loop. Summary: verified the new override
+mechanism is correct (not the timing bug it initially looked like — traced
+with temporary instrumentation, fully removed). The formation/gating call
+path now genuinely runs through the real automatic round-boundary check for
+all nine scenarios. Refined finding for the architect: the four detectors
+that compute `roundHadConsolidatingAction` from real play are still never
+exercised, since the override always wins when a scenario configures one —
+narrower than my prior two entries stated, not a new gap. Minor structural
+cleanup (indentation, one ternary). Domain 365/365, property tests green,
+acceptance 597/597 run twice.
