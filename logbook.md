@@ -32360,3 +32360,16 @@ priority: 00
 task: greedo-entity-build-economy
 commit: 33e570ff2d
 ```
+
+## 2026-08-12T20:15:53Z — architect: user resolves entity dividend policy
+
+User direction: "Dividends should never be paid out unless the property is
+fully developed."
+
+Action: traced the entity rent and settlement paths. Undeveloped entity streets
+do collect double vacant rent into the entity treasury. `operate` attempts a
+treasury-only build before settlement, but when the balance is below the next
+construction cost it falls through to `repayLoanOrPayDividend`, which distributes
+any treasury of at least $150. That contradicts the user direction and can drain
+rent before it reaches the next construction cost. Routed to specifier for an
+acceptance-criterion correction before implementation.
