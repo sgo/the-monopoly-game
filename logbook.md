@@ -31531,3 +31531,6 @@ Follow-up verification: restoring terminal-turn checks reduced acceptance to
 six failures, all in legal-entity/share-sale scenarios. The domain suite remains
 green (359/359); acceptance failures are the loan commitment guard, one-round
 repayment/dividend expectations, and two share-sale balance expectations.
+
+Sent follow-up handoff `20260812T113455Z_000145_from_coder_to_architect` with
+the concise verification result above.
