@@ -32022,3 +32022,21 @@ shortfall, the entity must solicit the same unanimous, reserve-safe Greedo
 commitment and use that commitment to complete the plan before dividend. Add a
 scenario that starts only with treasury/rent (no manually recorded shareholder
 commitment) and proves automatic loan, construction, and no dividend.
+
+## 2026-08-12T19:03:48Z — architect receives coder criterion-conflict query
+
+Received priority-00 note from coder:
+
+```
+Re-read your role and constitution.
+
+Auto-commit conflicts with entity-15 and dividend criteria; advise.
+```
+
+Action: confirmed a real Gherkin-policy contradiction. Entity-15 requires a
+$100 treasury to build one house and raise no loan, while the architect's
+automatic-financing direction would make eligible Greedo shareholders finance
+the remaining two-house shortfall. Entity-30 currently passes only because its
+Given explicitly records each shareholder's commitment; it does not establish
+whether the entity should solicit that commitment automatically after rent.
+Routing the criteria decision to specifier; coder must not guess the policy.
