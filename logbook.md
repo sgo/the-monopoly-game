@@ -31470,3 +31470,21 @@ The specifier must make cli-1's 10-roll, cli-2's 50-roll, and cli-5's 10-roll
 thresholds literal steps rather than single-row Examples values. They are fixed
 minimum observations, not scenario variables; doing so removes the remaining
 three false soft-mutation targets.
+
+## 2026-08-12T10:26:00Z - specifier hands off Greedo entity-build-loan commit to coder
+
+Action: committed entity-24..27,29..31 (commit 50e90de) specifying that Greedo
+commits to a legal-entity build loan when EVERY shareholder can afford its share,
+is solvent, and its reserve allows it. Build-loan commitment is all-or-nothing
+(no partial loan) - a non-committing shareholder would free-ride on the rental
+income the loan buys. Handed implementation to coder (outbox
+000001). Root cause: commitToBuild() was never called by production code so
+entities never raised loans and never built hotels in real play.
+
+## 2026-08-12T10:34:00Z - specifier hands off entity narration to coder (000002)
+
+Committed journal/report/logging -67..69 (commit 6758443) narrating entity rent,
+rent-funded builds, and loan-funded builds. Root observability gap: Rent.java
+entity path never fires events, Game.java:207 ignores HouseBuilt, no
+LegalEntityRentPaid/entity-build Entry types. Delivered to coder via outbox root
+(id 000002).
