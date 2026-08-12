@@ -32610,3 +32610,10 @@ Action: accepted the structural review. The base-reserve correction and
 hotel-only dividend gate are complete; the removed null-deeds guard was dead
 code. This review does not authorize or include the separately paused
 market-deadlock proposal.
+
+Final architect verification of the accepted base-reserve/dividend correction:
+four differential mutation scans reported no changed surface; DRY found no
+duplicates; soft Gherkin mutation completed (125 total, 80 killed, 45 survived,
+0 errors); and isolated property tests passed (23 tests, 0 failures). The
+market-deadlock specification is intentionally still awaiting user approval,
+so this task is not phase-closed or forwarded to implementation.
