@@ -31915,3 +31915,21 @@ No extra narration specs: loan-raise narration is reason-agnostic and already
 covered.
 
 Routing to coder (default preference).
+
+## 2026-08-12 — specifier: sync to architect on greedo-entity-build-economy
+
+Per the architect's directive (c20c7e9eba) and user request to let the architect
+close the loop, the specifier-originated portion of the entity build-economy
+correction is complete and routed onward:
+
+- Added entity-30 acceptance coverage (see prior entry) encoding the requirement
+  that a nonzero treasury must not disable build-loan preparation: rent funds
+  the base build, then a unanimous commitment funds the remaining shortfall
+  before any dividend.
+- The scenario is red-by-design against current code (builds 1 of 3 houses),
+  reproducing the flagged defect.
+- Committed as 6f6173d294 and routed to the coder (priority 00) to implement.
+- No extra narration specs needed (loan-raise narration is reason-agnostic).
+
+The coder loop is now in progress; the architect can close/advance the review
+loop when the coder/refactorer chain returns.
