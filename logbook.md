@@ -32764,3 +32764,18 @@ priority: 00
 task: greedo-market-deadlock-trigger
 commit: d17eaf0311
 ```
+
+## 2026-08-13T00:04:03Z — architect: received stale coder note
+
+Received priority-50 note handoff 000155 from coder:
+
+> Re-read your role and constitution.
+>
+> 000001 stale; fcecc76 merged. Domain green; 5 acceptance failures. Advise.
+
+Action: confirmed `fcecc76` is already an ancestor. The reported five
+acceptance failures were subsequently root-caused and repaired by refactorer
+commit `7fea0b421a` (shared Background fixtures leaking into unrelated entity
+scenarios); it verified 597/597 acceptance tests. This note is obsolete. The
+active p00 coder follow-up remains the separate production-wiring correction in
+handoff 000254.
