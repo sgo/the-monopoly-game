@@ -32269,3 +32269,21 @@ while fully-developed entities take the established debt/dividend path.
 Independent verification: property profile 23/23; acceptance suite 591 with
 no failures; differential mutation clean (70 sites); DRY clean; and soft
 Gherkin mutation completed for `greedo-legal-entity.feature`.
+
+## 2026-08-12 — specifier: merged phase-complete sync (architect 000246)
+
+Received priority-50 git_handoff 000246 from architect (task greedo-entity-
+build-economy, commit e25fe80696, "Merge final entity economy review").
+
+Action: fast-forward merged e25fe80696. The merged implementation fixes the
+flagged empty-bank gate:
+- canPrepareBuildCommitment no longer requires bankBalance == $0.
+- New solicitCommitmentIfNeeded: after a treasury-only plan, if a buildable
+  street remains unfunded beyond treasury, prepare the unanimous reserve-safe
+  commitment and recompute the plan to complete construction (auto-solicit).
+- leavesABuildableStreetUnfunded detects the remaining shortfall.
+
+Verified: acceptance BUILD SUCCESS, 591 tests, 0 failures. My entity-30
+(auto-solicit success, treasury $100 --> loan $200, 3 houses, no dividend) and
+entity-15 (decline case) are both GREEN. The entity build-economy correction is
+closed.
