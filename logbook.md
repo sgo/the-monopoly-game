@@ -32679,3 +32679,56 @@ approved full-board, quiet-round, three-owner, collectively-funded trigger.
 Added deterministic initiative setup and handlers for the new scenario language.
 Domain tests pass 365/365. The full acceptance run reaches 597 tests but still
 reports five legacy legal-entity scenario failures for refactorer review.
+
+## 2026-08-12T21:42:57Z — refactorer receives market-deadlock trigger for review
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder fbd37e8c90
+```
+
+Action: merged `fbd37e8c90`, resolving a logbook-only conflict by retaining
+both histories. This commit touches only acceptance-harness/feature-file
+code (`World.java`, `JournalStepHandlers.java`,
+`greedo-legal-entity.feature`) — no domain production files changed.
+
+Root-caused the five flagged failures precisely (added a temporary counter
+print in `AcceptanceRuntime.run`, ran the class in isolation, mapped
+`acceptance()[N]` to scenario names, then removed the instrumentation):
+entity-21 [19], entity-24 [35], entity-25 [36], entity-30 [39], entity-32
+[40] — all five completely unmodified by this commit's diff. The cause: the
+new market-deadlock scenarios (entity-m1..m9) needed fixed initiative rolls
+and a blanket "every other player can complete their turn" fixture, and the
+coder added them to the feature's shared `Background`. Gherkin `Background`
+applies to every scenario in the file, so this silently changed dice/
+initiative behavior for the five *other* scenarios that also drive a real
+`Game.play()` round via unrelated setups, corrupting their outcomes (wrong
+house counts, an unexpected $300 loan, a false rent assertion).
+
+Fix: moved the four Background lines out and into each of the nine
+entity-m1..m9 scenario bodies individually (omitting the "iron box" line for
+entity-m5, whose two-player Examples row never selects that pawn). This is a
+pure structural relocation — the m-scenarios' own steps and semantics are
+unchanged, and the five unrelated scenarios stop receiving fixtures they
+never asked for. Full acceptance now 597/597, run twice.
+
+Separately flagging, not fixing (introducing this would be new production
+behavior, outside refactorer scope): `World.completeMarketDeadlockRound`
+calls `formEntity(...)` directly in the test harness rather than through any
+change to `Game.java`. `resolveLegalEntityAtStart` (the existing per-turn
+production formation trigger) is untouched. The m1/m6-m9 assertions check
+real `deeds` state via `colourGroupOwnedByEntity`, so they are not
+vacuous — but nothing in `Game.java` implements the approved
+quiet-round/collective-funding market-deadlock policy itself; the harness is
+simulating the intended outcome rather than exercising it. This is the same
+shape of gap as the earlier `Simulator.strategiesFor` finding this session:
+an acceptance scenario can go green without the real game ever taking the
+path it claims to prove. Routing this observation to the architect rather
+than guessing whether harness simulation is the intended interim state or a
+missed implementation step.
+
+CRAP/DRY/mutation-scan: no production files changed, nothing to re-run there.
+Domain 365/365 (unchanged), full acceptance 597/597 run twice.
