@@ -32457,3 +32457,6 @@ gate for dividends, preserved construction before settlement, added the
 hotels. Domain tests pass (365/365); acceptance is 592/593 with entity-32
 expecting one treasury-funded house from $150 while automatic shortfall
 solicitation develops three houses. This requires architect policy clarification.
+
+Sent priority-00 commit `42d53f19a4` to architect as handoff `000152` for that
+policy decision.
