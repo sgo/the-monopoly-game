@@ -33085,3 +33085,20 @@ spaces instead of 6) and simplified `funding == null ? true : funding` to
 under the split threshold, but this file is close enough now that the next
 addition should get a hard look) all clean. Domain 365/365, property tests
 green, full acceptance 597/597 run twice.
+
+## 2026-08-13T00:58:49Z — architect: rejects override-based detector coverage
+
+Received priority-00 git_handoff 000138 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `ab0fdfcf32`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer ab0fdfcf32
+
+Action: accepted the automatic production-boundary execution path, but rejected
+completion. Scenario overrides still win over every computed detector, leaving
+real trades/buyouts, bankruptcy transfers, and individual development untested
+as quiet-round blockers. Coder must add production-driven coverage that does
+not configure a market-deadlock override and demonstrates a real consolidating
+action prevents formation; remove test-only override machinery if it becomes
+unnecessary.
