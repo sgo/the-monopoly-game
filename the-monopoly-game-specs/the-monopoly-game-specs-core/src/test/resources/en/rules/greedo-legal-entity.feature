@@ -9,6 +9,10 @@ Feature: Greedo legal entity for a three-way colour-group split
   Background:
     Given the official rule set
     And we select 3 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And pawn "iron box" will roll 2 for initiative
+    And every other player can complete their turn
 
   # entity-m1
   Scenario Outline: three Greedo co-owners of a colour group automatically coalesce into a legal entity at market deadlock, holding equal shares

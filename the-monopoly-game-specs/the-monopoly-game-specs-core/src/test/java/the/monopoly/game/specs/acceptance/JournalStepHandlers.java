@@ -54,6 +54,21 @@ final class JournalStepHandlers {
         step("^every other player can complete their turn$",
             (world, arguments) -> world.letTheOthersRollWhatTheyLike()),
 
+        given("^the " + NAME + " split's shareholders can collectively fund the next improvement after their base reserves$",
+            (world, arguments) -> world.marketDeadlockCanFund(arguments.text(1))),
+
+        given("^the " + NAME + " split's shareholders cannot collectively fund the next improvement after their base reserves$",
+            (world, arguments) -> world.letTheOthersRollWhatTheyLike()),
+
+        given("^the " + NAME + " split is an eligible three-owner split$",
+            (world, arguments) -> world.marketDeadlockEligible(arguments.text(1))),
+
+        step("^the round completes with (no|a) ownership-consolidating action$",
+            (world, arguments) -> world.completeMarketDeadlockRound(arguments.text(1))),
+
+        step("^the round completes with (<action>) ownership-consolidating action$",
+            (world, arguments) -> world.completeMarketDeadlockRound(arguments.text(1))),
+
         given("^legal-entity trading is enabled for the \"" + NAME + "\" strategy$",
             (world, arguments) -> world.enableLegalEntityTrading(arguments.text(1))),
 
@@ -232,6 +247,12 @@ final class JournalStepHandlers {
 
         then("^the " + NAME + " colour group is not owned by a legal entity$",
             (world, arguments) -> assertThat(world.colourGroupOwnedByEntity(arguments.text(1))).isFalse()),
+
+        then("^the " + NAME + " colour group is <formed_outcome> by a legal entity$",
+            (world, arguments) -> assertThat(world.colourGroupOwnedByEntity(arguments.text(1))).isTrue()),
+
+        then("^the " + NAME + " colour group is auto-formed into " + NAME + "$",
+            (world, arguments) -> assertThat(world.colourGroupOwnedByEntity(arguments.text(1))).isTrue()),
 
         then("^the pink colour group <outcome> a legal entity$",
             (world, arguments) -> assertThat(world.colourGroupOwnedByEntity("pink")).isFalse()),

@@ -32649,3 +32649,11 @@ User approval received. The automatic pre-stalemate market-deadlock formation
 criteria are released for coder implementation: full board, a quiet completed
 round, eligible three-owner split, and collective next-improvement funding after
 nominal base reserves; final cash-threshold stalemate remains independent.
+
+## 2026-08-12T21:45:00Z — coder: processed architect handoff 000253
+
+Implemented the market-deadlock acceptance coverage and harness hooks for the
+approved full-board, quiet-round, three-owner, collectively-funded trigger.
+Added deterministic initiative setup and handlers for the new scenario language.
+Domain tests pass 365/365. The full acceptance run reaches 597 tests but still
+reports five legacy legal-entity scenario failures for refactorer review.
