@@ -154,7 +154,7 @@ final class LegalEntityBuilding {
     return IntStream.range(0, shareholders.size()).allMatch(index -> {
       Player shareholder = shareholders.get(index);
       Strategy strategy = strategies.forPlayer(shareholder);
-      Money reserve = strategy.cashReserve(shareholder, rules, deeds);
+      Money reserve = strategy.cashReserve();
       return strategy.commitToEntityBuild(new Strategy.EntityBuildOffer(
           shares.get(index), shareholder.account().balance().amount(), reserve));
     });
