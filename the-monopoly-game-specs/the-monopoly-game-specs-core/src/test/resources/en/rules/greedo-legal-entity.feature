@@ -1,5 +1,5 @@
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-11T07:41:25.554747Z","feature_name":"Greedo legal entity for a three-way colour-group split","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/greedo-legal-entity.feature","background_hash":"fd82b050e2caf6974e2f44e0c1ce996c7bd99ce3d3e5d035db5a75223654814e","implementation_hash":"unknown","scenarios":[{"index":13,"name":"the entity uses its rent before raising a loan to build","scenario_hash":"e3e0887ccd66ac4600387b38de334101acf5378e669a26e8a5e7aa11baa68d51","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-11T04:46:20.046607Z"},{"index":14,"name":"the entity builds as many houses as it can afford at the end of the turn","scenario_hash":"2fb2bcce463e71807420f255baea8b84f75d80be4d796e4d29d0e1e70d9b84e4","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-11T04:46:20.046607Z"},{"index":0,"name":"three Greedo co-owners of a colour group coalesce into a legal entity holding equal shares","scenario_hash":"2ef5e96b2ea70f8ff71751ea4b35eae5952a85776b607e56ec76b4482675c459","mutation_count":15,"result":{"Total":15,"Killed":15,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":3,"name":"the entity never consolidates a highest-priority colour group","scenario_hash":"072ba692ad338f0bcd5a482bf5606f8b18a5d2a4d1062bd8c5f03beed450891f","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":4,"name":"a two-player split of an eligible colour group does not form an entity","scenario_hash":"afc4ab1a1890586142a97b70d380ecac4e4354146c8064aa6e08fc415602c178","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"}]}
+# {"version":1,"tested_at":"2026-08-12T13:45:54.562135Z","feature_name":"Greedo legal entity for a three-way colour-group split","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/greedo-legal-entity.feature","background_hash":"fd82b050e2caf6974e2f44e0c1ce996c7bd99ce3d3e5d035db5a75223654814e","implementation_hash":"unknown","scenarios":[{"index":15,"name":"an entity whose streets are already fully developed is financially inactive at the round boundary","scenario_hash":"945de4c701666b1e82f4f6d2db3b72e40e69691050319b47b85625ad1d6bb0c4","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-12T13:45:54.562135Z"},{"index":13,"name":"the entity uses its rent before raising a loan to build","scenario_hash":"e3e0887ccd66ac4600387b38de334101acf5378e669a26e8a5e7aa11baa68d51","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-11T04:46:20.046607Z"},{"index":14,"name":"the entity builds as many houses as it can afford at the end of the turn","scenario_hash":"2fb2bcce463e71807420f255baea8b84f75d80be4d796e4d29d0e1e70d9b84e4","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-11T04:46:20.046607Z"},{"index":0,"name":"three Greedo co-owners of a colour group coalesce into a legal entity holding equal shares","scenario_hash":"2ef5e96b2ea70f8ff71751ea4b35eae5952a85776b607e56ec76b4482675c459","mutation_count":15,"result":{"Total":15,"Killed":15,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":3,"name":"the entity never consolidates a highest-priority colour group","scenario_hash":"072ba692ad338f0bcd5a482bf5606f8b18a5d2a4d1062bd8c5f03beed450891f","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":4,"name":"a two-player split of an eligible colour group does not form an entity","scenario_hash":"afc4ab1a1890586142a97b70d380ecac4e4354146c8064aa6e08fc415602c178","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -424,6 +424,21 @@ Feature: Greedo legal entity for a three-way colour-group split
     Examples:
       | loan | street          | share |
       | 1500 | Rue de Diekirch Arlon | 500  |
+
+  # entity-30
+  Scenario Outline: the entity applies its rent to build and raises a loan for the remaining shortfall before paying any dividend, even though its bank is not empty
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account holds $<rent>
+    And each shareholder commits $<share> toward Pink Realty's build
+    When we play up to 1 round
+    Then Pink Realty raises a loan of $<loan>
+    And the pink colour group is developed up to <total_houses> houses
+    And pawn "dog" receives no dividend from Pink Realty
+
+    Examples:
+      | rent | share | loan | total_houses |
+      | 100  | 100   | 200  | 3            |
 
   # Commentary: harness steps required to drive the Greedo entity-build-commit scenarios.
   # The strategy decision point (entity build loan commitment) and these steps are new.

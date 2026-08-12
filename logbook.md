@@ -31715,6 +31715,8 @@ dividend priority.
 Verification: domain tests 359/359 passed; full acceptance 590/590 passed;
 `git diff --check` passed.
 
+Sent normal git handoff `20260812T132433Z_000147_from_coder_to_refactorer` for
+review at commit `93f1c514ad`.
 ## 2026-08-12T15:38:00Z — refactorer receives entity narration for review
 
 Received coder priority-50 handoff:
@@ -31804,3 +31806,145 @@ threshold, now 60/63 split across the two files, mirroring the existing
 covering the previously 0%-covered build-commitment negotiation path, and
 fixed two pre-existing DRY violations found during review. Domain 365/365,
 property tests green, acceptance 590/590 run twice.
+
+## 2026-08-12T11:54:55Z — architect returns round-boundary timing criteria
+
+Sent priority-00 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: 0f840032d4
+```
+
+Required criteria decisions: entity-17 must state its intended post-boundary
+outcome; entity-26 must keep the shareholder distressed through the boundary
+or accept the resulting commitment; entity-30/31 must span operation and
+settlement across two rounds; share-sale-8 must account for the post-round
+shareholder commitment or arrange a scenario that isolates its intended
+share-sale outcome.
+
+## 2026-08-12T13:46:58Z — architect receives narration refactorer review
+
+Received priority-50 git handoff from refactorer:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 0ba2e6877a
+```
+
+Action: merged the review, preserving the prior architect timing-criteria
+record while resolving the logbook-only merge conflict. Reviewed the extracted
+`LegalEntityBuilding` collaborator, round-boundary operation and narration
+wiring, then verified domain property tests, differential Java mutation scans,
+DRY diagnostics, full acceptance, and soft acceptance mutation for the five
+affected features. The review’s new split-allocation mutation surface killed
+all six mutants; the full acceptance suite reported no failures.
+
+## 2026-08-12 — specifier: received phase-complete narration sync (architect 000240)
+
+Received priority-50 git_handoff 000240 from architect (task greedo-legal-
+entity-narration, commit c1c0701842):
+
+```
+id: 20260812T134749Z_000240_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: c1c0701842
+task: greedo-legal-entity-narration
+
+Re-read your role and constitution.
+
+merge_and_process architect c1c0701842
+```
+
+Action: merged (fast-forward) c1c0701842 into main. The commit implements the
+entity rent + entity house-build narration (closes the 9 previously-failing
+steps), via extraction of LegalEntityBuilding, new Journal.Entry/Report lines,
+and harness steps. It also refreshed the mutation manifests for the reworked
+greedo-legal-entity and greedo-share-sale features (my entity-17 / share-sale-8
+scenarios now each have a mutation entry and all are killed).
+
+Verified: acceptance pipeline BUILD SUCCESS, 590 tests, 0 failures (previously
+9). All timing reworks + narration are green.
+
+## 2026-08-12 — specifier: entity build-economy finding routed to architect
+
+Finding (asked user, user approved: "yes ask the architect to evaluate this and
+perhaps run his own games to confirm and give suggestions").
+
+Empirical (3 x 8p CLI runs, LE + stalemate trading on): entities form + pay
+dividends (2000+/game) but raise 0 loans, build 0 houses, collect 0 rent.
+Tracing the code:
+
+- Shareholders paying rent into the entity does NOT block construction: rent
+  goes to the treasury and is reinvested by buildAsMuchAsAffordable before any
+  dividend.
+- Real cause: canPrepareBuildCommitment (LegalEntityBuilding.java:26) only fires
+  when bankBalance == $0. Once non-loan cash (e.g. rent) pushes the bank above
+  $0, the entity stops attempting a build-loan commitment. At bank >= 150,
+  repayLoanOrPayDividend pays a DIVIDEND instead of building, even while streets
+  are undeveloped. So moderate rent is diverted to dividends, not construction.
+- prepareBuildCommitment tries maximumHotelCost then falls back to
+  standardBuildCost (1 house/street), but allAgreeToBuild (ALL-OR-NOTHING,
+  reserve-gated per confirmed policy) can fail both when a shareholder's reserve
+  exceeds balance.
+
+This is a spec-relevant economic finding (not a redundant toggle). Routed to
+architect for evaluation, independent runs, and suggestions.
+
+Action: see handoff <NEXT>.
+
+## 2026-08-12 — specifier: architect accepted build-economy finding, routed to coder
+
+The architect merged my entity-build-economy finding (commit b2594c42ab) as
+94c43dbd5e ("Merge entity build-economy finding", logbook only) and sent a
+priority-00 handoff (000241, task greedo-entity-build-economy) to the CODER
+(commit 94c43dbd5e), starting the architect review loop.
+
+Per constitution workflow: a priority-00 architect->coder handoff is an architect
+review loop; the result flows coder -> refactorer -> back to ARCHITECT, not to
+specifier. The specifier re-engages only when the architect sends a phase-complete
+sync. No specifier action pending; holding for the loop to close.
+
+## 2026-08-12 — specifier: add entity-30 spec per architect directive, route to coder
+
+Responding to architect directive (c20c7e9eba / review loop greedo-entity-build-
+economy): nonzero treasury must never by itself disable build-loan preparation;
+an eligible entity must apply its existing treasury to construction and, for the
+remaining shortfall, seek the unanimous reserve-safe commitment before dividend.
+
+Added entity-30 to greedo-legal-entity.feature:
+  Given 4 players, Pink Realty formed, bank holds $100, each shareholder commits
+  $100. Then: raises a loan of $200, pink group developed to 3 houses, dog
+  receives no dividend.
+
+Acceptance: 591 tests, exactly 1 failure = entity-30 "developed up to 3 houses"
+(expected 3, was 1). "raises a loan $200" and "no dividend" PASSED. This exactly
+reproduces the flagged bug: cannotExtendPlan returns true when
+startedWithTreasuryFunds && !plan.isEmpty() (LegalEntityBuilding.java:60), capping
+the build at the 1 treasury-funded house instead of financing to 3 with the
+agreed loan. Red-by-design state awaiting coder fix.
+
+No extra narration specs: loan-raise narration is reason-agnostic and already
+covered.
+
+Routing to coder (default preference).
+
+## 2026-08-12 — entity-30 mixed treasury/loan behavior implemented
+
+Processed specification commit `6f6173d294` and merged it as `5f93232`.
+Updated `LegalEntityBuilding` so an entity with treasury cash can continue
+planning across all streets when existing shareholder commitments authorize the
+remaining shortfall; treasury-only entities retain their one-round cap. This
+produces the specified $200 loan and three total houses from a $100 treasury.
+
+Verification: full acceptance 591/591 passed; domain tests 365/365 passed;
+`git diff --check` passed.

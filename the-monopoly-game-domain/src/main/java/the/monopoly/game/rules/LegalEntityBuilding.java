@@ -71,7 +71,8 @@ final class LegalEntityBuilding {
   private static boolean cannotExtendPlan(LegalEntity entity, Money shortfall, boolean startedWithTreasuryFunds,
                                           List<ColourStreet> plan) {
     if (shortfall.amount() <= 0) return false;
-    if (startedWithTreasuryFunds && !plan.isEmpty()) return true;
+    if (startedWithTreasuryFunds && !plan.isEmpty()
+        && (entity.buildCommitmentsEmpty() || plan.size() >= entity.streets().size())) return true;
     return !canBorrowForBuilding(entity, shortfall);
   }
 
@@ -186,12 +187,12 @@ final class LegalEntityBuilding {
 
 /* mutate4java-manifest
 version=1
-moduleHash=eb4fd1f3d0ee1cada670e8c1d83b77a99a1704e88b1a9174595000ae86fe7268
+moduleHash=87118d2b78f05b193a0260340a1bc6ec0ecfaa70e02c21b7046d2146ed7382f9
 scope.0.id=Y2xhc3M6TGVnYWxFbnRpdHlCdWlsZGluZyNMZWdhbEVudGl0eUJ1aWxkaW5nOjE0
 scope.0.kind=class
 scope.0.startLine=14
 scope.0.endLine=185
-scope.0.semanticHash=7edf070454034c9eb8426a07b76d7629d78c4ac6e0d88b685b3e964fd88ffb27
+scope.0.semanticHash=4da2c465aa733ff48b8ff72c1cb5101db087d0c813170e32f605d55cc38d6e01
 scope.1.id=bWV0aG9kOkxlZ2FsRW50aXR5QnVpbGRpbmcjYWZmb3JkYWJsZUJ1aWxkUGxhbigyKTo0Nw
 scope.1.kind=method
 scope.1.startLine=47
@@ -276,7 +277,7 @@ scope.17.id=bWV0aG9kOkxlZ2FsRW50aXR5QnVpbGRpbmcjc2hhcmVzT2YoMik6MTcw
 scope.17.kind=method
 scope.17.startLine=170
 scope.17.endLine=177
-scope.17.semanticHash=5fcae9a71945b2c3ea8e2c0432547bc980b1aadf79994900b75803e535d0667b
+scope.17.semanticHash=67971fcc300c2210733b86d9c0a053dae49907d830d9bd261f0f426481c50821
 scope.18.id=bWV0aG9kOkxlZ2FsRW50aXR5QnVpbGRpbmcjc3RhbmRhcmRCdWlsZENvc3QoMSk6MTQ5
 scope.18.kind=method
 scope.18.startLine=149
