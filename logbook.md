@@ -31948,3 +31948,39 @@ produces the specified $200 loan and three total houses from a $100 treasury.
 
 Verification: full acceptance 591/591 passed; domain tests 365/365 passed;
 `git diff --check` passed.
+
+## 2026-08-12T15:23:47Z — refactorer receives entity build-economy fix for review
+
+Received coder priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 2ef40822f2
+```
+
+Action: merged `2ef40822f2`, resolving a logbook-only conflict by retaining
+both histories. This closes the architect review loop opened by the
+specifier's entity-build-economy finding (real games formed entities and
+paid dividends but never raised loans or built houses, because
+`cannotExtendPlan` capped a treasury-funded entity's build plan at one house
+the moment any starting treasury balance existed, regardless of standing
+build commitments).
+
+The fix is a single added condition in `LegalEntityBuilding.cannotExtendPlan`:
+a nonzero-treasury entity now only stops extending its plan when it has no
+build commitments to draw on, or when the plan already covers every street
+in the group — otherwise it keeps planning across the whole group, funding
+the affordable part from treasury and the rest from the agreed commitment/
+loan. Reviewed for correctness: the outer `affordableBuildPlan` loop still
+terminates independently via street exhaustion in `cheapestBuildableStreet`,
+so loosening this guard cannot introduce a runaway loop.
+
+CRAP: `cannotExtendPlan` is now exactly 6.0 (CC=6, 100% coverage) — at the
+threshold, not over it. dry4java reports no duplicates in the file.
+Mutation-scan: 66 sites, well under the 100-site split threshold. No other
+production file touched by this commit. Manifest refreshed via
+`--update-manifest`.
+
+Domain 365/365, property-tests profile green, full acceptance 591/591 (the
+new entity-30 scenario included) run twice.
