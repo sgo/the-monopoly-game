@@ -104,12 +104,6 @@ public class World {
   private Entry selectedEvent;
   private String renderedEventText;
   private String loggedEventText;
-  private boolean marketDeadlockFunding;
-  private boolean marketDeadlockEligible;
-  private String marketDeadlockGroup;
-  private boolean marketDeadlockScenario;
-  private Game lastGame;
-  private String pendingMarketDeadlockAction;
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
@@ -420,15 +414,10 @@ public class World {
         stalemateTrading,
         legalEntityTrading
     );
-    lastGame = game;
-    if (marketDeadlockScenario) {
-      game.configureMarketDeadlockRound(!"a".equals(pendingMarketDeadlockAction), marketDeadlockFunding);
-    }
     Game.Result result = play.apply(game);
     turnOrder = result.turnOrder();
     journal = result.journal();
     deeds = result.deeds();
-    marketDeadlockScenario = false;
   }
 
   public void placePawn(String pawnName, int position) {
@@ -1130,32 +1119,22 @@ public class World {
   }
 
   public void marketDeadlockCanFund(String group) {
-    marketDeadlockScenario = true;
-    marketDeadlockFunding = true;
-    marketDeadlockGroup = group;
     letTheOthersRollWhatTheyLike();
   }
 
   public void marketDeadlockCannotFund(String group) {
-    marketDeadlockScenario = true;
-    marketDeadlockFunding = false;
+    holdPawnBalance("dog", Money.ZERO);
+    holdPawnBalance("high hat", Money.ZERO);
+    holdPawnBalance("iron box", Money.ZERO);
     letTheOthersRollWhatTheyLike();
   }
 
   public void marketDeadlockEligible(String group) {
-    marketDeadlockScenario = true;
-    marketDeadlockEligible = true;
-    marketDeadlockGroup = group;
     letTheOthersRollWhatTheyLike();
   }
 
   public void completeMarketDeadlockRound(String action) {
     letTheOthersRollWhatTheyLike();
-    if (lastGame == null) {
-      pendingMarketDeadlockAction = action;
-      return;
-    }
-    lastGame.resolveMarketDeadlockAtRoundBoundary("no".equals(action), marketDeadlockFunding);
   }
 
   private Roll nextQueuedPawnRoll(Player player) {

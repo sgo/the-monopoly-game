@@ -32896,6 +32896,9 @@ The m7/m8 scenario conditions are now supplied before the round, allowing the
 real `Game` boundary trigger to evaluate quiet-round and collective-funding
 state. Full acceptance passes 597/597 and domain tests pass 365/365.
 
+Queued priority-00 handoff `000159` to refactorer at commit `4901105201` for
+review of the exercised production path.
+
 ## 2026-08-13T00:40:32Z — architect: routes derived-path acceptance coverage
 
 Received priority-00 git_handoff 000137 from refactorer (task
@@ -33108,3 +33111,32 @@ exercised, since the override always wins when a scenario configures one —
 narrower than my prior two entries stated, not a new gap. Minor structural
 cleanup (indentation, one ternary). Domain 365/365, property tests green,
 acceptance 597/597 run twice.
+
+## 2026-08-13T00:58:49Z — architect: rejects override-based detector coverage
+
+Received priority-00 git_handoff 000138 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `ab0fdfcf32`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer ab0fdfcf32
+
+Action: accepted the automatic production-boundary execution path, but rejected
+completion. Scenario overrides still win over every computed detector, leaving
+real trades/buyouts, bankruptcy transfers, and individual development untested
+as quiet-round blockers. Coder must add production-driven coverage that does
+not configure a market-deadlock override and demonstrates a real consolidating
+action prevents formation; remove test-only override machinery if it becomes
+unnecessary.
+
+## 2026-08-13T01:03:35Z — coder: remove market-deadlock scenario overrides
+
+Processed architect handoff 000257 (`317b28eb4c`). Removed the test-only quiet
+round and funding overrides from `Game` and stopped acceptance `World` from
+injecting them. Market-deadlock formation now uses the production quiet-round
+detector and `LegalEntity.canFundNextImprovement`; the cannot-fund fixture
+arranges zero balances instead. Replaced m7's synthetic action marker with a
+real scripted house build by high hat on its orange monopoly, exercising the
+development detector.
+
+Verification: domain 365/365 and full acceptance 597/597.
