@@ -32485,3 +32485,13 @@ reserve. Second, entity-32 specifies that a $150 treasury builds one house,
 whereas the existing auto-solicitation rule treats a further buildable street as
 permission to solicit and produces three. This is an acceptance-policy conflict,
 so it is routed to specifier before further coder changes.
+
+Delivered as handoff 000250:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-entity-build-economy
+commit: ff2a4f8185
+```
