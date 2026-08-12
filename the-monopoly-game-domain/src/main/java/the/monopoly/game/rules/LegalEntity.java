@@ -154,13 +154,12 @@ public final class LegalEntity {
 
   public Operation operate(Deeds deeds, Strategy.OfPlayers strategies, Rule.Set rules) {
     if (!hasShareholders()) return new Operation.NoAction();
-    if (loan.equals(Money.ZERO) && lastCapitalizedShareholderGrewOlder) return settled();
     Operation building = LegalEntityBuilding.buildAsMuchAsAffordable(this, deeds, strategies, rules);
-    return building != null ? operatedAs(building) : settled();
+    return building != null ? operatedAs(building) : settled(deeds);
   }
 
-  private Operation settled() {
-    Operation settlement = repayLoanOrPayDividend();
+  private Operation settled(Deeds deeds) {
+    Operation settlement = repayLoanOrPayDividend(deeds);
     return operatedAs(settlement != null ? settlement : new Operation.NoAction());
   }
 
@@ -169,11 +168,15 @@ public final class LegalEntity {
     return operation;
   }
 
-  private Operation repayLoanOrPayDividend() {
+  private Operation repayLoanOrPayDividend(Deeds deeds) {
     if (!loan.equals(Money.ZERO)) return repayLoanIfAffordable();
-    return bankBalance().amount() >= 150
+    return bankBalance().amount() >= 150 && (deeds == null || fullyDeveloped(deeds))
         && (lastCapitalizedShareholder == null || lastCapitalizedShareholderGrewOlder)
         ? payDividend() : null;
+  }
+
+  private boolean fullyDeveloped(Deeds deeds) {
+    return streets.stream().allMatch(deeds::hasHotelOn);
   }
 
   private Operation repayLoanIfAffordable() {

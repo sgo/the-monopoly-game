@@ -871,9 +871,9 @@ Feature: game report
   # report-65
   Scenario Outline: the report narrates that <entity_name> repays a shareholder loan
     Given <entity_name> is formed
-    And the street "Rue de Diekirch Arlon" has 4 houses built
-    And the street "Bruul Mechelen" has 4 houses built
-    And the street "Place Verte Verviers" has 4 houses built
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
     And <entity_name> owes pawn "dog" $100
     And <entity_name>'s bank account holds $105
     When we play up to 1 round
@@ -886,9 +886,9 @@ Feature: game report
   # report-66
   Scenario Outline: the report narrates an equal dividend paid by <entity_name> to each shareholder
     Given <entity_name> is formed
-    And the street "Rue de Diekirch Arlon" has 4 houses built
-    And the street "Bruul Mechelen" has 4 houses built
-    And the street "Place Verte Verviers" has 4 houses built
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
     And <entity_name>'s bank account holds $150
     And pawn "dog" will roll 12 for their turn
     When we play up to 1 round

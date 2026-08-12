@@ -20052,6 +20052,29 @@ repeat shape). Ran `./acceptance/run-acceptance.sh`: 433 tests, 0
 failures — both scenarios pass against the already-merged, already-fixed
 implementation.
 
+## 2026-08-12T20:27:20Z — architect routes combined entity-economy implementation
+
+The merged criteria require two coordinated behavioral changes:
+
+- Entity build offers evaluate a shareholder against Greedo's nominal base
+  reserve, not individual dynamic monopoly/station reserve bumps; unanimous
+  approval and the no-free-rider affordability check remain mandatory.
+- Dividends require every entity street to have a hotel. Under-developed
+  entities retain rent and treasury surplus for construction; entity-32 is the
+  red acceptance coverage for this rule.
+
+Routing the observable behavior to coder for implementation and verification.
+
+Delivered as handoff 000249:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-entity-build-economy
+commit: fd12c20098
+```
+
 Committed as `e0cb12bedc` "Retune distressed-sale-17 to the mortgage-floor
 boundary, add distressed-sale-18" (2 files, 85 insertions).
 
@@ -31963,6 +31986,9 @@ produces the specified $200 loan and three total houses from a $100 treasury.
 Verification: full acceptance 591/591 passed; domain tests 365/365 passed;
 `git diff --check` passed.
 
+Sent priority-00 git handoff `20260812T193029Z_000151_from_coder_to_refactorer`
+for review at commit `155e6f95c0`.
+
 The coder loop is now in progress; the architect can close/advance the review
 loop when the coder/refactorer chain returns.
 
@@ -32269,3 +32295,266 @@ near-duplicate solicit-and-recompute blocks the coder's fix introduced
 by hand and with the full suite. Domain 365/365, property tests green,
 acceptance 591/591 (one of four runs hit the known cli-1 unseeded-dice
 timing flake, unrelated to this change and reproduced clean on retry).
+## 2026-08-12T19:42:34Z — architect receives final entity-economy refactorer review
+
+Received priority-00 git handoff from refactorer:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 667792b0ac
+```
+
+Action: merged the review and retained both logbook histories. Accepted the
+extracted `solicitCommitmentIfNeeded` boundary: the entity first identifies a
+treasury-only plan, then solicits only when an additional buildable
+improvement remains unfunded. That satisfies automatic shortfall financing
+while fully-developed entities take the established debt/dividend path.
+Independent verification: property profile 23/23; acceptance suite 591 with
+no failures; differential mutation clean (70 sites); DRY clean; and soft
+Gherkin mutation completed for `greedo-legal-entity.feature`.
+
+## 2026-08-12 — specifier: merged phase-complete sync (architect 000246)
+
+Received priority-50 git_handoff 000246 from architect (task greedo-entity-
+build-economy, commit e25fe80696, "Merge final entity economy review").
+
+Action: fast-forward merged e25fe80696. The merged implementation fixes the
+flagged empty-bank gate:
+- canPrepareBuildCommitment no longer requires bankBalance == $0.
+- New solicitCommitmentIfNeeded: after a treasury-only plan, if a buildable
+  street remains unfunded beyond treasury, prepare the unanimous reserve-safe
+  commitment and recompute the plan to complete construction (auto-solicit).
+- leavesABuildableStreetUnfunded detects the remaining shortfall.
+
+Verified: acceptance BUILD SUCCESS, 591 tests, 0 failures. My entity-30
+(auto-solicit success, treasury $100 --> loan $200, 3 houses, no dividend) and
+entity-15 (decline case) are both GREEN. The entity build-economy correction is
+closed.
+
+## 2026-08-12 — specifier: empirical regression - entity building (rent AND loan) absent in real play; route to architect
+
+User requested new 8-player empirical runs after the build-economy fix merge
+(e25fe80696/closing 000246). Rebuilt jar, ran 10 LE-on + 10 LE-off control games.
+
+Results (10 games each):
+- LE ON : 9/10 bankruptcy end, 1/10 stalemate. Entity loans=0, builds=0, rent=0.
+  Entities only form, pay dividends, and sell shares.
+- LE OFF: 1/10 bankruptcy end, 9/10 stalemate. (control)
+
+So legal entities DO break stalemates (via share concentration + dividends +
+inheritance -> bankruptcy), but entity DEVELOPMENT is entirely absent in real
+play: 0 loans raised, 0 houses built, 0 rent collected.
+
+This is a REGRESSION vs the earlier empirical observation (le-122, before the
+narration/build refactors): entities used to build rent-funded houses (27 builds
+per game observed). Now rent-funded building AND loan-funded building are both
+absent. The acceptance suite is green (entity-30 auto-solicit passes) but the
+real 8-player loop never exercises it - likely the unanimous ALL-OR-NOTHING
+reserve/affordability gate fails on near-complete-monopoly co-owners in real
+games, and/or rent is diverted to dividends before it reaches a build.
+
+User direction: send to architect for investigation. We want to see building
+BOTH with rent funds AND via loans. Routing priority-00 to architect.
+
+## 2026-08-12T20:06:50Z — architect: received empirical entity-development regression
+
+Received priority-00 git_handoff 000171 from specifier (task
+`greedo-entity-build-economy`, commit `5eab2f6da9`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process specifier 5eab2f6da9
+
+Action: merged the report, rebuilt the simulator, and independently ran ten
+eight-player legal-entity-enabled games. All ten again produced zero entity
+loans, zero entity house builds, and zero entity rent events.
+
+Code trace: automatic solicitation is wired through `LegalEntityBuilding` when
+the entity treasury cannot fund the next build. It still requires unanimous
+`Greedo` shareholder consent. Each offer is checked against that shareholder's
+dynamic individual reserve, including reserves for a near-complete monopoly or
+stations. In real play at least one shareholder consequently declines the
+maximum-hotel and fallback one-house-per-street commitment. The explicit
+all-or-nothing/no-free-rider policy therefore prevents both rent-funded and
+loan-funded entity development, despite the artificial zero-reserve acceptance
+scenario passing.
+
+This is an economic-rule decision, not a safe wiring correction: weakening the
+consent or reserve policy here would contradict current accepted behavior.
+
+## 2026-08-12T20:06:50Z — architect routes entity-development policy decision
+
+Decision required: define an entity-investment policy that makes both
+treasury/rent-funded and loan-funded development attainable in ordinary
+eight-player games while retaining the accepted all-shareholder/no-free-rider
+guarantee. In particular, decide whether an entity contribution uses a
+different reserve policy from a shareholder's individual monopoly/station
+strategy reserve, whether the offer should be sized differently, or whether
+formation/another stated rule governs this. Add observable coverage using
+non-artificial shareholder reserves; the present zero-reserve scenario alone
+does not represent the real-game failure.
+
+## 2026-08-12 — specifier: decide entity-development reserve policy (architect 000247)
+
+Architect escalated policy decision (33e570ff2d): real 8-player games never
+build/raise loans because entity contributions are gated by each shareholder's
+INDIVIDUAL dynamic reserve (Greedo.cashReserve(player,rules,deeds) includes the
+near-complete-monopoly and station reserve bumps). Acceptance uses contrived
+zero-reserve shareholders, so it passes without representing the real failure.
+
+User decision: BASE_RESERVE. An entity build-loan contribution is evaluated
+against the shareholder's NOMINAL base reserve only, not the monopoly/station
+bump. The unanimous all-shareholder + no-free-rider guarantee is unchanged.
+
+Implication: a shareholder who owns a near-complete monopoly (large dynamic
+reserve) but a moderate base reserve STILL lets the entity raise a build loan
+and build, because the entity offer uses the base reserve.
+
+## 2026-08-12 — specifier: decide entity dividend "fully developed" policy (architect 000248)
+
+Architect routed policy correction (7a73a356f0) from user direction: "Dividends
+should never be paid out unless the property is fully developed." Root cause:
+repayLoanOrPayDividend pays a dividend whenever treasury >= $150 and the
+last-capitalised triggers are met, WITHOUT a fully-developed check. An
+under-developed entity with >=$150 rent therefore dividends instead of saving
+toward the next construction cost (contributing to the observed 0-build/
+0-loan real-game dormancy).
+
+User decision (via AskQuestion): FULLY DEVELOPED = every entity street has a
+HOTEL. Dividend requires hotels + treasury >= $150 + last-capitalised-aged
+triggers. Under-developed entities (0..4 houses) never pay dividends.
+
+Spec changes in greedo-legal-entity.feature:
+- entity-8/11/18/19 revised: "fully developed" dividend-eligibility scenarios
+  now use HOTELS (was 4 houses) so the loan-block and last-capitalised trigger
+  tests isolate cleanly under the new gate.
+- NEW entity-32 (red-by-design): an under-developed entity spends its treasury
+  on building rather than paying a dividend, even when treasury >= $150 and the
+  last-capitalised shareholder has aged. Examples: 0 houses/150 -> builds 1,
+  no dividend; 0 houses/300 -> builds 3, no dividend.
+
+Acceptance: 593 tests, 2 failures, BOTH entity-32 examples failing at
+"pawn dog receives no dividend from Pink Realty" -- current code still pays an
+under-developed dividend (dividend-drain bug). entity-8/11/18/19 + all others
+green. Red-by-design, implementation (fully-developed gate in
+repayLoanOrPayDividend) is coder/architect scope. Routing to architect.
+
+## 2026-08-12T20:27:20Z — architect: received fully-developed dividend criteria
+
+Received priority-00 git_handoff 000173 from specifier (task
+`greedo-entity-build-economy`, commit `ded702d237`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process specifier ded702d237
+
+Action: accepted the complete policy. A legal entity may pay a dividend only
+when every entity street has a hotel; an entity with zero through four houses
+on any street retains its treasury and uses it for building. The new
+red-by-design entity-32 scenarios establish the missing behavior. Together
+with the returned base-reserve decision, the criteria are now ready for coder
+implementation.
+Delivered as handoff 000247:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-entity-build-economy
+commit: 33e570ff2d
+```
+
+## 2026-08-12T20:15:53Z — architect: user resolves entity dividend policy
+
+User direction: "Dividends should never be paid out unless the property is
+fully developed."
+
+Action: traced the entity rent and settlement paths. Undeveloped entity streets
+do collect double vacant rent into the entity treasury. `operate` attempts a
+treasury-only build before settlement, but when the balance is below the next
+construction cost it falls through to `repayLoanOrPayDividend`, which distributes
+any treasury of at least $150. That contradicts the user direction and can drain
+rent before it reaches the next construction cost. Routed to specifier for an
+acceptance-criterion correction before implementation.
+
+## 2026-08-12 — specifier: reconcile entity-32 vs auto-solicit policy (architect 000250)
+
+Architect flagged a real acceptance-policy conflict (ff2a4f8185) in my entity-32:
+I specified a $150 treasury builds ONE house (dividend-gate test), but the
+accepted auto-solicitation rule treats any further buildable street as permission
+to solicit, so eligible default shareholders would cover the shortfall and build
+THREE (as in entity-30). The two under-developed-treasury scenarios disagreed.
+
+Reconciliation: entity-32 now sets the non-dividend shareholders to DECLINE
+("has a balance that allows only $<ceiling_share>" = 0), so no auto-solicited
+loan bridges the gap: the entity builds only with its own treasury and, being
+under-developed, pays no dividend. Examples: 0 houses/150 -> builds 1, no
+dividend; 0 houses/300 -> builds 3, no dividend.
+
+This isolates the develop-before-dividend rule from the auto-solicit behaviour
+(entity-30 still proves loans fire when shareholders finance the shortfall).
+entity-32 stays red-by-design only at the dividend gate (current code still pays
+an under-developed dividend). Benchmarked: 593 tests, 2 failures = entity-32's
+no-dividend asserts; entity-30 green.
+
+There remains the coder/architect task: allAgreeToBuild still passes
+cashReserve(player,rules,deeds) (dynamic monopoly/station reserve) rather than
+the specified BASE_RESERVE -- unresolved implementation follow-up.
+
+## 2026-08-12T22:45:20Z — coder reports entity-32 policy conflict
+
+Processed architect handoff `fd12c20098`. Implemented the fully-developed hotel
+gate for dividends, preserved construction before settlement, added the
+`developed_total` acceptance handler, and updated dividend fixtures to use
+hotels. Domain tests pass (365/365); acceptance is 592/593 with entity-32
+expecting one treasury-funded house from $150 while automatic shortfall
+solicitation develops three houses. This requires architect policy clarification.
+
+Sent priority-00 commit `42d53f19a4` to architect as handoff `000152` for that
+policy decision.
+## 2026-08-12T20:46:20Z — architect: received coder implementation review
+
+Received priority-00 git_handoff 000152 from coder (task
+`greedo-entity-build-economy`, commit `42d53f19a4`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process coder 42d53f19a4
+
+Action: reviewed the already-merged implementation. The hotel-only dividend
+gate is present, but two blockers remain. First, `allAgreeToBuild` still passes
+`strategy.cashReserve(player, rules, deeds)` to each entity offer, so it retains
+the forbidden dynamic monopoly/station reserve rather than the specified base
+reserve. Second, entity-32 specifies that a $150 treasury builds one house,
+whereas the existing auto-solicitation rule treats a further buildable street as
+permission to solicit and produces three. This is an acceptance-policy conflict,
+so it is routed to specifier before further coder changes.
+
+Delivered as handoff 000250:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-entity-build-economy
+commit: ff2a4f8185
+```
+
+## 2026-08-12T20:50:34Z — architect: received entity-32 reconciliation
+
+Received priority-00 git_handoff 000174 from specifier (task
+`greedo-entity-build-economy`, commit `022c9e8f79`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process specifier 022c9e8f79
+
+Action: merged the revised entity-32 acceptance criterion. It now explicitly
+uses shareholders who decline financing, so a $150 treasury builds one house
+without a loan and is retained rather than paid as a dividend. Auto-solicitation
+remains covered separately by entity-30. The remaining coder correction is to
+use the specified nominal base reserve for entity build offers.
+
+Applied the correction by passing `Strategy.cashReserve()` to entity build
+offers. Domain tests pass (365/365) and acceptance passes (593/593).

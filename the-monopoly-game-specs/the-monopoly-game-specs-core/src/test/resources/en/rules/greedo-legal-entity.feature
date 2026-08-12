@@ -116,11 +116,11 @@ Feature: Greedo legal entity for a three-way colour-group split
       | 200       | 200  | 2               | 0              |
 
   # entity-8
-  Scenario Outline: no dividend is paid while any shareholder loan to the entity is still outstanding
+  Scenario Outline: no dividend is paid while any shareholder loan to the entity is still outstanding, even when the entity is fully developed
     Given Pink Realty is formed
-    And the street "Rue de Diekirch Arlon" has 4 houses built
-    And the street "Bruul Mechelen" has 4 houses built
-    And the street "Place Verte Verviers" has 4 houses built
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
     And Pink Realty owes pawn "dog" $<principal>
     And Pink Realty's bank account holds $<surplus>
     And every other ownable space is owned by pawn "racecar"
@@ -132,11 +132,11 @@ Feature: Greedo legal entity for a three-way colour-group split
       | 100       | 150     |
 
   # entity-11
-  Scenario Outline: a dividend is paid only after the entire loan plus interest has been repaid
+  Scenario Outline: a dividend is paid only after the entire loan plus interest has been repaid and the entity is fully developed
     Given Pink Realty is formed
-    And the street "Rue de Diekirch Arlon" has 4 houses built
-    And the street "Bruul Mechelen" has 4 houses built
-    And the street "Place Verte Verviers" has 4 houses built
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
     And Pink Realty owes pawn "dog" $<principal>
     And Pink Realty's loan has been fully repaid
     And Pink Realty's bank account holds $<surplus>
@@ -298,11 +298,11 @@ Feature: Greedo legal entity for a three-way colour-group split
       | 1500 | Rue de Diekirch Arlon | Bruul Mechelen | Place Verte Verviers  | 500   |
 
   # entity-18
-  Scenario Outline: no dividend is paid unless the last-capitalised shareholder grows a year older
+  Scenario Outline: no dividend is paid unless the last-capitalised shareholder grows a year older, even when the entity is fully developed
     Given Pink Realty is formed
-    And the street "Rue de Diekirch Arlon" has 4 houses built
-    And the street "Bruul Mechelen" has 4 houses built
-    And the street "Place Verte Verviers" has 4 houses built
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
     And Pink Realty owes pawn "dog" $<principal>
     And Pink Realty's loan has been fully repaid
     And Pink Realty's bank account holds $<surplus>
@@ -315,11 +315,11 @@ Feature: Greedo legal entity for a three-way colour-group split
       | 0         | 150     |
 
   # entity-19
-  Scenario Outline: the entity pays an equal dividend when the last-capitalised shareholder grows a year older
+  Scenario Outline: the entity pays an equal dividend when the last-capitalised shareholder grows a year older and the entity is fully developed
     Given Pink Realty is formed
-    And the street "Rue de Diekirch Arlon" has 4 houses built
-    And the street "Bruul Mechelen" has 4 houses built
-    And the street "Place Verte Verviers" has 4 houses built
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
     And Pink Realty owes pawn "dog" $<principal>
     And Pink Realty's loan has been fully repaid
     And Pink Realty's bank account holds $<surplus>
@@ -451,6 +451,29 @@ Feature: Greedo legal entity for a three-way colour-group split
     Examples:
       | rent | balance | reserve | loan | total_houses |
       | 100  | 200     | 0       | 200  | 3            |
+
+  # entity-32
+  Scenario Outline: an under-developed entity whose shareholders decline to finance a build loan spends its treasury on building rather than paying a dividend, even when the treasury exceeds the dividend threshold and the last-capitalised shareholder has aged
+    Given we select 4 players
+    And Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has <houses> house(s) built
+    And the street "Bruul Mechelen" has <houses> house(s) built
+    And the street "Place Verte Verviers" has <houses> house(s) built
+    And Pink Realty owns no outstanding loan
+    And Pink Realty's bank account holds $<surplus>
+    And the last-capitalised shareholder of Pink Realty is pawn "dog"
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And pawn "high hat" has a balance that allows only $<ceiling_share> toward the entity
+    And pawn "iron box" has a balance that allows only $<ceiling_share> toward the entity
+    When we play up to 1 round
+    Then pawn "dog" receives no dividend from Pink Realty
+    And the pink colour group is developed up to <developed_total> houses
+    And Pink Realty's bank account holds $<surplus_remaining>
+
+    Examples:
+      | houses | surplus | ceiling_share | developed_total | surplus_remaining |
+      | 0      | 150     | 0             | 1               | 50                 |
+      | 0      | 300     | 0             | 3               | 0                  |
 
   # Commentary: harness steps required to drive the Greedo entity-build-commit scenarios.
   # The strategy decision point (entity build loan commitment) and these steps are new.

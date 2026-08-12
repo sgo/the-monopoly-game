@@ -169,7 +169,7 @@ class LegalEntityTest {
   void operatingRepaysAnOutstandingLoanWithFivePercentInterestWhenNothingIsBuildable() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
-    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.streets().forEach(deeds::arrangeHotel);
     entity.raiseLoan(new Money(100));
     entity.depositToBank(new Money(5));
 
@@ -185,7 +185,7 @@ class LegalEntityTest {
   void operatingPaysADividendWhenNothingIsBuildableAndNoLoanIsOutstanding() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
-    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.streets().forEach(deeds::arrangeHotel);
     entity.depositToBank(new Money(150));
     entity.recordCapitalization(dog);
     entity.shareholderGrewOlder(dog);
@@ -203,7 +203,7 @@ class LegalEntityTest {
   void operatingDoesNotPayADividendBeforeTheLastCapitalizedShareholderGrowsOlder() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
-    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.streets().forEach(deeds::arrangeHotel);
     entity.depositToBank(new Money(150));
     entity.recordCapitalization(dog);
 
@@ -239,7 +239,7 @@ class LegalEntityTest {
   void aDividendKeepsAnIntegerRemainderInTheEntityBank() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
-    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.streets().forEach(deeds::arrangeHotel);
     entity.depositToBank(new Money(170));
     entity.recordCapitalization(dog);
     entity.shareholderGrewOlder(dog);
@@ -404,7 +404,7 @@ class LegalEntityTest {
   private LegalEntity dividendEligibleEntity(Money bankBalance) {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
-    entity.streets().forEach(street -> deeds.arrangeHouses(street, 4));
+    entity.streets().forEach(deeds::arrangeHotel);
     entity.depositToBank(bankBalance);
     entity.recordCapitalization(dog);
     return entity;
