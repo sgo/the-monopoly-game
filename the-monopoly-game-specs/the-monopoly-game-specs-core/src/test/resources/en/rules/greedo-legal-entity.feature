@@ -354,3 +354,131 @@ Feature: Greedo legal entity for a three-way colour-group split
       | player_count | group | street_dog            | street_high_hat      | street_high_hat_extras |
       | 4            | pink  | Rue de Diekirch Arlon | Bruul Mechelen       | Place Verte Verviers   |
       | 8            | green | Boulevard Tirou Charleroi | Veldstraat Gent  | Boulevard d'Avroy Liège |
+
+  # entity-24
+  Scenario Outline: the entity raises a build loan when every Greedo shareholder can afford its share, is solvent, and its reserve allows it
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account is empty
+    And pawn "dog" has a balance of $<balance>
+    And pawn "high hat" has a balance of $<balance>
+    And pawn "iron box" has a balance of $<balance>
+    And pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    And pawn "high hat" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    And pawn "iron box" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    When we play up to 1 round
+    Then Pink Realty raises a loan of $<loan>
+    And the street "<street>" has at least <houses> houses built
+
+    Examples:
+      | balance | reserve | loan | street              | houses |
+      | 200     | 0       | 300  | Rue de Diekirch Arlon | 1      |
+
+  # entity-25
+  Scenario Outline: the entity does not raise a build loan when a Greedo shareholder cannot afford its share
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account is empty
+    And pawn "high hat" has a balance that allows only $<ceiling_share> toward the entity
+    And pawn "iron box" has a balance that allows only $<ceiling_share> toward the entity
+    When we play up to 1 round
+    Then Pink Realty raises no more than $0 in loans
+    And the pink colour group is developed up to no more than <total_houses> houses
+
+    Examples:
+      | ceiling_share | total_houses |
+      | 40            | 0            |
+
+  # entity-26
+  Scenario Outline: the entity does not raise a build loan while a Greedo shareholder is in distress
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account is empty
+    And pawn "high hat" is in debt by $<debt>
+    When we play up to 1 round
+    Then Pink Realty raises no more than $0 in loans
+    And the pink colour group is developed up to no more than <total_houses> houses
+
+    Examples:
+      | debt | total_houses |
+      | 50   | 0            |
+
+  # entity-27
+  Scenario Outline: the entity does not raise a build loan when a Greedo shareholder's reserve would be breached
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account is empty
+    And pawn "dog" has a balance of $<balance>
+    And pawn "high hat" has a balance of $<balance>
+    And pawn "iron box" has a balance of $<balance>
+    And pawn "high hat" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    When we play up to 1 round
+    Then Pink Realty raises no more than $0 in loans
+    And the pink colour group is developed up to no more than <total_houses> houses
+
+    Examples:
+      | balance | reserve | total_houses |
+      | 150     | 150     | 0            |
+
+  # entity-29
+  Scenario Outline: the entity builds a hotel when every Greedo shareholder commits to a full build loan
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account is empty
+    And each shareholder commits $<share> toward Pink Realty's build
+    When we play up to 1 round
+    Then Pink Realty raises a loan of $<loan>
+    And the street "<street>" has a hotel built
+
+    Examples:
+      | loan | street          | share |
+      | 1500 | Rue de Diekirch Arlon | 500  |
+
+  # entity-30
+  Scenario Outline: a raised build loan is repaid with interest before the entity pays any dividend
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account is empty
+    And each shareholder commits $<share> toward Pink Realty's build
+    And pawn "dog" will roll 12 for their turn
+    When we play up to 1 round
+    Then Pink Realty raises a loan of $<loan>
+    And the entity repays the loan with interest before any dividend
+
+    Examples:
+      | loan | share |
+      | 100  | 100   |
+
+  # entity-31
+  Scenario Outline: the last-capitalised shareholder of a build loan becomes the dividend-granting shareholder when they grow a year older
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account is empty
+    And each shareholder commits $<share> toward Pink Realty's build
+    And the last-capitalised shareholder of Pink Realty is pawn "dog"
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    When we play up to 1 round
+    Then each of pawn "dog", pawn "high hat", and pawn "iron box" receives a $<dividend_share> dividend from Pink Realty
+
+    Examples:
+      | share | dividend_share |
+      | 100   | 50             |
+
+  # Commentary: harness steps required to drive the Greedo entity-build-commit scenarios.
+  # The strategy decision point (entity build loan commitment) and these steps are new.
+  # Existing reusable steps: "each shareholder commits $X", "Pink Realty raises a loan of
+  # $X", "Pink Realty raises no more than $X in loans", "pawn X has a balance that allows
+  # only $Y toward the entity", "the pink colour group is developed up to no more than N
+  # houses", "the street S has a hotel built", "each of ... receives a $X dividend from
+  # Pink Realty", "the last-capitalised shareholder of Pink Realty is pawn X", "... grows a
+  # year older", "pawn X follows the \"Greedo\" strategy, keeping a $Y reserve".
+  # NEW steps needed:
+  #   - "pawn X has a balance of $Y"  (set a pre-game balance via holdPawnBalance)
+  #   - "pawn X is in debt by $Y"     (set a negative balance -> distress)
+  #   - "pawn X has a balance that allows only $Y ..." already exists for the ceiling case
+  #   - "raises no loan" -> expressed as "raises no more than $0 in loans" (existing)
+  # NOTE: build-loan commitment is ALL-OR-NOTHING. No partial loan. Reasoning: a shareholder
+  # who did not commit would otherwise free-ride on the rental income the loan buys, collecting
+  # dividends/rent from improvements they did not help fund. So the entity raises a build loan
+  # only when EVERY shareholder commits (affordable + solvent + reserve allows). A declined
+  # shareholder blocks the loan entirely.

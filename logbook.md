@@ -31100,6 +31100,25 @@ episode a few cycles back — everything here stays properly confined to
 
 Domain unaffected (unchanged). Full acceptance 575/575, run twice.
 
+## 2026-08-11T16:07:56Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: 925e7a8ee5
+```
+
+Summary: verified the deterministic share-sale setup closing out the
+share-sale-8/9 boundary-condition loop. No production domain code touched
+across the whole chain (confirmed via diff against my last review point) —
+entirely acceptance-harness work, and properly confined to `World.java`
+this time (no repeat of the earlier domain-boundary leak). No CRAP/DRY
+concerns. Acceptance 575/575 run twice.
+
 ## 2026-08-11T14:36:31Z — architect sends deterministic setup to coder
 
 Sent priority-00 git handoff to coder for `b9e62f51d7`, the accepted
@@ -31348,3 +31367,108 @@ journal changes for refactorer review.
 
 Correction: the first local send attempt used an invalid abbreviated commit;
 the actual handoff commit is `954ff4902d`.
+## 2026-08-11T20:20:00+02:00 — refactorer reviews CLI Greedo flag wiring (954ff4902d)
+
+Merged `954ff4902d`. Real, high-value bug found via playtesting (27 x
+8-player CLI games, 0 entity-share sales ever fired): `Simulator.
+strategiesFor` built every real-game Greedo via `Greedo::new`
+(`legalEntityTrading=false` always), so `Bankruptcy.isEligibleBidder`
+never found an eligible bidder in actual CLI play regardless of
+`--optional-greedo-legal-entity` — the whole share-sale mechanism worked
+only in tests, never for real. This plausibly explains the win-rate/no-
+share-of-events anomaly flagged and deferred as a pure "economic
+observation" several cycles ago. Fixed by threading `stalemateTrading`/
+`legalEntityTrading` into `strategiesFor` and constructing every Greedo
+with the real flags. Also added a `Journal.Entry.StrategyNamed` event
+(standard event-adapter shape, `Report.line`'s exempted switch) logging
+each player's actual wired strategy and its observed flags at game start —
+directly falsifiable evidence the flags reach real play, not just an
+assertion that trusts the constructor call.
+
+The fix's `strategiesFor` implementation bypassed `STRATEGIES`'s own
+`Supplier<Strategy>` values entirely — construction is now a hardcoded
+`new Greedo(...)` regardless of which registered strategy name was
+selected, while the map's values go completely unused (only `containsKey`
+mattered). Harmless today (`Greedo` is the only registered strategy) but
+misleading: a reader would assume the supplier constructs the instance.
+Simplified `STRATEGIES` from `Map<String, Supplier<Strategy>>` to
+`Set<String>`, since it's now genuinely just a name-validation set — same
+CC (verified by direct before/after comparison, no branching changed),
+`dry4java` clean, mutation-scan 73 sites. Could not get a clean `crap4java`
+coverage run for this file: `SimulatorTest.keepsPlayingUntilToldToStop`
+fails consistently in this environment, confirmed via A/B worktree
+comparison to be the same known pre-existing flake (reproduces identically
+on my last-reviewed commit, untouched by this cycle) — not a regression,
+just this sandbox's timing sensitivity. `Game.java`'s new `strategyNamed`
+adapter (CC=4) and `Report.java`'s new case are both clean, matching
+established patterns.
+
+Domain 359/359. Full acceptance 576/576 (including the new cli-6
+scenario), run twice. CLI module's other 11 tests pass; the one known
+flake excluded per established precedent.
+
+## 2026-08-11T17:09:15Z — architect completes legal-entity share-sale review
+
+Sent phase-complete priority-50 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-legal-entity
+commit: 692bfc36db
+```
+
+All review loops are closed. The scenario has no artificial participant policy,
+the fixed High Hat funding precondition is no longer an Examples mutation
+target, and soft Gherkin mutation is fully killed.
+
+## 2026-08-11T18:20:41Z — architect receives refactorer CLI review
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer fc01eaff44
+```
+
+Action: merging `fc01eaff44` for architectural review. The returned commit
+contains the real CLI Greedo optional-trading flag wiring and startup strategy
+observation boundary, then simplifies the now-dead strategy supplier map to
+the name-validation set it actually is. A logbook-only conflict was resolved
+by retaining both the refactorer history and this architect phase record.
+
+## 2026-08-11T21:03:00Z — architect hardens CLI strategy-state assertions
+
+Action: soft mutation of `specs-cli:en/cli.feature` exposed that the new
+strategy-state handlers treated every token except exactly `enabled` as false;
+the `disabled -> diSabled` mutation therefore survived. Replaced that implicit
+boolean conversion with a closed `enabled`/`disabled` parser, making malformed
+criteria fail. The rerun kills that mutation (6/9 killed); its three remaining
+survivors are pre-existing one-row `<minimum rolls>` thresholds in cli-1,
+cli-2, and cli-5. Each is a fixed criterion, not a varying scenario dimension,
+and must be made literal by the specifier to remove its false mutation target.
+
+The CLI module's `keepsPlayingUntilToldToStop` unit test still fails its fixed
+one-second liveness assertion because a naturally completed game is permitted
+by the `Running` contract; a focused retry reproduced this known timing test
+failure. The new CLI acceptance scenario independently verifies the actual
+optional-flag wiring.
+
+## 2026-08-11T19:04:43Z — architect returns CLI threshold criteria gap
+
+Sent priority-00 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: d21a0fa209
+```
+
+The specifier must make cli-1's 10-roll, cli-2's 50-roll, and cli-5's 10-roll
+thresholds literal steps rather than single-row Examples values. They are fixed
+minimum observations, not scenario variables; doing so removes the remaining
+three false soft-mutation targets.
