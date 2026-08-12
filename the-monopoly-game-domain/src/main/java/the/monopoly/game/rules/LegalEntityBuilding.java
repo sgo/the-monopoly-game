@@ -53,7 +53,8 @@ final class LegalEntityBuilding {
   }
 
   private static boolean canPrepareBuildCommitment(LegalEntity entity, Strategy.OfPlayers strategies, Rule.Set rules) {
-    return strategies != null && rules != null && entity.buildCommitmentsEmpty();
+    return strategies != null && rules != null && entity.buildCommitmentsEmpty()
+        && entity.shareholders().stream().allMatch(player -> strategies.forPlayer(player).legalEntityTradingEnabled());
   }
 
   private static Money financeShortfall(LegalEntity entity, Money shortfall, Strategy.OfPlayers strategies,

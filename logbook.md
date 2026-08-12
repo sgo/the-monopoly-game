@@ -31986,6 +31986,9 @@ produces the specified $200 loan and three total houses from a $100 treasury.
 Verification: full acceptance 591/591 passed; domain tests 365/365 passed;
 `git diff --check` passed.
 
+Sent priority-00 git handoff `20260812T193029Z_000151_from_coder_to_refactorer`
+for review at commit `155e6f95c0`.
+
 The coder loop is now in progress; the architect can close/advance the review
 loop when the coder/refactorer chain returns.
 
@@ -32456,3 +32459,11 @@ construction cost it falls through to `repayLoanOrPayDividend`, which distribute
 any treasury of at least $150. That contradicts the user direction and can drain
 rent before it reaches the next construction cost. Routed to specifier for an
 acceptance-criterion correction before implementation.
+## 2026-08-12T22:45:20Z — coder reports entity-32 policy conflict
+
+Processed architect handoff `fd12c20098`. Implemented the fully-developed hotel
+gate for dividends, preserved construction before settlement, added the
+`developed_total` acceptance handler, and updated dividend fixtures to use
+hotels. Domain tests pass (365/365); acceptance is 592/593 with entity-32
+expecting one treasury-funded house from $150 while automatic shortfall
+solicitation develops three houses. This requires architect policy clarification.

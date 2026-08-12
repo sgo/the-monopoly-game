@@ -54,6 +54,11 @@ public interface Strategy {
     return false;
   }
 
+  /** Whether this strategy has opted into automatic legal-entity development. */
+  default boolean legalEntityTradingEnabled() {
+    return false;
+  }
+
   /** Whether to pay the fine to begin this turn outside jail. */
   default boolean pays(JailFine fine) {
     return false;
