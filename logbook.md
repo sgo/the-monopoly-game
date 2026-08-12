@@ -32520,3 +32520,18 @@ priority: 00
 task: greedo-entity-build-economy
 commit: ff2a4f8185
 ```
+
+## 2026-08-12T20:50:34Z — architect: received entity-32 reconciliation
+
+Received priority-00 git_handoff 000174 from specifier (task
+`greedo-entity-build-economy`, commit `022c9e8f79`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process specifier 022c9e8f79
+
+Action: merged the revised entity-32 acceptance criterion. It now explicitly
+uses shareholders who decline financing, so a $150 treasury builds one house
+without a loan and is retained rather than paid as a dividend. Auto-solicitation
+remains covered separately by entity-30. The remaining coder correction is to
+use the specified nominal base reserve for entity build offers.
