@@ -32689,3 +32689,7 @@ to request only the next standard build shortfall; explicit full-build
 commitments remain available for hotel scenarios. Domain tests pass 365/365.
 Acceptance failures reduced from five to four; remaining failures are isolated
 to legal-entity rent/setup and two build-loan scenario expectations.
+
+## 2026-08-13 — coder: notified architect of loan fix
+
+Queued note `000156` with commit `102e22c` and the updated test status.
