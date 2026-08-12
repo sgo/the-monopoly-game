@@ -32287,3 +32287,28 @@ Verified: acceptance BUILD SUCCESS, 591 tests, 0 failures. My entity-30
 (auto-solicit success, treasury $100 --> loan $200, 3 houses, no dividend) and
 entity-15 (decline case) are both GREEN. The entity build-economy correction is
 closed.
+
+## 2026-08-12 — specifier: empirical regression - entity building (rent AND loan) absent in real play; route to architect
+
+User requested new 8-player empirical runs after the build-economy fix merge
+(e25fe80696/closing 000246). Rebuilt jar, ran 10 LE-on + 10 LE-off control games.
+
+Results (10 games each):
+- LE ON : 9/10 bankruptcy end, 1/10 stalemate. Entity loans=0, builds=0, rent=0.
+  Entities only form, pay dividends, and sell shares.
+- LE OFF: 1/10 bankruptcy end, 9/10 stalemate. (control)
+
+So legal entities DO break stalemates (via share concentration + dividends +
+inheritance -> bankruptcy), but entity DEVELOPMENT is entirely absent in real
+play: 0 loans raised, 0 houses built, 0 rent collected.
+
+This is a REGRESSION vs the earlier empirical observation (le-122, before the
+narration/build refactors): entities used to build rent-funded houses (27 builds
+per game observed). Now rent-funded building AND loan-funded building are both
+absent. The acceptance suite is green (entity-30 auto-solicit passes) but the
+real 8-player loop never exercises it - likely the unanimous ALL-OR-NOTHING
+reserve/affordability gate fails on near-complete-monopoly co-owners in real
+games, and/or rent is diverted to dividends before it reaches a build.
+
+User direction: send to architect for investigation. We want to see building
+BOTH with rent funds AND via loans. Routing priority-00 to architect.
