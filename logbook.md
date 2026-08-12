@@ -31470,3 +31470,24 @@ The specifier must make cli-1's 10-roll, cli-2's 50-roll, and cli-5's 10-roll
 thresholds literal steps rather than single-row Examples values. They are fixed
 minimum observations, not scenario variables; doing so removes the remaining
 three false soft-mutation targets.
+
+## 2026-08-12T11:19:01Z — architect clarifies entity-30/31 operation timing
+
+Received coder priority-00 note:
+
+```
+Re-read your role and constitution.
+
+Clarify entity-30/31 timing versus the once-per-round entity operation.
+```
+
+Action: clarified the architectural invariant. An entity operation occurs once
+per completed game round, after every eligible player has taken that round's
+turn, and exactly once for each eligible entity. Rent, capitalization, or any
+other event during that round may change the operation's inputs but must not
+trigger another operation in the same round. The round boundary belongs in
+`Game`'s turn-loop coordination, not in a permanent per-entity `operated`
+flag. Thus the current per-player `operateLegalEntities` call and its
+`receivedRent()` bypass do not implement once-per-round semantics. Entity
+formation/shareholder changes take effect at the next operation boundary;
+zero-shareholder entities are skipped.
