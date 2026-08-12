@@ -32558,3 +32558,41 @@ use the specified nominal base reserve for entity build offers.
 
 Applied the correction by passing `Strategy.cashReserve()` to entity build
 offers. Domain tests pass (365/365) and acceptance passes (593/593).
+
+## 2026-08-12T20:53:08Z — refactorer receives base-reserve correction for review
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder aba15eb0ca
+```
+
+Action: merged `aba15eb0ca`, resolving a logbook-only conflict by retaining
+both histories. This closes the base-reserve leg of the entity-build-economy
+review loop, which spanned several coder/architect/specifier round trips
+since the last refactorer review: entity offers now use
+`strategy.cashReserve()` (nominal base) instead of
+`cashReserve(player, rules, deeds)` (dynamic monopoly/station-inflated), and
+`legalEntityTradingEnabled()` moved from a `Greedo`-only method onto
+`Strategy` as a `default false` so `canPrepareBuildCommitment` can check it
+generically. Also folded in, from the intervening commits: the
+fully-developed-hotel dividend gate (an under-developed entity retains its
+treasury for construction instead of paying a dividend), which required
+removing `operate`'s early `lastCapitalizedShareholderGrewOlder` shortcut so
+a build is always attempted before settlement.
+
+Found one leftover: `repayLoanOrPayDividend` carried a `deeds == null ||`
+guard around the new `fullyDeveloped(deeds)` check. Traced every call site
+(both `operate` overloads, `Game.journalOperation`, and every test) — `deeds`
+is never null in this codebase; the guard was dead, unreachable defensive
+code. Removed it.
+
+CRAP: everything at or under 6 (`repayLoanOrPayDividend` itself is exactly
+6.0 at 100% coverage). dry4java clean across the four touched files.
+Mutation-scan: 58/71/58/13 sites, all well under the split threshold.
+Manifests refreshed via `--update-manifest`.
+
+Domain 365/365, property tests green, full acceptance 593/593 (including
+the new entity-32 fully-developed-dividend scenarios) run twice, both clean.
