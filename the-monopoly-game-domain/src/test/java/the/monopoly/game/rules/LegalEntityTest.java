@@ -375,6 +375,31 @@ class LegalEntityTest {
     assertThat(entity.bankBalance()).isEqualTo(Money.ZERO);
   }
 
+  @Test
+  void canFundNextImprovementWhenAStreetStillNeedsHousesAndShareholdersAgree() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    dog.account().deposit(new Money(3000));
+    highHat.account().deposit(new Money(3000));
+    ironBox.account().deposit(new Money(3000));
+    Strategy.OfPlayers strategies = player -> new Greedo(Money.ZERO, false, true);
+
+    assertThat(entity.canFundNextImprovement(strategies, rules, deeds)).isTrue();
+  }
+
+  @Test
+  void cannotFundANextImprovementOnceEveryStreetHasAHotelEvenWithWillingShareholders() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    entity.streets().forEach(deeds::arrangeHotel);
+    dog.account().deposit(new Money(3000));
+    highHat.account().deposit(new Money(3000));
+    ironBox.account().deposit(new Money(3000));
+    Strategy.OfPlayers strategies = player -> new Greedo(Money.ZERO, false, true);
+
+    assertThat(entity.canFundNextImprovement(strategies, rules, deeds)).isFalse();
+  }
+
   private void ownEveryRemainingSpace(Player owner) {
     rules.streets().filter(it -> it instanceof the.monopoly.game.components.streets.Ownable)
         .map(it -> (the.monopoly.game.components.streets.Ownable) it)

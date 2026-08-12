@@ -33378,3 +33378,38 @@ longer selected for formation merely because their fixed house-cost sum is
 fundable.
 
 Verification: domain 365/365 and full acceptance 598/598, including entity-m10.
+
+## 2026-08-13T01:36:38Z — refactorer receives real-next-improvement fix for review
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 110219bb4d
+```
+
+Action: merged `110219bb4d` (clean, no conflict). This closes an empirically
+found bug: `canFundNextImprovement` summed `standardBuildCost` across every
+entity street unconditionally, so a fully-developed split (every street
+already hotelled) still looked "fundable" and got auto-formed at market
+deadlock — then had no build plan and went straight to paying dividends,
+explaining the architect's observed 4-formations/0-builds/566-dividends run.
+Fix: `standardBuildCost` now takes `deeds` and excludes hotelled streets
+from the sum, and `canFundNextImprovement` additionally requires at least
+one non-hotelled street to exist at all. This also quietly improves
+`amountNeededToContinue`'s shortfall math for entities that are partway
+developed — it no longer inflates the required amount with the cost of
+streets that need no further construction.
+
+Coverage: `canFundNextImprovement` was new code at 0% domain-unit coverage
+(CRAP exactly at the 6.0 threshold, not over, but genuinely untested outside
+acceptance). Added two focused `LegalEntityTest` cases — funds when a street
+still needs houses, does not fund once every street is hotelled — mirroring
+the existing `automaticallyCommitsSharesToBuildWhenEveryShareholderCanAfford
+ThePlan` pattern. CRAP clean afterward (method no longer appears in the
+report, fully covered). dry4java clean, mutation-scan 70 sites. Manifest
+refreshed.
+
+Domain 365/365 (2 new), property tests green, full acceptance 598/598
+(including entity-m10) run twice.
