@@ -32732,3 +32732,26 @@ missed implementation step.
 
 CRAP/DRY/mutation-scan: no production files changed, nothing to re-run there.
 Domain 365/365 (unchanged), full acceptance 597/597 run twice.
+
+## 2026-08-12T21:57:52Z — refactorer returns market-deadlock trigger to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 7fea0b421a
+```
+
+Priority 00, architect review loop. Summary: root-caused and fixed a
+Background-scope regression that broke five unrelated legacy scenarios
+(moved four fixture lines from the shared Background into each of the nine
+market-deadlock scenario bodies); acceptance 597/597 run twice. Also
+flagging, not fixing: the market-deadlock trigger is implemented only as a
+test-harness simulation (`World.completeMarketDeadlockRound` calls
+`formEntity` directly); nothing in `Game.java` implements the approved
+quiet-round/collective-funding policy itself. Routing that observation for
+architect decision rather than guessing whether it's an intended interim
+state or a missed implementation step.
