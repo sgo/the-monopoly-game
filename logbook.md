@@ -33345,3 +33345,14 @@ priority: 00
 task: greedo-market-deadlock-trigger
 commit: 75d9eec4fc
 ```
+
+## 2026-08-13T01:36:17Z — coder: require a real next improvement for formation
+
+Processed architect handoff 000262 (`6e6cb82781`). Fixed
+`LegalEntityBuilding.canFundNextImprovement` so automatic market-deadlock
+formation requires at least one entity street without a hotel and computes the
+funding shortfall only across non-hotel streets. Fully developed splits are no
+longer selected for formation merely because their fixed house-cost sum is
+fundable.
+
+Verification: domain 365/365 and full acceptance 598/598, including entity-m10.
