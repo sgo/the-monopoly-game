@@ -40,16 +40,15 @@ final class LegalEntityBuilding {
                                                                Strategy.OfPlayers strategies, Rule.Set rules,
                                                                List<ColourStreet> plan) {
     if (!canPrepareBuildCommitment(entity, strategies, rules)) return plan;
-    if (!leavesABuildableStreetUnfunded(entity, deeds, plan)) return plan;
-    prepareBuildCommitment(entity, strategies, rules, deeds);
+    Money amount = amountNeededToContinue(entity, deeds, plan);
+    if (amount.equals(Money.ZERO) || !allAgreeToBuild(entity, amount, strategies, rules, deeds)) return plan;
+    commitSharesToBuild(entity, amount);
     return affordableBuildPlan(entity, deeds);
   }
 
-  private static boolean leavesABuildableStreetUnfunded(LegalEntity entity, Deeds deeds, List<ColourStreet> plan) {
-    boolean canReachHotels = canReachHotels(entity);
-    if (plan.isEmpty()) return cheapestBuildableStreet(entity, deeds, List.of(), canReachHotels) != null;
-    ColourStreet next = cheapestBuildableStreet(entity, deeds, plan, canReachHotels);
-    return next != null && totalConstructionCost(plan).plus(next.houseConstructionCost()).exceeds(entity.bankBalance());
+  private static Money amountNeededToContinue(LegalEntity entity, Deeds deeds, List<ColourStreet> plan) {
+    Money required = standardBuildCost(entity);
+    return required.exceeds(entity.bankBalance()) ? required.minus(entity.bankBalance()) : Money.ZERO;
   }
 
   private static boolean canPrepareBuildCommitment(LegalEntity entity, Strategy.OfPlayers strategies, Rule.Set rules) {
@@ -60,7 +59,10 @@ final class LegalEntityBuilding {
   private static Money financeShortfall(LegalEntity entity, Money shortfall, Strategy.OfPlayers strategies,
                                         Rule.Set rules, Deeds deeds) {
     if (shortfall.amount() <= 0) return Money.ZERO;
-    if (strategies != null && rules != null) commitToBuildIfAllAgree(entity, shortfall, strategies, rules, deeds);
+    if (strategies != null && rules != null) {
+      commitToBuildIfAllAgree(entity, shortfall, strategies, rules, deeds);
+      if (!canBorrowForBuilding(entity, shortfall)) return Money.ZERO;
+    }
     return borrowShortfall(entity, shortfall);
   }
 
@@ -133,13 +135,6 @@ final class LegalEntityBuilding {
     commitSharesToBuild(entity, shortfall);
   }
 
-  private static void prepareBuildCommitment(LegalEntity entity, Strategy.OfPlayers strategies, Rule.Set rules,
-                                             Deeds deeds) {
-    Money amount = maximumHotelCost(entity);
-    if (!allAgreeToBuild(entity, amount, strategies, rules, deeds)) amount = standardBuildCost(entity);
-    if (allAgreeToBuild(entity, amount, strategies, rules, deeds)) commitSharesToBuild(entity, amount);
-  }
-
   private static void commitSharesToBuild(LegalEntity entity, Money amount) {
     List<Player> shareholders = entity.shareholders();
     List<Money> shares = sharesOf(shareholders, amount);
@@ -158,13 +153,6 @@ final class LegalEntityBuilding {
       return strategy.commitToEntityBuild(new Strategy.EntityBuildOffer(
           shares.get(index), shareholder.account().balance().amount(), reserve));
     });
-  }
-
-  private static Money maximumHotelCost(LegalEntity entity) {
-    return entity.streets().stream()
-        .map(street -> new Money(street.houseConstructionCost().amount()
-            * (street.hotelConstructionRequiresNumberOfHouses() + 1)))
-        .reduce(Money.ZERO, Money::plus);
   }
 
   private static Money standardBuildCost(LegalEntity entity) {

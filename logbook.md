@@ -32680,6 +32680,50 @@ Added deterministic initiative setup and handlers for the new scenario language.
 Domain tests pass 365/365. The full acceptance run reaches 597 tests but still
 reports five legacy legal-entity scenario failures for refactorer review.
 
+## 2026-08-12T21:42:57Z — coder: handed off to refactorer
+
+Queued priority-00 git handoff `000154` for `greedo-market-deadlock-trigger`
+at commit `fbd37e8c90`, including the acceptance coverage and implementation
+notes above. Refactorer review is requested for the five legacy acceptance
+failures.
+
+## 2026-08-13 — coder: processed stale specifier handoff 000001
+
+The queued `greedo-legal-entity` coding task references commit `50e90de`,
+which was already merged into this worktree. Its requested implementation is
+present in ancestor commit `fcecc76c8c` (Strategy entity-build decision,
+Greedo policy, and LegalEntity financing wiring), so no duplicate code change
+was made. Domain tests remain green at 365/365; acceptance remains at 597
+tests with the five previously recorded legacy legal-entity failures.
+
+## 2026-08-12T22:03:57Z — coder: notified architect
+
+Sent note `000155` to architect: the queued specifier task was stale because
+`fcecc76c8c` is already merged; domain tests are green, while acceptance still
+has five legacy legal-entity failures. Requested direction on whether coder
+should repair those failures.
+
+## 2026-08-13 — coder: repaired all-or-nothing entity borrowing
+
+Corrected `LegalEntityBuilding` so a failed shareholder commitment blocks the
+loan instead of borrowing unconditionally. Also changed automatic solicitation
+to request only the next standard build shortfall; explicit full-build
+commitments remain available for hotel scenarios. Domain tests pass 365/365.
+Acceptance failures reduced from five to four; remaining failures are isolated
+to legal-entity rent/setup and two build-loan scenario expectations.
+
+## 2026-08-13 — coder: notified architect of loan fix
+
+Queued note `000156` with commit `102e22c` and the updated test status.
+
+## 2026-08-13 — coder: processed architect handoff 000254
+
+Merged architect commit `d17eaf0311` and completed the requested production
+wiring. `Game` now evaluates the approved market-deadlock formation policy at
+the completed round boundary, journals entity formation, and the acceptance
+harness delegates to that production decision instead of calling `formEntity`
+directly. The m-scenario fixtures remain isolated from unrelated scenarios.
+Domain tests pass 365/365 and full acceptance passes 597/597.
 ## 2026-08-12T21:42:57Z — refactorer receives market-deadlock trigger for review
 
 Received coder priority-00 handoff:
@@ -32755,3 +32799,25 @@ test-harness simulation (`World.completeMarketDeadlockRound` calls
 quiet-round/collective-funding policy itself. Routing that observation for
 architect decision rather than guessing whether it's an intended interim
 state or a missed implementation step.
+
+## 2026-08-12T21:57:56Z — architect: rejects harness-only market-deadlock implementation
+
+Received priority-00 git_handoff 000135 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `7fea0b421a`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer 7fea0b421a
+
+Action: accepted the feature-fixture isolation fix, but rejected the
+harness-only implementation as completion. The approved automatic formation
+policy must be wired into `Game` at the production round boundary; tests must
+drive that path rather than calling `World.formEntity` directly. Routing this
+observable behavior defect back to coder.
+
+Required correction: move automatic formation out of
+`World.completeMarketDeadlockRound` and into the real `Game` round-boundary
+flow. Preserve the approved full-board, quiet-round, eligibility, and
+collective-base-reserve rules; make the m-scenarios execute the production
+path. Retain the isolated m-scenario fixtures so unrelated entity scenarios
+remain unaffected.

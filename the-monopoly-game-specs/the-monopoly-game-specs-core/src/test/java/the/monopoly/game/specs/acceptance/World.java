@@ -108,6 +108,7 @@ public class World {
   private boolean marketDeadlockEligible;
   private String marketDeadlockGroup;
   private boolean marketDeadlockScenario;
+  private Game lastGame;
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
@@ -416,8 +417,10 @@ public class World {
         },
         jail,
         stalemateTrading,
-        legalEntityTrading && !marketDeadlockScenario
+        legalEntityTrading
     );
+    lastGame = game;
+    if (marketDeadlockScenario) game.disableAutomaticMarketDeadlock();
     Game.Result result = play.apply(game);
     turnOrder = result.turnOrder();
     journal = result.journal();
@@ -1139,24 +1142,8 @@ public class World {
 
   public void completeMarketDeadlockRound(String action) {
     letTheOthersRollWhatTheyLike();
-    if (!"no".equals(action) || !legalEntityTrading || !marketDeadlockFunding) return;
-    if (deeds == null || ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
-        .anyMatch(street -> deeds.isUnowned(street.type()))) return;
-    ruleSet.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
-        .map(ColourStreet::colourGroup).distinct()
-        .filter(colour -> colour != Street.Colour.orange)
-        .filter(colour -> marketDeadlockGroup == null || colour.name().equals(marketDeadlockGroup))
-        .map(colour -> ruleSet.streets().filter(ColourStreet.class::isInstance)
-            .map(ColourStreet.class::cast).filter(street -> street.colourGroup() == colour).toList())
-        .filter(group -> group.stream().map(street -> deeds.ownerOf(street.type()).orElse(null))
-            .filter(java.util.Objects::nonNull).distinct().count() == 3)
-        .filter(group -> marketDeadlockEligible || legalEntityTrading)
-        .findFirst().ifPresent(group -> {
-          Street.Colour colour = group.getFirst().colourGroup();
-          List<Player> shareholders = players().stream().filter(player -> group.stream()
-              .anyMatch(street -> deeds.ownerOf(street.type()).filter(player.id()::equals).isPresent())).toList();
-          formEntity(colour, false, shareholders);
-        });
+    if (lastGame != null) lastGame.resolveMarketDeadlockAtRoundBoundary(
+        "no".equals(action), marketDeadlockFunding);
   }
 
   private Roll nextQueuedPawnRoll(Player player) {
