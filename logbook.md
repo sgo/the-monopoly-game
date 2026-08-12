@@ -33237,6 +33237,7 @@ task: greedo-market-deadlock-trigger
 commit: e4ccac04e0
 ```
 
+
 ## 2026-08-12 — specifier: empirical 8-player LE study (fresh jar, 10 pairs)
 
 Ran 10 paired 8-player Greedo games, LE-on vs LE-off (correct jar rebuild after
@@ -33289,3 +33290,33 @@ fundable. Acceptance went 41->42 legal-entity scenarios with exactly 1 failure
 = m10 ("Expecting value to be false but was true"), pinning the domain bug.
 Routed to architect/coder for the production fix (canFundNextImprovement /
 standardBuildCost must exclude hotel streets).
+
+The soft mutation runner refreshed its checked-in acceptance-mutation manifest
+for the corrected scenario wording. Delivered that generated verification
+artifact as follow-up handoff 000260:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 7b92f93064
+```
+
+## 2026-08-13T01:27:00Z — architect: finds auto-formation development gap
+
+Observed normal eight-player Greedo simulations with legal-entity trading
+enabled. Formation itself is not rare: three samples formed entities at player
+years 1–4 (with one later formation at year 112). The defect is selection for
+development. In one complete run, 4 entities formed, 0 entity houses were
+built, 0 entity loans were raised, and 566 dividends were paid.
+
+Cause: `LegalEntityBuilding.canFundNextImprovement` uses the colour group's
+fixed standard house cost even when all its streets already have hotels.
+`Game.formIfFundable` therefore selects a fully-developed split as fundable;
+after formation it has no build plan and immediately follows its dividend
+path. The existing criteria cover an already-formed fully-developed entity
+being inactive, but do not say that automatic market-deadlock formation must
+choose a split with a real next improvement. This is a Gherkin-content gap,
+not a test-harness issue. Routed to specifier for the intended policy and
+acceptance coverage; no production code changed.
