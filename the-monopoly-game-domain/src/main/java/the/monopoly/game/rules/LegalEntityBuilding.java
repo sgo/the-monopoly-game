@@ -71,7 +71,8 @@ final class LegalEntityBuilding {
   private static boolean cannotExtendPlan(LegalEntity entity, Money shortfall, boolean startedWithTreasuryFunds,
                                           List<ColourStreet> plan) {
     if (shortfall.amount() <= 0) return false;
-    if (startedWithTreasuryFunds && !plan.isEmpty()) return true;
+    if (startedWithTreasuryFunds && !plan.isEmpty()
+        && (entity.buildCommitmentsEmpty() || plan.size() >= entity.streets().size())) return true;
     return !canBorrowForBuilding(entity, shortfall);
   }
 

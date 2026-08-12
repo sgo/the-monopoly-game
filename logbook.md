@@ -31917,3 +31917,14 @@ No extra narration specs: loan-raise narration is reason-agnostic and already
 covered.
 
 Routing to coder (default preference).
+
+## 2026-08-12 — entity-30 mixed treasury/loan behavior implemented
+
+Processed specification commit `6f6173d294` and merged it as `5f93232`.
+Updated `LegalEntityBuilding` so an entity with treasury cash can continue
+planning across all streets when existing shareholder commitments authorize the
+remaining shortfall; treasury-only entities retain their one-round cap. This
+produces the specified $200 loan and three total houses from a $100 treasury.
+
+Verification: full acceptance 591/591 passed; domain tests 365/365 passed;
+`git diff --check` passed.
