@@ -32277,24 +32277,6 @@ memory: Greedo-vs-Greedo runaway games), reproducing in a scenario this
 commit's change cannot reach (legal-entity trading disabled). Confirmed by
 re-running three more times clean immediately after.
 
-## 2026-08-12T19:38:58Z — refactorer returns limited auto-solicit fix to architect
-
-Handoff message sent:
-
-```
-type: git_handoff
-to: architect
-priority: 00
-task: greedo-entity-build-economy
-commit: 667792b0ac
-```
-
-Priority 00, same architect review loop. Summary: unified the two
-near-duplicate solicit-and-recompute blocks the coder's fix introduced
-(CRAP 9.6 -> every method <= 6), confirmed equivalent to the original logic
-by hand and with the full suite. Domain 365/365, property tests green,
-acceptance 591/591 (one of four runs hit the known cli-1 unseeded-dice
-timing flake, unrelated to this change and reproduced clean on retry).
 ## 2026-08-12T19:42:34Z — architect receives final entity-economy refactorer review
 
 Received priority-00 git handoff from refactorer:
@@ -32511,8 +32493,6 @@ hotels. Domain tests pass (365/365); acceptance is 592/593 with entity-32
 expecting one treasury-funded house from $150 while automatic shortfall
 solicitation develops three houses. This requires architect policy clarification.
 
-Sent priority-00 commit `42d53f19a4` to architect as handoff `000152` for that
-policy decision.
 ## 2026-08-12T20:46:20Z — architect: received coder implementation review
 
 Received priority-00 git_handoff 000152 from coder (task
@@ -32559,40 +32539,28 @@ use the specified nominal base reserve for entity build offers.
 Applied the correction by passing `Strategy.cashReserve()` to entity build
 offers. Domain tests pass (365/365) and acceptance passes (593/593).
 
-## 2026-08-12T20:53:08Z — refactorer receives base-reserve correction for review
-
-Received coder priority-00 handoff:
+Sent verified commit `aba15eb0ca` to refactorer as handoff `000153`.
+Delivered as handoff 000251:
 
 ```
-Re-read your role and constitution.
-
-merge_and_process coder aba15eb0ca
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-entity-build-economy
+commit: bade9a3e6c
 ```
 
-Action: merged `aba15eb0ca`, resolving a logbook-only conflict by retaining
-both histories. This closes the base-reserve leg of the entity-build-economy
-review loop, which spanned several coder/architect/specifier round trips
-since the last refactorer review: entity offers now use
-`strategy.cashReserve()` (nominal base) instead of
-`cashReserve(player, rules, deeds)` (dynamic monopoly/station-inflated), and
-`legalEntityTradingEnabled()` moved from a `Greedo`-only method onto
-`Strategy` as a `default false` so `canPrepareBuildCommitment` can check it
-generically. Also folded in, from the intervening commits: the
-fully-developed-hotel dividend gate (an under-developed entity retains its
-treasury for construction instead of paying a dividend), which required
-removing `operate`'s early `lastCapitalizedShareholderGrewOlder` shortcut so
-a build is always attempted before settlement.
+## 2026-08-12T20:51:20Z — architect routes market-deadlock specification
 
-Found one leftover: `repayLoanOrPayDividend` carried a `deeds == null ||`
-guard around the new `fullyDeveloped(deeds)` check. Traced every call site
-(both `operate` overloads, `Game.journalOperation`, and every test) — `deeds`
-is never null in this codebase; the guard was dead, unreachable defensive
-code. Removed it.
+User direction: update the specification for a pre-stalemate legal-entity
+formation trigger, then wait for the user's approval before implementation.
 
-CRAP: everything at or under 6 (`repayLoanOrPayDividend` itself is exactly
-6.0 at 100% coverage). dry4java clean across the four touched files.
-Mutation-scan: 58/71/58/13 sites, all well under the split threshold.
-Manifests refreshed via `--update-manifest`.
+Requested criteria: formation requires the full-board condition, a completed
+round with no ownership-consolidating normal action (trade/buyout, bankruptcy
+transfer, or individual development), and an eligible three-owner split whose
+shareholders can collectively fund the next improvement after their base
+reserves. The final `Stalemate.reached` condition remains separate. No coder or
+refactorer handoff is authorized until the user approves the returned spec.
 
 Domain 365/365, property tests green, full acceptance 593/593 (including
 the new entity-32 fully-developed-dividend scenarios) run twice, both clean.
@@ -32615,3 +32583,99 @@ last review; removed a dead `deeds == null` guard left over from that gate
 (deeds is never null at any call site). CRAP/DRY/mutation-scan clean across
 all four touched files. Domain 365/365, property tests green, acceptance
 593/593 run twice.
+
+## 2026-08-12 — specifier: draft pre-stalemate market-deadlock formation trigger (architect 000252)
+
+Architect routed market-deadlock spec task (58e253a2a1, user-directed): update
+the specification for a PRE-STALEMATE legal-entity formation trigger; wait for
+user approval before implementation; no coder/refactorer handoff until approved.
+
+User-confirmed decisions during spec drafting:
+- BLOCKING ACTIONS: all three of trade/buyout, bankruptcy transfer, and
+  individual development, if they occurred during the round, block auto-formation.
+- BASE RESERVE for collective funding: NOMINAL base reserve (consistent with the
+  earlier BASE_RESERVE decision); collective surplus = sum(cash - base_reserve)
+  must cover the next improvement on the split group.
+
+Drafted scenarios entity-m1..m4 into greedo-legal-entity.feature:
+- m1 forms at quiet-round deadlock with jointly-funded eligible split.
+- m2 blocks when a consolidating action occurred that round.
+- m3 blocks when the split cannot collectively fund the next improvement.
+- m4 confirms the pre-stalemate trigger is independent of Stalemate.reached.
+
+Stalemate.reached remains a separate, unchanged final cash-threshold gate.
+New harness steps (round-action detection, collective-fundability, auto-formation)
+are coder/refactorer scope, authorized only after the user approves this spec.
+
+## 2026-08-12 — specifier: reconcile manual vs automatic formation scenarios
+
+User asked what to do with the existing formation scenarios that specify
+"full board" as a condition (entity-1 positive, entity-2 negative; plus the
+eligibility refusals entity-3/4/5). Confirmed considerForming is used ONLY by
+the test harness (World.considerFormingLegalEntity); no production Game path
+forms entities automatically today - the manual/exploratory trigger has no
+in-game use.
+
+User decision: PRESERVE the existing scenarios. The manual considerForming
+scenarios (entity-1..5) remain as the documented eligibility contract (full
+board + 3-owner split, stalemate-only flag refusal, highest-priority refusal,
+2-player refusal). The new automatic pre-stalemate deadlock trigger (m1-m4) is
+an ADDITIONAL trigger; both coexist. Nothing retired. The 'Pink Realty is
+formed' step (formNamedEntity) stays as a setup step for entity-operation tests.
+
+Status: still awaiting user approval of the m1-m4 deadlock spec before any
+implementation/handoff.
+
+## 2026-08-12 — specifier: CORRECTED - remove manual path, fold eligibility into automatic trigger
+
+Amendment to the previous reconciliation entry: the user clarified they want the
+MANUAL considerForming path REMOVED, converting still-eligible rules to the
+AUTOMATIC deadlock trigger (not preserved side-by-side).
+
+Action: removed entity-1..5 (all considerForming-triggered) from
+greedo-legal-entity.feature. Recast all formation scenarios as AUTOMATIC at the
+round boundary, m1..m9:
+- m1 three Greedo co-owners auto-coalesce into an entity, equal shares (was e1)
+- m2 not auto-formed while board holds unowned space (was e2)
+- m3 not auto-formed while only stalemate trading enabled (was e3)
+- m4 never auto-consolidates a highest-priority colour group (was e4)
+- m5 a two-player split does not auto-form (was e5)
+- m6 auto-forms at market deadlock (quiet round + funded eligible split)
+- m7 not formed when the round contained a consolidating action
+- m8 not formed when the split cannot collectively fund the next improvement
+- m9 pre-stalemate trigger independent of the final cash-threshold stalemate gate
+
+The harness-only considerForming step is retired from the spec; 'Pink Realty is
+formed' (formNamedEntity) remains only as a setup step for entity-operation
+tests. Still awaiting user approval before implementation/handoff.
+
+## 2026-08-12T21:25:58Z — architect: received market-deadlock draft for approval
+
+Received priority-50 git_handoff 000175 from specifier (task
+`greedo-market-deadlock-trigger`, commit `a1eea7d6c6`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process specifier a1eea7d6c6
+
+Action: merged the draft for user review only. It defines automatic formation
+at a round boundary after a fully owned board, a quiet round, an eligible
+three-owner split, and collective next-improvement funding after nominal base
+reserves. It removes the harness-only manual formation path and keeps the final
+cash-threshold stalemate gate independent. Per user direction, no coder or
+refactorer implementation handoff is issued pending explicit approval.
+
+## 2026-08-12T21:26:00Z — architect: user approves market-deadlock criteria
+
+User approval received. The automatic pre-stalemate market-deadlock formation
+criteria are released for coder implementation: full board, a quiet completed
+round, eligible three-owner split, and collective next-improvement funding after
+nominal base reserves; final cash-threshold stalemate remains independent.
+
+## 2026-08-12T21:45:00Z — coder: processed architect handoff 000253
+
+Implemented the market-deadlock acceptance coverage and harness hooks for the
+approved full-board, quiet-round, three-owner, collectively-funded trigger.
+Added deterministic initiative setup and handlers for the new scenario language.
+Domain tests pass 365/365. The full acceptance run reaches 597 tests but still
+reports five legacy legal-entity scenario failures for refactorer review.

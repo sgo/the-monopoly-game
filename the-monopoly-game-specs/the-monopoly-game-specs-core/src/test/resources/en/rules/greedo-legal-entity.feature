@@ -9,15 +9,21 @@ Feature: Greedo legal entity for a three-way colour-group split
   Background:
     Given the official rule set
     And we select 3 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And pawn "iron box" will roll 2 for initiative
+    And every other player can complete their turn
 
-  # entity-1
-  Scenario Outline: three Greedo co-owners of a colour group coalesce into a legal entity holding equal shares
+  # entity-m1
+  Scenario Outline: three Greedo co-owners of a colour group automatically coalesce into a legal entity at market deadlock, holding equal shares
     Given legal-entity trading is enabled for the "Greedo" strategy
     And pawn "dog" owns "<street_dog>"
     And pawn "high hat" owns "<street_high_hat>"
     And pawn "iron box" owns "<street_iron_box>"
     And every other ownable space is owned by pawn "high hat"
-    When pawn "dog" considers forming a legal entity over the <group> colour group
+    And the <group> split's shareholders can collectively fund the next improvement after their base reserves
+    When we play up to 1 round
+    And the round completes with no ownership-consolidating action
     Then the <group> colour group is owned by <entity_name>
     And each of pawn "dog", pawn "high hat", and pawn "iron box" holds a third of <entity_name>
 
@@ -27,60 +33,130 @@ Feature: Greedo legal entity for a three-way colour-group split
       | yellow | Grote Markt Hasselt    | Place de l'Ange Namur | Hoogstraat (Brussel) / Rue Haute (Bruxelles) | Yellow Realty |
       | green  | Boulevard Tirou Charleroi | Veldstraat Gent  | Boulevard d'Avroy Liège  | Green Realty |
 
-  # entity-2
-  Scenario Outline: the entity is not formed while the board still holds unowned space
+  # entity-m2
+  Scenario Outline: the entity is not auto-formed while the board still holds unowned space, at the round boundary
     Given legal-entity trading is enabled for the "Greedo" strategy
     And pawn "dog" owns "Rue de Diekirch Arlon"
     And pawn "high hat" owns "Bruul Mechelen"
     And pawn "iron box" owns "Place Verte Verviers"
-    When pawn "dog" considers forming a legal entity over the pink colour group
-    Then the pink colour group <outcome> a legal entity
+    When we play up to 1 round
+    And the round completes with no ownership-consolidating action
+    Then the pink colour group is not owned by a legal entity
 
-    Examples:
-      | outcome |
-      | is not owned by |
-
-  # entity-3
-  Scenario Outline: the entity is not formed while only stalemate trading (not legal-entity trading) is enabled
+  # entity-m3
+  Scenario Outline: the entity is not auto-formed while only stalemate trading (not legal-entity trading) is enabled, at the round boundary
     Given <enabled_flag> trading is enabled for the "Greedo" strategy
     And pawn "dog" owns "Rue de Diekirch Arlon"
     And pawn "high hat" owns "Bruul Mechelen"
     And pawn "iron box" owns "Place Verte Verviers"
     And every other ownable space is owned by pawn "high hat"
-    When pawn "dog" considers forming a legal entity over the pink colour group
+    And the pink split's shareholders can collectively fund the next improvement after their base reserves
+    When we play up to 1 round
+    And the round completes with no ownership-consolidating action
     Then the pink colour group is not owned by a legal entity
 
     Examples:
       | enabled_flag |
       | stalemate    |
 
-  # entity-4
-  Scenario Outline: the entity never consolidates a highest-priority colour group
+  # entity-m4
+  Scenario Outline: the entity never auto-consolidates a highest-priority colour group, at the round boundary
     Given legal-entity trading is enabled for the "Greedo" strategy
     And pawn "dog" owns "Lippenslaan Knokke"
     And pawn "high hat" owns "Rue Royale Tournai"
     And pawn "iron box" owns "Groenplaats Antwerpen"
     And every other ownable space is owned by pawn "high hat"
-    When pawn "dog" considers forming a legal entity over the <group> colour group
+    And the <group> split's shareholders can collectively fund the next improvement after their base reserves
+    When we play up to 1 round
+    And the round completes with no ownership-consolidating action
     Then the <group> colour group is not owned by a legal entity
 
     Examples:
       | group   |
       | orange  |
 
-  # entity-5
-  Scenario Outline: a two-player split of an eligible colour group does not form an entity
+  # entity-m5
+  Scenario Outline: a two-player split of an eligible colour group does not auto-form an entity, at the round boundary
     Given legal-entity trading is enabled for the "Greedo" strategy
     And we select <player_count> players
     And pawn "dog" owns "Rue de Diekirch Arlon"
     And pawn "high hat" owns "Bruul Mechelen"
     And every other ownable space is owned by pawn "high hat"
-    When pawn "dog" considers forming a legal entity over the pink colour group
+    When we play up to 1 round
+    And the round completes with no ownership-consolidating action
     Then the pink colour group is not owned by a legal entity
 
     Examples:
       | player_count |
       | 2            |
+
+  # entity-m6
+  Scenario Outline: the entity forms at market deadlock when a full round passes with no ownership-consolidating action and an eligible three-owner split can collectively fund the next improvement after base reserves
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "high hat" owns "Bruul Mechelen"
+    And pawn "iron box" owns "Place Verte Verviers"
+    And every other ownable space is owned by pawn "high hat"
+    And the <group> split is an eligible three-owner split
+    And the <group> split's shareholders can collectively fund the next improvement after their base reserves
+    When we play up to 1 round
+    And the round completes with <action> ownership-consolidating action
+    Then the <group> colour group is auto-formed into <entity_name>
+
+    Examples:
+      | group | action | entity_name |
+      | pink  | no     | Pink Realty |
+
+  # entity-m7
+  Scenario Outline: the entity does not form at market deadlock when the round contained an ownership-consolidating action
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "high hat" owns "Bruul Mechelen"
+    And pawn "iron box" owns "Place Verte Verviers"
+    And every other ownable space is owned by pawn "high hat"
+    And the <group> split is an eligible three-owner split
+    And the <group> split's shareholders can collectively fund the next improvement after their base reserves
+    When we play up to 1 round
+    And the round completes with <action> ownership-consolidating action
+    Then the <group> colour group is not owned by a legal entity
+
+    Examples:
+      | group | action |
+      | pink  | a      |
+
+  # entity-m8
+  Scenario Outline: the entity does not form at market deadlock when the split's shareholders cannot collectively fund the next improvement after base reserves
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "high hat" owns "Bruul Mechelen"
+    And pawn "iron box" owns "Place Verte Verviers"
+    And every other ownable space is owned by pawn "high hat"
+    And the <group> split is an eligible three-owner split
+    And the <group> split's shareholders cannot collectively fund the next improvement after their base reserves
+    When we play up to 1 round
+    And the round completes with no ownership-consolidating action
+    Then the <group> colour group is not owned by a legal entity
+
+    Examples:
+      | group |
+      | pink  |
+
+  # entity-m9
+  Scenario Outline: the pre-stalemate formation trigger is independent of the final cash-threshold stalemate gate
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "high hat" owns "Bruul Mechelen"
+    And pawn "iron box" owns "Place Verte Verviers"
+    And every other ownable space is owned by pawn "high hat"
+    And the <group> split is an eligible three-owner split
+    And the <group> split's shareholders can collectively fund the next improvement after their base reserves
+    When we play up to 1 round
+    And the round completes with no ownership-consolidating action
+    Then the <group> colour group is <formed_outcome> by a legal entity
+
+    Examples:
+      | group | formed_outcome |
+      | pink  | auto-formed     |
 
   # entity-6
   Scenario Outline: the entity repays a shareholder loan with five percent interest on top before paying any dividend
