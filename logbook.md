@@ -32545,3 +32545,15 @@ priority: 00
 task: greedo-entity-build-economy
 commit: bade9a3e6c
 ```
+
+## 2026-08-12T20:51:20Z — architect routes market-deadlock specification
+
+User direction: update the specification for a pre-stalemate legal-entity
+formation trigger, then wait for the user's approval before implementation.
+
+Requested criteria: formation requires the full-board condition, a completed
+round with no ownership-consolidating normal action (trade/buyout, bankruptcy
+transfer, or individual development), and an eligible three-owner split whose
+shareholders can collectively fund the next improvement after their base
+reserves. The final `Stalemate.reached` condition remains separate. No coder or
+refactorer handoff is authorized until the user approves the returned spec.
