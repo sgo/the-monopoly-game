@@ -32535,3 +32535,13 @@ uses shareholders who decline financing, so a $150 treasury builds one house
 without a loan and is retained rather than paid as a dividend. Auto-solicitation
 remains covered separately by entity-30. The remaining coder correction is to
 use the specified nominal base reserve for entity build offers.
+
+Delivered as handoff 000251:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-entity-build-economy
+commit: bade9a3e6c
+```
