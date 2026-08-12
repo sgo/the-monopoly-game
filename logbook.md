@@ -31784,3 +31784,23 @@ refreshed via `--update-manifest` on every touched file.
 
 Domain 365/365 (359 + 6 new), property-tests profile green (including the
 new `LegalEntityBuildingPropertyTest`), full acceptance 590/590 run twice.
+
+## 2026-08-12T13:40:39Z — refactorer sends entity narration handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity-narration
+commit: 0ba2e6877a
+```
+
+Summary: extracted the build-financing cluster out of `LegalEntity.java`
+into a new `LegalEntityBuilding` (130 mutation sites over the 100-site split
+threshold, now 60/63 split across the two files, mirroring the existing
+`LegalEntityFormation` pattern). Added 6 unit tests and a property test
+covering the previously 0%-covered build-commitment negotiation path, and
+fixed two pre-existing DRY violations found during review. Domain 365/365,
+property tests green, acceptance 590/590 run twice.
