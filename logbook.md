@@ -31880,39 +31880,75 @@ architect for evaluation, independent runs, and suggestions.
 
 Action: see handoff <NEXT>.
 
-## 2026-08-12T14:19:05Z — architect receives entity build-economy finding
+## 2026-08-12 — specifier: architect accepted build-economy finding, routed to coder
+
+The architect merged my entity-build-economy finding (commit b2594c42ab) as
+94c43dbd5e ("Merge entity build-economy finding", logbook only) and sent a
+priority-00 handoff (000241, task greedo-entity-build-economy) to the CODER
+(commit 94c43dbd5e), starting the architect review loop.
+
+Per constitution workflow: a priority-00 architect->coder handoff is an architect
+review loop; the result flows coder -> refactorer -> back to ARCHITECT, not to
+specifier. The specifier re-engages only when the architect sends a phase-complete
+sync. No specifier action pending; holding for the loop to close.
+
+## 2026-08-12 — specifier: add entity-30 spec per architect directive, route to coder
+
+Responding to architect directive (c20c7e9eba / review loop greedo-entity-build-
+economy): nonzero treasury must never by itself disable build-loan preparation;
+an eligible entity must apply its existing treasury to construction and, for the
+remaining shortfall, seek the unanimous reserve-safe commitment before dividend.
+
+Added entity-30 to greedo-legal-entity.feature:
+  Given 4 players, Pink Realty formed, bank holds $100, each shareholder commits
+  $100. Then: raises a loan of $200, pink group developed to 3 houses, dog
+  receives no dividend.
+
+Acceptance: 591 tests, exactly 1 failure = entity-30 "developed up to 3 houses"
+(expected 3, was 1). "raises a loan $200" and "no dividend" PASSED. This exactly
+reproduces the flagged bug: cannotExtendPlan returns true when
+startedWithTreasuryFunds && !plan.isEmpty() (LegalEntityBuilding.java:60), capping
+the build at the 1 treasury-funded house instead of financing to 3 with the
+agreed loan. Red-by-design state awaiting coder fix.
+
+No extra narration specs: loan-raise narration is reason-agnostic and already
+covered.
+
+Routing to coder (default preference).
+
+## 2026-08-12 — specifier: sync to architect on greedo-entity-build-economy
+
+Per the architect's directive (c20c7e9eba) and user request to let the architect
+close the loop, the specifier-originated portion of the entity build-economy
+correction is complete and routed onward:
+
+- Added entity-30 acceptance coverage (see prior entry) encoding the requirement
+  that a nonzero treasury must not disable build-loan preparation: rent funds
+  the base build, then a unanimous commitment funds the remaining shortfall
+  before any dividend.
+- The scenario is red-by-design against current code (builds 1 of 3 houses),
+  reproducing the flagged defect.
+- Committed as 6f6173d294 and routed to the coder (priority 00) to implement.
+- No extra narration specs needed (loan-raise narration is reason-agnostic).
+
+The coder loop is now in progress; the architect can close/advance the review
+loop when the coder/refactorer chain returns.
+
+## 2026-08-12T14:34:25Z — architect receives entity build-economy spec sync
 
 Received priority-50 git handoff from specifier:
 
 ```
 Re-read your role and constitution.
 
-merge_and_process specifier b2594c42ab
+merge_and_process specifier e49f24d04a
 ```
 
-Action: merged the specifier's finding and independently reproduced it with
-the packaged eight-player CLI using legal-entity and stalemate trading. Two
-entities formed and later paid dividends, while neither raised a loan nor built
-an improvement. The cause is confirmed in `LegalEntityBuilding`: the
-commitment preparation gate requires an exactly-zero treasury, so rent leaves
-an entity unable to finance the remaining shortfall and dividends win instead.
-
-## 2026-08-12T13:47:49Z — architect closes narration review with specifier
-
-Sent priority-50 git handoff to specifier:
-
-```
-type: git_handoff
-to: specifier
-priority: 50
-task: greedo-legal-entity-narration
-commit: c1c0701842
-```
-
-Summary: refactorer review accepted. The normal game path retains the
-round-boundary entity operation and rent/build journal/report narration;
-`LegalEntityBuilding` isolates the construction and shareholder-financing
-collaborator.
+Action: merged the logbook-only sync. The new entity-30 acceptance criterion
+correctly exposes the second blocking branch: after one treasury-funded house,
+`cannotExtendPlan` rejects the remaining unanimously-financed shortfall. It is
+red by design and already routed to the coder in the active correction loop;
+no independent architect implementation or duplicate handoff is appropriate.
 
 ## 2026-08-12T14:19:50Z — architect routes entity build-economy correction
 
@@ -31926,12 +31962,7 @@ task: greedo-entity-build-economy
 commit: 94c43dbd5e
 ```
 
-Required observable correction: an eligible entity must apply its existing
-treasury to construction and, when a buildable shortfall remains, seek the
-existing unanimous reserve-safe shareholder commitment for that shortfall
-before it considers a dividend. A nonzero treasury must never by itself
-disable build-loan preparation. Preserve the existing all-or-nothing consent,
-reserve protection, debt-first settlement, and no-shareholder safeguards. Add
-acceptance coverage for a rent-funded partial shortfall that demonstrates build
-and prevents a dividend; run repeated CLI simulations with both optional flags
-as an integration check.
+Required observable correction: use available treasury first, then seek the
+existing unanimous reserve-safe shareholder commitment for every remaining
+buildable shortfall before considering a dividend. Preserve debt-first
+settlement, consent, reserve, and no-shareholder safeguards.
