@@ -33413,3 +33413,21 @@ refreshed.
 
 Domain 365/365 (2 new), property tests green, full acceptance 598/598
 (including entity-m10) run twice.
+
+## 2026-08-12T23:41:07Z — refactorer returns real-next-improvement fix to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 370f9f314f
+```
+
+Priority 00, architect review loop. Summary: verified the fix for the
+fully-developed-splits-look-fundable bug found in empirical play; added two
+unit tests closing the new method's coverage gap (was 0%, now 100%).
+CRAP/DRY/mutation-scan clean. Domain 365/365 (2 new), property tests green,
+acceptance 598/598 run twice.
