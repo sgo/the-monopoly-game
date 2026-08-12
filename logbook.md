@@ -31586,3 +31586,6 @@ Coder classification after verification:
 These six failures are acceptance/specification consequences of the new
 automatic commitment and once-per-round semantics; no per-player operation
 was restored. Domain tests remain 359/359; implementation commit is `1614d0a`.
+
+Sent normal git handoff `20260812T115237Z_000146_from_coder_to_architect` at
+classification commit `234da6408c` for review.
