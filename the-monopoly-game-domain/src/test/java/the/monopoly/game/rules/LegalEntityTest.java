@@ -6,6 +6,7 @@ import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
@@ -339,6 +340,39 @@ class LegalEntityTest {
     assertThat(deeds.housesBuiltOn(street)).isZero();
     assertThat(entity.shareholderPayment(dog)).isEqualTo(Money.ZERO);
     assertThat(dog.account().balance().amount()).isEqualTo(new Money(30));
+  }
+
+  @Test
+  void automaticallyCommitsSharesToBuildWhenEveryShareholderCanAffordThePlan() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    dog.account().deposit(new Money(3000));
+    highHat.account().deposit(new Money(3000));
+    ironBox.account().deposit(new Money(3000));
+    Strategy.OfPlayers strategies = player -> new Greedo(Money.ZERO, false, true);
+
+    LegalEntity.Operation operation = entity.operate(deeds, strategies, rules);
+
+    assertThat(operation).isNotEqualTo(new LegalEntity.Operation.NoAction());
+    assertThat(dog.account().balance().amount().amount()).isLessThan(3000);
+    assertThat(highHat.account().balance().amount().amount()).isLessThan(3000);
+    assertThat(ironBox.account().balance().amount().amount()).isLessThan(3000);
+  }
+
+  @Test
+  void doesNotAutoCommitWhenAShareholderHasLegalEntityTradingDisabled() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    dog.account().deposit(new Money(3000));
+    highHat.account().deposit(new Money(3000));
+    ironBox.account().deposit(new Money(3000));
+    Strategy.OfPlayers strategies = player -> new Greedo(Money.ZERO, false, false);
+
+    LegalEntity.Operation operation = entity.operate(deeds, strategies, rules);
+
+    assertThat(operation).isEqualTo(new LegalEntity.Operation.NoAction());
+    assertThat(dog.account().balance().amount()).isEqualTo(new Money(3000));
+    assertThat(entity.bankBalance()).isEqualTo(Money.ZERO);
   }
 
   private void ownEveryRemainingSpace(Player owner) {

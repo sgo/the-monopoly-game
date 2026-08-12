@@ -31714,3 +31714,73 @@ dividend priority.
 
 Verification: domain tests 359/359 passed; full acceptance 590/590 passed;
 `git diff --check` passed.
+
+## 2026-08-12T15:38:00Z — refactorer receives entity narration for review
+
+Received coder priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 93f1c514ad
+```
+
+Action: merged `93f1c514ad`, resolving a logbook-only conflict by retaining
+both histories. This is the refactorer's first pass over the entire
+round-boundary entity-operation rework (architect merge 0f840032), the
+Greedo build-loan commitment feature (specifier 50e90de, coder 234da64), and
+this narration commit — none of that work routed through the refactorer
+during the architect review-loop cycles that produced it.
+
+CRAP: `LegalEntity.java` carried the whole build-financing cluster
+(buildAsMuchAsAffordable, affordableBuildPlan, cheapestBuildableStreet,
+canBorrowForBuilding, commitToBuildIfAllAgree, prepareBuildCommitment,
+allAgreeToBuild, maximumHotelCost/standardBuildCost, borrowShortfall,
+sharesOf, buildOneImprovement) inline, pushing it to 130 mutation sites —
+over the 100-site split threshold for the first time since the earlier
+`LegalEntityFormation` extraction. Extracted that whole cluster into a new
+package-private `LegalEntityBuilding` (mirroring the existing
+`LegalEntityFormation` pattern: static methods taking the entity as a
+parameter, three new package-private accessors added to `LegalEntity` —
+`buildCommitmentsEmpty()`, `buildCommitmentOf()`, `clearBuildCommitments()` —
+for what buildCommitments needed). `LegalEntity.java` is now 60 sites,
+`LegalEntityBuilding.java` 63.
+
+Four new methods exceeded the CRAP-6 threshold, all coverage-driven
+(`prepareBuildCommitment`/`commitToEntityBuild`/`commitToBuildIfAllAgree` at
+0% coverage, `canPrepareBuildCommitment` at 25%): the auto-commitment
+negotiation path — the actual point of the whole feature — had no unit
+coverage at all, only acceptance coverage. Added 6 focused unit tests (4 in
+`GreedoTest` directly exercising `commitToEntityBuild`'s four branches, 2 in
+`LegalEntityTest` driving `operate(deeds, strategies, rules)` through the
+auto-commit-accepted and auto-commit-declined paths) and one property test
+(`LegalEntityBuildingPropertyTest`, jetCheck, `sharesOf` conservation and
+fairness across 1-8 shareholders and $0-$10,000 — that split function is
+depended on by every build-commitment and loan-raise, so an unfair or lossy
+split would misallocate cost silently). `sharesOf` widened from private to
+package-private static to make it testable in isolation, matching how the
+rest of `LegalEntityBuilding` is structured.
+
+Extracted `canReachHotels` out of `affordableBuildPlan`'s condition and
+`canPrepareBuildCommitment`/`financeShortfall` out of
+`buildAsMuchAsAffordable`'s body (structure-preserving; verified equivalent
+by hand before extracting, then confirmed with the full suite). Also found
+and fixed two DRY violations independent of the build-commitment feature:
+`playTurns`/`playTurn` each logged the stalemate-ending journal entries with
+identical inline blocks (dry4java score 1.00, Game.java:173-176/193-196) —
+extracted `logStalemate`; and `LegalEntity.operate` duplicated its
+mark-operated-then-return-or-NoAction tail in both branches — extracted
+`settled()`/`operatedAs()`. Also removed two unused parameters
+(`strategies`, `rules`) from `affordableBuildPlan` that the body never read.
+
+Every remaining method is at or below CRAP 6 except the two constitution-
+exempted sealed switches: `Report.line` (218.9) and `Game.journalOperation`
+(42.0, `LegalEntity.Operation`'s switch, moved here from
+`operateLegalEntities` in an earlier cycle). dry4java clean outside the
+pre-existing, already-accepted `Journalling` adapter block
+(Game.java:390-543, one-liner-per-entry-type by design). Mutation-scan: all
+seven touched/new files under 100 sites (60/63/78/3/12/58/12). Manifests
+refreshed via `--update-manifest` on every touched file.
+
+Domain 365/365 (359 + 6 new), property-tests profile green (including the
+new `LegalEntityBuildingPropertyTest`), full acceptance 590/590 run twice.
