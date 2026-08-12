@@ -32557,3 +32557,68 @@ transfer, or individual development), and an eligible three-owner split whose
 shareholders can collectively fund the next improvement after their base
 reserves. The final `Stalemate.reached` condition remains separate. No coder or
 refactorer handoff is authorized until the user approves the returned spec.
+
+## 2026-08-12 — specifier: draft pre-stalemate market-deadlock formation trigger (architect 000252)
+
+Architect routed market-deadlock spec task (58e253a2a1, user-directed): update
+the specification for a PRE-STALEMATE legal-entity formation trigger; wait for
+user approval before implementation; no coder/refactorer handoff until approved.
+
+User-confirmed decisions during spec drafting:
+- BLOCKING ACTIONS: all three of trade/buyout, bankruptcy transfer, and
+  individual development, if they occurred during the round, block auto-formation.
+- BASE RESERVE for collective funding: NOMINAL base reserve (consistent with the
+  earlier BASE_RESERVE decision); collective surplus = sum(cash - base_reserve)
+  must cover the next improvement on the split group.
+
+Drafted scenarios entity-m1..m4 into greedo-legal-entity.feature:
+- m1 forms at quiet-round deadlock with jointly-funded eligible split.
+- m2 blocks when a consolidating action occurred that round.
+- m3 blocks when the split cannot collectively fund the next improvement.
+- m4 confirms the pre-stalemate trigger is independent of Stalemate.reached.
+
+Stalemate.reached remains a separate, unchanged final cash-threshold gate.
+New harness steps (round-action detection, collective-fundability, auto-formation)
+are coder/refactorer scope, authorized only after the user approves this spec.
+
+## 2026-08-12 — specifier: reconcile manual vs automatic formation scenarios
+
+User asked what to do with the existing formation scenarios that specify
+"full board" as a condition (entity-1 positive, entity-2 negative; plus the
+eligibility refusals entity-3/4/5). Confirmed considerForming is used ONLY by
+the test harness (World.considerFormingLegalEntity); no production Game path
+forms entities automatically today - the manual/exploratory trigger has no
+in-game use.
+
+User decision: PRESERVE the existing scenarios. The manual considerForming
+scenarios (entity-1..5) remain as the documented eligibility contract (full
+board + 3-owner split, stalemate-only flag refusal, highest-priority refusal,
+2-player refusal). The new automatic pre-stalemate deadlock trigger (m1-m4) is
+an ADDITIONAL trigger; both coexist. Nothing retired. The 'Pink Realty is
+formed' step (formNamedEntity) stays as a setup step for entity-operation tests.
+
+Status: still awaiting user approval of the m1-m4 deadlock spec before any
+implementation/handoff.
+
+## 2026-08-12 — specifier: CORRECTED - remove manual path, fold eligibility into automatic trigger
+
+Amendment to the previous reconciliation entry: the user clarified they want the
+MANUAL considerForming path REMOVED, converting still-eligible rules to the
+AUTOMATIC deadlock trigger (not preserved side-by-side).
+
+Action: removed entity-1..5 (all considerForming-triggered) from
+greedo-legal-entity.feature. Recast all formation scenarios as AUTOMATIC at the
+round boundary, m1..m9:
+- m1 three Greedo co-owners auto-coalesce into an entity, equal shares (was e1)
+- m2 not auto-formed while board holds unowned space (was e2)
+- m3 not auto-formed while only stalemate trading enabled (was e3)
+- m4 never auto-consolidates a highest-priority colour group (was e4)
+- m5 a two-player split does not auto-form (was e5)
+- m6 auto-forms at market deadlock (quiet round + funded eligible split)
+- m7 not formed when the round contained a consolidating action
+- m8 not formed when the split cannot collectively fund the next improvement
+- m9 pre-stalemate trigger independent of the final cash-threshold stalemate gate
+
+The harness-only considerForming step is retired from the spec; 'Pink Realty is
+formed' (formNamedEntity) remains only as a setup step for entity-operation
+tests. Still awaiting user approval before implementation/handoff.
