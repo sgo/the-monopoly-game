@@ -33140,3 +33140,43 @@ real scripted house build by high hat on its orange monopoly, exercising the
 development detector.
 
 Verification: domain 365/365 and full acceptance 597/597.
+
+## 2026-08-13T01:04:52Z — refactorer receives detector-exercising fix for review
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder bec60e1547
+```
+
+Action: merged `bec60e1547` (clean, no conflict). This is a genuinely clean
+resolution of the gap I refined last cycle: `marketDeadlockQuietOverride`/
+`marketDeadlockFundingOverride`/`configureMarketDeadlockRound`/
+`disableAutomaticMarketDeadlock` are all removed from `Game` entirely — no
+override machinery left to shadow real detection. `completeRound`'s
+automatic call now unconditionally uses `!roundHadConsolidatingAction` and
+the real per-entity funding check. `World`'s market-deadlock helper methods
+lost their bookkeeping fields and now either do nothing beyond the existing
+`letTheOthersRollWhatTheyLike()` or arrange real state:
+`marketDeadlockCannotFund` zeroes every shareholder's balance instead of
+setting a synthetic flag. `entity-m7`'s Given steps replaced the "round
+completes with a ownership-consolidating action" marker with a real `pawn
+"high hat" will build a house on "Lippenslaan Knokke"` step — an actual
+individual-development event on an unrelated (orange) group, reusing the
+existing `pawnWillBuildHouseOn` step handler rather than inventing new
+test-only machinery, so it's the real `developAndTrackConsolidation`
+detector that blocks formation, not a stand-in.
+
+Minor, not fixed: `entity-m6`/`m8`/`m9` still carry "the round completes
+with <action> ownership-consolidating action" as a step; with the override
+removed, `completeMarketDeadlockRound` no longer does anything but the
+already-redundant `letTheOthersRollWhatTheyLike()`. The step name now
+overstates what it does. This is Gherkin scenario content, not pipeline or
+manifest housekeeping, so it's the specifier's call, not mine — noting it
+for whoever picks up the next pass rather than editing the feature file.
+
+CRAP dropped further (mutation-scan 93, down from 96, from the removed
+override plumbing); DRY clean; nothing else to update. Domain 365/365,
+property tests green, full acceptance 597/597 run twice.
