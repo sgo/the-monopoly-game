@@ -31879,3 +31879,15 @@ This is a spec-relevant economic finding (not a redundant toggle). Routed to
 architect for evaluation, independent runs, and suggestions.
 
 Action: see handoff <NEXT>.
+
+## 2026-08-12 — specifier: architect accepted build-economy finding, routed to coder
+
+The architect merged my entity-build-economy finding (commit b2594c42ab) as
+94c43dbd5e ("Merge entity build-economy finding", logbook only) and sent a
+priority-00 handoff (000241, task greedo-entity-build-economy) to the CODER
+(commit 94c43dbd5e), starting the architect review loop.
+
+Per constitution workflow: a priority-00 architect->coder handoff is an architect
+review loop; the result flows coder -> refactorer -> back to ARCHITECT, not to
+specifier. The specifier re-engages only when the architect sends a phase-complete
+sync. No specifier action pending; holding for the loop to close.
