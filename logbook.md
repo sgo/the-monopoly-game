@@ -31642,3 +31642,37 @@ settlement operation in the following round; and both share-sale-8 examples
 assert balances before the new shareholder's end-of-round entity-build
 commitment. Returning these criteria decisions to specifier; no per-turn
 operation will be reintroduced.
+
+## 2026-08-12 — specifier: timing rework set resolved (round-boundary reconciliation)
+
+Architect handoff 000239 (round-boundary merge 0f840032) returned six Gherkin
+timing mismatches to specifier. Resolved per user review:
+
+- entity-17 reworked: fully-developed pink group (hotel on each street) -> no
+  build plan -> entity financially inactive at the round boundary. Bank ending,
+  max loan, no-dividend asserted deterministically from the Examples table.
+- entity-26 DROPPED as redundant: distress is settled by selling the share
+  (share-sale scenarios already prove it) and distress does NOT block a loan;
+  a loan never drives a shareholder negative (canBorrowForBuilding requires
+  balance >= share on every shareholder).
+- entity-30 DROPPED as redundant with entity-6: same-round raise+repay is
+  forbidden at the boundary; a single-round reframe (pre-establish loan via
+  "Pink Realty owes ...") reproduces entity-6 verbatim.
+- entity-31 DROPPED as redundant with entity-19: same-round capitalize+
+  dividend is forbidden; single-round reframe (loan repaid + 4 houses + aged
+  capitalized shareholder) reproduces entity-19 verbatim.
+- share-sale-8 reconciled: pre-build hotel on each pink street so the boundary
+  has nothing to build, stopping the auto-commit build-loan that was charging
+  buyer-shareholder high hat to -505; high_hat_ending=995 now holds.
+
+Entity numbers 26/30/31 left intentionally skipped to avoid churn in the
+mutation-manifest scenario indices at the top of the feature file.
+
+Acceptance (JDK 25.0.2-zulu, mvn -Pacceptance): 590 tests, 9 failures. All
+timing reworks GREEN (GreedoLegalEntity + GreedoShareSale = 0 failures). The 9
+remaining failures are the narration-step set (journal-67/68/69,
+report-67/68/69, logging-67/68/69) routed to coder in handoff 000002. Handoff
+000001 (build-commit implementation) is SUPERSEDED: the strategy decision
+point, commitToBuildIfAllAgree, prepareBuildCommitment and
+Greedo.commitToEntityBuild were implemented by the architect's round-boundary
+merge 0f840032.

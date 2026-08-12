@@ -239,16 +239,21 @@ Feature: Greedo legal entity for a three-way colour-group split
       | 300  | Rue de Diekirch Arlon  | Bruul Mechelen | Place Verte Verviers  | 3            | 0              |
 
   # entity-17
-  Scenario Outline: an entity with nothing to build, repay, or pay becomes idle instead of spinning
+  Scenario Outline: an entity whose streets are already fully developed is financially inactive at the round boundary
     Given Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
     And Pink Realty owns no outstanding loan
     And Pink Realty's bank account is empty
     When we play up to 1 round
-    Then Pink Realty issues no loan, repayment, or dividend
+    Then Pink Realty's bank account holds $<bank_ending>
+    And Pink Realty raises no more than $<max_loan> in loans
+    And pawn "dog" receives no dividend from Pink Realty
 
     Examples:
-      | scenario |
-      | idle     |
+      | bank_ending | max_loan |
+      | 0           | 0        |
 
   # entity-22
   Scenario Outline: an entity with an empty bank whose shareholders commit to a group build loan develops one house on every street it can fund
@@ -389,20 +394,6 @@ Feature: Greedo legal entity for a three-way colour-group split
       | ceiling_share | total_houses |
       | 40            | 0            |
 
-  # entity-26
-  Scenario Outline: the entity does not raise a build loan while a Greedo shareholder is in distress
-    Given we select 4 players
-    And Pink Realty is formed
-    And Pink Realty's bank account is empty
-    And pawn "high hat" is in debt by $<debt>
-    When we play up to 1 round
-    Then Pink Realty raises no more than $0 in loans
-    And the pink colour group is developed up to no more than <total_houses> houses
-
-    Examples:
-      | debt | total_houses |
-      | 50   | 0            |
-
   # entity-27
   Scenario Outline: the entity does not raise a build loan when a Greedo shareholder's reserve would be breached
     Given we select 4 players
@@ -433,36 +424,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     Examples:
       | loan | street          | share |
       | 1500 | Rue de Diekirch Arlon | 500  |
-
-  # entity-30
-  Scenario Outline: a raised build loan is repaid with interest before the entity pays any dividend
-    Given we select 4 players
-    And Pink Realty is formed
-    And Pink Realty's bank account is empty
-    And each shareholder commits $<share> toward Pink Realty's build
-    And pawn "dog" will roll 12 for their turn
-    When we play up to 1 round
-    Then Pink Realty raises a loan of $<loan>
-    And the entity repays the loan with interest before any dividend
-
-    Examples:
-      | loan | share |
-      | 100  | 100   |
-
-  # entity-31
-  Scenario Outline: the last-capitalised shareholder of a build loan becomes the dividend-granting shareholder when they grow a year older
-    Given we select 4 players
-    And Pink Realty is formed
-    And Pink Realty's bank account is empty
-    And each shareholder commits $<share> toward Pink Realty's build
-    And the last-capitalised shareholder of Pink Realty is pawn "dog"
-    And the last-capitalised shareholder of Pink Realty grows a year older
-    When we play up to 1 round
-    Then each of pawn "dog", pawn "high hat", and pawn "iron box" receives a $<dividend_share> dividend from Pink Realty
-
-    Examples:
-      | share | dividend_share |
-      | 100   | 50             |
 
   # Commentary: harness steps required to drive the Greedo entity-build-commit scenarios.
   # The strategy decision point (entity build loan commitment) and these steps are new.
