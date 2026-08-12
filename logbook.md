@@ -31913,3 +31913,25 @@ Summary: refactorer review accepted. The normal game path retains the
 round-boundary entity operation and rent/build journal/report narration;
 `LegalEntityBuilding` isolates the construction and shareholder-financing
 collaborator.
+
+## 2026-08-12T14:19:50Z — architect routes entity build-economy correction
+
+Sent priority-00 git handoff to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-entity-build-economy
+commit: 94c43dbd5e
+```
+
+Required observable correction: an eligible entity must apply its existing
+treasury to construction and, when a buildable shortfall remains, seek the
+existing unanimous reserve-safe shareholder commitment for that shortfall
+before it considers a dividend. A nonzero treasury must never by itself
+disable build-loan preparation. Preserve the existing all-or-nothing consent,
+reserve protection, debt-first settlement, and no-shareholder safeguards. Add
+acceptance coverage for a rent-funded partial shortfall that demonstrates build
+and prevents a dividend; run repeated CLI simulations with both optional flags
+as an integration check.
