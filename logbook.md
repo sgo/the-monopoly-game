@@ -32896,6 +32896,9 @@ The m7/m8 scenario conditions are now supplied before the round, allowing the
 real `Game` boundary trigger to evaluate quiet-round and collective-funding
 state. Full acceptance passes 597/597 and domain tests pass 365/365.
 
+Queued priority-00 handoff `000159` to refactorer at commit `4901105201` for
+review of the exercised production path.
+
 ## 2026-08-13T00:40:32Z — architect: routes derived-path acceptance coverage
 
 Received priority-00 git_handoff 000137 from refactorer (task
