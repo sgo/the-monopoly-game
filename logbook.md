@@ -32724,6 +32724,9 @@ the completed round boundary, journals entity formation, and the acceptance
 harness delegates to that production decision instead of calling `formEntity`
 directly. The m-scenario fixtures remain isolated from unrelated scenarios.
 Domain tests pass 365/365 and full acceptance passes 597/597.
+
+Queued priority-00 handoff `000157` to refactorer at commit `254fd869c8` for
+review of the production market-deadlock trigger.
 ## 2026-08-12T21:42:57Z — refactorer receives market-deadlock trigger for review
 
 Received coder priority-00 handoff:
@@ -32905,3 +32908,27 @@ call site — nothing in `Game.java` detects whether a round actually
 contained a consolidating action, so the approved blocking policy is
 untestable-by-real-play; only the acceptance harness's direct two-argument
 call can exercise the `false` branch.
+
+## 2026-08-13T00:30:33Z — architect: rejects synthetic quiet-round signal
+
+Received priority-00 git_handoff 000136 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `d4769be646`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer d4769be646
+
+Action: accepted the production formation wiring and structural cleanup, but
+rejected completion. `Game.playTurns` passes literal `true` for quiet-round,
+so real ownership-consolidating actions never block formation. Coder must track
+trades/buyouts, bankruptcy transfers, and individual development across each
+completed round and pass the derived quiet-round result to the real
+round-boundary formation path. The harness must exercise that derived path.
+
+## 2026-08-13 — coder: processed architect handoff 000255
+
+Implemented real quiet-round tracking in `Game`: peer trades, monopoly buyouts,
+bankruptcy transfers, and individual player development now mark the current
+round as ownership-consolidating. The production market-deadlock formation
+trigger receives the derived quiet-round value instead of a hardcoded literal.
+Domain tests pass 365/365 and full acceptance passes 597/597.
