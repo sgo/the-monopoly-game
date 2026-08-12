@@ -43,6 +43,7 @@ public class Rent implements Landings {
       tenant.account().withdraw(rent);
       entity.depositToBank(rent);
       entity.receiveRent(land);
+      events.paid(tenant, entity, land, rent);
     }
   }
 
@@ -96,22 +97,25 @@ public class Rent implements Landings {
   /** What the payment did, for whoever records the game. */
   public interface Events {
     void paid(Player tenant, Player owner, Ownable land, Money rent);
+
+    default void paid(Player tenant, LegalEntity entity, ColourStreet land, Money rent) {
+    }
   }
 }
 
 /* mutate4java-manifest
 version=1
-moduleHash=6b39525a87e46b7457371ff72ab7081f99dde0bae855a0cde78b7e0f1af42c33
+moduleHash=bd064c77ade9962e4caf55755009a83218302061f96e9bfaf856692d51a5e6ef
 scope.0.id=Y2xhc3M6UmVudCNSZW50OjE3
 scope.0.kind=class
 scope.0.startLine=17
-scope.0.endLine=100
-scope.0.semanticHash=df5f1a86b511e720d2956a645b6116210247ddadc11708813ea502bfec29ed8d
-scope.1.id=Y2xhc3M6UmVudC5FdmVudHMjRXZlbnRzOjk3
+scope.0.endLine=104
+scope.0.semanticHash=ca18c9e3eb6c97a72b97eeeac2c84cfc02890b39efe5374fdf08b9ff8b8d3432
+scope.1.id=Y2xhc3M6UmVudC5FdmVudHMjRXZlbnRzOjk4
 scope.1.kind=class
-scope.1.startLine=97
-scope.1.endLine=99
-scope.1.semanticHash=fc09187a8709c77891ffe59ea917931ae99a82857d3ef90cca6983cd757786d2
+scope.1.startLine=98
+scope.1.endLine=103
+scope.1.semanticHash=a97bcb02463d73b6aac2fedfc6fb62bb8ca04361469c4e34aa48be230caf93e7
 scope.2.id=ZmllbGQ6UmVudCNkZWVkczoxOA
 scope.2.kind=field
 scope.2.startLine=18
@@ -140,51 +144,56 @@ scope.6.semanticHash=8f90b89a0f4f61ab31d1d05eb010b34195c3e0a9cffef75c49d25c1fcf7
 scope.7.id=bWV0aG9kOlJlbnQjY29sbGVjdCgzKTozOQ
 scope.7.kind=method
 scope.7.startLine=39
-scope.7.endLine=47
-scope.7.semanticHash=2d96ec3ac7e6431eef886274a7479b41a6e07d570197ec089bd2cb23a76380f4
-scope.8.id=bWV0aG9kOlJlbnQjY29sbGVjdCg0KTo1Ng
+scope.7.endLine=48
+scope.7.semanticHash=25cc3fa026aa646093d847a3296434535bb7fe8873ab42e96cf7431d6022627c
+scope.8.id=bWV0aG9kOlJlbnQjY29sbGVjdCg0KTo1Nw
 scope.8.kind=method
-scope.8.startLine=56
-scope.8.endLine=64
+scope.8.startLine=57
+scope.8.endLine=65
 scope.8.semanticHash=906dfb31a4a778b3f0476eae5abcb2256233ee63ec144e847d06482b00854845
-scope.9.id=bWV0aG9kOlJlbnQjY29sb3VyU3RyZWV0UmVudCgyKTo3NQ
+scope.9.id=bWV0aG9kOlJlbnQjY29sb3VyU3RyZWV0UmVudCgyKTo3Ng
 scope.9.kind=method
-scope.9.startLine=75
-scope.9.endLine=85
+scope.9.startLine=76
+scope.9.endLine=86
 scope.9.semanticHash=16e6d98241514c1aad7d123c40d4e58c3f78ab087096f9fef45f34ad0a7ab475
 scope.10.id=bWV0aG9kOlJlbnQjY3Rvcig1KToyNA
 scope.10.kind=method
 scope.10.startLine=24
 scope.10.endLine=30
 scope.10.semanticHash=2c805b1f02919623a3df7643f4080941db6014ed1f24ee698789d06fcc6a1689
-scope.11.id=bWV0aG9kOlJlbnQjZW50aXR5UmVudCgxKTo0OQ
+scope.11.id=bWV0aG9kOlJlbnQjZW50aXR5UmVudCgxKTo1MA
 scope.11.kind=method
-scope.11.startLine=49
-scope.11.endLine=54
+scope.11.startLine=50
+scope.11.endLine=55
 scope.11.semanticHash=7ffcc55ebffd519a11c4860b8ba24b632f5bbe6d057c0f5f0472a61d58816dcd
-scope.12.id=bWV0aG9kOlJlbnQjb3duZWQoMik6ODc
+scope.12.id=bWV0aG9kOlJlbnQjb3duZWQoMik6ODg
 scope.12.kind=method
-scope.12.startLine=87
-scope.12.endLine=90
+scope.12.startLine=88
+scope.12.endLine=91
 scope.12.semanticHash=3a3cc3a4127442b176d4bb18120267dcd184a0f1452e6a88afdaa657ab2fd358
-scope.13.id=bWV0aG9kOlJlbnQjcGxheWVyTmFtZWQoMSk6OTI
+scope.13.id=bWV0aG9kOlJlbnQjcGxheWVyTmFtZWQoMSk6OTM
 scope.13.kind=method
-scope.13.startLine=92
-scope.13.endLine=94
+scope.13.startLine=93
+scope.13.endLine=95
 scope.13.semanticHash=fe784ad0d125f4f24c91a494994efaa90a23932b8683b3623632b72cf559a25c
-scope.14.id=bWV0aG9kOlJlbnQjcmVudEZvcigzKTo2Ng
+scope.14.id=bWV0aG9kOlJlbnQjcmVudEZvcigzKTo2Nw
 scope.14.kind=method
-scope.14.startLine=66
-scope.14.endLine=73
+scope.14.startLine=67
+scope.14.endLine=74
 scope.14.semanticHash=927f0a52ad48acf992edfc026934c19e8d7fb7da90296c34d13c42815e2b7b68
 scope.15.id=bWV0aG9kOlJlbnQjcmVzb2x2ZSgzKTozMg
 scope.15.kind=method
 scope.15.startLine=32
 scope.15.endLine=37
 scope.15.semanticHash=de8570595b73affa06e32ae14a42b1e1b823cfc6c509b8b4294be431643b894e
-scope.16.id=bWV0aG9kOlJlbnQuRXZlbnRzI3BhaWQoNCk6OTg
+scope.16.id=bWV0aG9kOlJlbnQuRXZlbnRzI3BhaWQoNCk6MTAx
 scope.16.kind=method
-scope.16.startLine=98
-scope.16.endLine=98
-scope.16.semanticHash=71d83f0a2565ae7b89740e40b53df44902a39a9e2b7225fcf1fe5ef2fd8283bb
+scope.16.startLine=101
+scope.16.endLine=102
+scope.16.semanticHash=2d1b6db01f8977714501e8aeb2a6656a122c33b6a5b3aac95129086943f837c8
+scope.17.id=bWV0aG9kOlJlbnQuRXZlbnRzI3BhaWQoNCk6OTk
+scope.17.kind=method
+scope.17.startLine=99
+scope.17.endLine=99
+scope.17.semanticHash=71d83f0a2565ae7b89740e40b53df44902a39a9e2b7225fcf1fe5ef2fd8283bb
 */

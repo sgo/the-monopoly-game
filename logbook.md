@@ -31407,6 +31407,30 @@ Domain 359/359. Full acceptance 576/576 (including the new cli-6
 scenario), run twice. CLI module's other 11 tests pass; the one known
 flake excluded per established precedent.
 
+## 2026-08-11T18:20:41Z — refactorer sent greedo-legal-entity handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: greedo-legal-entity
+commit: fc01eaff44
+```
+
+Summary: verified the CLI Greedo flag-wiring fix — a real, high-value bug
+where real CLI games never actually enabled legal-entity trading in player
+strategies regardless of the flag, explaining zero share sales across 27
+real playtests. Simplified `Simulator.STRATEGIES` from a now-partially-dead
+`Map<String, Supplier<Strategy>>` to `Set<String>` since construction
+bypasses the supplier entirely now (same CC, verified by direct
+comparison). Could not get a clean `crap4java` coverage run for
+`Simulator.java` due to the known pre-existing `SimulatorTest.
+keepsPlayingUntilToldToStop` flake (confirmed via A/B worktree against my
+last commit — reproduces identically, not a regression); `dry4java` and
+mutation-scan both clean. Domain 359/359, acceptance 576/576 run twice.
+
 ## 2026-08-11T17:09:15Z — architect completes legal-entity share-sale review
 
 Sent phase-complete priority-50 git handoff to specifier:
@@ -31473,6 +31497,23 @@ thresholds literal steps rather than single-row Examples values. They are fixed
 minimum observations, not scenario variables; doing so removes the remaining
 three false soft-mutation targets.
 
+## 2026-08-12T10:26:00Z - specifier hands off Greedo entity-build-loan commit to coder
+
+Action: committed entity-24..27,29..31 (commit 50e90de) specifying that Greedo
+commits to a legal-entity build loan when EVERY shareholder can afford its share,
+is solvent, and its reserve allows it. Build-loan commitment is all-or-nothing
+(no partial loan) - a non-committing shareholder would free-ride on the rental
+income the loan buys. Handed implementation to coder (outbox
+000001). Root cause: commitToBuild() was never called by production code so
+entities never raised loans and never built hotels in real play.
+
+## 2026-08-12T10:34:00Z - specifier hands off entity narration to coder (000002)
+
+Committed journal/report/logging -67..69 (commit 6758443) narrating entity rent,
+rent-funded builds, and loan-funded builds. Root observability gap: Rent.java
+entity path never fires events, Game.java:207 ignores HouseBuilt, no
+LegalEntityRentPaid/entity-build Entry types. Delivered to coder via outbox root
+(id 000002).
 ## 2026-08-12T12:45:00Z — clarification requested from architect
 
 Sent:
@@ -31587,6 +31628,8 @@ These six failures are acceptance/specification consequences of the new
 automatic commitment and once-per-round semantics; no per-player operation
 was restored. Domain tests remain 359/359; implementation commit is `1614d0a`.
 
+Sent normal git handoff `20260812T115237Z_000146_from_coder_to_architect` at
+classification commit `234da6408c` for review.
 ## 2026-08-12T11:35:48Z — architect sends round-boundary triage direction
 
 Sent priority-00 git handoff to coder:
@@ -31626,6 +31669,122 @@ assert balances before the new shareholder's end-of-round entity-build
 commitment. Returning these criteria decisions to specifier; no per-turn
 operation will be reintroduced.
 
+## 2026-08-12 — specifier: timing rework set resolved (round-boundary reconciliation)
+
+Architect handoff 000239 (round-boundary merge 0f840032) returned six Gherkin
+timing mismatches to specifier. Resolved per user review:
+
+- entity-17 reworked: fully-developed pink group (hotel on each street) -> no
+  build plan -> entity financially inactive at the round boundary. Bank ending,
+  max loan, no-dividend asserted deterministically from the Examples table.
+- entity-26 DROPPED as redundant: distress is settled by selling the share
+  (share-sale scenarios already prove it) and distress does NOT block a loan;
+  a loan never drives a shareholder negative (canBorrowForBuilding requires
+  balance >= share on every shareholder).
+- entity-30 DROPPED as redundant with entity-6: same-round raise+repay is
+  forbidden at the boundary; a single-round reframe (pre-establish loan via
+  "Pink Realty owes ...") reproduces entity-6 verbatim.
+- entity-31 DROPPED as redundant with entity-19: same-round capitalize+
+  dividend is forbidden; single-round reframe (loan repaid + 4 houses + aged
+  capitalized shareholder) reproduces entity-19 verbatim.
+- share-sale-8 reconciled: pre-build hotel on each pink street so the boundary
+  has nothing to build, stopping the auto-commit build-loan that was charging
+  buyer-shareholder high hat to -505; high_hat_ending=995 now holds.
+
+Entity numbers 26/30/31 left intentionally skipped to avoid churn in the
+mutation-manifest scenario indices at the top of the feature file.
+
+Acceptance (JDK 25.0.2-zulu, mvn -Pacceptance): 590 tests, 9 failures. All
+timing reworks GREEN (GreedoLegalEntity + GreedoShareSale = 0 failures). The 9
+remaining failures are the narration-step set (journal-67/68/69,
+report-67/68/69, logging-67/68/69) routed to coder in handoff 000002. Handoff
+000001 (build-commit implementation) is SUPERSEDED: the strategy decision
+point, commitToBuildIfAllAgree, prepareBuildCommitment and
+Greedo.commitToEntityBuild were implemented by the architect's round-boundary
+merge 0f840032.
+
+## 2026-08-12T15:24:02Z — entity narration implemented
+
+Processed specifier priority-00 handoff `20260812T131154Z_000003` (base
+`f427954`). Added journal entries and report wording for entity rent payments
+and entity house builds; loan-plus-build operations now narrate both events.
+The round-boundary entity operation preserves terminal-round behavior and the
+entity build planner allows treasury-funded hotel completion without changing
+dividend priority.
+
+Verification: domain tests 359/359 passed; full acceptance 590/590 passed;
+`git diff --check` passed.
+
+## 2026-08-12T15:38:00Z — refactorer receives entity narration for review
+
+Received coder priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 93f1c514ad
+```
+
+Action: merged `93f1c514ad`, resolving a logbook-only conflict by retaining
+both histories. This is the refactorer's first pass over the entire
+round-boundary entity-operation rework (architect merge 0f840032), the
+Greedo build-loan commitment feature (specifier 50e90de, coder 234da64), and
+this narration commit — none of that work routed through the refactorer
+during the architect review-loop cycles that produced it.
+
+CRAP: `LegalEntity.java` carried the whole build-financing cluster
+(buildAsMuchAsAffordable, affordableBuildPlan, cheapestBuildableStreet,
+canBorrowForBuilding, commitToBuildIfAllAgree, prepareBuildCommitment,
+allAgreeToBuild, maximumHotelCost/standardBuildCost, borrowShortfall,
+sharesOf, buildOneImprovement) inline, pushing it to 130 mutation sites —
+over the 100-site split threshold for the first time since the earlier
+`LegalEntityFormation` extraction. Extracted that whole cluster into a new
+package-private `LegalEntityBuilding` (mirroring the existing
+`LegalEntityFormation` pattern: static methods taking the entity as a
+parameter, three new package-private accessors added to `LegalEntity` —
+`buildCommitmentsEmpty()`, `buildCommitmentOf()`, `clearBuildCommitments()` —
+for what buildCommitments needed). `LegalEntity.java` is now 60 sites,
+`LegalEntityBuilding.java` 63.
+
+Four new methods exceeded the CRAP-6 threshold, all coverage-driven
+(`prepareBuildCommitment`/`commitToEntityBuild`/`commitToBuildIfAllAgree` at
+0% coverage, `canPrepareBuildCommitment` at 25%): the auto-commitment
+negotiation path — the actual point of the whole feature — had no unit
+coverage at all, only acceptance coverage. Added 6 focused unit tests (4 in
+`GreedoTest` directly exercising `commitToEntityBuild`'s four branches, 2 in
+`LegalEntityTest` driving `operate(deeds, strategies, rules)` through the
+auto-commit-accepted and auto-commit-declined paths) and one property test
+(`LegalEntityBuildingPropertyTest`, jetCheck, `sharesOf` conservation and
+fairness across 1-8 shareholders and $0-$10,000 — that split function is
+depended on by every build-commitment and loan-raise, so an unfair or lossy
+split would misallocate cost silently). `sharesOf` widened from private to
+package-private static to make it testable in isolation, matching how the
+rest of `LegalEntityBuilding` is structured.
+
+Extracted `canReachHotels` out of `affordableBuildPlan`'s condition and
+`canPrepareBuildCommitment`/`financeShortfall` out of
+`buildAsMuchAsAffordable`'s body (structure-preserving; verified equivalent
+by hand before extracting, then confirmed with the full suite). Also found
+and fixed two DRY violations independent of the build-commitment feature:
+`playTurns`/`playTurn` each logged the stalemate-ending journal entries with
+identical inline blocks (dry4java score 1.00, Game.java:173-176/193-196) —
+extracted `logStalemate`; and `LegalEntity.operate` duplicated its
+mark-operated-then-return-or-NoAction tail in both branches — extracted
+`settled()`/`operatedAs()`. Also removed two unused parameters
+(`strategies`, `rules`) from `affordableBuildPlan` that the body never read.
+
+Every remaining method is at or below CRAP 6 except the two constitution-
+exempted sealed switches: `Report.line` (218.9) and `Game.journalOperation`
+(42.0, `LegalEntity.Operation`'s switch, moved here from
+`operateLegalEntities` in an earlier cycle). dry4java clean outside the
+pre-existing, already-accepted `Journalling` adapter block
+(Game.java:390-543, one-liner-per-entry-type by design). Mutation-scan: all
+seven touched/new files under 100 sites (60/63/78/3/12/58/12). Manifests
+refreshed via `--update-manifest` on every touched file.
+
+Domain 365/365 (359 + 6 new), property-tests profile green (including the
+new `LegalEntityBuildingPropertyTest`), full acceptance 590/590 run twice.
+
 ## 2026-08-12T11:54:55Z — architect returns round-boundary timing criteria
 
 Sent priority-00 git handoff to specifier:
@@ -31644,3 +31803,21 @@ or accept the resulting commitment; entity-30/31 must span operation and
 settlement across two rounds; share-sale-8 must account for the post-round
 shareholder commitment or arrange a scenario that isolates its intended
 share-sale outcome.
+
+## 2026-08-12T13:46:58Z — architect receives narration refactorer review
+
+Received priority-50 git handoff from refactorer:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 0ba2e6877a
+```
+
+Action: merged the review, preserving the prior architect timing-criteria
+record while resolving the logbook-only merge conflict. Reviewed the extracted
+`LegalEntityBuilding` collaborator, round-boundary operation and narration
+wiring, then verified domain property tests, differential Java mutation scans,
+DRY diagnostics, full acceptance, and soft acceptance mutation for the five
+affected features. The review’s new split-allocation mutation surface killed
+all six mutants; the full acceptance suite reported no failures.

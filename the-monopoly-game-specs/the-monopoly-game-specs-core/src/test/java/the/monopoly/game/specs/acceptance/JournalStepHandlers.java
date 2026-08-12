@@ -278,6 +278,19 @@ final class JournalStepHandlers {
             (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityDividendPaid it
                 && it.name().equals(arguments.text(1)), "equal dividend"))),
 
+        then("^the game journal records that pawn \"" + NAME + "\" pays \\$" + VALUE
+                + " rent to " + NAME + " for \"" + NAME + "\"$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityRentPaid it
+                && it.tenant().equals(idOf(arguments.text(1))) && it.rent().amount() == arguments.number(2)
+                && it.name().equals(arguments.text(3)) && it.land().equals(SpaceNames.of(arguments.text(4))),
+                "entity rent paid"))),
+
+        then("^the game journal records that " + NAME + " builds a house on \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityHouseBuilt it
+                && it.name().equals(arguments.text(1)) && it.land().equals(SpaceNames.of(arguments.text(2)))
+                && it.price().amount() == arguments.number(3), "entity house built"))),
+
         step("^we play up to " + VALUE + " rounds$",
             (world, arguments) -> world.playUpToRounds(arguments.number(1))),
 
