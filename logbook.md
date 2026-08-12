@@ -31822,6 +31822,81 @@ DRY diagnostics, full acceptance, and soft acceptance mutation for the five
 affected features. The review’s new split-allocation mutation surface killed
 all six mutants; the full acceptance suite reported no failures.
 
+## 2026-08-12 — specifier: received phase-complete narration sync (architect 000240)
+
+Received priority-50 git_handoff 000240 from architect (task greedo-legal-
+entity-narration, commit c1c0701842):
+
+```
+id: 20260812T134749Z_000240_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: c1c0701842
+task: greedo-legal-entity-narration
+
+Re-read your role and constitution.
+
+merge_and_process architect c1c0701842
+```
+
+Action: merged (fast-forward) c1c0701842 into main. The commit implements the
+entity rent + entity house-build narration (closes the 9 previously-failing
+steps), via extraction of LegalEntityBuilding, new Journal.Entry/Report lines,
+and harness steps. It also refreshed the mutation manifests for the reworked
+greedo-legal-entity and greedo-share-sale features (my entity-17 / share-sale-8
+scenarios now each have a mutation entry and all are killed).
+
+Verified: acceptance pipeline BUILD SUCCESS, 590 tests, 0 failures (previously
+9). All timing reworks + narration are green.
+
+## 2026-08-12 — specifier: entity build-economy finding routed to architect
+
+Finding (asked user, user approved: "yes ask the architect to evaluate this and
+perhaps run his own games to confirm and give suggestions").
+
+Empirical (3 x 8p CLI runs, LE + stalemate trading on): entities form + pay
+dividends (2000+/game) but raise 0 loans, build 0 houses, collect 0 rent.
+Tracing the code:
+
+- Shareholders paying rent into the entity does NOT block construction: rent
+  goes to the treasury and is reinvested by buildAsMuchAsAffordable before any
+  dividend.
+- Real cause: canPrepareBuildCommitment (LegalEntityBuilding.java:26) only fires
+  when bankBalance == $0. Once non-loan cash (e.g. rent) pushes the bank above
+  $0, the entity stops attempting a build-loan commitment. At bank >= 150,
+  repayLoanOrPayDividend pays a DIVIDEND instead of building, even while streets
+  are undeveloped. So moderate rent is diverted to dividends, not construction.
+- prepareBuildCommitment tries maximumHotelCost then falls back to
+  standardBuildCost (1 house/street), but allAgreeToBuild (ALL-OR-NOTHING,
+  reserve-gated per confirmed policy) can fail both when a shareholder's reserve
+  exceeds balance.
+
+This is a spec-relevant economic finding (not a redundant toggle). Routed to
+architect for evaluation, independent runs, and suggestions.
+
+Action: see handoff <NEXT>.
+
+## 2026-08-12T14:19:05Z — architect receives entity build-economy finding
+
+Received priority-50 git handoff from specifier:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier b2594c42ab
+```
+
+Action: merged the specifier's finding and independently reproduced it with
+the packaged eight-player CLI using legal-entity and stalemate trading. Two
+entities formed and later paid dividends, while neither raised a loan nor built
+an improvement. The cause is confirmed in `LegalEntityBuilding`: the
+commitment preparation gate requires an exactly-zero treasury, so rent leaves
+an entity unable to finance the remaining shortfall and dividends win instead.
+
 ## 2026-08-12T13:47:49Z — architect closes narration review with specifier
 
 Sent priority-50 git handoff to specifier:
@@ -31837,6 +31912,4 @@ commit: c1c0701842
 Summary: refactorer review accepted. The normal game path retains the
 round-boundary entity operation and rent/build journal/report narration;
 `LegalEntityBuilding` isolates the construction and shareholder-financing
-collaborator. Verification recorded: property tests 23/23, full acceptance
-590 with no failures, six new differential Java mutants killed, and soft
-Gherkin mutation complete for all five affected feature files.
+collaborator.
