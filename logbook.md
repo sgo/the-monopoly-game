@@ -31625,3 +31625,22 @@ settlement operation in the following round; and both share-sale-8 examples
 assert balances before the new shareholder's end-of-round entity-build
 commitment. Returning these criteria decisions to specifier; no per-turn
 operation will be reintroduced.
+
+## 2026-08-12T11:54:55Z — architect returns round-boundary timing criteria
+
+Sent priority-00 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: 0f840032d4
+```
+
+Required criteria decisions: entity-17 must state its intended post-boundary
+outcome; entity-26 must keep the shareholder distressed through the boundary
+or accept the resulting commitment; entity-30/31 must span operation and
+settlement across two rounds; share-sale-8 must account for the post-round
+shareholder commitment or arrange a scenario that isolates its intended
+share-sale outcome.
