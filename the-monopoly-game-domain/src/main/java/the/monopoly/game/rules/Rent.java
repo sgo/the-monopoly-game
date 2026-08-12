@@ -43,6 +43,7 @@ public class Rent implements Landings {
       tenant.account().withdraw(rent);
       entity.depositToBank(rent);
       entity.receiveRent(land);
+      events.paid(tenant, entity, land, rent);
     }
   }
 
@@ -96,6 +97,9 @@ public class Rent implements Landings {
   /** What the payment did, for whoever records the game. */
   public interface Events {
     void paid(Player tenant, Player owner, Ownable land, Money rent);
+
+    default void paid(Player tenant, LegalEntity entity, ColourStreet land, Money rent) {
+    }
   }
 }
 

@@ -119,6 +119,17 @@ final class GameLogStepHandlers {
                 + NAME + "\", and pawn \"" + NAME + "\" an equal dividend$",
             (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.LegalEntityDividendPaid it
                 && it.name().equals(arguments.text(1)), "equal dividend"))),
+        then("^the game log records that pawn \"" + NAME + "\" pays \\$" + VALUE
+                + " rent to " + NAME + " for \"" + NAME + "\"$",
+            (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.LegalEntityRentPaid it
+                && it.tenant().equals(idOf(arguments.text(1))) && it.rent().amount() == arguments.number(2)
+                && it.name().equals(arguments.text(3)) && it.land().equals(SpaceNames.of(arguments.text(4))),
+                "entity rent paid"))),
+        then("^the game log records that " + NAME + " builds a house on \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.LegalEntityHouseBuilt it
+                && it.name().equals(arguments.text(1)) && it.land().equals(SpaceNames.of(arguments.text(2)))
+                && it.price().amount() == arguments.number(3), "entity house built"))),
         then("^the game report says that " + NAME + " is formed, held in equal thirds by pawn \"" + NAME
                 + "\", pawn \"" + NAME + "\", and pawn \"" + NAME + "\"$",
             (world, arguments) -> says(world, arguments.text(1) + " is formed, held in equal thirds by")),
@@ -132,6 +143,15 @@ final class GameLogStepHandlers {
         then("^the game report says that " + NAME + " pays each of pawn \"" + NAME + "\", pawn \""
                 + NAME + "\", and pawn \"" + NAME + "\" an equal dividend$",
             (world, arguments) -> says(world, arguments.text(1) + " pays each of")),
+        then("^the game report says that pawn \"" + NAME + "\" pays \\$" + VALUE
+                + " rent to " + NAME + " for \"" + NAME + "\"$",
+            (world, arguments) -> says(world, arguments.text(1) + " pays $"
+                + arguments.number(2) + " rent to " + arguments.text(3) + " for " + arguments.text(4))),
+        then("^the game report says that " + NAME + " builds a house on \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> says(world, builtAHouse(arguments.text(1),
+                SpaceNames.of(arguments.text(2)).name().replaceAll("(?<=[a-z])(?=[A-Z])", " "),
+                arguments.number(3)))),
         then("^the game log records that pawn \"" + NAME + "\" starts a turn aged " + VALUE
                 + " years before it records that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
             (world, arguments) -> logRecordsInOrder(world,

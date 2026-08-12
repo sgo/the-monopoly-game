@@ -160,13 +160,28 @@ final class JournalStepHandlers {
             (world, arguments) -> assertThat(world.totalHouses(Street.Colour.pink))
                 .isEqualTo(arguments.number(1))),
 
-        then("^Pink Realty raises no more than \\$(<max_loan>) in loans$",
+        then("^Pink Realty raises no more than \\$" + VALUE + " in loans$",
             (world, arguments) -> assertThat(world.gameLog().stream()
                 .filter(Entry.LegalEntityLoanRaised.class::isInstance)
                 .map(Entry.LegalEntityLoanRaised.class::cast)
                 .filter(entry -> entry.name().equals("Pink Realty"))
                 .mapToInt(entry -> entry.amount().amount()).sum())
                 .isLessThanOrEqualTo(arguments.number(1))),
+
+        then("^the street \"" + NAME + "\" has at least " + VALUE + " houses built$",
+            (world, arguments) -> assertThat(world.housesBuilt(SpaceNames.of(arguments.text(1))))
+                .isGreaterThanOrEqualTo(arguments.number(2))),
+
+        then("^the entity repays the loan with interest before any dividend$",
+            (world, arguments) -> {
+              List<Entry> entries = world.gameLog();
+              int repayment = entries.indexOf(entries.stream()
+                  .filter(Entry.LegalEntityLoanRepaid.class::isInstance).findFirst()
+                  .orElseThrow(() -> new AssertionError("No loan repayment was recorded.")));
+              int dividend = entries.indexOf(entries.stream()
+                  .filter(Entry.LegalEntityDividendPaid.class::isInstance).findFirst().orElse(null));
+              assertThat(dividend < 0 || repayment < dividend).isTrue();
+            }),
 
         then("^each of pawn \"dog\", pawn \"high hat\", and pawn \"iron box\" receives a \\$(<dividend_share>) dividend from Pink Realty$",
             (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityDividendPaid it
@@ -198,6 +213,12 @@ final class JournalStepHandlers {
 
         given("^each shareholder commits \\$(<share>|<commitment>) toward Pink Realty's build$",
             (world, arguments) -> world.shareholdersCommitToBuild("Pink Realty", money(arguments.number(1)))),
+
+        given("^pawn \"" + NAME + "\" has a balance of \\$" + VALUE + "$",
+            (world, arguments) -> world.holdPawnBalance(arguments.text(1), money(arguments.number(2)))),
+
+        given("^pawn \"" + NAME + "\" is in debt by \\$" + VALUE + "$",
+            (world, arguments) -> world.holdPawnBalance(arguments.text(1), money(-arguments.number(2)))),
 
         step("^pawn \"" + NAME + "\" considers forming a legal entity over the " + NAME + " colour group$",
             (world, arguments) -> world.considerFormingLegalEntity(arguments.text(1), arguments.text(2))),
@@ -256,6 +277,19 @@ final class JournalStepHandlers {
                 + NAME + "\", and pawn \"" + NAME + "\" an equal dividend$",
             (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityDividendPaid it
                 && it.name().equals(arguments.text(1)), "equal dividend"))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" pays \\$" + VALUE
+                + " rent to " + NAME + " for \"" + NAME + "\"$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityRentPaid it
+                && it.tenant().equals(idOf(arguments.text(1))) && it.rent().amount() == arguments.number(2)
+                && it.name().equals(arguments.text(3)) && it.land().equals(SpaceNames.of(arguments.text(4))),
+                "entity rent paid"))),
+
+        then("^the game journal records that " + NAME + " builds a house on \"" + NAME
+                + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.LegalEntityHouseBuilt it
+                && it.name().equals(arguments.text(1)) && it.land().equals(SpaceNames.of(arguments.text(2)))
+                && it.price().amount() == arguments.number(3), "entity house built"))),
 
         step("^we play up to " + VALUE + " rounds$",
             (world, arguments) -> world.playUpToRounds(arguments.number(1))),
@@ -320,23 +354,25 @@ final class JournalStepHandlers {
         then("^the game journal records that the \"Greedo\" strategy observes legal-entity trading as "
                 + NAME + "$",
             (world, arguments) -> {
+              boolean expected = expectedTradingState(arguments.text(1));
               world.awaitGameLog(world.simulatorPlayerCount(), Entry.StrategyNamed.class::isInstance,
                   "strategy observations");
               assertThat(world.gameLog().stream()
                   .filter(Entry.StrategyNamed.class::isInstance)
                   .map(Entry.StrategyNamed.class::cast)
-                  .allMatch(entry -> entry.legalEntityEnabled() == arguments.text(1).equals("enabled"))).isTrue();
+                  .allMatch(entry -> entry.legalEntityEnabled() == expected)).isTrue();
             }),
 
         then("^the game journal records that the \"Greedo\" strategy observes stalemate trading as "
                 + NAME + "$",
             (world, arguments) -> {
+              boolean expected = expectedTradingState(arguments.text(1));
               world.awaitGameLog(world.simulatorPlayerCount(), Entry.StrategyNamed.class::isInstance,
                   "strategy observations");
               assertThat(world.gameLog().stream()
                   .filter(Entry.StrategyNamed.class::isInstance)
                   .map(Entry.StrategyNamed.class::cast)
-                  .allMatch(entry -> entry.stalemateEnabled() == arguments.text(1).equals("enabled"))).isTrue();
+                  .allMatch(entry -> entry.stalemateEnabled() == expected)).isTrue();
             }),
 
         then("^the game journal records that pawn \"" + NAME + "\" rolls " + VALUE + " for initiative$",
@@ -734,6 +770,14 @@ final class JournalStepHandlers {
       case "bankrupt" -> true;
       case "not bankrupt" -> false;
       default -> throw new IllegalArgumentException("Unknown bankrupt state: " + state);
+    };
+  }
+
+  private static boolean expectedTradingState(String state) {
+    return switch (state) {
+      case "enabled" -> true;
+      case "disabled" -> false;
+      default -> throw new IllegalArgumentException("Unknown trading state: " + state);
     };
   }
 }

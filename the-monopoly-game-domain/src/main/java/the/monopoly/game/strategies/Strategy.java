@@ -49,6 +49,11 @@ public interface Strategy {
     return false;
   }
 
+  /** Whether this shareholder commits their share of a legal-entity build loan. */
+  default boolean commitToEntityBuild(EntityBuildOffer offer) {
+    return false;
+  }
+
   /** Whether to pay the fine to begin this turn outside jail. */
   default boolean pays(JailFine fine) {
     return false;
@@ -118,6 +123,9 @@ public interface Strategy {
     public boolean isAffordable() {
       return available.covers(price);
     }
+  }
+
+  record EntityBuildOffer(Money share, Money available, Money reserve) {
   }
 
   record JailFine(Money amount, Money available) {

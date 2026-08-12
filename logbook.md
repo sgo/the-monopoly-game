@@ -31365,6 +31365,8 @@ commit: 677c50f0a3
 Action: sent the verified CLI flag wiring and startup strategy-observation
 journal changes for refactorer review.
 
+Correction: the first local send attempt used an invalid abbreviated commit;
+the actual handoff commit is `954ff4902d`.
 ## 2026-08-11T20:20:00+02:00 — refactorer reviews CLI Greedo flag wiring (954ff4902d)
 
 Merged `954ff4902d`. Real, high-value bug found via playtesting (27 x
@@ -31428,3 +31430,287 @@ comparison). Could not get a clean `crap4java` coverage run for
 keepsPlayingUntilToldToStop` flake (confirmed via A/B worktree against my
 last commit — reproduces identically, not a regression); `dry4java` and
 mutation-scan both clean. Domain 359/359, acceptance 576/576 run twice.
+
+## 2026-08-11T17:09:15Z — architect completes legal-entity share-sale review
+
+Sent phase-complete priority-50 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-legal-entity
+commit: 692bfc36db
+```
+
+All review loops are closed. The scenario has no artificial participant policy,
+the fixed High Hat funding precondition is no longer an Examples mutation
+target, and soft Gherkin mutation is fully killed.
+
+## 2026-08-11T18:20:41Z — architect receives refactorer CLI review
+
+Received refactorer priority-50 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer fc01eaff44
+```
+
+Action: merging `fc01eaff44` for architectural review. The returned commit
+contains the real CLI Greedo optional-trading flag wiring and startup strategy
+observation boundary, then simplifies the now-dead strategy supplier map to
+the name-validation set it actually is. A logbook-only conflict was resolved
+by retaining both the refactorer history and this architect phase record.
+
+## 2026-08-11T21:03:00Z — architect hardens CLI strategy-state assertions
+
+Action: soft mutation of `specs-cli:en/cli.feature` exposed that the new
+strategy-state handlers treated every token except exactly `enabled` as false;
+the `disabled -> diSabled` mutation therefore survived. Replaced that implicit
+boolean conversion with a closed `enabled`/`disabled` parser, making malformed
+criteria fail. The rerun kills that mutation (6/9 killed); its three remaining
+survivors are pre-existing one-row `<minimum rolls>` thresholds in cli-1,
+cli-2, and cli-5. Each is a fixed criterion, not a varying scenario dimension,
+and must be made literal by the specifier to remove its false mutation target.
+
+The CLI module's `keepsPlayingUntilToldToStop` unit test still fails its fixed
+one-second liveness assertion because a naturally completed game is permitted
+by the `Running` contract; a focused retry reproduced this known timing test
+failure. The new CLI acceptance scenario independently verifies the actual
+optional-flag wiring.
+
+## 2026-08-11T19:04:43Z — architect returns CLI threshold criteria gap
+
+Sent priority-00 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-legal-entity
+commit: d21a0fa209
+```
+
+The specifier must make cli-1's 10-roll, cli-2's 50-roll, and cli-5's 10-roll
+thresholds literal steps rather than single-row Examples values. They are fixed
+minimum observations, not scenario variables; doing so removes the remaining
+three false soft-mutation targets.
+
+## 2026-08-12T10:26:00Z - specifier hands off Greedo entity-build-loan commit to coder
+
+Action: committed entity-24..27,29..31 (commit 50e90de) specifying that Greedo
+commits to a legal-entity build loan when EVERY shareholder can afford its share,
+is solvent, and its reserve allows it. Build-loan commitment is all-or-nothing
+(no partial loan) - a non-committing shareholder would free-ride on the rental
+income the loan buys. Handed implementation to coder (outbox
+000001). Root cause: commitToBuild() was never called by production code so
+entities never raised loans and never built hotels in real play.
+
+## 2026-08-12T10:34:00Z - specifier hands off entity narration to coder (000002)
+
+Committed journal/report/logging -67..69 (commit 6758443) narrating entity rent,
+rent-funded builds, and loan-funded builds. Root observability gap: Rent.java
+entity path never fires events, Game.java:207 ignores HouseBuilt, no
+LegalEntityRentPaid/entity-build Entry types. Delivered to coder via outbox root
+(id 000002).
+## 2026-08-12T12:45:00Z — clarification requested from architect
+
+Sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Clarify entity-30/31 timing: one-round scenarios expect repayment/dividend after build loan, but current entity operates once with treasury consumed by construction.
+```
+
+The coder implementation wires Greedo's legal-entity build-loan decision and
+passes the domain suite, but entity-30/31 acceptance criteria conflict with the
+current once-per-round entity operating semantics.
+
+Correction: the initial note exceeded the handoff message limit; the concise
+message above is the one being sent.
+
+## 2026-08-12T11:19:01Z — architect clarifies entity-30/31 operation timing
+
+Received coder priority-00 note:
+
+```
+Re-read your role and constitution.
+
+Clarify entity-30/31 timing versus the once-per-round entity operation.
+```
+
+Action: clarified the architectural invariant. An entity operation occurs once
+per completed game round, after every eligible player has taken that round's
+turn, and exactly once for each eligible entity. Rent, capitalization, or any
+other event during that round may change the operation's inputs but must not
+trigger another operation in the same round. The round boundary belongs in
+`Game`'s turn-loop coordination, not in a permanent per-entity `operated`
+flag. Thus the current per-player `operateLegalEntities` call and its
+`receivedRent()` bypass do not implement once-per-round semantics. Entity
+formation/shareholder changes take effect at the next operation boundary;
+zero-shareholder entities are skipped.
+
+## 2026-08-12T13:25:00Z — architect follow-up requested
+
+Sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Round-boundary merge done; acceptance still shows entity-25/27 loan guards and entity-30/31 timing failures.
+```
+
+The round-boundary implementation passes domain tests (359/359), but focused
+acceptance still reports loan suppression and one-round repayment/dividend
+criteria that need architectural/specification resolution.
+
+Follow-up verification: restoring terminal-turn checks reduced acceptance to
+six failures, all in legal-entity/share-sale scenarios. The domain suite remains
+green (359/359); acceptance failures are the loan commitment guard, one-round
+repayment/dividend expectations, and two share-sale balance expectations.
+
+Sent follow-up handoff `20260812T113455Z_000145_from_coder_to_architect` with
+the concise verification result above.
+## 2026-08-12T11:20:17Z — architect sends entity-operation timing clarification
+
+Sent priority-00 git handoff to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: 210f0cebaf
+```
+
+The implementation direction is a `Game` round-boundary operation phase,
+without rent-triggered repeat operations and without relying on the permanent
+entity `operated` flag as the round clock.
+
+## 2026-08-12T11:34:55Z — architect directs round-boundary failure triage
+
+Received coder priority-00 note:
+
+```
+Re-read your role and constitution.
+
+Round-boundary merge done; six entity/share-sale acceptance failures remain.
+```
+
+Action: directed coder not to restore per-player operation to satisfy the
+failures. The invariant remains one operation per eligible entity after the
+full player round. Coder must classify every failure: a mismatch with that
+invariant is a production defect for coder; an assertion that encoded the old
+per-turn timing is a Gherkin acceptance-criteria change for specifier. Return
+the concrete failing scenario names, actual/expected values, and the round
+boundary implementation commit through a normal git handoff for review.
+
+Coder classification after verification:
+
+- entity-17 (`an entity with nothing to build...`): expected no action; actual
+  `LegalEntityLoanRaised($300)` at the completed-round operation boundary.
+- entity-26 (`...shareholder is in distress`): expected no loan; actual loan
+  `$300`. The distressed shareholder's share is resolved before the boundary,
+  so the remaining shareholders pass the automatic Greedo commitment policy.
+- entity-30: expected a loan and same-round repayment; no repayment is possible
+  after the single operation has already raised the loan.
+- entity-31: expected same-round dividend; no dividend is possible after the
+  single operation has already built/raised the loan.
+- share-sale-8, both examples: expected high-hat balance `$995`; actual
+  `-$505`, because the post-round entity operation charges the new shareholder
+  their build-loan share.
+
+These six failures are acceptance/specification consequences of the new
+automatic commitment and once-per-round semantics; no per-player operation
+was restored. Domain tests remain 359/359; implementation commit is `1614d0a`.
+
+Sent normal git handoff `20260812T115237Z_000146_from_coder_to_architect` at
+classification commit `234da6408c` for review.
+## 2026-08-12T11:35:48Z — architect sends round-boundary triage direction
+
+Sent priority-00 git handoff to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-legal-entity
+commit: cfcada1e68
+```
+
+The coder is to preserve once-per-round semantics, separate implementation
+failures from superseded Gherkin timing expectations, and return the concrete
+failure evidence in the next normal handoff.
+
+## 2026-08-12T11:52:37Z — architect receives round-boundary implementation
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 234da6408c
+```
+
+Action: merged `234da6408c`, resolving a logbook-only conflict by retaining
+both histories. The round-loop owns a single entity-operation phase after all
+players take their turns; individual turns no longer operate entities and the
+former rent bypass is removed. This implements the once-per-round boundary.
+
+The six acceptance failures are Gherkin timing mismatches, not implementation
+defects: entity-17 expects an old pre-operation idle state; entity-26's debt is
+settled before the operation boundary; entity-30 and entity-31 require a
+settlement operation in the following round; and both share-sale-8 examples
+assert balances before the new shareholder's end-of-round entity-build
+commitment. Returning these criteria decisions to specifier; no per-turn
+operation will be reintroduced.
+
+## 2026-08-12 — specifier: timing rework set resolved (round-boundary reconciliation)
+
+Architect handoff 000239 (round-boundary merge 0f840032) returned six Gherkin
+timing mismatches to specifier. Resolved per user review:
+
+- entity-17 reworked: fully-developed pink group (hotel on each street) -> no
+  build plan -> entity financially inactive at the round boundary. Bank ending,
+  max loan, no-dividend asserted deterministically from the Examples table.
+- entity-26 DROPPED as redundant: distress is settled by selling the share
+  (share-sale scenarios already prove it) and distress does NOT block a loan;
+  a loan never drives a shareholder negative (canBorrowForBuilding requires
+  balance >= share on every shareholder).
+- entity-30 DROPPED as redundant with entity-6: same-round raise+repay is
+  forbidden at the boundary; a single-round reframe (pre-establish loan via
+  "Pink Realty owes ...") reproduces entity-6 verbatim.
+- entity-31 DROPPED as redundant with entity-19: same-round capitalize+
+  dividend is forbidden; single-round reframe (loan repaid + 4 houses + aged
+  capitalized shareholder) reproduces entity-19 verbatim.
+- share-sale-8 reconciled: pre-build hotel on each pink street so the boundary
+  has nothing to build, stopping the auto-commit build-loan that was charging
+  buyer-shareholder high hat to -505; high_hat_ending=995 now holds.
+
+Entity numbers 26/30/31 left intentionally skipped to avoid churn in the
+mutation-manifest scenario indices at the top of the feature file.
+
+Acceptance (JDK 25.0.2-zulu, mvn -Pacceptance): 590 tests, 9 failures. All
+timing reworks GREEN (GreedoLegalEntity + GreedoShareSale = 0 failures). The 9
+remaining failures are the narration-step set (journal-67/68/69,
+report-67/68/69, logging-67/68/69) routed to coder in handoff 000002. Handoff
+000001 (build-commit implementation) is SUPERSEDED: the strategy decision
+point, commitToBuildIfAllAgree, prepareBuildCommitment and
+Greedo.commitToEntityBuild were implemented by the architect's round-boundary
+merge 0f840032.
+
+## 2026-08-12T15:24:02Z — entity narration implemented
+
+Processed specifier priority-00 handoff `20260812T131154Z_000003` (base
+`f427954`). Added journal entries and report wording for entity rent payments
+and entity house builds; loan-plus-build operations now narrate both events.
+The round-boundary entity operation preserves terminal-round behavior and the
+entity build planner allows treasury-funded hotel completion without changing
+dividend priority.
+
+Verification: domain tests 359/359 passed; full acceptance 590/590 passed;
+`git diff --check` passed.

@@ -924,3 +924,48 @@ Feature: game logging
     Examples:
       | entity_name |
       | Pink Realty |
+
+  # logging-67
+  Scenario Outline: the log records that pawn "<renter>" pays rent to <entity_name> for an entity-owned street
+    Given we select 4 players
+    And <entity_name> is formed
+    And the street "Rue de Diekirch Arlon" has 4 houses built
+    And the street "Bruul Mechelen" has 4 houses built
+    And the street "Place Verte Verviers" has 4 houses built
+    And pawn "<renter>" starts at position <renter_position>
+    And pawn "<renter>" will claim rent for "<renter_street>"
+    When pawn "<renter>" lands on "<renter_street>"
+    Then the game log records that pawn "<renter>" pays $<rent> rent to <entity_name> for "<renter_street>"
+
+    Examples:
+      | entity_name | renter  | renter_position | renter_street   | rent |
+      | Pink Realty  | racecar | 3               | Bruul Mechelen  | 625  |
+
+  # logging-68
+  Scenario Outline: the log records that <entity_name> builds a house on a street when its treasury can pay for it
+    Given <entity_name> is formed
+    And the street "Rue de Diekirch Arlon" has 4 houses built
+    And the street "Bruul Mechelen" has 4 houses built
+    And the street "Place Verte Verviers" has 4 houses built
+    And <entity_name>'s bank account holds $<treasury>
+    And pawn "dog" will roll 12 for their turn
+    When we play up to 1 round
+    Then the game log records that <entity_name> builds a house on "<street>" for $100
+
+    Examples:
+      | entity_name | treasury | street             |
+      | Pink Realty  | 100      | Rue de Diekirch Arlon |
+
+  # logging-69
+  Scenario Outline: the log records that <entity_name> raises a loan and builds a house on a street when its treasury cannot pay for it
+    Given <entity_name> is formed
+    And <entity_name>'s bank account holds $<rent>
+    And each shareholder commits $<commitment> toward Pink Realty's build
+    And pawn "dog" will roll 12 for their turn
+    When we play up to 1 round
+    Then the game log records that <entity_name> raises a loan of $<shortfall> from pawn "dog", pawn "high hat", and pawn "iron box"
+    And the game log records that <entity_name> builds a house on "<street>" for $100
+
+    Examples:
+      | entity_name | rent | shortfall | commitment | street             |
+      | Pink Realty  | 50   | 50        | 25         | Rue de Diekirch Arlon |

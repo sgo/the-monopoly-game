@@ -6,6 +6,7 @@ import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
 import the.monopoly.game.components.streets.Street;
+import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -145,8 +146,17 @@ public final class LegalEntity {
 
   /** Applies the entity's end-of-turn priority: build as much as affordable, then service debt, then pay a dividend. */
   public Operation operate(Deeds deeds) {
+    return operate(deeds, null, null);
+  }
+
+  public Operation operate(Deeds deeds, Strategy.OfPlayers strategies, Rule.Set rules) {
     if (!hasShareholders()) return new Operation.NoAction();
-    Operation building = buildAsMuchAsAffordable(deeds);
+    if (loan.equals(Money.ZERO) && lastCapitalizedShareholderGrewOlder) {
+      Operation settlement = repayLoanOrPayDividend();
+      markOperated();
+      return settlement != null ? settlement : new Operation.NoAction();
+    }
+    Operation building = buildAsMuchAsAffordable(deeds, strategies, rules);
     if (building != null) {
       markOperated();
       return building;
@@ -156,11 +166,15 @@ public final class LegalEntity {
     return settlement != null ? settlement : new Operation.NoAction();
   }
 
-  private Operation buildAsMuchAsAffordable(Deeds deeds) {
-    List<ColourStreet> plan = affordableBuildPlan(deeds);
+  private Operation buildAsMuchAsAffordable(Deeds deeds, Strategy.OfPlayers strategies, Rule.Set rules) {
+    if (strategies != null && rules != null && buildCommitments.isEmpty() && bankBalance().equals(Money.ZERO))
+      prepareBuildCommitment(strategies, rules, deeds);
+    List<ColourStreet> plan = affordableBuildPlan(deeds, strategies, rules);
     if (plan.isEmpty()) return null;
 
     Money shortfall = totalConstructionCost(plan).minus(bankBalance());
+    if (shortfall.amount() > 0 && strategies != null && rules != null)
+      commitToBuildIfAllAgree(shortfall, strategies, rules, deeds);
     Money loanRaised = Money.ZERO;
     if (shortfall.amount() > 0) {
       loanRaised = borrowShortfall(shortfall);
@@ -173,12 +187,13 @@ public final class LegalEntity {
         : new Operation.LoanRaisedAndHouseBuilt(loanRaised, firstBuilt);
   }
 
-  private List<ColourStreet> affordableBuildPlan(Deeds deeds) {
+  private List<ColourStreet> affordableBuildPlan(Deeds deeds, Strategy.OfPlayers strategies, Rule.Set rules) {
     List<ColourStreet> plan = new java.util.ArrayList<>();
     Money totalCost = Money.ZERO;
     boolean startedWithTreasuryFunds = bankBalance().amount() > 0;
-    boolean canReachHotels = bankBalance().equals(Money.ZERO) && loan.equals(Money.ZERO)
-        && !buildCommitments.isEmpty();
+    boolean canReachHotels = loan.equals(Money.ZERO)
+        && (lastCapitalizedShareholder == null && bankBalance().amount() > 0 && bankBalance().amount() < 150
+            || !buildCommitments.isEmpty());
     while (true) {
       ColourStreet next = cheapestBuildableStreet(deeds, plan, canReachHotels);
       if (next == null) break;
@@ -225,6 +240,48 @@ public final class LegalEntity {
         shareholders.get(index).account().balance().amount().amount() >= shares.get(index).amount()
             && buildCommitments.getOrDefault(shareholders.get(index).id(), Money.ZERO).amount()
                 >= shares.get(index).amount());
+  }
+
+  private void commitToBuildIfAllAgree(Money shortfall, Strategy.OfPlayers strategies, Rule.Set rules, Deeds deeds) {
+    List<Money> shares = sharesOf(shortfall);
+    if (!allAgreeToBuild(shortfall, strategies, rules, deeds)) {
+      buildCommitments.clear();
+      return;
+    }
+    for (int index = 0; index < shareholders.size(); index++)
+      commitToBuild(shareholders.get(index), shares.get(index));
+  }
+
+  private void prepareBuildCommitment(Strategy.OfPlayers strategies, Rule.Set rules, Deeds deeds) {
+    Money amount = maximumHotelCost();
+    if (!allAgreeToBuild(amount, strategies, rules, deeds)) amount = standardBuildCost();
+    if (allAgreeToBuild(amount, strategies, rules, deeds)) {
+      List<Money> shares = sharesOf(amount);
+      for (int index = 0; index < shareholders.size(); index++)
+        commitToBuild(shareholders.get(index), shares.get(index));
+    }
+  }
+
+  private boolean allAgreeToBuild(Money amount, Strategy.OfPlayers strategies, Rule.Set rules, Deeds deeds) {
+    List<Money> shares = sharesOf(amount);
+    return java.util.stream.IntStream.range(0, shareholders.size()).allMatch(index -> {
+      Player shareholder = shareholders.get(index);
+      Strategy strategy = strategies.forPlayer(shareholder);
+      Money reserve = strategy.cashReserve(shareholder, rules, deeds);
+      return strategy.commitToEntityBuild(new Strategy.EntityBuildOffer(
+          shares.get(index), shareholder.account().balance().amount(), reserve));
+    });
+  }
+
+  private Money maximumHotelCost() {
+    return streets.stream()
+        .map(street -> new Money(street.houseConstructionCost().amount()
+            * (street.hotelConstructionRequiresNumberOfHouses() + 1)))
+        .reduce(Money.ZERO, Money::plus);
+  }
+
+  private Money standardBuildCost() {
+    return streets.stream().map(ColourStreet::houseConstructionCost).reduce(Money.ZERO, Money::plus);
   }
 
   private Money borrowShortfall(Money shortfall) {

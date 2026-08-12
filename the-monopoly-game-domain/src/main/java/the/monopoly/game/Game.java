@@ -166,6 +166,16 @@ public class Game {
       for (Player player : turnOrder) {
         if (playTurn(player, builder, turnOrder, journal, journalling, building)) return;
       }
+      operateLegalEntities(journalling);
+      if (remainingPlayers().size() <= 1) return;
+      if (Stalemate.reached(rules, players, deeds)) {
+        journal.log(new Journal.Entry.Stalemate());
+        remainingPlayers().forEach(it -> {
+          journal.log(new Journal.Entry.FinalBalance(it.id(), it.account().balance().amount()));
+          journal.log(new Journal.Entry.FinalAge(it.id(), journalling.age(it)));
+        });
+        return;
+      }
     } while (untilComplete && keepPlaying.getAsBoolean() && remainingPlayers().size() > 1);
   }
 
@@ -175,10 +185,10 @@ public class Game {
     resolveLegalEntityAtStart(player, journalling);
     resolveSplitOwnershipAtStart(player, turnOrder, journalling);
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
-    operateLegalEntities(journalling);
     if (isBuilderStillSolvent(player, builder)) building.develop(player);
     if (remainingPlayers().size() <= 1) return true;
     if (!Stalemate.reached(rules, players, deeds)) return false;
+    if (player.id().equals(turnOrder.getLast().id())) operateLegalEntities(journalling);
     journal.log(new Journal.Entry.Stalemate());
     remainingPlayers().forEach(it -> {
       journal.log(new Journal.Entry.FinalBalance(it.id(), it.account().balance().amount()));
@@ -188,31 +198,27 @@ public class Game {
   }
 
   private boolean operateLegalEntities(Journalling journalling) {
-    boolean operated = deeds.legalEntities().stream()
-        .filter(LegalEntity::hasShareholders)
-        .anyMatch(entity -> !entity.operated());
     deeds.legalEntities().forEach(entity -> operateEntity(entity, journalling));
-    return operated;
+    return true;
   }
 
   private void operateEntity(LegalEntity entity, Journalling journalling) {
-    if (!entity.hasShareholders() || doneOperatingForNow(entity)) return;
+    if (!entity.hasShareholders()) return;
     journalOperation(entity, journalling);
   }
 
   private void journalOperation(LegalEntity entity, Journalling journalling) {
-    switch (entity.operate(deeds)) {
+    switch (entity.operate(deeds, strategies, rules)) {
       case LegalEntity.Operation.LoanRepaid it ->
           journalling.entityLoanRepaid(entity, it.shareholder(), it.principal(), it.repayment());
-      case LegalEntity.Operation.HouseBuilt ignored -> { }
-      case LegalEntity.Operation.LoanRaisedAndHouseBuilt it -> journalling.entityLoanRaised(entity, it.loan());
+      case LegalEntity.Operation.HouseBuilt it -> journalling.entityHouseBuilt(entity, it.street());
+      case LegalEntity.Operation.LoanRaisedAndHouseBuilt it -> {
+        journalling.entityLoanRaised(entity, it.loan());
+        journalling.entityHouseBuilt(entity, it.street());
+      }
       case LegalEntity.Operation.DividendPaid it -> journalling.entityDividendPaid(entity, it.amount());
       case LegalEntity.Operation.NoAction ignored -> { }
     }
-  }
-
-  private boolean doneOperatingForNow(LegalEntity entity) {
-    return entity.operated() && !entity.receivedRent();
   }
 
   private boolean isBuilderStillSolvent(Player player, Player builder) {
@@ -448,6 +454,15 @@ public class Game {
     public void entityDividendPaid(LegalEntity entity, Money amount) {
       journal.log(new Journal.Entry.LegalEntityDividendPaid(entity.name(),
           entity.shareholders().stream().map(Player::id).toList(), amount));
+    }
+
+    public void entityHouseBuilt(LegalEntity entity, ColourStreet street) {
+      journal.log(new Journal.Entry.LegalEntityHouseBuilt(entity.name(), street.type(), street.houseConstructionCost()));
+    }
+
+    @Override
+    public void paid(Player tenant, LegalEntity entity, ColourStreet land, Money rent) {
+      journal.log(new Journal.Entry.LegalEntityRentPaid(entity.name(), tenant.id(), land.type(), rent));
     }
 
     @Override
@@ -703,6 +718,12 @@ public class Game {
       }
 
       record LegalEntityLiquidated(String name, Player.ID recipient, Money amount) implements Entry {
+      }
+
+      record LegalEntityRentPaid(String name, Player.ID tenant, Street.Type land, Money rent) implements Entry {
+      }
+
+      record LegalEntityHouseBuilt(String name, Street.Type land, Money price) implements Entry {
       }
 
       record PurchaseDeclined(Player.ID player, Street.Type land, Money price,
