@@ -32135,3 +32135,12 @@ commit: ecb9539473
 
 Decision required: reconcile entity-15's treasury-only/no-loan outcome with
 the requested automatic post-rent shareholder-financing policy.
+
+Coder verification after applying the resolved auto-solicit policy: entity-30 is
+covered, but full acceptance has three failures, all in legacy journal-66,
+report-66, and logging-66 equal-dividend scenarios. They form Pink Realty with
+the two-player background, seed four houses, and hold $150; automatic solicitation
+raises a $150 loan and builds a house instead of paying the expected dividend.
+Restoring the gate returns the prior 591/591 acceptance baseline. This concrete
+policy/spec conflict requires architect direction on revising the dividend
+criteria or defining an additional auto-solicitation boundary.
