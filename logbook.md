@@ -32136,6 +32136,18 @@ commit: ecb9539473
 Decision required: reconcile entity-15's treasury-only/no-loan outcome with
 the requested automatic post-rent shareholder-financing policy.
 
+## 2026-08-12 — auto-solicit boundary implemented
+
+Processed architect handoff `bcb2d22928` (merged as `812bc90`). Commitment
+solicitation now occurs only when an initial build plan exists with a remaining
+treasury shortfall, or when an unaffordable buildable street exists at zero
+treasury. Fully developed entities therefore proceed directly to debt/dividend
+settlement. The plan is recomputed after commitments so mixed treasury-plus-loan
+builds reach all eligible streets.
+
+Verification: full acceptance 591/591 passed; domain tests 365/365 passed;
+`git diff --check` passed.
+
 Coder verification after applying the resolved auto-solicit policy: entity-30 is
 covered, but full acceptance has three failures, all in legacy journal-66,
 report-66, and logging-66 equal-dividend scenarios. They form Pink Realty with

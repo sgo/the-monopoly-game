@@ -17,10 +17,20 @@ final class LegalEntityBuilding {
 
   static LegalEntity.Operation buildAsMuchAsAffordable(LegalEntity entity, Deeds deeds,
                                                         Strategy.OfPlayers strategies, Rule.Set rules) {
-    if (canPrepareBuildCommitment(entity, strategies, rules))
-      prepareBuildCommitment(entity, strategies, rules, deeds);
     List<ColourStreet> plan = affordableBuildPlan(entity, deeds);
+    if (plan.isEmpty() && canPrepareBuildCommitment(entity, strategies, rules)
+        && cheapestBuildableStreet(entity, deeds, List.of(), canReachHotels(entity)) != null) {
+      prepareBuildCommitment(entity, strategies, rules, deeds);
+      plan = affordableBuildPlan(entity, deeds);
+    }
     if (plan.isEmpty()) return null;
+
+    ColourStreet next = cheapestBuildableStreet(entity, deeds, plan, canReachHotels(entity));
+    if (canPrepareBuildCommitment(entity, strategies, rules) && next != null
+        && totalConstructionCost(plan).plus(next.houseConstructionCost()).exceeds(entity.bankBalance())) {
+      prepareBuildCommitment(entity, strategies, rules, deeds);
+      plan = affordableBuildPlan(entity, deeds);
+    }
 
     Money shortfall = totalConstructionCost(plan).minus(entity.bankBalance());
     Money loanRaised = financeShortfall(entity, shortfall, strategies, rules, deeds);
@@ -34,7 +44,7 @@ final class LegalEntityBuilding {
 
   private static boolean canPrepareBuildCommitment(LegalEntity entity, Strategy.OfPlayers strategies, Rule.Set rules) {
     return strategies != null && rules != null
-        && entity.buildCommitmentsEmpty() && entity.bankBalance().equals(Money.ZERO);
+        && entity.buildCommitmentsEmpty();
   }
 
   private static Money financeShortfall(LegalEntity entity, Money shortfall, Strategy.OfPlayers strategies,
