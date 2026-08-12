@@ -32157,3 +32157,19 @@ implementation boundary is that automatic shareholder solicitation occurs only
 after a buildable plan exists and its cost exceeds treasury. An entity with no
 buildable improvement must not create a commitment and must continue directly
 to debt/dividend settlement.
+
+## 2026-08-12T19:26:56Z — architect routes entity auto-solicit boundary
+
+Sent priority-00 git handoff to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-entity-build-economy
+commit: bcb2d22928
+```
+
+Implement automatic solicitation only for an actual buildable shortfall. Keep
+fully developed entities (including journal-66) out of commitment preparation
+so their existing debt/dividend settlement remains unchanged.
