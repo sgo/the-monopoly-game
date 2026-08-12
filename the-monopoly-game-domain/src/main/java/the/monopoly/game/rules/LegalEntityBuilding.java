@@ -18,7 +18,8 @@ final class LegalEntityBuilding {
   /** Whether every shareholder would fund their share of the entity's next standard-cost improvement. */
   static boolean canFundNextImprovement(LegalEntity entity, Strategy.OfPlayers strategies, Rule.Set rules,
                                         Deeds deeds) {
-    return allAgreeToBuild(entity, standardBuildCost(entity), strategies, rules, deeds);
+    return entity.streets().stream().anyMatch(street -> !deeds.hasHotelOn(street))
+        && allAgreeToBuild(entity, standardBuildCost(entity, deeds), strategies, rules, deeds);
   }
 
   static LegalEntity.Operation buildAsMuchAsAffordable(LegalEntity entity, Deeds deeds,
@@ -53,7 +54,7 @@ final class LegalEntityBuilding {
   }
 
   private static Money amountNeededToContinue(LegalEntity entity, Deeds deeds, List<ColourStreet> plan) {
-    Money required = standardBuildCost(entity);
+    Money required = standardBuildCost(entity, deeds);
     return required.exceeds(entity.bankBalance()) ? required.minus(entity.bankBalance()) : Money.ZERO;
   }
 
@@ -161,8 +162,9 @@ final class LegalEntityBuilding {
     });
   }
 
-  private static Money standardBuildCost(LegalEntity entity) {
-    return entity.streets().stream().map(ColourStreet::houseConstructionCost).reduce(Money.ZERO, Money::plus);
+  private static Money standardBuildCost(LegalEntity entity, Deeds deeds) {
+    return entity.streets().stream().filter(street -> !deeds.hasHotelOn(street))
+        .map(ColourStreet::houseConstructionCost).reduce(Money.ZERO, Money::plus);
   }
 
   private static Money borrowShortfall(LegalEntity entity, Money shortfall) {

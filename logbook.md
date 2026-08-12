@@ -33202,3 +33202,179 @@ not fixed: three m-scenarios still carry a step that no longer does
 anything beyond an already-redundant dice fallback, now that the override
 it used to configure is gone — Gherkin content, so it's the specifier's
 call whether to clean it up.
+
+## 2026-08-13T01:09:00Z — architect: routes stale market-deadlock wording
+
+Received priority-00 git_handoff 000139 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `2ad01b2bbf`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer 2ad01b2bbf
+
+Action: accepted the real detector coverage: all market-deadlock override
+machinery is removed and entity-m7 uses a genuine player development event to
+block formation. Found a Gherkin content defect in entity-m6/m8/m9: their
+"round completes with <action> ownership-consolidating action" step now has no
+effect and overstates what the scenario does. Routed to specifier for criteria
+cleanup; no production change is needed for this finding.
+
+## 2026-08-12 — specifier: remove effectless round-completion step (architect 000258)
+
+Architect flagged (86f99a3ae8): the market-deadlock override machinery was
+removed by the refactorer, so the "round completes with <action>/
+no ownership-consolidating action" step in entity-m1/m2/m3/m4/m5/m6/m8/m9 has
+no effect. Its handler completeMarketDeadlockRound(action) ignores the action
+and only calls letTheOthersRollWhatTheyLike() (already implied by the
+"every other player can complete their turn" setup).
+
+Criteria cleanup: removed the effectless step from entity-m1..m6, m8, m9
+(now "When we play up to 1 round" flows directly to "Then"). Removed the unused
+<action> column from entity-m6's Examples. entity-m7 already drives blocking via
+a genuine player development event (pawn "high hat" will build a house on
+"Lippenslaan Knokke") and correctly omits the step. No production change needed.
+
+## 2026-08-13T01:14:00Z — architect: closes market-deadlock criteria cleanup
+
+Received priority-00 git_handoff 000176 from specifier (task
+`greedo-market-deadlock-trigger`, commit `cdaa3266d8`): the approved criteria
+cleanup removes the obsolete, effectless round-completion steps and the unused
+entity-m6 example column. Merged as `73457e1b67`; this neither adds a test-only
+control path nor changes production logic.
+
+Verification after merge: full acceptance passed (597 tests, including 41
+Greedo legal-entity scenarios); the soft Gherkin mutation check for
+`greedo-legal-entity.feature` passed; and the domain property profile passed
+(23 tests). The prior refactorer closeout had already recorded clean mutation
+and DRY scans for the production detector. The market-deadlock phase is ready
+for specification closeout.
+
+Delivered as handoff 000259:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-market-deadlock-trigger
+commit: e4ccac04e0
+```
+
+
+## 2026-08-12 — specifier: empirical 8-player LE study (fresh jar, 10 pairs)
+
+Ran 10 paired 8-player Greedo games, LE-on vs LE-off (correct jar rebuild after
+discovering an earlier jar was stale and produced bogus 33k-dividend output).
+
+Aggregate (live-journal event counts; each pair = 1 game):
+- LE-on: 9/10 wins, 1 stalemate. 24 entity formations, 29 loan raises, 27 loan
+  repayments, 152 entity builds / 475 total builds (32%), 2952 entity dividends,
+  38 share sales, 2 liquidations.
+- LE-off: 1/10 wins, 9 stalemates. No entity activity; 39 total builds.
+
+Per-game LE-on (formations/loans/divs/builds/entityBuilds):
+leon-1 3/4/95/20/20 W; l2 2/2/1/62/12 W; l3 3/3/739/102/19 W; l4 2/2/772/13/13 W;
+l5 3/3/542/19/19 W; l6 2/2/108/52/12 W; l7 3/4/589/40/20 S; l8 3/5/44/52/19 W;
+l9 1/2/0/51/6 W; l10 2/2/62/64/12 W.
+
+Outcome: legal-entity mechanism strongly resolves 8p stalemates (9/10 vs 1/10).
+Entities do form, raise loans, build (32% of builds), and pay dividends.
+
+Concerns to route/verify (architect): entities pay high dividend volumes
+(e.g. 2952 across 10 games); in leon-1 a hotel-level $750 rent on a single
+street fills treasury then an equal dividend is paid - confirm this is the
+intended fully-developed gate returning true (streets having hotels), not a
+leak. Also confirm the run tools/script (tmp/empirical-le-8p.sh) is kept.
+
+Follow-up: resolved the dividend-volume concern - buildAsMuchAsAffordable builds
+one improvement per street in the plan but journals only operation.firstBuilt
+(LegalEntityBuilding.java:34-37), so one logged build event can represent several
+streets (incl. reaching hotels). This explains hotel-level $750 single-street rent
+with few logged entity builds; dividends are legitimate (fully-developed gate),
+not a leak. Game logs under-report per-operation development by design.
+
+## 2026-08-13 — specifier: specify formation-requires-real-next-improvement policy (architect 000261)
+
+Architect (75d9eec4fc) found a development-selection gap in auto-formation:
+Game.formIfFundable treats a full-developed colour split as fundable because
+LegalEntityBuilding.canFundNextImprovement (= allAgreeToBuild(standardBuildCost))
+sums houseConstructionCost for every entity street UNCONDITIONALLY
+(LegalEntityBuilding.java:164), including streets already at a hotel. Result:
+4 entities formed, 0 entity houses, 0 loans, 566 dividends in one run.
+
+Spec policy: automatic market-deadlock formation must ONLY select a split with
+a REAL next improvement (at least one entity street not yet at a hotel); a
+fully-developed split that has no build plan must not be allocated (it would
+immediately follow its dividend path and never develop).
+
+Acceptance: added entity-m10 (red-by-design) - an eligible three-owner split
+whose streets already have hotels is NOT auto-formed, even when collectively
+fundable. Acceptance went 41->42 legal-entity scenarios with exactly 1 failure
+= m10 ("Expecting value to be false but was true"), pinning the domain bug.
+Routed to architect/coder for the production fix (canFundNextImprovement /
+standardBuildCost must exclude hotel streets).
+
+## 2026-08-13T01:31:00Z — architect: accepts real-next-improvement criteria
+
+Received priority-00 git_handoff 000177 from specifier (task
+`greedo-market-deadlock-trigger`, commit `f49bb7c6b7`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process specifier f49bb7c6b7
+
+Merged the accepted entity-m10 criterion. It precisely separates two policies:
+automatic formation must require an actual remaining improvement, while an
+already-formed fully developed entity remains inactive. The scenario is
+intentionally red against the current production implementation; routed to
+coder for the focused domain fix.
+
+The soft mutation runner refreshed its checked-in acceptance-mutation manifest
+for the corrected scenario wording. Delivered that generated verification
+artifact as follow-up handoff 000260:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 7b92f93064
+```
+
+## 2026-08-13T01:27:00Z — architect: finds auto-formation development gap
+
+Observed normal eight-player Greedo simulations with legal-entity trading
+enabled. Formation itself is not rare: three samples formed entities at player
+years 1–4 (with one later formation at year 112). The defect is selection for
+development. In one complete run, 4 entities formed, 0 entity houses were
+built, 0 entity loans were raised, and 566 dividends were paid.
+
+Cause: `LegalEntityBuilding.canFundNextImprovement` uses the colour group's
+fixed standard house cost even when all its streets already have hotels.
+`Game.formIfFundable` therefore selects a fully-developed split as fundable;
+after formation it has no build plan and immediately follows its dividend
+path. The existing criteria cover an already-formed fully-developed entity
+being inactive, but do not say that automatic market-deadlock formation must
+choose a split with a real next improvement. This is a Gherkin-content gap,
+not a test-harness issue. Routed to specifier for the intended policy and
+acceptance coverage; no production code changed.
+
+Delivered as handoff 000261:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 75d9eec4fc
+```
+
+## 2026-08-13T01:36:17Z — coder: require a real next improvement for formation
+
+Processed architect handoff 000262 (`6e6cb82781`). Fixed
+`LegalEntityBuilding.canFundNextImprovement` so automatic market-deadlock
+formation requires at least one entity street without a hotel and computes the
+funding shortfall only across non-hotel streets. Fully developed splits are no
+longer selected for formation merely because their fixed house-cost sum is
+fundable.
+
+Verification: domain 365/365 and full acceptance 598/598, including entity-m10.

@@ -1,5 +1,5 @@
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-12T21:00:51.002205Z","feature_name":"Greedo legal entity for a three-way colour-group split","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/greedo-legal-entity.feature","background_hash":"fd82b050e2caf6974e2f44e0c1ce996c7bd99ce3d3e5d035db5a75223654814e","implementation_hash":"unknown","scenarios":[{"index":15,"name":"an entity whose streets are already fully developed is financially inactive at the round boundary","scenario_hash":"945de4c701666b1e82f4f6d2db3b72e40e69691050319b47b85625ad1d6bb0c4","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-12T13:45:54.562135Z"},{"index":14,"name":"the entity builds as many houses as it can afford at the end of the turn","scenario_hash":"2fb2bcce463e71807420f255baea8b84f75d80be4d796e4d29d0e1e70d9b84e4","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-11T04:46:20.046607Z"},{"index":0,"name":"three Greedo co-owners of a colour group coalesce into a legal entity holding equal shares","scenario_hash":"2ef5e96b2ea70f8ff71751ea4b35eae5952a85776b607e56ec76b4482675c459","mutation_count":15,"result":{"Total":15,"Killed":15,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":3,"name":"the entity never consolidates a highest-priority colour group","scenario_hash":"072ba692ad338f0bcd5a482bf5606f8b18a5d2a4d1062bd8c5f03beed450891f","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"},{"index":4,"name":"a two-player split of an eligible colour group does not form an entity","scenario_hash":"afc4ab1a1890586142a97b70d380ecac4e4354146c8064aa6e08fc415602c178","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-10T17:36:35.189910Z"}]}
+# {"version":1,"tested_at":"2026-08-12T23:13:57.837338Z","feature_name":"Greedo legal entity for a three-way colour-group split","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/greedo-legal-entity.feature","background_hash":"fd82b050e2caf6974e2f44e0c1ce996c7bd99ce3d3e5d035db5a75223654814e","implementation_hash":"unknown","scenarios":[{"index":0,"name":"three Greedo co-owners of a colour group automatically coalesce into a legal entity at market deadlock, holding equal shares","scenario_hash":"bad6f8ced230bd697179f2785ce27140cf2629d9c90046b6f0839ccfe93281a1","mutation_count":15,"result":{"Total":15,"Killed":15,"Survived":0,"Errors":0},"tested_at":"2026-08-12T23:13:57.837338Z"},{"index":3,"name":"the entity never auto-consolidates a highest-priority colour group, at the round boundary","scenario_hash":"97ccaf56aa722a52dd867b9da3a4c313fe398073545c0fc236ffa306907ad4e3","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-12T23:13:57.837338Z"},{"index":4,"name":"a two-player split of an eligible colour group does not auto-form an entity, at the round boundary","scenario_hash":"763023a56e4a499f6aa9f8363af159280ba4ad82c713f3c5e7f7e840b284ac08","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-12T23:13:57.837338Z"},{"index":6,"name":"the entity does not form at market deadlock when the round contained an ownership-consolidating action","scenario_hash":"260adbfceaa194fca5974ecfd5dffe6d7b94ab13f985bb269631bf7c2adc5d67","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-12T23:13:57.837338Z"},{"index":7,"name":"the entity does not form at market deadlock when the split's shareholders cannot collectively fund the next improvement after base reserves","scenario_hash":"c0353a58d2acd0c6b8d8e9a4b271646668a4b05e5ed9420711a2562f5d112552","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-12T23:13:57.837338Z"},{"index":19,"name":"an entity whose streets are already fully developed is financially inactive at the round boundary","scenario_hash":"945de4c701666b1e82f4f6d2db3b72e40e69691050319b47b85625ad1d6bb0c4","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-12T23:13:57.837338Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -23,7 +23,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And every other ownable space is owned by pawn "high hat"
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the <group> colour group is owned by <entity_name>
     And each of pawn "dog", pawn "high hat", and pawn "iron box" holds a third of <entity_name>
 
@@ -44,7 +43,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And pawn "high hat" owns "Bruul Mechelen"
     And pawn "iron box" owns "Place Verte Verviers"
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the pink colour group is not owned by a legal entity
 
   # entity-m3
@@ -60,7 +58,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And every other ownable space is owned by pawn "high hat"
     And the pink split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the pink colour group is not owned by a legal entity
 
     Examples:
@@ -80,7 +77,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And every other ownable space is owned by pawn "high hat"
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the <group> colour group is not owned by a legal entity
 
     Examples:
@@ -98,7 +94,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And pawn "high hat" owns "Bruul Mechelen"
     And every other ownable space is owned by pawn "high hat"
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the pink colour group is not owned by a legal entity
 
     Examples:
@@ -119,12 +114,11 @@ Feature: Greedo legal entity for a three-way colour-group split
     And the <group> split is an eligible three-owner split
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    And the round completes with <action> ownership-consolidating action
     Then the <group> colour group is auto-formed into <entity_name>
 
     Examples:
-      | group | action | entity_name |
-      | pink  | no     | Pink Realty |
+      | group | entity_name |
+      | pink  | Pink Realty |
 
   # entity-m7
   Scenario Outline: the entity does not form at market deadlock when the round contained an ownership-consolidating action
@@ -161,7 +155,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And the <group> split is an eligible three-owner split
     And the <group> split's shareholders cannot collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the <group> colour group is not owned by a legal entity
 
     Examples:
@@ -182,12 +175,34 @@ Feature: Greedo legal entity for a three-way colour-group split
     And the <group> split is an eligible three-owner split
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the <group> colour group is <formed_outcome> by a legal entity
 
     Examples:
       | group | formed_outcome |
       | pink  | auto-formed     |
+
+  # entity-m10
+  Scenario Outline: the entity is not auto-formed when the eligible split's streets are already fully developed, because there is no real next improvement to fund
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And pawn "iron box" will roll 2 for initiative
+    And every other player can complete their turn
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "high hat" owns "Bruul Mechelen"
+    And pawn "iron box" owns "Place Verte Verviers"
+    And every other ownable space is owned by pawn "high hat"
+    And the <group> split is an eligible three-owner split
+    And the <group> split's shareholders can collectively fund the next improvement after their base reserves
+    When we play up to 1 round
+    Then the <group> colour group is not owned by a legal entity
+
+    Examples:
+      | group |
+      | pink  |
 
   # entity-6
   Scenario Outline: the entity repays a shareholder loan with five percent interest on top before paying any dividend
