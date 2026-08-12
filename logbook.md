@@ -32269,3 +32269,20 @@ while fully-developed entities take the established debt/dividend path.
 Independent verification: property profile 23/23; acceptance suite 591 with
 no failures; differential mutation clean (70 sites); DRY clean; and soft
 Gherkin mutation completed for `greedo-legal-entity.feature`.
+
+## 2026-08-12T19:42:53Z — architect closes entity build-economy phase
+
+Sent priority-50 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-entity-build-economy
+commit: e25fe80696
+```
+
+Summary: accepted automatic unanimous Greedo financing only for an actual
+treasury shortfall with an additional buildable improvement. Fully developed
+entities remain on their original debt/dividend settlement path. All
+coder/refactorer review loops are closed.
