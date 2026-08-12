@@ -31487,3 +31487,6 @@ message: Clarify entity-30/31 timing: one-round scenarios expect repayment/divid
 The coder implementation wires Greedo's legal-entity build-loan decision and
 passes the domain suite, but entity-30/31 acceptance criteria conflict with the
 current once-per-round entity operating semantics.
+
+Correction: the initial note exceeded the handoff message limit; the concise
+message above is the one being sent.
