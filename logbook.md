@@ -20052,6 +20052,19 @@ repeat shape). Ran `./acceptance/run-acceptance.sh`: 433 tests, 0
 failures — both scenarios pass against the already-merged, already-fixed
 implementation.
 
+## 2026-08-12T20:27:20Z — architect routes combined entity-economy implementation
+
+The merged criteria require two coordinated behavioral changes:
+
+- Entity build offers evaluate a shareholder against Greedo's nominal base
+  reserve, not individual dynamic monopoly/station reserve bumps; unanimous
+  approval and the no-free-rider affordability check remain mandatory.
+- Dividends require every entity street to have a hotel. Under-developed
+  entities retain rent and treasury surplus for construction; entity-32 is the
+  red acceptance coverage for this rule.
+
+Routing the observable behavior to coder for implementation and verification.
+
 Committed as `e0cb12bedc` "Retune distressed-sale-17 to the mortgage-floor
 boundary, add distressed-sale-18" (2 files, 85 insertions).
 
