@@ -31821,3 +31821,34 @@ wiring, then verified domain property tests, differential Java mutation scans,
 DRY diagnostics, full acceptance, and soft acceptance mutation for the five
 affected features. The review’s new split-allocation mutation surface killed
 all six mutants; the full acceptance suite reported no failures.
+
+## 2026-08-12 — specifier: received phase-complete narration sync (architect 000240)
+
+Received priority-50 git_handoff 000240 from architect (task greedo-legal-
+entity-narration, commit c1c0701842):
+
+```
+id: 20260812T134749Z_000240_from_architect
+from: architect
+to: specifier
+recipient: specifier
+priority: 50
+type: git_handoff
+role: architect
+commit: c1c0701842
+task: greedo-legal-entity-narration
+
+Re-read your role and constitution.
+
+merge_and_process architect c1c0701842
+```
+
+Action: merged (fast-forward) c1c0701842 into main. The commit implements the
+entity rent + entity house-build narration (closes the 9 previously-failing
+steps), via extraction of LegalEntityBuilding, new Journal.Entry/Report lines,
+and harness steps. It also refreshed the mutation manifests for the reworked
+greedo-legal-entity and greedo-share-sale features (my entity-17 / share-sale-8
+scenarios now each have a mutation entry and all are killed).
+
+Verified: acceptance pipeline BUILD SUCCESS, 590 tests, 0 failures (previously
+9). All timing reworks + narration are green.
