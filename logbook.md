@@ -20065,6 +20065,16 @@ The merged criteria require two coordinated behavioral changes:
 
 Routing the observable behavior to coder for implementation and verification.
 
+Delivered as handoff 000249:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-entity-build-economy
+commit: fd12c20098
+```
+
 Committed as `e0cb12bedc` "Retune distressed-sale-17 to the mortgage-floor
 boundary, add distressed-sale-18" (2 files, 85 insertions).
 
