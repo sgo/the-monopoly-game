@@ -32459,6 +32459,31 @@ construction cost it falls through to `repayLoanOrPayDividend`, which distribute
 any treasury of at least $150. That contradicts the user direction and can drain
 rent before it reaches the next construction cost. Routed to specifier for an
 acceptance-criterion correction before implementation.
+
+## 2026-08-12 — specifier: reconcile entity-32 vs auto-solicit policy (architect 000250)
+
+Architect flagged a real acceptance-policy conflict (ff2a4f8185) in my entity-32:
+I specified a $150 treasury builds ONE house (dividend-gate test), but the
+accepted auto-solicitation rule treats any further buildable street as permission
+to solicit, so eligible default shareholders would cover the shortfall and build
+THREE (as in entity-30). The two under-developed-treasury scenarios disagreed.
+
+Reconciliation: entity-32 now sets the non-dividend shareholders to DECLINE
+("has a balance that allows only $<ceiling_share>" = 0), so no auto-solicited
+loan bridges the gap: the entity builds only with its own treasury and, being
+under-developed, pays no dividend. Examples: 0 houses/150 -> builds 1, no
+dividend; 0 houses/300 -> builds 3, no dividend.
+
+This isolates the develop-before-dividend rule from the auto-solicit behaviour
+(entity-30 still proves loans fire when shareholders finance the shortfall).
+entity-32 stays red-by-design only at the dividend gate (current code still pays
+an under-developed dividend). Benchmarked: 593 tests, 2 failures = entity-32's
+no-dividend asserts; entity-30 green.
+
+There remains the coder/architect task: allAgreeToBuild still passes
+cashReserve(player,rules,deeds) (dynamic monopoly/station reserve) rather than
+the specified BASE_RESERVE -- unresolved implementation follow-up.
+
 ## 2026-08-12T22:45:20Z — coder reports entity-32 policy conflict
 
 Processed architect handoff `fd12c20098`. Implemented the fully-developed hotel
