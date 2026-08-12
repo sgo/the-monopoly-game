@@ -32673,3 +32673,10 @@ present in ancestor commit `fcecc76c8c` (Strategy entity-build decision,
 Greedo policy, and LegalEntity financing wiring), so no duplicate code change
 was made. Domain tests remain green at 365/365; acceptance remains at 597
 tests with the five previously recorded legacy legal-entity failures.
+
+## 2026-08-12T22:03:57Z — coder: notified architect
+
+Sent note `000155` to architect: the queued specifier task was stale because
+`fcecc76c8c` is already merged; domain tests are green, while acceptance still
+has five legacy legal-entity failures. Requested direction on whether coder
+should repair those failures.
