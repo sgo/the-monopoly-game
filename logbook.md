@@ -32350,3 +32350,13 @@ strategy reserve, whether the offer should be sized differently, or whether
 formation/another stated rule governs this. Add observable coverage using
 non-artificial shareholder reserves; the present zero-reserve scenario alone
 does not represent the real-game failure.
+
+Delivered as handoff 000247:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: greedo-entity-build-economy
+commit: 33e570ff2d
+```
