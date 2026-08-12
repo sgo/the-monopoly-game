@@ -32371,3 +32371,32 @@ Required new coverage: a scenario using NON-artificial shareholder reserves
 - e.g. a shareholder holding a near-monopoly (high dynamic reserve) with a
   moderate base reserve -- proving the entity still auto-solicits, raises a loan,
   and builds. This models the real-game failure condition.
+
+## 2026-08-12 — specifier: decide entity dividend "fully developed" policy (architect 000248)
+
+Architect routed policy correction (7a73a356f0) from user direction: "Dividends
+should never be paid out unless the property is fully developed." Root cause:
+repayLoanOrPayDividend pays a dividend whenever treasury >= $150 and the
+last-capitalised triggers are met, WITHOUT a fully-developed check. An
+under-developed entity with >=$150 rent therefore dividends instead of saving
+toward the next construction cost (contributing to the observed 0-build/
+0-loan real-game dormancy).
+
+User decision (via AskQuestion): FULLY DEVELOPED = every entity street has a
+HOTEL. Dividend requires hotels + treasury >= $150 + last-capitalised-aged
+triggers. Under-developed entities (0..4 houses) never pay dividends.
+
+Spec changes in greedo-legal-entity.feature:
+- entity-8/11/18/19 revised: "fully developed" dividend-eligibility scenarios
+  now use HOTELS (was 4 houses) so the loan-block and last-capitalised trigger
+  tests isolate cleanly under the new gate.
+- NEW entity-32 (red-by-design): an under-developed entity spends its treasury
+  on building rather than paying a dividend, even when treasury >= $150 and the
+  last-capitalised shareholder has aged. Examples: 0 houses/150 -> builds 1,
+  no dividend; 0 houses/300 -> builds 3, no dividend.
+
+Acceptance: 593 tests, 2 failures, BOTH entity-32 examples failing at
+"pawn dog receives no dividend from Pink Realty" -- current code still pays an
+under-developed dividend (dividend-drain bug). entity-8/11/18/19 + all others
+green. Red-by-design, implementation (fully-developed gate in
+repayLoanOrPayDividend) is coder/architect scope. Routing to architect.
