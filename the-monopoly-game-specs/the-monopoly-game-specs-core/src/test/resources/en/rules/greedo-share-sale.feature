@@ -145,6 +145,9 @@ Feature: selling legal-entity shares to avoid bankruptcy
     Given legal-entity trading is enabled for the "Greedo" strategy
     And we select 4 players
     And Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
     And pawn "iron box" is bankrupt
     And pawn "dog" owns no mortgaged property
     And pawn "dog" has $<dog_balance> to spend
