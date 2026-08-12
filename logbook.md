@@ -32821,3 +32821,64 @@ flow. Preserve the approved full-board, quiet-round, eligibility, and
 collective-base-reserve rules; make the m-scenarios execute the production
 path. Retain the isolated m-scenario fixtures so unrelated entity scenarios
 remain unaffected.
+
+## 2026-08-12T22:21:24Z — refactorer receives production market-deadlock wiring for review
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 254fd869c8
+```
+
+Action: merged `254fd869c8`, resolving a logbook-only conflict by retaining
+both histories. This wires `resolveMarketDeadlockAtRoundBoundary` into the
+real `Game` round-boundary flow, and `World.completeMarketDeadlockRound` now
+calls that real method on the real `Game` instance instead of simulating
+formation itself — closing the gap the architect sent back last cycle.
+
+Found and removed one piece of dead code: `resolveLegalEntityAtStart` was
+left behind with its call site deleted from `playTurn` but the method itself
+still defined (0% coverage, unreachable). Its body was near-identical to the
+new `resolveMarketDeadlockAtRoundBoundary`'s entity-forming logic, so nothing
+was lost by deleting it outright.
+
+Found and fixed a DRY violation: `Game.collectivelyFundNextImprovement`
+reimplemented `LegalEntityBuilding`'s existing `standardBuildCost` +
+`allAgreeToBuild` combination line-for-line (same cost formula, same
+base+remainder share split, same per-shareholder `EntityBuildOffer` check).
+Added `LegalEntityBuilding.canFundNextImprovement` (reusing the two existing
+private methods) and a public `LegalEntity.canFundNextImprovement` wrapper;
+`Game` now calls that instead of carrying its own copy. Verified identical
+semantics by hand before merging.
+
+CRAP: `resolveMarketDeadlockAtRoundBoundary` came in at CC=6/CRAP=25.1 (19%
+coverage) carrying a 4-condition guard and the whole formation search inline.
+Split into `canFormAtMarketDeadlock` (the guard), `fundableEntityAtMarketDeadlock`
+(the colour-group search), and `formIfFundable` (per-colour formation
+attempt) — mirroring the shape the now-deleted `resolveLegalEntityAtStart`
+used to have. Every method in the touched files is now at or under CRAP 6.
+dry4java clean. Mutation-scan: 86/67/58 sites, all under the split threshold.
+Manifests refreshed.
+
+Separately flagging, not fixing: `resolveMarketDeadlockAtRoundBoundary` is
+called from `playTurns` as `resolveMarketDeadlockAtRoundBoundary(true, true,
+journalling)` — both the `quietRound` and `collectiveFunding` arguments are
+hardcoded literals, not derived from real round state. `collectiveFunding`'s
+hardcoding is harmless: the real per-entity affordability check still runs
+downstream via `canFundNextImprovement`, so that argument is only an outer
+short-circuit. `quietRound`, however, has no real detector anywhere in
+`Game.java` — nothing tracks whether a trade/buyout, bankruptcy transfer, or
+individual development occurred during the round. In production this
+argument can only ever be `true`, so the approved "blocks formation when the
+round contained a consolidating action" policy (entity-m7) is exercised only
+by the acceptance harness calling the two-argument public overload directly
+with an explicit `false` — real gameplay can never take that branch. This is
+one layer further into the same gap flagged last cycle: the formation
+*mechanics* now run on real `Game`/`Deeds` state, but the *quiet-round
+signal* that is supposed to gate them is still synthetic. Implementing real
+consolidating-action tracking is new behavior, not refactorer scope; routing
+the observation to the architect.
+
+Domain 365/365, property tests green, full acceptance 597/597 run twice.
