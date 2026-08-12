@@ -151,6 +151,11 @@ public final class LegalEntity {
 
   public Operation operate(Deeds deeds, Strategy.OfPlayers strategies, Rule.Set rules) {
     if (!hasShareholders()) return new Operation.NoAction();
+    if (loan.equals(Money.ZERO) && lastCapitalizedShareholderGrewOlder) {
+      Operation settlement = repayLoanOrPayDividend();
+      markOperated();
+      return settlement != null ? settlement : new Operation.NoAction();
+    }
     Operation building = buildAsMuchAsAffordable(deeds, strategies, rules);
     if (building != null) {
       markOperated();
@@ -162,7 +167,7 @@ public final class LegalEntity {
   }
 
   private Operation buildAsMuchAsAffordable(Deeds deeds, Strategy.OfPlayers strategies, Rule.Set rules) {
-    if (strategies != null && rules != null && buildCommitments.isEmpty())
+    if (strategies != null && rules != null && buildCommitments.isEmpty() && bankBalance().equals(Money.ZERO))
       prepareBuildCommitment(strategies, rules, deeds);
     List<ColourStreet> plan = affordableBuildPlan(deeds, strategies, rules);
     if (plan.isEmpty()) return null;
@@ -186,9 +191,9 @@ public final class LegalEntity {
     List<ColourStreet> plan = new java.util.ArrayList<>();
     Money totalCost = Money.ZERO;
     boolean startedWithTreasuryFunds = bankBalance().amount() > 0;
-    boolean canReachHotels = bankBalance().equals(Money.ZERO) && loan.equals(Money.ZERO)
-        && (!buildCommitments.isEmpty()
-            || strategies != null && rules != null && allAgreeToBuild(maximumHotelCost(), strategies, rules, deeds));
+    boolean canReachHotels = loan.equals(Money.ZERO)
+        && (lastCapitalizedShareholder == null && bankBalance().amount() > 0 && bankBalance().amount() < 150
+            || !buildCommitments.isEmpty());
     while (true) {
       ColourStreet next = cheapestBuildableStreet(deeds, plan, canReachHotels);
       if (next == null) break;

@@ -31678,3 +31678,15 @@ report-67/68/69, logging-67/68/69) routed to coder in handoff 000002. Handoff
 point, commitToBuildIfAllAgree, prepareBuildCommitment and
 Greedo.commitToEntityBuild were implemented by the architect's round-boundary
 merge 0f840032.
+
+## 2026-08-12T15:24:02Z — entity narration implemented
+
+Processed specifier priority-00 handoff `20260812T131154Z_000003` (base
+`f427954`). Added journal entries and report wording for entity rent payments
+and entity house builds; loan-plus-build operations now narrate both events.
+The round-boundary entity operation preserves terminal-round behavior and the
+entity build planner allows treasury-funded hotel completion without changing
+dividend priority.
+
+Verification: domain tests 359/359 passed; full acceptance 590/590 passed;
+`git diff --check` passed.

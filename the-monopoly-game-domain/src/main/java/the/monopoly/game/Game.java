@@ -188,6 +188,7 @@ public class Game {
     if (isBuilderStillSolvent(player, builder)) building.develop(player);
     if (remainingPlayers().size() <= 1) return true;
     if (!Stalemate.reached(rules, players, deeds)) return false;
+    if (player.id().equals(turnOrder.getLast().id())) operateLegalEntities(journalling);
     journal.log(new Journal.Entry.Stalemate());
     remainingPlayers().forEach(it -> {
       journal.log(new Journal.Entry.FinalBalance(it.id(), it.account().balance().amount()));
@@ -210,8 +211,11 @@ public class Game {
     switch (entity.operate(deeds, strategies, rules)) {
       case LegalEntity.Operation.LoanRepaid it ->
           journalling.entityLoanRepaid(entity, it.shareholder(), it.principal(), it.repayment());
-      case LegalEntity.Operation.HouseBuilt ignored -> { }
-      case LegalEntity.Operation.LoanRaisedAndHouseBuilt it -> journalling.entityLoanRaised(entity, it.loan());
+      case LegalEntity.Operation.HouseBuilt it -> journalling.entityHouseBuilt(entity, it.street());
+      case LegalEntity.Operation.LoanRaisedAndHouseBuilt it -> {
+        journalling.entityLoanRaised(entity, it.loan());
+        journalling.entityHouseBuilt(entity, it.street());
+      }
       case LegalEntity.Operation.DividendPaid it -> journalling.entityDividendPaid(entity, it.amount());
       case LegalEntity.Operation.NoAction ignored -> { }
     }
@@ -450,6 +454,15 @@ public class Game {
     public void entityDividendPaid(LegalEntity entity, Money amount) {
       journal.log(new Journal.Entry.LegalEntityDividendPaid(entity.name(),
           entity.shareholders().stream().map(Player::id).toList(), amount));
+    }
+
+    public void entityHouseBuilt(LegalEntity entity, ColourStreet street) {
+      journal.log(new Journal.Entry.LegalEntityHouseBuilt(entity.name(), street.type(), street.houseConstructionCost()));
+    }
+
+    @Override
+    public void paid(Player tenant, LegalEntity entity, ColourStreet land, Money rent) {
+      journal.log(new Journal.Entry.LegalEntityRentPaid(entity.name(), tenant.id(), land.type(), rent));
     }
 
     @Override
@@ -705,6 +718,12 @@ public class Game {
       }
 
       record LegalEntityLiquidated(String name, Player.ID recipient, Money amount) implements Entry {
+      }
+
+      record LegalEntityRentPaid(String name, Player.ID tenant, Street.Type land, Money rent) implements Entry {
+      }
+
+      record LegalEntityHouseBuilt(String name, Street.Type land, Money price) implements Entry {
       }
 
       record PurchaseDeclined(Player.ID player, Street.Type land, Money price,

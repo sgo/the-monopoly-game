@@ -67,9 +67,13 @@ public final class Report {
       case Entry.PurchaseDeclined it -> declineLine(it);
       case Entry.RentPaid it -> name(it.tenant()) + " pays " + name(it.owner()) + " $"
           + it.rent().amount() + " rent for " + spaceName(it.land());
+      case Entry.LegalEntityRentPaid it -> name(it.tenant()) + " pays $" + it.rent().amount()
+          + " rent to " + it.name() + " for " + spaceName(it.land());
       case Entry.PlayerPaid it -> name(it.payer()) + " pays " + name(it.payee()) + " $" + it.amount().amount();
       case Entry.HouseBuilt it ->
           name(it.player()) + " builds a house on " + spaceName(it.land()) + " for $" + it.price().amount();
+      case Entry.LegalEntityHouseBuilt it ->
+          it.name() + " builds a house on " + spaceName(it.land()) + " for $" + it.price().amount();
       case Entry.HouseSold it ->
           name(it.player()) + " sells a house on " + spaceName(it.land()) + " for $" + it.price().amount();
       case Entry.Mortgaged it ->
