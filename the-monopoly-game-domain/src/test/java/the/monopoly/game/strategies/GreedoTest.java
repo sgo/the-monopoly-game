@@ -227,6 +227,38 @@ class GreedoTest {
     assertThat(reserve).isEqualTo(new Money(180));
   }
 
+  @Test
+  void refusesAnEntityBuildCommitmentWhenLegalEntityTradingIsDisabled() {
+    Strategy notTrading = new Greedo(Money.ZERO, false, false);
+
+    assertThat(notTrading.commitToEntityBuild(
+        new Strategy.EntityBuildOffer(new Money(50), new Money(1000), Money.ZERO))).isFalse();
+  }
+
+  @Test
+  void commitsToAnEntityBuildShareItCanAffordWithoutTouchingItsReserve() {
+    Strategy trading = new Greedo(Money.ZERO, false, true);
+
+    assertThat(trading.commitToEntityBuild(
+        new Strategy.EntityBuildOffer(new Money(50), new Money(1000), Money.ZERO))).isTrue();
+  }
+
+  @Test
+  void declinesAnEntityBuildShareThatWouldDipIntoItsReserve() {
+    Strategy trading = new Greedo(Money.ZERO, false, true);
+
+    assertThat(trading.commitToEntityBuild(
+        new Strategy.EntityBuildOffer(new Money(50), new Money(120), new Money(100)))).isFalse();
+  }
+
+  @Test
+  void declinesAnEntityBuildShareItCannotAfford() {
+    Strategy trading = new Greedo(Money.ZERO, false, true);
+
+    assertThat(trading.commitToEntityBuild(
+        new Strategy.EntityBuildOffer(new Money(50), new Money(30), Money.ZERO))).isFalse();
+  }
+
   /** A strategy that has an opinion about nothing leaves the land alone. */
   @Test
   void aStrategyThatAnswersNothingBuysNothingAndBidsNothing() {
