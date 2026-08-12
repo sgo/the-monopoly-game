@@ -31914,6 +31914,20 @@ review loop; the result flows coder -> refactorer -> back to ARCHITECT, not to
 specifier. The specifier re-engages only when the architect sends a phase-complete
 sync. No specifier action pending; holding for the loop to close.
 
+## 2026-08-12 — architect review exposes entity-15 semantic conflict
+
+Merged architect review `6da1499e8e` as `1c31209`. The requested removal of the
+zero-treasury gate was tested, but full acceptance then produced four failures:
+entity-15 raised `$200` from a `$100` treasury where the existing scenario
+requires no loan; the same automatic-financing change also prevented the
+established entity-66 dividend journal/log/report scenarios. Restoring the gate
+returns the verified 591/591 baseline and leaves entity-30's explicit-commitment
+fix green. Sent the contradiction to architect for a decision on whether
+entity-15/dividend criteria or automatic nonzero-treasury commitment semantics
+should change.
+
+Sent corrected note `20260812T190312Z_000149_from_coder_to_architect`.
+
 ## 2026-08-12 — specifier: add entity-30 spec per architect directive, route to coder
 
 Responding to architect directive (c20c7e9eba / review loop greedo-entity-build-
@@ -32010,6 +32024,24 @@ production file touched by this commit. Manifest refreshed via
 
 Domain 365/365, property-tests profile green, full acceptance 591/591 (the
 new entity-30 scenario included) run twice.
+
+## 2026-08-12T15:28:00Z — refactorer returns entity build-economy fix to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-entity-build-economy
+commit: 61b3376255
+```
+
+Priority 00 to stay within the architect's review loop (opened by the
+priority-00 architect->coder handoff for this task). Summary: reviewed the
+`cannotExtendPlan` fix for correctness and termination, confirmed CRAP/DRY/
+mutation-scan clean, domain 365/365, property tests green, acceptance
+591/591 run twice. No structural changes made.
 
 ## 2026-08-12T15:28:06Z — architect receives entity build-economy refactorer review
 
@@ -32122,6 +32154,26 @@ commit: ecb9539473
 Decision required: reconcile entity-15's treasury-only/no-loan outcome with
 the requested automatic post-rent shareholder-financing policy.
 
+## 2026-08-12 — auto-solicit boundary implemented
+
+Processed architect handoff `bcb2d22928` (merged as `812bc90`). Commitment
+solicitation now occurs only when an initial build plan exists with a remaining
+treasury shortfall, or when an unaffordable buildable street exists at zero
+treasury. Fully developed entities therefore proceed directly to debt/dividend
+settlement. The plan is recomputed after commitments so mixed treasury-plus-loan
+builds reach all eligible streets.
+
+Verification: full acceptance 591/591 passed; domain tests 365/365 passed;
+`git diff --check` passed.
+
+Coder verification after applying the resolved auto-solicit policy: entity-30 is
+covered, but full acceptance has three failures, all in legacy journal-66,
+report-66, and logging-66 equal-dividend scenarios. They form Pink Realty with
+the two-player background, seed four houses, and hold $150; automatic solicitation
+raises a $150 loan and builds a house instead of paying the expected dividend.
+Restoring the gate returns the prior 591/591 acceptance baseline. This concrete
+policy/spec conflict requires architect direction on revising the dividend
+criteria or defining an additional auto-solicitation boundary.
 ## 2026-08-12T19:17:21Z — architect routes resolved entity-build policy
 
 Sent priority-00 git handoff to coder:
@@ -32158,18 +32210,62 @@ after a buildable plan exists and its cost exceeds treasury. An entity with no
 buildable improvement must not create a commitment and must continue directly
 to debt/dividend settlement.
 
-## 2026-08-12T19:26:56Z — architect routes entity auto-solicit boundary
+## 2026-08-12T19:30:29Z — refactorer receives limited auto-solicit fix for review
 
-Sent priority-00 git handoff to coder:
+Received coder priority-00 handoff:
 
 ```
-type: git_handoff
-to: coder
-priority: 00
-task: greedo-entity-build-economy
-commit: bcb2d22928
+Re-read your role and constitution.
+
+merge_and_process coder 155e6f95c0
 ```
 
-Implement automatic solicitation only for an actual buildable shortfall. Keep
-fully developed entities (including journal-66) out of commitment preparation
-so their existing debt/dividend settlement remains unchanged.
+Action: merged `155e6f95c0`, resolving a logbook-only conflict by retaining
+both histories. This closes the second round of the architect's
+entity-build-economy review loop: `canPrepareBuildCommitment` dropped its
+`bankBalance == $0` gate entirely (auto-solicit now applies to any treasury
+level), and `buildAsMuchAsAffordable` gained two call sites that solicit a
+commitment and recompute the plan — one for an entity that can't build
+anything from treasury alone, one for an entity that can build something but
+not everything. Traced both call sites: they are mutually exclusive in
+practice (whichever fires first empties `buildCommitmentsEmpty()`, which
+gates the other), so this is one behavior expressed as two near-duplicate
+blocks rather than two distinct behaviors.
+
+CRAP: `buildAsMuchAsAffordable` rose to CC=9/CRAP=9.6 (over threshold) from
+the duplicated solicit-and-recompute logic. Unified both call sites into
+`solicitCommitmentIfNeeded`, with the two conditions (plan empty vs. plan
+leaves a street unfunded) folded into one `leavesABuildableStreetUnfunded`
+predicate — confirmed equivalent to the original two conditions by hand
+before merging them, since exactly one can ever be true per call. Every
+method is back to CRAP <= 6; `buildAsMuchAsAffordable` itself is now CC=3.
+dry4java clean, mutation-scan 70 sites (within the split threshold).
+
+Domain 365/365, property tests green. Acceptance 591/591 three of four runs;
+one run showed a single failure in `SpecsCliEnCliAcceptanceTest` (cli-1, a
+2-player game with legal-entity and stalemate trading both disabled) —
+"records no winner" after "at least 10 rolls" and a stop signal, but the
+game finished first. This is the same known real-unseeded-dice timing
+non-determinism as `SimulatorTest.keepsPlayingUntilToldToStop` (see
+memory: Greedo-vs-Greedo runaway games), reproducing in a scenario this
+commit's change cannot reach (legal-entity trading disabled). Confirmed by
+re-running three more times clean immediately after.
+
+## 2026-08-12T19:42:34Z — architect receives final entity-economy refactorer review
+
+Received priority-00 git handoff from refactorer:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 667792b0ac
+```
+
+Action: merged the review and retained both logbook histories. Accepted the
+extracted `solicitCommitmentIfNeeded` boundary: the entity first identifies a
+treasury-only plan, then solicits only when an additional buildable
+improvement remains unfunded. That satisfies automatic shortfall financing
+while fully-developed entities take the established debt/dividend path.
+Independent verification: property profile 23/23; acceptance suite 591 with
+no failures; differential mutation clean (70 sites); DRY clean; and soft
+Gherkin mutation completed for `greedo-legal-entity.feature`.
