@@ -181,6 +181,29 @@ Feature: Greedo legal entity for a three-way colour-group split
       | group | formed_outcome |
       | pink  | auto-formed     |
 
+  # entity-m10
+  Scenario Outline: the entity is not auto-formed when the eligible split's streets are already fully developed, because there is no real next improvement to fund
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And pawn "iron box" will roll 2 for initiative
+    And every other player can complete their turn
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "high hat" owns "Bruul Mechelen"
+    And pawn "iron box" owns "Place Verte Verviers"
+    And every other ownable space is owned by pawn "high hat"
+    And the <group> split is an eligible three-owner split
+    And the <group> split's shareholders can collectively fund the next improvement after their base reserves
+    When we play up to 1 round
+    Then the <group> colour group is not owned by a legal entity
+
+    Examples:
+      | group |
+      | pink  |
+
   # entity-6
   Scenario Outline: the entity repays a shareholder loan with five percent interest on top before paying any dividend
     Given Pink Realty is formed
