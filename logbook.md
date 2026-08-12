@@ -32638,3 +32638,10 @@ three-owner split, and collective next-improvement funding after nominal base
 reserves. It removes the harness-only manual formation path and keeps the final
 cash-threshold stalemate gate independent. Per user direction, no coder or
 refactorer implementation handoff is issued pending explicit approval.
+
+## 2026-08-12T21:26:00Z — architect: user approves market-deadlock criteria
+
+User approval received. The automatic pre-stalemate market-deadlock formation
+criteria are released for coder implementation: full board, a quiet completed
+round, eligible three-owner split, and collective next-improvement funding after
+nominal base reserves; final cash-threshold stalemate remains independent.
