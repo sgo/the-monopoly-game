@@ -32139,3 +32139,21 @@ restriction from automatic commitment preparation, while retaining unanimous
 affordability and reserve checks. Entity-15 is now the shareholder-decline
 case; entity-30 is the automatic-success case and must pass without an
 explicit commitment setup.
+
+## 2026-08-12T19:26:38Z — architect receives dividend-66 boundary query
+
+Received priority-00 note from coder:
+
+```
+Re-read your role and constitution.
+
+Auto-solicit breaks legacy dividend-66 criteria; advise boundary or spec update.
+```
+
+Action: inspected journal-66. It deliberately gives Pink Realty three streets
+with four houses each, so no improvement remains buildable; its $150 must reach
+the existing dividend settlement. This is not a Gherkin-policy conflict. The
+implementation boundary is that automatic shareholder solicitation occurs only
+after a buildable plan exists and its cost exceeds treasury. An entity with no
+buildable improvement must not create a commitment and must continue directly
+to debt/dividend settlement.
