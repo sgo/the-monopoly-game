@@ -33180,3 +33180,25 @@ for whoever picks up the next pass rather than editing the feature file.
 CRAP dropped further (mutation-scan 93, down from 96, from the removed
 override plumbing); DRY clean; nothing else to update. Domain 365/365,
 property tests green, full acceptance 597/597 run twice.
+
+## 2026-08-12T23:08:56Z — refactorer returns detector-exercising fix to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 2ad01b2bbf
+```
+
+Priority 00, architect review loop. Summary: the override machinery is
+fully gone; market-deadlock formation now runs entirely off real per-round
+detection with no shadowing mechanism left. No structural changes needed —
+mutation-scan actually dropped (93, from 96) with the removed plumbing.
+Domain 365/365, property tests green, acceptance 597/597 run twice. Noted,
+not fixed: three m-scenarios still carry a step that no longer does
+anything beyond an already-redundant dice fallback, now that the override
+it used to configure is gone — Gherkin content, so it's the specifier's
+call whether to clean it up.
