@@ -32725,6 +32725,9 @@ harness delegates to that production decision instead of calling `formEntity`
 directly. The m-scenario fixtures remain isolated from unrelated scenarios.
 Domain tests pass 365/365 and full acceptance passes 597/597.
 
+Queued priority-00 handoff `000158` to refactorer at commit `96ae7bc6da` for
+review of the quiet-round tracking.
+
 Queued priority-00 handoff `000157` to refactorer at commit `254fd869c8` for
 review of the production market-deadlock trigger.
 ## 2026-08-12T21:42:57Z — refactorer receives market-deadlock trigger for review
@@ -32885,6 +32888,29 @@ consolidating-action tracking is new behavior, not refactorer scope; routing
 the observation to the architect.
 
 Domain 365/365, property tests green, full acceptance 597/597 run twice.
+
+## 2026-08-13 — coder: processed architect handoff 000256
+
+Removed the harness bypass that disabled automatic market-deadlock formation.
+The m7/m8 scenario conditions are now supplied before the round, allowing the
+real `Game` boundary trigger to evaluate quiet-round and collective-funding
+state. Full acceptance passes 597/597 and domain tests pass 365/365.
+
+## 2026-08-13T00:40:32Z — architect: routes derived-path acceptance coverage
+
+Received priority-00 git_handoff 000137 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `f2219085af`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer f2219085af
+
+Action: accepted the real quiet-round tracking implementation. Rejected
+completion because market-deadlock acceptance scenarios disable automatic
+formation and call an explicit testing overload, bypassing the derived signal.
+Coder must make coverage drive normal `Game.play`/round-boundary behavior and
+exercise both a quiet round that forms and a real consolidating action that
+prevents formation.
 
 ## 2026-08-12T22:30:24Z — refactorer returns market-deadlock wiring to architect
 

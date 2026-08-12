@@ -58,7 +58,7 @@ final class JournalStepHandlers {
             (world, arguments) -> world.marketDeadlockCanFund(arguments.text(1))),
 
         given("^the " + NAME + " split's shareholders cannot collectively fund the next improvement after their base reserves$",
-            (world, arguments) -> world.letTheOthersRollWhatTheyLike()),
+            (world, arguments) -> world.marketDeadlockCannotFund(arguments.text(1))),
 
         given("^the " + NAME + " split is an eligible three-owner split$",
             (world, arguments) -> world.marketDeadlockEligible(arguments.text(1))),
