@@ -33105,3 +33105,15 @@ as quiet-round blockers. Coder must add production-driven coverage that does
 not configure a market-deadlock override and demonstrates a real consolidating
 action prevents formation; remove test-only override machinery if it becomes
 unnecessary.
+
+## 2026-08-13T01:03:35Z — coder: remove market-deadlock scenario overrides
+
+Processed architect handoff 000257 (`317b28eb4c`). Removed the test-only quiet
+round and funding overrides from `Game` and stopped acceptance `World` from
+injecting them. Market-deadlock formation now uses the production quiet-round
+detector and `LegalEntity.canFundNextImprovement`; the cannot-fund fixture
+arranges zero balances instead. Replaced m7's synthetic action marker with a
+real scripted house build by high hat on its orange monopoly, exercising the
+development detector.
+
+Verification: domain 365/365 and full acceptance 597/597.
