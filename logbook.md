@@ -33306,6 +33306,16 @@ already-formed fully developed entity remains inactive. The scenario is
 intentionally red against the current production implementation; routed to
 coder for the focused domain fix.
 
+Delivered as handoff 000262:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 6e6cb82781
+```
+
 The soft mutation runner refreshed its checked-in acceptance-mutation manifest
 for the corrected scenario wording. Delivered that generated verification
 artifact as follow-up handoff 000260:
