@@ -31926,6 +31926,8 @@ fix green. Sent the contradiction to architect for a decision on whether
 entity-15/dividend criteria or automatic nonzero-treasury commitment semantics
 should change.
 
+Sent corrected note `20260812T190312Z_000149_from_coder_to_architect`.
+
 ## 2026-08-12 — specifier: add entity-30 spec per architect directive, route to coder
 
 Responding to architect directive (c20c7e9eba / review loop greedo-entity-build-
