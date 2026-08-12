@@ -31507,3 +31507,21 @@ commit: 210f0cebaf
 The implementation direction is a `Game` round-boundary operation phase,
 without rent-triggered repeat operations and without relying on the permanent
 entity `operated` flag as the round clock.
+
+## 2026-08-12T11:34:55Z — architect directs round-boundary failure triage
+
+Received coder priority-00 note:
+
+```
+Re-read your role and constitution.
+
+Round-boundary merge done; six entity/share-sale acceptance failures remain.
+```
+
+Action: directed coder not to restore per-player operation to satisfy the
+failures. The invariant remains one operation per eligible entity after the
+full player round. Coder must classify every failure: a mismatch with that
+invariant is a production defect for coder; an assertion that encoded the old
+per-turn timing is a Gherkin acceptance-criteria change for specifier. Return
+the concrete failing scenario names, actual/expected values, and the round
+boundary implementation commit through a normal git handoff for review.
