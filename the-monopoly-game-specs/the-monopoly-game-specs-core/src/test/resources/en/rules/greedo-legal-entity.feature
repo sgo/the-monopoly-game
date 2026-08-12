@@ -425,6 +425,21 @@ Feature: Greedo legal entity for a three-way colour-group split
       | loan | street          | share |
       | 1500 | Rue de Diekirch Arlon | 500  |
 
+  # entity-30
+  Scenario Outline: the entity applies its rent to build and raises a loan for the remaining shortfall before paying any dividend, even though its bank is not empty
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account holds $<rent>
+    And each shareholder commits $<share> toward Pink Realty's build
+    When we play up to 1 round
+    Then Pink Realty raises a loan of $<loan>
+    And the pink colour group is developed up to <total_houses> houses
+    And pawn "dog" receives no dividend from Pink Realty
+
+    Examples:
+      | rent | share | loan | total_houses |
+      | 100  | 100   | 200  | 3            |
+
   # Commentary: harness steps required to drive the Greedo entity-build-commit scenarios.
   # The strategy decision point (entity build loan commitment) and these steps are new.
   # Existing reusable steps: "each shareholder commits $X", "Pink Realty raises a loan of

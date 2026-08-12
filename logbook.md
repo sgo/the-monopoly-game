@@ -31891,3 +31891,27 @@ Per constitution workflow: a priority-00 architect->coder handoff is an architec
 review loop; the result flows coder -> refactorer -> back to ARCHITECT, not to
 specifier. The specifier re-engages only when the architect sends a phase-complete
 sync. No specifier action pending; holding for the loop to close.
+
+## 2026-08-12 — specifier: add entity-30 spec per architect directive, route to coder
+
+Responding to architect directive (c20c7e9eba / review loop greedo-entity-build-
+economy): nonzero treasury must never by itself disable build-loan preparation;
+an eligible entity must apply its existing treasury to construction and, for the
+remaining shortfall, seek the unanimous reserve-safe commitment before dividend.
+
+Added entity-30 to greedo-legal-entity.feature:
+  Given 4 players, Pink Realty formed, bank holds $100, each shareholder commits
+  $100. Then: raises a loan of $200, pink group developed to 3 houses, dog
+  receives no dividend.
+
+Acceptance: 591 tests, exactly 1 failure = entity-30 "developed up to 3 houses"
+(expected 3, was 1). "raises a loan $200" and "no dividend" PASSED. This exactly
+reproduces the flagged bug: cannotExtendPlan returns true when
+startedWithTreasuryFunds && !plan.isEmpty() (LegalEntityBuilding.java:60), capping
+the build at the 1 treasury-funded house instead of financing to 3 with the
+agreed loan. Red-by-design state awaiting coder fix.
+
+No extra narration specs: loan-raise narration is reason-agnostic and already
+covered.
+
+Routing to coder (default preference).
