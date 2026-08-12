@@ -32003,3 +32003,22 @@ entity receiving rent before its first operation still never asks its Greedo
 shareholders for unanimous reserve-safe financing, and can dividend instead of
 building. The returned entity-30 manually pre-commits shares and cannot prove
 the required automatic decision path.
+
+## 2026-08-12T15:30:51Z — architect rejects incomplete entity build-economy correction
+
+Sent priority-00 git handoff to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-entity-build-economy
+commit: 6da1499e8e
+```
+
+Required correction: remove the zero-treasury precondition from the automatic
+commitment decision. For a nonzero treasury with a buildable remaining
+shortfall, the entity must solicit the same unanimous, reserve-safe Greedo
+commitment and use that commitment to complete the plan before dividend. Add a
+scenario that starts only with treasury/rent (no manually recorded shareholder
+commitment) and proves automatic loan, construction, and no dividend.
