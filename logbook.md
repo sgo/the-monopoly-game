@@ -31472,3 +31472,18 @@ The specifier must make cli-1's 10-roll, cli-2's 50-roll, and cli-5's 10-roll
 thresholds literal steps rather than single-row Examples values. They are fixed
 minimum observations, not scenario variables; doing so removes the remaining
 three false soft-mutation targets.
+
+## 2026-08-12T12:45:00Z — clarification requested from architect
+
+Sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Clarify entity-30/31 timing: one-round scenarios expect repayment/dividend after build loan, but current entity operates once with treasury consumed by construction.
+```
+
+The coder implementation wires Greedo's legal-entity build-loan decision and
+passes the domain suite, but entity-30/31 acceptance criteria conflict with the
+current once-per-round entity operating semantics.
