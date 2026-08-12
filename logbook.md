@@ -33248,3 +33248,21 @@ priority: 00
 task: greedo-market-deadlock-trigger
 commit: 7b92f93064
 ```
+
+## 2026-08-13T01:27:00Z — architect: finds auto-formation development gap
+
+Observed normal eight-player Greedo simulations with legal-entity trading
+enabled. Formation itself is not rare: three samples formed entities at player
+years 1–4 (with one later formation at year 112). The defect is selection for
+development. In one complete run, 4 entities formed, 0 entity houses were
+built, 0 entity loans were raised, and 566 dividends were paid.
+
+Cause: `LegalEntityBuilding.canFundNextImprovement` uses the colour group's
+fixed standard house cost even when all its streets already have hotels.
+`Game.formIfFundable` therefore selects a fully-developed split as fundable;
+after formation it has no build plan and immediately follows its dividend
+path. The existing criteria cover an already-formed fully-developed entity
+being inactive, but do not say that automatic market-deadlock formation must
+choose a split with a real next improvement. This is a Gherkin-content gap,
+not a test-harness issue. Routed to specifier for the intended policy and
+acceptance coverage; no production code changed.
