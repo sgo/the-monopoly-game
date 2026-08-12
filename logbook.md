@@ -32277,6 +32277,24 @@ memory: Greedo-vs-Greedo runaway games), reproducing in a scenario this
 commit's change cannot reach (legal-entity trading disabled). Confirmed by
 re-running three more times clean immediately after.
 
+## 2026-08-12T19:38:58Z — refactorer returns limited auto-solicit fix to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-entity-build-economy
+commit: 667792b0ac
+```
+
+Priority 00, same architect review loop. Summary: unified the two
+near-duplicate solicit-and-recompute blocks the coder's fix introduced
+(CRAP 9.6 -> every method <= 6), confirmed equivalent to the original logic
+by hand and with the full suite. Domain 365/365, property tests green,
+acceptance 591/591 (one of four runs hit the known cli-1 unseeded-dice
+timing flake, unrelated to this change and reproduced clean on retry).
 ## 2026-08-12T19:42:34Z — architect receives final entity-economy refactorer review
 
 Received priority-00 git handoff from refactorer:
@@ -32493,6 +32511,8 @@ hotels. Domain tests pass (365/365); acceptance is 592/593 with entity-32
 expecting one treasury-funded house from $150 while automatic shortfall
 solicitation develops three houses. This requires architect policy clarification.
 
+Sent priority-00 commit `42d53f19a4` to architect as handoff `000152` for that
+policy decision.
 ## 2026-08-12T20:46:20Z — architect: received coder implementation review
 
 Received priority-00 git_handoff 000152 from coder (task
@@ -32536,34 +32556,57 @@ without a loan and is retained rather than paid as a dividend. Auto-solicitation
 remains covered separately by entity-30. The remaining coder correction is to
 use the specified nominal base reserve for entity build offers.
 
-Delivered as handoff 000251:
+Applied the correction by passing `Strategy.cashReserve()` to entity build
+offers. Domain tests pass (365/365) and acceptance passes (593/593).
+
+## 2026-08-12T20:53:08Z — refactorer receives base-reserve correction for review
+
+Received coder priority-00 handoff:
 
 ```
-type: git_handoff
-to: coder
-priority: 00
-task: greedo-entity-build-economy
-commit: bade9a3e6c
+Re-read your role and constitution.
+
+merge_and_process coder aba15eb0ca
 ```
 
-## 2026-08-12T20:51:20Z — architect routes market-deadlock specification
+Action: merged `aba15eb0ca`, resolving a logbook-only conflict by retaining
+both histories. This closes the base-reserve leg of the entity-build-economy
+review loop, which spanned several coder/architect/specifier round trips
+since the last refactorer review: entity offers now use
+`strategy.cashReserve()` (nominal base) instead of
+`cashReserve(player, rules, deeds)` (dynamic monopoly/station-inflated), and
+`legalEntityTradingEnabled()` moved from a `Greedo`-only method onto
+`Strategy` as a `default false` so `canPrepareBuildCommitment` can check it
+generically. Also folded in, from the intervening commits: the
+fully-developed-hotel dividend gate (an under-developed entity retains its
+treasury for construction instead of paying a dividend), which required
+removing `operate`'s early `lastCapitalizedShareholderGrewOlder` shortcut so
+a build is always attempted before settlement.
 
-User direction: update the specification for a pre-stalemate legal-entity
-formation trigger, then wait for the user's approval before implementation.
+Found one leftover: `repayLoanOrPayDividend` carried a `deeds == null ||`
+guard around the new `fullyDeveloped(deeds)` check. Traced every call site
+(both `operate` overloads, `Game.journalOperation`, and every test) — `deeds`
+is never null in this codebase; the guard was dead, unreachable defensive
+code. Removed it.
 
-Requested criteria: formation requires the full-board condition, a completed
-round with no ownership-consolidating normal action (trade/buyout, bankruptcy
-transfer, or individual development), and an eligible three-owner split whose
-shareholders can collectively fund the next improvement after their base
-reserves. The final `Stalemate.reached` condition remains separate. No coder or
-refactorer handoff is authorized until the user approves the returned spec.
+CRAP: everything at or under 6 (`repayLoanOrPayDividend` itself is exactly
+6.0 at 100% coverage). dry4java clean across the four touched files.
+Mutation-scan: 58/71/58/13 sites, all well under the split threshold.
+Manifests refreshed via `--update-manifest`.
 
-Delivered as handoff 000252:
+Domain 365/365, property tests green, full acceptance 593/593 (including
+the new entity-32 fully-developed-dividend scenarios) run twice, both clean.
 
-```
-type: git_handoff
-to: specifier
-priority: 00
-task: greedo-entity-build-economy
-commit: 58e253a2a1
-```
+## 2026-08-12T20:59:08Z — architect: received refactorer base-reserve review
+
+Received priority-00 git_handoff 000134 from refactorer (task
+`greedo-entity-build-economy`, commit `3fbf7e920b`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer 3fbf7e920b
+
+Action: accepted the structural review. The base-reserve correction and
+hotel-only dividend gate are complete; the removed null-deeds guard was dead
+code. This review does not authorize or include the separately paused
+market-deadlock proposal.
