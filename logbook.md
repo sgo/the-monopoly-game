@@ -32889,6 +32889,45 @@ the observation to the architect.
 
 Domain 365/365, property tests green, full acceptance 597/597 run twice.
 
+## 2026-08-13T00:40:32Z — architect: routes derived-path acceptance coverage
+
+Received priority-00 git_handoff 000137 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `f2219085af`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer f2219085af
+
+Action: accepted the real quiet-round tracking implementation. Rejected
+completion because market-deadlock acceptance scenarios disable automatic
+formation and call an explicit testing overload, bypassing the derived signal.
+Coder must make coverage drive normal `Game.play`/round-boundary behavior and
+exercise both a quiet round that forms and a real consolidating action that
+prevents formation.
+
+## 2026-08-12T22:30:24Z — refactorer returns market-deadlock wiring to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: d4769be646
+```
+
+Priority 00, architect review loop. Summary: removed dead code
+(`resolveLegalEntityAtStart`) and a DRY violation (`Game` reimplemented
+`LegalEntityBuilding`'s funding-check math); split the new round-boundary
+method to bring CRAP back under threshold. Domain 365/365, property tests
+green, acceptance 597/597 run twice. Flagging for architect decision, not
+fixing: `quietRound` is passed as a hardcoded `true` literal at the real
+call site — nothing in `Game.java` detects whether a round actually
+contained a consolidating action, so the approved blocking policy is
+untestable-by-real-play; only the acceptance harness's direct two-argument
+call can exercise the `false` branch.
+
 ## 2026-08-13T00:30:33Z — architect: rejects synthetic quiet-round signal
 
 Received priority-00 git_handoff 000136 from refactorer (task
@@ -32912,3 +32951,52 @@ bankruptcy transfers, and individual player development now mark the current
 round as ownership-consolidating. The production market-deadlock formation
 trigger receives the derived quiet-round value instead of a hardcoded literal.
 Domain tests pass 365/365 and full acceptance passes 597/597.
+
+## 2026-08-13T00:33:45Z — refactorer receives quiet-round tracking for review
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 96ae7bc6da
+```
+
+Action: merged `96ae7bc6da`, resolving a logbook-only conflict by retaining
+both histories. This tracks real ownership-consolidating actions
+(`completeTrade`, `applyBuyout`, a bankruptcy entry in the round's journal
+slice, and a net increase in `totalDevelopments()` after `building.develop`)
+across each round via a new `roundHadConsolidatingAction` field, and passes
+the derived value to `resolveMarketDeadlockAtRoundBoundary` instead of the
+previous hardcoded `true` — closing the specific gap I flagged.
+
+CRAP: `playTurns` and `playTurn` both grew past threshold from the added
+tracking calls (CC=8/7). Extracted `completeRound` (bankruptcy check +
+`operateLegalEntities` + the market-deadlock call) out of `playTurns`, and
+`developAndTrackConsolidation` (the before/after `totalDevelopments` check
+around `building.develop`) out of `playTurn`. Both methods are back to
+CRAP 6.0. dry4java clean outside the pre-existing Journalling adapter block.
+Mutation-scan: 94 sites — under the 100-site split threshold, but closer to
+it than before; worth watching on the next change to this file. Manifest
+refreshed.
+
+Flagging, not fixing: the architect's directive was two-part — "track...
+AND the harness must exercise that derived path." Only the first half is
+covered. `World.java`'s market-deadlock scenarios still call
+`game.disableAutomaticMarketDeadlock()` and drive
+`resolveMarketDeadlockAtRoundBoundary` through its explicit two-argument
+public overload, so none of the four new detectors
+(`completeTrade`/`applyBuyout`/bankruptcy-journal-scan/`totalDevelopments`
+delta) are exercised by anything — unit or acceptance. I looked at adding a
+domain-level `GameTest` covering this directly, but a correct positive/
+negative pair needs a full deterministic multi-player round (fixed dice,
+pre-owned board, an eligible fundable split, and a genuine trigger for one
+of the four detectors) built via the raw `Game` constructor; given this
+session's own documented lesson about hand-built reproductions silently
+testing the wrong thing, I did not want to improvise that construction and
+call it verified without being confident it exercises what it claims to.
+Routing the "harness must exercise the derived path" half of the directive
+back to the architect rather than guessing at scenario construction that's
+normally specifier/coder territory.
+
+Domain 365/365, property tests green, full acceptance 597/597 run twice.
