@@ -32351,6 +32351,66 @@ formation/another stated rule governs this. Add observable coverage using
 non-artificial shareholder reserves; the present zero-reserve scenario alone
 does not represent the real-game failure.
 
+## 2026-08-12 — specifier: decide entity-development reserve policy (architect 000247)
+
+Architect escalated policy decision (33e570ff2d): real 8-player games never
+build/raise loans because entity contributions are gated by each shareholder's
+INDIVIDUAL dynamic reserve (Greedo.cashReserve(player,rules,deeds) includes the
+near-complete-monopoly and station reserve bumps). Acceptance uses contrived
+zero-reserve shareholders, so it passes without representing the real failure.
+
+User decision: BASE_RESERVE. An entity build-loan contribution is evaluated
+against the shareholder's NOMINAL base reserve only, not the monopoly/station
+bump. The unanimous all-shareholder + no-free-rider guarantee is unchanged.
+
+Implication: a shareholder who owns a near-complete monopoly (large dynamic
+reserve) but a moderate base reserve STILL lets the entity raise a build loan
+and build, because the entity offer uses the base reserve.
+
+## 2026-08-12 — specifier: decide entity dividend "fully developed" policy (architect 000248)
+
+Architect routed policy correction (7a73a356f0) from user direction: "Dividends
+should never be paid out unless the property is fully developed." Root cause:
+repayLoanOrPayDividend pays a dividend whenever treasury >= $150 and the
+last-capitalised triggers are met, WITHOUT a fully-developed check. An
+under-developed entity with >=$150 rent therefore dividends instead of saving
+toward the next construction cost (contributing to the observed 0-build/
+0-loan real-game dormancy).
+
+User decision (via AskQuestion): FULLY DEVELOPED = every entity street has a
+HOTEL. Dividend requires hotels + treasury >= $150 + last-capitalised-aged
+triggers. Under-developed entities (0..4 houses) never pay dividends.
+
+Spec changes in greedo-legal-entity.feature:
+- entity-8/11/18/19 revised: "fully developed" dividend-eligibility scenarios
+  now use HOTELS (was 4 houses) so the loan-block and last-capitalised trigger
+  tests isolate cleanly under the new gate.
+- NEW entity-32 (red-by-design): an under-developed entity spends its treasury
+  on building rather than paying a dividend, even when treasury >= $150 and the
+  last-capitalised shareholder has aged. Examples: 0 houses/150 -> builds 1,
+  no dividend; 0 houses/300 -> builds 3, no dividend.
+
+Acceptance: 593 tests, 2 failures, BOTH entity-32 examples failing at
+"pawn dog receives no dividend from Pink Realty" -- current code still pays an
+under-developed dividend (dividend-drain bug). entity-8/11/18/19 + all others
+green. Red-by-design, implementation (fully-developed gate in
+repayLoanOrPayDividend) is coder/architect scope. Routing to architect.
+
+## 2026-08-12T20:27:20Z — architect: received fully-developed dividend criteria
+
+Received priority-00 git_handoff 000173 from specifier (task
+`greedo-entity-build-economy`, commit `ded702d237`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process specifier ded702d237
+
+Action: accepted the complete policy. A legal entity may pay a dividend only
+when every entity street has a hotel; an entity with zero through four houses
+on any street retains its treasury and uses it for building. The new
+red-by-design entity-32 scenarios establish the missing behavior. Together
+with the returned base-reserve decision, the criteria are now ready for coder
+implementation.
 Delivered as handoff 000247:
 
 ```
@@ -32373,50 +32433,3 @@ construction cost it falls through to `repayLoanOrPayDividend`, which distribute
 any treasury of at least $150. That contradicts the user direction and can drain
 rent before it reaches the next construction cost. Routed to specifier for an
 acceptance-criterion correction before implementation.
-
-Delivered as handoff 000248:
-
-```
-type: git_handoff
-to: specifier
-priority: 00
-task: greedo-entity-build-economy
-commit: 7a73a356f0
-```
-
-## 2026-08-12 — specifier: decide entity-development reserve policy (architect 000247)
-
-Architect escalated policy decision (33e570ff2d): real 8-player games never
-build/raise loans because entity contributions are gated by each shareholder's
-INDIVIDUAL dynamic reserve (Greedo.cashReserve(player,rules,deeds) includes the
-near-complete-monopoly and station reserve bumps). Acceptance uses contrived
-zero-reserve shareholders, so it passes without representing the real failure.
-
-User decision: BASE_RESERVE. An entity build-loan contribution is evaluated
-against the shareholder's NOMINAL base reserve only, not the monopoly/station
-bump. The unanimous all-shareholder + no-free-rider guarantee is unchanged.
-
-Implication: a shareholder who owns a near-complete monopoly (large dynamic
-reserve) but a moderate base reserve STILL lets the entity raise a build loan
-and build, because the entity offer uses the base reserve.
-
-Required new coverage: a scenario using NON-artificial shareholder reserves
-- e.g. a shareholder holding a near-monopoly (high dynamic reserve) with a
-  moderate base reserve -- proving the entity still auto-solicits, raises a loan,
-  and builds. This models the real-game failure condition.
-
-## 2026-08-12T20:17:27Z — architect: received entity base-reserve policy
-
-Received priority-00 git_handoff 000172 from specifier (task
-`greedo-entity-build-economy`, commit `ca04f172f0`):
-
-> Re-read your role and constitution.
->
-> merge_and_process specifier ca04f172f0
-
-Action: merged the decision. Entity build contributions must use the
-shareholder's nominal Greedo base reserve, excluding dynamic individual
-monopoly/station reserve bumps, while preserving unanimous consent and the
-no-free-rider check. The separate user-directed dividend-policy correction
-(handoff 000248) remains outstanding with the specifier; no partial coder
-handoff is issued until that criterion loop returns.
