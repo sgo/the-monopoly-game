@@ -32882,3 +32882,19 @@ consolidating-action tracking is new behavior, not refactorer scope; routing
 the observation to the architect.
 
 Domain 365/365, property tests green, full acceptance 597/597 run twice.
+
+## 2026-08-13T00:30:33Z — architect: rejects synthetic quiet-round signal
+
+Received priority-00 git_handoff 000136 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `d4769be646`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer d4769be646
+
+Action: accepted the production formation wiring and structural cleanup, but
+rejected completion. `Game.playTurns` passes literal `true` for quiet-round,
+so real ownership-consolidating actions never block formation. Coder must track
+trades/buyouts, bankruptcy transfers, and individual development across each
+completed round and pass the derived quiet-round result to the real
+round-boundary formation path. The harness must exercise that derived path.
