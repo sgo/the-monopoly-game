@@ -31933,3 +31933,26 @@ correction is complete and routed onward:
 
 The coder loop is now in progress; the architect can close/advance the review
 loop when the coder/refactorer chain returns.
+
+## 2026-08-12 — specifier: resolve entity build policy conflict (architect 000243)
+
+Architect escalated priority-00 policy contradiction (ecb9539473): entity-15
+($100 treasury builds 1 house, no loan) conflicts with the auto-financing
+direction (rent covers base build, then eligible shareholders fund the
+remaining shortfall).
+
+User resolved: AUTO-SOLICIT. The entity automatically solicits eligible Greedo
+shareholders to fund the build shortfall after applying rent.
+
+Implemented in greedo-legal-entity.feature:
+- entity-15 REVISED to the decline case: ineligible shareholders (balance 150,
+  reserve 150) so the entity builds only the rent-covered house and raises no
+  loan (asserts no loan, 1 house, rent remaining 0).
+- entity-30 REVISED to the auto-solicit SUCCESS case: treasury $100 + eligible
+  shareholders (balance 200, reserve 0), NO explicit commit step. Asserts:
+  loan $200, 3 houses, no dividend.
+
+Acceptance: 591 tests, 1 failure = entity-30 ("developed to 3" expected 3,
+was 1). entity-15 now passes. The single red is exactly the coder bug: the
+entity does not yet auto-solicit/complete the plan past the treasury-funded
+house. Red-by-design, awaiting coder fix.

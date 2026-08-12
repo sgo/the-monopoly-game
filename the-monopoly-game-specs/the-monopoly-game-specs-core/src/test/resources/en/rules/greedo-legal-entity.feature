@@ -213,17 +213,24 @@ Feature: Greedo legal entity for a three-way colour-group split
       | 150  |
 
   # entity-15
-  Scenario Outline: the entity uses its rent before raising a loan to build
-    Given Pink Realty is formed
+  Scenario Outline: the entity uses its rent before raising a loan to build when its shareholders decline the build-loan commitment
+    Given we select 4 players
+    And Pink Realty is formed
     And Pink Realty's bank account holds $<rent>
+    And pawn "dog" has a balance of $<balance>
+    And pawn "high hat" has a balance of $<balance>
+    And pawn "iron box" has a balance of $<balance>
+    And pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    And pawn "high hat" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    And pawn "iron box" follows the "Greedo" strategy, keeping a $<reserve> reserve
     When we play up to 1 round
     Then Pink Realty raises no more than $<max_loan> in loans
     And the pink colour group is developed up to at least <houses_at_least> houses
     And Pink Realty's bank account holds $<rent_remaining>
 
     Examples:
-      | rent | max_loan | houses_at_least | rent_remaining |
-      | 100  | 0        | 1               | 0              |
+      | rent | balance | reserve | max_loan | houses_at_least | rent_remaining |
+      | 100  | 150     | 150     | 0        | 1               | 0              |
 
   # entity-16
   Scenario Outline: the entity builds as many houses as it can afford at the end of the turn
@@ -426,19 +433,24 @@ Feature: Greedo legal entity for a three-way colour-group split
       | 1500 | Rue de Diekirch Arlon | 500  |
 
   # entity-30
-  Scenario Outline: the entity applies its rent to build and raises a loan for the remaining shortfall before paying any dividend, even though its bank is not empty
+  Scenario Outline: the entity automatically solicits its Greedo shareholders to fund the build shortfall after applying its rent, builds, and pays no dividend even though its bank is not empty
     Given we select 4 players
     And Pink Realty is formed
     And Pink Realty's bank account holds $<rent>
-    And each shareholder commits $<share> toward Pink Realty's build
+    And pawn "dog" has a balance of $<balance>
+    And pawn "high hat" has a balance of $<balance>
+    And pawn "iron box" has a balance of $<balance>
+    And pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    And pawn "high hat" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    And pawn "iron box" follows the "Greedo" strategy, keeping a $<reserve> reserve
     When we play up to 1 round
     Then Pink Realty raises a loan of $<loan>
     And the pink colour group is developed up to <total_houses> houses
     And pawn "dog" receives no dividend from Pink Realty
 
     Examples:
-      | rent | share | loan | total_houses |
-      | 100  | 100   | 200  | 3            |
+      | rent | balance | reserve | loan | total_houses |
+      | 100  | 200     | 0       | 200  | 3            |
 
   # Commentary: harness steps required to drive the Greedo entity-build-commit scenarios.
   # The strategy decision point (entity build loan commitment) and these steps are new.
