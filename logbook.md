@@ -32886,6 +32886,22 @@ the observation to the architect.
 
 Domain 365/365, property tests green, full acceptance 597/597 run twice.
 
+## 2026-08-13T00:40:32Z — architect: routes derived-path acceptance coverage
+
+Received priority-00 git_handoff 000137 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `f2219085af`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer f2219085af
+
+Action: accepted the real quiet-round tracking implementation. Rejected
+completion because market-deadlock acceptance scenarios disable automatic
+formation and call an explicit testing overload, bypassing the derived signal.
+Coder must make coverage drive normal `Game.play`/round-boundary behavior and
+exercise both a quiet round that forms and a real consolidating action that
+prevents formation.
+
 ## 2026-08-12T22:30:24Z — refactorer returns market-deadlock wiring to architect
 
 Handoff message sent:
