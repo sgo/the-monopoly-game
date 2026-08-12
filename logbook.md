@@ -32901,3 +32901,11 @@ so real ownership-consolidating actions never block formation. Coder must track
 trades/buyouts, bankruptcy transfers, and individual development across each
 completed round and pass the derived quiet-round result to the real
 round-boundary formation path. The harness must exercise that derived path.
+
+## 2026-08-13 — coder: processed architect handoff 000255
+
+Implemented real quiet-round tracking in `Game`: peer trades, monopoly buyouts,
+bankruptcy transfers, and individual player development now mark the current
+round as ownership-consolidating. The production market-deadlock formation
+trigger receives the derived quiet-round value instead of a hardcoded literal.
+Domain tests pass 365/365 and full acceptance passes 597/597.

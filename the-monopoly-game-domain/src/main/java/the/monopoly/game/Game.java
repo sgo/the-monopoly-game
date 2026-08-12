@@ -56,6 +56,7 @@ public class Game {
   private final boolean stalemateTrading;
   private final boolean legalEntityTrading;
   private boolean automaticMarketDeadlock = true;
+  private boolean roundHadConsolidatingAction;
 
   public Game(Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies) {
     this(rules, players, cups, strategies, new Deeds(), null);
@@ -164,11 +165,19 @@ public class Game {
                          Journalling journalling, Building building, boolean untilComplete,
                          BooleanSupplier keepPlaying) {
     do {
+      roundHadConsolidatingAction = false;
+      int roundJournalStart = journal.entries().size();
       for (Player player : turnOrder) {
         if (playTurn(player, builder, turnOrder, journal, journalling, building)) return;
       }
+      if (journal.entries().subList(roundJournalStart, journal.entries().size()).stream()
+          .anyMatch(entry -> entry instanceof Journal.Entry.Bankrupt)) {
+        roundHadConsolidatingAction = true;
+      }
       operateLegalEntities(journalling);
-      if (automaticMarketDeadlock) resolveMarketDeadlockAtRoundBoundary(true, true, journalling);
+      if (automaticMarketDeadlock) {
+        resolveMarketDeadlockAtRoundBoundary(!roundHadConsolidatingAction, true, journalling);
+      }
       if (remainingPlayers().size() <= 1) return;
       if (Stalemate.reached(rules, players, deeds)) {
         logStalemate(journal, journalling);
@@ -186,7 +195,11 @@ public class Game {
     if (deeds.isBankrupt(player)) return false;
     resolveSplitOwnershipAtStart(player, turnOrder, journalling);
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
-    if (isBuilderStillSolvent(player, builder)) building.develop(player);
+    if (isBuilderStillSolvent(player, builder)) {
+      int housesBefore = totalDevelopments();
+      building.develop(player);
+      if (totalDevelopments() > housesBefore) roundHadConsolidatingAction = true;
+    }
     if (remainingPlayers().size() <= 1) return true;
     if (!Stalemate.reached(rules, players, deeds)) return false;
     if (player.id().equals(turnOrder.getLast().id())) operateLegalEntities(journalling);
@@ -280,6 +293,7 @@ public class Game {
   }
 
   private boolean applyBuyout(MonopolyBuyout.Outcome outcome, Journalling journalling) {
+    roundHadConsolidatingAction = true;
     journalling.splitMonopolyWon(outcome.winner(), outcome.loser());
     if (!outcome.payment().equals(Money.ZERO)) journalling.splitMonopolyPaid(
         outcome.winner(), outcome.loser(), outcome.payment());
@@ -287,6 +301,7 @@ public class Game {
   }
 
   private void completeTrade(Player trader, Strategy.TradeOffer offer, Journalling journalling) {
+    roundHadConsolidatingAction = true;
     deeds.transferWithoutPayment(offer.offered(), trader, offer.partner());
     deeds.transferWithoutPayment(offer.wanted(), offer.partner(), trader);
     journalling.peerTrade(trader, offer.offered(), offer.partner(), offer.wanted());
@@ -295,6 +310,12 @@ public class Game {
   private boolean allOwnableSpacesOwned() {
     return rules.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
         .allMatch(it -> !deeds.isUnowned(it.type()));
+  }
+
+  private int totalDevelopments() {
+    return rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
+        .mapToInt(street -> deeds.housesBuiltOn(street) + (deeds.hasHotelOn(street)
+            ? street.hotelConstructionRequiresNumberOfHouses() + 1 : 0)).sum();
   }
 
   /** Applies the automatic legal-entity formation check at a completed quiet round boundary. */
