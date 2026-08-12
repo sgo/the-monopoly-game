@@ -32250,3 +32250,22 @@ non-determinism as `SimulatorTest.keepsPlayingUntilToldToStop` (see
 memory: Greedo-vs-Greedo runaway games), reproducing in a scenario this
 commit's change cannot reach (legal-entity trading disabled). Confirmed by
 re-running three more times clean immediately after.
+
+## 2026-08-12T19:38:58Z — refactorer returns limited auto-solicit fix to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-entity-build-economy
+commit: 667792b0ac
+```
+
+Priority 00, same architect review loop. Summary: unified the two
+near-duplicate solicit-and-recompute blocks the coder's fix introduced
+(CRAP 9.6 -> every method <= 6), confirmed equivalent to the original logic
+by hand and with the full suite. Domain 365/365, property tests green,
+acceptance 591/591 (one of four runs hit the known cli-1 unseeded-dice
+timing flake, unrelated to this change and reproduced clean on retry).
