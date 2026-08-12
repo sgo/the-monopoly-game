@@ -31821,3 +31821,22 @@ wiring, then verified domain property tests, differential Java mutation scans,
 DRY diagnostics, full acceptance, and soft acceptance mutation for the five
 affected features. The review’s new split-allocation mutation surface killed
 all six mutants; the full acceptance suite reported no failures.
+
+## 2026-08-12T13:47:49Z — architect closes narration review with specifier
+
+Sent priority-50 git handoff to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-legal-entity-narration
+commit: c1c0701842
+```
+
+Summary: refactorer review accepted. The normal game path retains the
+round-boundary entity operation and rent/build journal/report narration;
+`LegalEntityBuilding` isolates the construction and shareholder-financing
+collaborator. Verification recorded: property tests 23/23, full acceptance
+590 with no failures, six new differential Java mutants killed, and soft
+Gherkin mutation complete for all five affected feature files.
