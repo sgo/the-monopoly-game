@@ -33291,6 +33291,21 @@ fundable. Acceptance went 41->42 legal-entity scenarios with exactly 1 failure
 Routed to architect/coder for the production fix (canFundNextImprovement /
 standardBuildCost must exclude hotel streets).
 
+## 2026-08-13T01:31:00Z — architect: accepts real-next-improvement criteria
+
+Received priority-00 git_handoff 000177 from specifier (task
+`greedo-market-deadlock-trigger`, commit `f49bb7c6b7`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process specifier f49bb7c6b7
+
+Merged the accepted entity-m10 criterion. It precisely separates two policies:
+automatic formation must require an actual remaining improvement, while an
+already-formed fully developed entity remains inactive. The scenario is
+intentionally red against the current production implementation; routed to
+coder for the focused domain fix.
+
 The soft mutation runner refreshed its checked-in acceptance-mutation manifest
 for the corrected scenario wording. Delivered that generated verification
 artifact as follow-up handoff 000260:
