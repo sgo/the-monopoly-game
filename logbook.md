@@ -31984,3 +31984,21 @@ production file touched by this commit. Manifest refreshed via
 
 Domain 365/365, property-tests profile green, full acceptance 591/591 (the
 new entity-30 scenario included) run twice.
+
+## 2026-08-12T15:28:00Z — refactorer returns entity build-economy fix to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-entity-build-economy
+commit: 61b3376255
+```
+
+Priority 00 to stay within the architect's review loop (opened by the
+priority-00 architect->coder handoff for this task). Summary: reviewed the
+`cannotExtendPlan` fix for correctness and termination, confirmed CRAP/DRY/
+mutation-scan clean, domain 365/365, property tests green, acceptance
+591/591 run twice. No structural changes made.
