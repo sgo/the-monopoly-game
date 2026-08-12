@@ -43,6 +43,7 @@ public final class Greedo implements Strategy {
     return stalemateTrading;
   }
 
+  @Override
   public boolean legalEntityTradingEnabled() {
     return legalEntityTrading;
   }

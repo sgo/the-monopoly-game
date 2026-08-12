@@ -32449,3 +32449,11 @@ construction cost it falls through to `repayLoanOrPayDividend`, which distribute
 any treasury of at least $150. That contradicts the user direction and can drain
 rent before it reaches the next construction cost. Routed to specifier for an
 acceptance-criterion correction before implementation.
+## 2026-08-12T22:45:20Z — coder reports entity-32 policy conflict
+
+Processed architect handoff `fd12c20098`. Implemented the fully-developed hotel
+gate for dividends, preserved construction before settlement, added the
+`developed_total` acceptance handler, and updated dividend fixtures to use
+hotels. Domain tests pass (365/365); acceptance is 592/593 with entity-32
+expecting one treasury-funded house from $150 while automatic shortfall
+solicitation develops three houses. This requires architect policy clarification.
