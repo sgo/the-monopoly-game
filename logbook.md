@@ -33180,3 +33180,19 @@ for whoever picks up the next pass rather than editing the feature file.
 CRAP dropped further (mutation-scan 93, down from 96, from the removed
 override plumbing); DRY clean; nothing else to update. Domain 365/365,
 property tests green, full acceptance 597/597 run twice.
+
+## 2026-08-13T01:09:00Z — architect: routes stale market-deadlock wording
+
+Received priority-00 git_handoff 000139 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `2ad01b2bbf`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer 2ad01b2bbf
+
+Action: accepted the real detector coverage: all market-deadlock override
+machinery is removed and entity-m7 uses a genuine player development event to
+block formation. Found a Gherkin content defect in entity-m6/m8/m9: their
+"round completes with <action> ownership-consolidating action" step now has no
+effect and overstates what the scenario does. Routed to specifier for criteria
+cleanup; no production change is needed for this finding.
