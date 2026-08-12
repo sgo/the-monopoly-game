@@ -31690,3 +31690,6 @@ dividend priority.
 
 Verification: domain tests 359/359 passed; full acceptance 590/590 passed;
 `git diff --check` passed.
+
+Sent normal git handoff `20260812T132433Z_000147_from_coder_to_refactorer` for
+review at commit `93f1c514ad`.
