@@ -33197,12 +33197,17 @@ block formation. Found a Gherkin content defect in entity-m6/m8/m9: their
 effect and overstates what the scenario does. Routed to specifier for criteria
 cleanup; no production change is needed for this finding.
 
-Delivered as handoff 000258:
+## 2026-08-12 — specifier: remove effectless round-completion step (architect 000258)
 
-```
-type: git_handoff
-to: specifier
-priority: 00
-task: greedo-market-deadlock-trigger
-commit: 86f99a3ae8
-```
+Architect flagged (86f99a3ae8): the market-deadlock override machinery was
+removed by the refactorer, so the "round completes with <action>/
+no ownership-consolidating action" step in entity-m1/m2/m3/m4/m5/m6/m8/m9 has
+no effect. Its handler completeMarketDeadlockRound(action) ignores the action
+and only calls letTheOthersRollWhatTheyLike() (already implied by the
+"every other player can complete their turn" setup).
+
+Criteria cleanup: removed the effectless step from entity-m1..m6, m8, m9
+(now "When we play up to 1 round" flows directly to "Then"). Removed the unused
+<action> column from entity-m6's Examples. entity-m7 already drives blocking via
+a genuine player development event (pawn "high hat" will build a house on
+"Lippenslaan Knokke") and correctly omits the step. No production change needed.

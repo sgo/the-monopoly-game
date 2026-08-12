@@ -23,7 +23,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And every other ownable space is owned by pawn "high hat"
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the <group> colour group is owned by <entity_name>
     And each of pawn "dog", pawn "high hat", and pawn "iron box" holds a third of <entity_name>
 
@@ -44,7 +43,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And pawn "high hat" owns "Bruul Mechelen"
     And pawn "iron box" owns "Place Verte Verviers"
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the pink colour group is not owned by a legal entity
 
   # entity-m3
@@ -60,7 +58,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And every other ownable space is owned by pawn "high hat"
     And the pink split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the pink colour group is not owned by a legal entity
 
     Examples:
@@ -80,7 +77,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And every other ownable space is owned by pawn "high hat"
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the <group> colour group is not owned by a legal entity
 
     Examples:
@@ -98,7 +94,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And pawn "high hat" owns "Bruul Mechelen"
     And every other ownable space is owned by pawn "high hat"
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the pink colour group is not owned by a legal entity
 
     Examples:
@@ -119,12 +114,11 @@ Feature: Greedo legal entity for a three-way colour-group split
     And the <group> split is an eligible three-owner split
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    And the round completes with <action> ownership-consolidating action
     Then the <group> colour group is auto-formed into <entity_name>
 
     Examples:
-      | group | action | entity_name |
-      | pink  | no     | Pink Realty |
+      | group | entity_name |
+      | pink  | Pink Realty |
 
   # entity-m7
   Scenario Outline: the entity does not form at market deadlock when the round contained an ownership-consolidating action
@@ -161,7 +155,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And the <group> split is an eligible three-owner split
     And the <group> split's shareholders cannot collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the <group> colour group is not owned by a legal entity
 
     Examples:
@@ -182,7 +175,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And the <group> split is an eligible three-owner split
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    And the round completes with no ownership-consolidating action
     Then the <group> colour group is <formed_outcome> by a legal entity
 
     Examples:
