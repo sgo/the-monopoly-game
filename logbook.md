@@ -33102,3 +33102,13 @@ as quiet-round blockers. Coder must add production-driven coverage that does
 not configure a market-deadlock override and demonstrates a real consolidating
 action prevents formation; remove test-only override machinery if it becomes
 unnecessary.
+
+Delivered as handoff 000257:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 317b28eb4c
+```
