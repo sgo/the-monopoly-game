@@ -32209,3 +32209,44 @@ implementation boundary is that automatic shareholder solicitation occurs only
 after a buildable plan exists and its cost exceeds treasury. An entity with no
 buildable improvement must not create a commitment and must continue directly
 to debt/dividend settlement.
+
+## 2026-08-12T19:30:29Z — refactorer receives limited auto-solicit fix for review
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 155e6f95c0
+```
+
+Action: merged `155e6f95c0`, resolving a logbook-only conflict by retaining
+both histories. This closes the second round of the architect's
+entity-build-economy review loop: `canPrepareBuildCommitment` dropped its
+`bankBalance == $0` gate entirely (auto-solicit now applies to any treasury
+level), and `buildAsMuchAsAffordable` gained two call sites that solicit a
+commitment and recompute the plan — one for an entity that can't build
+anything from treasury alone, one for an entity that can build something but
+not everything. Traced both call sites: they are mutually exclusive in
+practice (whichever fires first empties `buildCommitmentsEmpty()`, which
+gates the other), so this is one behavior expressed as two near-duplicate
+blocks rather than two distinct behaviors.
+
+CRAP: `buildAsMuchAsAffordable` rose to CC=9/CRAP=9.6 (over threshold) from
+the duplicated solicit-and-recompute logic. Unified both call sites into
+`solicitCommitmentIfNeeded`, with the two conditions (plan empty vs. plan
+leaves a street unfunded) folded into one `leavesABuildableStreetUnfunded`
+predicate — confirmed equivalent to the original two conditions by hand
+before merging them, since exactly one can ever be true per call. Every
+method is back to CRAP <= 6; `buildAsMuchAsAffordable` itself is now CC=3.
+dry4java clean, mutation-scan 70 sites (within the split threshold).
+
+Domain 365/365, property tests green. Acceptance 591/591 three of four runs;
+one run showed a single failure in `SpecsCliEnCliAcceptanceTest` (cli-1, a
+2-player game with legal-entity and stalemate trading both disabled) —
+"records no winner" after "at least 10 rolls" and a stop signal, but the
+game finished first. This is the same known real-unseeded-dice timing
+non-determinism as `SimulatorTest.keepsPlayingUntilToldToStop` (see
+memory: Greedo-vs-Greedo runaway games), reproducing in a scenario this
+commit's change cannot reach (legal-entity trading disabled). Confirmed by
+re-running three more times clean immediately after.
