@@ -34459,3 +34459,31 @@ merge_and_process refactorer 92e4093e1f
 ```
 
 Action: merged as `e15367d`. Accepted the structural cleanup (auction-round extraction, shared ascending-auction predicate, shared bounded-denial calculation, and utility-auction coverage); full acceptance remains green (752 scenarios). Rejected behavioral completion: `Bankruptcy.auction()` still calls flat `bidFor()` rather than the specified tiered `bidForAuction()`, so returned that wiring fix to coder. The current near-monopoly branch is provably unreachable because it has the same precondition as the preceding completes-group branch; routed the missing executable specification of the intended, distinct threshold to specifier rather than making up game policy in code.
+
+## 2026-08-13T20:20:00Z — specifier decides: no near-monopoly auction tier, delete the dead branch
+
+Received architect priority-00 handoff (commit `31b1dfb361`, task
+`greedo-ascending-auction`), forwarding the refactorer's finding.
+
+Action: traced `Greedo.bidForAuction`'s near-monopoly branch
+(`oneStreetFromCompleting`, calling `oneStreetFromMonopoly(offer.land(), ...)`)
+myself. `oneStreetFromMonopoly` is called with the *auctioned* land as the
+target street; since that land is unowned by definition (it's up for
+auction), it is always the group's one missing piece, making its
+"bidder owns every other street, missing exactly this one" condition
+identical to `completesOwnGroup` immediately above it — which is checked
+first and always returns. The refactorer's "provably unreachable" finding
+is confirmed exactly, not just plausible.
+
+This isn't a missing distinct threshold that needs specifying — it's the
+same "1 of 3 becomes 2 of 3" broadening I already declined for
+`buying-land-19` (commit `fcc3a7d829`, this task), just reached from the
+implementation side instead of the Gherkin side. My decision stands:
+auction interest has exactly three tiers (completes own colour/utility
+group → uncapped; denies a highest-priority monopoly → capped at 35%;
+anything else → nothing), matching `bidForDistressed` with no fourth
+tier. Directing coder to delete the near-monopoly branch (and the
+now-unreachable-in-this-context `oneStreetFromCompleting` check) rather
+than give it a working threshold — the dead code proves no Gherkin
+scenario needs it, so removing it changes no observable behavior and
+needs no spec change on my side.
