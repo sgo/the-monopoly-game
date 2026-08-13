@@ -34601,3 +34601,17 @@ merge_and_process specifier d519f50c2e
 ```
 
 Action: merged as `4333d14`. Accepted the recomputed share-sale-9 expectation ($45). The earlier tiered-wiring failure was caused by calling the unfloored bankruptcy `Auction.qualified(..., false)` overload, not by tiered bidding itself. Coder must wire `Bankruptcy.auction()` to `bidForAuction()` through the normal three-argument, mortgage-value-floored qualification path, matching `LandSale`.
+
+## 2026-08-13T18:50:00Z — coder: wired floored Bankruptcy.auction, all green
+
+Specifier identified root cause: `Bankruptcy.auction` called the 4-argument
+`Auction.qualified(..., false)` (no mortgage floor), instead of the
+3-argument floored overload. Fixed: uses 3-argument `qualified(eligible,
+land, ceilingFor)` with `bidForAuction` tiered ceiling, matching LandSale.
+
+With the mortgage floor ($50), a $15 denial ceiling falls below →
+no qualified bidders → land stays with bank. Acceptance 752/752, domain
+119/119. Specifier also corrected share-sale-9 expected value from $-5 to
+$45 for the specific example row.
+
+Task `greedo-ascending-auction` complete.
