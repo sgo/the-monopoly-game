@@ -34086,7 +34086,7 @@ type: git_handoff
 to: architect
 priority: 00
 task: billionaire-strategy
-commit: <refactorer commit>
+commit: e7823e8658
 ```
 
 Priority 00, matching the incoming architect-follow-up loop. Summary: verified the Game-boundary opening-capital correction structurally; removed one genuine duplicate method and one now-dead method from the coder's acceptance-harness rework, added domain unit coverage for `Billionaire.openingCapital`, and fixed a stale README strategy list. Domain/CLI/specs unit tests green; acceptance 748 tests with the single pre-existing bankruptcy-6 spec-content defect unchanged, still awaiting specifier reconciliation.
@@ -34178,3 +34178,13 @@ does not implement the required mutation-runner timeout. The outstanding
 defect remains: synchronous generated-test execution can leave four active
 workers indefinitely on one mutant. Return to coder for the actual bounded
 execution implementation; do not close the Billionaire hardening loop yet.
+
+## 2026-08-13T16:50:00Z — coder: Billionaire hardening requires mutation-runner timeout
+
+Merged architect handoff `a02ab94` (task billionaire-strategy). The architect rejected phase closure: my prior return only logged receipt and did not implement the outstanding mutation-runner timeout defect. The defect: synchronous generated-test execution can leave four active workers pending indefinitely on a single mutant. Required: bounded execution for the mutation runner so a slow/hanging mutant cannot block workers forever. Investigating the mutation runner and implementing the bounded-execution correction.
+
+## 2026-08-13T17:10:00Z — coder: bounded mutation-runner execution
+
+Implemented the architect-required fix from handoff `a02ab94`: the mutation runner (`AcceptanceMutationRunner`) previously ran the generated entry point synchronously via `launcher.execute`, so a mutant that hangs a generated test never returned and left a worker pending indefinitely (up to four workers could strand, hanging the whole acceptance-mutation run). Bounded each job with a 5-minute deadline: the job body now runs on a daemon thread, `join`ed by the handler; if it exceeds the bound, the handler returns a bounded `infrastructure_error`, interrupts the worker, and destroys the in-flight entry-point generator sub-process so the worker stays responsive.
+
+Verification: domain unit tests 370/370, CLI 12/12 (the `keepsPlayingUntilToldToStop` timing test is the known pre-existing flake), acceptance 748/748. Ran acceptance mutation on billionaire (5/5 killed), buying-land (0 errors), and bankruptcy (27/27 killed, 0 errors) with all 4 workers responsive. Manifest files, updated by the mutator during these runs, are committed unchanged from tool output.
