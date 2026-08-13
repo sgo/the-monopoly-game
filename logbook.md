@@ -33562,3 +33562,51 @@ Verification: domain 367/367; full acceptance 599/599, including cli-jar-5.
 The standalone CLI unit suite still has the known unseeded-dice timing flake in
 `SimulatorTest.keepsPlayingUntilToldToStop`; it is unrelated and acceptance's
 packaged CLI scenarios pass.
+
+## 2026-08-13T07:11:44Z — refactorer receives README CLI usage embed for review
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 36131316c3
+```
+
+Action: merged `36131316c3` (clean, no conflict). This extends the
+simulator's `-h`/`--h` usage text with both optional flag names and a
+"Report file: <path>" line, embeds that usage block verbatim in README.md,
+documents the legal-entity mechanism at length in SIMULATOR.md, and adds
+acceptance coverage (`cli-jar-5`) asserting both flag names appear in the
+README.
+
+Found, not fixed: the new "Report file: $TMPDIR/the-monopoly-game.report"
+line — now printed by the running jar's own `-h` output and quoted in
+README.md — describes behavior that does not exist. Verified directly: `grep`
+across the whole CLI module and every specs test file for the report
+filename, `tmpdir`, or a write call finds nothing outside the two new
+usage-text occurrences; ran the packaged jar with `-h` and with a real
+completed 2-player game, and no file appears at the printed path either
+time (the game result only ever goes to stdout, matching the README's own
+separate line: "prints the full game report to stdout"). This claim was not
+introduced by this commit — an identical, unimplemented requirement
+("writes the final game report to a file, which defaults to
+`the-monopoly-game.report`...") already existed in SIMULATOR.md's
+Requirements section beforehand — but this commit makes it more consequential
+by baking the same false claim directly into the program's own `--help`
+output, where a user would reasonably expect it to be true. `cli-jar-5`
+doesn't catch this: it only asserts the flag names appear, not the report
+line's accuracy. This is a behavior-vs-documentation mismatch, not a
+structural issue, so implementing the missing file-write or removing the
+claim are both outside refactorer scope (new behavior or content decisions,
+respectively) — routing to the architect to decide which way to close it.
+
+CRAP: crap4java blocked by the same known `SimulatorTest.
+keepsPlayingUntilToldToStop` dice-timing flake as recent CLI cycles
+(confirmed still present, unrelated to this change); relied on dry4java
+(clean) and mutate4java --scan (74 sites, well under the split threshold) as
+sufficient verification, consistent with established precedent for this
+limitation. Manifest refreshed.
+
+Domain 367/367, property tests green, full acceptance 599/599 (including
+the new cli-jar-5 scenario) run twice.
