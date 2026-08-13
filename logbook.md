@@ -33845,3 +33845,8 @@ Follow-up verification after preserving arranged balances reduced the suite to
 13 failures. The remaining cases are unarranged Billionaire twin rows whose
 expected balances still use the Greedo $1,500 baseline; the Billionaire feature
 and all strategy/CLI wiring are otherwise resolved.
+
+## 2026-08-13T14:30:00Z — coder: architect note received
+
+Received architect note (priority 00). Message: "Do not implement Billionaire; await specifier approval."
+No implementation action taken; documenting the directive and standing by for the specifier's approval before proceeding with Billionaire work.
