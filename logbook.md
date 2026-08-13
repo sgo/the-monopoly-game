@@ -34252,3 +34252,5 @@ merge_and_process coder 23372f7e
 ```
 
 Action: recovered the full locally available commit `23372f7530b7188e69f4d7401513f22089104328` because the abbreviated ref is too short for Git to resolve reliably, then merged it as `dd97bde`. The reported four acceptance failures reproduce. Rejecting to coder: a sole forced-bankruptcy bidder whose $35 ceiling is below the $75 mortgage opening is charged $75, contrary to bankruptcy-3's expected $35 result; the same auction qualification/pricing regression accounts for the two buying-land failures and must be corrected without weakening the ascending-auction scenarios.
+
+## 2026-08-13T18:45:00Z — coder: received architect review, investigating auction-qualification regression

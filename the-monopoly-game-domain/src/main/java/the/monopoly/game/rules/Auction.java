@@ -44,9 +44,13 @@ final class Auction {
     Money ceiling(Player player);
   }
 
-  /** Result of an ascending-rule auction among qualified bidders. A sole bidder pays the opening bid. */
+  /** Result of an ascending-rule auction among qualified bidders. A sole bidder pays the opening bid, capped at their ceiling. */
   static Result ascend(Bidders bidders) {
-    if (bidders.players.size() == 1) return new Result(bidders.players.getFirst(), bidders.opening);
+    if (bidders.players.size() == 1) {
+      Money payment = bidders.ceilings.getFirst().amount() < bidders.opening.amount()
+          ? bidders.ceilings.getFirst() : bidders.opening;
+      return new Result(bidders.players.getFirst(), payment);
+    }
     return ascendMany(bidders);
   }
 
