@@ -34071,3 +34071,14 @@ contradiction in `bankruptcy.feature`: its Billionaire example does not arrange
 the owner's balance, so normal setup correctly yields `$57,700,007`, while the
 example asserts `$1,507`. Route this acceptance-criteria defect to specifier
 for a decision; do not alter the scenario or production behavior here.
+
+## 2026-08-13T13:46:29Z — specifier follow-up `billionaire-strategy`
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 29cf0cee24
+```
+
+Sending the accepted Game-boundary implementation and the documented
+bankruptcy-scenario contradiction to specifier for acceptance-criteria review.
