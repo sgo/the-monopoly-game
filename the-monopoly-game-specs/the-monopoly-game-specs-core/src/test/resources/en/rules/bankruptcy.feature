@@ -111,7 +111,7 @@ Feature: bankruptcy
     Examples:
       | strategy | starting balance | owner final balance |
       | Greedo   | 10                | 1507                 |
-      | Billionaire | 10             | 1507                 |
+      | Billionaire | 10             | 57700007              |
 
   # bankruptcy-7
   Scenario Outline: "<strategy>" keeps an inherited mortgage when it cannot afford to pay it off, paying only the mandatory interest

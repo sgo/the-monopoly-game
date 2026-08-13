@@ -376,6 +376,18 @@ final class JournalStepHandlers {
                   .count()).isEqualTo(world.simulatorPlayerCount());
             }),
 
+        then("^the game journal records that pawn \"" + NAME + "\" uses the \"Billionaire\" strategy$",
+            (world, arguments) -> world.awaitGameLog(1,
+                entry -> entry instanceof Entry.StrategyNamed named
+                    && named.player().value().equals(arguments.text(1))
+                    && named.name().equals("Billionaire"), "Billionaire strategy")),
+
+        then("^the game journal records that pawn \"" + NAME + "\" uses the \"Greedo\" strategy$",
+            (world, arguments) -> world.awaitGameLog(1,
+                entry -> entry instanceof Entry.StrategyNamed named
+                    && named.player().value().equals(arguments.text(1))
+                    && named.name().equals("Greedo"), "Greedo strategy")),
+
         then("^the game journal records that the \"Greedo\" strategy observes legal-entity trading as "
                 + NAME + "$",
             (world, arguments) -> {
@@ -568,7 +580,7 @@ final class JournalStepHandlers {
 
         given("^pawn \"" + NAME + "\" follows the \"" + NAME + "\" strategy, keeping a \\$"
                 + VALUE + " reserve$",
-            (world, arguments) -> world.pawnFollowsWithReserve(arguments.text(1),
+            (world, arguments) -> world.pawnFollows(arguments.text(1),
                 Vocabulary.strategyWithReserve(arguments.text(2), money(arguments.number(3)),
                     world.isStalemateTrading(), world.isLegalEntityTrading()))),
 
@@ -810,25 +822,30 @@ final class JournalStepHandlers {
 
 /* mutate4java-manifest
 version=1
-moduleHash=33a1f18970a009a00006fd2c2e226d6500c26f54e562f0dc4707c152ecf3cd13
+moduleHash=84b213c7c922263d8479112c70ee4cb7ba6b07efa7ab8c9a8147d43694da560a
 scope.0.id=Y2xhc3M6Sm91cm5hbFN0ZXBIYW5kbGVycyNKb3VybmFsU3RlcEhhbmRsZXJzOjQ4
 scope.0.kind=class
 scope.0.startLine=48
-scope.0.endLine=706
-scope.0.semanticHash=2fff943d1814ea22af89bcfcbb99397fb44722eceaf31cbecbf7ed024daab6a8
+scope.0.endLine=821
+scope.0.semanticHash=cfed1939d01f4334642a90e3651a3e0a4538124ee057ea575246adb7f33fb344
 scope.1.id=bWV0aG9kOkpvdXJuYWxTdGVwSGFuZGxlcnMjY3RvcigwKTo0OQ
 scope.1.kind=method
 scope.1.startLine=49
 scope.1.endLine=50
 scope.1.semanticHash=a7330247d1ba0ccc6eb267a7aaafe651c1edf65f9251ec84a0dadaa9c074a1ae
-scope.2.id=bWV0aG9kOkpvdXJuYWxTdGVwSGFuZGxlcnMjZXhwZWN0ZWRCYW5rcnVwdFN0YXRlKDEpOjY5OQ
+scope.2.id=bWV0aG9kOkpvdXJuYWxTdGVwSGFuZGxlcnMjZXhwZWN0ZWRCYW5rcnVwdFN0YXRlKDEpOjgwNg
 scope.2.kind=method
-scope.2.startLine=699
-scope.2.endLine=705
+scope.2.startLine=806
+scope.2.endLine=812
 scope.2.semanticHash=b20d3dbc4be360fe08c388e538d417ec4ea9ef295c9575b87bbcc843eb365b0a
-scope.3.id=bWV0aG9kOkpvdXJuYWxTdGVwSGFuZGxlcnMjaGFuZGxlcnMoMCk6NTI
+scope.3.id=bWV0aG9kOkpvdXJuYWxTdGVwSGFuZGxlcnMjZXhwZWN0ZWRUcmFkaW5nU3RhdGUoMSk6ODE0
 scope.3.kind=method
-scope.3.startLine=52
-scope.3.endLine=697
-scope.3.semanticHash=2c6f4071baa393c1ef65f620ad58d02d2686ea4ee80c63963909e5d2e74d9263
+scope.3.startLine=814
+scope.3.endLine=820
+scope.3.semanticHash=1223c61a7217a07d1deb1477ee989f187a0f1ab4ab032f3b629c689b48cca8c9
+scope.4.id=bWV0aG9kOkpvdXJuYWxTdGVwSGFuZGxlcnMjaGFuZGxlcnMoMCk6NTI
+scope.4.kind=method
+scope.4.startLine=52
+scope.4.endLine=804
+scope.4.semanticHash=5866fb93bc3be3ccdd853bfe1db81b9c5049dd3b6430102845084aaa5b97a6e7
 */
