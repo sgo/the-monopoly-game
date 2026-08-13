@@ -34387,6 +34387,7 @@ merge_and_process coder cf02591
 ```
 
 Action: recovered and merged full commit `cf02591bd1d4392e025ef98efae856d632f6c4ad` as `c717e0a`. Accepted the trace: the stated $1507 final balance is not reachable from bankruptcy-to-bank auction semantics—$1500 less the $30 mortgage-value opening, then the $3 mandatory mortgage interest, is $1467. Routing this Gherkin content defect to specifier; code must not add an unsupported mortgage-value deposit merely to match the example.
+
 ## 2026-08-13T19:56:00Z — specifier decides bankruptcy-3 and buying-land-19
 
 Received architect priority-00 handoff (commit `df8eb7155a`, task
@@ -34422,6 +34423,23 @@ unaffected. Retitled the scenario to state this dual point.
 Full acceptance 752/752 verified locally. Sending both corrections back to
 architect at the same priority.
 
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-ascending-auction
+commit: fcc3a7d829
+```
+
+## 2026-08-13T20:00:00Z — specifier: coder's independent trace confirms the fix already sent
+
+Coder's cash-flow trace above (`$1500 − $30 − $3 = $1467`) exactly matches
+the correction already committed and sent back to architect in handoff
+`000183` (commit `fcc3a7d829`, this same task). No further action needed;
+that handoff stands as the answer to this routing.
+
 ## 2026-08-13T17:57:30Z — received specifier handoff `greedo-ascending-auction`
 
 ```
@@ -34453,4 +34471,41 @@ Merged `31b1dfb` (fast-forward). Architect resolved all three open items:
 - Domain unit: 119/119 green (new utility-auction test added).
 - Full acceptance: **752/752, 0 failures**. Pipeline green.
 
-Task `greedo-ascending-auction` complete. No further implementation changes.
+## 2026-08-13T20:20:00Z — specifier decides: no near-monopoly auction tier, delete the dead branch
+
+Received architect priority-00 handoff (commit `31b1dfb361`, task
+`greedo-ascending-auction`), forwarding the refactorer's finding.
+
+Action: traced `Greedo.bidForAuction`'s near-monopoly branch
+(`oneStreetFromCompleting`, calling `oneStreetFromMonopoly(offer.land(), ...)`)
+myself. `oneStreetFromMonopoly` is called with the *auctioned* land as the
+target street; since that land is unowned by definition (it's up for
+auction), it is always the group's one missing piece, making its
+"bidder owns every other street, missing exactly this one" condition
+identical to `completesOwnGroup` immediately above it — which is checked
+first and always returns. The refactorer's "provably unreachable" finding
+is confirmed exactly, not just plausible.
+
+This isn't a missing distinct threshold that needs specifying — it's the
+same "1 of 3 becomes 2 of 3" broadening I already declined for
+`buying-land-19` (commit `fcc3a7d829`, this task), just reached from the
+implementation side instead of the Gherkin side. My decision stands:
+auction interest has exactly three tiers (completes own colour/utility
+group → uncapped; denies a highest-priority monopoly → capped at 35%;
+anything else → nothing), matching `bidForDistressed` with no fourth
+tier. Directing coder to delete the near-monopoly branch (and the
+now-unreachable-in-this-context `oneStreetFromCompleting` check) rather
+than give it a working threshold — the dead code proves no Gherkin
+scenario needs it, so removing it changes no observable behavior and
+needs no spec change on my side.
+
+## 2026-08-13T18:22:27Z — received specifier handoff `greedo-ascending-auction`
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 1d2e24ff25
+```
+
+Action: merged as `21b2e68`. Specifier confirms the near-monopoly branch represents a previously rejected broadening, not a missing tier: delete it. Forwarding the decision to coder with the already-pending requirement to route `Bankruptcy.auction()` through tiered `bidForAuction()`; the intended final policy has only completion (uncapped), highest-priority denial (35%), and no interest.
+>>>>>>> swarmforge-architect
