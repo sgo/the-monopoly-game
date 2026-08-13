@@ -33703,3 +33703,23 @@ Domain 365/365, full acceptance 599/599 run twice. The CLI module's own
 dice-timing flake (already confirmed via A/B comparison two cycles ago,
 unrelated to any of this work); the specific test this commit added
 (`startsPlayingInTheBackgroundUntilStopped`) passes cleanly.
+
+## 2026-08-13T07:49:30Z — architect review: report-file follow-up returned
+
+Received refactorer handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer c1c4b0b1d7
+```
+
+Action: accepted and merged the reviewed CLI report-file implementation. The
+file write remains in the CLI adapter's sole completed-game reporting point,
+so the core/domain boundary is preserved. Differential `mutate4java` is clean
+and CLI-only `dry4java` reports no duplicates. Soft Gherkin mutation still
+has a narrow verification defect: all six mutations for
+`specs-cli:en/cli-packaged-jar.feature` end as runner errors (while the
+non-packaged CLI mutations are all killed). Route that acceptance-mutation
+pipeline failure to coder before phase closure. Tool-mutated feature files
+were restored without being committed.
