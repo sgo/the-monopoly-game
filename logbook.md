@@ -34499,6 +34499,16 @@ than give it a working threshold — the dead code proves no Gherkin
 scenario needs it, so removing it changes no observable behavior and
 needs no spec change on my side.
 
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-ascending-auction
+commit: 1d2e24ff25
+```
+
 ## 2026-08-13T18:22:27Z — received specifier handoff `greedo-ascending-auction`
 
 ```
@@ -34508,6 +34518,7 @@ merge_and_process specifier 1d2e24ff25
 ```
 
 Action: merged as `21b2e68`. Specifier confirms the near-monopoly branch represents a previously rejected broadening, not a missing tier: delete it. Forwarding the decision to coder with the already-pending requirement to route `Bankruptcy.auction()` through tiered `bidForAuction()`; the intended final policy has only completion (uncapped), highest-priority denial (35%), and no interest.
+
 ## 2026-08-13T18:45:00Z — coder: deleted dead near-monopoly branch, routed Bankruptcy wiring
 
 Specifier confirmed the near-monopoly branch in `Greedo.bidForAuction` is
@@ -34550,3 +34561,33 @@ merge_and_process coder 5493c56
 ```
 
 Action: recovered and merged full commit `5493c5691f473a45c2f0140688c3ab0437bd4664` as `0b3c9d2`. Accepted deletion of the specifier-rejected dead branch. Rejected the retained flat bankruptcy bidding: its share-sale-13 failure establishes that this older scenario's expected outcomes must be recomputed for the explicitly specified tiered engine, not that the engine should be bypassed. Routed the scenario-content update to specifier. Removed the literal `>>>>>>> swarmforge-architect` conflict marker accidentally committed in the coder logbook.
+
+## 2026-08-13T20:40:00Z — specifier finds a wiring defect, not a spec gap, for share-sale-9
+
+Received architect priority-00 handoff (commit `4872df8147`, task
+`greedo-ascending-auction`).
+
+Action: traced the coder's `bidForAuction` wiring attempt directly rather
+than accepting the reported $25 at face value. `Bankruptcy.auction()`
+called `Auction.qualified(..., false)` — the `floorOpening=false`
+4-argument overload, inherited unchanged from the old flat-`bidFor` code —
+so a lone bidder's ceiling never had to clear the land's mortgage value at
+all; it just paid its own ceiling outright. `LandSale.auction()` uses the
+3-argument overload, which defaults `floorOpening=true`. This is a wiring
+defect, not a missing spec decision: my original commit (`043ccff3b2`)
+was explicit that both `LandSale` and `Bankruptcy` should open at the
+land's mortgage value.
+
+Verified by wiring `Bankruptcy.auction()` to `bidForAuction` with the
+3-argument (floored) overload locally: `high hat` (balance $45 after the
+$5 share purchase) has a denial-tier ceiling of $15 against Steenstraat
+Brugge's $50 mortgage-value floor — below it, so no bidder qualifies and
+the land correctly stays with the bank. `high hat`'s balance stays $45,
+not the stale $-5 (never recomputed for this engine) nor the buggy $25
+(unfloored). Full acceptance 752/752 with this fix applied. Reverted the
+domain code after verifying — implementing it is coder's work, not mine.
+
+Corrected `greedo-share-sale.feature`'s `share-sale-9` second example row
+(`high_hat_ending`) from `-5` to `45`. Routing the wiring fix
+(`Bankruptcy.auction` must use the floored `qualified` overload, matching
+`LandSale`) back to coder via architect.
