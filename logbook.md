@@ -34591,3 +34591,13 @@ Corrected `greedo-share-sale.feature`'s `share-sale-9` second example row
 (`high_hat_ending`) from `-5` to `45`. Routing the wiring fix
 (`Bankruptcy.auction` must use the floored `qualified` overload, matching
 `LandSale`) back to coder via architect.
+
+## 2026-08-13T18:40:11Z — received specifier handoff `greedo-ascending-auction`
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier d519f50c2e
+```
+
+Action: merged as `4333d14`. Accepted the recomputed share-sale-9 expectation ($45). The earlier tiered-wiring failure was caused by calling the unfloored bankruptcy `Auction.qualified(..., false)` overload, not by tiered bidding itself. Coder must wire `Bankruptcy.auction()` to `bidForAuction()` through the normal three-argument, mortgage-value-floored qualification path, matching `LandSale`.
