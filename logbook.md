@@ -33943,6 +33943,25 @@ User explicitly authorized handoff. Sending the approved `billionaire-strategy`
 package to coder from architect commit `c98f8f0b86`, with the setup-only
 opening-capital and full Greedo-equivalence constraints from the review above.
 
+## 2026-08-13T13:12:36Z — received coder handoff `billionaire-strategy`
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 5490037525
+```
+
+Action: merged coder commit `5490037525` as `80139c8`. Acceptance generation
+and suite complete successfully. The implementation correctly makes
+`Billionaire` a `Greedo` subtype and exposes the CLI selection, but the
+opening-capital application is duplicated in the CLI `Simulator.Running` and
+the acceptance-test `World`; `Game` itself never applies it. A direct domain
+game with a Billionaire can therefore bypass the approved opening-capital
+behavior, so the setup invariant remains at an adapter/test boundary rather
+than the game boundary. A coder correction is required before phase closure.
+User direction requires explicit permission before any further handoff; await
+that permission rather than sending the correction automatically.
+
 ## 2026-08-13T15:00:00Z — coder: received architect authorized election-strategy handoff
 
 Received architect priority-00 git_handoff for task `billionaire-strategy`, commit `bfa3b4bfab` (message: "Re-read your role and constitution. merge_and_process architect bfa3b4bfab"). Merged the authorized implementation package. Merging this into the coder branch and will review/verify under coder rules: Billionaire is a setup-only opening-capital variant of Greedo with an opening balance of $57,700,000, applied once during game setup, keeping `$0` cash reserve and all Greedo-equivalent behaviors (buying, priority, trading, bankruptcy, buyout, legal entities).
