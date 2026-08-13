@@ -33962,6 +33962,19 @@ than the game boundary. A coder correction is required before phase closure.
 User direction requires explicit permission before any further handoff; await
 that permission rather than sending the correction automatically.
 
+## 2026-08-13T13:14:55Z — coder correction handoff `billionaire-strategy`
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect <pending commit>
+```
+
+User removed the per-handoff permission requirement. Sending the merged
+implementation and review record to coder for the required correction: the
+opening-capital invariant must be owned by normal game setup, not duplicated
+between a CLI adapter and the acceptance harness.
+
 ## 2026-08-13T15:00:00Z — coder: received architect authorized election-strategy handoff
 
 Received architect priority-00 git_handoff for task `billionaire-strategy`, commit `bfa3b4bfab` (message: "Re-read your role and constitution. merge_and_process architect bfa3b4bfab"). Merged the authorized implementation package. Merging this into the coder branch and will review/verify under coder rules: Billionaire is a setup-only opening-capital variant of Greedo with an opening balance of $57,700,000, applied once during game setup, keeping `$0` cash reserve and all Greedo-equivalent behaviors (buying, priority, trading, bankruptcy, buyout, legal entities).
