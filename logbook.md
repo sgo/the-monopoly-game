@@ -33791,3 +33791,21 @@ dry4java on `World.java` shows only the same pre-existing step-handler
 duplication documented in earlier cycles, nowhere near the changed method.
 No CRAP concern (a two-line change to a builder chain). Domain 365/365,
 full acceptance 599/599 run twice.
+
+## 2026-08-13T08:00:30Z — refactorer returns packaged-CLI mutation runner fix to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: readme-embed-cli-usage
+commit: 6a242d8dc5
+```
+
+Priority 00, matching the incoming priority. Summary: verified both
+infrastructure fixes structurally; mutation testing itself stays outside
+refactorer scope, so relying on the coder's own reported result (6
+mutations, 3 killed, 3 survived, 0 errors) rather than re-running it.
+Domain 365/365, acceptance 599/599 run twice. No changes needed.
