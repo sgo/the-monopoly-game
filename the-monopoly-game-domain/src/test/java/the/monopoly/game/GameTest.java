@@ -521,7 +521,7 @@ class GameTest {
     assertThat(result.deeds().ownerOf(Street.Type.DiestsestraatLeuven)).contains(Pawn.high_hat.id());
     assertThat(result.journal()).containsSubsequence(
         new Entry.Moved(Pawn.dog.id(), 0, 3),
-        new Entry.AuctionWon(Pawn.high_hat.id(), Street.Type.DiestsestraatLeuven, new Money(120))
+        new Entry.AuctionWon(Pawn.high_hat.id(), Street.Type.DiestsestraatLeuven, new Money(30))
     );
   }
 

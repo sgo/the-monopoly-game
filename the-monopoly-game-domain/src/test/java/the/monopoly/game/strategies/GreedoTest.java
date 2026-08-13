@@ -61,6 +61,50 @@ class GreedoTest {
   }
 
   @Test
+  void anAuctionBidForAStreetThatCompletesItsOwnMonopolyIsUncapped() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player bidder = player(bank, "bidder", 1500);
+    Deeds deeds = new Deeds();
+    deeds.sell(ownable(Street.Type.LippenslaanKnokke), bidder, Money.ZERO);
+    deeds.sell(ownable(Street.Type.RueRoyaleTournai), bidder, Money.ZERO);
+
+    Money bid = strategy.bidForAuction(
+        new Strategy.Offer(ownable(Street.Type.GroenplaatsAntwerpen), new Money(1500)),
+        bidder, rules, deeds);
+
+    assertThat(bid).isEqualTo(new Money(1500));
+  }
+
+  @Test
+  void anAuctionBidToDenyAHighestPriorityMonopolyIsCappedAtThirtyFivePercent() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player bidder = player(bank, "bidder", 500);
+    Deeds deeds = new Deeds();
+
+    Money bid = strategy.bidForAuction(
+        new Strategy.Offer(ownable(Street.Type.LippenslaanKnokke), new Money(500)),
+        bidder, rules, deeds);
+
+    assertThat(bid).isEqualTo(new Money(175));
+  }
+
+  @Test
+  void anAuctionBidForAMiddlingStreetItCannotCompleteIsNothing() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player bidder = player(bank, "bidder", 500);
+    Deeds deeds = new Deeds();
+
+    Money bid = strategy.bidForAuction(
+        new Strategy.Offer(ownable(Street.Type.DiestsestraatLeuven), new Money(500)),
+        bidder, rules, deeds);
+
+    assertThat(bid).isEqualTo(Money.ZERO);
+  }
+
+  @Test
   void aTradeOfferingLandTheTraderDoesNotOwnIsDeclined() {
     Rule.Set rules = Rule.Set.Type.official.create();
     Bank bank = rules.bank();

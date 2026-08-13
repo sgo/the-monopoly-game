@@ -85,7 +85,7 @@ class BankruptcyTest {
     Ownable land = (Ownable) rules.create(Street.Type.DiestsestraatLeuven);
     give(deeds, land, dog);
     dog.account().withdraw(new Money(1600));
-    Strategy.OfPlayers strategies = player -> player.equals(highHat) ? bidding(10) : Strategy.UNDECIDED;
+    Strategy.OfPlayers strategies = player -> player.equals(highHat) ? bidding(40) : Strategy.UNDECIDED;
     Events events = new Events();
 
     new Bankruptcy(deeds, rules, players, strategies, events).resolve(dog, null);
