@@ -33760,6 +33760,16 @@ registration/manifest housekeeping, not a Gherkin acceptance-content decision.
 Route to coder. `mutate4java` automatically refreshed World.java's embedded
 manifest; do not hand-edit that generated section.
 
+## 2026-08-13T08:10:48Z — received coder handoff `readme-embed-cli-usage`
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder ea72198e22
+```
+
+Action: merging the verification-only return and closing the completed phase.
+
 ## 2026-08-13T09:56:00Z — coder: packaged-CLI mutation runner fixed
 
 Processed architect handoff 000266. The packaged-CLI acceptance mutations were
