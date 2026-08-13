@@ -34242,3 +34242,37 @@ Verified: domain and CLI unit tests green, full acceptance 748/748.
 ## 2026-08-13T17:30:00Z — coder: received specifier `greedo-ascending-auction`
 
 Received and merged specifier handoff `043ccff` (initial task name `greedo-ascending-auction`). New behavior slice: unify auction bidding as an ascending, tier-gated engine. Greedo's ordinary auction bid (LandSale/Bankruptcy) previously did a single flat sealed bid of everything-available-minus-reserve; on Billionaire's opening capital a single uncontested auction could convert nearly all $57.7M into one property (~30% Billionaire bankruptcy rate empirically). The spec generalizes the existing three-tier interest rule from distressed-sale bidding to ordinary auctions and replaces the single-pass sealed bid with DistressedSale's ascending-round mechanic (opens at mortgage value, climbs $5, settles when no other bidder can exceed). This closes the Billionaire overbidding defect. Processing under coder/TDD rules.
+
+## 2026-08-13T18:15:00Z — coder: implemented greedo-ascending-auction, routing to architect
+
+### What was done
+
+- `Strategy.bidForAuction(Offer, Player, Rule.Set, Deeds)` — default delegates to `bidFor`.
+- `Greedo.bidForAuction` — four-branch tier: own-monopoly-completion → uncapped;
+  utilityMonopolyOpportunity → uncapped; deny-HIGHEST → 35% cap; else → 0.
+- Shared `rules.Auction` utility — ascending engine ($5-steps from mortgage,
+  `qualified` with configurable floor). LandSale uses tiered `bidForAuction`
+  and mortgage floor; Bankruptcy uses flat `bidFor` without a mortgage floor
+  (preserving journal/logging/report scripted-bid parity).
+- All existing unit tests updated (LandSaleTest, BankruptcyTest, GameTest,
+  GreedoTest) for ascending expectations and added bidForAuction tier tests.
+- Domain unit: 373/373 green. CLI: 12/12 (when not flaking on the pre-existing
+  `SimulatorTest.keepsPlayingUntilToldToStop` timing issue).
+
+### Acceptance delta
+
+Baseline (HEAD `043ccff`, before implementation): **33 failures** out of 752.
+After implementation: **4 failures**.
+
+Resolved: journal-6/51, logging-10/55, report-6/51, auctions-1..6,
+bankruptcy-7/8/10, ~20 buying-land recomputed auction-outcome scenarios.
+
+### Three open spec-content items, requested Architect/Specifier review
+
+1. **buying-land-19** (scenarios [45]/[46]) — A real Greedo high_hat (with 1-of-3 yellow streets) has the turn to bid on a MIDDLE-priority yellow street (Place de l'Ange Namur). The new four-branch tier produces $0 for MIDDLE, so high_hat does not qualify. The unchanged scenario still expects $1000 final balance (= the old flat available−reserve bid of $500). No tier rule permits $500 for a MIDDLE street. Question: should the tier recognise "one away from colour-group completion" as a positive tier, or must buying-land-19 be remapped?
+
+2. **bankruptcy-3** — The specifier recomputed the owner final balance from 1487 to 1507 (bid 10→35), but actual production consistently produces 1467 (both on baseline and post-implementation). The arithmetic mismatch is a mortgage-payout accounting formula difference (mortgage interest lifts/keeps differ by ~40 from expected). Pre-existing, not caused by the ascending engine.
+
+3. **share-sale-13** — A distressed shareholder disposes of a personal HIGHEST-priority street (Steenstraat Brugge) through a bank-forced auction. The real Greedo sole bidder pays the opening ($50) under the ascending engine, but the unchanged legacy scenario expects high_hat to pay its own ceiling ($45, reflecting post-share-sale remaining balance) — the OLD flat `bidFor` charged the bidder's own ceiling for a sole bid. The tension: recomputed scripted+bankruptcy scenarios (journal-51/log-55) expect "sole → opening" (parity with landing auctions), while share-sale-13 expects "sole → bidder's ceiling." Question: should forced-bankruptcy auctions preserve the old sole-pays-ceiling rule, or should the ascending opening-price rule be universal and share-sale-13 remapped?
+
+Route to the architect for disposition; no further coder-owned implementation changes until triage resolves.
