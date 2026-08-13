@@ -33836,3 +33836,19 @@ Processed architect handoff 000267 and merged `bbfc78fdf6`. No further
 coder-owned implementation changes were needed. The normal acceptance
 pipeline passed 599/599 with zero failures, errors, or skips. Returning the
 verified state to the architect for phase closure.
+
+## 2026-08-13T08:48:53Z — architect design: `billionaire-strategy`
+
+User request: introduce a `Billionaire` player strategy that makes the same
+decisions as Greedo but starts with $57,700,000 (the user-specified rounded
+simulation equivalent of Jean-Pierre Berghmans' estimated wealth).
+
+Architectural decision: starting capital is game setup, not a CLI-only
+exception or a decision-policy concern. Add a strategy-level opening-capital
+capability whose default is zero; apply it exactly once before the game starts.
+`Billionaire` must remain Greedo-compatible for existing trading, buyout,
+bankruptcy, and legal-entity rules—do not duplicate Greedo's decision logic or
+silently make the strategy lose those behaviours. The CLI must accept
+`billionaire` alongside `greedo`, including mixed per-player selections; its
+default remains Greedo. Cover both the initial balance and CLI selection with
+tests/acceptance scenarios.
