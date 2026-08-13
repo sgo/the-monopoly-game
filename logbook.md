@@ -34238,3 +34238,7 @@ implementation and hardening (Game-boundary opening-capital setup, the
 bankruptcy-6 acceptance correction, and the bounded mutation-runner timeout
 fix). All coder/refactorer/architect loops for this task are closed.
 Verified: domain and CLI unit tests green, full acceptance 748/748.
+
+## 2026-08-13T17:30:00Z — coder: received specifier `greedo-ascending-auction`
+
+Received and merged specifier handoff `043ccff` (initial task name `greedo-ascending-auction`). New behavior slice: unify auction bidding as an ascending, tier-gated engine. Greedo's ordinary auction bid (LandSale/Bankruptcy) previously did a single flat sealed bid of everything-available-minus-reserve; on Billionaire's opening capital a single uncontested auction could convert nearly all $57.7M into one property (~30% Billionaire bankruptcy rate empirically). The spec generalizes the existing three-tier interest rule from distressed-sale bidding to ordinary auctions and replaces the single-pass sealed bid with DistressedSale's ascending-round mechanic (opens at mortgage value, climbs $5, settles when no other bidder can exceed). This closes the Billionaire overbidding defect. Processing under coder/TDD rules.
