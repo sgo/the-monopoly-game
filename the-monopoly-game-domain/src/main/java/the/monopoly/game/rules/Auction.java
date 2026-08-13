@@ -58,28 +58,36 @@ final class Auction {
     Player winner = null;
     Money bid = new Money(bidders.opening.amount());
     boolean firstOffer = true;
-    boolean raised;
-    boolean settled;
+    Round round;
     do {
-      raised = false;
-      settled = false;
-      for (int index = 0; index < bidders.players.size(); index++) {
-        Money offer = firstOffer ? bid : new Money(Math.max(bid.amount(), 0) + 5);
-        if (offer.exceeds(bidders.ceilings.get(index))) continue;
-        winner = bidders.players.get(index);
-        bid = offer;
-        firstOffer = false;
-        raised = true;
-        if (cannotRaise(bidders.ceilings, index, bid)) {
-          settled = true;
-          break;
-        }
-      }
-    } while (raised && !settled);
+      round = raiseRound(bidders, winner, bid, firstOffer);
+      winner = round.winner();
+      bid = round.bid();
+      firstOffer = false;
+    } while (round.raised() && !round.settled());
     return new Result(winner, bid);
   }
 
-  private static boolean cannotRaise(List<Money> ceilings, int currentBidder, Money bid) {
+  /** One pass over every bidder, each raising by $5 over the current bid or dropping out. */
+  private static Round raiseRound(Bidders bidders, Player winner, Money bid, boolean firstOffer) {
+    boolean raised = false;
+    boolean settled = false;
+    for (int index = 0; index < bidders.players.size(); index++) {
+      Money offer = firstOffer ? bid : new Money(bid.amount() + 5);
+      if (offer.exceeds(bidders.ceilings.get(index))) continue;
+      winner = bidders.players.get(index);
+      bid = offer;
+      firstOffer = false;
+      raised = true;
+      if (cannotRaise(bidders.ceilings, index, bid)) {
+        settled = true;
+        break;
+      }
+    }
+    return new Round(winner, bid, raised, settled);
+  }
+
+  static boolean cannotRaise(List<Money> ceilings, int currentBidder, Money bid) {
     for (int index = 0; index < ceilings.size(); index++) {
       if (index != currentBidder && ceilings.get(index).amount() >= bid.amount()) return false;
     }
@@ -90,5 +98,8 @@ final class Auction {
   }
 
   record Result(Player winner, Money bid) {
+  }
+
+  private record Round(Player winner, Money bid, boolean raised, boolean settled) {
   }
 }
