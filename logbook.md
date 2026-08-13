@@ -33611,6 +33611,29 @@ limitation. Manifest refreshed.
 Domain 367/367, property tests green, full acceptance 599/599 (including
 the new cli-jar-5 scenario) run twice.
 
+## 2026-08-13T07:17:30Z — refactorer returns README CLI usage embed to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: readme-embed-cli-usage
+commit: 78601f6a76
+```
+
+Priority 00, matching the coder's incoming priority. Summary: structurally
+clean (dry4java clean, mutation-scan 74 sites; crap4java blocked by the
+known CLI dice-timing flake, unrelated). Domain 367/367, property tests
+green, acceptance 599/599 run twice. Flagging for decision: the new
+"Report file: $TMPDIR/the-monopoly-game.report" usage line, now printed by
+the jar's own `-h` output and quoted in the README, describes behavior that
+doesn't exist — verified empirically (no file appears after `-h` or a real
+completed game). Predates this commit (already an unimplemented requirement
+in SIMULATOR.md) but is now more visible. Implementing the write or removing
+the claim are both outside refactorer scope.
+
 ## 2026-08-13T07:30:33Z — architect review: `readme-embed-cli-usage`
 
 Received refactorer handoff:
@@ -33631,23 +33654,52 @@ had no changed surface; `dry4java` reported existing test-helper duplicates;
 soft acceptance mutation completed all features but the six packaged-CLI
 mutations ended as runner errors and must be resolved by the CLI follow-up.
 
-Delivered to coder:
+## 2026-08-13T09:36:25Z — coder: write the CLI report file
 
-```
-type: git_handoff
-to: coder
-priority: 00
-task: readme-embed-cli-usage
-commit: 8a6fad2171
-```
+Processed architect handoff 000265 (`8a6fad2171`). The CLI now writes every
+completed or stopped simulation's rendered report to the documented default
+path, `java.io.tmpdir/the-monopoly-game.report`, while continuing to print the
+same report to stdout. Added a focused unit assertion comparing the file
+contents with the returned report.
 
-## 2026-08-13T07:42:43Z — received refactorer handoff `readme-embed-cli-usage`
+Verification: focused CLI tests pass; full acceptance 599/599, including all
+packaged CLI scenarios.
+
+## 2026-08-13T09:36:56Z — refactorer receives CLI report-file write for review
+
+Received coder priority-00 handoff:
 
 ```
 Re-read your role and constitution.
 
-merge_and_process refactorer c1c4b0b1d7
+merge_and_process coder d300ce125e
 ```
 
-Action: merging the refactorer-reviewed report-file implementation and
-performing final architectural verification.
+Action: merged `d300ce125e` (clean, no conflict). Closes the finding from
+last cycle: `Running`'s constructor now writes the rendered report to
+`reportPath()` (via `Files.writeString`) right alongside printing it to
+`Result`, for every completed-or-stopped simulation — there's only one
+place a completed game produces its final report in this file, so this is
+the correct, single choke point; verified by reading the whole file, not
+just the diff. A new unit test compares the file's contents against the
+returned report string.
+
+Cleanup: `reportPath()` was `private`; widened it to package-private
+(`SimulatorTest` is in the same package) and pointed the new test's file
+path at `Simulator.reportPath()` instead of re-deriving the same
+`$TMPDIR/the-monopoly-game.report` string inline — one less place for
+production and test to silently drift apart if the filename ever changes.
+Also dropped a stray fully-qualified `java.nio.file.Path.of(...)` in favor
+of the already-imported `Path`.
+
+Verified the fix empirically rather than trusting the diff: ran the
+packaged jar for a real completed 2-player game, and `the-monopoly-game.
+report` now appears in the system temp directory with real content (56KB,
+not empty) — previously it never appeared under any circumstance. dry4java
+clean, mutation-scan 76 sites. Manifest refreshed.
+
+Domain 365/365, full acceptance 599/599 run twice. The CLI module's own
+`SimulatorTest.keepsPlayingUntilToldToStop` remains the known pre-existing
+dice-timing flake (already confirmed via A/B comparison two cycles ago,
+unrelated to any of this work); the specific test this commit added
+(`startsPlayingInTheBackgroundUntilStopped`) passes cleanly.
