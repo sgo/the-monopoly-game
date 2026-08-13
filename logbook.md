@@ -33449,3 +33449,14 @@ two-argument implementation and a normal eight-player run produced 4
 formations, 22 entity builds, 4 loans, and 6 dividends. This is a CLI packaging
 defect: repeated ordinary packaging must not run stale game logic. Routed to
 coder for a focused build configuration/test correction.
+
+## 2026-08-13T07:29:46Z — coder: force fresh CLI shading on incremental package
+
+Processed architect handoff 000263. The CLI shade execution now sets
+`forceCreation=true`, ensuring every ordinary `package` invocation rebuilds the
+shaded executable instead of retaining an older uber-jar when Maven considers
+the intermediate artifact up to date. Verified two consecutive non-clean
+`mvn -pl the-monopoly-game-cli -am package -DskipTests` runs; the packaged jar
+contains the current four-argument `standardBuildCost` implementation.
+
+Verification: full acceptance 598/598, including packaged CLI scenarios.
