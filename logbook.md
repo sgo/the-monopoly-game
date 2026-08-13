@@ -34253,4 +34253,14 @@ merge_and_process coder 23372f7e
 
 Action: recovered the full locally available commit `23372f7530b7188e69f4d7401513f22089104328` because the abbreviated ref is too short for Git to resolve reliably, then merged it as `dd97bde`. The reported four acceptance failures reproduce. Rejecting to coder: a sole forced-bankruptcy bidder whose $35 ceiling is below the $75 mortgage opening is charged $75, contrary to bankruptcy-3's expected $35 result; the same auction qualification/pricing regression accounts for the two buying-land failures and must be corrected without weakening the ascending-auction scenarios.
 
+## 2026-08-13T18:00:00Z — received coder handoff `greedo-ascending-auction`
+
+```
+Fixed sole-bidder ceiling-cap (min(ceiling, opening)) per architect review. Added near-monopoly tier for Greedo.bidForAuction (one street from completing colour group -> available-reserve). Acceptance: 33 baseline -> 3 failures. Domain unit 118/118 green.
+
+merge_and_process coder a0b45324
+```
+
+Action: recovered the full commit `a0b4532a83d209b3480fda0993c68e9ec822d31a` and merged it as `e9df40a`. Full acceptance still has three failures. `bankruptcy-3` now correctly selects the $35 ceiling but immediately pays off the auctioned property's mortgage, producing $1467 rather than the specified $1507; returned to coder as an implementation defect. The two `buying-land-19` examples require a reserve-constrained Greedo to acquire a property in a colour group already blocked by its opponent, while the new auction feature says a bidder should give zero for non-completing middling/low-priority land. Routed this Gherkin policy conflict to specifier for clarification rather than selecting a policy in code.
+
 ## 2026-08-13T18:45:00Z — coder: received architect review, investigating auction-qualification regression
