@@ -10,12 +10,24 @@ read back afterward as a plain-English report.
 
 ```sh
 mvn -pl the-monopoly-game-cli -am package -DskipTests
-java -jar the-monopoly-game-cli/target/the-monopoly-game-cli-0.2.0-SNAPSHOT.jar [number of players] [strategy for each player]
+java -jar the-monopoly-game-cli/target/the-monopoly-game-cli-0.2.0-SNAPSHOT.jar [number of players] [strategy for each player] [optional flags]
 ```
 
 With no arguments, it runs a 2-player game with every player using the
 "Greedo" strategy (the only strategy currently implemented) and prints the
-full game report to stdout. `-h`/`--h` prints usage.
+full game report to stdout. `-h`/`--h` prints this usage:
+
+```text
+Usage: simulator [number of players] [strategy for each player]
+Available strategies: greedo
+Optional flags:
+  --optional-greedo-stalemate-trading
+  --optional-greedo-legal-entity
+Report file: $TMPDIR/the-monopoly-game.report
+```
+
+The final report is written to `the-monopoly-game.report` in the system
+temporary directory.
 
 ## Building and testing
 

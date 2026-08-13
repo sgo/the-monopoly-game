@@ -33533,3 +33533,32 @@ twice. CLI module's SimulatorTest.keepsPlayingUntilToldToStop failed
 consistently during my own verification but reproduces identically on the
 pre-merge baseline via A/B worktree comparison — pre-existing, not caused
 by this commit.
+
+## 2026-08-13T05:55:00Z — architect: closes CLI packaging review
+
+Received priority-00 git_handoff 000141 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `aea26fa5e6`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer aea26fa5e6
+
+Merged the reviewed packaging correction. The Shade execution now forces jar
+creation on every ordinary package. Independently ran two consecutive
+non-clean packages; both executed Shade, and bytecode inspection of the final
+jar confirmed the current `canFundNextImprovement` gate and
+`standardBuildCost(entity, deeds)` method. Full acceptance passed 598/598,
+including the 42 legal-entity and packaged CLI scenarios. The market-deadlock
+and eight-player legal-entity phase is complete.
+
+## 2026-08-13T09:11:06Z — coder: embed complete CLI usage in README
+
+Processed specifier handoff 000178 (`407f6e06b4`). Extended simulator `-h`/`--h`
+usage to name both optional Greedo flags and the default temporary report path,
+embedded the corresponding usage report in `README.md`, and added the acceptance
+assertion that each optional flag appears in the README usage section.
+
+Verification: domain 367/367; full acceptance 599/599, including cli-jar-5.
+The standalone CLI unit suite still has the known unseeded-dice timing flake in
+`SimulatorTest.keepsPlayingUntilToldToStop`; it is unrelated and acceptance's
+packaged CLI scenarios pass.

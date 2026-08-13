@@ -54,6 +54,9 @@ final class PomStepHandlers {
         then("^the packaged jar's output explains how to use the simulator$",
             (world, arguments) -> world.assertPackagedCliUsage()),
 
+        then("^the README usage report includes the optional flag \"" + NAME + "\"$",
+            (world, arguments) -> world.assertReadmeUsageFlag(arguments.text(1))),
+
         then("^the project includes dependency \"" + NAME + "\"$",
             (world, arguments) -> world.assertPomDeclaresDependency(arguments.text(1))),
 

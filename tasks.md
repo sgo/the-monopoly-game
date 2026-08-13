@@ -722,3 +722,44 @@ didn't already call for.
   ending immediately as it should. Fixed by stopping the loop once
   `deeds.isBankrupt(player)` or `jail.holds(player)` becomes true. See
   `bankruptcy-8` and `jail-9`.
+- **`legal-entity-for-split-colour-groups`** (done) — resolves the 3+-way
+  colour-group split impasse that `greedo-stalemate-trading` above cannot
+  touch (a split across three or more owners can never be built or
+  consolidated, so an 8-player game tends to stall forever). Adds an opt-in
+  **legal entity** mechanism behind
+  `--optional-greedo-legal-entity`; a company formed over a colour group
+  owns, develops, and rents out all of its streets as one collective.
+  Refines how the game ends impasses without removing the separate
+  cash-threshold `Stalemate` terminal. See
+  [`SIMULATOR.md`](SIMULATOR.md) and the `greedo-legal-entity.feature` /
+  `greedo-share-sale.feature` specs.
+  - **Formation** — once the whole board is owned and the just-completed
+    round contained no ownership-consolidating action, the game
+    automatically forms an entity over any eligible colour group split
+    across exactly **three** owners, **before** `Stalemate.reached` fires.
+    Refuses a highest-priority group, a two-owner split, a split whose
+    streets are already fully developed (no real next improvement), and one
+    whose shareholders cannot **collectively** fund the next improvement
+    after each keeps its base reserve.
+  - **Operation** — the entity holds its own bank account and acts per round
+    in priority: build as far as affordable (soliciting an **ALL-OR-NOTHING**
+    build loan from its shareholders, each capped at a personal
+    affordability ceiling), then repay any shareholder loan
+    (principal + 5% interest), then pay an equal dividend — the dividend
+    only once the loan is fully repaid **and** every street has a hotel,
+    the treasury is at/above threshold, and the last-capitalised shareholder
+    has aged a year.
+  - **Distressed shares & liquidation** — a shareholder about to go bankrupt
+    may sell a legal-entity share to a fellow shareholder (bid up to a third
+    of bank balance); when one shareholder remains they may liquidate the
+    entity and keep its remaining treasury. See `greedo-share-sale.feature`.
+- **`auto-formation-real-next-improvement`** (done) — closes a
+  development-selection gap in the legal-entity auto-formation trigger:
+  formation previously treated a fully-developed colour split as fundable
+  (`standardBuildCost` summed a house cost for every street, including ones
+  that already have a hotel), so it would form an entity that had no build
+  plan and went straight to its dividend path (one run: 4 entities formed,
+  0 houses, 0 loans, 566 dividends). Auto-formation now requires a **real
+  next improvement** — at least one entity street not yet at a hotel — and
+  `standardBuildCost(entity, deeds)` excludes hotel streets. Pinned by
+  `entity-m10`.

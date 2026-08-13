@@ -238,3 +238,31 @@ A few things were notable:
 
 As expected, specifications were missing both I and the AI did not think of.
 So we rinse & repeat.
+
+### Testing Through the UI
+
+When you deal with humans automating this is usually painful. And yet it is something we do too much of. This rooted in our struggle with motivation to actually apply good development practices such as Behavior Driven Design and Test Driven Design. And so our bosses have to pay someone to write test automation scripts that exercise the UI. As well as hire a manual tester. These people suffer because of our lack of work ethic.
+
+#### But... in the defense of humans.
+
+We don't do stupid things that often.
+
+When we test a component in isolation with unit or integration tests we may play with all sorts of configurations. Then when we wire the application into the UI we tend to remember to wire up the configuration and we certainly do not wire it up with the test configuration.
+
+Humans are wise like that.
+
+But AI will be stupid. AI will not wire configuration from the UI up with the system at all. Worse it will leave test configuration wired up into the system. All your tests and specifications may be green but when you run the application it doesn't do what it is supposed to do.
+
+#### So, what to do?
+
+Are we going to run all the specifications through the UI? The AI won't complain about it. But your patience and your bosses' wallet will.
+
+Maybe you've seen tools boot up before that will immediately vomit a bunch of configuration details on the screen. If you've ever done some debugging those may provide useful hints as to why something isn't working the way you expected.
+
+So I've found it is useful. To write a spec that states the UI should print a specific state from the game on startup. And that this particular bit of state can be controlled with a UI toggle.
+
+As such you assert the UI is wired up correctly and all the specifications that rely on this bit of configuration will start working without having to validate them all through the UI.
+
+In larger projects you'd want to use a larger swarm were one of the agents has the QA role specifically for this purpose.
+
+- specs can be green but not wired up correctly in the UI. There's no need to test functionality throug the UI but simply making the UI report it's active settings at startup suffices to ensure startup toggles are passed correctly into the game to ensure it runs properly.
