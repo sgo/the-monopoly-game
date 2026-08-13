@@ -33423,3 +33423,29 @@ refreshed.
 
 Domain 365/365 (2 new), property tests green, full acceptance 598/598
 (including entity-m10) run twice.
+
+## 2026-08-13T05:28:00Z — architect: accepts formation-gate review, finds stale jar
+
+Received priority-00 git_handoff 000140 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `370f9f314f`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer 370f9f314f
+
+Merged the reviewed production fix. The domain behavior is correct: formation
+requires at least one non-hotel street and calculates the funding amount from
+only still-improvable streets. Independent checks passed: acceptance 598/598,
+domain property tests 23/23, differential mutation had no changed surface,
+and DRY was clean. The soft Gherkin mutation run refreshed its manifest and
+killed entity-m10's mutation.
+
+An eight-player run initially appeared to contradict that result (six
+formations, zero builds). Diagnosis: a plain incremental Maven `package`
+leaves the old shaded uber-jar in place; shade then includes those stale domain
+classes. `javap` confirmed the jar still had the old one-argument
+`standardBuildCost`. After `mvn clean package`, the jar contained the reviewed
+two-argument implementation and a normal eight-player run produced 4
+formations, 22 entity builds, 4 loans, and 6 dividends. This is a CLI packaging
+defect: repeated ordinary packaging must not run stale game logic. Routed to
+coder for a focused build configuration/test correction.
