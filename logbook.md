@@ -33530,3 +33530,13 @@ jar confirmed the current `canFundNextImprovement` gate and
 `standardBuildCost(entity, deeds)` method. Full acceptance passed 598/598,
 including the 42 legal-entity and packaged CLI scenarios. The market-deadlock
 and eight-player legal-entity phase is complete.
+
+Delivered as handoff 000264:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: greedo-market-deadlock-trigger
+commit: e6dff36d76
+```
