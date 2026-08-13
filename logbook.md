@@ -33328,6 +33328,16 @@ already-formed fully developed entity remains inactive. The scenario is
 intentionally red against the current production implementation; routed to
 coder for the focused domain fix.
 
+Delivered as handoff 000262:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 6e6cb82781
+```
+
 The soft mutation runner refreshed its checked-in acceptance-mutation manifest
 for the corrected scenario wording. Delivered that generated verification
 artifact as follow-up handoff 000260:
@@ -33431,3 +33441,40 @@ fully-developed-splits-look-fundable bug found in empirical play; added two
 unit tests closing the new method's coverage gap (was 0%, now 100%).
 CRAP/DRY/mutation-scan clean. Domain 365/365 (2 new), property tests green,
 acceptance 598/598 run twice.
+
+## 2026-08-13T05:28:00Z — architect: accepts formation-gate review, finds stale jar
+
+Received priority-00 git_handoff 000140 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `370f9f314f`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer 370f9f314f
+
+Merged the reviewed production fix. The domain behavior is correct: formation
+requires at least one non-hotel street and calculates the funding amount from
+only still-improvable streets. Independent checks passed: acceptance 598/598,
+domain property tests 23/23, differential mutation had no changed surface,
+and DRY was clean. The soft Gherkin mutation run refreshed its manifest and
+killed entity-m10's mutation.
+
+An eight-player run initially appeared to contradict that result (six
+formations, zero builds). Diagnosis: a plain incremental Maven `package`
+leaves the old shaded uber-jar in place; shade then includes those stale domain
+classes. `javap` confirmed the jar still had the old one-argument
+`standardBuildCost`. After `mvn clean package`, the jar contained the reviewed
+two-argument implementation and a normal eight-player run produced 4
+formations, 22 entity builds, 4 loans, and 6 dividends. This is a CLI packaging
+defect: repeated ordinary packaging must not run stale game logic. Routed to
+coder for a focused build configuration/test correction.
+
+## 2026-08-13T07:29:46Z — coder: force fresh CLI shading on incremental package
+
+Processed architect handoff 000263. The CLI shade execution now sets
+`forceCreation=true`, ensuring every ordinary `package` invocation rebuilds the
+shaded executable instead of retaining an older uber-jar when Maven considers
+the intermediate artifact up to date. Verified two consecutive non-clean
+`mvn -pl the-monopoly-game-cli -am package -DskipTests` runs; the packaged jar
+contains the current four-argument `standardBuildCost` implementation.
+
+Verification: full acceptance 598/598, including packaged CLI scenarios.
