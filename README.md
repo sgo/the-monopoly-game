@@ -14,12 +14,12 @@ java -jar the-monopoly-game-cli/target/the-monopoly-game-cli-0.3.0-SNAPSHOT.jar 
 ```
 
 With no arguments, it runs a 2-player game with every player using the
-"Greedo" strategy (the only strategy currently implemented) and prints the
-full game report to stdout. `-h`/`--h` prints this usage:
+"Greedo" strategy and prints the full game report to stdout. `-h`/`--h`
+prints this usage:
 
 ```text
 Usage: simulator [number of players] [strategy for each player]
-Available strategies: greedo
+Available strategies: greedo, billionaire
 Optional flags:
   --optional-greedo-stalemate-trading
   --optional-greedo-legal-entity
