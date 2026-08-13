@@ -33754,3 +33754,40 @@ worker because each mutation rebuilds the shared shaded jar.
 Verification: targeted soft mutation run completed 6 mutations with 3 killed,
 3 survived, and 0 errors. Full acceptance passed 599/599. Generated mutation
 manifest changes were restored before commit.
+
+## 2026-08-13T07:56:48Z — refactorer receives packaged-CLI mutation runner fix for review
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 0e8a78a2ad
+```
+
+Action: merged `0e8a78a2ad` (clean, no conflict). Two small, well-targeted
+infrastructure fixes: `World.runProcess` no longer uses `inheritIO()`
+(which let the packaged CLI's Maven subprocess output bypass the mutation
+worker's stdout/stderr protocol capture and turn every packaged-CLI
+mutation into a runner error) — it now merges stderr into stdout and
+discards it while still checking the exit code; and
+`run-acceptance-mutation.sh` runs the packaged-CLI feature with exactly one
+worker instead of four, since parallel mutations there race on the shared
+target directory while replacing the shaded jar.
+
+Not my scope to run (mutation testing and Gherkin acceptance mutation are
+explicitly outside refactorer ownership), so I didn't re-run the mutation
+suite myself; the coder's own verification (6 mutations, 3 killed, 3
+survived, 0 errors — a real result now, not a runner artifact) is the
+relevant signal, and any follow-up on the 3 survivors is architect/coder
+territory. `runProcess` only has the one call site (packaging the CLI
+module for acceptance), so this doesn't touch anything test-outcome-
+relevant beyond that step; discarding the build's own console output does
+make a genuine `mvn package` failure less diagnosable (only the generic
+"Command failed: ..." message would show), but that's an intentional,
+reasonable trade for clean mutation-worker output capture, not a defect.
+
+dry4java on `World.java` shows only the same pre-existing step-handler
+duplication documented in earlier cycles, nowhere near the changed method.
+No CRAP concern (a two-line change to a builder chain). Domain 365/365,
+full acceptance 599/599 run twice.
