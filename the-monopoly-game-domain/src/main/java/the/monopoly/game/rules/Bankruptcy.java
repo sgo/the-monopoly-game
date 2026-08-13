@@ -170,17 +170,15 @@ public final class Bankruptcy {
   }
 
   private void auction(Ownable land) {
-    Player winner = null;
-    Money bid = Money.ZERO;
-    for (Player player : players) {
-      if (deeds.isBankrupt(player)) continue;
-      Money offered = strategies.forPlayer(player).bidFor(new Strategy.Offer(land, player.account().balance().amount()));
-      if (offered.exceeds(bid)) { winner = player; bid = offered; }
-    }
-    if (winner == null) return;
-    deeds.sell(land, winner, bid);
-    events.wonAtAuction(winner, land, bid);
-    settleInheritedMortgage(land, winner);
+    List<Player> eligible = players.stream().filter(player -> !deeds.isBankrupt(player)).toList();
+    Auction.Bidders qualified = Auction.qualified(eligible, land,
+        player -> strategies.forPlayer(player).bidFor(new Strategy.Offer(land, player.account().balance().amount())),
+        false);
+    if (qualified.players().isEmpty()) return;
+    Auction.Result result = Auction.ascend(qualified);
+    deeds.sell(land, result.winner(), result.bid());
+    events.wonAtAuction(result.winner(), land, result.bid());
+    settleInheritedMortgage(land, result.winner());
   }
 
   private void inherit(Ownable land, Player debtor, Player creditor) {

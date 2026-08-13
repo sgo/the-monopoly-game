@@ -1,10 +1,10 @@
-# acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-13T14:30:23.368583Z","feature_name":"buying unowned land","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/coder/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/buying-land.feature","background_hash":"f9cad8a167d25a58781606f42a70845a9afe8a18f1f63bed35985499ab19f099","implementation_hash":"unknown","scenarios":[{"index":1,"name":"an agreeable player declines unowned land they cannot afford","scenario_hash":"25d66eead6dfa67317179b740c8538a38e59dd2ae6e98b74bba7f7ccf1c890ce","mutation_count":12,"result":{"Total":12,"Killed":12,"Survived":0,"Errors":0},"tested_at":"2026-08-13T14:30:23.368583Z"},{"index":7,"name":"an agreeable player one street away from a colour monopoly reserves that street's price","scenario_hash":"a5f7cb543f9367c42322d18b834181983a40606fe8cb48a4f863637564890a6a","mutation_count":10,"result":{"Total":10,"Killed":10,"Survived":0,"Errors":0},"tested_at":"2026-08-13T14:30:23.368583Z"},{"index":10,"name":"an agreeable player one street away from completing two colour groups still declines land that would dip below the pricier missing street","scenario_hash":"8e9c8362042060f86c423fa8928ef01ecad0743cdb880fb737959c9ff9b06134","mutation_count":10,"result":{"Total":10,"Killed":10,"Survived":0,"Errors":0},"tested_at":"2026-08-13T14:30:23.368583Z"},{"index":11,"name":"an agreeable player falls back to a cheaper reachable missing street within the same priority tier when the pricier one is unaffordable","scenario_hash":"0e5c4c757847f8aaa7f6c25ff63f897b2b7280564449b88a2df9480effad30ee","mutation_count":10,"result":{"Total":10,"Killed":10,"Survived":0,"Errors":0},"tested_at":"2026-08-13T14:30:23.368583Z"},{"index":15,"name":"an agreeable player one station away from completing the set reserves that station's price","scenario_hash":"537cc61f3c4b99df71f30415f230f47987c855630bc7f40a3f0dbfd83ead910f","mutation_count":10,"result":{"Total":10,"Killed":10,"Survived":0,"Errors":0},"tested_at":"2026-08-13T14:30:23.368583Z"},{"index":16,"name":"an agreeable player reserves a middle-priority colour group's missing street over a pricier missing station in the lowest tier","scenario_hash":"af1906ef7b7d8e1cb8f15a2df830c4339d46da095fb079bb70d3be3b52391aaf","mutation_count":10,"result":{"Total":10,"Killed":10,"Survived":0,"Errors":0},"tested_at":"2026-08-13T14:30:23.368583Z"},{"index":20,"name":"an agreeable player reserves a highest-priority colour group's missing street over a pricier missing street in a middle-priority group","scenario_hash":"2cc5a81c772a931bd84880f414be7e700185cb6ce63b3e9c00d9db8a5aa3eba8","mutation_count":10,"result":{"Total":10,"Killed":10,"Survived":0,"Errors":0},"tested_at":"2026-08-13T14:30:23.368583Z"}]}
-# acceptance-mutation-manifest-end
-
 # language: en
 
 Feature: buying unowned land
+
+  # A property auction (see auctions.feature) ascends from the land's mortgage
+  # value; "will bid $X at auction" fixes a pawn's ceiling for that ascent, not
+  # a flat winning amount, so the price paid is often below the ceiling.
 
   Background:
     Given the official rule set
@@ -43,8 +43,8 @@ Feature: buying unowned land
 
     Examples:
       | strategy | property            | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
-      | Greedo   | Diestsestraat Leuven | 59                    | 60           | 59                         | 1440                            |
-      | Billionaire | Diestsestraat Leuven | 59                  | 60           | 59                         | 1440                            |
+      | Greedo   | Diestsestraat Leuven | 59                    | 60           | 59                         | 1470                            |
+      | Billionaire | Diestsestraat Leuven | 59                  | 60           | 59                         | 1470                            |
 
   # buying-land-3
   Scenario Outline: an agreeable player keeping a reserve declines land that would dip below it
@@ -59,8 +59,8 @@ Feature: buying unowned land
 
     Examples:
       | strategy | property         | dog_starting_balance | reserve | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
-      | Greedo   | Rue Grande Dinant | 150                  | 96      | 60           | 150                        | 1440                             |
-      | Billionaire | Rue Grande Dinant | 150                | 96      | 60           | 150                        | 1440                             |
+      | Greedo   | Rue Grande Dinant | 150                  | 96      | 60           | 150                        | 1470                             |
+      | Billionaire | Rue Grande Dinant | 150                | 96      | 60           | 150                        | 1470                             |
 
   # buying-land-4
   Scenario Outline: an agreeable player keeping a reserve buys land that would leave at least the reserve behind
@@ -91,8 +91,8 @@ Feature: buying unowned land
 
     Examples:
       | strategy | reserve | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
-      | Greedo   | 56      | 200                  | 150          | 200                        | 1350                             |
-      | Billionaire | 56   | 200                  | 150          | 200                        | 1350                             |
+      | Greedo   | 56      | 200                  | 150          | 200                        | 1425                             |
+      | Billionaire | 56   | 200                  | 150          | 200                        | 1425                             |
 
   # buying-land-6
   Scenario Outline: an agreeable player keeping a reserve buys a utility anyway to deny another player a monopoly on them
@@ -136,8 +136,8 @@ Feature: buying unowned land
 
     Examples:
       | strategy | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
-      | Greedo   | 150                   | 100          | 150                         | 1400                             |
-      | Billionaire | 150                | 100          | 150                         | 1400                             |
+      | Greedo   | 150                   | 100          | 150                         | 1445                             |
+      | Billionaire | 150                | 100          | 150                         | 1445                             |
 
   # buying-land-9
   Scenario Outline: an agreeable player one street away from a colour monopoly still buys land that would leave at least that street's price behind
@@ -189,8 +189,8 @@ Feature: buying unowned land
 
     Examples:
       | strategy | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
-      | Greedo   | 250                   | 100          | 250                         | 1400                             |
-      | Billionaire | 250                | 100          | 250                         | 1400                             |
+      | Greedo   | 250                   | 100          | 250                         | 1410                             |
+      | Billionaire | 250                | 100          | 250                         | 1410                             |
 
   # buying-land-12
   Scenario Outline: an agreeable player falls back to a cheaper reachable missing street within the same priority tier when the pricier one is unaffordable
@@ -209,8 +209,8 @@ Feature: buying unowned land
 
     Examples:
       | strategy | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
-      | Greedo   | 150                   | 60           | 150                         | 1440                             |
-      | Billionaire | 150                | 60           | 150                         | 1440                             |
+      | Greedo   | 150                   | 60           | 150                         | 1470                             |
+      | Billionaire | 150                | 60           | 150                         | 1470                             |
 
   # buying-land-13
   Scenario Outline: an agreeable player is not blocked by an unaffordable missing street once a cheaper reachable street in the same priority tier sets the reserve instead
@@ -244,8 +244,8 @@ Feature: buying unowned land
 
     Examples:
       | strategy | reserve | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
-      | Greedo   | 30      | 120                   | 100          | 120                         | 1400                             |
-      | Billionaire | 30   | 120                   | 100          | 120                         | 1400                             |
+      | Greedo   | 30      | 120                   | 100          | 120                         | 1450                             |
+      | Billionaire | 30   | 120                   | 100          | 120                         | 1450                             |
 
   # buying-land-15
   Scenario Outline: an agreeable player with no reachable near-complete monopoly is not blocked by an unaffordable missing street once the configured reserve is small enough
@@ -278,8 +278,8 @@ Feature: buying unowned land
 
     Examples:
       | strategy | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
-      | Greedo   | 250                   | 100          | 250                         | 1400                             |
-      | Billionaire | 250                | 100          | 250                         | 1400                             |
+      | Greedo   | 250                   | 100          | 250                         | 1410                             |
+      | Billionaire | 250                | 100          | 250                         | 1410                             |
 
   # buying-land-17
   Scenario Outline: an agreeable player reserves a middle-priority colour group's missing street over a pricier missing station in the lowest tier
@@ -298,8 +298,8 @@ Feature: buying unowned land
 
     Examples:
       | strategy | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
-      | Greedo   | 150                   | 100          | 150                         | 1400                             |
-      | Billionaire | 150                | 100          | 150                         | 1400                             |
+      | Greedo   | 150                   | 100          | 150                         | 1430                             |
+      | Billionaire | 150                | 100          | 150                         | 1430                             |
 
   # buying-land-18
   Scenario Outline: an agreeable player still buys into a colour group another player already blocks, provided the reserve is maintained
@@ -317,21 +317,21 @@ Feature: buying unowned land
       | Billionaire | 40   | 300                  | 40                          |
 
   # buying-land-19
-  Scenario Outline: an agreeable player does not buy into a colour group another player already blocks if doing so would dip below the reserve
+  Scenario Outline: an agreeable player does not buy into a colour group another player already blocks if doing so would dip below the reserve, and a lone-owning bystander has no auction interest in a second piece either
     Given pawn "high hat" owns "Grote Markt Hasselt"
     And pawn "high hat" follows the "Greedo" strategy, keeping a $1000 reserve
     And pawn "dog" follows the "<strategy>" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     When pawn "dog" lands on "Place de l'Ange Namur"
     Then pawn "dog" does not own "Place de l'Ange Namur"
-    And pawn "high hat" owns "Place de l'Ange Namur"
+    And pawn "high hat" does not own "Place de l'Ange Namur"
     And pawn "dog"'s account balance is $<expected_dog_final_balance>
     And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
 
     Examples:
       | strategy | reserve | dog_starting_balance | expected_dog_final_balance | expected_high_hat_final_balance |
-      | Greedo   | 40      | 290                   | 290                         | 1000                             |
-      | Billionaire | 40   | 290                   | 290                         | 1000                             |
+      | Greedo   | 40      | 290                   | 290                         | 1500                             |
+      | Billionaire | 40   | 290                   | 290                         | 1500                             |
 
   # buying-land-20
   Scenario Outline: an agreeable player is not limited to a pricier missing station's reserve when a middle-priority colour group's cheaper missing street applies instead
@@ -368,8 +368,8 @@ Feature: buying unowned land
 
     Examples:
       | strategy | dog_starting_balance | high_hat_bid | expected_dog_final_balance | expected_high_hat_final_balance |
-      | Greedo   | 150                   | 50           | 150                         | 1450                             |
-      | Billionaire | 150                | 50           | 150                         | 1450                             |
+      | Greedo   | 150                   | 75           | 150                         | 1430                             |
+      | Billionaire | 150                | 75           | 150                         | 1430                             |
 
   # buying-land-22
   Scenario Outline: an agreeable player is not limited to a pricier middle-priority group's reserve when a highest-priority group's cheaper missing street applies instead

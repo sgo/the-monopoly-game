@@ -129,6 +129,16 @@ public interface Strategy {
     return bidFor(offer);
   }
 
+  /**
+   * Ceiling this player will bid to win land at an ordinary (landing) auction
+   * that ascends in steps until one bidder remains. Defaults to the flat
+   * {@link #bidFor(Offer)} ceiling so strategies without tiered opinion bid as
+   * before; strategies that value land by strategic interest override this.
+   */
+  default Money bidForAuction(Offer offer, Player bidder, Rule.Set rules, Deeds deeds) {
+    return bidFor(offer);
+  }
+
   /** The improvement a player is being asked to buy for a street they already own. */
   record BuildOffer(ColourStreet land, Money price, Money available, boolean hotel) {
     public boolean isAffordable() {

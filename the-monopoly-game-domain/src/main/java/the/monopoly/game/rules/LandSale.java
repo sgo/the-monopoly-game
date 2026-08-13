@@ -46,24 +46,18 @@ public class LandSale implements Landings {
   }
 
   /**
-   * Everyone says what the land is worth to them and the best bid takes it. A
-   * bid has to beat the one before it to win, so nothing is not a bid and two
-   * players wanting it equally leaves it with whoever spoke first.
+   * The auction ascends from the land's mortgage value in $5 steps until only
+   * one bidder is still willing to raise. Each player's ceiling is their
+   * strategic valuation of the land, so a sole bidder pays only the opening
+   * bid and nobody overpays above their own ceiling. Where no bidder is
+   * strategically interested the land stays with the bank.
    */
   private void auction(Ownable land) {
-    Player winner = null;
-    Money winningBid = Money.ZERO;
-    for (Player bidder : table) {
-      Money bid = strategies.forPlayer(bidder).bidFor(offerTo(bidder, land));
-      if (bid.exceeds(winningBid)) {
-        winner = bidder;
-        winningBid = bid;
-      }
-    }
-    if (winner == null) return;
-
-    deeds.sell(land, winner, winningBid);
-    events.wonAtAuction(winner, land, winningBid);
+    Auction.Bidders qualified = Auction.qualified(table, land, player -> auctionCeiling(player, land));
+    if (qualified.players().isEmpty()) return;
+    Auction.Result result = Auction.ascend(qualified);
+    deeds.sell(land, result.winner(), result.bid());
+    events.wonAtAuction(result.winner(), land, result.bid());
   }
 
   private Strategy.Offer offerTo(Player player, Ownable land) {
@@ -71,6 +65,11 @@ public class LandSale implements Landings {
     return new Strategy.Offer(land, player.account().balance().amount(),
         strategy.cashReserve(player, rules, deeds),
         deeds.utilityMonopolyOpportunity(rules, land));
+  }
+
+  private Money auctionCeiling(Player bidder, Ownable land) {
+    return strategies.forPlayer(bidder)
+        .bidForAuction(offerTo(bidder, land), bidder, rules, deeds);
   }
 
   public void sell(Player seller, Ownable land, Player buyer, Money price) {

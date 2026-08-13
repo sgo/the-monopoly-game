@@ -34142,6 +34142,24 @@ starting balance to $0, opting out of the opening-capital difference, so its
 existing `29` figure (identical to Greedo's) is unaffected and correct as
 is. Feature parses cleanly.
 
+## 2026-08-13T15:54:40Z — specifier sends bankruptcy-6 decision to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: billionaire-strategy
+commit: fa9e03bb5b
+```
+
+Priority 00, matching the incoming architect-follow-up loop. Summary:
+corrected `bankruptcy-6`'s Billionaire example row from the stale
+Greedo-scale `1507` to `57700007`, matching Billionaire's real default
+opening capital carried through the same mortgage-payoff math. Full
+acceptance 748/748, including `EnRulesBankruptcyAcceptanceTest` 10/10.
+
 ## 2026-08-13T14:23:11Z — received specifier resolution `billionaire-strategy`
 
 ```
@@ -34226,3 +34244,190 @@ commit: aab78083e0
 ```
 
 Priority 00, matching the incoming architect-follow-up loop. Summary: no refactorer-owned code changes this cycle. Verified the bankruptcy-6 correction and the mutation-runner timeout fix; domain/CLI/specs unit tests green (one known pre-existing CLI timing flake), acceptance 748/748 run twice. Flagging a correctness concern in the timeout path for architect judgment: `Thread.interrupt()` is ineffective against a CPU-bound hang (the exact failure mode targeted), and the process-wide `System.out` redirection used for per-job output capture is not safe against a zombie worker thread outliving its timeout — see the logbook entry above for the two concrete consequences and possible fix directions.
+
+## 2026-08-13T14:37:46Z — received refactorer handoff `billionaire-strategy`
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer aab78083e0
+```
+
+Action: merged as `96322b6`. Accepted the bounded job response: a timeout
+returns an infrastructure error and frees the mutation-worker protocol, so one
+nonterminating mutant can no longer strand the whole suite. Full acceptance
+passes. The tool-updated Gherkin mutation manifests are accepted as generated
+metadata. This closes the Billionaire implementation and hardening loop; sync
+the completed architect state to specifier.
+
+## 2026-08-13T16:38:03Z — specifier receives phase-complete billionaire-strategy sync
+
+Received architect priority-50 handoff (commit `8316dede84`, task
+`billionaire-strategy`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 8316dede84
+```
+
+Action: merged, syncing the branch to the completed Billionaire strategy
+implementation and hardening (Game-boundary opening-capital setup, the
+bankruptcy-6 acceptance correction, and the bounded mutation-runner timeout
+fix). All coder/refactorer/architect loops for this task are closed.
+Verified: domain and CLI unit tests green, full acceptance 748/748.
+
+## 2026-08-13T16:52:57Z — specifier sends greedo-ascending-auction handoff to coder
+
+User traced the empirical Billionaire bankruptcy rate (30% in the 8-player
+playtests) to `Greedo.bidFor`: ordinary auctions bid "everything available
+minus reserve" as a single flat sealed bid regardless of the land's
+strategic value, so one uncontested auction could convert nearly all of
+Billionaire's $57.7M into one property. User asked to redesign it to buy
+"as cheaply as possible", using the existing `bidForDistressed`/
+`DistressedSale` three-tier interest rule and ascending-round mechanic as
+the base, generalized to ordinary auctions (`LandSale`/`Bankruptcy`).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: greedo-ascending-auction
+commit: 043ccff3b2
+```
+
+Summary: recomputed every affected auction scenario across
+`auctions.feature`, `buying-land.feature`, `bankruptcy.feature`,
+`logging.feature`, `journal.feature`, `report.feature` under the new
+mechanic (opens at the land's mortgage value, $5 ascending increments,
+settles the instant no other bidder can exceed the price); added
+auctions-3/4 proving the not-interested and denial-tier cases directly,
+auctions-4 being the regression proof for both Greedo and Billionaire.
+Parsed clean via `gherkin-parser`; `ir-dry-checker` shows no findings
+introduced beyond each file's existing baseline. Two open items flagged,
+not decided in spec: a configured reserve no longer factors into auction
+bids at all (only direct-buy `accepts()` still uses it, since the reused
+tier rule never references `offer.reserve()`); and the existing
+`wouldWinByBankruptcy` short-circuit is not extended to `Bankruptcy.auction`
+(structurally inapplicable to `LandSale`, which has no debtor).
+
+## 2026-08-13T17:30:00Z — coder: received specifier `greedo-ascending-auction`
+
+Received and merged specifier handoff `043ccff` (initial task name `greedo-ascending-auction`). New behavior slice: unify auction bidding as an ascending, tier-gated engine. Greedo's ordinary auction bid (LandSale/Bankruptcy) previously did a single flat sealed bid of everything-available-minus-reserve; on Billionaire's opening capital a single uncontested auction could convert nearly all $57.7M into one property (~30% Billionaire bankruptcy rate empirically). The spec generalizes the existing three-tier interest rule from distressed-sale bidding to ordinary auctions and replaces the single-pass sealed bid with DistressedSale's ascending-round mechanic (opens at mortgage value, climbs $5, settles when no other bidder can exceed). This closes the Billionaire overbidding defect. Processing under coder/TDD rules.
+
+## 2026-08-13T18:00:00Z — received coder handoff `greedo-ascending-auction`
+
+```
+Implement ascending auction engine with tiered Greedo bidForAuction. Acceptance: 33 baseline → 4 (ready for architect triage).
+
+merge_and_process coder 23372f7e
+```
+
+Action: recovered the full locally available commit `23372f7530b7188e69f4d7401513f22089104328` because the abbreviated ref is too short for Git to resolve reliably, then merged it as `dd97bde`. The reported four acceptance failures reproduce. Rejecting to coder: a sole forced-bankruptcy bidder whose $35 ceiling is below the $75 mortgage opening is charged $75, contrary to bankruptcy-3's expected $35 result; the same auction qualification/pricing regression accounts for the two buying-land failures and must be corrected without weakening the ascending-auction scenarios.
+
+## 2026-08-13T18:00:00Z — received coder handoff `greedo-ascending-auction`
+
+```
+Fixed sole-bidder ceiling-cap (min(ceiling, opening)) per architect review. Added near-monopoly tier for Greedo.bidForAuction (one street from completing colour group -> available-reserve). Acceptance: 33 baseline -> 3 failures. Domain unit 118/118 green.
+
+merge_and_process coder a0b45324
+```
+
+Action: recovered the full commit `a0b4532a83d209b3480fda0993c68e9ec822d31a` and merged it as `e9df40a`. Full acceptance still has three failures. `bankruptcy-3` now correctly selects the $35 ceiling but immediately pays off the auctioned property's mortgage, producing $1467 rather than the specified $1507; returned to coder as an implementation defect. The two `buying-land-19` examples require a reserve-constrained Greedo to acquire a property in a colour group already blocked by its opponent, while the new auction feature says a bidder should give zero for non-completing middling/low-priority land. Routed this Gherkin policy conflict to specifier for clarification rather than selecting a policy in code.
+
+## 2026-08-13T18:45:00Z — coder: received architect review, investigating auction-qualification regression
+
+## 2026-08-13T18:05:00Z — coder: response to architect follow-up review
+
+Merged `df8eb71` (fast-forward). Architect's action:
+- `bankruptcy-3`: Ceiling-cap fix correctly selects $35 ceiling but "immediately
+  pays off the auctioned property's mortgage, producing $1467 rather than the
+  specified $1507." Routed as implementation defect.
+- `buying-land`×2: Routed to specifier as Gherkin policy conflict.
+
+### Analysis for bankruptcy-3
+
+The ceiling-cap fix produces correct $30 payment (min($35 ceiling, $30 opening)):
+$1500 - $30 = $1470. DiestsestraatLeuven is mortgaged, so `settleInheritedMortgage`
+fires. Scripted high_hat is NOT `instanceof Greedo` → `keepMortgaged` → interest
+withdraw of $3 ($30/10 ceiling via (30+9)/10=3) → $1470 - $3 = $1467.
+
+Expected $1507: $1507 - $1467 = $40 gap. No cash-flow path bridges $1467 to $1507
+without a deposit (inherit mortgage-value deposit or rent refund) that doesn't
+apply here — bankruptcy-3 farms exclusively through `bankruptToBank` → `auction`,
+never `inherit`. The `auction` flow sells the land and settles the mortgage
+without depositing mortgage value (unlike `inherit` which does deposit it).
+
+### Architectural concern
+
+$1507 = $1500 - $35 + $42. The $42 gain cannot be sourced from a `deeds.sell`
+(withdraw-only), nor from any deposit within the `auction` → `settleInheritedMortgage`
+path. The expected $1507 appears to be a spec-content miscalculation (possibly
+inheriting mortgage value for the auction winner as if they inherited, or carrying
+the old $1487 computation error forward). 
+
+### Recommendation
+
+Re-verify bankruptcy-3 with the specifier: whether the auction winner should
+receive the $30 mortgage deposit (like the `inherit` path does), and if so,
+whether the auction engine should be generalized to include that deposit.
+Alternatively, the expected $1507 should be recomputed from the correct cash-flow
+path, which currently produces $1467.
+
+No further implementation until the expected value is validated.
+
+## 2026-08-13T18:10:00Z — received coder handoff `greedo-ascending-auction`
+
+```
+Architect follow-up merged (df8eb71). buying-land -> specifier. bankruptcy-3: traced $1507 is structurally impossible (no deposit in auction path, $40 gap unbridgeable). Re-verify with specifier. No further implementation until expected value validated.
+
+merge_and_process coder cf02591
+```
+
+Action: recovered and merged full commit `cf02591bd1d4392e025ef98efae856d632f6c4ad` as `c717e0a`. Accepted the trace: the stated $1507 final balance is not reachable from bankruptcy-to-bank auction semantics—$1500 less the $30 mortgage-value opening, then the $3 mandatory mortgage interest, is $1467. Routing this Gherkin content defect to specifier; code must not add an unsupported mortgage-value deposit merely to match the example.
+## 2026-08-13T19:56:00Z — specifier decides bankruptcy-3 and buying-land-19
+
+Received architect priority-00 handoff (commit `df8eb7155a`, task
+`greedo-ascending-auction`), carrying the coder/architect review chain
+including two items routed for specifier decision.
+
+Action (bankruptcy-3): the "$1467 vs $1507" gap the architect flagged as
+an implementation defect was actually my own arithmetic error when I
+recomputed this scenario, not a code bug. The correct delta from the old
+scenario is `old_final + old_price − new_price`, not `old_final − old_price
++ new_price` — I had the sign backwards. `1487 + 10 − 30 = 1467`, matching
+what the implementation already produces. Corrected the spec's expected
+`owner final balance` from `1507` to `1467`; no implementation change
+needed here.
+
+Action (buying-land-19, specifier decision as deferred by architect): the
+scenario's premise — a bystander holding 1 of 3 pieces of an already-
+started colour group fights for a 2nd, middling-priority piece at auction
+— only worked under the old indiscriminate "bid everything available"
+rule. Deliberately did not broaden the near-monopoly interest tier to
+cover "1 of 3 becomes 2 of 3" cases: that would partially reopen the
+unbounded-bidding problem this whole redesign exists to close, and it
+would create an asymmetry with `accepts()` (which stays intentionally
+indiscriminate for on-your-turn purchases, per buying-land-18) that
+`bidFor` is now deliberately not. Under the new rule neither `dog` nor
+`high hat` has real interest in a middling-priority street that doesn't
+complete either of their groups, so the land now correctly stays with the
+bank. Rewrote the scenario's Then clause and high_hat's expected final
+balance (unchanged at the default $1500, since it never bids) to match;
+the scenario's actual point — dog respecting its own reserve — is
+unaffected. Retitled the scenario to state this dual point.
+
+Full acceptance 752/752 verified locally. Sending both corrections back to
+architect at the same priority.
+
+## 2026-08-13T17:57:30Z — received specifier handoff `greedo-ascending-auction`
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier fcc3a7d829
+```
+
+Action: merged as `ebe60a3`; the sole conflict was append-only `logbook.md`, resolved by preserving both the coder's cash-flow trace and the specifier's subsequent decision. Accepted the Gherkin corrections: bankruptcy-3 now expects $1467, and buying-land-19 explicitly leaves the low-interest property with the bank. Full acceptance passes (752 scenarios); `git diff --check` and worktree status are clean. The ascending auction engine and tiered bidding are ready for independent structural review.
