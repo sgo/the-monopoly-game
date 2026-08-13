@@ -34160,3 +34160,7 @@ mutated Greedo-priority scenarios can run indefinitely and strand all workers.
 Terminated only the verified runner process group and restored its temporary
 feature mutations. Route a bounded runner-timeout fix to coder before final
 hardening-suite closure.
+
+## 2026-08-13T16:40:00Z — coder: received refactorer+specifier Billionaire follow-up
+
+Merged architect handoff commit `de94926` (task billionaire-strategy). The chain since my boundary fix `eb81e86`: refactorer deduplicated World.java and added BillionaireTest covering openingCapital; specifier corrected the bankruptcy-6 contradiction (£1507 -> £57,700,007 for an unarranged Billionaire); architect appended a mutation-runner-timeout routing note. Reviewing and verifying under coder rules before routing.
