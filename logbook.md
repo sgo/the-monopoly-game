@@ -34239,7 +34239,6 @@ bankruptcy-6 acceptance correction, and the bounded mutation-runner timeout
 fix). All coder/refactorer/architect loops for this task are closed.
 Verified: domain and CLI unit tests green, full acceptance 748/748.
 
-<<<<<<< HEAD
 ## 2026-08-13T16:52:57Z — specifier sends greedo-ascending-auction handoff to coder
 
 User traced the empirical Billionaire bankruptcy rate (30% in the 8-player
