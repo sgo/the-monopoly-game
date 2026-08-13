@@ -33830,6 +33830,23 @@ duplication documented in earlier cycles, nowhere near the changed method.
 No CRAP concern (a two-line change to a builder chain). Domain 365/365,
 full acceptance 599/599 run twice.
 
+## 2026-08-13T08:00:30Z — refactorer returns packaged-CLI mutation runner fix to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: readme-embed-cli-usage
+commit: 6a242d8dc5
+```
+
+Priority 00, matching the incoming priority. Summary: verified both
+infrastructure fixes structurally; mutation testing itself stays outside
+refactorer scope, so relying on the coder's own reported result (6
+mutations, 3 killed, 3 survived, 0 errors) rather than re-running it.
+Domain 365/365, acceptance 599/599 run twice. No changes needed.
 ## 2026-08-13T10:10:00Z — coder: architect follow-up verified
 
 Processed architect handoff 000267 and merged `bbfc78fdf6`. No further
@@ -33986,3 +34003,55 @@ Processing architect priority-00 `billionaire-strategy` review loop (commit `bfa
 The Billionaire feature and all other features pass; 12 of 13 stale twin-row failures were a coder-owned acceptance-harness bug: the `has $X to spend` step wired to `holdPawnBalance` (World.java) set a concrete balance but did not suppress the Billionaire opening capital, so an arranged Billionaire re-applied the $57.7M capital at game start. Extracted `suppressOpeningCapitalIfNeeded` and called it from both `arrangePawnBalance` and `holdPawnBalance`.
 
 One twin-row failure remains (bankruptcy scenario 6, Billionaire row): high hat, the Billionaire, is not arranged to any balance, so it correctly opens at $57.7M, but the row asserts the Greedo-scale $1507 owner final balance. This is a spec-content contradiction (opening capital replaces $1500, so an unarranged Billionaire cannot end at a Greedo-scale balance). Returning the state to the architect with the logbook note; no further coder-owned implementation change is appropriate.
+
+## 2026-08-13T16:00:00Z — coder: correcting Billionaire setup boundary per architect 2db04997ff
+
+Received and merged architect priority-00 handoff `2db04997ff`. The architect directs that the opening-capital invariant must be owned by normal game setup (`Game`), not duplicated between the CLI adapter (`Simulator.Running`) and the acceptance harness (`World`). Currently `Game` never applies it, so a direct domain game with a Billionaire bypasses the approved opening-capital behavior. Correction: move opening-capital application into the `Game` constructor, and remove the duplicated application from `Simulator` and `World`. Arranged-balance scenarios keep opting out by downgrading the Billionaire (appliesOpeningCapital=false), so Game's application is a no-op there.
+
+## 2026-08-13T16:20:00Z — coder: Billionaire opening capital moved to Game boundary
+
+Implemented the architect-mandated correction from handoff `2db04997ff`: the opening-capital invariant is now owned by normal game setup. Added `Game.applyOpeningCapital()` (called from the delegating constructor) which replaces each player's rule-default balance with the strategy's opening capital when it supplies one. Removed the duplicated application from the CLI `Simulator.start` and the acceptance `World.playAndCapture`, and dropped the now-redundant `arrangedBalances` tracking in `World`. Arranged-balance scenarios continue to opt out by downgrading the Billionaire to `appliesOpeningCapital=false`, so Game's application is a no-op there.
+
+Verification: domain unit tests 367/367, CLI unit tests 12/12 (the `keepsPlayingUntilToldToStop` failure is a pre-existing timing flake that also fails on baseline in isolation; it passes in the full suite). Acceptance: Billionaire feature and all other features pass; the single remaining bankruptcy-6 Billionaire twin-row failure (£1507 vs £57,700,007 for an unarranged Billionaire) is the pre-existing spec-content defect, unchanged and still routed to the architect/specifier.
+
+## 2026-08-13T13:43:00Z — refactorer received coder handoff `billionaire-strategy`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 00
+task: billionaire-strategy
+commit: eb81e86190
+```
+
+Action: merged commit `eb81e86190` ("Own Billionaire opening capital at the game boundary") as `1424e08`, resolving a `logbook.md` append-only conflict by keeping both branches' entries. This is an architect follow-up loop (the coder's fix for architect handoff `2db04997ff`); reviewing and verifying under refactorer rules before handing back to the architect.
+
+## 2026-08-13T13:43:00Z — refactorer review: `billionaire-strategy`
+
+Installed `crap4java`, `dry4java`, and `mutate4java` fresh from `github.com/unclebob/{crap4java,dry4java,mutate4java}` (none were present on this machine); `dry4java` needed an explicit `maven-compiler-plugin` pin (its `maven.compiler.release` property is silently ignored by the ancient default-bound compiler plugin), `mutate4java` needed a synthetic local `com.unclebob:wiki-workspace` parent pom to satisfy its `relativePath`, and both `crap4java`/`mutate4java` had `org.jacoco:jacoco-maven-plugin:0.8.12` hardcoded in their coverage runners, which can't instrument this project's Java 25 (class file major version 69) bytecode — bumped both to `0.8.15`. These are local tooling fixes only, outside this repository.
+
+Mutation-site scan on every file this task touched or added: `Game.java` 93, `Billionaire.java` 5, `Simulator.java` 76, `Greedo.java` 58 — all well under the 100-site split threshold.
+
+CRAP (`crap4java`, domain + cli): every production method at or below CRAP 6 except the two constitution-exempted sealed switches, `Report.line` (218.9) and `Game.journalOperation` (42.0), and the long-standing untested `Simulator.main` CLI shim (20.0) — all three pre-existing and unrelated to this diff. `Billionaire.openingCapital` came in right at the CRAP=6 threshold (0% domain-unit coverage, only exercised via CLI/acceptance); added `BillionaireTest` covering the default opening capital, the reserve-constructor overload, and the suppressed case, bringing it to CRAP=2.0 at 100% coverage.
+
+`dry4java` (domain + cli `src/main`, and the touched acceptance-support sources): every finding is pre-existing and untouched by this diff — the established `Game` journal-adapter one-liner-per-entry-type shape, `LandSale`/`Rent`, and the acceptance `World`/`MonopolyStepHelpers` entity-lookup repetition. One genuine duplicate the coder's fix introduced: `World.pawnFollowsWithReserve` was byte-identical to `World.pawnFollows`. Removed it and pointed its one caller (`JournalStepHandlers`) at `pawnFollows`; also removed the now-dead `pawnFollowsGreedoWithReserve` (no longer called by any step handler after this task's Vocabulary-based rework). Moved two getters (`isStalemateTrading`/`isLegalEntityTrading`) that had been inserted in the middle of `World`'s field-declaration block down next to the rest of the methods. Refreshed the `mutate4java` manifests on both edited files via `--update-manifest`.
+
+Fixed a stale `README.md` line: "the only strategy currently implemented" and "Available strategies: greedo" no longer matched `Simulator.usage()` now that Billionaire exists.
+
+Verification: `mvn test` from the repo root — all modules green (domain, cli, specs). Full acceptance pipeline: 748/748 tests except the one pre-existing bankruptcy-6 Billionaire twin-row failure already diagnosed and routed by the coder (an unarranged Billionaire correctly opens at $57,700,000 but the scenario's `Examples` row still asserts the Greedo-scale $1507 owner final balance) — unchanged by this review, still a Gherkin-content question for the specifier, not something a refactorer edits.
+
+## 2026-08-13T13:43:00Z — refactorer sent billionaire-strategy handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: billionaire-strategy
+commit: <refactorer commit>
+```
+
+Priority 00, matching the incoming architect-follow-up loop. Summary: verified the Game-boundary opening-capital correction structurally; removed one genuine duplicate method and one now-dead method from the coder's acceptance-harness rework, added domain unit coverage for `Billionaire.openingCapital`, and fixed a stale README strategy list. Domain/CLI/specs unit tests green; acceptance 748 tests with the single pre-existing bankruptcy-6 spec-content defect unchanged, still awaiting specifier reconciliation.

@@ -140,10 +140,6 @@ public final class Simulator {
 
     Rule.Set rules = Rule.Set.Type.official.create();
     List<Player> players = rules.players().select(playerCount).toList();
-    players.forEach(player -> strategies.forPlayer(player).openingCapital().ifPresent(capital -> {
-      Money current = player.account().balance().amount();
-      player.account().deposit(capital.minus(current));
-    }));
     Deeds deeds = new Deeds();
     return new Running(new Game(rules, players, player -> Cup.of(rules.dice().toList()), strategies, deeds,
         Cards.Decks.official(deeds), new Jail(rules), stalemateTrading, legalEntityTrading));
