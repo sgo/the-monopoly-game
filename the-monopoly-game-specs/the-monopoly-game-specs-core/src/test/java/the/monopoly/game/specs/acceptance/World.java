@@ -100,6 +100,14 @@ public class World {
   private MonopolyBuyout.Outcome buyout;
   private boolean stalemateTrading;
   private boolean legalEntityTrading;
+
+  boolean isStalemateTrading() {
+    return stalemateTrading;
+  }
+
+  boolean isLegalEntityTrading() {
+    return legalEntityTrading;
+  }
   private boolean simulatorStalemateTrading;
   private boolean simulatorLegalEntityTrading;
   private Entry selectedEvent;
@@ -604,6 +612,10 @@ public class World {
     pawnStrategies.put(pawnName, strategy);
   }
 
+  public void pawnFollowsWithReserve(String pawnName, Strategy strategy) {
+    pawnStrategies.put(pawnName, strategy);
+  }
+
   public void pawnFollowsGreedoWithReserve(String pawnName, Money reserve) {
     pawnStrategies.put(pawnName, new the.monopoly.game.strategies.Greedo(reserve, false, legalEntityTrading));
   }
@@ -862,20 +874,32 @@ public class World {
   }
 
   public void assertGreedoPriority(String spaceName, String expected) {
-    the.monopoly.game.strategies.Strategy.Priority actual =
-        new the.monopoly.game.strategies.Greedo().priority(ownable(SpaceNames.of(spaceName)));
+    assertPriority("Greedo", spaceName, expected);
+  }
+
+  public void assertPriority(String strategyName, String spaceName, String expected) {
+    Strategy.Priority actual =
+        Vocabulary.strategy(strategyName).priority(ownable(SpaceNames.of(spaceName)));
     org.assertj.core.api.Assertions.assertThat(actual.name().toLowerCase()).isEqualTo(expected);
   }
 
   public void pawnConsidersTrading(String traderName, String offeredName, String partnerName, String wantedName) {
+    pawnConsidersTrading("Greedo", traderName, offeredName, partnerName, wantedName);
+  }
+
+  public void pawnConsidersTrading(String strategyName, String traderName, String offeredName, String partnerName, String wantedName) {
     Player trader = pawn(traderName);
     Player partner = pawn(partnerName);
     Strategy.TradeOffer offer = new Strategy.TradeOffer(
         trader, partner, ownable(SpaceNames.of(offeredName)), ownable(SpaceNames.of(wantedName)));
-    tradeAccepted = new the.monopoly.game.strategies.Greedo().accepts(offer, ruleSet, deeds);
+    tradeAccepted = Vocabulary.strategy(strategyName).accepts(offer, ruleSet, deeds);
   }
 
   public void assertGreedoTradeDecision(String decision) {
+    assertTradeDecision("Greedo", decision);
+  }
+
+  public void assertTradeDecision(String strategyName, String decision) {
     if (tradeAccepted == null) throw new AssertionError("No trade has been considered yet.");
     boolean expected = decision.equals("accepts");
     org.assertj.core.api.Assertions.assertThat(tradeAccepted).isEqualTo(expected);

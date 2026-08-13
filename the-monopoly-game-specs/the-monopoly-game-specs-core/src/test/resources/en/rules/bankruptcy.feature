@@ -96,10 +96,10 @@ Feature: bankruptcy
       | 10                | 0                     | 1537                 |
 
   # bankruptcy-6
-  Scenario Outline: "Greedo" pays off an inherited mortgage immediately when it can afford to
+  Scenario Outline: "<strategy>" pays off an inherited mortgage immediately when it can afford to
     Given pawn "high hat" owns "Diestsestraat Leuven"
     And the street "Diestsestraat Leuven" has a hotel built
-    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" follows the "<strategy>" strategy
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting balance> to spend
     When pawn "dog" lands on "Diestsestraat Leuven"
@@ -109,14 +109,15 @@ Feature: bankruptcy
     And pawn "high hat"'s account balance is $<owner final balance>
 
     Examples:
-      | starting balance | owner final balance |
-      | 10                | 1507                 |
+      | strategy | starting balance | owner final balance |
+      | Greedo   | 10                | 1507                 |
+      | Billionaire | 10             | 1507                 |
 
   # bankruptcy-7
-  Scenario Outline: "Greedo" keeps an inherited mortgage when it cannot afford to pay it off, paying only the mandatory interest
+  Scenario Outline: "<strategy>" keeps an inherited mortgage when it cannot afford to pay it off, paying only the mandatory interest
     Given pawn "high hat" owns "Diestsestraat Leuven"
     And the street "Diestsestraat Leuven" has a hotel built
-    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" follows the "<strategy>" strategy
     And pawn "high hat" has $<owner starting balance> to spend
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting balance> to spend
@@ -127,8 +128,9 @@ Feature: bankruptcy
     And pawn "high hat"'s account balance is $<owner final balance>
 
     Examples:
-      | owner starting balance | starting balance | owner final balance |
-      | 0                       | 2                 | 29                   |
+      | strategy | owner starting balance | starting balance | owner final balance |
+      | Greedo   | 0                       | 2                 | 29                   |
+      | Billionaire | 0                    | 2                 | 29                   |
 
   # bankruptcy-8
   Scenario Outline: a doubles roll that causes bankruptcy does not grant a phantom extra move afterward
