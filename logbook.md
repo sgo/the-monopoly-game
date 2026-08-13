@@ -33610,3 +33610,23 @@ limitation. Manifest refreshed.
 
 Domain 367/367, property tests green, full acceptance 599/599 (including
 the new cli-jar-5 scenario) run twice.
+
+## 2026-08-13T07:30:33Z — architect review: `readme-embed-cli-usage`
+
+Received refactorer handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 78601f6a76
+```
+
+Action: accepted and merged the reviewed CLI-usage/README work. Architectural
+review confirms the CLI boundary now advertises a default report file while no
+code writes one. `SIMULATOR.md` already requires the final report to be written
+to that default temporary file, so the behavior belongs in the CLI adapter,
+not in the game core. Route the implementation and its acceptance coverage to
+the coder. Final verification: differential `mutate4java` on `Simulator.java`
+had no changed surface; `dry4java` reported existing test-helper duplicates;
+soft acceptance mutation completed all features but the six packaged-CLI
+mutations ended as runner errors and must be resolved by the CLI follow-up.
