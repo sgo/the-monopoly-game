@@ -89,7 +89,14 @@ public final class Simulator {
   private static String usage() {
     return "Usage: simulator [number of players] [strategy for each player]"
         + System.lineSeparator() + "Available strategies: " + String.join(", ", STRATEGIES)
-        + System.lineSeparator() + "Optional flag: --optional-greedo-stalemate-trading";
+        + System.lineSeparator() + "Optional flags:"
+        + System.lineSeparator() + "  --optional-greedo-stalemate-trading"
+        + System.lineSeparator() + "  --optional-greedo-legal-entity"
+        + System.lineSeparator() + "Report file: " + reportPath();
+  }
+
+  private static String reportPath() {
+    return java.nio.file.Path.of(System.getProperty("java.io.tmpdir"), "the-monopoly-game.report").toString();
   }
 
   public static Result run(int playerCount, Strategy.OfPlayers strategies) {
