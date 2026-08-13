@@ -33894,3 +33894,21 @@ merge_and_process specifier 0ce75e527e
 
 Action: merging the approved Billionaire strategy specification and reviewing
 its acceptance criteria before implementation routing.
+
+## 2026-08-13T12:54:54Z — architect review: approved `billionaire-strategy`
+
+Merged specifier commit `0ce75e527e` as `721344d6a5`. The approved acceptance
+suite fails at the intended implementation boundary: its new scenarios cannot
+construct `Billionaire` ("Unknown strategy \"Billionaire\"").
+
+Architecture decision for implementation: Billionaire is a Greedo-equivalent
+strategy whose special value is an opening balance of `$57,700,000`, applied
+once during normal game setup in place of the standard `$1,500`. It is not a
+cash reserve and must remain `$0`, and it must not be a CLI-only or test-only
+exception. Preserve Greedo behavior for buying, priority, trading, bankruptcy,
+buyout, and legal-entity paths, including all code currently recognizing
+Greedo.
+
+User direction received before routing: do not hand off to anyone without
+explicit permission. The approved implementation package is retained locally
+pending that permission; no coder handoff has been sent.
