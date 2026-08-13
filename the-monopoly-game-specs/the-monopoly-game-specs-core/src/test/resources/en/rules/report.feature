@@ -69,7 +69,7 @@ Feature: game report
 
     Examples:
       | dog_bid | high_hat_bid | auction_winner | auction_price |
-      | 90      | 120          | high hat       | 120           |
+      | 90      | 120          | high hat       | 95            |
 
   # report-6
   Scenario Outline: the report narrates rent paid after the landing movement
@@ -437,11 +437,11 @@ Feature: game report
     And pawn "dog" has $5 to spend
     And pawn "high hat" will bid $<bid> for "Diestsestraat Leuven" at auction
     When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
-    Then the game report says that pawn "high hat" wins the auction for "Diestsestraat Leuven" at $<bid>
+    Then the game report says that pawn "high hat" wins the auction for "Diestsestraat Leuven" at $<price>
 
     Examples:
-      | bid |
-      | 10  |
+      | bid | price |
+      | 35  | 30    |
 
   # report-37
   Scenario Outline: the report narrates land inherited by a creditor when a debtor goes bankrupt to them

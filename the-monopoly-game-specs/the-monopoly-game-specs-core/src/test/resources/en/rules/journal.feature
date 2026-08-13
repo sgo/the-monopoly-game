@@ -80,7 +80,7 @@ Feature: game journal
 
     Examples:
       | dog_bid | high_hat_bid | auction_winner | auction_price | expected_auction_price |
-      | 90      | 120          | high hat       | 120           | 120                    |
+      | 90      | 120          | high hat       | 95            | 95                     |
 
   # journal-6
   Scenario Outline: the journal records rent paid after the landing movement
@@ -450,11 +450,11 @@ Feature: game journal
     And pawn "dog" has $5 to spend
     And pawn "high hat" will bid $<bid> for "Diestsestraat Leuven" at auction
     When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
-    Then the game journal records that pawn "high hat" wins the auction for "Diestsestraat Leuven" at $<bid>
+    Then the game journal records that pawn "high hat" wins the auction for "Diestsestraat Leuven" at $<price>
 
     Examples:
-      | bid |
-      | 10  |
+      | bid | price |
+      | 35  | 30    |
 
   # journal-37
   Scenario Outline: the journal records land inherited by a creditor when a debtor goes bankrupt to them

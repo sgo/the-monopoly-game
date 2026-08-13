@@ -59,7 +59,7 @@ Feature: bankruptcy
 
     Examples:
       | bid | debtor final balance | owner final balance |
-      | 10  | 0                     | 1487                 |
+      | 35  | 0                     | 1507                 |
 
   # bankruptcy-4
   Scenario Outline: a Get Out of Jail Free card returns to the bottom of its deck when its holder goes bankrupt to the bank

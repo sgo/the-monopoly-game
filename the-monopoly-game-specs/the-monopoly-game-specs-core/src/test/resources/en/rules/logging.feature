@@ -94,7 +94,7 @@ Feature: game logging
 
     Examples:
       | dog_bid | high_hat_bid | auction_winner | auction_price | expected_auction_price |
-      | 90      | 120          | high hat       | 120           | 120                    |
+      | 90      | 120          | high hat       | 95            | 95                     |
 
   # logging-6
   Scenario Outline: the log records rent paid after the landing movement
@@ -464,11 +464,11 @@ Feature: game logging
     And pawn "dog" has $5 to spend
     And pawn "high hat" will bid $<bid> for "Diestsestraat Leuven" at auction
     When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
-    Then the game log records that pawn "high hat" wins the auction for "Diestsestraat Leuven" at $<bid>
+    Then the game log records that pawn "high hat" wins the auction for "Diestsestraat Leuven" at $<price>
 
     Examples:
-      | bid |
-      | 10  |
+      | bid | price |
+      | 35  | 30    |
 
   # logging-37
   Scenario Outline: the log records land inherited by a creditor when a debtor goes bankrupt to them
