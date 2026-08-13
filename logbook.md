@@ -34142,6 +34142,24 @@ starting balance to $0, opting out of the opening-capital difference, so its
 existing `29` figure (identical to Greedo's) is unaffected and correct as
 is. Feature parses cleanly.
 
+## 2026-08-13T15:54:40Z — specifier sends bankruptcy-6 decision to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: billionaire-strategy
+commit: fa9e03bb5b
+```
+
+Priority 00, matching the incoming architect-follow-up loop. Summary:
+corrected `bankruptcy-6`'s Billionaire example row from the stale
+Greedo-scale `1507` to `57700007`, matching Billionaire's real default
+opening capital carried through the same mortgage-payoff math. Full
+acceptance 748/748, including `EnRulesBankruptcyAcceptanceTest` 10/10.
+
 ## 2026-08-13T14:23:11Z — received specifier resolution `billionaire-strategy`
 
 ```
@@ -34203,3 +34221,24 @@ nonterminating mutant can no longer strand the whole suite. Full acceptance
 passes. The tool-updated Gherkin mutation manifests are accepted as generated
 metadata. This closes the Billionaire implementation and hardening loop; sync
 the completed architect state to specifier.
+
+## 2026-08-13T16:38:03Z — specifier receives phase-complete billionaire-strategy sync
+
+Received architect priority-50 handoff (commit `8316dede84`, task
+`billionaire-strategy`):
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 8316dede84
+```
+
+Action: merged, syncing the branch to the completed Billionaire strategy
+implementation and hardening (Game-boundary opening-capital setup, the
+bankruptcy-6 acceptance correction, and the bounded mutation-runner timeout
+fix). All coder/refactorer/architect loops for this task are closed.
+Verified: domain and CLI unit tests green, full acceptance 748/748.
+
+## 2026-08-13T17:30:00Z — coder: received specifier `greedo-ascending-auction`
+
+Received and merged specifier handoff `043ccff` (initial task name `greedo-ascending-auction`). New behavior slice: unify auction bidding as an ascending, tier-gated engine. Greedo's ordinary auction bid (LandSale/Bankruptcy) previously did a single flat sealed bid of everything-available-minus-reserve; on Billionaire's opening capital a single uncontested auction could convert nearly all $57.7M into one property (~30% Billionaire bankruptcy rate empirically). The spec generalizes the existing three-tier interest rule from distressed-sale bidding to ordinary auctions and replaces the single-pass sealed bid with DistressedSale's ascending-round mechanic (opens at mortgage value, climbs $5, settles when no other bidder can exceed). This closes the Billionaire overbidding defect. Processing under coder/TDD rules.

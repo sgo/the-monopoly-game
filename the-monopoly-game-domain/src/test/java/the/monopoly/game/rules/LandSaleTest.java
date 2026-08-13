@@ -72,14 +72,14 @@ class LandSaleTest {
   }
 
   @Test
-  void landTurnedDownGoesToTheHighestBidderAtTheBidTheyMade() {
+  void landTurnedDownGoesToTheHighestCeilingAtThePriceThatOutlastedTheOtherBidder() {
     plays(dog, bidding(90));
     plays(highHat, bidding(120));
 
     landOn(dog, LAND);
 
     assertThat(deeds.ownerOf(LAND)).contains(highHat.id());
-    assertThat(highHat.account().balance()).isEqualTo(Balance.of(1380));
+    assertThat(highHat.account().balance()).isEqualTo(Balance.of(1405));
     assertThat(dog.account().balance()).isEqualTo(Balance.of(1500));
   }
 
@@ -91,7 +91,7 @@ class LandSaleTest {
     landOn(dog, LAND);
 
     assertThat(deeds.ownerOf(LAND)).contains(dog.id());
-    assertThat(dog.account().balance()).isEqualTo(Balance.of(1360));
+    assertThat(dog.account().balance()).isEqualTo(Balance.of(1375));
   }
 
   @Test
@@ -101,7 +101,7 @@ class LandSaleTest {
 
     landOn(dog, LAND);
 
-    assertThat(reported.events).containsExactly("high hat won DiestsestraatLeuven at 120");
+    assertThat(reported.events).containsExactly("high hat won DiestsestraatLeuven at 95");
   }
 
   /**

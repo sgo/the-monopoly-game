@@ -187,6 +187,28 @@ public class Greedo implements Strategy {
     return new Money(Math.max(0, offer.available().amount() - effectiveReserve.amount()));
   }
 
+  /**
+   * Ordinary (landing) auctions follow the same three-tier interest used by
+   * distressed sales: completing the bidder's own colour group is worth
+   * whatever is available; denying an opponent's highest-priority monopoly is
+   * worth a bounded share of the balance; anything a middling or low-priority
+   * street that completes neither is worth nothing. Preventing a flat bid from
+   * converting a large opening capital into a single property (the Billionaire
+   * overbidding defect) is the point of gating the bid this way.
+   */
+  @Override
+  public Money bidForAuction(Offer offer, Player bidder, Rule.Set rules, Deeds deeds) {
+    boolean completesOwnGroup = deeds.completesColourGroup(rules, offer.land(), bidder);
+    if (completesOwnGroup) return offer.available();
+    if (offer.utilityMonopolyOpportunity()) return offer.available();
+    boolean deniesOpponent = priority(offer.land()) == Priority.HIGHEST;
+    if (deniesOpponent) {
+      int available = offer.available().amount();
+      return new Money(Math.min(available, available * 35 / 100));
+    }
+    return Money.ZERO;
+  }
+
   @Override
   public boolean claims(RentClaim claim) {
     return true;
