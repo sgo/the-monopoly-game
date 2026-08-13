@@ -34509,3 +34509,36 @@ merge_and_process specifier 1d2e24ff25
 
 Action: merged as `21b2e68`. Specifier confirms the near-monopoly branch represents a previously rejected broadening, not a missing tier: delete it. Forwarding the decision to coder with the already-pending requirement to route `Bankruptcy.auction()` through tiered `bidForAuction()`; the intended final policy has only completion (uncapped), highest-priority denial (35%), and no interest.
 >>>>>>> swarmforge-architect
+
+## 2026-08-13T18:45:00Z — coder: deleted dead near-monopoly branch, routed Bankruptcy wiring
+
+Specifier confirmed the near-monopoly branch in `Greedo.bidForAuction` is
+provably unreachable (same condition as `completesOwnGroup` above) and the
+specific policy has exactly three tiers. Deleted the branch; acceptance stays
+752/752 green.
+
+### Bankruptcy wiring blocked
+
+The architect also directed: "route `Bankruptcy.auction()` through tiered
+`bidForAuction()`." Wired it at commit `a0b4532`[sic] — but acceptance reports:
+
+  EnRulesGreedoShareSaleAcceptanceTest.acceptance()[13]
+  high hat expected -5 but was 25
+
+`Bankruptcy.auction()` previously used flat `bidFor` ($50 ceiling for a
+scripted $50-balance bidder), allocating the full balance to the first
+auction. Tierred `bidForAuction()` caps the denial tier at 35% ($17 for $50
+balance), leaving budget for subsequent auctions and altering the final
+balance.
+
+The failure is a content mismatch, not an implementation defect:
+- `bankruptcy.feature` scenarios that exercise `Bankruptcy.auction` are
+  already recomputed and pass with flat `bidFor`.
+- `greedo-share-sale.feature` scenario 13 exercises `Bankruptcy.auction`
+  implicitly through a bank-forced auction in the context of entity share sale,
+  and was never specifier-recomputed for the tiered engine.
+- Changing the `Bankruptcy.auction` bidding formula requires the specifier to
+  recompute the share-sale-13 examples.
+
+Reverted `Bankruptcy.auction` to flat `bidFor` to keep acceptance green.
+Routing the re-wire instruction back to architect for specifier triage.
