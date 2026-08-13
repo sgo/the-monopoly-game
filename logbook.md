@@ -33703,3 +33703,21 @@ Domain 365/365, full acceptance 599/599 run twice. The CLI module's own
 dice-timing flake (already confirmed via A/B comparison two cycles ago,
 unrelated to any of this work); the specific test this commit added
 (`startsPlayingInTheBackgroundUntilStopped`) passes cleanly.
+
+## 2026-08-13T07:42:25Z — refactorer returns CLI report-file write to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: readme-embed-cli-usage
+commit: c1c4b0b1d7
+```
+
+Priority 00, matching the incoming priority. Summary: verified the report
+file now genuinely gets written by running the packaged jar for a real
+game (previously it never appeared). Widened reportPath() to package-private
+so the new test reuses it instead of duplicating the path string. dry4java
+and mutation-scan clean. Domain 365/365, acceptance 599/599 run twice.
