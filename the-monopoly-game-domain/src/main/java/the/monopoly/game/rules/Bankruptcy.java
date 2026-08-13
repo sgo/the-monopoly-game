@@ -172,8 +172,10 @@ public final class Bankruptcy {
   private void auction(Ownable land) {
     List<Player> eligible = players.stream().filter(player -> !deeds.isBankrupt(player)).toList();
     Auction.Bidders qualified = Auction.qualified(eligible, land,
-        player -> strategies.forPlayer(player).bidFor(new Strategy.Offer(land, player.account().balance().amount())),
-        false);
+        player -> {
+          Strategy strat = strategies.forPlayer(player);
+          return strat.bidForAuction(new Strategy.Offer(land, player.account().balance().amount()), player, rules, deeds);
+        });
     if (qualified.players().isEmpty()) return;
     Auction.Result result = Auction.ascend(qualified);
     deeds.sell(land, result.winner(), result.bid());
