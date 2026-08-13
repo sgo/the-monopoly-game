@@ -34055,3 +34055,19 @@ commit: <refactorer commit>
 ```
 
 Priority 00, matching the incoming architect-follow-up loop. Summary: verified the Game-boundary opening-capital correction structurally; removed one genuine duplicate method and one now-dead method from the coder's acceptance-harness rework, added domain unit coverage for `Billionaire.openingCapital`, and fixed a stale README strategy list. Domain/CLI/specs unit tests green; acceptance 748 tests with the single pre-existing bankruptcy-6 spec-content defect unchanged, still awaiting specifier reconciliation.
+
+## 2026-08-13T13:46:29Z — received refactorer handoff `billionaire-strategy`
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer e7823e8658
+```
+
+Action: merged refactorer commit `e7823e8658` as `35fd970`. Architectural
+review accepts the Game-owned opening-capital setup and the removal of duplicate
+acceptance-harness helpers. The acceptance suite exposes a Gherkin-content
+contradiction in `bankruptcy.feature`: its Billionaire example does not arrange
+the owner's balance, so normal setup correctly yields `$57,700,007`, while the
+example asserts `$1,507`. Route this acceptance-criteria defect to specifier
+for a decision; do not alter the scenario or production behavior here.
