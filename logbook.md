@@ -34051,7 +34051,7 @@ type: git_handoff
 to: architect
 priority: 00
 task: billionaire-strategy
-commit: <refactorer commit>
+commit: e7823e8658
 ```
 
 Priority 00, matching the incoming architect-follow-up loop. Summary: verified the Game-boundary opening-capital correction structurally; removed one genuine duplicate method and one now-dead method from the coder's acceptance-harness rework, added domain unit coverage for `Billionaire.openingCapital`, and fixed a stale README strategy list. Domain/CLI/specs unit tests green; acceptance 748 tests with the single pre-existing bankruptcy-6 spec-content defect unchanged, still awaiting specifier reconciliation.
