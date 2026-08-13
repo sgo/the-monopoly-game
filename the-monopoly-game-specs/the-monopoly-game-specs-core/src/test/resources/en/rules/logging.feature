@@ -73,14 +73,15 @@ Feature: game logging
 
   # logging-4
   Scenario Outline: the log records an unowned-land purchase after the landing movement
-    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" follows the "<strategy>" strategy
     When pawn "dog" lands on "<property>"
     Then the game log records that pawn "dog" buys "<property>" for $<purchase_price>
     And the game log records that pawn "dog" moves before it records that pawn "dog" buys "<property>" for $<expected_purchase_price>
 
     Examples:
-      | property            | purchase_price | expected_purchase_price |
-      | Diestsestraat Leuven | 60             | 60                      |
+      | strategy | property | purchase_price | expected_purchase_price |
+      | Greedo | Diestsestraat Leuven | 60 | 60 |
+      | Billionaire | Diestsestraat Leuven | 60 | 60 |
 
   # logging-5
   Scenario Outline: the log records the winner and price of an auction after the landing movement
@@ -98,41 +99,44 @@ Feature: game logging
   # logging-6
   Scenario Outline: the log records rent paid after the landing movement
     And pawn "high hat" owns "Diestsestraat Leuven"
-    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" follows the "<strategy>" strategy
     When pawn "dog" lands on "Diestsestraat Leuven"
     Then the game log records that pawn "dog" pays pawn "high hat" $<rent> rent for "Diestsestraat Leuven"
     And the game log records that pawn "dog" moves before it records that pawn "dog" pays pawn "high hat" $<expected_rent> rent for "Diestsestraat Leuven"
 
     Examples:
-      | rent | expected_rent |
-      | 4    | 4             |
+      | strategy | rent | expected_rent |
+      | Greedo | 4 | 4 |
+      | Billionaire | 4 | 4 |
 
   # logging-7
   Scenario Outline: the log records rent paid for a utility as a multiple of the dice roll that landed there
     And pawn "dog" starts at position 7
     And pawn "dog" will roll 1 and 4 for their turn
     And pawn "high hat" owns "Elektriciteitscentrale"
-    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" follows the "<strategy>" strategy
     When we play the game
     Then the game log records that pawn "dog" pays pawn "high hat" $<rent> rent for "Elektriciteitscentrale"
     And the game log records that pawn "dog" moves before it records that pawn "dog" pays pawn "high hat" $<expected_rent> rent for "Elektriciteitscentrale"
 
     Examples:
-      | rent | expected_rent |
-      | 20   | 20            |
+      | strategy | rent | expected_rent |
+      | Greedo | 20 | 20 |
+      | Billionaire | 20 | 20 |
 
   # logging-8
   Scenario Outline: the log records a house built during a player's turn
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" owns "Diestsestraat Leuven"
-    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" has $100 to spend
     When we play the game
     Then the game log records that pawn "dog" builds a house on "Rue Grande Dinant" for $<cost>
 
     Examples:
-      | cost |
-      | 50   |
+      | strategy | cost |
+      | Greedo | 50 |
+      | Billionaire | 50 |
 
   # logging-9
   Scenario Outline: the log records a house sold back to the bank
@@ -194,15 +198,16 @@ Feature: game logging
     Given pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" owns "Diestsestraat Leuven"
     And the land "Rue Grande Dinant" is mortgaged
-    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" will build a house on "Diestsestraat Leuven"
     And pawn "dog" has $100 to spend
     When we play the game
     Then the game log records that pawn "dog" is refused building a house on "Diestsestraat Leuven" for $<cost> because a street in the colour group is mortgaged
 
     Examples:
-      | cost |
-      | 50   |
+      | strategy | cost |
+      | Greedo | 50 |
+      | Billionaire | 50 |
 
   # logging-15
   Scenario Outline: the log records a card drawn before the effect it resolves
@@ -388,64 +393,70 @@ Feature: game logging
 
   # logging-31
   Scenario Outline: the log records why a player declines to buy land they cannot afford
-    Given pawn "dog" follows the "Greedo" strategy
+    Given pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
     When pawn "dog" lands on "<property>"
     Then the game log records that pawn "dog" declines to buy "<property>" because it cannot afford the $<price> price
 
     Examples:
-      | property             | dog_starting_balance | high_hat_bid | price |
-      | Diestsestraat Leuven | 59                    | 60           | 60    |
+      | strategy | property | dog_starting_balance | high_hat_bid | price |
+      | Greedo | Diestsestraat Leuven | 59 | 60 | 60 |
+      | Billionaire | Diestsestraat Leuven | 59 | 60 | 60 |
 
   # logging-32
   Scenario Outline: the log records why a player keeping a reserve declines a purchase that would dip below it
-    Given pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    Given pawn "dog" follows the "<strategy>" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
     When pawn "dog" lands on "<property>"
     Then the game log records that pawn "dog" declines to buy "<property>" because it would drop the balance below the $<reserve> reserve
 
     Examples:
-      | property         | dog_starting_balance | reserve | high_hat_bid |
-      | Rue Grande Dinant | 150                  | 96      | 60           |
+      | strategy | property | dog_starting_balance | reserve | high_hat_bid |
+      | Greedo | Rue Grande Dinant | 150 | 96 | 60 |
+      | Billionaire | Rue Grande Dinant | 150 | 96 | 60 |
 
   # logging-33
   Scenario Outline: the log records a player's reserve alongside their balance at the start of a turn
-    Given pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    Given pawn "dog" follows the "<strategy>" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "dog" will roll 2 and 3 for their turn
     When we play the game
     Then the game log records that pawn "dog" starts a turn with $<dog_starting_balance> and a $<reserve> reserve
 
     Examples:
-      | dog_starting_balance | reserve |
-      | 1500                 | 0       |
-      | 1500                 | 100     |
+      | strategy | dog_starting_balance | reserve |
+      | Greedo | 1500 | 0 |
+      | Billionaire | 1500 | 0 |
+      | Greedo | 1500 | 100 |
+      | Billionaire | 1500 | 100 |
 
   # logging-34
   Scenario Outline: the log records why a player declines to buy a card-driven property they cannot afford
     Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
-    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
     When pawn "dog" lands on "Kans / Chance"
     Then the game log records that pawn "dog" declines to buy "Rue de Diekirch Arlon" because it cannot afford the $<price> price
 
     Examples:
-      | dog_starting_balance | price |
-      | 100                  | 140   |
+      | strategy | dog_starting_balance | price |
+      | Greedo | 100 | 140 |
+      | Billionaire | 100 | 140 |
 
   # logging-35
   Scenario Outline: the log records why a player keeping a reserve declines a card-driven purchase that would dip below it
     Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
-    And pawn "dog" follows the "Greedo" strategy, keeping a $<reserve> reserve
+    And pawn "dog" follows the "<strategy>" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     When pawn "dog" lands on "Kans / Chance"
     Then the game log records that pawn "dog" declines to buy "Rue de Diekirch Arlon" because it would drop the balance below the $<reserve> reserve
 
     Examples:
-      | dog_starting_balance | reserve |
-      | 200                  | 65      |
+      | strategy | dog_starting_balance | reserve |
+      | Greedo | 200 | 65 |
+      | Billionaire | 200 | 65 |
 
   # logging-36
   Scenario Outline: the log records a bank-forced auction win during another player's bankruptcy
@@ -477,7 +488,7 @@ Feature: game logging
   Scenario Outline: the log records a creditor paying interest to keep an inherited mortgage in place
     Given pawn "high hat" owns "Diestsestraat Leuven"
     And the street "Diestsestraat Leuven" has a hotel built
-    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" follows the "<strategy>" strategy
     And pawn "high hat" has $<owner_starting_balance> to spend
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting_balance> to spend
@@ -485,22 +496,24 @@ Feature: game logging
     Then the game log records that pawn "high hat" pays $<interest> interest to keep the mortgage on "Rue Grande Dinant"
 
     Examples:
-      | owner_starting_balance | starting_balance | interest |
-      | 0                       | 2                 | 3        |
+      | strategy | owner_starting_balance | starting_balance | interest |
+      | Greedo | 0 | 2 | 3 |
+      | Billionaire | 0 | 2 | 3 |
 
   # logging-39
   Scenario Outline: the log records a creditor immediately lifting an inherited mortgage
     Given pawn "high hat" owns "Diestsestraat Leuven"
     And the street "Diestsestraat Leuven" has a hotel built
-    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" follows the "<strategy>" strategy
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting_balance> to spend
     When pawn "dog" lands on "Diestsestraat Leuven"
     Then the game log records that pawn "high hat" lifts the mortgage on "Rue Grande Dinant" for $<total> including $<interest> interest
 
     Examples:
-      | starting_balance | total | interest |
-      | 10                | 33    | 3        |
+      | strategy | starting_balance | total | interest |
+      | Greedo | 10 | 33 | 3 |
+      | Billionaire | 10 | 33 | 3 |
 
   # logging-40
   Scenario Outline: the log records a decline with no reason when the strategy has no buying policy
@@ -515,21 +528,22 @@ Feature: game logging
   # logging-41
   Scenario Outline: the log records the reserve dynamically sized for a near-complete colour monopoly at the start of a turn
     Given pawn "dog" owns "Rue Grande Dinant"
-    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "dog" will roll 2 and 3 for their turn
     When we play the game
     Then the game log records that pawn "dog" starts a turn with $<dog_starting_balance> and a $<reserve> reserve
 
     Examples:
-      | dog_starting_balance | reserve |
-      | 1500                  | 60      |
+      | strategy | dog_starting_balance | reserve |
+      | Greedo | 1500 | 60 |
+      | Billionaire | 1500 | 60 |
 
   # logging-42
   Scenario Outline: the log records a debtor putting a property up for sale and the sole buyer's winning offer
     Given pawn "high hat" owns "Rue Royale Tournai"
     And pawn "high hat" owns "Groenplaats Antwerpen"
-    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" follows the "<strategy>" strategy
     And pawn "high hat" has $<high_hat_starting_balance> to spend
     And pawn "dog" owns "Lippenslaan Knokke"
     And pawn "dog" has $<dog_starting_balance> to spend
@@ -539,21 +553,22 @@ Feature: game logging
     And the game log records that pawn "high hat" wins the distressed sale for "Lippenslaan Knokke" at $<expected_bid>
 
     Examples:
-      | dog_starting_balance | high_hat_starting_balance | expected_bid |
-      | 0                     | 200                        | 100           |
+      | strategy | dog_starting_balance | high_hat_starting_balance | expected_bid |
+      | Greedo | 0 | 200 | 100 |
+      | Billionaire | 0 | 200 | 100 |
 
   # logging-43
   Scenario Outline: the log records every $5 raise in a bidding war before the winning offer
     Given we select 3 players
     And pawn "iron box" will roll 6 for initiative
-    Given pawn "dog" follows the "Greedo" strategy
+    Given pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" owns "Boulevard Tirou Charleroi"
     And pawn "dog" owns "Lippenslaan Knokke"
     And pawn "high hat" owns "Rue Royale Tournai"
     And pawn "high hat" owns "Groenplaats Antwerpen"
-    And pawn "high hat" follows the "Greedo" strategy
+    And pawn "high hat" follows the "<strategy>" strategy
     And pawn "high hat" has $<high_hat_starting_balance> to spend
-    And pawn "iron box" follows the "Greedo" strategy
+    And pawn "iron box" follows the "<strategy>" strategy
     And pawn "iron box" has $<iron_box_starting_balance> to spend
     And pawn "dog" has $<dog_starting_balance> to spend
     When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
@@ -568,23 +583,26 @@ Feature: game logging
     And the game log records that pawn "iron box" wins the distressed sale for "Lippenslaan Knokke" at $105
 
     Examples:
-      | dog_starting_balance | high_hat_starting_balance | iron_box_starting_balance |
-      | 0                     | 100                        | 320                        |
+      | strategy | dog_starting_balance | high_hat_starting_balance | iron_box_starting_balance |
+      | Greedo | 0 | 100 | 320 |
+      | Billionaire | 0 | 100 | 320 |
 
   # logging-44
   Scenario Outline: the log records a near-complete colour group's reserve only while its missing street remains affordable
     Given pawn "dog" owns "Rue de Diekirch Arlon"
     And pawn "dog" owns "Bruul Mechelen"
-    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "dog" will roll 2 and 3 for their turn
     When we play the game
     Then the game log records that pawn "dog" starts a turn with $<dog_starting_balance> and a $<reserve> reserve
 
     Examples:
-      | dog_starting_balance | reserve |
-      | 200                   | 160     |
-      | 100                   | 0       |
+      | strategy | dog_starting_balance | reserve |
+      | Greedo | 200 | 160 |
+      | Billionaire | 200 | 160 |
+      | Greedo | 100 | 0 |
+      | Billionaire | 100 | 0 |
 
   # logging-45
   Scenario Outline: the log records a card drawn before the bank pays the player directly
@@ -614,7 +632,7 @@ Feature: game logging
 
   # logging-47
   Scenario Outline: the log records that no one bids before it records the resulting mortgage
-    Given pawn "high hat" follows the "Greedo" strategy, keeping a $<high_hat_reserve> reserve
+    Given pawn "high hat" follows the "<strategy>" strategy, keeping a $<high_hat_reserve> reserve
     And pawn "high hat" has $<high_hat_starting_balance> to spend
     And pawn "dog" owns "Lippenslaan Knokke"
     And pawn "dog" has $<dog_starting_balance> to spend
@@ -623,8 +641,9 @@ Feature: game logging
     And the game log records that pawn "dog" finds no bidder for Lippenslaan Knokke before it records that pawn "dog" mortgages Lippenslaan Knokke for $<mortgage_value>
 
     Examples:
-      | dog_starting_balance | high_hat_starting_balance | high_hat_reserve | mortgage_value |
-      | 10                    | 95                         | 85                | 90               |
+      | strategy | dog_starting_balance | high_hat_starting_balance | high_hat_reserve | mortgage_value |
+      | Greedo | 10 | 95 | 85 | 90 |
+      | Billionaire | 10 | 95 | 85 | 90 |
 
   # logging-48
   Scenario Outline: the log records a peer trade completed at the start of a turn, once stalemate trading is enabled for the "Greedo" strategy and the whole board is owned

@@ -355,12 +355,20 @@ public final class MonopolyStepHandlers {
 
         then("^the \"Greedo\" strategy's priority for \"" + NAME + "\" is \"" + NAME + "\"$",
             (world, arguments) -> world.assertGreedoPriority(arguments.text(1), arguments.text(2))),
+        then("^the \"" + NAME + "\" strategy's priority for \"" + NAME + "\" is \"" + NAME + "\"$",
+            (world, arguments) -> world.assertPriority(arguments.text(1), arguments.text(2), arguments.text(3))),
         step("^pawn \"" + NAME + "\" considers trading \"" + NAME
                 + "\" to pawn \"" + NAME + "\" for \"" + NAME + "\"$",
             (world, arguments) -> world.pawnConsidersTrading(
                 arguments.text(1), arguments.text(2), arguments.text(3), arguments.text(4))),
+        step("^pawn \"" + NAME + "\" considers trading \"" + NAME
+                + "\" to pawn \"" + NAME + "\" for \"" + NAME + "\" with the \"" + NAME + "\" strategy$",
+            (world, arguments) -> world.pawnConsidersTrading(
+                arguments.text(5), arguments.text(1), arguments.text(2), arguments.text(3), arguments.text(4))),
         then("^the \"Greedo\" strategy " + NAME + " the trade$",
-            (world, arguments) -> world.assertGreedoTradeDecision(arguments.text(1)))
+            (world, arguments) -> world.assertGreedoTradeDecision(arguments.text(1))),
+        then("^the \"" + NAME + "\" strategy " + NAME + " the trade$",
+            (world, arguments) -> world.assertTradeDecision(arguments.text(1), arguments.text(2)))
     );
   }
 }

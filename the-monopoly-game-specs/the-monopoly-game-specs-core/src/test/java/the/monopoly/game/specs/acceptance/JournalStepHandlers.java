@@ -376,6 +376,18 @@ final class JournalStepHandlers {
                   .count()).isEqualTo(world.simulatorPlayerCount());
             }),
 
+        then("^the game journal records that pawn \"" + NAME + "\" uses the \"Billionaire\" strategy$",
+            (world, arguments) -> world.awaitGameLog(1,
+                entry -> entry instanceof Entry.StrategyNamed named
+                    && named.player().value().equals(arguments.text(1))
+                    && named.name().equals("Billionaire"), "Billionaire strategy")),
+
+        then("^the game journal records that pawn \"" + NAME + "\" uses the \"Greedo\" strategy$",
+            (world, arguments) -> world.awaitGameLog(1,
+                entry -> entry instanceof Entry.StrategyNamed named
+                    && named.player().value().equals(arguments.text(1))
+                    && named.name().equals("Greedo"), "Greedo strategy")),
+
         then("^the game journal records that the \"Greedo\" strategy observes legal-entity trading as "
                 + NAME + "$",
             (world, arguments) -> {
@@ -566,10 +578,11 @@ final class JournalStepHandlers {
         given("^pawn \"" + NAME + "\" follows the \"" + NAME + "\" strategy$",
             (world, arguments) -> world.pawnFollows(arguments.text(1), Vocabulary.strategy(arguments.text(2)))),
 
-        given("^pawn \"" + NAME + "\" follows the \"Greedo\" strategy, keeping a \\$"
+        given("^pawn \"" + NAME + "\" follows the \"" + NAME + "\" strategy, keeping a \\$"
                 + VALUE + " reserve$",
-            (world, arguments) -> world.pawnFollowsGreedoWithReserve(
-                arguments.text(1), money(arguments.number(2)))),
+            (world, arguments) -> world.pawnFollowsWithReserve(arguments.text(1),
+                Vocabulary.strategyWithReserve(arguments.text(2), money(arguments.number(3)),
+                    world.isStalemateTrading(), world.isLegalEntityTrading()))),
 
         given("^pawn \"" + NAME + "\" starts in jail$",
             (world, arguments) -> world.startPawnInJail(arguments.text(1))),

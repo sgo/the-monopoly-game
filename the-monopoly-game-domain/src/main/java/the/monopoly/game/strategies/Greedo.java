@@ -16,7 +16,7 @@ import java.util.Optional;
  * Agrees to whatever it has the means to pay for: it buys land it can afford,
  * and at auction it bids the most it can afford rather than lose the land.
  */
-public final class Greedo implements Strategy {
+public class Greedo implements Strategy {
   private final Money reserve;
   private final boolean stalemateTrading;
   private final boolean legalEntityTrading;
