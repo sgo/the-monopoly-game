@@ -34591,3 +34591,13 @@ Corrected `greedo-share-sale.feature`'s `share-sale-9` second example row
 (`high_hat_ending`) from `-5` to `45`. Routing the wiring fix
 (`Bankruptcy.auction` must use the floored `qualified` overload, matching
 `LandSale`) back to coder via architect.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-ascending-auction
+commit: d519f50c2e
+```
