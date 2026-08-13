@@ -33967,7 +33967,7 @@ that permission rather than sending the correction automatically.
 ```
 Re-read your role and constitution.
 
-merge_and_process architect <pending commit>
+merge_and_process architect 2db04997ff
 ```
 
 User removed the per-handoff permission requirement. Sending the merged
