@@ -34207,6 +34207,44 @@ Implemented the architect-required fix from handoff `a02ab94`: the mutation runn
 
 Verification: domain unit tests 370/370, CLI 12/12 (the `keepsPlayingUntilToldToStop` timing test is the known pre-existing flake), acceptance 748/748. Ran acceptance mutation on billionaire (5/5 killed), buying-land (0 errors), and bankruptcy (27/27 killed, 0 errors) with all 4 workers responsive. Manifest files, updated by the mutator during these runs, are committed unchanged from tool output.
 
+## 2026-08-13T14:36:00Z — refactorer received coder handoff `billionaire-strategy`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 00
+task: billionaire-strategy
+commit: ff526efaa2
+```
+
+Action: merged commit `ff526efaa2` ("Bound mutation-runner job execution with a timeout") as `aab7808`, cleanly (no conflict this time). This picks up the specifier's bankruptcy-6 correction ($1507 -> $57,700,007 for an unarranged Billionaire) and the coder's mutation-runner timeout fix. Reviewing and verifying under refactorer rules before handing back to the architect.
+
+## 2026-08-13T14:36:00Z — refactorer review: `billionaire-strategy` (mutation-runner timeout)
+
+`acceptance/mutation-runner/AcceptanceMutationRunner.java` has no `pom.xml` of its own — it's a standalone runner-adapter script run via single-file `java -cp ... AcceptanceMutationRunner.java`, one of the constitution's project-specific acceptance-pipeline components, environmentally unsuitable for `crap4java`/`dry4java`/`mutate4java` (no Maven module to resolve, no JUnit tests of its own). Reviewed it by hand instead of by tool.
+
+Found a correctness concern in the new timeout path, not fixed here since it requires a behavior change to the output-capture design, not structural cleanup: `handle()` redirects the process-wide `System.out` (via `System.setOut`) to capture each job's output, and on timeout it only calls `Thread.interrupt()` on the worker before moving on to the next job. `Thread.interrupt()` is cooperative — it does nothing against a tight, non-blocking CPU-bound loop, which is exactly the shape of the hang this fix targets (a mutated `Greedo`-strategy game loop that never reaches a stop condition; two-player Greedo-vs-Greedo games are already a documented characteristic that can run forever with real dice, unrelated to mutation). Two consequences follow from an ineffective interrupt: (1) the "responsive" worker keeps a zombie thread spinning on a CPU core for the rest of the run, competing with the other three live workers and risking a slowdown that looks like more timeouts; (2) because `System.out`/`System.setOut` is JVM-global rather than per-job, if that zombie thread (or anything it calls) ever does print again after `handle()` has moved on and reassigned `System.out` to a later job's buffer or back to `protocol`, that stray output lands in the wrong place — silently corrupting a later job's captured diagnostics, or worse, corrupting the real stdout line-based JSON protocol the parent `gherkin-mutator` process parses. Routing this to the architect rather than patching it myself: a real fix needs either a per-job output sink instead of global `System.out` reassignment, or running each job in a genuinely killable OS process instead of an in-process daemon thread — both are coder-level design decisions, not refactoring.
+
+No structural cleanup found elsewhere in this diff; the `handle()`/`runJob()` extraction is a reasonable, non-duplicative split. `bankruptcy.feature`/`billionaire.feature`/`buying-land.feature` changes are specifier-approved scenario content and mutator-refreshed manifests; left untouched.
+
+Verification: `mvn test` from the repo root — green (the `keepsPlayingUntilToldToStop` CLI test failed once in isolation, then passed on retry, matching the documented pre-existing flake). Full acceptance pipeline: 748/748, run twice — confirms the bankruptcy-6 fix holds. Did not run acceptance mutation (not owned by this role).
+
+## 2026-08-13T14:36:00Z — refactorer sent billionaire-strategy handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: billionaire-strategy
+commit: aab78083e0
+```
+
+Priority 00, matching the incoming architect-follow-up loop. Summary: no refactorer-owned code changes this cycle. Verified the bankruptcy-6 correction and the mutation-runner timeout fix; domain/CLI/specs unit tests green (one known pre-existing CLI timing flake), acceptance 748/748 run twice. Flagging a correctness concern in the timeout path for architect judgment: `Thread.interrupt()` is ineffective against a CPU-bound hang (the exact failure mode targeted), and the process-wide `System.out` redirection used for per-job output capture is not safe against a zombie worker thread outliving its timeout — see the logbook entry above for the two concrete consequences and possible fix directions.
+
 ## 2026-08-13T14:37:46Z — received refactorer handoff `billionaire-strategy`
 
 ```
@@ -34301,51 +34339,6 @@ Action: recovered the full commit `a0b4532a83d209b3480fda0993c68e9ec822d31a` and
 
 ## 2026-08-13T18:45:00Z — coder: received architect review, investigating auction-qualification regression
 
-## 2026-08-13T19:56:00Z — specifier decides bankruptcy-3 and buying-land-19
-
-Received architect priority-00 handoff (commit `df8eb7155a`, task
-`greedo-ascending-auction`), carrying the coder/architect review chain
-including two items routed for specifier decision.
-
-Action (bankruptcy-3): the "$1467 vs $1507" gap the architect flagged as
-an implementation defect was actually my own arithmetic error when I
-recomputed this scenario, not a code bug. The correct delta from the old
-scenario is `old_final + old_price − new_price`, not `old_final − old_price
-+ new_price` — I had the sign backwards. `1487 + 10 − 30 = 1467`, matching
-what the implementation already produces. Corrected the spec's expected
-`owner final balance` from `1507` to `1467`; no implementation change
-needed here.
-
-Action (buying-land-19, specifier decision as deferred by architect): the
-scenario's premise — a bystander holding 1 of 3 pieces of an already-
-started colour group fights for a 2nd, middling-priority piece at auction
-— only worked under the old indiscriminate "bid everything available"
-rule. Deliberately did not broaden the near-monopoly interest tier to
-cover "1 of 3 becomes 2 of 3" cases: that would partially reopen the
-unbounded-bidding problem this whole redesign exists to close, and it
-would create an asymmetry with `accepts()` (which stays intentionally
-indiscriminate for on-your-turn purchases, per buying-land-18) that
-`bidFor` is now deliberately not. Under the new rule neither `dog` nor
-`high hat` has real interest in a middling-priority street that doesn't
-complete either of their groups, so the land now correctly stays with the
-bank. Rewrote the scenario's Then clause and high_hat's expected final
-balance (unchanged at the default $1500, since it never bids) to match;
-the scenario's actual point — dog respecting its own reserve — is
-unaffected. Retitled the scenario to state this dual point.
-
-Full acceptance 752/752 verified locally. Sending both corrections back to
-architect at the same priority.
-
-Handoff message sent:
-
-```
-type: git_handoff
-to: architect
-priority: 00
-task: greedo-ascending-auction
-commit: fcc3a7d829
-```
-
 ## 2026-08-13T18:05:00Z — coder: response to architect follow-up review
 
 Merged `df8eb71` (fast-forward). Architect's action:
@@ -34395,9 +34388,74 @@ merge_and_process coder cf02591
 
 Action: recovered and merged full commit `cf02591bd1d4392e025ef98efae856d632f6c4ad` as `c717e0a`. Accepted the trace: the stated $1507 final balance is not reachable from bankruptcy-to-bank auction semantics—$1500 less the $30 mortgage-value opening, then the $3 mandatory mortgage interest, is $1467. Routing this Gherkin content defect to specifier; code must not add an unsupported mortgage-value deposit merely to match the example.
 
+## 2026-08-13T19:56:00Z — specifier decides bankruptcy-3 and buying-land-19
+
+Received architect priority-00 handoff (commit `df8eb7155a`, task
+`greedo-ascending-auction`), carrying the coder/architect review chain
+including two items routed for specifier decision.
+
+Action (bankruptcy-3): the "$1467 vs $1507" gap the architect flagged as
+an implementation defect was actually my own arithmetic error when I
+recomputed this scenario, not a code bug. The correct delta from the old
+scenario is `old_final + old_price − new_price`, not `old_final − old_price
++ new_price` — I had the sign backwards. `1487 + 10 − 30 = 1467`, matching
+what the implementation already produces. Corrected the spec's expected
+`owner final balance` from `1507` to `1467`; no implementation change
+needed here.
+
+Action (buying-land-19, specifier decision as deferred by architect): the
+scenario's premise — a bystander holding 1 of 3 pieces of an already-
+started colour group fights for a 2nd, middling-priority piece at auction
+— only worked under the old indiscriminate "bid everything available"
+rule. Deliberately did not broaden the near-monopoly interest tier to
+cover "1 of 3 becomes 2 of 3" cases: that would partially reopen the
+unbounded-bidding problem this whole redesign exists to close, and it
+would create an asymmetry with `accepts()` (which stays intentionally
+indiscriminate for on-your-turn purchases, per buying-land-18) that
+`bidFor` is now deliberately not. Under the new rule neither `dog` nor
+`high hat` has real interest in a middling-priority street that doesn't
+complete either of their groups, so the land now correctly stays with the
+bank. Rewrote the scenario's Then clause and high_hat's expected final
+balance (unchanged at the default $1500, since it never bids) to match;
+the scenario's actual point — dog respecting its own reserve — is
+unaffected. Retitled the scenario to state this dual point.
+
+Full acceptance 752/752 verified locally. Sending both corrections back to
+architect at the same priority.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-ascending-auction
+commit: fcc3a7d829
+```
+
 ## 2026-08-13T20:00:00Z — specifier: coder's independent trace confirms the fix already sent
 
 Coder's cash-flow trace above (`$1500 − $30 − $3 = $1467`) exactly matches
 the correction already committed and sent back to architect in handoff
 `000183` (commit `fcc3a7d829`, this same task). No further action needed;
 that handoff stands as the answer to this routing.
+
+## 2026-08-13T17:57:30Z — received specifier handoff `greedo-ascending-auction`
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier fcc3a7d829
+```
+
+Action: merged as `ebe60a3`; the sole conflict was append-only `logbook.md`, resolved by preserving both the coder's cash-flow trace and the specifier's subsequent decision. Accepted the Gherkin corrections: bankruptcy-3 now expects $1467, and buying-land-19 explicitly leaves the low-interest property with the bank. Full acceptance passes (752 scenarios); `git diff --check` and worktree status are clean. The ascending auction engine and tiered bidding are ready for independent structural review.
+
+## 2026-08-13T18:16:20Z — received refactorer handoff `greedo-ascending-auction`
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 92e4093e1f
+```
+
+Action: merged as `e15367d`. Accepted the structural cleanup (auction-round extraction, shared ascending-auction predicate, shared bounded-denial calculation, and utility-auction coverage); full acceptance remains green (752 scenarios). Rejected behavioral completion: `Bankruptcy.auction()` still calls flat `bidFor()` rather than the specified tiered `bidForAuction()`, so returned that wiring fix to coder. The current near-monopoly branch is provably unreachable because it has the same precondition as the preceding completes-group branch; routed the missing executable specification of the intended, distinct threshold to specifier rather than making up game policy in code.
