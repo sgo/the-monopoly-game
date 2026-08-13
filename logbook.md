@@ -33742,6 +33742,24 @@ non-packaged CLI mutations are all killed). Route that acceptance-mutation
 pipeline failure to coder before phase closure. Tool-mutated feature files
 were restored without being committed.
 
+## 2026-08-13T08:07:51Z — architect review: packaged-CLI mutation fix returned
+
+Received refactorer handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 6a242d8dc5
+```
+
+Action: accepted and merged the mutation-runner repair. Targeted soft mutation
+now executes all six packaged-CLI mutations with zero runner errors, but three
+survive. The feature's mutation manifest records only scenarios 1–2, while the
+three survivors correspond to later scenarios 3–5; this is acceptance-pipeline
+registration/manifest housekeeping, not a Gherkin acceptance-content decision.
+Route to coder. `mutate4java` automatically refreshed World.java's embedded
+manifest; do not hand-edit that generated section.
+
 ## 2026-08-13T09:56:00Z — coder: packaged-CLI mutation runner fixed
 
 Processed architect handoff 000266. The packaged-CLI acceptance mutations were
