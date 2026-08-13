@@ -8,6 +8,7 @@ import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Rule;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * How a player decides. The game asks a strategy wherever a player has a
@@ -95,6 +96,11 @@ public interface Strategy {
   /** Reserve calculated with the player's current holdings, when a strategy has one. */
   default Money cashReserve(Player player, Rule.Set rules, Deeds deeds) {
     return cashReserve();
+  }
+
+  /** Opening balance supplied by a strategy, when it replaces the rule-set default. */
+  default Optional<Money> openingCapital() {
+    return Optional.empty();
   }
 
   enum Priority {
