@@ -33848,3 +33848,15 @@ architect handoffs and specifier-to-coder implementation handoffs default to
 `50`. Re-filed as `50_20260813T121139Z_000179_from_specifier_to_coder.handoff`,
 still targeting the coder, carrying the Billionaire implementation for spec
 commit `0ce75e5`.
+
+## 2026-08-13T12:51:11Z — specifier: billionaire-strategy re-routed to architect
+
+Handoff `000179` (billionaire-strategy-implementation, priority `00`) was
+initially sent to the coder. Per the user's routing rule, a `00`-priority
+specifier handoff answers the architect's `00` and must go back to the
+architect, so the coder copy was rescinded
+(`00_..._000179_from_specifier_to_coder.handoff.rescinded`) and the work was
+re-sent to the architect as handoff `000180`:
+`00_20260813T125111Z_000180_from_specifier_to_architect.handoff`, task
+`billionaire-strategy`, commit `0ce75e527e`, priority `00`. The architect now
+owns routing of the Billionaire work onward.
