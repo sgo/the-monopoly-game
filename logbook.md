@@ -33840,3 +33840,8 @@ merged spec sweep duplicated Greedo scenarios as Billionaire rows while
 retaining expectations for the $1,500 opening balance; this requires the
 specifier/architect to reconcile the generated twin expectations before a
 green handoff is possible.
+
+Follow-up verification after preserving arranged balances reduced the suite to
+13 failures. The remaining cases are unarranged Billionaire twin rows whose
+expected balances still use the Greedo $1,500 baseline; the Billionaire feature
+and all strategy/CLI wiring are otherwise resolved.

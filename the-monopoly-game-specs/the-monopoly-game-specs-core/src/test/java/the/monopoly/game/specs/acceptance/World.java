@@ -414,6 +414,7 @@ public class World {
       Strategy strategy = strategyOf(player);
       strategy.openingCapital().ifPresent(capital -> {
         Money current = player.account().balance().amount();
+        if (current.amount() < ruleSet.players().startingCapital().amount()) return;
         player.account().deposit(capital.minus(current));
       });
     });
