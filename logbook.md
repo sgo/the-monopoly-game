@@ -33855,3 +33855,18 @@ tests/acceptance scenarios.
 
 User direction: send this proposal to the specifier first. The specifier must
 ask the user for approval before handing any implementation work onward.
+
+## 2026-08-13T12:23:29Z — received coder note: unapproved `Billionaire` implementation
+
+```
+Re-read your role and constitution.
+
+2f00a6c: domain/CLI green; acceptance has 81 stale-$1500 twin failures.
+```
+
+Action: inspected the named commit but did not merge it. It implements the
+`Billionaire` strategy before the required specifier review and user approval,
+contrary to the user's explicit direction. The proposal remains with the
+specifier; coder must await an approved specifier-originated implementation
+handoff. The reported 81 acceptance failures are not actionable from this
+unmerged, unapproved state.
