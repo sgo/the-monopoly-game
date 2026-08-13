@@ -100,6 +100,21 @@ public class Game {
     this.jail = jail;
     this.stalemateTrading = stalemateTrading;
     this.legalEntityTrading = legalEntityTrading;
+    applyOpeningCapital();
+  }
+
+  /**
+   * Game setup opens every account with the standard starting capital and no
+   * rule pays anyone before the first roll, so a strategy that supplies an
+   * opening capital replaces the account's balance with that capital in place
+   * of the rule-set default. Owning this here keeps the setup invariant at the
+   * game boundary rather than in a CLI adapter or acceptance harness.
+   */
+  private void applyOpeningCapital() {
+    players.forEach(player -> strategies.forPlayer(player).openingCapital().ifPresent(capital -> {
+      Money current = player.account().balance().amount();
+      player.account().deposit(capital.minus(current));
+    }));
   }
 
   /** A game whose players leave every choice they are offered alone. */

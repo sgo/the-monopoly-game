@@ -99,7 +99,6 @@ public class World {
   private int packagedCliExitCode;
   private Boolean tradeAccepted;
   private final Map<String, Money> entityBalances = new HashMap<>();
-  private final Set<String> arrangedBalances = new HashSet<>();
   private MonopolyBuyout.Outcome buyout;
   private boolean stalemateTrading;
   private boolean legalEntityTrading;
@@ -409,15 +408,6 @@ public class World {
 
   private void playAndCapture(Function<Game, Game.Result> play) {
     gameStarted = true;
-    players().forEach(player -> {
-      if (arrangedBalances.contains(player.id().value())) return;
-      Strategy strategy = strategyOf(player);
-      strategy.openingCapital().ifPresent(capital -> {
-        Money current = player.account().balance().amount();
-        if (current.amount() < ruleSet.players().startingCapital().amount()) return;
-        player.account().deposit(capital.minus(current));
-      });
-    });
     Cards.Decks officialDecks = Cards.Decks.official(deeds == null ? deeds = new Deeds() : deeds);
     Game game = new Game(
         ruleSet, players(), player -> () -> nextQueuedPawnRoll(player), this::strategyOf,
@@ -1136,7 +1126,6 @@ public class World {
               + amount.amount() + "."
       );
     pawn(pawnName).account().withdraw(startingCapital.minus(amount));
-    arrangedBalances.add(pawnName);
     suppressOpeningCapitalIfNeeded(pawnName);
   }
 
