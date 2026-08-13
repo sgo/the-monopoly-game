@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
@@ -45,8 +46,18 @@ import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.r
 public final class AcceptanceMutationRunner {
   private static final String GENERATED_PACKAGE = "the.monopoly.game.specs.acceptance.generated";
 
+  /**
+   * Upper bound on one mutation job, from entry-point generation through
+   * compilation and JUnit execution. A mutant that sends a generated test
+   * into an infinite loop must not tie up a worker indefinitely, or four such
+   * mutations could strand every worker and hang the whole run.
+   */
+  private static final long JOB_TIMEOUT_MS = 5 * 60 * 1000;
+
   private final Path root;
   private final Path generator;
+  private final AtomicReference<Thread> interruptionGate = new AtomicReference<>();
+  private final AtomicReference<Process> generatorProcess = new AtomicReference<>();
 
   private AcceptanceMutationRunner(Path root) {
     this.root = root;
@@ -72,12 +83,50 @@ public final class AcceptanceMutationRunner {
   private String handle(Map<String, String> job) {
     String id = job.getOrDefault("id", "");
     long started = System.nanoTime();
-    Path work = null;
     PrintStream protocol = System.out;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
+    Path work;
     try {
-      System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
       work = Files.createTempDirectory("acceptance-mutation-");
+    } catch (Exception cause) {
+      return response(id, "infrastructure_error", "", "cannot create work directory: " + cause, started);
+    }
+
+    AtomicReference<String> reply = new AtomicReference<>();
+    Thread worker = new Thread(() -> reply.set(runJob(job, started, work, output)), "mutation-job-" + id);
+    interruptionGate.set(worker);
+    worker.setDaemon(true);
+    worker.start();
+    try {
+      worker.join(JOB_TIMEOUT_MS);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+
+    String result = reply.get();
+    if (result == null) {
+      // The job did not finish within the bound. Interrupt the worker so the
+      // running JUnit execution (and any blocked generator read) unwinds,
+      // report a bounded result, and move on to keep the worker responsive.
+      Thread active = interruptionGate.getAndSet(null);
+      if (active != null) active.interrupt();
+      Process generator = generatorProcess.getAndSet(null);
+      if (generator != null) generator.destroy();
+      result = response(id, "infrastructure_error", output.toString(StandardCharsets.UTF_8),
+          "mutation job exceeded its " + (JOB_TIMEOUT_MS / 1000) + "s bound; treating as a runner error", started);
+    }
+    interruptionGate.set(null);
+
+    System.setOut(protocol);
+    deleteTree(work);
+    return result;
+  }
+
+  /** Processes a mutation job end to end and returns its JSON response. */
+  private String runJob(Map<String, String> job, long started, Path work, ByteArrayOutputStream output) {
+    String id = job.getOrDefault("id", "");
+    try {
       Path sources = work.resolve("src");
       Path classes = Files.createDirectories(work.resolve("classes"));
 
@@ -94,9 +143,6 @@ public final class AcceptanceMutationRunner {
       System.err.println("job " + id + " failed: " + cause);
       return response(id, "infrastructure_error", output.toString(StandardCharsets.UTF_8),
           String.valueOf(cause.getMessage()), started);
-    } finally {
-      System.setOut(protocol);
-      deleteTree(work);
     }
   }
 
@@ -116,7 +162,13 @@ public final class AcceptanceMutationRunner {
         .directory(root.toFile())
         .redirectErrorStream(true)
         .start();
-    String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    generatorProcess.set(process);
+    String output;
+    try {
+      output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+    } finally {
+      generatorProcess.set(null);
+    }
     if (process.waitFor() != 0)
       throw new IllegalStateException("entry point generation failed: " + output);
   }
