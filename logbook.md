@@ -33630,3 +33630,13 @@ the coder. Final verification: differential `mutate4java` on `Simulator.java`
 had no changed surface; `dry4java` reported existing test-helper duplicates;
 soft acceptance mutation completed all features but the six packaged-CLI
 mutations ended as runner errors and must be resolved by the CLI follow-up.
+
+Delivered to coder:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: readme-embed-cli-usage
+commit: 8a6fad2171
+```
