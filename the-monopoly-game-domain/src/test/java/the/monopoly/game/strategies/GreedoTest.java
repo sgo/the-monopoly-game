@@ -77,6 +77,20 @@ class GreedoTest {
   }
 
   @Test
+  void anAuctionBidForAUtilityWithAnotherUtilityAlreadyOwnedIsUncapped() {
+    Rule.Set rules = Rule.Set.Type.official.create();
+    Bank bank = rules.bank();
+    Player bidder = player(bank, "bidder", 500);
+    Deeds deeds = new Deeds();
+
+    Money bid = strategy.bidForAuction(
+        new Strategy.Offer(ownable(Street.Type.Watermaatschappij), new Money(500), Money.ZERO, true),
+        bidder, rules, deeds);
+
+    assertThat(bid).isEqualTo(new Money(500));
+  }
+
+  @Test
   void anAuctionBidToDenyAHighestPriorityMonopolyIsCappedAtThirtyFivePercent() {
     Rule.Set rules = Rule.Set.Type.official.create();
     Bank bank = rules.bank();
