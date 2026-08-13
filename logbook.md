@@ -33540,3 +33540,14 @@ priority: 50
 task: greedo-market-deadlock-trigger
 commit: e6dff36d76
 ```
+
+## 2026-08-13T07:17:57Z — received refactorer handoff `readme-embed-cli-usage`
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 78601f6a76
+```
+
+Action: reviewing the supplied commit for the CLI/reporting boundary and its
+README-usage finding before deciding the required follow-up.
