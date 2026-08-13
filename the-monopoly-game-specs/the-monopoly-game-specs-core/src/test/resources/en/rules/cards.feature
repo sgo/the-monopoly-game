@@ -278,7 +278,7 @@ Feature: chance and community chest cards
 
   # cards-20
   Scenario Outline: a card that advances to a named property leaves it unowned when the pawn declines to buy
-    Given pawn "dog" follows the "Greedo" strategy
+    Given pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
     And the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
     When pawn "dog" lands on "Kans / Chance"
@@ -287,5 +287,6 @@ Feature: chance and community chest cards
     And pawn "dog"'s account balance is $<expected_balance>
 
     Examples:
-      | dog_starting_balance | position | expected_balance |
-      | 100                  | 11       | 100               |
+      | strategy | dog_starting_balance | position | expected_balance |
+      | Greedo   | 100                  | 11       | 100               |
+      | Billionaire | 100               | 11       | 100               |

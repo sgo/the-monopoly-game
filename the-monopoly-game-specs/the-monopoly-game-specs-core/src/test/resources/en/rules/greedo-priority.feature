@@ -8,36 +8,64 @@
 Feature: Greedo strategy priority table
 
   # greedo-priority-1
-  Scenario Outline: Greedo's monopoly-building priority for every purchaseable space on the board
-    Then the "Greedo" strategy's priority for "<space>" is "<priority>"
+  Scenario Outline: "<strategy>"'s monopoly-building priority for every purchaseable space on the board
+    Then the "<strategy>" strategy's priority for "<space>" is "<priority>"
 
     Examples:
-      | space                                        | priority |
-      | Lippenslaan Knokke                            | highest  |
-      | Rue Royale Tournai                             | highest  |
-      | Groenplaats Antwerpen                          | highest  |
-      | Rue St-Léonard Liège                           | highest  |
-      | Lange Steenstraat Kortrijk                     | highest  |
-      | Grand Place Mons                               | highest  |
-      | Steenstraat Brugge                             | highest  |
-      | Place du Monument Spa                          | highest  |
-      | Kapellestraat Oostende                         | highest  |
-      | Rue Grande Dinant                              | middle   |
-      | Diestsestraat Leuven                           | middle   |
-      | Rue de Diekirch Arlon                          | middle   |
-      | Bruul Mechelen                                 | middle   |
-      | Place Verte Verviers                           | middle   |
-      | Grote Markt Hasselt                            | middle   |
-      | Place de l'Ange Namur                          | middle   |
-      | Hoogstraat (Brussel) / Rue Haute (Bruxelles)   | middle   |
-      | Boulevard Tirou Charleroi                      | lowest   |
-      | Veldstraat Gent                                | lowest   |
-      | Boulevard d'Avroy Liège                        | lowest   |
-      | Meir Antwerpen                                 | lowest   |
-      | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)  | lowest   |
-      | Elektriciteitscentrale                         | lowest   |
-      | Watermaatschappij                              | lowest   |
-      | Noord Station                                  | lowest   |
-      | Centraal Station                               | lowest   |
-      | Buurtspoorwegen                                | lowest   |
-      | Zuid Station                                   | lowest   |
+      | strategy | space | priority |
+      | Greedo | Lippenslaan Knokke | highest |
+      | Billionaire | Lippenslaan Knokke | highest |
+      | Greedo | Rue Royale Tournai | highest |
+      | Billionaire | Rue Royale Tournai | highest |
+      | Greedo | Groenplaats Antwerpen | highest |
+      | Billionaire | Groenplaats Antwerpen | highest |
+      | Greedo | Rue St-Léonard Liège | highest |
+      | Billionaire | Rue St-Léonard Liège | highest |
+      | Greedo | Lange Steenstraat Kortrijk | highest |
+      | Billionaire | Lange Steenstraat Kortrijk | highest |
+      | Greedo | Grand Place Mons | highest |
+      | Billionaire | Grand Place Mons | highest |
+      | Greedo | Steenstraat Brugge | highest |
+      | Billionaire | Steenstraat Brugge | highest |
+      | Greedo | Place du Monument Spa | highest |
+      | Billionaire | Place du Monument Spa | highest |
+      | Greedo | Kapellestraat Oostende | highest |
+      | Billionaire | Kapellestraat Oostende | highest |
+      | Greedo | Rue Grande Dinant | middle |
+      | Billionaire | Rue Grande Dinant | middle |
+      | Greedo | Diestsestraat Leuven | middle |
+      | Billionaire | Diestsestraat Leuven | middle |
+      | Greedo | Rue de Diekirch Arlon | middle |
+      | Billionaire | Rue de Diekirch Arlon | middle |
+      | Greedo | Bruul Mechelen | middle |
+      | Billionaire | Bruul Mechelen | middle |
+      | Greedo | Place Verte Verviers | middle |
+      | Billionaire | Place Verte Verviers | middle |
+      | Greedo | Grote Markt Hasselt | middle |
+      | Billionaire | Grote Markt Hasselt | middle |
+      | Greedo | Place de l'Ange Namur | middle |
+      | Billionaire | Place de l'Ange Namur | middle |
+      | Greedo | Hoogstraat (Brussel) / Rue Haute (Bruxelles) | middle |
+      | Billionaire | Hoogstraat (Brussel) / Rue Haute (Bruxelles) | middle |
+      | Greedo | Boulevard Tirou Charleroi | lowest |
+      | Billionaire | Boulevard Tirou Charleroi | lowest |
+      | Greedo | Veldstraat Gent | lowest |
+      | Billionaire | Veldstraat Gent | lowest |
+      | Greedo | Boulevard d'Avroy Liège | lowest |
+      | Billionaire | Boulevard d'Avroy Liège | lowest |
+      | Greedo | Meir Antwerpen | lowest |
+      | Billionaire | Meir Antwerpen | lowest |
+      | Greedo | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles) | lowest |
+      | Billionaire | Nieuwstraat (Brussel) / Rue Neuve (Bruxelles) | lowest |
+      | Greedo | Elektriciteitscentrale | lowest |
+      | Billionaire | Elektriciteitscentrale | lowest |
+      | Greedo | Watermaatschappij | lowest |
+      | Billionaire | Watermaatschappij | lowest |
+      | Greedo | Noord Station | lowest |
+      | Billionaire | Noord Station | lowest |
+      | Greedo | Centraal Station | lowest |
+      | Billionaire | Centraal Station | lowest |
+      | Greedo | Buurtspoorwegen | lowest |
+      | Billionaire | Buurtspoorwegen | lowest |
+      | Greedo | Zuid Station | lowest |
+      | Billionaire | Zuid Station | lowest |

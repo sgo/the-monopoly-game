@@ -1,5 +1,6 @@
 package the.monopoly.game.specs.acceptance;
 
+import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.strategies.Greedo;
@@ -30,6 +31,15 @@ final class Vocabulary {
   static Strategy strategy(String name) {
     return switch (name) {
       case "Greedo" -> new Greedo();
+      default -> throw new AssertionError("Unknown strategy \"" + name + "\".");
+    };
+  }
+
+  /** A strategy by name, keeping a reserve, as the features call it. */
+  static Strategy strategyWithReserve(String name, Money reserve,
+                                      boolean stalemateTrading, boolean legalEntityTrading) {
+    return switch (name) {
+      case "Greedo" -> new Greedo(reserve, stalemateTrading, legalEntityTrading);
       default -> throw new AssertionError("Unknown strategy \"" + name + "\".");
     };
   }

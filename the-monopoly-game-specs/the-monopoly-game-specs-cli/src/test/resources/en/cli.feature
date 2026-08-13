@@ -101,3 +101,16 @@ Feature: Monopoly command line interface
     Examples:
       | raw arguments                                           | legal entity state | stalemate state |
       | 8 greedo greedo greedo greedo greedo greedo greedo greedo --optional-greedo-legal-entity | enabled            | disabled        |
+
+  # cli-7
+  Scenario Outline: the CLI accepts the billionaire strategy alongside greedo as a mixed per-player selection
+    Given the simulator is configured with the raw arguments "<raw arguments>"
+    When I start the simulator
+    Then the game journal records that pawn "<billionaire pawn>" uses the "Billionaire" strategy
+    And the game journal records that pawn "<greedo pawn>" uses the "Greedo" strategy
+    When I stop the simulator before the game ends
+    Then the simulator process ends
+
+    Examples:
+      | raw arguments                                   | billionaire pawn | greedo pawn |
+      | 2 greedo billionaire                            | high hat         | dog         |
