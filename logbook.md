@@ -33852,3 +33852,6 @@ silently make the strategy lose those behaviours. The CLI must accept
 `billionaire` alongside `greedo`, including mixed per-player selections; its
 default remains Greedo. Cover both the initial balance and CLI selection with
 tests/acceptance scenarios.
+
+User direction: send this proposal to the specifier first. The specifier must
+ask the user for approval before handing any implementation work onward.
