@@ -33630,3 +33630,14 @@ the coder. Final verification: differential `mutate4java` on `Simulator.java`
 had no changed surface; `dry4java` reported existing test-helper duplicates;
 soft acceptance mutation completed all features but the six packaged-CLI
 mutations ended as runner errors and must be resolved by the CLI follow-up.
+
+## 2026-08-13T09:36:25Z — coder: write the CLI report file
+
+Processed architect handoff 000265 (`8a6fad2171`). The CLI now writes every
+completed or stopped simulation's rendered report to the documented default
+path, `java.io.tmpdir/the-monopoly-game.report`, while continuing to print the
+same report to stdout. Added a focused unit assertion comparing the file
+contents with the returned report.
+
+Verification: focused CLI tests pass; full acceptance 599/599, including all
+packaged CLI scenarios.

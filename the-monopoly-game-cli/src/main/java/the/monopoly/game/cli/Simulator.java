@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Thin command boundary for running a configured Monopoly simulation. */
@@ -159,11 +162,15 @@ public final class Simulator {
       thread = new Thread(() -> {
         try {
           Game.Result outcome = game.playUntilStopped(() -> !stopRequested.get());
-          result = new Result(0, Report.of(outcome.journal()));
+          String report = Report.of(outcome.journal());
+          Files.writeString(Path.of(reportPath()), report);
+          result = new Result(0, report);
         } catch (RuntimeException cause) {
           String message = cause.getMessage() == null
               ? cause.getClass().getSimpleName() : cause.getMessage();
           result = new Result(1, "Simulation failed: " + message);
+        } catch (IOException cause) {
+          result = new Result(1, "Simulation failed: could not write " + reportPath() + ": " + cause.getMessage());
         }
       }, "monopoly-simulator");
       thread.setDaemon(true);
