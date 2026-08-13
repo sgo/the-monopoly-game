@@ -317,21 +317,21 @@ Feature: buying unowned land
       | Billionaire | 40   | 300                  | 40                          |
 
   # buying-land-19
-  Scenario Outline: an agreeable player does not buy into a colour group another player already blocks if doing so would dip below the reserve
+  Scenario Outline: an agreeable player does not buy into a colour group another player already blocks if doing so would dip below the reserve, and a lone-owning bystander has no auction interest in a second piece either
     Given pawn "high hat" owns "Grote Markt Hasselt"
     And pawn "high hat" follows the "Greedo" strategy, keeping a $1000 reserve
     And pawn "dog" follows the "<strategy>" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     When pawn "dog" lands on "Place de l'Ange Namur"
     Then pawn "dog" does not own "Place de l'Ange Namur"
-    And pawn "high hat" owns "Place de l'Ange Namur"
+    And pawn "high hat" does not own "Place de l'Ange Namur"
     And pawn "dog"'s account balance is $<expected_dog_final_balance>
     And pawn "high hat"'s account balance is $<expected_high_hat_final_balance>
 
     Examples:
       | strategy | reserve | dog_starting_balance | expected_dog_final_balance | expected_high_hat_final_balance |
-      | Greedo   | 40      | 290                   | 290                         | 1000                             |
-      | Billionaire | 40   | 290                   | 290                         | 1000                             |
+      | Greedo   | 40      | 290                   | 290                         | 1500                             |
+      | Billionaire | 40   | 290                   | 290                         | 1500                             |
 
   # buying-land-20
   Scenario Outline: an agreeable player is not limited to a pricier missing station's reserve when a middle-priority colour group's cheaper missing street applies instead

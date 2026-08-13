@@ -34239,6 +34239,42 @@ bankruptcy-6 acceptance correction, and the bounded mutation-runner timeout
 fix). All coder/refactorer/architect loops for this task are closed.
 Verified: domain and CLI unit tests green, full acceptance 748/748.
 
+## 2026-08-13T16:52:57Z — specifier sends greedo-ascending-auction handoff to coder
+
+User traced the empirical Billionaire bankruptcy rate (30% in the 8-player
+playtests) to `Greedo.bidFor`: ordinary auctions bid "everything available
+minus reserve" as a single flat sealed bid regardless of the land's
+strategic value, so one uncontested auction could convert nearly all of
+Billionaire's $57.7M into one property. User asked to redesign it to buy
+"as cheaply as possible", using the existing `bidForDistressed`/
+`DistressedSale` three-tier interest rule and ascending-round mechanic as
+the base, generalized to ordinary auctions (`LandSale`/`Bankruptcy`).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: greedo-ascending-auction
+commit: 043ccff3b2
+```
+
+Summary: recomputed every affected auction scenario across
+`auctions.feature`, `buying-land.feature`, `bankruptcy.feature`,
+`logging.feature`, `journal.feature`, `report.feature` under the new
+mechanic (opens at the land's mortgage value, $5 ascending increments,
+settles the instant no other bidder can exceed the price); added
+auctions-3/4 proving the not-interested and denial-tier cases directly,
+auctions-4 being the regression proof for both Greedo and Billionaire.
+Parsed clean via `gherkin-parser`; `ir-dry-checker` shows no findings
+introduced beyond each file's existing baseline. Two open items flagged,
+not decided in spec: a configured reserve no longer factors into auction
+bids at all (only direct-buy `accepts()` still uses it, since the reused
+tier rule never references `offer.reserve()`); and the existing
+`wouldWinByBankruptcy` short-circuit is not extended to `Bankruptcy.auction`
+(structurally inapplicable to `LandSale`, which has no debtor).
+
 ## 2026-08-13T17:30:00Z — coder: received specifier `greedo-ascending-auction`
 
 Received and merged specifier handoff `043ccff` (initial task name `greedo-ascending-auction`). New behavior slice: unify auction bidding as an ascending, tier-gated engine. Greedo's ordinary auction bid (LandSale/Bankruptcy) previously did a single flat sealed bid of everything-available-minus-reserve; on Billionaire's opening capital a single uncontested auction could convert nearly all $57.7M into one property (~30% Billionaire bankruptcy rate empirically). The spec generalizes the existing three-tier interest rule from distressed-sale bidding to ordinary auctions and replaces the single-pass sealed bid with DistressedSale's ascending-round mechanic (opens at mortgage value, climbs $5, settles when no other bidder can exceed). This closes the Billionaire overbidding defect. Processing under coder/TDD rules.
@@ -34313,3 +34349,37 @@ merge_and_process coder cf02591
 ```
 
 Action: recovered and merged full commit `cf02591bd1d4392e025ef98efae856d632f6c4ad` as `c717e0a`. Accepted the trace: the stated $1507 final balance is not reachable from bankruptcy-to-bank auction semantics—$1500 less the $30 mortgage-value opening, then the $3 mandatory mortgage interest, is $1467. Routing this Gherkin content defect to specifier; code must not add an unsupported mortgage-value deposit merely to match the example.
+## 2026-08-13T19:56:00Z — specifier decides bankruptcy-3 and buying-land-19
+
+Received architect priority-00 handoff (commit `df8eb7155a`, task
+`greedo-ascending-auction`), carrying the coder/architect review chain
+including two items routed for specifier decision.
+
+Action (bankruptcy-3): the "$1467 vs $1507" gap the architect flagged as
+an implementation defect was actually my own arithmetic error when I
+recomputed this scenario, not a code bug. The correct delta from the old
+scenario is `old_final + old_price − new_price`, not `old_final − old_price
++ new_price` — I had the sign backwards. `1487 + 10 − 30 = 1467`, matching
+what the implementation already produces. Corrected the spec's expected
+`owner final balance` from `1507` to `1467`; no implementation change
+needed here.
+
+Action (buying-land-19, specifier decision as deferred by architect): the
+scenario's premise — a bystander holding 1 of 3 pieces of an already-
+started colour group fights for a 2nd, middling-priority piece at auction
+— only worked under the old indiscriminate "bid everything available"
+rule. Deliberately did not broaden the near-monopoly interest tier to
+cover "1 of 3 becomes 2 of 3" cases: that would partially reopen the
+unbounded-bidding problem this whole redesign exists to close, and it
+would create an asymmetry with `accepts()` (which stays intentionally
+indiscriminate for on-your-turn purchases, per buying-land-18) that
+`bidFor` is now deliberately not. Under the new rule neither `dog` nor
+`high hat` has real interest in a middling-priority street that doesn't
+complete either of their groups, so the land now correctly stays with the
+bank. Rewrote the scenario's Then clause and high_hat's expected final
+balance (unchanged at the default $1500, since it never bids) to match;
+the scenario's actual point — dog respecting its own reserve — is
+unaffected. Retitled the scenario to state this dual point.
+
+Full acceptance 752/752 verified locally. Sending both corrections back to
+architect at the same priority.
