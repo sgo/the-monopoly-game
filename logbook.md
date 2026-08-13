@@ -34188,3 +34188,41 @@ Merged architect handoff `a02ab94` (task billionaire-strategy). The architect re
 Implemented the architect-required fix from handoff `a02ab94`: the mutation runner (`AcceptanceMutationRunner`) previously ran the generated entry point synchronously via `launcher.execute`, so a mutant that hangs a generated test never returned and left a worker pending indefinitely (up to four workers could strand, hanging the whole acceptance-mutation run). Bounded each job with a 5-minute deadline: the job body now runs on a daemon thread, `join`ed by the handler; if it exceeds the bound, the handler returns a bounded `infrastructure_error`, interrupts the worker, and destroys the in-flight entry-point generator sub-process so the worker stays responsive.
 
 Verification: domain unit tests 370/370, CLI 12/12 (the `keepsPlayingUntilToldToStop` timing test is the known pre-existing flake), acceptance 748/748. Ran acceptance mutation on billionaire (5/5 killed), buying-land (0 errors), and bankruptcy (27/27 killed, 0 errors) with all 4 workers responsive. Manifest files, updated by the mutator during these runs, are committed unchanged from tool output.
+
+## 2026-08-13T14:36:00Z — refactorer received coder handoff `billionaire-strategy`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 00
+task: billionaire-strategy
+commit: ff526efaa2
+```
+
+Action: merged commit `ff526efaa2` ("Bound mutation-runner job execution with a timeout") as `aab7808`, cleanly (no conflict this time). This picks up the specifier's bankruptcy-6 correction ($1507 -> $57,700,007 for an unarranged Billionaire) and the coder's mutation-runner timeout fix. Reviewing and verifying under refactorer rules before handing back to the architect.
+
+## 2026-08-13T14:36:00Z — refactorer review: `billionaire-strategy` (mutation-runner timeout)
+
+`acceptance/mutation-runner/AcceptanceMutationRunner.java` has no `pom.xml` of its own — it's a standalone runner-adapter script run via single-file `java -cp ... AcceptanceMutationRunner.java`, one of the constitution's project-specific acceptance-pipeline components, environmentally unsuitable for `crap4java`/`dry4java`/`mutate4java` (no Maven module to resolve, no JUnit tests of its own). Reviewed it by hand instead of by tool.
+
+Found a correctness concern in the new timeout path, not fixed here since it requires a behavior change to the output-capture design, not structural cleanup: `handle()` redirects the process-wide `System.out` (via `System.setOut`) to capture each job's output, and on timeout it only calls `Thread.interrupt()` on the worker before moving on to the next job. `Thread.interrupt()` is cooperative — it does nothing against a tight, non-blocking CPU-bound loop, which is exactly the shape of the hang this fix targets (a mutated `Greedo`-strategy game loop that never reaches a stop condition; two-player Greedo-vs-Greedo games are already a documented characteristic that can run forever with real dice, unrelated to mutation). Two consequences follow from an ineffective interrupt: (1) the "responsive" worker keeps a zombie thread spinning on a CPU core for the rest of the run, competing with the other three live workers and risking a slowdown that looks like more timeouts; (2) because `System.out`/`System.setOut` is JVM-global rather than per-job, if that zombie thread (or anything it calls) ever does print again after `handle()` has moved on and reassigned `System.out` to a later job's buffer or back to `protocol`, that stray output lands in the wrong place — silently corrupting a later job's captured diagnostics, or worse, corrupting the real stdout line-based JSON protocol the parent `gherkin-mutator` process parses. Routing this to the architect rather than patching it myself: a real fix needs either a per-job output sink instead of global `System.out` reassignment, or running each job in a genuinely killable OS process instead of an in-process daemon thread — both are coder-level design decisions, not refactoring.
+
+No structural cleanup found elsewhere in this diff; the `handle()`/`runJob()` extraction is a reasonable, non-duplicative split. `bankruptcy.feature`/`billionaire.feature`/`buying-land.feature` changes are specifier-approved scenario content and mutator-refreshed manifests; left untouched.
+
+Verification: `mvn test` from the repo root — green (the `keepsPlayingUntilToldToStop` CLI test failed once in isolation, then passed on retry, matching the documented pre-existing flake). Full acceptance pipeline: 748/748, run twice — confirms the bankruptcy-6 fix holds. Did not run acceptance mutation (not owned by this role).
+
+## 2026-08-13T14:36:00Z — refactorer sent billionaire-strategy handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: billionaire-strategy
+commit: aab78083e0
+```
+
+Priority 00, matching the incoming architect-follow-up loop. Summary: no refactorer-owned code changes this cycle. Verified the bankruptcy-6 correction and the mutation-runner timeout fix; domain/CLI/specs unit tests green (one known pre-existing CLI timing flake), acceptance 748/748 run twice. Flagging a correctness concern in the timeout path for architect judgment: `Thread.interrupt()` is ineffective against a CPU-bound hang (the exact failure mode targeted), and the process-wide `System.out` redirection used for per-job output capture is not safe against a zombie worker thread outliving its timeout — see the logbook entry above for the two concrete consequences and possible fix directions.
