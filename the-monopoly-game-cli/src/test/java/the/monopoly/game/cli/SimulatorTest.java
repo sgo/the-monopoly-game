@@ -90,7 +90,7 @@ class SimulatorTest {
 
   @Test
   void startsPlayingInTheBackgroundUntilStopped() {
-    Path report = Path.of(System.getProperty("java.io.tmpdir"), "the-monopoly-game.report");
+    Path report = Path.of(Simulator.reportPath());
     try { Files.deleteIfExists(report); } catch (Exception cause) { throw new AssertionError(cause); }
     Simulator.Running running = Simulator.start(2, Simulator.strategiesFor(2, List.of()));
 

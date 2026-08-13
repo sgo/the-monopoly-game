@@ -33664,3 +33664,42 @@ contents with the returned report.
 
 Verification: focused CLI tests pass; full acceptance 599/599, including all
 packaged CLI scenarios.
+
+## 2026-08-13T09:36:56Z — refactorer receives CLI report-file write for review
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder d300ce125e
+```
+
+Action: merged `d300ce125e` (clean, no conflict). Closes the finding from
+last cycle: `Running`'s constructor now writes the rendered report to
+`reportPath()` (via `Files.writeString`) right alongside printing it to
+`Result`, for every completed-or-stopped simulation — there's only one
+place a completed game produces its final report in this file, so this is
+the correct, single choke point; verified by reading the whole file, not
+just the diff. A new unit test compares the file's contents against the
+returned report string.
+
+Cleanup: `reportPath()` was `private`; widened it to package-private
+(`SimulatorTest` is in the same package) and pointed the new test's file
+path at `Simulator.reportPath()` instead of re-deriving the same
+`$TMPDIR/the-monopoly-game.report` string inline — one less place for
+production and test to silently drift apart if the filename ever changes.
+Also dropped a stray fully-qualified `java.nio.file.Path.of(...)` in favor
+of the already-imported `Path`.
+
+Verified the fix empirically rather than trusting the diff: ran the
+packaged jar for a real completed 2-player game, and `the-monopoly-game.
+report` now appears in the system temp directory with real content (56KB,
+not empty) — previously it never appeared under any circumstance. dry4java
+clean, mutation-scan 76 sites. Manifest refreshed.
+
+Domain 365/365, full acceptance 599/599 run twice. The CLI module's own
+`SimulatorTest.keepsPlayingUntilToldToStop` remains the known pre-existing
+dice-timing flake (already confirmed via A/B comparison two cycles ago,
+unrelated to any of this work); the specific test this commit added
+(`startsPlayingInTheBackgroundUntilStopped`) passes cleanly.
