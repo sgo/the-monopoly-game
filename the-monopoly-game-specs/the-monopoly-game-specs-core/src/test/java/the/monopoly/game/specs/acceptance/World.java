@@ -1137,16 +1137,25 @@ public class World {
       );
     pawn(pawnName).account().withdraw(startingCapital.minus(amount));
     arrangedBalances.add(pawnName);
-    if (pawnStrategies.get(pawnName) instanceof Billionaire billionaire)
-      pawnStrategies.put(pawnName, new Billionaire(billionaire.cashReserve(),
-          billionaire.stalemateTradingEnabled(), billionaire.legalEntityTradingEnabled(), false));
+    suppressOpeningCapitalIfNeeded(pawnName);
   }
 
-  /** Sets a balance representing wealth accumulated during the game. */
+  /**
+   * Sets a balance representing wealth accumulated during the game. Arranging
+   * a Billionaire to a concrete balance means the account is intentionally at
+   * that value, so the strategy's opening capital must not re-apply later.
+   */
   public void holdPawnBalance(String pawnName, Money amount) {
     Money current = pawn(pawnName).account().balance().amount();
     if (amount.exceeds(current)) pawn(pawnName).account().deposit(amount.minus(current));
     else if (current.exceeds(amount)) pawn(pawnName).account().withdraw(current.minus(amount));
+    suppressOpeningCapitalIfNeeded(pawnName);
+  }
+
+  private void suppressOpeningCapitalIfNeeded(String pawnName) {
+    if (pawnStrategies.get(pawnName) instanceof Billionaire billionaire)
+      pawnStrategies.put(pawnName, new Billionaire(billionaire.cashReserve(),
+          billionaire.stalemateTradingEnabled(), billionaire.legalEntityTradingEnabled(), false));
   }
 
   public Money stalemateThreshold() {

@@ -33946,3 +33946,11 @@ opening-capital and full Greedo-equivalence constraints from the review above.
 ## 2026-08-13T15:00:00Z — coder: received architect authorized election-strategy handoff
 
 Received architect priority-00 git_handoff for task `billionaire-strategy`, commit `bfa3b4bfab` (message: "Re-read your role and constitution. merge_and_process architect bfa3b4bfab"). Merged the authorized implementation package. Merging this into the coder branch and will review/verify under coder rules: Billionaire is a setup-only opening-capital variant of Greedo with an opening balance of $57,700,000, applied once during game setup, keeping `$0` cash reserve and all Greedo-equivalent behaviors (buying, priority, trading, bankruptcy, buyout, legal entities).
+
+## 2026-08-13T15:30:00Z — coder: Billionaire harness opening-capital suppression
+
+Processing architect priority-00 `billionaire-strategy` review loop (commit `bfa3b4bfab`). Merged; reviewed the Billionaire implementation (Strategy.openingCapital default empty; Simulator.start deposits capital-current once at setup, replacing the $1500 default). Verified domain (367) and CLI (12) unit tests pass and ran the acceptance pipeline.
+
+The Billionaire feature and all other features pass; 12 of 13 stale twin-row failures were a coder-owned acceptance-harness bug: the `has $X to spend` step wired to `holdPawnBalance` (World.java) set a concrete balance but did not suppress the Billionaire opening capital, so an arranged Billionaire re-applied the $57.7M capital at game start. Extracted `suppressOpeningCapitalIfNeeded` and called it from both `arrangePawnBalance` and `holdPawnBalance`.
+
+One twin-row failure remains (bankruptcy scenario 6, Billionaire row): high hat, the Billionaire, is not arranged to any balance, so it correctly opens at $57.7M, but the row asserts the Greedo-scale $1507 owner final balance. This is a spec-content contradiction (opening capital replaces $1500, so an unarranged Billionaire cannot end at a Greedo-scale balance). Returning the state to the architect with the logbook note; no further coder-owned implementation change is appropriate.
