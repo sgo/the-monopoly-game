@@ -34301,7 +34301,6 @@ Action: recovered the full commit `a0b4532a83d209b3480fda0993c68e9ec822d31a` and
 
 ## 2026-08-13T18:45:00Z — coder: received architect review, investigating auction-qualification regression
 
-<<<<<<< HEAD
 ## 2026-08-13T19:56:00Z — specifier decides bankruptcy-3 and buying-land-19
 
 Received architect priority-00 handoff (commit `df8eb7155a`, task
