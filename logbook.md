@@ -34487,3 +34487,13 @@ now-unreachable-in-this-context `oneStreetFromCompleting` check) rather
 than give it a working threshold — the dead code proves no Gherkin
 scenario needs it, so removing it changes no observable behavior and
 needs no spec change on my side.
+
+## 2026-08-13T18:22:27Z — received specifier handoff `greedo-ascending-auction`
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 1d2e24ff25
+```
+
+Action: merged as `21b2e68`. Specifier confirms the near-monopoly branch represents a previously rejected broadening, not a missing tier: delete it. Forwarding the decision to coder with the already-pending requirement to route `Bankruptcy.auction()` through tiered `bidForAuction()`; the intended final policy has only completion (uncapped), highest-priority denial (35%), and no interest.
