@@ -33883,3 +33883,14 @@ Action: inspected the named commit but did not merge it. It is another change
 to the same unapproved implementation line. No Billionaire behavior or related
 acceptance adjustment may enter the architect branch until the specifier has
 obtained the user's approval and issued the implementation handoff.
+
+## 2026-08-13T12:51:25Z — received specifier handoff `billionaire-strategy`
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 0ce75e527e
+```
+
+Action: merging the approved Billionaire strategy specification and reviewing
+its acceptance criteria before implementation routing.
