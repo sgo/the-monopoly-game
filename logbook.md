@@ -34141,3 +34141,22 @@ the Billionaire row's `owner final balance` from the stale `1507` to
 starting balance to $0, opting out of the opening-capital difference, so its
 existing `29` figure (identical to Greedo's) is unaffected and correct as
 is. Feature parses cleanly.
+
+## 2026-08-13T14:23:11Z — received specifier resolution `billionaire-strategy`
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier fa9e03bb5b
+```
+
+Action: merged the corrected bankruptcy-6 expectation: an unarranged
+Billionaire has its actual `$57,700,000` opening capital, so the post-payoff
+balance is `$57,700,007`. Full acceptance passes. The focused soft Gherkin
+mutation of `billionaire.feature` kills all five mutants. The wider soft
+mutation suite exposed an unrelated runner defect: `AcceptanceMutationRunner`
+executes generated JUnit synchronously in a hot JVM with no per-job timeout;
+mutated Greedo-priority scenarios can run indefinitely and strand all workers.
+Terminated only the verified runner process group and restored its temporary
+feature mutations. Route a bounded runner-timeout fix to coder before final
+hardening-suite closure.
