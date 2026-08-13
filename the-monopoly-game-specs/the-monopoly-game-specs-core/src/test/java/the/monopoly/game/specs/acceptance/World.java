@@ -1323,7 +1323,11 @@ public class World {
 
   private static void runProcess(Path workingDirectory, String... command) {
     try {
-      Process process = new ProcessBuilder(command).directory(workingDirectory.toFile()).inheritIO().start();
+      Process process = new ProcessBuilder(command)
+          .directory(workingDirectory.toFile())
+          .redirectErrorStream(true)
+          .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+          .start();
       if (process.waitFor() != 0) throw new AssertionError("Command failed: " + String.join(" ", command));
     } catch (IOException | InterruptedException cause) {
       Thread.currentThread().interrupt();

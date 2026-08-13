@@ -33723,3 +33723,16 @@ has a narrow verification defect: all six mutations for
 non-packaged CLI mutations are all killed). Route that acceptance-mutation
 pipeline failure to coder before phase closure. Tool-mutated feature files
 were restored without being committed.
+
+## 2026-08-13T09:56:00Z — coder: packaged-CLI mutation runner fixed
+
+Processed architect handoff 000266. The packaged-CLI acceptance mutations were
+reported as runner errors because `World.packageCli()` launched Maven with
+`inheritIO()`, allowing Maven output to bypass the mutation worker's protocol
+capture. Maven now redirects merged output to `DISCARD` while retaining exit
+status checks. The packaged-CLI mutation script also runs this feature with one
+worker because each mutation rebuilds the shared shaded jar.
+
+Verification: targeted soft mutation run completed 6 mutations with 3 killed,
+3 survived, and 0 errors. Full acceptance passed 599/599. Generated mutation
+manifest changes were restored before commit.
