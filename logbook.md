@@ -34431,3 +34431,49 @@ merge_and_process specifier fcc3a7d829
 ```
 
 Action: merged as `ebe60a3`; the sole conflict was append-only `logbook.md`, resolved by preserving both the coder's cash-flow trace and the specifier's subsequent decision. Accepted the Gherkin corrections: bankruptcy-3 now expects $1467, and buying-land-19 explicitly leaves the low-interest property with the bank. Full acceptance passes (752 scenarios); `git diff --check` and worktree status are clean. The ascending auction engine and tiered bidding are ready for independent structural review.
+
+## 2026-08-13T18:15:00Z — refactorer received architect handoff `greedo-ascending-auction`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: refactorer
+priority: 00
+task: greedo-ascending-auction
+commit: 50e64f8aac
+```
+
+Action: merged commit `50e64f8aac` as `ab5e05d`, resolving an append-only `logbook.md` conflict (kept both the tail of the billionaire-strategy chain and the full new greedo-ascending-auction chain). First refactorer touch on this feature: `Auction.java` (new), `Bankruptcy.java`/`LandSale.java` (now delegate to it), `Greedo.java`/`Strategy.java` (`bidForAuction`), plus the corrected `bankruptcy.feature`/`buying-land.feature`. Reviewing under refactorer rules before handing back to the architect.
+
+## 2026-08-13T18:15:00Z — refactorer review: `greedo-ascending-auction`
+
+Mutation-site scan on every touched/new production file: `Auction.java` 30, `Bankruptcy.java` 57, `LandSale.java` 10, `Greedo.java` 61, `DistressedSale.java` 64 — all well under the 100-site split threshold.
+
+CRAP (`crap4java`, domain): two methods came in above the project's 6.0 threshold (the tool's own default warning line is 8.0, so neither tripped that, but the project rule is stricter). `Auction.ascendMany` was CC=7 at 100% coverage (CRAP 7.0) — extracted the inner per-round bidding loop into `Auction.raiseRound`, splitting the do-while orchestration from the round mechanics; both now sit at CRAP 3.0 and 5.0. `Greedo.bidForAuction` was CC=6 at 78.3% coverage (CRAP 6.4) — JaCoCo showed the `utilityMonopolyOpportunity` branch untested (a real, reachable gap: a Utility auction with another Utility already owned by anyone), so added `anAuctionBidForAUtilityWithAnotherUtilityAlreadyOwnedIsUncapped` to `GreedoTest`; extracting the identical 35%-cap block (see below) also dropped its CC to 5, landing it at CRAP 5.4.
+
+`dry4java` (domain `src/main`) flagged `Auction.cannotRaise` against `DistressedSale.cannotRaise` at score 0.91 — byte-identical apart from a parameter name. Made `Auction.cannotRaise` package-visible and deleted `DistressedSale`'s copy in favor of calling it. Manual reading found a second duplicate `dry4java` didn't surface (its default candidate-size threshold doesn't compare sub-method fragments): the "deny an opponent's highest-priority monopoly" 35%-cap block was copied verbatim from the pre-existing `bidForDistressed` into the new `bidForAuction`, complete with a `Math.min(available, available * 35 / 100)` that's always equal to `available * 35 / 100` for non-negative `available` (guaranteed here — auction ceilings are never negative). Extracted `Greedo.denialOrNothing`, shared by both callers, dropping the redundant `Math.min`. Also simplified a second redundant guard, `Auction.ascendMany`'s `Math.max(bid.amount(), 0)` on the ascending step: `bid` starts at `landMortgageValue()` (board-configured, never negative) and only ever climbs by $5, so the floor can never bind.
+
+Two findings not fixed here — real design questions for architect/coder judgment, not structural cleanup:
+
+1. **`Greedo.bidForAuction`'s near-monopoly tier is dead code.** The "one street short of completing the bidder's own group" branch calls `oneStreetFromMonopoly(offer.land(), bidder, rules, deeds).isPresent()`. Since `offer.land()` is always unowned (it's the land up for auction), that helper can only return present when the bidder already owns every *other* street in the group and this land is the sole remaining unowned member — which is exactly `Deeds.completesColourGroup`'s condition (`allMatch(it -> it.type() == land.type() || ownerOf(it.type()) == buyer)`), checked immediately above and returning early. JaCoCo confirms: that branch has 0% coverage and cannot be reached by any input, not just an untested one. The near-monopoly tier the specifier's design and the coder's own logbook entry describe ("one street from completing colour group -> available-reserve") never actually fires. Whatever the intended condition was (plausibly "would become one-street-short *after* winning this land," i.e. bidder currently owns `group.size()-2`, not `group.size()-1`), it needs a coder-level fix, not a refactorer guess at new game logic.
+
+2. **`Bankruptcy.auction()` still uses the flat `bidFor()` ceiling, not the new tiered `bidForAuction()`.** `LandSale.auction()` was updated to call `auctionCeiling` → `strategy.bidForAuction(...)`; `Bankruptcy.auction()` was not — it still builds its `Auction.qualified(...)` ceiling function from `strategies.forPlayer(player).bidFor(...)`, the old "everything available" bid. The specifier's design brief explicitly generalized this to "ordinary auctions (`LandSale`/`Bankruptcy`)," and `Auction.java`'s own class doc says it's "shared by... the bank-forced auction of a bankrupt debtor's land." Bankruptcy already has both `rules` and `deeds` in scope, so nothing structural blocks wiring it the same way LandSale was. Left unfixed because it's a behavior change (what a bidder actually pays in the exact auction type this redesign exists to fix), and no acceptance scenario currently exercises a real Greedo/Billionaire bidder in a `Bankruptcy`-forced auction — the one existing scenario for it (`bankruptcy.feature`, "the bank auctions the land") scripts a fixed bid rather than using a real strategy, so this gap wouldn't show up as a failing test either way.
+
+Also found and fixed (structural, zero behavior risk): shared `Auction.cannotRaise` with `DistressedSale` as noted above. Refreshed the `mutate4java` manifests on `DistressedSale.java` and `Greedo.java` via `--update-manifest` (`Auction.java` never had one; not adding one here — manifest creation belongs to an actual mutation run, which this role doesn't own).
+
+Verification: `mvn test` from the repo root — all modules green. Full acceptance pipeline: 752/752 (confirmed test count matches the specifier's prior run), run twice.
+
+## 2026-08-13T18:15:00Z — refactorer sent greedo-ascending-auction handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-ascending-auction
+commit: 92e4093e1f
+```
+
+Priority 00, matching the incoming architect-follow-up loop. Summary: reduced `Auction.ascendMany` and `Greedo.bidForAuction` to CRAP ≤6 (both were previously above the project threshold, though under the tool's own 8.0 default), deduplicated `Auction.cannotRaise`/`DistressedSale.cannotRaise` and the 35%-cap block duplicated into `bidForAuction`, simplified two redundant Math guards, and closed a real coverage gap on the utility-monopoly branch. Domain/CLI/specs unit tests green, acceptance 752/752 run twice. Flagging two behavior-level findings for architect judgment, not fixed here: `Greedo.bidForAuction`'s near-monopoly tier is unreachable dead code (JaCoCo-confirmed — it duplicates `completesOwnGroup`'s precondition exactly), and `Bankruptcy.auction()` still uses the old flat `bidFor()` ceiling instead of the new tiered `bidForAuction()`, potentially leaving bankruptcy-forced auctions outside the fix this whole redesign targets. See the logbook entry above for the full trace on both.
