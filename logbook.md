@@ -33610,3 +33610,26 @@ limitation. Manifest refreshed.
 
 Domain 367/367, property tests green, full acceptance 599/599 (including
 the new cli-jar-5 scenario) run twice.
+
+## 2026-08-13T07:17:30Z — refactorer returns README CLI usage embed to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: readme-embed-cli-usage
+commit: 78601f6a76
+```
+
+Priority 00, matching the coder's incoming priority. Summary: structurally
+clean (dry4java clean, mutation-scan 74 sites; crap4java blocked by the
+known CLI dice-timing flake, unrelated). Domain 367/367, property tests
+green, acceptance 599/599 run twice. Flagging for decision: the new
+"Report file: $TMPDIR/the-monopoly-game.report" usage line, now printed by
+the jar's own `-h` output and quoted in the README, describes behavior that
+doesn't exist — verified empirically (no file appears after `-h` or a real
+completed game). Predates this commit (already an unimplemented requirement
+in SIMULATOR.md) but is now more visible. Implementing the write or removing
+the claim are both outside refactorer scope.
