@@ -33478,3 +33478,38 @@ the intermediate artifact up to date. Verified two consecutive non-clean
 contains the current four-argument `standardBuildCost` implementation.
 
 Verification: full acceptance 598/598, including packaged CLI scenarios.
+
+## 2026-08-13T05:30:19Z — refactorer receives CLI packaging fix for review
+
+Received coder priority-00 handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 3f71ed1854
+```
+
+Action: merged `3f71ed1854` (clean, no conflict). One-line pom.xml fix:
+`<forceCreation>true</forceCreation>` on the CLI module's shade execution,
+so an ordinary incremental `package` always rebuilds the shaded jar instead
+of Maven treating the intermediate artifact as up to date and silently
+keeping a stale one — this is what let the architect's earlier empirical
+run exercise old domain classes despite a real fix already being merged.
+
+No Java source changed, so no CRAP/DRY/mutation-scan applies. Verified the
+fix does what it claims rather than trusting the pom.xml diff: ran two
+consecutive non-clean `mvn -pl the-monopoly-game-cli -am package -DskipTests`
+and confirmed the jar's mtime advances on the second run (it wouldn't have
+before this change).
+
+While verifying, `the-monopoly-game-cli`'s own `mvn test` failed on
+`SimulatorTest.keepsPlayingUntilToldToStop` — consistently, 5/5 runs, more
+persistently than the "occasional" pattern this flake has shown earlier in
+the session. Confirmed via A/B worktree comparison against my own last
+commit (`370f9f314f`, untouched by this pom.xml-only change) that it
+reproduces identically there too — same known real-unseeded-dice timing
+flake (see memory: Greedo-vs-Greedo runaway games), not a regression from
+this commit, just presently more consistent in this sandbox.
+
+Domain 365/365, full acceptance 598/598 (including packaged CLI scenarios)
+run twice.
