@@ -33770,6 +33770,16 @@ merge_and_process coder ea72198e22
 
 Action: merging the verification-only return and closing the completed phase.
 
+Delivered phase-complete sync to specifier:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: readme-embed-cli-usage
+commit: 2792e37539
+```
+
 ## 2026-08-13T09:56:00Z — coder: packaged-CLI mutation runner fixed
 
 Processed architect handoff 000266. The packaged-CLI acceptance mutations were
