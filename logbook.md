@@ -33826,3 +33826,16 @@ Processed architect handoff 000267 and merged `bbfc78fdf6`. No further
 coder-owned implementation changes were needed. The normal acceptance
 pipeline passed 599/599 with zero failures, errors, or skips. Returning the
 verified state to the architect for phase closure.
+
+## 2026-08-13T12:40:01Z — specifier: billionaire-strategy approved
+
+Processed architect handoff 000269 (`aa77f58d7a`). The user approved the
+Billionaire strategy design: a Greedo-identical strategy whose opening balance
+overrides the standard starting capital with $57,700,000 (the $1500 is
+replaced). The opening-capital override is a strategy-level setup capability
+applied exactly once before the game starts; default (no override) keeps the
+rule-set capital, and only Billionaire sets it to $57.7M. Billionaire must not
+duplicate Greedo's decision logic; CLI accepts `billionaire` alongside
+`greedo` (mixed per-player selections), default remains Greedo, with balance
+and CLI selection covered by tests/acceptance. Implementation was routed to the
+coder in handoff `000179` on spec commit `0ce75e5`.
