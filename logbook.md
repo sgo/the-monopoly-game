@@ -34238,3 +34238,39 @@ implementation and hardening (Game-boundary opening-capital setup, the
 bankruptcy-6 acceptance correction, and the bounded mutation-runner timeout
 fix). All coder/refactorer/architect loops for this task are closed.
 Verified: domain and CLI unit tests green, full acceptance 748/748.
+
+## 2026-08-13T16:52:57Z — specifier sends greedo-ascending-auction handoff to coder
+
+User traced the empirical Billionaire bankruptcy rate (30% in the 8-player
+playtests) to `Greedo.bidFor`: ordinary auctions bid "everything available
+minus reserve" as a single flat sealed bid regardless of the land's
+strategic value, so one uncontested auction could convert nearly all of
+Billionaire's $57.7M into one property. User asked to redesign it to buy
+"as cheaply as possible", using the existing `bidForDistressed`/
+`DistressedSale` three-tier interest rule and ascending-round mechanic as
+the base, generalized to ordinary auctions (`LandSale`/`Bankruptcy`).
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: greedo-ascending-auction
+commit: 043ccff3b2
+```
+
+Summary: recomputed every affected auction scenario across
+`auctions.feature`, `buying-land.feature`, `bankruptcy.feature`,
+`logging.feature`, `journal.feature`, `report.feature` under the new
+mechanic (opens at the land's mortgage value, $5 ascending increments,
+settles the instant no other bidder can exceed the price); added
+auctions-3/4 proving the not-interested and denial-tier cases directly,
+auctions-4 being the regression proof for both Greedo and Billionaire.
+Parsed clean via `gherkin-parser`; `ir-dry-checker` shows no findings
+introduced beyond each file's existing baseline. Two open items flagged,
+not decided in spec: a configured reserve no longer factors into auction
+bids at all (only direct-buy `accepts()` still uses it, since the reused
+tier rule never references `offer.reserve()`); and the existing
+`wouldWinByBankruptcy` short-circuit is not extended to `Bankruptcy.auction`
+(structurally inapplicable to `LandSale`, which has no debtor).
