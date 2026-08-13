@@ -58,9 +58,26 @@ The table below shows the impact this sudden sense of cooperation had on the out
 Finally, in all games where a stalemate is forming and trading happens, one of the less wealthy Greedos wins **~63%** of
 the time.
 
-*Note: the more players, the less likely monopolies can be formed between just two of them. More of the less wealthy
-Greedos would have to come together to break the stalemate. I haven't considered what conditions they could agree on
-given them all a reasonable chance to win the game and thus agree to the trade.*
+Now the results above were observed in a game of 3 Greedos. As soon as you have more and especially with 8 Greedos you would still get a stalemate almost 100% of the time. This is because as soon as colour groups becomes split between three instead of two players, making a mutually beneficial trade becomes almost impossible. The three players would need to hold three streets from three different colour groups, and all three of them would need to hold at least one street in the same three colour groups. Which is near impossible to happen.
+
+So, how to break the stalemate with 8 Greedos?
+
+##### Legal Entities
+
+When three Greedos hold one street from the same colour group, they can transfer their property into a legal entity. In the game these are identified by names such as "Pink Realty" after the colour group of the streets.
+
+This legal entity now meets the requirement where a full colour group has a single owner and development can begin. This breaks the stalemate as costs of traveling around the board now exceeds salary income.
+
+Development of the properties in the legal entity is financed by taking out loans from the shareholders or rental income as it comes in. After development rental income will also be used to repay the loans with a 5% interest. Finally, when no further development is possible and no more loans need to be repaid the legal entity will pay out dividends to the shareholders.
+
+As a result of this change the stalemate is broken ~85% of the time even with eight Greedos.
+
+|                   | With stalemate trading (n=20) | With legal entities (n=20) |
+|-------------------|-------------------------------|----------------------------|
+| Stalemate         | **80%** (16)                  | **15%** (3)                |
+| Bankruptcy winner | 20% (4)                       | 85% (17)                   |
+
+And when the game does end in a stalemate it is because most of the time everyone but the shareholders are destroyed. While the shareholders themselves live in a sort of equilibrium because of the shared income from the legal entity. Then the imbalance among them does push the game into a duration of thousands of years.
 
 ### How Long Does a Game Last?
 

@@ -27,6 +27,7 @@ import the.monopoly.game.strategies.Strategy;
 
 import java.time.Duration;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -1308,6 +1309,16 @@ public class World {
   public void assertPackagedCliUsage() {
     if (packagedCliOutput == null || !packagedCliOutput.contains("Usage: simulator"))
       throw new AssertionError("Packaged jar did not print simulator usage: " + packagedCliOutput);
+  }
+
+  public void assertReadmeUsageFlag(String flag) {
+    Path readme = PomInspector.repoRoot("the-monopoly-game-cli").resolve("README.md");
+    try {
+      if (!Files.readString(readme).contains(flag))
+        throw new AssertionError("README usage report does not include " + flag + ".");
+    } catch (IOException cause) {
+      throw new AssertionError("Could not read " + readme + ".", cause);
+    }
   }
 
   private static void runProcess(Path workingDirectory, String... command) {

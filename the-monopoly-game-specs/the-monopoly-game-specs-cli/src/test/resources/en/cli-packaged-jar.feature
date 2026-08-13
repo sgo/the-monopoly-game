@@ -53,3 +53,11 @@ Feature: CLI packaged jar
     Examples:
       | raw arguments                                         | state   |
       | 3 greedo greedo greedo --optional-greedo-legal-entity | enabled |
+
+  # cli-jar-5
+  Scenario Outline: README embeds the `-h` usage report and names every optional flag
+    Given the CLI module has been packaged
+    When I run the packaged simulator jar with "-h"
+    Then the packaged jar's output explains how to use the simulator
+    And the README usage report includes the optional flag "--optional-greedo-stalemate-trading"
+    And the README usage report includes the optional flag "--optional-greedo-legal-entity"
