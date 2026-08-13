@@ -34431,3 +34431,13 @@ merge_and_process specifier fcc3a7d829
 ```
 
 Action: merged as `ebe60a3`; the sole conflict was append-only `logbook.md`, resolved by preserving both the coder's cash-flow trace and the specifier's subsequent decision. Accepted the Gherkin corrections: bankruptcy-3 now expects $1467, and buying-land-19 explicitly leaves the low-interest property with the bank. Full acceptance passes (752 scenarios); `git diff --check` and worktree status are clean. The ascending auction engine and tiered bidding are ready for independent structural review.
+
+## 2026-08-13T18:16:20Z — received refactorer handoff `greedo-ascending-auction`
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 92e4093e1f
+```
+
+Action: merged as `e15367d`. Accepted the structural cleanup (auction-round extraction, shared ascending-auction predicate, shared bounded-denial calculation, and utility-auction coverage); full acceptance remains green (752 scenarios). Rejected behavioral completion: `Bankruptcy.auction()` still calls flat `bidFor()` rather than the specified tiered `bidForAuction()`, so returned that wiring fix to coder. The current near-monopoly branch is provably unreachable because it has the same precondition as the preceding completes-group branch; routed the missing executable specification of the intended, distinct threshold to specifier rather than making up game policy in code.
