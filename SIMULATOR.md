@@ -136,6 +136,86 @@ stalemate. No reasonably-scoped trading strategy eliminates the deadlock in
 general; at best it narrows how often it happens. Treated as a known
 characteristic, not a defect — no fix planned.
 
+### Optional: Legal entity for 3+-way colour-group splits
+
+The key blind spot of the mechanisms above is a colour group split across
+*three or more* owners. Stalemate trading's buyout only handles a group split
+between exactly two players, so at 3+ players a split colour group can never
+be built out or consolidated — rent stays capped at vacant rates and the game
+can stall forever (observed at 8 players, where this is the norm). An opt-in
+CLI flag, `--optional-greedo-legal-entity`, adds a "legal entity" mechanism
+that lifts exactly that impasse by letting three co-owners of a split colour
+group form a company that owns, develops, and rents out the whole group
+together.
+
+#### Formation
+
+When the flag is enabled, once the **whole board is owned** and the market is
+dead (no ownership-consolidating action — trade, buyout, bankruptcy transfer,
+or individual development — happened in the just-completed round), the game
+automatically forms a legal entity over any eligible colour group, **before**
+`Stalemate.reached` can fire. Formation requires, all at once:
+
+- **An eligible three-owner split.** The colour group must be split across
+  exactly **three distinct owners/players**. A two-owner (or non-player-owned)
+  split is never consolidated this way, and the entity is never formed over a
+  *highest-priority* colour group.
+- **A real next improvement.** At least one of the group's streets must not yet
+  have a hotel. A split whose streets are already fully developed is **not**
+  selected — it has no build plan and would only pay dividends, so formation
+  refuses it.
+- **Collective fundability.** The three shareholders must be able to
+  **collectively** fund the next improvement on the split group **after** their
+  base reserves — each keeps its own cash reserve, and their combined surplus
+  must cover the next build.
+
+The entity is named after its colour group ("Pink Realty", "Yellow Realty",
+"Green Realty", …) and is held in **equal thirds** by the three co-owners. It
+is an opt-in behaviour, so it never forms unless `--optional-greedo-legal-
+entity` is enabled (with only stalemate trading on, the split stays untouched).
+
+`Stalemate.reached` (the final cash-threshold terminal check) stays fully
+separate from this trigger: the entity may form pre-stalemate while the cash
+threshold has not yet been reached.
+
+#### Operation
+
+A legal entity has its own **bank account** (rent and loans land there, not in
+any shareholder's pocket), and acts once per round in a fixed priority:
+
+1. **Build** — develop its streets as far as it can afford from its treasury.
+   If its own funds are short, it can **solicit a build loan** from its
+   shareholders: each Greedo shareholder commits a share of the shortfall, and
+   the loan is only raised if **every** shareholder can afford its share and
+   keep its base reserve intact (**ALL-OR-NOTHING**): one decliner blocks the
+   whole loan. A shareholder's commitment is also capped at a personal
+   affordability ceiling. With no loan needed, it builds as many houses as its
+   treasury allows at the end of the turn.
+2. **Repay debt** — pay back any outstanding shareholder loan (principal + 5%
+   interest) before distributing anything.
+3. **Pay a dividend** — an equal dividend to all shareholders, **only** once the
+   entire loan (plus interest) has been repaid **and** every entity street has a
+   hotel ("fully developed"). Two extra gates must also hold: the entity
+   treasury must be at or above the dividend threshold, and the last
+   shareholder to have injected build capital must have aged a year. A
+   fully-developed entity therefore settles as financially inactive at the
+   round boundary when those gates fail — it does not build or pay out.
+
+Rent from tenants is collected into the entity's bank account, and a
+shareholder who lands on their *own* entity's street **still pays rent** into
+the entity (they are not exempt).
+
+#### Distressed shares and liquidation
+
+When a shareholder is about to go bankrupt, before their own houses are sold
+or their own land mortgaged, they may **sell a share of their legal entity** to
+a fellow shareholder to raise the shortfall — the share's value is based on the
+entity's maximum developed rent. A fellow shareholder bids up to a third of
+their bank balance; if no fellow shareholder will bid, the share does not
+change hands. When only **one shareholder remains**, that final shareholder may
+**liquidate** the entity to settle their debt, keeping the entity's remaining
+treasury.
+
 ### Optional: Greedo stalemate trading
 
 An opt-in CLI flag, `--optional-greedo-stalemate-trading`, enables a second
@@ -243,3 +323,11 @@ The game result report and journal should have a human-readable format.
   winner
 - writes the final game report to a file, which defaults to
   `the-monopoly-game.report` in the system temporary directory
+
+Two optional flags extend the Greedo strategy's behaviour (both opt-in; neither
+is on by default):
+- `--optional-greedo-stalemate-trading` — enables the peer-trade/buyout bridge
+  described under [Optional: Greedo stalemate trading](#optional-greedo-stalemate-trading).
+- `--optional-greedo-legal-entity` — enables the legal-entity mechanism for
+  3+-way colour-group splits described under
+  [Optional: Legal entity for 3+-way colour-group splits](#optional-legal-entity-for-3-way-colour-group-splits).
