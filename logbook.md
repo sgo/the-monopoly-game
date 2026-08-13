@@ -33721,3 +33721,36 @@ file now genuinely gets written by running the packaged jar for a real
 game (previously it never appeared). Widened reportPath() to package-private
 so the new test reuses it instead of duplicating the path string. dry4java
 and mutation-scan clean. Domain 365/365, acceptance 599/599 run twice.
+
+## 2026-08-13T07:49:30Z — architect review: report-file follow-up returned
+
+Received refactorer handoff:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer c1c4b0b1d7
+```
+
+Action: accepted and merged the reviewed CLI report-file implementation. The
+file write remains in the CLI adapter's sole completed-game reporting point,
+so the core/domain boundary is preserved. Differential `mutate4java` is clean
+and CLI-only `dry4java` reports no duplicates. Soft Gherkin mutation still
+has a narrow verification defect: all six mutations for
+`specs-cli:en/cli-packaged-jar.feature` end as runner errors (while the
+non-packaged CLI mutations are all killed). Route that acceptance-mutation
+pipeline failure to coder before phase closure. Tool-mutated feature files
+were restored without being committed.
+
+## 2026-08-13T09:56:00Z — coder: packaged-CLI mutation runner fixed
+
+Processed architect handoff 000266. The packaged-CLI acceptance mutations were
+reported as runner errors because `World.packageCli()` launched Maven with
+`inheritIO()`, allowing Maven output to bypass the mutation worker's protocol
+capture. Maven now redirects merged output to `DISCARD` while retaining exit
+status checks. The packaged-CLI mutation script also runs this feature with one
+worker because each mutation rebuilds the shared shaded jar.
+
+Verification: targeted soft mutation run completed 6 mutations with 3 killed,
+3 survived, and 0 errors. Full acceptance passed 599/599. Generated mutation
+manifest changes were restored before commit.
