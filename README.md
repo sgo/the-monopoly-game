@@ -10,7 +10,7 @@ read back afterward as a plain-English report.
 
 ```sh
 mvn -pl the-monopoly-game-cli -am package -DskipTests
-java -jar the-monopoly-game-cli/target/the-monopoly-game-cli-0.2.0-SNAPSHOT.jar [number of players] [strategy for each player] [optional flags]
+java -jar the-monopoly-game-cli/target/the-monopoly-game-cli-0.3.0-SNAPSHOT.jar [number of players] [strategy for each player] [optional flags]
 ```
 
 With no arguments, it runs a 2-player game with every player using the
