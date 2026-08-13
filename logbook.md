@@ -34164,3 +34164,17 @@ hardening-suite closure.
 ## 2026-08-13T16:40:00Z — coder: received refactorer+specifier Billionaire follow-up
 
 Merged architect handoff commit `de94926` (task billionaire-strategy). The chain since my boundary fix `eb81e86`: refactorer deduplicated World.java and added BillionaireTest covering openingCapital; specifier corrected the bankruptcy-6 contradiction (£1507 -> £57,700,007 for an unarranged Billionaire); architect appended a mutation-runner-timeout routing note. Reviewing and verifying under coder rules before routing.
+
+## 2026-08-13T14:26:58Z — received coder handoff `billionaire-strategy`
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 4662fc75c1
+```
+
+Action: merged as `63be93c`. This return adds only its receipt log entry and
+does not implement the required mutation-runner timeout. The outstanding
+defect remains: synchronous generated-test execution can leave four active
+workers indefinitely on one mutant. Return to coder for the actual bounded
+execution implementation; do not close the Billionaire hardening loop yet.
