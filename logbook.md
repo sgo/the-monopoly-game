@@ -34460,6 +34460,17 @@ merge_and_process refactorer 92e4093e1f
 
 Action: merged as `e15367d`. Accepted the structural cleanup (auction-round extraction, shared ascending-auction predicate, shared bounded-denial calculation, and utility-auction coverage); full acceptance remains green (752 scenarios). Rejected behavioral completion: `Bankruptcy.auction()` still calls flat `bidFor()` rather than the specified tiered `bidForAuction()`, so returned that wiring fix to coder. The current near-monopoly branch is provably unreachable because it has the same precondition as the preceding completes-group branch; routed the missing executable specification of the intended, distinct threshold to specifier rather than making up game policy in code.
 
+## 2026-08-13T18:30:00Z — coder: merged architect resolution, pipeline green
+
+Merged `31b1dfb` (fast-forward). Architect resolved all three open items:
+- **`bankruptcy-3`**: Accepted $1467 as correct, updated feature manifest from $1507→$1467.
+- **`buying-land-19`**: Specifier resolved: a lone-owning bystander has no auction interest. High hat does NOT own Place de l'Ange Namur, balance stays $1500. Updated feature manifest.
+- **Structure refactor**: `DistressedSale` reuses `Auction.cannotRaise`, `Greedo.denialOrNothing` extracted as private method shared by `bidForDistressed` and `bidForAuction`. `Auction` made package-private with `CeilingFor` interface.
+
+### Verification
+- Domain unit: 119/119 green (new utility-auction test added).
+- Full acceptance: **752/752, 0 failures**. Pipeline green.
+
 ## 2026-08-13T20:20:00Z — specifier decides: no near-monopoly auction tier, delete the dead branch
 
 Received architect priority-00 handoff (commit `31b1dfb361`, task
@@ -34497,3 +34508,56 @@ priority: 00
 task: greedo-ascending-auction
 commit: 1d2e24ff25
 ```
+
+## 2026-08-13T18:22:27Z — received specifier handoff `greedo-ascending-auction`
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 1d2e24ff25
+```
+
+Action: merged as `21b2e68`. Specifier confirms the near-monopoly branch represents a previously rejected broadening, not a missing tier: delete it. Forwarding the decision to coder with the already-pending requirement to route `Bankruptcy.auction()` through tiered `bidForAuction()`; the intended final policy has only completion (uncapped), highest-priority denial (35%), and no interest.
+
+## 2026-08-13T18:45:00Z — coder: deleted dead near-monopoly branch, routed Bankruptcy wiring
+
+Specifier confirmed the near-monopoly branch in `Greedo.bidForAuction` is
+provably unreachable (same condition as `completesOwnGroup` above) and the
+specific policy has exactly three tiers. Deleted the branch; acceptance stays
+752/752 green.
+
+### Bankruptcy wiring blocked
+
+The architect also directed: "route `Bankruptcy.auction()` through tiered
+`bidForAuction()`." Wired it at commit `a0b4532`[sic] — but acceptance reports:
+
+  EnRulesGreedoShareSaleAcceptanceTest.acceptance()[13]
+  high hat expected -5 but was 25
+
+`Bankruptcy.auction()` previously used flat `bidFor` ($50 ceiling for a
+scripted $50-balance bidder), allocating the full balance to the first
+auction. Tierred `bidForAuction()` caps the denial tier at 35% ($17 for $50
+balance), leaving budget for subsequent auctions and altering the final
+balance.
+
+The failure is a content mismatch, not an implementation defect:
+- `bankruptcy.feature` scenarios that exercise `Bankruptcy.auction` are
+  already recomputed and pass with flat `bidFor`.
+- `greedo-share-sale.feature` scenario 13 exercises `Bankruptcy.auction`
+  implicitly through a bank-forced auction in the context of entity share sale,
+  and was never specifier-recomputed for the tiered engine.
+- Changing the `Bankruptcy.auction` bidding formula requires the specifier to
+  recompute the share-sale-13 examples.
+
+Reverted `Bankruptcy.auction` to flat `bidFor` to keep acceptance green.
+Routing the re-wire instruction back to architect for specifier triage.
+
+## 2026-08-13T18:28:43Z — received coder handoff `greedo-ascending-auction`
+
+```
+Deleted specifier-confirmed dead near-monopoly branch (752/752 green). Bankruptcy wiring to bidForAuction blocked: share-sale-13 expects flat bidFor allocation (full balance to first auction), tiered bidForAuction caps at 35% creating a budget mismatch. This is a spec-content issue — share-sale-13 examples not recomputed for tiered engine. Reverted to flat bidFor. Route to specifier.
+
+merge_and_process coder 5493c56
+```
+
+Action: recovered and merged full commit `5493c5691f473a45c2f0140688c3ab0437bd4664` as `0b3c9d2`. Accepted deletion of the specifier-rejected dead branch. Rejected the retained flat bankruptcy bidding: its share-sale-13 failure establishes that this older scenario's expected outcomes must be recomputed for the explicitly specified tiered engine, not that the engine should be bypassed. Routed the scenario-content update to specifier. Removed the literal `>>>>>>> swarmforge-architect` conflict marker accidentally committed in the coder logbook.
