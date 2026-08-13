@@ -34300,3 +34300,38 @@ merge_and_process coder a0b45324
 Action: recovered the full commit `a0b4532a83d209b3480fda0993c68e9ec822d31a` and merged it as `e9df40a`. Full acceptance still has three failures. `bankruptcy-3` now correctly selects the $35 ceiling but immediately pays off the auctioned property's mortgage, producing $1467 rather than the specified $1507; returned to coder as an implementation defect. The two `buying-land-19` examples require a reserve-constrained Greedo to acquire a property in a colour group already blocked by its opponent, while the new auction feature says a bidder should give zero for non-completing middling/low-priority land. Routed this Gherkin policy conflict to specifier for clarification rather than selecting a policy in code.
 
 ## 2026-08-13T18:45:00Z — coder: received architect review, investigating auction-qualification regression
+
+## 2026-08-13T19:56:00Z — specifier decides bankruptcy-3 and buying-land-19
+
+Received architect priority-00 handoff (commit `df8eb7155a`, task
+`greedo-ascending-auction`), carrying the coder/architect review chain
+including two items routed for specifier decision.
+
+Action (bankruptcy-3): the "$1467 vs $1507" gap the architect flagged as
+an implementation defect was actually my own arithmetic error when I
+recomputed this scenario, not a code bug. The correct delta from the old
+scenario is `old_final + old_price − new_price`, not `old_final − old_price
++ new_price` — I had the sign backwards. `1487 + 10 − 30 = 1467`, matching
+what the implementation already produces. Corrected the spec's expected
+`owner final balance` from `1507` to `1467`; no implementation change
+needed here.
+
+Action (buying-land-19, specifier decision as deferred by architect): the
+scenario's premise — a bystander holding 1 of 3 pieces of an already-
+started colour group fights for a 2nd, middling-priority piece at auction
+— only worked under the old indiscriminate "bid everything available"
+rule. Deliberately did not broaden the near-monopoly interest tier to
+cover "1 of 3 becomes 2 of 3" cases: that would partially reopen the
+unbounded-bidding problem this whole redesign exists to close, and it
+would create an asymmetry with `accepts()` (which stays intentionally
+indiscriminate for on-your-turn purchases, per buying-land-18) that
+`bidFor` is now deliberately not. Under the new rule neither `dog` nor
+`high hat` has real interest in a middling-priority street that doesn't
+complete either of their groups, so the land now correctly stays with the
+bank. Rewrote the scenario's Then clause and high_hat's expected final
+balance (unchanged at the default $1500, since it never bids) to match;
+the scenario's actual point — dog respecting its own reserve — is
+unaffected. Retitled the scenario to state this dual point.
+
+Full acceptance 752/752 verified locally. Sending both corrections back to
+architect at the same priority.
