@@ -34188,3 +34188,18 @@ Merged architect handoff `a02ab94` (task billionaire-strategy). The architect re
 Implemented the architect-required fix from handoff `a02ab94`: the mutation runner (`AcceptanceMutationRunner`) previously ran the generated entry point synchronously via `launcher.execute`, so a mutant that hangs a generated test never returned and left a worker pending indefinitely (up to four workers could strand, hanging the whole acceptance-mutation run). Bounded each job with a 5-minute deadline: the job body now runs on a daemon thread, `join`ed by the handler; if it exceeds the bound, the handler returns a bounded `infrastructure_error`, interrupts the worker, and destroys the in-flight entry-point generator sub-process so the worker stays responsive.
 
 Verification: domain unit tests 370/370, CLI 12/12 (the `keepsPlayingUntilToldToStop` timing test is the known pre-existing flake), acceptance 748/748. Ran acceptance mutation on billionaire (5/5 killed), buying-land (0 errors), and bankruptcy (27/27 killed, 0 errors) with all 4 workers responsive. Manifest files, updated by the mutator during these runs, are committed unchanged from tool output.
+
+## 2026-08-13T14:37:46Z — received refactorer handoff `billionaire-strategy`
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer aab78083e0
+```
+
+Action: merged as `96322b6`. Accepted the bounded job response: a timeout
+returns an infrastructure error and frees the mutation-worker protocol, so one
+nonterminating mutant can no longer strand the whole suite. Full acceptance
+passes. The tool-updated Gherkin mutation manifests are accepted as generated
+metadata. This closes the Billionaire implementation and hardening loop; sync
+the completed architect state to specifier.
