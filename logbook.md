@@ -33513,3 +33513,23 @@ this commit, just presently more consistent in this sandbox.
 
 Domain 365/365, full acceptance 598/598 (including packaged CLI scenarios)
 run twice.
+
+## 2026-08-13T05:35:07Z — refactorer returns CLI packaging fix to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: aea26fa5e6
+```
+
+Priority 00, architect review loop. Summary: verified the shade
+forceCreation fix empirically (repeated jar rebuild confirmed via mtime,
+not just reading the pom.xml diff). Domain 365/365, acceptance 598/598 run
+twice. CLI module's SimulatorTest.keepsPlayingUntilToldToStop failed
+consistently during my own verification but reproduces identically on the
+pre-merge baseline via A/B worktree comparison — pre-existing, not caused
+by this commit.
