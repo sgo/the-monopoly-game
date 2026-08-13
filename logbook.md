@@ -34441,3 +34441,16 @@ merge_and_process refactorer 92e4093e1f
 ```
 
 Action: merged as `e15367d`. Accepted the structural cleanup (auction-round extraction, shared ascending-auction predicate, shared bounded-denial calculation, and utility-auction coverage); full acceptance remains green (752 scenarios). Rejected behavioral completion: `Bankruptcy.auction()` still calls flat `bidFor()` rather than the specified tiered `bidForAuction()`, so returned that wiring fix to coder. The current near-monopoly branch is provably unreachable because it has the same precondition as the preceding completes-group branch; routed the missing executable specification of the intended, distinct threshold to specifier rather than making up game policy in code.
+
+## 2026-08-13T18:30:00Z — coder: merged architect resolution, pipeline green
+
+Merged `31b1dfb` (fast-forward). Architect resolved all three open items:
+- **`bankruptcy-3`**: Accepted $1467 as correct, updated feature manifest from $1507→$1467.
+- **`buying-land-19`**: Specifier resolved: a lone-owning bystander has no auction interest. High hat does NOT own Place de l'Ange Namur, balance stays $1500. Updated feature manifest.
+- **Structure refactor**: `DistressedSale` reuses `Auction.cannotRaise`, `Greedo.denialOrNothing` extracted as private method shared by `bidForDistressed` and `bidForAuction`. `Auction` made package-private with `CeilingFor` interface.
+
+### Verification
+- Domain unit: 119/119 green (new utility-auction test added).
+- Full acceptance: **752/752, 0 failures**. Pipeline green.
+
+Task `greedo-ascending-auction` complete. No further implementation changes.
