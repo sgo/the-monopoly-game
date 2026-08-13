@@ -33449,3 +33449,13 @@ two-argument implementation and a normal eight-player run produced 4
 formations, 22 entity builds, 4 loans, and 6 dividends. This is a CLI packaging
 defect: repeated ordinary packaging must not run stale game logic. Routed to
 coder for a focused build configuration/test correction.
+
+Delivered as handoff 000263:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: greedo-market-deadlock-trigger
+commit: 0e12ba63e0
+```
