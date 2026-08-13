@@ -34264,3 +34264,42 @@ merge_and_process coder a0b45324
 Action: recovered the full commit `a0b4532a83d209b3480fda0993c68e9ec822d31a` and merged it as `e9df40a`. Full acceptance still has three failures. `bankruptcy-3` now correctly selects the $35 ceiling but immediately pays off the auctioned property's mortgage, producing $1467 rather than the specified $1507; returned to coder as an implementation defect. The two `buying-land-19` examples require a reserve-constrained Greedo to acquire a property in a colour group already blocked by its opponent, while the new auction feature says a bidder should give zero for non-completing middling/low-priority land. Routed this Gherkin policy conflict to specifier for clarification rather than selecting a policy in code.
 
 ## 2026-08-13T18:45:00Z — coder: received architect review, investigating auction-qualification regression
+
+## 2026-08-13T18:05:00Z — coder: response to architect follow-up review
+
+Merged `df8eb71` (fast-forward). Architect's action:
+- `bankruptcy-3`: Ceiling-cap fix correctly selects $35 ceiling but "immediately
+  pays off the auctioned property's mortgage, producing $1467 rather than the
+  specified $1507." Routed as implementation defect.
+- `buying-land`×2: Routed to specifier as Gherkin policy conflict.
+
+### Analysis for bankruptcy-3
+
+The ceiling-cap fix produces correct $30 payment (min($35 ceiling, $30 opening)):
+$1500 - $30 = $1470. DiestsestraatLeuven is mortgaged, so `settleInheritedMortgage`
+fires. Scripted high_hat is NOT `instanceof Greedo` → `keepMortgaged` → interest
+withdraw of $3 ($30/10 ceiling via (30+9)/10=3) → $1470 - $3 = $1467.
+
+Expected $1507: $1507 - $1467 = $40 gap. No cash-flow path bridges $1467 to $1507
+without a deposit (inherit mortgage-value deposit or rent refund) that doesn't
+apply here — bankruptcy-3 farms exclusively through `bankruptToBank` → `auction`,
+never `inherit`. The `auction` flow sells the land and settles the mortgage
+without depositing mortgage value (unlike `inherit` which does deposit it).
+
+### Architectural concern
+
+$1507 = $1500 - $35 + $42. The $42 gain cannot be sourced from a `deeds.sell`
+(withdraw-only), nor from any deposit within the `auction` → `settleInheritedMortgage`
+path. The expected $1507 appears to be a spec-content miscalculation (possibly
+inheriting mortgage value for the auction winner as if they inherited, or carrying
+the old $1487 computation error forward). 
+
+### Recommendation
+
+Re-verify bankruptcy-3 with the specifier: whether the auction winner should
+receive the $30 mortgage deposit (like the `inherit` path does), and if so,
+whether the auction engine should be generalized to include that deposit.
+Alternatively, the expected $1507 should be recomputed from the correct cash-flow
+path, which currently produces $1467.
+
+No further implementation until the expected value is validated.
