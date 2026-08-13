@@ -7,6 +7,8 @@ import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -88,6 +90,8 @@ class SimulatorTest {
 
   @Test
   void startsPlayingInTheBackgroundUntilStopped() {
+    Path report = Path.of(Simulator.reportPath());
+    try { Files.deleteIfExists(report); } catch (Exception cause) { throw new AssertionError(cause); }
     Simulator.Running running = Simulator.start(2, Simulator.strategiesFor(2, List.of()));
 
     assertThat(running.isPlaying()).isTrue();
@@ -97,6 +101,11 @@ class SimulatorTest {
 
     assertThat(result.succeeded()).isTrue();
     assertThat(result.output()).contains("The game starts");
+    try {
+      assertThat(Files.readString(report)).isEqualTo(result.output());
+    } catch (Exception cause) {
+      throw new AssertionError("The simulator did not write its report file.", cause);
+    }
     assertThat(running.isPlaying()).isFalse();
   }
 
