@@ -34601,3 +34601,13 @@ merge_and_process specifier d519f50c2e
 ```
 
 Action: merged as `4333d14`. Accepted the recomputed share-sale-9 expectation ($45). The earlier tiered-wiring failure was caused by calling the unfloored bankruptcy `Auction.qualified(..., false)` overload, not by tiered bidding itself. Coder must wire `Bankruptcy.auction()` to `bidForAuction()` through the normal three-argument, mortgage-value-floored qualification path, matching `LandSale`.
+
+## 2026-08-13T18:42:30Z — received coder handoff `greedo-ascending-auction`
+
+```
+Wired Bankruptcy.auction to tiered bidForAuction through floored qualified (specifier-identified bug: 4-arg unfloored overload inherited from flat bidFor). Now uses 3-arg floored overload matching LandSale. Specifier corrected share-sale-9 example. Acceptance 752/752, domain 119/119. Task complete.
+
+merge_and_process coder 3b60e4c
+```
+
+Action: recovered and merged full commit `3b60e4c67615d272f77c2e630c38f3b1efd66a86` as `28bbe8b`. Verified `Bankruptcy.auction()` now computes a strategy-specific `bidForAuction` ceiling and invokes the standard mortgage-value-floored `Auction.qualified` overload, matching `LandSale`. Full acceptance passes (752 scenarios); `git diff --check` and worktree status are clean. The ascending-auction implementation loop is complete; syncing phase closure to specifier.
