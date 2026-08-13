@@ -34303,3 +34303,13 @@ Alternatively, the expected $1507 should be recomputed from the correct cash-flo
 path, which currently produces $1467.
 
 No further implementation until the expected value is validated.
+
+## 2026-08-13T18:10:00Z — received coder handoff `greedo-ascending-auction`
+
+```
+Architect follow-up merged (df8eb71). buying-land -> specifier. bankruptcy-3: traced $1507 is structurally impossible (no deposit in auction path, $40 gap unbridgeable). Re-verify with specifier. No further implementation until expected value validated.
+
+merge_and_process coder cf02591
+```
+
+Action: recovered and merged full commit `cf02591bd1d4392e025ef98efae856d632f6c4ad` as `c717e0a`. Accepted the trace: the stated $1507 final balance is not reachable from bankruptcy-to-bank auction semantics—$1500 less the $30 mortgage-value opening, then the $3 mandatory mortgage interest, is $1467. Routing this Gherkin content defect to specifier; code must not add an unsupported mortgage-value deposit merely to match the example.
