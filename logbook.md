@@ -34130,3 +34130,21 @@ the Billionaire row's `owner final balance` from the stale `1507` to
 starting balance to $0, opting out of the opening-capital difference, so its
 existing `29` figure (identical to Greedo's) is unaffected and correct as
 is. Feature parses cleanly.
+
+## 2026-08-13T15:54:40Z — specifier sends bankruptcy-6 decision to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: billionaire-strategy
+commit: fa9e03bb5b
+```
+
+Priority 00, matching the incoming architect-follow-up loop. Summary:
+corrected `bankruptcy-6`'s Billionaire example row from the stale
+Greedo-scale `1507` to `57700007`, matching Billionaire's real default
+opening capital carried through the same mortgage-payoff math. Full
+acceptance 748/748, including `EnRulesBankruptcyAcceptanceTest` 10/10.
