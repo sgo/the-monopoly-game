@@ -33839,3 +33839,12 @@ duplicate Greedo's decision logic; CLI accepts `billionaire` alongside
 `greedo` (mixed per-player selections), default remains Greedo, with balance
 and CLI selection covered by tests/acceptance. Implementation was routed to the
 coder in handoff `000179` on spec commit `0ce75e5`.
+
+## 2026-08-13T14:45:00Z — specifier: handoff 000179 priority corrected to 50
+
+Handoff `000179` (billionaire-strategy-implementation) was initially filed at
+priority `00` to the coder. Per workflow rules, priority `00` is reserved for
+architect handoffs and specifier-to-coder implementation handoffs default to
+`50`. Re-filed as `50_20260813T121139Z_000179_from_specifier_to_coder.handoff`,
+still targeting the coder, carrying the Billionaire implementation for spec
+commit `0ce75e5`.
