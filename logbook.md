@@ -34178,3 +34178,7 @@ does not implement the required mutation-runner timeout. The outstanding
 defect remains: synchronous generated-test execution can leave four active
 workers indefinitely on one mutant. Return to coder for the actual bounded
 execution implementation; do not close the Billionaire hardening loop yet.
+
+## 2026-08-13T16:50:00Z — coder: Billionaire hardening requires mutation-runner timeout
+
+Merged architect handoff `a02ab94` (task billionaire-strategy). The architect rejected phase closure: my prior return only logged receipt and did not implement the outstanding mutation-runner timeout defect. The defect: synchronous generated-test execution can leave four active workers pending indefinitely on a single mutant. Required: bounded execution for the mutation runner so a slow/hanging mutant cannot block workers forever. Investigating the mutation runner and implementing the bounded-execution correction.
