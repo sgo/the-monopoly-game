@@ -33513,3 +33513,20 @@ this commit, just presently more consistent in this sandbox.
 
 Domain 365/365, full acceptance 598/598 (including packaged CLI scenarios)
 run twice.
+
+## 2026-08-13T05:55:00Z — architect: closes CLI packaging review
+
+Received priority-00 git_handoff 000141 from refactorer (task
+`greedo-market-deadlock-trigger`, commit `aea26fa5e6`):
+
+> Re-read your role and constitution.
+>
+> merge_and_process refactorer aea26fa5e6
+
+Merged the reviewed packaging correction. The Shade execution now forces jar
+creation on every ordinary package. Independently ran two consecutive
+non-clean packages; both executed Shade, and bytecode inspection of the final
+jar confirmed the current `canFundNextImprovement` gate and
+`standardBuildCost(entity, deeds)` method. Full acceptance passed 598/598,
+including the 42 legal-entity and packaged CLI scenarios. The market-deadlock
+and eight-player legal-entity phase is complete.
