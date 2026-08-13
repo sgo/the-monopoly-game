@@ -85,12 +85,19 @@ for feature in "${FEATURE_FILES[@]}"; do
   "$ROOT/acceptance/acceptance-entrypoint-generator.bb" --feature-path "$feature" "$ir" "$generated"
 
   echo "== mutating $feature (level $LEVEL) =="
+  workers=4
+  # Packaged-CLI scenarios invoke Maven against the shared target directory;
+  # parallel mutations race while replacing the shaded jar and become runner
+  # errors instead of meaningful test outcomes.
+  if [[ "$feature" == "specs-cli:en/cli-packaged-jar.feature" ]]; then
+    workers=1
+  fi
   (cd "$APS" && bb gherkin-mutator \
     --feature "$feature_file" \
     --work-dir "$work_dir" \
     --generated-dir "$generated" \
     --runner-worker "$WORKER" \
-    --workers 4 \
+    --workers "$workers" \
     --status-interval 30s \
     --level "$LEVEL") || status=$?
 done

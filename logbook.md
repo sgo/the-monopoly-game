@@ -33704,6 +33704,24 @@ dice-timing flake (already confirmed via A/B comparison two cycles ago,
 unrelated to any of this work); the specific test this commit added
 (`startsPlayingInTheBackgroundUntilStopped`) passes cleanly.
 
+## 2026-08-13T07:42:25Z — refactorer returns CLI report-file write to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: readme-embed-cli-usage
+commit: c1c4b0b1d7
+```
+
+Priority 00, matching the incoming priority. Summary: verified the report
+file now genuinely gets written by running the packaged jar for a real
+game (previously it never appeared). Widened reportPath() to package-private
+so the new test reuses it instead of duplicating the path string. dry4java
+and mutation-scan clean. Domain 365/365, acceptance 599/599 run twice.
+
 ## 2026-08-13T07:49:30Z — architect review: report-file follow-up returned
 
 Received refactorer handoff:
@@ -33724,12 +33742,52 @@ non-packaged CLI mutations are all killed). Route that acceptance-mutation
 pipeline failure to coder before phase closure. Tool-mutated feature files
 were restored without being committed.
 
-## 2026-08-13T08:00:48Z — received refactorer handoff `readme-embed-cli-usage`
+## 2026-08-13T09:56:00Z — coder: packaged-CLI mutation runner fixed
+
+Processed architect handoff 000266. The packaged-CLI acceptance mutations were
+reported as runner errors because `World.packageCli()` launched Maven with
+`inheritIO()`, allowing Maven output to bypass the mutation worker's protocol
+capture. Maven now redirects merged output to `DISCARD` while retaining exit
+status checks. The packaged-CLI mutation script also runs this feature with one
+worker because each mutation rebuilds the shared shaded jar.
+
+Verification: targeted soft mutation run completed 6 mutations with 3 killed,
+3 survived, and 0 errors. Full acceptance passed 599/599. Generated mutation
+manifest changes were restored before commit.
+
+## 2026-08-13T07:56:48Z — refactorer receives packaged-CLI mutation runner fix for review
+
+Received coder priority-00 handoff:
 
 ```
 Re-read your role and constitution.
 
-merge_and_process refactorer 6a242d8dc5
+merge_and_process coder 0e8a78a2ad
 ```
 
-Action: merging the review result and confirming final task closure.
+Action: merged `0e8a78a2ad` (clean, no conflict). Two small, well-targeted
+infrastructure fixes: `World.runProcess` no longer uses `inheritIO()`
+(which let the packaged CLI's Maven subprocess output bypass the mutation
+worker's stdout/stderr protocol capture and turn every packaged-CLI
+mutation into a runner error) — it now merges stderr into stdout and
+discards it while still checking the exit code; and
+`run-acceptance-mutation.sh` runs the packaged-CLI feature with exactly one
+worker instead of four, since parallel mutations there race on the shared
+target directory while replacing the shaded jar.
+
+Not my scope to run (mutation testing and Gherkin acceptance mutation are
+explicitly outside refactorer ownership), so I didn't re-run the mutation
+suite myself; the coder's own verification (6 mutations, 3 killed, 3
+survived, 0 errors — a real result now, not a runner artifact) is the
+relevant signal, and any follow-up on the 3 survivors is architect/coder
+territory. `runProcess` only has the one call site (packaging the CLI
+module for acceptance), so this doesn't touch anything test-outcome-
+relevant beyond that step; discarding the build's own console output does
+make a genuine `mvn package` failure less diagnosable (only the generic
+"Command failed: ..." message would show), but that's an intentional,
+reasonable trade for clean mutation-worker output capture, not a defect.
+
+dry4java on `World.java` shows only the same pre-existing step-handler
+duplication documented in earlier cycles, nowhere near the changed method.
+No CRAP concern (a two-line change to a builder chain). Domain 365/365,
+full acceptance 599/599 run twice.
