@@ -33826,3 +33826,17 @@ Processed architect handoff 000267 and merged `bbfc78fdf6`. No further
 coder-owned implementation changes were needed. The normal acceptance
 pipeline passed 599/599 with zero failures, errors, or skips. Returning the
 verified state to the architect for phase closure.
+## 2026-08-13T14:25:00Z — coder: Billionaire strategy implementation
+
+Processed specifier handoff 000179 and merged `0ce75e5`. Added Billionaire as
+a Greedo subtype with a $57,700,000 opening-capital capability, wired the
+acceptance vocabulary and CLI strategy selection, and added the CLI journal
+assertions for mixed Greedo/Billionaire selection. Explicitly arranged
+scenario balances are preserved by the acceptance harness.
+
+Domain tests pass (367 tests) and CLI tests pass (12 tests). The full
+acceptance run reaches 748 tests but currently reports 81 failures because the
+merged spec sweep duplicated Greedo scenarios as Billionaire rows while
+retaining expectations for the $1,500 opening balance; this requires the
+specifier/architect to reconcile the generated twin expectations before a
+green handoff is possible.

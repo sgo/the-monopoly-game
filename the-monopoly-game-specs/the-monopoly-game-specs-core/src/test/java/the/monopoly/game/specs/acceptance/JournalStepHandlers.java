@@ -376,6 +376,18 @@ final class JournalStepHandlers {
                   .count()).isEqualTo(world.simulatorPlayerCount());
             }),
 
+        then("^the game journal records that pawn \"" + NAME + "\" uses the \"Billionaire\" strategy$",
+            (world, arguments) -> world.awaitGameLog(1,
+                entry -> entry instanceof Entry.StrategyNamed named
+                    && named.player().value().equals(arguments.text(1))
+                    && named.name().equals("Billionaire"), "Billionaire strategy")),
+
+        then("^the game journal records that pawn \"" + NAME + "\" uses the \"Greedo\" strategy$",
+            (world, arguments) -> world.awaitGameLog(1,
+                entry -> entry instanceof Entry.StrategyNamed named
+                    && named.player().value().equals(arguments.text(1))
+                    && named.name().equals("Greedo"), "Greedo strategy")),
+
         then("^the game journal records that the \"Greedo\" strategy observes legal-entity trading as "
                 + NAME + "$",
             (world, arguments) -> {

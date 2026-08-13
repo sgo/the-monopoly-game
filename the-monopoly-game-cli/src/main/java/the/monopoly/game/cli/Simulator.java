@@ -11,6 +11,7 @@ import the.monopoly.game.rules.Cards;
 import the.monopoly.game.rules.Deeds;
 import the.monopoly.game.rules.Jail;
 import the.monopoly.game.strategies.Greedo;
+import the.monopoly.game.strategies.Billionaire;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.HashMap;
@@ -24,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Thin command boundary for running a configured Monopoly simulation. */
 public final class Simulator {
-  private static final Set<String> STRATEGIES = Set.of("greedo");
+  private static final Set<String> STRATEGIES = Set.of("greedo", "billionaire");
 
   private Simulator() {
   }
@@ -84,7 +85,10 @@ public final class Simulator {
     for (int index = 0; index < playerCount; index++) {
       String name = names.get(index);
       if (!STRATEGIES.contains(name)) throw new IllegalArgumentException("Unknown strategy: " + name + ".");
-      selections.put(Pawn.values()[index].id(), new Greedo(Money.ZERO, stalemateTrading, legalEntityTrading));
+      Strategy strategy = name.equals("billionaire")
+          ? new Billionaire(Money.ZERO, stalemateTrading, legalEntityTrading)
+          : new Greedo(Money.ZERO, stalemateTrading, legalEntityTrading);
+      selections.put(Pawn.values()[index].id(), strategy);
     }
     return player -> selections.get(player.id());
   }
@@ -136,6 +140,10 @@ public final class Simulator {
 
     Rule.Set rules = Rule.Set.Type.official.create();
     List<Player> players = rules.players().select(playerCount).toList();
+    players.forEach(player -> strategies.forPlayer(player).openingCapital().ifPresent(capital -> {
+      Money current = player.account().balance().amount();
+      player.account().deposit(capital.minus(current));
+    }));
     Deeds deeds = new Deeds();
     return new Running(new Game(rules, players, player -> Cup.of(rules.dice().toList()), strategies, deeds,
         Cards.Decks.official(deeds), new Jail(rules), stalemateTrading, legalEntityTrading));

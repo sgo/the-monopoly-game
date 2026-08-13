@@ -24,6 +24,8 @@ import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Stalemate;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
+import the.monopoly.game.strategies.Billionaire;
+import the.monopoly.game.strategies.Greedo;
 
 import java.time.Duration;
 import java.io.IOException;
@@ -97,6 +99,7 @@ public class World {
   private int packagedCliExitCode;
   private Boolean tradeAccepted;
   private final Map<String, Money> entityBalances = new HashMap<>();
+  private final Set<String> arrangedBalances = new HashSet<>();
   private MonopolyBuyout.Outcome buyout;
   private boolean stalemateTrading;
   private boolean legalEntityTrading;
@@ -296,11 +299,14 @@ public class World {
   public void configureSimulatorRaw(String rawArguments) {
     List<String> arguments = List.of(rawArguments.trim().split("\\s+"));
     simulatorPlayers = Integer.parseInt(arguments.getFirst());
-    simulatorStrategies = player -> new the.monopoly.game.strategies.Greedo();
     simulatorStalemateTrading = arguments.contains("--optional-greedo-stalemate-trading");
     simulatorLegalEntityTrading = arguments.contains("--optional-greedo-legal-entity");
-    simulatorStrategies = player -> new the.monopoly.game.strategies.Greedo(
-        the.monopoly.game.components.finance.Money.ZERO, simulatorStalemateTrading, simulatorLegalEntityTrading);
+    List<String> names = arguments.subList(1, arguments.size()).stream()
+        .filter(argument -> !argument.startsWith("--")).toList();
+    simulatorStrategies = player -> names.get(player.id().value().equals("dog") ? 0 : 1)
+        .equals("billionaire")
+        ? new Billionaire(Money.ZERO, simulatorStalemateTrading, simulatorLegalEntityTrading)
+        : new Greedo(Money.ZERO, simulatorStalemateTrading, simulatorLegalEntityTrading);
   }
 
   public void resolveSplitMonopoly(String firstPawn, String secondPawn) {
@@ -403,6 +409,14 @@ public class World {
 
   private void playAndCapture(Function<Game, Game.Result> play) {
     gameStarted = true;
+    players().forEach(player -> {
+      if (arrangedBalances.contains(player.id().value())) return;
+      Strategy strategy = strategyOf(player);
+      strategy.openingCapital().ifPresent(capital -> {
+        Money current = player.account().balance().amount();
+        player.account().deposit(capital.minus(current));
+      });
+    });
     Cards.Decks officialDecks = Cards.Decks.official(deeds == null ? deeds = new Deeds() : deeds);
     Game game = new Game(
         ruleSet, players(), player -> () -> nextQueuedPawnRoll(player), this::strategyOf,
@@ -1121,6 +1135,10 @@ public class World {
               + amount.amount() + "."
       );
     pawn(pawnName).account().withdraw(startingCapital.minus(amount));
+    arrangedBalances.add(pawnName);
+    if (pawnStrategies.get(pawnName) instanceof Billionaire billionaire)
+      pawnStrategies.put(pawnName, new Billionaire(billionaire.cashReserve(),
+          billionaire.stalemateTradingEnabled(), billionaire.legalEntityTradingEnabled(), false));
   }
 
   /** Sets a balance representing wealth accumulated during the game. */

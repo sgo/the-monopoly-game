@@ -4,6 +4,7 @@ import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.strategies.Greedo;
+import the.monopoly.game.strategies.Billionaire;
 import the.monopoly.game.strategies.Strategy;
 
 /**
@@ -31,6 +32,7 @@ final class Vocabulary {
   static Strategy strategy(String name) {
     return switch (name) {
       case "Greedo" -> new Greedo();
+      case "billionaire", "Billionaire" -> new Billionaire();
       default -> throw new AssertionError("Unknown strategy \"" + name + "\".");
     };
   }
@@ -40,6 +42,7 @@ final class Vocabulary {
                                       boolean stalemateTrading, boolean legalEntityTrading) {
     return switch (name) {
       case "Greedo" -> new Greedo(reserve, stalemateTrading, legalEntityTrading);
+      case "billionaire", "Billionaire" -> new Billionaire(reserve, stalemateTrading, legalEntityTrading);
       default -> throw new AssertionError("Unknown strategy \"" + name + "\".");
     };
   }
