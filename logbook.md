@@ -34896,3 +34896,57 @@ merge_and_process specifier cfeb976dc9
 ```
 
 Action: merged the clarified report and logging snapshot scenarios.
+
+## 2026-08-14T09:10:27Z — specifier sends cli-year-limit handoff to coder
+
+User asked to investigate a 5-minute-cap batch run to see whether long
+runners genuinely never resolve or are just slow. Log analysis across 70
+games (billionaire-retest-50, billionaire-5min, billionaire-retest) showed
+resolving games (win or stalemate) cluster under ~1,000 simulated years
+(median ~230), while the two observed timeouts jumped an order of magnitude
+higher (3,354 and 19,159 years) and ran at roughly a third the simulation
+speed. User proposed keeping the game running to completion by default but
+adding an opt-in CLI cap so it doesn't have to be waited out.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: cli-year-limit
+commit: 802b86bd0e
+```
+
+Specified an optional `--max-years=<N>` CLI flag: unset by default (game
+behavior unchanged), and when set, the game stops itself once any
+remaining player's age reaches the limit — checked at the same point
+`Stalemate.reached()` already is in `Game.playTurn`, so it applies
+uniformly across `play()`/`playToCompletion()`/`playUntilStopped()`, not
+just bounded test scenarios. On stopping it logs a new `YearLimitReached`
+journal entry plus `FinalBalance`/`FinalAge` for every survivor, mirroring
+`logStalemate`, so a capped run still leaves a readable snapshot.
+
+Three new specs:
+- `year-limit.feature` (specs-core): stops once a player's age reaches the
+  limit; does not stop while everyone is still under it; never triggers
+  with no limit configured. Uses `pawn "dog" starts at position 35` +
+  `will roll 5 for their turn` to land exactly on GO in one controlled
+  turn, since landing on/passing GO is the only place age increments.
+- `cli.feature` (cli-8, cli-9): `--max-years=1` makes the simulator stop
+  itself on a real game with no explicit `stop()` call; `--max-years=0` is
+  rejected the same way `playUpToRounds(0)` already is.
+- `cli-packaged-jar.feature` (cli-jar-6, and cli-jar-5 extended): the
+  packaged jar's startup stdout confirms the configured year limit,
+  matching the existing stalemate-trading/legal-entity confirmation lines;
+  the README usage-flag scenario now also checks for `--max-years`.
+
+All three files pass `gherkin-parser` and `gherkin-ir-dry-checker` with no
+new findings beyond the pre-existing low-severity possible-synonym/
+near-duplicate pairs already present in these files. The new step
+vocabulary (`the game is limited to N years`, `the game ends because the
+year limit was reached`, `--max-years` parsing, the new journal entry and
+stdout confirmation line) does not exist yet, so these scenarios could not
+be RED-verified against the current implementation — that verification is
+for the coder to run once the corresponding step handlers and domain code
+exist.
