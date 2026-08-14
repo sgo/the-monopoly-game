@@ -34750,3 +34750,43 @@ Merged specifier `323a3e0`. Five new scenarios covering four defects:
 - Full acceptance: **757/757, 0 failures, 0 errors**
 
 Task `legal-entity-rent-and-share-defects` complete.
+
+## 2026-08-14T07:15:00Z — refactorer received coder handoff `legal-entity-rent-and-share-defects`
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 740f2cc9bf
+```
+
+Action: merged commit `740f2cc9bf` as `ac93f6e`, resolving an append-only `logbook.md` conflict (both branches were strictly additive over the shared `92e4093e1f` base; reconstructed by taking the upstream architect/specifier/coder chain in full and inserting the refactorer's own two entries — received/reviewed the prior `greedo-ascending-auction` architect handoff — at the point the upstream chain's "received refactorer handoff" entry shows they belong; also stripped a literal `>>>>>>> 8f13cbb` conflict marker accidentally committed upstream, same class of artifact as a previous incident). First refactorer touch on this task: `Bankruptcy.java`, `LegalEntity.java`, `Rent.java`, `Greedo.java` (docstring only) fixing four playtesting defects (unconditional entity rent withdrawal, entity dividend unfreezing after a bankrupt last-capitalizer, selling all of a debtor's entity shares rather than stopping at the first, and counting distinct owners rather than shareholder slots for liquidation). Reviewing under refactorer rules before handing back to the architect.
+
+## 2026-08-14T07:15:00Z — refactorer review: `legal-entity-rent-and-share-defects`
+
+`mvn test` on the domain module immediately after merge failed: `RentTest.aTenantWhoCannotAffordEntityRentPaysNothing` asserted the exact guarded behavior this task's Rent.java change deliberately removed (tenant balance clamped to 0, `entity.receivedRent()` false) — a stale unit test the coder's production fix left behind, contradicting the now-settled unconditional-withdraw rule and blocking verification outright. Not a game-policy judgment call (the specifier's handoff note states the rent rule "is already settled and not up for change"); rewrote the test to assert the correct behavior instead (tenant balance goes to -8, entity still receives the rent in full), matching the pattern `Rent`'s player-owned withdrawal path already has no dedicated unit test for (deferring to the bankruptcy chain elsewhere, per the coder's own root-finding note). Domain module now 374/374 green.
+
+Mutation-site scan on every touched production file: `Bankruptcy.java` 42, `LegalEntity.java` 26, `Rent.java` 8, `Greedo.java` 58 — all well under the 100-site split threshold.
+
+CRAP (`crap4java`, domain, flaky `SimulatorTest.keepsPlayingUntilToldToStop` in the CLI module skipped for the isolated measurement only, not committed): one method came in above the project's 6.0 threshold beyond the two constitution-exempted sealed-switch dispatches (`Report.line` at 218.9, `Game.journalOperation` at 42.0, both unchanged and already on record). `LegalEntity.repayLoanOrPayDividend` rose to CC=7 / CRAP 7.0 at 100% coverage after the coder added the `deeds.isBankrupt(lastCapitalizedShareholder)` gate for entity-33. Extracted `readyForDividend` (the affordability/development/capitalization conjunction) and `lastCapitalizationSettled` (the three-way disjunction for whether the last capitalizer stopped blocking dividends) out of it; all three methods now sit at CRAP 3.0.
+
+`dry4java` on `domain/src/main` found nothing new beyond pre-existing, unrelated `Game.java` duplication and boilerplate constructor matches (`LandSale`/`Rent`, score 1.00 — same five-field assignment pattern several classes in this codebase share; not worth a shared base class for a five-line constructor). Manual reading found a real duplicate `dry4java`'s declaration-level threshold missed: the "exactly one distinct shareholder" check now appears in both `LegalEntity.liquidateTo` (this task's fix for share-sale-23) and `Bankruptcy.sellEntitySharesUntilSolvent` (same fix, same task, different class). Extracted a named `LegalEntity.hasOneDistinctShareholder()` query used by both call sites instead of each spelling out `shareholders.stream().distinct().count() == 1` independently.
+
+Refreshed the `mutate4java` manifests on `Bankruptcy.java`, `LegalEntity.java`, `Rent.java`, and `Greedo.java` via `--update-manifest` (Greedo's manifest still referenced the coder-deleted near-monopoly branch's line range from the prior task; no other structural change to that file this cycle).
+
+Verification: `mvn test` from the repo root — all modules green except the CLI module's pre-existing `keepsPlayingUntilToldToStop`, confirmed present at the merge commit before any refactorer change (a known isolated/full-reactor timing characteristic, unrelated to this task's domain-only changes). Full acceptance pipeline: 757/757 (matches the coder's reported count), run twice.
+
+## 2026-08-14T07:15:00Z — refactorer sent legal-entity-rent-and-share-defects handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: legal-entity-rent-and-share-defects
+commit: 6eb306bb67
+```
+
+Priority 00, matching the incoming architect-follow-up loop. Summary: fixed a stale domain unit test the coder's Rent.java change left contradicting settled behavior (was blocking `mvn test` outright), closed a CRAP gap on `LegalEntity.repayLoanOrPayDividend` opened by the entity-33 fix (extracted `readyForDividend`/`lastCapitalizationSettled`), and deduplicated the "exactly one distinct shareholder" check the share-sale-23 fix introduced in two classes behind `LegalEntity.hasOneDistinctShareholder()`. No behavior changes beyond the test fix, which restores an already-decided, already-implemented rule rather than deciding new policy. Domain 374/374, full reactor green apart from the known pre-existing CLI flake, acceptance 757/757 run twice.
