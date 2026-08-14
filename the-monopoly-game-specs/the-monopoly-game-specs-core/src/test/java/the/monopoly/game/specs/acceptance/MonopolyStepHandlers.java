@@ -250,6 +250,9 @@ public final class MonopolyStepHandlers {
         then("^the game log records no winner$",
             (world, arguments) -> logRecordsNoWinner(world)),
 
+        then("^the game log records that the year limit was reached$",
+            (world, arguments) -> logRecords(world, Claim.ofAny(Entry.YearLimitReached.class))),
+
         then("^the simulator exits successfully$",
             (world, arguments) -> assertThat(world.simulatorResult().succeeded()).isTrue()),
 
@@ -273,6 +276,9 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> assertThat(world.simulatorResult().output())
                 .contains("number of players must be between 2 and 8")
                 .contains("received " + arguments.number(1) + " players")),
+
+        then("^the output explains that a game needs at least one year$",
+            (world, arguments) -> assertThat(world.simulatorResult().output()).contains("A game needs at least one year")),
 
         step("^we play " + VALUE + " times$",
             (world, arguments) -> world.playMonopolyGames(arguments.number(1))),

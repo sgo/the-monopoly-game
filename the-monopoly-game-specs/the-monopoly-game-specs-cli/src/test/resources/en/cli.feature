@@ -114,3 +114,26 @@ Feature: Monopoly command line interface
     Examples:
       | raw arguments                                   | billionaire pawn | greedo pawn |
       | 2 greedo billionaire                            | high hat         | dog         |
+
+  # cli-8
+  Scenario Outline: the CLI stops a real game on its own once a player's age reaches the configured year limit
+    Given the simulator is configured with the raw arguments "<raw arguments>"
+    When I start the simulator
+    Then the simulator process ends
+    And the game log records no winner
+    And the game log records that the year limit was reached
+
+    Examples:
+      | raw arguments                   |
+      | 2 greedo greedo --max-years=1   |
+
+  # cli-9
+  Scenario Outline: the CLI rejects a year limit that is not a positive number
+    Given the simulator is configured with the raw arguments "<raw arguments>"
+    When I run the simulator
+    Then the simulator exits unsuccessfully
+    And the output explains that a game needs at least one year
+
+    Examples:
+      | raw arguments                   |
+      | 2 greedo greedo --max-years=0   |

@@ -104,6 +104,8 @@ public class World {
   private boolean legalEntityTrading;
   private boolean simulatorStalemateTrading;
   private boolean simulatorLegalEntityTrading;
+  private int gameMaxYears = -1;
+  private int simulatorMaxYears = -1;
   private Entry selectedEvent;
   private String renderedEventText;
   private String loggedEventText;
@@ -209,6 +211,10 @@ public class World {
     simulatorStrategies = player -> new the.monopoly.game.strategies.Greedo();
   }
 
+  public void setMaxYears(int maxYears) {
+    gameMaxYears = maxYears;
+  }
+
   public void configureSimulatorWithGreedo() {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
     simulatorStrategies = player -> new the.monopoly.game.strategies.Greedo();
@@ -223,7 +229,7 @@ public class World {
 
   public void runSimulator() {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
-    simulatorResult = Simulator.run(simulatorPlayers, simulatorStrategies);
+    simulatorResult = Simulator.run(simulatorPlayers, simulatorStrategies, false, false, simulatorMaxYears);
   }
 
   public Simulator.Result simulatorResult() {
@@ -240,7 +246,7 @@ public class World {
   public void startSimulator() {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
     runningSimulator = Simulator.start(simulatorPlayers, simulatorStrategies, simulatorStalemateTrading,
-        simulatorLegalEntityTrading);
+        simulatorLegalEntityTrading, simulatorMaxYears);
   }
 
   public void stopSimulator() {
@@ -300,6 +306,12 @@ public class World {
     simulatorPlayers = Integer.parseInt(arguments.getFirst());
     simulatorStalemateTrading = arguments.contains("--optional-greedo-stalemate-trading");
     simulatorLegalEntityTrading = arguments.contains("--optional-greedo-legal-entity");
+    simulatorMaxYears = -1;
+    for (String argument : arguments) {
+      if (argument.startsWith("--max-years=")) {
+        simulatorMaxYears = Integer.parseInt(argument.substring("--max-years=".length()));
+      }
+    }
     List<String> names = arguments.subList(1, arguments.size()).stream()
         .filter(argument -> !argument.startsWith("--")).toList();
     simulatorStrategies = player -> names.get(player.id().value().equals("dog") ? 0 : 1)
@@ -426,7 +438,8 @@ public class World {
         },
         jail,
         stalemateTrading,
-        legalEntityTrading
+        legalEntityTrading,
+        gameMaxYears
     );
     Game.Result result = play.apply(game);
     turnOrder = result.turnOrder();
@@ -485,6 +498,10 @@ public class World {
 
   public boolean endedInStalemate() {
     return journal != null && journal.stream().anyMatch(Entry.Stalemate.class::isInstance);
+  }
+
+  public boolean endedInYearLimit() {
+    return journal != null && journal.stream().anyMatch(Entry.YearLimitReached.class::isInstance);
   }
 
   public void givePawnGetOutOfJailFreeCard(String pawnName) {
@@ -1317,6 +1334,18 @@ public class World {
     }
     throw new AssertionError("Packaged jar output did not confirm legal entity trading is " + state
         + ": " + packagedCliOutputBuffer);
+  }
+
+  public void assertPackagedCliYearLimit(int yearLimit) {
+    long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
+    while (System.nanoTime() < deadline) {
+      synchronized (packagedCliOutputBuffer) {
+        if (packagedCliOutputBuffer.toString().contains("Year limit is " + yearLimit + " years")) return;
+      }
+      LockSupport.parkNanos(5_000_000);
+    }
+    throw new AssertionError("Packaged jar output did not confirm year limit is " + yearLimit
+        + " years: " + packagedCliOutputBuffer);
   }
 
   public void stopPackagedCli() {
