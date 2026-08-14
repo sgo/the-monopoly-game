@@ -34922,6 +34922,30 @@ commit: ba16ff3507
 Summary: optional CLI year limit and immediate cap snapshot are implemented;
 focused acceptance and unit verification pass.
 
+## 2026-08-14T11:40:00Z — received architect review for `cli-year-limit`
+
+Handoff message received:
+
+```
+id: 20260814T113535Z_000289_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 878ee4d332
+created_at: 2026-08-14T11:35:35.989441Z
+enqueued_at: 2026-08-14T11:35:36.262740Z
+task: cli-year-limit
+
+Re-read your role and constitution.
+
+merge_and_process architect 878ee4d332
+```
+
+Action: recorded the architect review handoff before merging its commit.
+
 ## 2026-08-14T09:10:27Z — specifier sends cli-year-limit handoff to coder
 
 User asked to investigate a 5-minute-cap batch run to see whether long
