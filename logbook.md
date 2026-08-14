@@ -34907,6 +34907,21 @@ logging, and report features. Domain unit tests passed (374 tests); the
 pre-existing simulator timing test remains flaky when the unbounded game
 finishes before its one-second observation window.
 
+## 2026-08-14T12:10:00Z — coder sends `cli-year-limit` to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: cli-year-limit
+commit: ba16ff3507
+```
+
+Summary: optional CLI year limit and immediate cap snapshot are implemented;
+focused acceptance and unit verification pass.
+
 ## 2026-08-14T09:10:27Z — specifier sends cli-year-limit handoff to coder
 
 User asked to investigate a 5-minute-cap batch run to see whether long
