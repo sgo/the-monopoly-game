@@ -121,6 +121,7 @@ public final class Report {
       case Entry.Bankrupt it -> name(it.player()) + " goes bankrupt to "
           + (it.creditor() == null ? "the bank" : name(it.creditor()));
       case Entry.Stalemate it -> "The game ends in a stalemate";
+      case Entry.YearLimitReached it -> "The year limit was reached";
       case Entry.FinalBalance it -> name(it.player()) + "'s final balance is $" + it.balance().amount();
       case Entry.FinalAge it -> name(it.player()) + "'s final age is " + it.age() + " years";
       case Entry.LegalEntityFormed it -> it.name() + " is formed, held in equal thirds by "

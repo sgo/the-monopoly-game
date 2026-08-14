@@ -5,6 +5,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.NAME;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.VALUE;
 import static the.monopoly.game.specs.acceptance.StepHandler.given;
 import static the.monopoly.game.specs.acceptance.StepHandler.step;
 import static the.monopoly.game.specs.acceptance.StepHandler.then;
@@ -42,6 +43,9 @@ final class PomStepHandlers {
 
         then("^the packaged jar's output confirms that legal entity is " + NAME + "$",
             (world, arguments) -> world.assertPackagedCliLegalEntity(arguments.text(1))),
+
+        then("^the packaged jar's output confirms that the year limit is " + VALUE + " years$",
+            (world, arguments) -> world.assertPackagedCliYearLimit(arguments.number(1))),
 
         step("^I stop the packaged jar$", (world, arguments) -> world.stopPackagedCli()),
 

@@ -331,3 +331,6 @@ is on by default):
 - `--optional-greedo-legal-entity` — enables the legal-entity mechanism for
   3+-way colour-group splits described under
   [Optional: Legal entity for 3+-way colour-group splits](#optional-legal-entity-for-3-way-colour-group-splits).
+- `--max-years=N` — caps the simulation at N simulated years (passes through
+  Go/jail). The game stops when any remaining player's age reaches N. The
+  default (omitted) lets the game play to its natural end.

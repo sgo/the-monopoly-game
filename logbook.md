@@ -34897,6 +34897,16 @@ merge_and_process specifier cfeb976dc9
 
 Action: merged the clarified report and logging snapshot scenarios.
 
+## 2026-08-14T12:09:10Z — coder resumed `cli-year-limit`
+
+Added the missing acceptance step handlers and changed the domain loop to
+stop immediately after the player whose age reaches the configured limit,
+then record every survivor's final balance and age. Focused acceptance
+verification passed: 289 generated scenarios across year-limit, journal,
+logging, and report features. Domain unit tests passed (374 tests); the
+pre-existing simulator timing test remains flaky when the unbounded game
+finishes before its one-second observation window.
+
 ## 2026-08-14T09:10:27Z — specifier sends cli-year-limit handoff to coder
 
 User asked to investigate a 5-minute-cap batch run to see whether long

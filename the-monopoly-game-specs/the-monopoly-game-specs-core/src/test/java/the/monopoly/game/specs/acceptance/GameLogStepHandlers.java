@@ -1035,7 +1035,17 @@ final class GameLogStepHandlers {
               double margin = expected * (arguments.number(2) / 100.0);
               assertThat(world.rolls().values())
                   .allSatisfy(seen -> assertThat(seen).isCloseTo(expected, within((int) margin)));
-            })
+            }),
+        then("^the game log records that the game ends because the year limit was reached before it records that pawn \"" + NAME
+                + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> logRecordsInOrder(world,
+                new Claim(entry -> entry instanceof Entry.YearLimitReached, "game ends because the year limit was reached"),
+                finalBalance(arguments.text(1), arguments.number(2)))),
+
+        then("^the game report says that the game ends because the year limit was reached before it says that pawn \"" + NAME
+                + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> saysInOrder(world, "The year limit was reached",
+                arguments.text(1) + "'s final balance is $" + arguments.number(2)))
     );
   }
 }
