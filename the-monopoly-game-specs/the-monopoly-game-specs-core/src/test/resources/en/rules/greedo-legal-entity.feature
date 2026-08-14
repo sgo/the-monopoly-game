@@ -324,6 +324,55 @@ Feature: Greedo legal entity for a three-way colour-group split
       | treasury | renter    | renter_position | renter_street          | rent | tenant_balance |
       | 5000     | iron box  | 3               | Bruul Mechelen         | 625  | 875           |
 
+  # entity-34
+  Scenario Outline: a tenant who cannot pay a legal entity's rent from cash becomes a distressed seller, exactly as for a player-owned street
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And pawn "high hat" returns every street except "Rue de Diekirch Arlon" to the bank
+    And pawn "iron box" owns "Meir Antwerpen"
+    And pawn "iron box" starts at position 8
+    And pawn "dog" starts at position 15
+    And pawn "high hat" starts at position 16
+    And pawn "iron box" will roll 2 and 1 for their turn
+    And pawn "dog" will roll 4 and 1 for their turn
+    And pawn "high hat" will roll 2 and 1 for their turn
+    And pawn "iron box" has $<tenant_balance> to spend
+    And pawn "dog" has $<peer_balance> to spend
+    And pawn "high hat" has $<peer_balance> to spend
+    When we play up to 1 round
+    Then the land "Meir Antwerpen" is mortgaged
+    And pawn "iron box"'s account balance is $<expected_balance>
+    And pawn "iron box" is not bankrupt
+
+    Examples:
+      | tenant_balance | peer_balance | expected_balance |
+      | 600            | 20           | 25               |
+
+  # entity-35
+  Scenario Outline: a tenant who cannot cover a legal entity's rent even after liquidating goes bankrupt, exactly as for a player-owned street
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And pawn "high hat" returns every street except "Rue de Diekirch Arlon" to the bank
+    And pawn "iron box" starts at position 8
+    And pawn "dog" starts at position 15
+    And pawn "high hat" starts at position 16
+    And pawn "iron box" will roll 2 and 1 for their turn
+    And pawn "dog" will roll 4 and 1 for their turn
+    And pawn "high hat" will roll 2 and 1 for their turn
+    And pawn "iron box" has $<tenant_balance> to spend
+    And pawn "dog" has $<peer_balance> to spend
+    And pawn "high hat" has $<peer_balance> to spend
+    When we play up to 1 round
+    Then pawn "iron box" is bankrupt
+    And pawn "iron box" holds no shares of any legal entity
+    And pawn "iron box"'s final balance is $<expected_final_balance>
+
+    Examples:
+      | tenant_balance | peer_balance | expected_final_balance |
+      | 50             | 20           | -693                   |
+
   # entity-14
   Scenario Outline: a raised loan is deposited into the entity's bank account
     Given Pink Realty is formed
@@ -454,7 +503,24 @@ Feature: Greedo legal entity for a three-way colour-group split
       | principal | surplus | dividend_share |
       | 0         | 150     | 50             |
 
-  
+  # entity-33
+  Scenario Outline: a dividend is still paid when the last-capitalised shareholder has gone bankrupt and can never grow older to unlock it
+    Given Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
+    And Pink Realty owes pawn "dog" $<principal>
+    And Pink Realty's loan has been fully repaid
+    And Pink Realty's bank account holds $<surplus>
+    And the last-capitalised shareholder of Pink Realty is pawn "high hat"
+    And pawn "high hat" is bankrupt
+    When we play up to 1 round
+    Then pawn "dog"'s account balance is $<dog_expected_balance>
+    And pawn "iron box"'s account balance is $<iron_box_expected_balance>
+
+    Examples:
+      | principal | surplus | dog_expected_balance | iron_box_expected_balance |
+      | 0         | 150     | 1575                 | 1575                      |
 
   # entity-9
   Scenario Outline: the entity forms from exactly the three co-owners of a colour group even when the game has more than three players

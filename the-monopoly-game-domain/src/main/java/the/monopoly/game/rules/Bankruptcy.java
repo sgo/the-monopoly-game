@@ -84,17 +84,18 @@ public final class Bankruptcy {
   }
 
   private boolean sellEntitySharesUntilSolvent(Player debtor) {
+    boolean anySold = false;
     for (LegalEntity entity : deeds.legalEntities()) {
       if (!Money.ZERO.exceeds(debtor.account().balance().amount())) return false;
       if (entity.shareOf(debtor) == 0.0) continue;
-      if (entity.shareholders().size() == 1) {
+      if (entity.shareholders().stream().distinct().count() == 1) {
         liquidateEntity(debtor, entity);
         distressedSale.resolve(debtor);
         continue;
       }
-      if (sellShareToHighestBidder(debtor, entity)) return true;
+      if (sellShareToHighestBidder(debtor, entity)) anySold = true;
     }
-    return false;
+    return anySold;
   }
 
   private void liquidateEntity(Player debtor, LegalEntity entity) {
@@ -172,8 +173,10 @@ public final class Bankruptcy {
   private void auction(Ownable land) {
     List<Player> eligible = players.stream().filter(player -> !deeds.isBankrupt(player)).toList();
     Auction.Bidders qualified = Auction.qualified(eligible, land,
-        player -> strategies.forPlayer(player).bidFor(new Strategy.Offer(land, player.account().balance().amount())),
-        false);
+        player -> {
+          Strategy strat = strategies.forPlayer(player);
+          return strat.bidForAuction(new Strategy.Offer(land, player.account().balance().amount()), player, rules, deeds);
+        });
     if (qualified.players().isEmpty()) return;
     Auction.Result result = Auction.ascend(qualified);
     deeds.sell(land, result.winner(), result.bid());

@@ -90,7 +90,7 @@ public final class LegalEntity {
 
   /** Dissolves this entity and transfers its remaining treasury to its final shareholder. */
   public Money liquidateTo(Player shareholder) {
-    if (shareholders.size() != 1 || !shareholders.contains(shareholder))
+    if (shareholders.stream().distinct().count() != 1 || !shareholders.contains(shareholder))
       throw new IllegalArgumentException("Liquidation requires the final shareholder.");
     Money balance = bankAccount.balance().amount();
     if (balance.amount() > 0) {
@@ -175,8 +175,11 @@ public final class LegalEntity {
 
   private Operation repayLoanOrPayDividend(Deeds deeds) {
     if (!loan.equals(Money.ZERO)) return repayLoanIfAffordable();
+    boolean lastCapitalizedIsGoneOrGrew = lastCapitalizedShareholder == null
+        || lastCapitalizedShareholderGrewOlder
+        || deeds.isBankrupt(lastCapitalizedShareholder);
     return bankBalance().amount() >= 150 && fullyDeveloped(deeds)
-        && (lastCapitalizedShareholder == null || lastCapitalizedShareholderGrewOlder)
+        && lastCapitalizedIsGoneOrGrew
         ? payDividend() : null;
   }
 
