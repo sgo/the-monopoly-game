@@ -34687,3 +34687,20 @@ Not included, still open: a turn/tick budget for tests (raised by the user;
 established as not what blocked these scenarios, so left unspecified), and
 an unexplained OOM seen earlier when chaining `lands on` steps.
 >>>>>>> 8f13cbb
+
+## 2026-08-14T07:00:00Z — coder: fixed four legal-entity defects, all green
+
+Merged specifier `323a3e0`. Five new scenarios covering four defects:
+
+| Defect | Root cause | Fix |
+|--------|-----------|-----|
+| entity-34/35 | Rent.java:43 guard `>= rent.amount()` blocks entity rent withdrawal | Removed guard, unconditional withdraw matches player rent |
+| entity-33 | LegalEntity:179 `lastCapitalizedShareholderGrewOlder` never fires for bankrupt player | Added `deeds.isBankrupt(lastCapitalizedShareholder)` to gate |
+| share-sale-22 | Bankruptcy:96 `return true` after first successful share sale | Removed early return, let loop sell all entity shares |
+| share-sale-23 | `shareholders().size()==1` counts slots, not distinct owners | Changed to distinct owner count in both `sellEntitySharesUntilSolvent` and `liquidateTo` |
+
+### Verification
+- Domain unit: 119/119 green
+- Full acceptance: **757/757, 0 failures, 0 errors**
+
+Task `legal-entity-rent-and-share-defects` complete.
