@@ -61,3 +61,16 @@ Feature: CLI packaged jar
     Then the packaged jar's output explains how to use the simulator
     And the README usage report includes the optional flag "--optional-greedo-stalemate-trading"
     And the README usage report includes the optional flag "--optional-greedo-legal-entity"
+    And the README usage report includes the optional flag "--max-years"
+
+  # cli-jar-6
+  Scenario Outline: the packaged jar confirms the configured year limit at the start of the game
+    Given the CLI module has been packaged
+    When I start the packaged simulator jar with the arguments "<raw arguments>"
+    Then the packaged jar's output confirms that the year limit is <year limit> years
+    When I stop the packaged jar
+    Then the packaged jar process ends
+
+    Examples:
+      | raw arguments                            | year limit |
+      | 3 greedo greedo greedo --max-years=500   | 500        |
