@@ -188,15 +188,14 @@ class RentTest {
   }
 
   @Test
-  void aTenantWhoCannotAffordEntityRentPaysNothing() {
+  void aTenantWhoCannotAffordEntityRentWithdrawsUnconditionally() {
     ColourStreet street = sell(Street.Type.DiestsestraatLeuven);
     LegalEntity entity = formEntityOwning(street);
     tenant.account().withdraw(new Money(1500));
 
     rent().resolve(tenant, street, IRRELEVANT_ROLL);
 
-    assertThat(tenant.account().balance()).isEqualTo(Balance.of(0));
-    assertThat(entity.receivedRent()).isFalse();
+    assertEntityReceivedRent(entity, -8);
   }
 
   private LegalEntity formEntityOwning(ColourStreet street) {
