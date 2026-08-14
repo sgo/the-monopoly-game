@@ -35083,3 +35083,20 @@ merge_and_process refactorer cdedce7180
 Action: merged the refactorer batch after resolving the logbook-only merge
 conflict. Reviewing the extracted journaling boundary and the new optional
 year-limit flow under architect rules.
+
+## 2026-08-14T11:35:10Z — architect review finds cli-year-limit regression
+
+Merged refactorer commit `cdedce7180` as `d6b633b811` after resolving the
+logbook-only conflict. The extracted package-private `Journalling` adapter
+preserves the domain/UI boundary and the CLI remains a thin input adapter.
+
+Verification: domain/CLI tests pass when excluding the pre-existing flaky
+`SimulatorTest.keepsPlayingUntilToldToStop`; domain property tests pass
+(23/23); differential mutation passes for `Game` (93 sites), `Journalling`
+(7), `Report` (3), and `Simulator` (83), with zero differential sites.
+The DRY scan reports only existing journalling boilerplate, constructor
+shapes, and the two CLI parsing branches; no new actionable duplication.
+Focused acceptance mutation of `year-limit.feature` killed one mutation but
+returned one survivor. Full acceptance ran 766 scenarios and found one real
+failure: `year-limit-3` (“no year limit is the default”) reports that the
+game ended because of the year limit. Routed to coder at priority 00.
