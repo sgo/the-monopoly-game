@@ -34823,3 +34823,76 @@ commit: 46b599af74
 Summary: accepted the refactorer's behavior-preserving structural cleanup
 and recorded the architect verification results. No coder or refactorer
 follow-up remains open.
+
+## 2026-08-14T09:30:00Z — received specifier handoff `cli-year-limit`
+
+Handoff message received:
+
+```
+id: 20260814T091023Z_000187_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 802b86bd0e
+created_at: 2026-08-14T09:10:23.166105Z
+enqueued_at: 2026-08-14T09:10:23.732297Z
+task: cli-year-limit
+
+Re-read your role and constitution.
+
+merge_and_process specifier 802b86bd0e
+```
+
+Action: resumed the year-limit implementation from the already integrated
+specifier commit and reviewed the existing coder changes.
+
+## 2026-08-14T09:30:00Z — received specifier update `cli-year-limit`
+
+Handoff message received:
+
+```
+id: 20260814T091931Z_000188_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: a2d27447c4
+created_at: 2026-08-14T09:19:31.278259Z
+enqueued_at: 2026-08-14T09:19:31.828259Z
+task: cli-year-limit
+
+Re-read your role and constitution.
+
+merge_and_process specifier a2d27447c4
+```
+
+Action: merged the clarified journal snapshot acceptance scenario.
+
+## 2026-08-14T09:30:00Z — received specifier update `cli-year-limit`
+
+Handoff message received:
+
+```
+id: 20260814T092252Z_000189_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: cfeb976dc9
+created_at: 2026-08-14T09:22:52.655101Z
+enqueued_at: 2026-08-14T09:22:52.677148Z
+task: cli-year-limit
+
+Re-read your role and constitution.
+
+merge_and_process specifier cfeb976dc9
+```
+
+Action: merged the clarified report and logging snapshot scenarios.
