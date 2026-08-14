@@ -34916,3 +34916,36 @@ starting values, age 0.
 Passes `gherkin-parser`/`gherkin-ir-dry-checker` with no new finding kinds
 beyond the pre-existing possible-synonym/near-duplicate noise already
 present throughout this large file.
+
+## 2026-08-14T09:22:33Z — specifier sends cli-year-limit follow-up to coder
+
+User asked whether `report.feature` and `logging.feature` needed the same
+treatment as `journal.feature`. They do: the stalemate path's survivor
+snapshot is tested identically across three rendering surfaces —
+`journal.feature` (structured `Entry` objects), `report.feature`
+(`Report.of(journal)` text), and `logging.feature` (the SLF4J-logged
+text) — each with its own `report-61`/`logging-61` mirroring
+`journal-61`. Added `report-70` and `logging-70` as the year-limit analogs
+of `journal-70`, same figures, same chain structure.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: cli-year-limit
+commit: cfeb976dc9
+```
+
+Did not extend `cli.feature`: its scenarios deliberately stay coarse
+(existence/boolean checks only) because they run against real, unscripted
+dice — exact-value chains like these three require scripted dice for
+reproducible figures, which is why that precision lives only in the
+specs-core feature files. `cli.feature`'s existing `cli-8` (year limit
+reached) and `cli-jar-6` (year limit confirmed at start) already cover
+what's appropriate at that layer.
+
+Passes `gherkin-parser`/`gherkin-ir-dry-checker` on both files with no new
+finding kinds beyond the same pre-existing possible-synonym/near-duplicate
+noise.
