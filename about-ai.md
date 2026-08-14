@@ -130,7 +130,7 @@ E.g:
 - Claude Sonnet 5
 - GPT 5.6-luna
 - GPT 5.4-mini
-- DeepSeek V4 Flash
+- DeepSeek V4 Flash (needs a bit more guidance)
 
 ### Coder
 
@@ -141,7 +141,7 @@ E.g:
 
 - Claude Sonnet 5
 - GPT 5.6-luna
-- DeepSeek V4 Flash
+- DeepSeek V4 Flash (guidance is baked in by the test discipline and verification workflow but can be slow to give up when too complicated)
 
 ### Refactorer
 
@@ -266,3 +266,22 @@ As such you assert the UI is wired up correctly and all the specifications that 
 In larger projects you'd want to use a larger swarm were one of the agents has the QA role specifically for this purpose.
 
 - specs can be green but not wired up correctly in the UI. There's no need to test functionality throug the UI but simply making the UI report it's active settings at startup suffices to ensure startup toggles are passed correctly into the game to ensure it runs properly.
+
+### David & Goliath
+
+So the game had been running pretty well. My Greedo strategy had been bankrupting each other but with 8 of them they would stalemate each other and the game would run forever. I discussed that in more detail in the document about [Economics](economics.md#doesnt-want-to-live-happily-ever-after).
+
+Then, I introduced the Billionaire.
+
+This returned the running forever stalemate. But it wasn't one where everyone became richer. No, this was a David & Goliath case. It was a game between two leftover players. Everyone else had already been bankrupted. One weak that owned a fully developed dark blue monopoly. And the Billionaire who owned nothing developed and was just slowly being drained of it's wealth. It took ~40000 in game years to bankrupt him.
+
+Instinctively you would've expected the Billionaire to simply win. And in fact he should have. But for some bugs which were actually specification gaps... aren't all bugs?
+
+* The Billionaire had no problem being a member of three legal entities. But once his co-shareholders bankrupted, he was the sole owner of the legal entity. He should've been collecting large amounts of rent. Unfortunately, the AI coder had bound payout of dividends to the age increase of the lowest initiate player at the start of the game, which now wasn't ageing anymore.
+  * This would not have helped the Billionaire win as his opponent was paying rent but his wealth wouldn't have been draining.
+* David was getting free stays on the legal entities properties. Normally, when a player can't pay the rent they end up as a distressed seller to raise the funds necessary. This wasn't happening for rent to a legal entity. It wasn't specced so the AI coder didn't reuse the existing rent settlement logic and had just written a duplicate / alternative  settlement system.
+
+Some more specification ended up settling the issues and resulted in the coder using the same code in different places.
+
+Not at all so different as what happens with humans.
+The test harness made sure nothing would regress.

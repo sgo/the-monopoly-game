@@ -58,17 +58,26 @@ The table below shows the impact this sudden sense of cooperation had on the out
 Finally, in all games where a stalemate is forming and trading happens, one of the less wealthy Greedos wins **~63%** of
 the time.
 
-Now the results above were observed in a game of 3 Greedos. As soon as you have more and especially with 8 Greedos you would still get a stalemate almost 100% of the time. This is because as soon as colour groups becomes split between three instead of two players, making a mutually beneficial trade becomes almost impossible. The three players would need to hold three streets from three different colour groups, and all three of them would need to hold at least one street in the same three colour groups. Which is near impossible to happen.
+Now the results above were observed in a game of 3 Greedos. As soon as you have more and especially with 8 Greedos you
+would still get a stalemate almost 100% of the time. This is because as soon as colour groups becomes split between
+three instead of two players, making a mutually beneficial trade becomes almost impossible. The three players would need
+to hold three streets from three different colour groups, and all three of them would need to hold at least one street
+in the same three colour groups. Which is near impossible to happen.
 
 So, how to break the stalemate with 8 Greedos?
 
 ##### Legal Entities
 
-When three Greedos hold one street from the same colour group, they can transfer their property into a legal entity. In the game these are identified by names such as "Pink Realty" after the colour group of the streets.
+When three Greedos hold one street from the same colour group, they can transfer their property into a legal entity. In
+the game these are identified by names such as "Pink Realty" after the colour group of the streets.
 
-This legal entity now meets the requirement where a full colour group has a single owner and development can begin. This breaks the stalemate as costs of traveling around the board now exceeds salary income.
+This legal entity now meets the requirement where a full colour group has a single owner and development can begin. This
+breaks the stalemate as costs of traveling around the board now exceeds salary income.
 
-Development of the properties in the legal entity is financed by taking out loans from the shareholders or rental income as it comes in. After development rental income will also be used to repay the loans with a 5% interest. Finally, when no further development is possible and no more loans need to be repaid the legal entity will pay out dividends to the shareholders.
+Development of the properties in the legal entity is financed by taking out loans from the shareholders or rental income
+as it comes in. After development rental income will also be used to repay the loans with a 5% interest. Finally, when
+no further development is possible and no more loans need to be repaid the legal entity will pay out dividends to the
+shareholders.
 
 As a result of this change the stalemate is broken ~85% of the time even with eight Greedos.
 
@@ -77,7 +86,9 @@ As a result of this change the stalemate is broken ~85% of the time even with ei
 | Stalemate         | **80%** (16)                  | **15%** (3)                |
 | Bankruptcy winner | 20% (4)                       | 85% (17)                   |
 
-And when the game does end in a stalemate it is because most of the time everyone but the shareholders are destroyed. While the shareholders themselves live in a sort of equilibrium because of the shared income from the legal entity. Then the imbalance among them does push the game into a duration of thousands of years.
+And when the game does end in a stalemate it is because most of the time everyone but the shareholders are destroyed.
+While the shareholders themselves live in a sort of equilibrium because of the shared income from the legal entity. Then
+the imbalance among them does push the game into a duration of thousands of years.
 
 ### How Long Does a Game Last?
 
@@ -99,6 +110,50 @@ Then the following information was observed running the game several times.
 | 3        | ~13.9                         | ~265.7                       |
 | 8        | -                             | ~295.4                       |
 
-**Conclusion: stalemates exceed the normal life expectancy of a player. It would be interesting to pass their wealth, or absence thereof, on to their inheritor. Which would introduce inequality as these inheritors would be players who start the game with a starting capital well above the standard $1500.**
+**Conclusion: stalemates exceed the normal life expectancy of a player. It would be interesting to pass their wealth, or
+absence thereof, on to their inheritor. Which would introduce inequality as these inheritors would be players who start
+the game with a starting capital well above the standard $1500.**
 
 *Note: I even observed games where players reached thousands of years*
+
+### The Billionaire
+
+To determine what a billionaire would be in the game of Monopoly I looked up the median income of a Belgian. Which
+equates to €3728. Or €44736 per year. At this rate a Belgian needs **28866 years** to earn the full wealth of the richest
+Belgian. (€12 913 683 000)
+
+Given the yearly salary in Monopoly is $400 a billionaire in Monopoly would have \$57.7 million.
+
+#### It's all about money...
+
+The first version of our Billionaire strategy is one that starts the game with \$57.7 million instead of the standard \$1500. Otherwise, the Billionaire is identical to Greedo.
+
+What does this mean for the game?
+I ran 50 games with peer trading and legal entity formation enabled.
+
+| Condition                           | WIN (bankruptcy-driven) | STALEMATE |
+|-------------------------------------|-------------------------|-----------|
+| **1 Billionaire + 7 Greedo** (n=50) | 15 (30%)                | 35 (70%)  |
+| **8 Greedo, no Billionaire** (n=50) | 44 (88%)                | 6 (12%)   |
+
+Visibly, the Billionaire made the stalemate outcome more likely.
+Not because he prevents other players from acquiring all the properties but because they simply can't bankrupt him before they reach the stalemate condition. (\$22000)
+
+So are Billionaires a stabilising force on the economy in spite of the obvious inequality?
+
+Not quite. You see these stalemates weren't of the happily ever after type. Most of the time everyone got destroyed except for one lucky and one unlucky one. And we should classify these three as follows...
+
+* The Billionaire
+* The Multi Millionaire
+* The Millionaire
+
+So where most of the other players simply bankrupted these guys picked up their wealth potential. The Millionaire is actually the unlucky one as around the 15.000 year mark he is destroyed by the other two.
+
+Then it goes one of two ways.
+
+1. The Billionaire destroys the Multi Millionaire because of his financial advantage.
+2. The Multi Millionaire slowly destroys the Billionaire because he happened to be asset poor.
+
+Btw, it takes about 30.000 years to destroy the Billionaire. Which is close to the 28.800 years a Belgian has to work to earn the amount of wealth the richest Belgian holds.
+
+**Conclusion: we need a Billionaire that is asset rich... just like in real life.**
