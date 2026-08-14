@@ -92,7 +92,7 @@ final class JournalStepHandlers {
         step("^pawn \"" + NAME + "\" will roll " + VALUE + " for their turn$",
             (world, arguments) -> {
               world.letTheOthersRollWhatTheyLike();
-              world.queuePawnRoll(arguments.text(1), new the.monopoly.game.components.dice.Roll(6, 6));
+              world.queuePawnRoll(arguments.text(1), World.rollTotalling(arguments.number(2)));
             }),
 
         given("^" + NAME + " is formed$",
@@ -337,6 +337,15 @@ final class JournalStepHandlers {
         then("^the game journal records that the game ends in a stalemate only once$",
             (world, arguments) -> assertThat(world.journal().stream()
                 .filter(Entry.Stalemate.class::isInstance).count()).isOne()),
+
+        then("^the game ends because the year limit was reached$",
+            (world, arguments) -> assertThat(world.endedInYearLimit()).isTrue()),
+
+        then("^the game does not end because the year limit was reached$",
+            (world, arguments) -> assertThat(world.endedInYearLimit()).isFalse()),
+
+        given("^the game is limited to " + VALUE + " years$",
+            (world, arguments) -> world.setMaxYears(arguments.number(1))),
 
         given("^pawn \"" + NAME + "\" starts at position " + VALUE + "$",
             (world, arguments) -> world.placePawn(arguments.text(1), arguments.number(2))),
@@ -799,7 +808,12 @@ final class JournalStepHandlers {
                 + "\" before it records that pawn \"" + NAME + "\" receives \\$" + VALUE + " from the bank$",
             (world, arguments) -> recordsInOrder(world,
                 chanceCardDrawn(arguments.text(1), arguments.text(2)),
-                bankReceived(arguments.text(3), arguments.number(4))))
+                bankReceived(arguments.text(3), arguments.number(4)))),
+        then("^the game journal records that the game ends because the year limit was reached before it records that pawn \"" + NAME
+                + "\"'s final balance is \\$" + VALUE + "$",
+            (world, arguments) -> recordsInOrder(world,
+                new Claim(entry -> entry instanceof Entry.YearLimitReached, "game ends because the year limit was reached"),
+                finalBalance(arguments.text(1), arguments.number(2))))
     );
   }
 

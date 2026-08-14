@@ -14,6 +14,7 @@ import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.components.streets.TaxSpace;
 import the.monopoly.game.rules.Cards;
 import the.monopoly.game.rules.Deeds;
+import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
@@ -150,6 +151,25 @@ class GameTest {
         .extracting(entry -> ((Entry.TurnStarted) entry).age())
         .containsExactly(0, 1);
     assertThat(result.journal()).contains(new Entry.SalaryCollected(dog.id(), new Money(200)));
+  }
+
+  @Test
+  void aGameEndsAsSoonAsARemainingPlayersAgeReachesTheConfiguredYearLimit() {
+    Player dog = players.getFirst();
+    dog.position().moveTo(37);
+    Map<Player.ID, Cup> cups = Map.of(
+        dog.id(), Cup.of(new Roll(5, 5), new Roll(1, 2)),
+        players.get(1).id(), Cup.of(new Roll(1, 3)),
+        players.get(2).id(), Cup.of(new Roll(1, 4))
+    );
+
+    Game.Result result = new Game(ruleSet, players, player -> cups.get(player.id()),
+        Strategy.OfPlayers.NOBODY_DECIDES, new Deeds(), Cards.Decks.EMPTY, new Jail(ruleSet), false, false, 1).play();
+
+    assertThat(result.journal()).contains(new Entry.YearLimitReached());
+    assertThat(result.journal()).filteredOn(Entry.FinalAge.class::isInstance)
+        .contains(new Entry.FinalAge(dog.id(), 1));
+    assertThat(result.journal()).filteredOn(Entry.TurnStarted.class::isInstance).hasSize(1);
   }
 
   @Test
