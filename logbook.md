@@ -35003,6 +35003,13 @@ merge_and_process architect 878ee4d332
 
 Action: recorded the architect review handoff before merging its commit.
 
+## 2026-08-14T13:39:00Z — coder fixes `cli-year-limit` acceptance regression
+
+The architect review exposed that the generic “will roll N” acceptance step
+queued double sixes regardless of N, causing an extra roll and an incorrect
+age snapshot. The step now queues a dice roll totaling the captured value.
+Focused year-limit acceptance verification passes all 3 scenarios.
+
 ## 2026-08-14T09:10:27Z — specifier sends cli-year-limit handoff to coder
 
 User asked to investigate a 5-minute-cap batch run to see whether long
