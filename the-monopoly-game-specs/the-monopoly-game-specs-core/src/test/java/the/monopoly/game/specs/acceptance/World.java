@@ -1200,7 +1200,7 @@ public class World {
   }
 
   /** A pair of dice adding up to a total the rules can actually be rolled. */
-  private static Roll rollTotalling(int total) {
+  static Roll rollTotalling(int total) {
     if (total < 2 || total > 12)
       throw new AssertionError("Two dice cannot total " + total + ".");
     int die1 = Math.min(6, total - 1);

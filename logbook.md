@@ -34864,6 +34864,23 @@ Summary: accepted the refactorer's behavior-preserving structural cleanup
 and recorded the architect verification results. No coder or refactorer
 follow-up remains open.
 
+The queued handoff's complete generated message was:
+
+```
+id: 20260814T072047Z_000288_from_architect
+from: architect
+to: specifier
+priority: 50
+type: git_handoff
+role: architect
+task: legal-entity-rent-and-share-defects
+commit: d2574d4afa
+created_at: 2026-08-14T07:20:47.483106Z
+
+Re-read your role and constitution.
+
+merge_and_process architect d2574d4afa
+```
 ## 2026-08-14T09:30:00Z — received specifier handoff `cli-year-limit`
 
 Handoff message received:
@@ -34961,6 +34978,37 @@ commit: ba16ff3507
 
 Summary: optional CLI year limit and immediate cap snapshot are implemented;
 focused acceptance and unit verification pass.
+
+## 2026-08-14T11:40:00Z — received architect review for `cli-year-limit`
+
+Handoff message received:
+
+```
+id: 20260814T113535Z_000289_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 878ee4d332
+created_at: 2026-08-14T11:35:35.989441Z
+enqueued_at: 2026-08-14T11:35:36.262740Z
+task: cli-year-limit
+
+Re-read your role and constitution.
+
+merge_and_process architect 878ee4d332
+```
+
+Action: recorded the architect review handoff before merging its commit.
+
+## 2026-08-14T13:39:00Z — coder fixes `cli-year-limit` acceptance regression
+
+The architect review exposed that the generic “will roll N” acceptance step
+queued double sixes regardless of N, causing an extra roll and an incorrect
+age snapshot. The step now queues a dice roll totaling the captured value.
+Focused year-limit acceptance verification passes all 3 scenarios.
 
 ## 2026-08-14T09:10:27Z — specifier sends cli-year-limit handoff to coder
 
@@ -35240,3 +35288,32 @@ already-documented CLI `keepsPlayingUntilToldToStop` flake, a test-design
 concern rather than a production defect. Domain 398/398 (1 new test),
 full reactor green apart from the known pre-existing CLI flake,
 acceptance 766/766 run four times.
+
+## 2026-08-14T11:31:00Z — received refactorer handoff `cli-year-limit`
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer cdedce7180
+```
+
+Action: merged the refactorer batch after resolving the logbook-only merge
+conflict. Reviewing the extracted journaling boundary and the new optional
+year-limit flow under architect rules.
+
+## 2026-08-14T11:35:10Z — architect review finds cli-year-limit regression
+
+Merged refactorer commit `cdedce7180` as `d6b633b811` after resolving the
+logbook-only conflict. The extracted package-private `Journalling` adapter
+preserves the domain/UI boundary and the CLI remains a thin input adapter.
+
+Verification: domain/CLI tests pass when excluding the pre-existing flaky
+`SimulatorTest.keepsPlayingUntilToldToStop`; domain property tests pass
+(23/23); differential mutation passes for `Game` (93 sites), `Journalling`
+(7), `Report` (3), and `Simulator` (83), with zero differential sites.
+The DRY scan reports only existing journalling boilerplate, constructor
+shapes, and the two CLI parsing branches; no new actionable duplication.
+Focused acceptance mutation of `year-limit.feature` killed one mutation but
+returned one survivor. Full acceptance ran 766 scenarios and found one real
+failure: `year-limit-3` (“no year limit is the default”) reports that the
+game ended because of the year limit. Routed to coder at priority 00.

@@ -92,7 +92,7 @@ final class JournalStepHandlers {
         step("^pawn \"" + NAME + "\" will roll " + VALUE + " for their turn$",
             (world, arguments) -> {
               world.letTheOthersRollWhatTheyLike();
-              world.queuePawnRoll(arguments.text(1), new the.monopoly.game.components.dice.Roll(6, 6));
+              world.queuePawnRoll(arguments.text(1), World.rollTotalling(arguments.number(2)));
             }),
 
         given("^" + NAME + " is formed$",
