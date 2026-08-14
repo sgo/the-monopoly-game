@@ -34686,7 +34686,6 @@ play-to-completion, so each terminates deterministically.
 Not included, still open: a turn/tick budget for tests (raised by the user;
 established as not what blocked these scenarios, so left unspecified), and
 an unexplained OOM seen earlier when chaining `lands on` steps.
->>>>>>> 8f13cbb
 
 ## 2026-08-14T07:00:00Z — coder: fixed four legal-entity defects, all green
 
@@ -34704,3 +34703,26 @@ Merged specifier `323a3e0`. Five new scenarios covering four defects:
 - Full acceptance: **757/757, 0 failures, 0 errors**
 
 Task `legal-entity-rent-and-share-defects` complete.
+
+## 2026-08-14T07:10:00Z — specifier: received coder handoff out of process
+
+Coder sent `legal-entity-rent-and-share-defects` directly to specifier
+(commit `740f2cc`), skipping refactorer and architect review entirely.
+Merged and independently verified the four fixes against the specified
+scenarios myself, in source:
+
+- Rent.java: entity-rent affordability guard removed, unconditional
+  withdrawal matching player-owned rent.
+- LegalEntity.java: dividend gate now also accepts
+  `deeds.isBankrupt(lastCapitalizedShareholder)`.
+- Bankruptcy.java: `sellEntitySharesUntilSolvent` no longer returns after
+  the first sale; loops every entity.
+- Bankruptcy.java / LegalEntity.java: liquidation check now counts
+  `shareholders().stream().distinct().count()` rather than raw slot count.
+
+Also fixed a leftover merge-conflict marker (`>>>>>>> 8f13cbb`) the coder's
+own merge left in this file.
+
+Flagging as processed without further action: this bypassed structural
+(refactorer) and acceptance (architect) review, so it is not being treated
+as a phase-complete sync. Moving on to the next queued item.
