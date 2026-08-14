@@ -34592,6 +34592,16 @@ Corrected `greedo-share-sale.feature`'s `share-sale-9` second example row
 (`Bankruptcy.auction` must use the floored `qualified` overload, matching
 `LandSale`) back to coder via architect.
 
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: greedo-ascending-auction
+commit: d519f50c2e
+```
+
 ## 2026-08-13T18:40:11Z — received specifier handoff `greedo-ascending-auction`
 
 ```
@@ -34615,3 +34625,65 @@ no qualified bidders → land stays with bank. Acceptance 752/752, domain
 $45 for the specific example row.
 
 Task `greedo-ascending-auction` complete.
+
+## 2026-08-13T18:42:30Z — received coder handoff `greedo-ascending-auction`
+
+```
+Wired Bankruptcy.auction to tiered bidForAuction through floored qualified (specifier-identified bug: 4-arg unfloored overload inherited from flat bidFor). Now uses 3-arg floored overload matching LandSale. Specifier corrected share-sale-9 example. Acceptance 752/752, domain 119/119. Task complete.
+
+merge_and_process coder 3b60e4c
+```
+
+Action: recovered and merged full commit `3b60e4c67615d272f77c2e630c38f3b1efd66a86` as `28bbe8b`. Verified `Bankruptcy.auction()` now computes a strategy-specific `bidForAuction` ceiling and invokes the standard mortgage-value-floored `Auction.qualified` overload, matching `LandSale`. Full acceptance passes (752 scenarios); `git diff --check` and worktree status are clean. The ascending-auction implementation loop is complete; syncing phase closure to specifier.
+
+## 2026-08-14T06:45:21Z — specifier sends legal-entity-rent-and-share-defects handoff to coder
+
+User asked why an 8-player Billionaire game never terminated. Playtesting
+and log analysis surfaced four defects, none of which any existing
+scenario covered. Specified all four as five failing scenarios.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: legal-entity-rent-and-share-defects
+commit: 323a3e098c
+```
+
+Root finding (entity-34, entity-35): `Rent.java` charges a legal entity's
+rent only when the tenant can already afford it in full; otherwise nothing
+happens at all — no payment, no distressed sale, no bankruptcy. Player-owned
+rent withdraws unconditionally and lets the established chain resolve the
+shortfall. The guard entered in "Implement legal entity rent reinvestment"
+with no scenario requiring it. Confirmed in the playtest log: the only
+player poor enough to lose took free stays at $646, $9 and $153 on
+developed entity streets while paying $1,275 when it held $3,998 — so
+entities could never bankrupt the player positioned to lose. The user
+confirmed the rent rule is already settled and not up for change, so these
+scenarios restate it for entity-owned streets rather than introducing
+policy. No new wiring is needed: `Game` already resolves bankruptcy after
+every landing and derives a null creditor for entity-owned streets.
+
+entity-33: an entity freezes permanently once the shareholder who last
+capitalised it goes bankrupt, because only that player collecting salary
+again can unlock a dividend. Rent still accrues; builds, loan repayment and
+dividends stop forever.
+
+share-sale-22: `sellEntitySharesUntilSolvent` returns after the first sale,
+so a debtor in two entities is bankrupted still holding the second share.
+
+share-sale-23: the liquidation check counts shareholder slots rather than
+distinct owners, so an entity bought out by one shareholder is never
+liquidated and survives as an ownerless landlord.
+
+Verification: acceptance 757 tests, 5 failures, all the specified
+assertions; no other scenario affected. Scenarios are bounded (explicit
+positions and rolls with `we play up to N rounds`) rather than
+play-to-completion, so each terminates deterministically.
+
+Not included, still open: a turn/tick budget for tests (raised by the user;
+established as not what blocked these scenarios, so left unspecified), and
+an unexplained OOM seen earlier when chaining `lands on` steps.
+>>>>>>> 8f13cbb
