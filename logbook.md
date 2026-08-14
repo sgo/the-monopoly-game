@@ -35317,3 +35317,12 @@ Focused acceptance mutation of `year-limit.feature` killed one mutation but
 returned one survivor. Full acceptance ran 766 scenarios and found one real
 failure: `year-limit-3` (“no year limit is the default”) reports that the
 game ended because of the year limit. Routed to coder at priority 00.
+
+## 2026-08-14T11:53:10Z — accepted refactorer follow-up `3c82cac769`
+
+Merged as `1b921586994`. The follow-up corrects the acceptance step helper to
+use the requested dice total, preserving the scenario’s intended movement
+and keeping the production/domain boundary unchanged. The focused
+`EnRulesYearLimitAcceptanceTest` passes all 3 scenarios. Soft acceptance
+mutation remains 1 killed / 1 survived in the existing feature mutator
+surface; the generated manifest was restored and is not part of the change.
