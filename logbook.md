@@ -34950,3 +34950,42 @@ stdout confirmation line) does not exist yet, so these scenarios could not
 be RED-verified against the current implementation — that verification is
 for the coder to run once the corresponding step handlers and domain code
 exist.
+
+## 2026-08-14T09:19:07Z — specifier sends cli-year-limit follow-up to coder
+
+User asked whether the journal/log/report actually covers the year limit
+being reached. `year-limit.feature` only asserted the boolean outcome plus
+one player's final age — it never verified the full survivor snapshot
+(`FinalBalance` + `FinalAge` for every remaining player) the design
+promised. `journal.feature` already has an established, precise pattern
+for exactly this concern on the stalemate path (journal-61): ordered
+assertions proving each entry is logged in sequence, not just that the
+game ended. Added journal-70 as the analogous scenario for the year-limit
+path.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: cli-year-limit
+commit: a2d27447c4
+```
+
+journal-70 chains: `YearLimitReached` before dog's `FinalBalance` before
+dog's `FinalAge` before high hat's `FinalBalance` before high hat's
+`FinalAge` — mirroring `logStalemate`'s snapshot behavior exactly. Reuses
+the existing player-agnostic `FinalBalance`-before-`FinalAge` step pairs;
+needs one new compound step analogous to the existing stalemate one at
+`JournalStepHandlers.java:662` (`"...ends because the year limit was
+reached before it records that pawn X's final balance..."`). High hat
+never takes a turn in this scenario (the check fires immediately after
+dog's single controlled turn, since the trigger is "any remaining player's
+age reaches the limit," unlike stalemate's "every remaining player clears
+the threshold") — so high hat's final balance/age are just its unchanged
+starting values, age 0.
+
+Passes `gherkin-parser`/`gherkin-ir-dry-checker` with no new finding kinds
+beyond the pre-existing possible-synonym/near-duplicate noise already
+present throughout this large file.
