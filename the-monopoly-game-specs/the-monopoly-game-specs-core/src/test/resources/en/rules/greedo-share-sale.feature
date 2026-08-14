@@ -9,11 +9,11 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
   Background:
     Given the official rule set
+    And legal-entity trading is enabled for the "Greedo" strategy
 
   # share-sale-1
   Scenario Outline: a shareholder in distress offers their legal-entity share to a fellow shareholder instead of going bankrupt
-    Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 5 players
+    Given we select 5 players
     And Pink Realty is formed
     And pawn "dog" owns no mortgaged property
     And pawn "dog" has $<dog_balance> to spend
@@ -33,8 +33,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
   # share-sale-2
   Scenario Outline: a shareholder does not go bankrupt because the share's value covers the tax debt
-    Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 5 players
+    Given we select 5 players
     And Pink Realty is formed
     And pawn "dog" owns no mortgaged property
     And pawn "dog" has $<dog_balance> to spend
@@ -49,8 +48,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
   # share-sale-3
   Scenario Outline: a shareholder sells a cheaper personal asset before offering their legal-entity share
-    Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 5 players
+    Given we select 5 players
     And Pink Realty is formed
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<dog_balance> to spend
@@ -67,8 +65,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
   # share-sale-4
   Scenario Outline: a legal-entity share does not change hands when no fellow shareholder will bid
-    Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 5 players
+    Given we select 5 players
     And Pink Realty is formed
     And pawn "dog" owns no mortgaged property
     And pawn "dog" has $<dog_balance> to spend
@@ -84,8 +81,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
   # share-sale-5
   Scenario Outline: a fellow shareholder bids up to a third of their bank balance, and the highest bid wins
-    Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 4 players
+    Given we select 4 players
     And Pink Realty is formed
     And pawn "dog" owns no mortgaged property
     And pawn "dog" has $<dog_balance> to spend
@@ -103,8 +99,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
   # share-sale-6
   Scenario Outline: the final shareholder may liquidate the legal entity to settle their debt
-    Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 4 players
+    Given we select 4 players
     And Pink Realty is formed
     And pawn "high hat" and pawn "iron box" have both gone bankrupt
     And pawn "dog" owns no mortgaged property
@@ -122,8 +117,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
   # share-sale-7
   Scenario Outline: the final shareholder sells newly-acquired entity assets when liquidation cash is insufficient
-    Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 4 players
+    Given we select 4 players
     And Pink Realty is formed
     And pawn "high hat" and pawn "iron box" have both gone bankrupt
     And pawn "dog" owns no mortgaged property
@@ -142,8 +136,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
   # share-sale-8
   Scenario Outline: a lone bidder buys a legal-entity share for a nominal $5; whether the seller avoids bankruptcy depends on whether the proceeds cover the remaining debt
-    Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 4 players
+    Given we select 4 players
     And Pink Realty is formed
     And the street "Rue de Diekirch Arlon" has a hotel built
     And the street "Bruul Mechelen" has a hotel built
@@ -165,8 +158,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
 
   # share-sale-9
   Scenario Outline: a distressed shareholder disposes of a personal asset before offering their legal-entity share, and the share sale may or may not settle the remaining debt
-    Given legal-entity trading is enabled for the "Greedo" strategy
-    And we select 3 players
+    Given we select 3 players
     And Pink Realty is formed
     And pawn "dog" returns every street except "Steenstraat Brugge" to the bank
     And pawn "iron box" is bankrupt
@@ -188,3 +180,56 @@ Feature: selling legal-entity shares to avoid bankruptcy
       | dog_balance | winning_bid | bankrupt_state | dog_ending | high_hat_ending |
       | 45          | 5           | not bankrupt   | 0          | 45              |
       | 40          | 5           | bankrupt       | -5         | 45              |
+
+  # share-sale-22
+  Scenario Outline: a distressed shareholder in two legal entities has both shares offered for sale, not only the first, before bankruptcy is finalised
+    Given we select 3 players
+    And Pink Realty is formed
+    And Yellow Realty is formed
+    And every other player can complete their turn
+    And pawn "iron box" starts at position 15
+    And pawn "high hat" starts at position 16
+    And pawn "dog" starts at position 35
+    And pawn "dog" has $<dog_balance> to spend
+    And pawn "high hat" has $<peer_balance> to spend
+    And pawn "iron box" has $<peer_balance> to spend
+    When we play up to 1 round
+    Then pawn "dog" is bankrupt
+    And pawn "dog" holds no shares of any legal entity
+    And pawn "dog"'s final balance is $<dog_ending>
+
+    Examples:
+      | dog_balance | peer_balance | dog_ending |
+      | 40          | 20           | -46        |
+
+  # share-sale-23
+  Scenario Outline: an entity whose every share has been bought out by one shareholder is liquidated for that shareholder's debt, exactly as a naturally-reduced one is
+    Given we select 3 players
+    And Pink Realty is formed
+    And pawn "high hat" returns every street except "Rue de Diekirch Arlon" to the bank
+    And pawn "iron box" starts at position 35
+    And pawn "dog" starts at position 15
+    And pawn "high hat" starts at position 1
+    And pawn "dog" will roll 4 and 1 for their turn
+    And pawn "high hat" will roll 2 and 1 for their turn
+    And pawn "iron box" will roll 2 and 1 for their turn
+    And pawn "dog" has $<dog_balance> to spend
+    And pawn "high hat" has $<high_hat_balance> to spend
+    And pawn "iron box" has $<iron_box_balance> to spend
+    When we play up to 1 round
+    Then pawn "iron box" holds no share of Pink Realty
+    And pawn "iron box" is not bankrupt
+    And pawn "high hat" holds no share of Pink Realty
+
+    Given pawn "dog" will roll 6 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And pawn "iron box" will roll 5 for initiative
+    And pawn "dog" starts at position 1
+    And pawn "dog" will roll 2 and 1 for their turn
+    And pawn "dog" has $<dog_final_balance> to spend
+    When we play up to 1 round
+    Then Pink Realty is dissolved
+
+    Examples:
+      | dog_balance | high_hat_balance | iron_box_balance | dog_final_balance |
+      | 10000       | 150              | 50               | 50                |
