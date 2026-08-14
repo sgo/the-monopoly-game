@@ -23,6 +23,7 @@ Available strategies: greedo, billionaire
 Optional flags:
   --optional-greedo-stalemate-trading
   --optional-greedo-legal-entity
+  --max-years=N
 Report file: $TMPDIR/the-monopoly-game.report
 ```
 

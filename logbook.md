@@ -34751,6 +34751,29 @@ Merged specifier `323a3e0`. Five new scenarios covering four defects:
 
 Task `legal-entity-rent-and-share-defects` complete.
 
+## 2026-08-14T07:10:00Z — specifier: received coder handoff out of process
+
+Coder sent `legal-entity-rent-and-share-defects` directly to specifier
+(commit `740f2cc`), skipping refactorer and architect review entirely.
+Merged and independently verified the four fixes against the specified
+scenarios myself, in source:
+
+- Rent.java: entity-rent affordability guard removed, unconditional
+  withdrawal matching player-owned rent.
+- LegalEntity.java: dividend gate now also accepts
+  `deeds.isBankrupt(lastCapitalizedShareholder)`.
+- Bankruptcy.java: `sellEntitySharesUntilSolvent` no longer returns after
+  the first sale; loops every entity.
+- Bankruptcy.java / LegalEntity.java: liquidation check now counts
+  `shareholders().stream().distinct().count()` rather than raw slot count.
+
+Also fixed a leftover merge-conflict marker (`>>>>>>> 8f13cbb`) the coder's
+own merge left in this file.
+
+Flagging as processed without further action: this bypassed structural
+(refactorer) and acceptance (architect) review, so it is not being treated
+as a phase-complete sync. Moving on to the next queued item.
+
 ## 2026-08-14T07:15:00Z — refactorer received coder handoff `legal-entity-rent-and-share-defects`
 
 Handoff message received:
@@ -34790,3 +34813,244 @@ commit: 6eb306bb67
 ```
 
 Priority 00, matching the incoming architect-follow-up loop. Summary: fixed a stale domain unit test the coder's Rent.java change left contradicting settled behavior (was blocking `mvn test` outright), closed a CRAP gap on `LegalEntity.repayLoanOrPayDividend` opened by the entity-33 fix (extracted `readyForDividend`/`lastCapitalizationSettled`), and deduplicated the "exactly one distinct shareholder" check the share-sale-23 fix introduced in two classes behind `LegalEntity.hasOneDistinctShareholder()`. No behavior changes beyond the test fix, which restores an already-decided, already-implemented rule rather than deciding new policy. Domain 374/374, full reactor green apart from the known pre-existing CLI flake, acceptance 757/757 run twice.
+
+## 2026-08-14T07:07:08Z — received refactorer handoff `legal-entity-rent-and-share-defects`
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 6eb306bb67
+```
+
+Action: merged commit `6eb306bb67` as the architect review state. The
+refactorer corrected the stale entity-rent unit assertion, extracted the
+legal-entity dividend-readiness predicates to keep CRAP below the project
+threshold, deduplicated the distinct-shareholder query behind
+`LegalEntity.hasOneDistinctShareholder()`, and refreshed generated mutation
+manifests. Reviewing the resulting structure and running architect-owned
+verification next.
+
+Architect verification: Java differential mutation ran sequentially on
+`Bankruptcy.java`, `LegalEntity.java`, `Rent.java`, and `Greedo.java`; all four
+baselines passed with zero changed mutation scopes, zero survivors, and zero
+uncovered sites. `dry4java` found only the established `Game` journal-adapter
+duplicates and the pre-existing `LandSale`/`Rent` constructor shape; no new
+duplication from this handoff warranted a structural change.
+
+`mvn test` passed the domain suite (374/374) but the full reactor and a retry
+hit the documented pre-existing timing failure in
+`SimulatorTest.keepsPlayingUntilToldToStop`. The explicit property suite
+passed (23/23). The full soft acceptance-mutation run reached the broad
+`greedo-priority.feature` workload, where four CPU-bound workers produced no
+progress for over six minutes; it was terminated after the runner's existing
+timeout failed to reclaim them. The targeted `greedo-legal-entity.feature`
+run completed 146 mutations with 97 killed, 49 pre-existing survivors, and 0
+errors. Partial tool-generated feature manifests were restored and are not
+part of this commit.
+
+## 2026-08-14T07:25:00Z — architect phase-complete sync for `legal-entity-rent-and-share-defects`
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: legal-entity-rent-and-share-defects
+commit: 46b599af74
+```
+
+Summary: accepted the refactorer's behavior-preserving structural cleanup
+and recorded the architect verification results. No coder or refactorer
+follow-up remains open.
+
+## 2026-08-14T09:30:00Z — received specifier handoff `cli-year-limit`
+
+Handoff message received:
+
+```
+id: 20260814T091023Z_000187_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 802b86bd0e
+created_at: 2026-08-14T09:10:23.166105Z
+enqueued_at: 2026-08-14T09:10:23.732297Z
+task: cli-year-limit
+
+Re-read your role and constitution.
+
+merge_and_process specifier 802b86bd0e
+```
+
+Action: resumed the year-limit implementation from the already integrated
+specifier commit and reviewed the existing coder changes.
+
+## 2026-08-14T09:30:00Z — received specifier update `cli-year-limit`
+
+Handoff message received:
+
+```
+id: 20260814T091931Z_000188_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: a2d27447c4
+created_at: 2026-08-14T09:19:31.278259Z
+enqueued_at: 2026-08-14T09:19:31.828259Z
+task: cli-year-limit
+
+Re-read your role and constitution.
+
+merge_and_process specifier a2d27447c4
+```
+
+Action: merged the clarified journal snapshot acceptance scenario.
+
+## 2026-08-14T09:30:00Z — received specifier update `cli-year-limit`
+
+Handoff message received:
+
+```
+id: 20260814T092252Z_000189_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: cfeb976dc9
+created_at: 2026-08-14T09:22:52.655101Z
+enqueued_at: 2026-08-14T09:22:52.677148Z
+task: cli-year-limit
+
+Re-read your role and constitution.
+
+merge_and_process specifier cfeb976dc9
+```
+
+Action: merged the clarified report and logging snapshot scenarios.
+
+## 2026-08-14T12:09:10Z — coder resumed `cli-year-limit`
+
+Added the missing acceptance step handlers and changed the domain loop to
+stop immediately after the player whose age reaches the configured limit,
+then record every survivor's final balance and age. Focused acceptance
+verification passed: 289 generated scenarios across year-limit, journal,
+logging, and report features. Domain unit tests passed (374 tests); the
+pre-existing simulator timing test remains flaky when the unbounded game
+finishes before its one-second observation window.
+
+## 2026-08-14T12:10:00Z — coder sends `cli-year-limit` to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: cli-year-limit
+commit: ba16ff3507
+```
+
+Summary: optional CLI year limit and immediate cap snapshot are implemented;
+focused acceptance and unit verification pass.
+
+## 2026-08-14T09:10:27Z — specifier sends cli-year-limit handoff to coder
+
+User asked to investigate a 5-minute-cap batch run to see whether long
+runners genuinely never resolve or are just slow. Log analysis across 70
+games (billionaire-retest-50, billionaire-5min, billionaire-retest) showed
+resolving games (win or stalemate) cluster under ~1,000 simulated years
+(median ~230), while the two observed timeouts jumped an order of magnitude
+higher (3,354 and 19,159 years) and ran at roughly a third the simulation
+speed. User proposed keeping the game running to completion by default but
+adding an opt-in CLI cap so it doesn't have to be waited out.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: cli-year-limit
+commit: 802b86bd0e
+```
+
+Specified an optional `--max-years=<N>` CLI flag: unset by default (game
+behavior unchanged), and when set, the game stops itself once any
+remaining player's age reaches the limit — checked at the same point
+`Stalemate.reached()` already is in `Game.playTurn`, so it applies
+uniformly across `play()`/`playToCompletion()`/`playUntilStopped()`, not
+just bounded test scenarios. On stopping it logs a new `YearLimitReached`
+journal entry plus `FinalBalance`/`FinalAge` for every survivor, mirroring
+`logStalemate`, so a capped run still leaves a readable snapshot.
+
+Three new specs:
+- `year-limit.feature` (specs-core): stops once a player's age reaches the
+  limit; does not stop while everyone is still under it; never triggers
+  with no limit configured. Uses `pawn "dog" starts at position 35` +
+  `will roll 5 for their turn` to land exactly on GO in one controlled
+  turn, since landing on/passing GO is the only place age increments.
+- `cli.feature` (cli-8, cli-9): `--max-years=1` makes the simulator stop
+  itself on a real game with no explicit `stop()` call; `--max-years=0` is
+  rejected the same way `playUpToRounds(0)` already is.
+- `cli-packaged-jar.feature` (cli-jar-6, and cli-jar-5 extended): the
+  packaged jar's startup stdout confirms the configured year limit,
+  matching the existing stalemate-trading/legal-entity confirmation lines;
+  the README usage-flag scenario now also checks for `--max-years`.
+
+All three files pass `gherkin-parser` and `gherkin-ir-dry-checker` with no
+new findings beyond the pre-existing low-severity possible-synonym/
+near-duplicate pairs already present in these files. The new step
+vocabulary (`the game is limited to N years`, `the game ends because the
+year limit was reached`, `--max-years` parsing, the new journal entry and
+stdout confirmation line) does not exist yet, so these scenarios could not
+be RED-verified against the current implementation — that verification is
+for the coder to run once the corresponding step handlers and domain code
+exist.
+
+## 2026-08-14T09:19:07Z — specifier sends cli-year-limit follow-up to coder
+
+User asked whether the journal/log/report actually covers the year limit
+being reached. `year-limit.feature` only asserted the boolean outcome plus
+one player's final age — it never verified the full survivor snapshot
+(`FinalBalance` + `FinalAge` for every remaining player) the design
+promised. `journal.feature` already has an established, precise pattern
+for exactly this concern on the stalemate path (journal-61): ordered
+assertions proving each entry is logged in sequence, not just that the
+game ended. Added journal-70 as the analogous scenario for the year-limit
+path.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: cli-year-limit
+commit: a2d27447c4
+```
+
+journal-70 chains: `YearLimitReached` before dog's `FinalBalance` before
+dog's `FinalAge` before high hat's `FinalBalance` before high hat's
+`FinalAge` — mirroring `logStalemate`'s snapshot behavior exactly. Reuses
+the existing player-agnostic `FinalBalance`-before-`FinalAge` step pairs;
+needs one new compound step analogous to the existing stalemate one at
+`JournalStepHandlers.java:662` (`"...ends because the year limit was
+reached before it records that pawn X's final balance..."`). High hat
+never takes a turn in this scenario (the check fires immediately after
+dog's single controlled turn, since the trigger is "any remaining player's
+age reaches the limit," unlike stalemate's "every remaining player clears
+the threshold") — so high hat's final balance/age are just its unchanged
+starting values, age 0.
+
+Passes `gherkin-parser`/`gherkin-ir-dry-checker` with no new finding kinds
+beyond the pre-existing possible-synonym/near-duplicate noise already
+present throughout this large file.

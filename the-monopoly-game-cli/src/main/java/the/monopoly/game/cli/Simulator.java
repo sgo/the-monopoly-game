@@ -36,6 +36,11 @@ public final class Simulator {
       System.out.println("Stalemate trading enabled");
     if (List.of(arguments).contains("--optional-greedo-legal-entity"))
       System.out.println("Legal entity trading enabled");
+    for (String argument : arguments) {
+      if (argument.startsWith("--max-years=")) {
+        System.out.println("Year limit is " + argument.substring("--max-years=".length()) + " years");
+      }
+    }
     Result result = execute(arguments);
     System.out.println(result.output());
     if (!result.succeeded()) System.exit(result.exitCode());
@@ -63,13 +68,25 @@ public final class Simulator {
     int playerCount = arguments.length == 0 ? 2 : Integer.parseInt(arguments[0]);
     boolean stalemateTrading = List.of(arguments).contains("--optional-greedo-stalemate-trading");
     boolean legalEntityTrading = List.of(arguments).contains("--optional-greedo-legal-entity");
+    int maxYears = extractMaxYears(arguments);
+    if (maxYears == 0) return new Result(1, "A game needs at least one year. " + usage());
     List<String> strategyNames = List.of(arguments).subList(Math.min(1, arguments.length), arguments.length).stream()
         .filter(argument -> !argument.equals("--optional-greedo-stalemate-trading")
-            && !argument.equals("--optional-greedo-legal-entity")).toList();
+            && !argument.equals("--optional-greedo-legal-entity")
+            && !argument.startsWith("--max-years")).toList();
     if (!strategyNames.isEmpty() && strategyNames.size() != playerCount)
       return new Result(1, "Supply one strategy for each player. " + usage());
     return run(playerCount, strategiesFor(playerCount, strategyNames, stalemateTrading, legalEntityTrading),
-        stalemateTrading, legalEntityTrading);
+        stalemateTrading, legalEntityTrading, maxYears);
+  }
+
+  private static int extractMaxYears(String... arguments) {
+    for (String argument : arguments) {
+      if (argument.startsWith("--max-years=")) {
+        return Integer.parseInt(argument.substring("--max-years=".length()));
+      }
+    }
+    return -1;
   }
 
   static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames) {
@@ -99,6 +116,7 @@ public final class Simulator {
         + System.lineSeparator() + "Optional flags:"
         + System.lineSeparator() + "  --optional-greedo-stalemate-trading"
         + System.lineSeparator() + "  --optional-greedo-legal-entity"
+        + System.lineSeparator() + "  --max-years=N"
         + System.lineSeparator() + "Report file: " + reportPath();
   }
 
@@ -116,7 +134,12 @@ public final class Simulator {
 
   public static Result run(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading,
                            boolean legalEntityTrading) {
-    return start(playerCount, strategies, stalemateTrading, legalEntityTrading).awaitEnd();
+    return run(playerCount, strategies, stalemateTrading, legalEntityTrading, -1);
+  }
+
+  public static Result run(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading,
+                           boolean legalEntityTrading, int maxYears) {
+    return start(playerCount, strategies, stalemateTrading, legalEntityTrading, maxYears).awaitEnd();
   }
 
   /**
@@ -135,6 +158,11 @@ public final class Simulator {
 
   public static Running start(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading,
                               boolean legalEntityTrading) {
+    return start(playerCount, strategies, stalemateTrading, legalEntityTrading, -1);
+  }
+
+  public static Running start(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading,
+                              boolean legalEntityTrading, int maxYears) {
     Result rejected = rejectOutOfRange(playerCount);
     if (rejected != null) return new Running(rejected);
 
@@ -142,7 +170,7 @@ public final class Simulator {
     List<Player> players = rules.players().select(playerCount).toList();
     Deeds deeds = new Deeds();
     return new Running(new Game(rules, players, player -> Cup.of(rules.dice().toList()), strategies, deeds,
-        Cards.Decks.official(deeds), new Jail(rules), stalemateTrading, legalEntityTrading));
+        Cards.Decks.official(deeds), new Jail(rules), stalemateTrading, legalEntityTrading, maxYears));
   }
 
   private static Result rejectOutOfRange(int playerCount) {

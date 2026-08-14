@@ -988,3 +988,22 @@ Feature: game logging
     Examples:
       | entity_name | rent | shortfall | commitment | street             |
       | Pink Realty  | 50   | 50        | 25         | Rue de Diekirch Arlon |
+
+  # logging-70
+  Scenario Outline: the log records each remaining player's final balance and age once the game ends because the year limit was reached
+    Given the game is limited to <year limit> years
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And pawn "dog" starts at position 35
+    And pawn "dog" will roll 5 for their turn
+    And pawn "dog"'s account holds $<dog_starting_account>
+    And pawn "high hat"'s account holds $<high_hat_starting_account>
+    When we play the game
+    Then the game log records that the game ends because the year limit was reached before it records that pawn "dog"'s final balance is $<dog_final_balance>
+    And the game log records that pawn "dog"'s final balance is $<dog_final_balance> before it records that pawn "dog"'s final age is <dog_final_age> years
+    And the game log records that pawn "dog"'s final age is <dog_final_age> years before it records that pawn "high hat"'s final balance is $<high_hat_final_balance>
+    And the game log records that pawn "high hat"'s final balance is $<high_hat_final_balance> before it records that pawn "high hat"'s final age is <high_hat_final_age> years
+
+    Examples:
+      | year limit | dog_starting_account | dog_final_balance | dog_final_age | high_hat_starting_account | high_hat_final_balance | high_hat_final_age |
+      | 1          | 1500                  | 1700               | 1              | 1500                       | 1500                    | 0                   |

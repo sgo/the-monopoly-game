@@ -55,6 +55,7 @@ public class Game {
   private final Jail jail;
   private final boolean stalemateTrading;
   private final boolean legalEntityTrading;
+  private final int maxYears;
   private boolean automaticMarketDeadlock = true;
   private boolean roundHadConsolidatingAction;
 
@@ -91,6 +92,13 @@ public class Game {
       Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
       Cards.Decks decks, Jail jail, boolean stalemateTrading, boolean legalEntityTrading
   ) {
+    this(rules, players, cups, strategies, deeds, decks, jail, stalemateTrading, legalEntityTrading, 0);
+  }
+
+  public Game(
+      Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
+      Cards.Decks decks, Jail jail, boolean stalemateTrading, boolean legalEntityTrading, int maxYears
+  ) {
     this.rules = rules;
     this.players = players;
     this.cups = cups;
@@ -100,6 +108,7 @@ public class Game {
     this.jail = jail;
     this.stalemateTrading = stalemateTrading;
     this.legalEntityTrading = legalEntityTrading;
+    this.maxYears = maxYears;
     applyOpeningCapital();
   }
 
@@ -184,6 +193,10 @@ public class Game {
       int roundJournalStart = journal.entries().size();
       for (Player player : turnOrder) {
         if (playTurn(player, builder, turnOrder, journal, journalling, building)) return;
+        if (maxYears > 0 && yearLimitReached(journalling)) {
+          logYearLimitReached(journal, journalling);
+          return;
+        }
       }
       completeRound(journal, roundJournalStart, journalling);
       if (remainingPlayers().size() <= 1) return;
@@ -226,6 +239,18 @@ public class Game {
 
   private void logStalemate(Journal journal, Journalling journalling) {
     journal.log(new Journal.Entry.Stalemate());
+    remainingPlayers().forEach(it -> {
+      journal.log(new Journal.Entry.FinalBalance(it.id(), it.account().balance().amount()));
+      journal.log(new Journal.Entry.FinalAge(it.id(), journalling.age(it)));
+    });
+  }
+
+  private boolean yearLimitReached(Journalling journalling) {
+    return remainingPlayers().stream().anyMatch(player -> journalling.age(player) >= maxYears);
+  }
+
+  private void logYearLimitReached(Journal journal, Journalling journalling) {
+    journal.log(new Journal.Entry.YearLimitReached());
     remainingPlayers().forEach(it -> {
       journal.log(new Journal.Entry.FinalBalance(it.id(), it.account().balance().amount()));
       journal.log(new Journal.Entry.FinalAge(it.id(), journalling.age(it)));
@@ -871,6 +896,9 @@ public class Game {
       }
 
       record Stalemate() implements Entry {
+      }
+
+      record YearLimitReached() implements Entry {
       }
 
       record FinalBalance(Player.ID player, Money balance) implements Entry {
