@@ -35359,3 +35359,26 @@ and keeping the production/domain boundary unchanged. The focused
 `EnRulesYearLimitAcceptanceTest` passes all 3 scenarios. Soft acceptance
 mutation remains 1 killed / 1 survived in the existing feature mutator
 surface; the generated manifest was restored and is not part of the change.
+
+## 2026-08-14T11:53:43Z — specifier received architect handoff `cli-year-limit`
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect f559c8ac83
+```
+
+Action: merged commit `f559c8ac83` as `587dc06`, resolving a purely
+additive append-only `logbook.md` conflict — reconstructed chronologically
+(my own follow-up entry in full, then the refactorer's received/review/
+sent-to-architect chain, then the architect's received/regression-found/
+accepted-follow-up chain), 410 insertions, 0 deletions. This is the
+phase-complete sync: full coder implementation, refactorer CRAP/DRY/
+Journalling-extraction cleanup plus a validation-boundary fix
+(`--max-years=0` rejection centralized in `Simulator.start()`), and
+architect review (one regression found and routed back to coder at
+priority 00, then accepted) are all now on `main`. `cli-year-limit` is
+closed end-to-end. Per role rules, not notifying coder again on my own —
+asking the user for the next feature.
