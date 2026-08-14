@@ -34750,3 +34750,37 @@ Merged specifier `323a3e0`. Five new scenarios covering four defects:
 - Full acceptance: **757/757, 0 failures, 0 errors**
 
 Task `legal-entity-rent-and-share-defects` complete.
+
+## 2026-08-14T07:07:08Z — received refactorer handoff `legal-entity-rent-and-share-defects`
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 6eb306bb67
+```
+
+Action: merged commit `6eb306bb67` as the architect review state. The
+refactorer corrected the stale entity-rent unit assertion, extracted the
+legal-entity dividend-readiness predicates to keep CRAP below the project
+threshold, deduplicated the distinct-shareholder query behind
+`LegalEntity.hasOneDistinctShareholder()`, and refreshed generated mutation
+manifests. Reviewing the resulting structure and running architect-owned
+verification next.
+
+Architect verification: Java differential mutation ran sequentially on
+`Bankruptcy.java`, `LegalEntity.java`, `Rent.java`, and `Greedo.java`; all four
+baselines passed with zero changed mutation scopes, zero survivors, and zero
+uncovered sites. `dry4java` found only the established `Game` journal-adapter
+duplicates and the pre-existing `LandSale`/`Rent` constructor shape; no new
+duplication from this handoff warranted a structural change.
+
+`mvn test` passed the domain suite (374/374) but the full reactor and a retry
+hit the documented pre-existing timing failure in
+`SimulatorTest.keepsPlayingUntilToldToStop`. The explicit property suite
+passed (23/23). The full soft acceptance-mutation run reached the broad
+`greedo-priority.feature` workload, where four CPU-bound workers produced no
+progress for over six minutes; it was terminated after the runner's existing
+timeout failed to reclaim them. The targeted `greedo-legal-entity.feature`
+run completed 146 mutations with 97 killed, 49 pre-existing survivors, and 0
+errors. Partial tool-generated feature manifests were restored and are not
+part of this commit.
