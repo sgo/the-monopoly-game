@@ -35446,6 +35446,20 @@ and keeping the production/domain boundary unchanged. The focused
 mutation remains 1 killed / 1 survived in the existing feature mutator
 surface; the generated manifest was restored and is not part of the change.
 
+## 2026-08-16T16:29:26Z — accepted refactorer handoff `asset-rich-billionaire`
+
+Merged refactorer commit `56d341766c` as `1b921586994`. The structural
+cleanup names the asset-rich colour set in `Game` and preserves the domain
+boundary; the CLI and strategy option remain explicit and testable.
+
+Verification: domain/CLI tests pass apart from the known flaky
+`SimulatorTest.keepsPlayingUntilToldToStop`; domain property tests pass
+(23/23); differential mutation for `Game` reports 98 sites with zero
+differential sites; DRY reports only the established journalling,
+constructor, and CLI branch duplicates. The new
+`asset-rich-billionaire.feature` soft mutation passes all 13 mutations
+(13 killed, 0 survived, 0 errors). Generated manifests were restored.
+
 ## 2026-08-14T11:53:43Z — specifier received architect handoff `cli-year-limit`
 
 Handoff message received:
