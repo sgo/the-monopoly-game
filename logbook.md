@@ -35623,3 +35623,107 @@ repro attempt diverged from real test behavior and was abandoned rather
 than guessed at). Domain 398/398, full reactor green apart from the known
 pre-existing CLI flake, acceptance 777/778 (one pre-existing, already-
 flagged failure).
+
+## 2026-08-16T18:50:22Z — refactorer received coder handoff `asset-rich-billionaire` (build-trigger fix)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 91cd44bc84
+```
+
+Action: merged commit `91cd44bc84` as `061494c`. This commit is a direct
+child of the coder's original `46a7256d83`, not of the reviewed chain
+this refactorer sent to the architect (`56d341766c`/`b3b10aa`) — the
+merge was clean regardless (no logbook conflict; the two chains never
+touched overlapping lines), so nothing from either side was lost, but it
+means this fix was written without first pulling in the architect's
+review or the specifier's own diagnosis of the underlying defect (visible
+on other branches via `git log --all`, out of scope to inspect or merge
+here per workflow rules — only the commit actually named in the handoff
+gets merged). Touches `Building.java` only:
+`firstOfferedBuild` now special-cases `assetRichOpening()` strategies,
+filtering out monopolies the player can't afford even a first house on
+(unless already partially built) and sorting the rest by houses-built-so-
+far (descending) then first-level cost (descending) before falling
+through to the existing per-group candidate/afford/build logic. Reviewing
+under refactorer rules before handing back.
+
+## 2026-08-16T18:50:22Z — refactorer review: `asset-rich-billionaire` (build-trigger fix)
+
+This directly targets the `asset-rich-billionaire-4` defect flagged in my
+prior review of this task: dog owns both granted monopolies from turn
+zero, and `firstOfferedBuild` previously tried monopolies in group-
+declaration order (Orange before Red, since Orange's streets sort earlier
+on the board) regardless of affordability, so a budget that could only
+cover one of the two groups got spent entirely on Orange — cheaper, so it
+absorbs more of the budget across successive house levels — before Red
+was ever reached. Confirmed by running the acceptance suite twice: `778/778`
+clean both times, `asset-rich-billionaire-4` passing.
+
+Mutation-site scan on the changed file: `Building.java` 13 sites, far
+under the 100-site threshold. CRAP (`crap4java`, domain): no new
+violations beyond the two already-documented exceptions
+(`Report.line`, `Game.journalOperation`) — the new `firstOfferedBuild`
+branch sits at CRAP 4.8 (CC=3), the new `firstLevelCost` helper at CRAP
+2.0 (CC=1). `dry4java` found nothing new attributable to this change.
+
+Found one housekeeping gap, not a structural or behavioral issue: the
+coder's edit left `Building.java`'s `mutate4java-manifest` footer stale
+(line ranges and semantic hashes still reflecting the pre-fix file).
+Refreshed it via `--update-manifest` — a metadata-only change, verified by
+diffing that only manifest lines moved, no production code changed.
+
+This fix is narrowly scoped to `assetRichOpening()` strategies and
+changes nothing about how ordinary (non-asset-rich) players build, which
+is the right shape for a targeted fix — but it does not address the
+larger characteristic the specifier's own 50-game batch diagnosis
+surfaced on a separate branch (44/50 games showing an asset-rich
+billionaire never building during real multi-player play): `Game.java`'s
+`developAndTrackConsolidation` is only ever invoked for the single
+initiative-winning `builder` player (`turnOrder.getFirst()`, fixed for
+the whole game, never reassigned), so any player who isn't that one
+"builder" — asset-rich or not — never calls `Building.develop()` at all
+during ordinary turns, regardless of what they can afford. This appears
+to be a long-standing characteristic of the whole game (not something
+this task introduced), only made visible now because an asset-rich
+billionaire's un-built granted monopoly is a much more dramatic tell than
+a normal player quietly never developing a purchased one. Out of scope
+for this handoff (it isn't part of the commit I was asked to merge, and
+addressing it is a game-wide behavior decision, not a structural cleanup)
+— noting it here in case it resurfaces as a separate task, since the
+architect/specifier chain investigating it lives on a different branch
+this role doesn't merge from unless a handoff names it.
+
+Verification: `mvn test` from the repo root — all modules green,
+including `SimulatorTest.keepsPlayingUntilToldToStop` this run (the known
+flake didn't trigger). Full acceptance pipeline: 778/778, run twice.
+
+## 2026-08-16T18:50:22Z — refactorer sent asset-rich-billionaire handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: asset-rich-billionaire
+commit: d00e47ad64
+```
+
+Priority 50, matching the normal specifier→coder→refactorer→architect
+pipeline flow. Summary: verified the coder's targeted fix for the
+`asset-rich-billionaire-4` defect flagged in this role's prior review —
+`Building.firstOfferedBuild` now filters/sorts an asset-rich strategy's
+granted monopolies by affordability instead of always trying the
+board-earlier (cheaper) group first, which was starving the other group
+of funds. No CRAP/DRY issues; refreshed one stale mutation manifest
+(metadata only). Flagging, not fixing: this narrow fix doesn't address
+the wider "only the initiative-winning `builder` ever develops houses in
+a real multi-player game" characteristic the specifier's own batch
+diagnosis surfaced on another branch — out of scope here since it wasn't
+part of the merged commit and is a game-wide behavior question, not
+structural cleanup. Domain 398/398, full reactor green (including the
+usually-flaky CLI test this run), acceptance 778/778 run twice.
