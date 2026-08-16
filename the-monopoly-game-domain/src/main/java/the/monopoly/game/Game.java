@@ -249,7 +249,8 @@ public class Game {
     if (deeds.isBankrupt(player)) return false;
     resolveSplitOwnershipAtStart(player, turnOrder, journalling);
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
-    if (isBuilderStillSolvent(player, builder)) developAndTrackConsolidation(player, building);
+    if (isPlayerStillSolvent(player) && (!legalEntityTrading || player.id().equals(builder.id())))
+      developAndTrackConsolidation(player, building);
     if (remainingPlayers().size() <= 1) return true;
     if (!Stalemate.reached(rules, players, deeds)) return false;
     if (player.id().equals(turnOrder.getLast().id())) operateLegalEntities(journalling);
@@ -300,8 +301,8 @@ public class Game {
     }
   }
 
-  private boolean isBuilderStillSolvent(Player player, Player builder) {
-    return player.id().equals(builder.id()) && !deeds.isBankrupt(player);
+  private boolean isPlayerStillSolvent(Player player) {
+    return !deeds.isBankrupt(player);
   }
 
   private String entityName(Street.Colour colour) {
