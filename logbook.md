@@ -36116,3 +36116,49 @@ defect, not an asset-rich-billionaire-specific one), so this needs a user
 decision on how to proceed rather than a specifier judgment call.
 2026-08-16T22:15:00Z coder: processed specifier handoff 20260816T200417Z_000192 for turn-development (670b1330f5). Fixed development gating so a non-initiative player develops on their own turn while preserving legal-entity mode behavior. Turn-development acceptance and Greedo legal-entity acceptance pass.
 2026-08-16T22:20:00Z coder: processed architect handoff 20260816T202212Z_000294 (d390a5dc60). Architect review confirms the turn-development diagnosis and records it as a game-wide behavior; current implementation retains the focused specifier fix and its targeted tests pass.
+
+## 2026-08-16T20:24:10Z — refactorer received coder handoff `turn-development` (architect sign-off)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder bff13c1c12
+```
+
+Action: merged commit `bff13c1c12` as `ee53c68`, resolving a single-point
+`logbook.md` conflict (both sides purely additive, both appending at
+base's tail; spliced this role's own unique tail in before the incoming
+chain's architect-review entry, which explicitly acknowledges merging
+this role's `c06a194f1a` — the same insertion-point rule used every prior
+cycle). No production code changed: same shape as the prior asset-rich-
+billionaire sign-off cycle — the architect classified the
+`mayDevelopThisTurn` extraction as observable behavior needing the
+coder's explicit sign-off (routed at priority 00), and the coder
+confirmed the fix stands as-is with its targeted tests passing. Confirmed
+via `git diff c06a194f1a..HEAD -- ':!logbook.md'`: empty.
+
+Verification: domain unit tests still green (unchanged, no production
+file changed). Not re-running the full acceptance pipeline for a
+logbook-only diff — the prior cycle's two clean 779/779 runs already
+cover this exact code state.
+
+## 2026-08-16T20:24:10Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: turn-development
+commit: ee53c68d73
+```
+
+Priority 00, matching the incoming architect-follow-up loop (the
+architect's own behavior-sign-off request to the coder, now closed).
+Summary: no refactorer-owned changes — this handoff only carried the
+architect's and coder's own review/sign-off notes forward, with no
+production diff to verify beyond what was already confirmed clean in the
+prior cycle (779/779 acceptance, CRAP/DRY clean).
