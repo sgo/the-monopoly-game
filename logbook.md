@@ -35952,3 +35952,4 @@ scenario, per their explicit instruction to confirm root cause first — the
 scope here is materially larger than the original ask (a game engine-wide
 defect, not an asset-rich-billionaire-specific one), so this needs a user
 decision on how to proceed rather than a specifier judgment call.
+2026-08-16T22:15:00Z coder: processed specifier handoff 20260816T200417Z_000192 for turn-development (670b1330f5). Fixed development gating so a non-initiative player develops on their own turn while preserving legal-entity mode behavior. Turn-development acceptance and Greedo legal-entity acceptance pass.
