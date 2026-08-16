@@ -35503,6 +35503,21 @@ closed end-to-end. Per role rules, not notifying coder again on my own —
 asking the user for the next feature.
 2026-08-16T18:05:00Z coder: processed specifier handoff 20260816T155232Z_000190_from_specifier_to_coder for asset-rich-billionaire; implemented opt-in strategy flag, orange/red deed grants, standard opening balance, journal/CLI reporting, packaged-jar assertion, and acceptance pipeline registration. Targeted acceptance passes 9/10 scenarios; red-monopoly building scenario remains under investigation.
 
+## 2026-08-16T18:59:47Z — architect review finds asset-rich building-policy behavior
+
+Merged refactorer commit `d00e47abf8` as the current merge. The change in
+`Building.firstOfferedBuild` is observable behavior: asset-rich players now
+filter to affordable or already-developed monopolies and prioritize the
+most-developed group, then the most expensive first level. This is coherent
+domain logic and keeps the strategy decision inside the domain, but must be
+accepted by coder as behavior-owner follow-up.
+
+Verification: `BuildingTest` passes; differential mutation for `Building`
+reports 13 sites with zero differential sites; asset-rich soft acceptance
+mutation passes 13/13 killed with 0 survivors and 0 errors. DRY reports only
+the existing journalling, constructor, and CLI branch duplicates. Routed to
+coder at priority 00 for behavioral review.
+
 ## 2026-08-16T16:04:45Z — refactorer received coder handoff `asset-rich-billionaire`
 
 Handoff message received:
