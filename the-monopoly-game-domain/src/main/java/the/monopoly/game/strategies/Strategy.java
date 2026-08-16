@@ -103,6 +103,10 @@ public interface Strategy {
     return Optional.empty();
   }
 
+  default boolean assetRichOpening() {
+    return false;
+  }
+
   enum Priority {
     HIGHEST, MIDDLE, LOWEST
   }

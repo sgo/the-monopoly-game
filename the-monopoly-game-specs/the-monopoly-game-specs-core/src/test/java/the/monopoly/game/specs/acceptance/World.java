@@ -104,6 +104,7 @@ public class World {
   private boolean legalEntityTrading;
   private boolean simulatorStalemateTrading;
   private boolean simulatorLegalEntityTrading;
+  private boolean simulatorAssetRichOpening;
   private int gameMaxYears = -1;
   private int simulatorMaxYears = -1;
   private Entry selectedEvent;
@@ -306,6 +307,7 @@ public class World {
     simulatorPlayers = Integer.parseInt(arguments.getFirst());
     simulatorStalemateTrading = arguments.contains("--optional-greedo-stalemate-trading");
     simulatorLegalEntityTrading = arguments.contains("--optional-greedo-legal-entity");
+    simulatorAssetRichOpening = arguments.contains("--optional-asset-rich-billionaire");
     simulatorMaxYears = -1;
     for (String argument : arguments) {
       if (argument.startsWith("--max-years=")) {
@@ -316,7 +318,8 @@ public class World {
         .filter(argument -> !argument.startsWith("--")).toList();
     simulatorStrategies = player -> names.get(player.id().value().equals("dog") ? 0 : 1)
         .equals("billionaire")
-        ? new Billionaire(Money.ZERO, simulatorStalemateTrading, simulatorLegalEntityTrading)
+        ? new Billionaire(Money.ZERO, simulatorStalemateTrading, simulatorLegalEntityTrading, true,
+            simulatorAssetRichOpening)
         : new Greedo(Money.ZERO, simulatorStalemateTrading, simulatorLegalEntityTrading);
   }
 
@@ -645,6 +648,16 @@ public class World {
     legalEntityTrading = true;
     if (players != null) players.forEach(player -> pawnStrategies.put(player.id().value(),
         new the.monopoly.game.strategies.Greedo(Money.ZERO, false, true)));
+  }
+
+  public void enableAssetRichOpening(String strategyName) {
+    if (!strategyName.equals("Billionaire")) throw new AssertionError("Unknown strategy \"" + strategyName + "\".");
+    String pawnName = players == null ? "dog" : players.getFirst().id().value();
+    Strategy current = pawnStrategies.getOrDefault(pawnName, new Billionaire());
+    if (!(current instanceof Billionaire billionaire))
+      throw new AssertionError("Pawn \"" + pawnName + "\" does not follow Billionaire.");
+    pawnStrategies.put(pawnName, new Billionaire(billionaire.cashReserve(), billionaire.stalemateTradingEnabled(),
+        billionaire.legalEntityTradingEnabled(), false, true));
   }
 
   public void considerFormingLegalEntity(String pawnName, String colourName) {
@@ -1153,7 +1166,8 @@ public class World {
   private void suppressOpeningCapitalIfNeeded(String pawnName) {
     if (pawnStrategies.get(pawnName) instanceof Billionaire billionaire)
       pawnStrategies.put(pawnName, new Billionaire(billionaire.cashReserve(),
-          billionaire.stalemateTradingEnabled(), billionaire.legalEntityTradingEnabled(), false));
+          billionaire.stalemateTradingEnabled(), billionaire.legalEntityTradingEnabled(), false,
+          billionaire.assetRichOpening()));
   }
 
   public Money stalemateThreshold() {
@@ -1270,7 +1284,7 @@ public class World {
   public void runPackagedCli(String flag) {
     Path root = PomInspector.repoRoot("the-monopoly-game-cli");
     Path jar = root.resolve("the-monopoly-game-cli").resolve("target")
-        .resolve("the-monopoly-game-cli-0.3.0-SNAPSHOT.jar");
+        .resolve("the-monopoly-game-cli-0.4.0-SNAPSHOT.jar");
     ProcessBuilder builder = new ProcessBuilder("java", "-jar", jar.toString(), flag);
     try {
       packagedCliProcess = builder.redirectErrorStream(true).start();
@@ -1285,7 +1299,7 @@ public class World {
   public void startPackagedCli(String rawArguments) {
     Path root = PomInspector.repoRoot("the-monopoly-game-cli");
     Path jar = root.resolve("the-monopoly-game-cli").resolve("target")
-        .resolve("the-monopoly-game-cli-0.3.0-SNAPSHOT.jar");
+        .resolve("the-monopoly-game-cli-0.4.0-SNAPSHOT.jar");
     try {
       packagedCliOutputBuffer = new StringBuilder();
       packagedCliProcess = new ProcessBuilder(
@@ -1346,6 +1360,19 @@ public class World {
     }
     throw new AssertionError("Packaged jar output did not confirm year limit is " + yearLimit
         + " years: " + packagedCliOutputBuffer);
+  }
+
+  public void assertPackagedCliAssetRichOpening(String state) {
+    long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
+    while (System.nanoTime() < deadline) {
+      synchronized (packagedCliOutputBuffer) {
+        if (packagedCliOutputBuffer.toString().contains("Asset-rich opening enabled")
+            == state.equals("enabled")) return;
+      }
+      LockSupport.parkNanos(5_000_000);
+    }
+    throw new AssertionError("Packaged jar output did not confirm asset-rich opening is " + state
+        + ": " + packagedCliOutputBuffer);
   }
 
   public void stopPackagedCli() {

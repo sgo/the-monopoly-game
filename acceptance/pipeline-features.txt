@@ -51,6 +51,7 @@ en/rules/rent.feature
 en/rules/station-rent.feature
 en/rules/utility-rent.feature
 en/rules/year-limit.feature
+en/rules/asset-rich-billionaire.feature
 en/monopoly.feature
 specs-cli:en/cli.feature
 specs-cli:en/cli-slf4j-config.feature

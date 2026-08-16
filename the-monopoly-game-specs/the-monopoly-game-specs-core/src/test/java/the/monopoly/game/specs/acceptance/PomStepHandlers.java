@@ -47,6 +47,9 @@ final class PomStepHandlers {
         then("^the packaged jar's output confirms that the year limit is " + VALUE + " years$",
             (world, arguments) -> world.assertPackagedCliYearLimit(arguments.number(1))),
 
+        then("^the packaged jar's output confirms that asset-rich opening is " + NAME + "$",
+            (world, arguments) -> world.assertPackagedCliAssetRichOpening(arguments.text(1))),
+
         step("^I stop the packaged jar$", (world, arguments) -> world.stopPackagedCli()),
 
         then("^the packaged jar process ends$",
