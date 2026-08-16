@@ -35414,7 +35414,7 @@ type: git_handoff
 to: coder
 priority: 50
 task: asset-rich-billionaire
-commit: 48cd367
+commit: 48cd367103
 ```
 
 Passes `gherkin-parser`/`gherkin-ir-dry-checker` on all three touched
