@@ -48,10 +48,23 @@ public class Building {
   }
 
   private Optional<Build> firstOfferedBuild(List<List<ColourStreet>> monopolies, Player player) {
+    if (strategies.forPlayer(player).assetRichOpening()) {
+      int balance = player.account().balance().amount().amount();
+      monopolies = monopolies.stream()
+          .filter(group -> group.stream().anyMatch(street -> deeds.housesBuiltOn(street) > 0)
+              || firstLevelCost(group) <= balance)
+          .sorted(Comparator.<List<ColourStreet>>comparingInt(group ->
+              group.stream().mapToInt(deeds::housesBuiltOn).sum()).reversed()
+              .thenComparing(Comparator.comparingInt(this::firstLevelCost).reversed())).toList();
+    }
     return monopolies.stream()
         .flatMap(this::candidateBuildsFor)
         .filter(it -> strategies.forPlayer(player).builds(it.offer(player)))
         .findFirst();
+  }
+
+  private int firstLevelCost(List<ColourStreet> group) {
+    return group.stream().mapToInt(street -> street.houseConstructionCost().amount()).sum();
   }
 
   private Stream<Build> candidateBuildsFor(List<ColourStreet> group) {
