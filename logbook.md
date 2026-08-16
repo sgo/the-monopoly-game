@@ -35382,3 +35382,41 @@ architect review (one regression found and routed back to coder at
 priority 00, then accepted) are all now on `main`. `cli-year-limit` is
 closed end-to-end. Per role rules, not notifying coder again on my own —
 asking the user for the next feature.
+
+## 2026-08-16T15:52:16Z — specifier sends asset-rich-billionaire handoff to coder
+
+User asked for a way to make the Billionaire strategy asset-rich instead
+of cash-rich: instead of the $57.7M opening balance, start it owning a
+real portfolio of board land (worked out from the same per-property
+valuation the stalemate threshold already uses — hotel rent per street,
+4-station rent per station, both-utility dice-max rent per utility, which
+sums to exactly $22,790 across the whole board). Landed on granting the
+whole Orange and Red colour groups (the game's own `Strategy.HIGHEST`
+priority tier, per `Strategy.priorityOf()`), unimproved, so Billionaire
+builds them up itself via ordinary Greedo logic rather than starting with
+free hotels.
+
+First pass specified this as a new "Tycoon" strategy (`tycoon.feature`);
+user pointed out a new strategy name would require touching every
+existing scenario that enumerates strategies by name (Greedo +
+Billionaire pairs throughout `building.feature`, `cli.feature`, etc.).
+Reworked as an opt-in flag on the existing "Billionaire" strategy instead
+— `--optional-asset-rich-billionaire` — following the exact same pattern
+already established for `--optional-greedo-stalemate-trading` and
+`--optional-greedo-legal-entity`. Deleted `tycoon.feature`, replaced it
+with `asset-rich-billionaire.feature`, and reworked the CLI-level
+scenario accordingly.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: asset-rich-billionaire
+commit: 48cd367
+```
+
+Passes `gherkin-parser`/`gherkin-ir-dry-checker` on all three touched
+files with no new finding kinds beyond the usual possible-synonym/
+near-duplicate noise.
