@@ -35652,3 +35652,4 @@ repro attempt diverged from real test behavior and was abandoned rather
 than guessed at). Domain 398/398, full reactor green apart from the known
 pre-existing CLI flake, acceptance 777/778 (one pre-existing, already-
 flagged failure).
+2026-08-16T19:10:00Z coder: processed architect handoff 20260816T190006Z_000292 (654d8fceec). Architect review merged; current Building.java contains the asset-rich monopoly prioritization fix from 91cd44bc84. Targeted asset-rich acceptance was rerun after that fix and passed all 10 scenarios, so the review note describing Red scenario-4 as open is stale relative to current HEAD.
