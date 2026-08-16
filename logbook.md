@@ -35540,3 +35540,43 @@ priority 00, then accepted) are all now on `main`. `cli-year-limit` is
 closed end-to-end. Per role rules, not notifying coder again on my own —
 asking the user for the next feature.
 2026-08-16T18:05:00Z coder: processed specifier handoff 20260816T155232Z_000190_from_specifier_to_coder for asset-rich-billionaire; implemented opt-in strategy flag, orange/red deed grants, standard opening balance, journal/CLI reporting, packaged-jar assertion, and acceptance pipeline registration. Targeted acceptance passes 9/10 scenarios; red-monopoly building scenario remains under investigation.
+
+## 2026-08-16T16:33:43Z — specifier received architect handoff `asset-rich-billionaire`
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 5658170e97
+```
+
+Action: merged commit `5658170e97` as `a77f3be`. This resolution needed
+extra care beyond the usual purely-additive `logbook.md` conflict: the
+upstream coder/refactorer/architect chain's own logbook entries had
+already been interleaved mid-file across several insertion points during
+their own prior merges (not something introduced here), so a plain `git
+merge` auto-resolution risked scrambling headers and bodies from
+unrelated entries together. Resolved by diffing each side against the
+merge-base (`48cd367103`) independently to isolate exactly what each side
+actually added, then inserting my own single specifier entry at its
+correct chronological position (immediately before the coder's "received
+specifier handoff" line, 3 minutes earlier) into the upstream chain's
+content taken otherwise verbatim and unmodified. Verified via a
+sorted-line diff that every non-blank line from the architect's commit
+survived the resolution intact.
+
+This is the phase-complete sync for `asset-rich-billionaire`: coder
+implementation (opt-in `--optional-asset-rich-billionaire` flag, Orange/Red
+deed grants, standard opening balance), refactorer cleanup (named the
+asset-rich colour set in `Game`, fixed a stale README usage flag,
+differential mutation clean for `Game` at 98 sites), and architect
+acceptance are all now on `main`. The coder's own note flagged the
+red-monopoly building scenario as "under investigation" at 9/10 passing;
+the refactorer's subsequent logbook entry reports the full
+`asset-rich-billionaire.feature` at 13/13 mutations killed with 0
+survivors, which isn't possible unless all 5 scenarios were green by that
+point — so this was resolved somewhere in the coder-to-refactorer handoff,
+just without its own dedicated log entry narrating the fix. `asset-rich-
+billionaire` is closed end-to-end. Per role rules, not notifying coder
+again on my own — asking the user for the next feature.
