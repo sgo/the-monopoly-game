@@ -35446,6 +35446,20 @@ and keeping the production/domain boundary unchanged. The focused
 mutation remains 1 killed / 1 survived in the existing feature mutator
 surface; the generated manifest was restored and is not part of the change.
 
+## 2026-08-16T16:29:26Z — accepted refactorer handoff `asset-rich-billionaire`
+
+Merged refactorer commit `56d341766c` as `1b921586994`. The structural
+cleanup names the asset-rich colour set in `Game` and preserves the domain
+boundary; the CLI and strategy option remain explicit and testable.
+
+Verification: domain/CLI tests pass apart from the known flaky
+`SimulatorTest.keepsPlayingUntilToldToStop`; domain property tests pass
+(23/23); differential mutation for `Game` reports 98 sites with zero
+differential sites; DRY reports only the established journalling,
+constructor, and CLI branch duplicates. The new
+`asset-rich-billionaire.feature` soft mutation passes all 13 mutations
+(13 killed, 0 survived, 0 errors). Generated manifests were restored.
+
 ## 2026-08-14T11:53:43Z — specifier received architect handoff `cli-year-limit`
 
 Handoff message received:
@@ -35488,6 +35502,21 @@ priority 00, then accepted) are all now on `main`. `cli-year-limit` is
 closed end-to-end. Per role rules, not notifying coder again on my own —
 asking the user for the next feature.
 2026-08-16T18:05:00Z coder: processed specifier handoff 20260816T155232Z_000190_from_specifier_to_coder for asset-rich-billionaire; implemented opt-in strategy flag, orange/red deed grants, standard opening balance, journal/CLI reporting, packaged-jar assertion, and acceptance pipeline registration. Targeted acceptance passes 9/10 scenarios; red-monopoly building scenario remains under investigation.
+
+## 2026-08-16T18:59:47Z — architect review finds asset-rich building-policy behavior
+
+Merged refactorer commit `d00e47abf8` as the current merge. The change in
+`Building.firstOfferedBuild` is observable behavior: asset-rich players now
+filter to affordable or already-developed monopolies and prioritize the
+most-developed group, then the most expensive first level. This is coherent
+domain logic and keeps the strategy decision inside the domain, but must be
+accepted by coder as behavior-owner follow-up.
+
+Verification: `BuildingTest` passes; differential mutation for `Building`
+reports 13 sites with zero differential sites; asset-rich soft acceptance
+mutation passes 13/13 killed with 0 survivors and 0 errors. DRY reports only
+the existing journalling, constructor, and CLI branch duplicates. Routed to
+coder at priority 00 for behavioral review.
 
 ## 2026-08-16T16:04:45Z — refactorer received coder handoff `asset-rich-billionaire`
 
@@ -35623,6 +35652,7 @@ repro attempt diverged from real test behavior and was abandoned rather
 than guessed at). Domain 398/398, full reactor green apart from the known
 pre-existing CLI flake, acceptance 777/778 (one pre-existing, already-
 flagged failure).
+2026-08-16T19:10:00Z coder: processed architect handoff 20260816T190006Z_000292 (654d8fceec). Architect review merged; current Building.java contains the asset-rich monopoly prioritization fix from 91cd44bc84. Targeted asset-rich acceptance was rerun after that fix and passed all 10 scenarios, so the review note describing Red scenario-4 as open is stale relative to current HEAD.
 
 ## 2026-08-16T18:50:22Z — refactorer received coder handoff `asset-rich-billionaire` (build-trigger fix)
 
