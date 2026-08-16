@@ -35103,6 +35103,39 @@ Passes `gherkin-parser`/`gherkin-ir-dry-checker` with no new finding kinds
 beyond the pre-existing possible-synonym/near-duplicate noise already
 present throughout this large file.
 
+## 2026-08-14T09:22:33Z — specifier sends cli-year-limit follow-up to coder
+
+User asked whether `report.feature` and `logging.feature` needed the same
+treatment as `journal.feature`. They do: the stalemate path's survivor
+snapshot is tested identically across three rendering surfaces —
+`journal.feature` (structured `Entry` objects), `report.feature`
+(`Report.of(journal)` text), and `logging.feature` (the SLF4J-logged
+text) — each with its own `report-61`/`logging-61` mirroring
+`journal-61`. Added `report-70` and `logging-70` as the year-limit analogs
+of `journal-70`, same figures, same chain structure.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: cli-year-limit
+commit: cfeb976dc9
+```
+
+Did not extend `cli.feature`: its scenarios deliberately stay coarse
+(existence/boolean checks only) because they run against real, unscripted
+dice — exact-value chains like these three require scripted dice for
+reproducible figures, which is why that precision lives only in the
+specs-core feature files. `cli.feature`'s existing `cli-8` (year limit
+reached) and `cli-jar-6` (year limit confirmed at start) already cover
+what's appropriate at that layer.
+
+Passes `gherkin-parser`/`gherkin-ir-dry-checker` on both files with no new
+finding kinds beyond the same pre-existing possible-synonym/near-duplicate
+noise.
+
 ## 2026-08-14T11:10:08Z — refactorer received coder handoff `cli-year-limit`
 
 Handoff message received:
@@ -35318,6 +35351,92 @@ returned one survivor. Full acceptance ran 766 scenarios and found one real
 failure: `year-limit-3` (“no year limit is the default”) reports that the
 game ended because of the year limit. Routed to coder at priority 00.
 
+## 2026-08-16T15:55:00Z — received specifier handoff `asset-rich-billionaire`
+
+## 2026-08-14T11:38:44Z — refactorer received coder handoff `cli-year-limit` (architect follow-up)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 2be978a45c
+```
+
+Action: merged commit `2be978a45c` as `3c82cac`, resolving a purely
+additive append-only `logbook.md` conflict the same way as prior cycles
+(both sides strictly additive over the shared `cdedce7180` base; took the
+upstream architect/coder chain in full and inserted the refactorer's own
+three entries from the prior `cli-year-limit` cycle at the point the
+upstream chain's own "received refactorer handoff" entry showed they
+belong). This is an architect review-loop follow-up (the architect sent a
+priority-00 handoff to the coder, not a new specifier-originated phase),
+so per workflow rules the completed result returns to the architect
+rather than advancing to the next pipeline role.
+
+The architect's review of the last `cli-year-limit` handoff (`cdedce7180`)
+confirmed the structural cleanup itself (the `Journalling` extraction,
+CRAP fixes, and the `Simulator.start` validation-boundary fix) but found
+one real acceptance regression: `year-limit-3` ("no year limit is the
+default, and the game is never stopped by one") reported the game ending
+because of the year limit anyway. Root cause, per the coder's fix: the
+generic `^pawn "NAME" will roll VALUE for their turn$` acceptance step in
+`JournalStepHandlers.java` ignored its own captured `VALUE` and always
+queued a hardcoded `Roll(6, 6)` — always doubles, always granting a bonus
+roll regardless of what the scenario actually asked for. This is exactly
+the mechanism this session flagged as suspected flakiness in the last
+review's `year-limit-1` finding (a doubles-triggered second roll pushing
+a pawn's age two years in one turn instead of one) — confirms that
+diagnosis was the right one, though the actual defect turned out to be
+deterministic and 100%-reproducing rather than genuinely random: every
+"will roll N for their turn" step across the whole acceptance suite was
+silently rolling double sixes instead of N, this task's `year-limit`
+scenarios were just the first to depend on the roll being non-double.
+Fixed by widening `World.rollTotalling(int)` from `private` to
+package-private and having the step call it with the captured total
+instead of the `Roll(6, 6)` stub.
+
+The fix is confined to `the-monopoly-game-specs-core`'s test-support step
+handlers (`JournalStepHandlers.java`, `World.java`), not `src/main/java`
+production code, so it falls outside this role's CRAP/mutation-scan/DRY
+tooling scope (consistent with every prior cycle — those tools have only
+ever been run against production sources in this project). Read the diff
+directly instead: a clean two-line change, no new duplication, no
+complexity introduced — `rollTotalling` was already a well-factored
+helper, this only widens its visibility and routes the existing step
+through it instead of a hardcoded stand-in. Nothing to restructure here.
+
+Verification: `mvn test` from the repo root — all modules green except
+the pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` flake. Full
+acceptance pipeline: 766/766, run twice, both clean — including
+`year-limit-3`, which is the scenario the architect's review caught.
+
+## 2026-08-14T11:38:44Z — refactorer sent cli-year-limit handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: cli-year-limit
+commit: 3c82cac769
+```
+
+Priority 00, matching the incoming architect-follow-up loop. Summary: no
+refactorer-owned changes were needed this cycle — the coder's fix
+(`JournalStepHandlers`/`World` now route the "will roll N for their turn"
+step through `rollTotalling(N)` instead of a hardcoded `Roll(6, 6)`) is a
+clean, minimal correction confined to test-support code, confirmed by
+direct reading rather than tooling since it sits outside `src/main/java`.
+This also confirms the flakiness this session's prior `cli-year-limit`
+review noted on `year-limit-1` (attributed to a doubles-triggered second
+roll falling through to real dice) was actually this same deterministic
+bug, not genuine randomness — every "will roll N" step across the suite
+was rolling double sixes regardless of N. Domain 398/398, full reactor
+green apart from the known pre-existing CLI flake, acceptance 766/766 run
+twice, including the previously-failing `year-limit-3`.
+
 ## 2026-08-14T11:53:10Z — accepted refactorer follow-up `3c82cac769`
 
 Merged as `1b921586994`. The follow-up corrects the acceptance step helper to
@@ -35326,3 +35445,46 @@ and keeping the production/domain boundary unchanged. The focused
 `EnRulesYearLimitAcceptanceTest` passes all 3 scenarios. Soft acceptance
 mutation remains 1 killed / 1 survived in the existing feature mutator
 surface; the generated manifest was restored and is not part of the change.
+
+## 2026-08-14T11:53:43Z — specifier received architect handoff `cli-year-limit`
+
+Handoff message received:
+
+```
+id: 20260816T155232Z_000190_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 48cd367103
+created_at: 2026-08-16T15:52:32.110279Z
+enqueued_at: 2026-08-16T15:52:32.305868Z
+task: asset-rich-billionaire
+
+Re-read your role and constitution.
+
+merge_and_process specifier 48cd367103
+```
+
+Action: recorded the new asset-rich billionaire specification before merging.
+
+Re-read your role and constitution.
+
+merge_and_process architect f559c8ac83
+```
+
+Action: merged commit `f559c8ac83` as `587dc06`, resolving a purely
+additive append-only `logbook.md` conflict — reconstructed chronologically
+(my own follow-up entry in full, then the refactorer's received/review/
+sent-to-architect chain, then the architect's received/regression-found/
+accepted-follow-up chain), 410 insertions, 0 deletions. This is the
+phase-complete sync: full coder implementation, refactorer CRAP/DRY/
+Journalling-extraction cleanup plus a validation-boundary fix
+(`--max-years=0` rejection centralized in `Simulator.start()`), and
+architect review (one regression found and routed back to coder at
+priority 00, then accepted) are all now on `main`. `cli-year-limit` is
+closed end-to-end. Per role rules, not notifying coder again on my own —
+asking the user for the next feature.
+2026-08-16T18:05:00Z coder: processed specifier handoff 20260816T155232Z_000190_from_specifier_to_coder for asset-rich-billionaire; implemented opt-in strategy flag, orange/red deed grants, standard opening balance, journal/CLI reporting, packaged-jar assertion, and acceptance pipeline registration. Targeted acceptance passes 9/10 scenarios; red-monopoly building scenario remains under investigation.

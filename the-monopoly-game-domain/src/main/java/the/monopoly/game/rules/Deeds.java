@@ -122,6 +122,10 @@ public class Deeds {
     owners.put(land.type(), buyer.id());
   }
 
+  public void grant(Ownable land, Player owner) {
+    owners.put(land.type(), owner.id());
+  }
+
   public void transfer(Ownable land, Player seller, Player buyer, Money price) {
     verifyOwner(land, seller);
     seller.account().deposit(price);

@@ -32,13 +32,17 @@ everything that happened.
 
 ## Out of scope for now (future work)
 
-- Additional standalone strategies beyond "Greedo" (e.g. trading,
-  strategic building) — the strategy abstraction should allow adding these
-  later without changing the CLI, journal, or engine. Selective buying is no
-  longer entirely future work: "Greedo" itself now carries a cash
-  reserve and utility-monopoly awareness (see Key Concepts) rather than
-  becoming a separate strategy; further selectivity (e.g. colour-group
-  awareness for streets) remains unspecified.
+- Additional strategies with genuinely different decision logic beyond
+  "Greedo" (e.g. trading, strategic building) — the strategy abstraction
+  should allow adding these later without changing the CLI, journal, or
+  engine. Selective buying is no longer entirely future work: "Greedo"
+  itself now carries a cash reserve and utility-monopoly awareness (see Key
+  Concepts) rather than becoming a separate strategy; further selectivity
+  (e.g. colour-group awareness for streets) remains unspecified.
+  "Billionaire" (see Key Concepts) is a second strategy, but it reuses
+  Greedo's decisions verbatim and only changes the opening balance, so it
+  doesn't count against this — a strategy with genuinely different decision
+  logic is still future work.
 - Human/interactive players.
 - Persisting, replaying, or comparing results across many simulated games
   (the existing `en/monopoly.feature` 1000-game scenario already exercises
@@ -84,6 +88,17 @@ get ahead, but never overpays when it doesn't have to.
   the purchase completes its own colour-group monopoly; otherwise bids up to
   35% of its available balance if the land is one it considers
   highest-priority to deny an opponent; otherwise declines.
+
+#### Billionaire
+
+Makes exactly the same decisions as "Greedo" — the same buying, rent,
+building, jail-fine, inherited-mortgage, and distressed-sale-bidding logic —
+but the game opens its account with \$57,700,000 instead of the usual
+\$1,500. Opening capital is a property of the strategy, applied once before
+the game starts, and replaces the standard opening balance rather than
+adding to it. There is no other behavioral difference from Greedo; it
+exists to let the CLI simulate a cash-dominant player without inventing new
+decision logic.
 
 ### Distressed sale
 
@@ -253,6 +268,39 @@ above still applies, and a meaningful fraction of games still stalemate
 even with the flag on — but it measurably converts a large share of
 would-be stalemates into an ordinary, decisive bankruptcy ending, and does
 so more often in the trailing player's favor than not.
+
+### Known characteristic: legal entity narrows, but doesn't guarantee, 3+-player resolution
+
+The legal-entity mechanism above removes the specific 3+-way colour-group-
+split impasse, but was never validated to force a bankruptcy or a terminal
+stalemate — that empirical outcome has no deterministic acceptance
+criterion to hold code to. Five real 8-player Greedo games
+(`--optional-greedo-stalemate-trading --optional-greedo-legal-entity`)
+found the impasse itself gone, but 4 of 5 runs still never resolved,
+grinding on to 240–514 player-years; the one run that did resolve did so by
+ordinary bankruptcy, not because the entity mechanism broke anything.
+Treated the same way as the Greedo-vs-Greedo stalemate above: a real,
+understood dynamic of the strategy, not a rules-engine defect — no fix
+planned.
+
+### Known characteristic: a Billionaire-mix endgame is slow-converging, not perpetual
+
+Once one player follows "Billionaire" instead of "Greedo", a game that
+collapses to two survivors (the billionaire plus one Greedo, or one Greedo
+legal entity) doesn't share the Greedo-vs-Greedo stable-oscillation
+characteristic above — a cash-rich-but-effectively-landless billionaire and
+a land-rich Greedo/entity instead show a real, near-linear convergence
+trend. One 5-minute-capped 8-player run measured the billionaire's balance
+draining at a remarkably consistent ~1,610–1,640/year across four separate
+multi-thousand-year windows, extrapolating to bankruptcy within another
+4–5 minutes of wall-clock the cap narrowly missed. A 50-game batch (1
+Billionaire + 7 Greedo, both optional flags on, `--max-years=2500`)
+confirms this in aggregate: every single game resolved well inside the
+cap — 15/50 ordinary wins, 35/50 stalemates at 2–4 survivors, none reaching
+even 700 simulated years — and the billionaire was a winner or stalemate
+survivor in all 50, never bankrupt. `--max-years` (see [CLI](#cli) below)
+exists precisely to cap the rare game that doesn't converge quickly,
+without having to tell "slow" from "perpetual" ahead of time.
 
 ### Player age
 
