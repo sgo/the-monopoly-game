@@ -35131,3 +35131,27 @@ Focused acceptance mutation of `year-limit.feature` killed one mutation but
 returned one survivor. Full acceptance ran 766 scenarios and found one real
 failure: `year-limit-3` (“no year limit is the default”) reports that the
 game ended because of the year limit. Routed to coder at priority 00.
+
+## 2026-08-16T15:55:00Z — received specifier handoff `asset-rich-billionaire`
+
+Handoff message received:
+
+```
+id: 20260816T155232Z_000190_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 48cd367103
+created_at: 2026-08-16T15:52:32.110279Z
+enqueued_at: 2026-08-16T15:52:32.305868Z
+task: asset-rich-billionaire
+
+Re-read your role and constitution.
+
+merge_and_process specifier 48cd367103
+```
+
+Action: recorded the new asset-rich billionaire specification before merging.
