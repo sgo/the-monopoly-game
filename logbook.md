@@ -35351,6 +35351,44 @@ returned one survivor. Full acceptance ran 766 scenarios and found one real
 failure: `year-limit-3` (“no year limit is the default”) reports that the
 game ended because of the year limit. Routed to coder at priority 00.
 
+## 2026-08-16T15:52:16Z — specifier sends asset-rich-billionaire handoff to coder
+
+User asked for a way to make the Billionaire strategy asset-rich instead
+of cash-rich: instead of the $57.7M opening balance, start it owning a
+real portfolio of board land (worked out from the same per-property
+valuation the stalemate threshold already uses — hotel rent per street,
+4-station rent per station, both-utility dice-max rent per utility, which
+sums to exactly $22,790 across the whole board). Landed on granting the
+whole Orange and Red colour groups (the game's own `Strategy.HIGHEST`
+priority tier, per `Strategy.priorityOf()`), unimproved, so Billionaire
+builds them up itself via ordinary Greedo logic rather than starting with
+free hotels.
+
+First pass specified this as a new "Tycoon" strategy (`tycoon.feature`);
+user pointed out a new strategy name would require touching every
+existing scenario that enumerates strategies by name (Greedo +
+Billionaire pairs throughout `building.feature`, `cli.feature`, etc.).
+Reworked as an opt-in flag on the existing "Billionaire" strategy instead
+— `--optional-asset-rich-billionaire` — following the exact same pattern
+already established for `--optional-greedo-stalemate-trading` and
+`--optional-greedo-legal-entity`. Deleted `tycoon.feature`, replaced it
+with `asset-rich-billionaire.feature`, and reworked the CLI-level
+scenario accordingly.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: asset-rich-billionaire
+commit: 48cd367103
+```
+
+Passes `gherkin-parser`/`gherkin-ir-dry-checker` on all three touched
+files with no new finding kinds beyond the usual possible-synonym/
+near-duplicate noise.
+
 ## 2026-08-16T15:55:00Z — received specifier handoff `asset-rich-billionaire`
 
 ## 2026-08-14T11:38:44Z — refactorer received coder handoff `cli-year-limit` (architect follow-up)
@@ -35502,6 +35540,103 @@ priority 00, then accepted) are all now on `main`. `cli-year-limit` is
 closed end-to-end. Per role rules, not notifying coder again on my own —
 asking the user for the next feature.
 2026-08-16T18:05:00Z coder: processed specifier handoff 20260816T155232Z_000190_from_specifier_to_coder for asset-rich-billionaire; implemented opt-in strategy flag, orange/red deed grants, standard opening balance, journal/CLI reporting, packaged-jar assertion, and acceptance pipeline registration. Targeted acceptance passes 9/10 scenarios; red-monopoly building scenario remains under investigation.
+
+## 2026-08-16T16:33:43Z — specifier received architect handoff `asset-rich-billionaire`
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 5658170e97
+```
+
+Action: merged commit `5658170e97` as `a77f3be`. This resolution needed
+extra care beyond the usual purely-additive `logbook.md` conflict: the
+upstream coder/refactorer/architect chain's own logbook entries had
+already been interleaved mid-file across several insertion points during
+their own prior merges (not something introduced here), so a plain `git
+merge` auto-resolution risked scrambling headers and bodies from
+unrelated entries together. Resolved by diffing each side against the
+merge-base (`48cd367103`) independently to isolate exactly what each side
+actually added, then inserting my own single specifier entry at its
+correct chronological position (immediately before the coder's "received
+specifier handoff" line, 3 minutes earlier) into the upstream chain's
+content taken otherwise verbatim and unmodified. Verified via a
+sorted-line diff that every non-blank line from the architect's commit
+survived the resolution intact.
+
+This is the phase-complete sync for `asset-rich-billionaire`: coder
+implementation (opt-in `--optional-asset-rich-billionaire` flag, Orange/Red
+deed grants, standard opening balance), refactorer cleanup (named the
+asset-rich colour set in `Game`, fixed a stale README usage flag,
+differential mutation clean for `Game` at 98 sites), and architect
+acceptance are all now on `main`. The coder's own note flagged the
+red-monopoly building scenario as "under investigation" at 9/10 passing;
+the refactorer's subsequent logbook entry reports the full
+`asset-rich-billionaire.feature` at 13/13 mutations killed with 0
+survivors, which isn't possible unless all 5 scenarios were green by that
+point — so this was resolved somewhere in the coder-to-refactorer handoff,
+just without its own dedicated log entry narrating the fix. `asset-rich-
+billionaire` is closed end-to-end. Per role rules, not notifying coder
+again on my own — asking the user for the next feature.
+
+## 2026-08-16T17:01:17Z — specifier reports a suspected asset-rich-billionaire defect to architect
+
+User asked to run 50 real games (1 asset-rich billionaire + 7 Greedo,
+`--optional-greedo-stalemate-trading --optional-greedo-legal-entity
+--optional-asset-rich-billionaire --max-years=2500`) and check whether the
+billionaire develops its granted land during play. It largely does not.
+
+Method: for each of the 50 runs, found the line index of the game's first
+terminal event (`wins the game` / `ends in a stalemate`) in the
+timestamped journal channel, then counted `dog builds a house`/`builds a
+hotel` occurrences strictly before that line.
+
+Findings:
+- 44/50 (88%) show **zero** `dog` building activity before the game ends,
+  despite `dog` already owning both full monopolies (Orange + Red) from
+  turn zero and steadily banking rent — balances climbing into the tens of
+  thousands over 100–200+ simulated years in several runs.
+- Of those 44: 14 show a sudden burst — up to 4 houses on all 6 granted
+  streets — logged in the same instant as, immediately *after*, the "game
+  ends in a stalemate" line. 30 never build at all, for the entire game.
+- Only 6/50 (12%) show normal, early building during real play, matching
+  what `asset-rich-billionaire-3`/`-4` specify. In the one case checked in
+  detail, that's also a game `dog` goes on to win.
+- No exceptions/crashes in any of the 50 runs. 0/50 hit the 2500-year cap
+  (max age reached: 1701). Outcome split: 40 WIN / 10 STALEMATE, but only
+  13 of the 40 wins go to `dog` — the other 27 scatter across Greedo
+  opponents, a sharp change from the cash-rich Billionaire's 50/50 win-or-
+  survive record in an earlier batch.
+
+This is hard to reconcile with `asset-rich-billionaire-3`/`-4` passing
+13/13 mutations per the refactorer's own log entry above. Working
+hypothesis, NOT verified against the actual implementation: those two
+scenarios arrange affordability via the test-only `pawn dog has $N to
+spend` step, which may poke the build-decision path directly, while cash
+accumulated turn-by-turn through ordinary play never triggers it — plausible
+if the build check normally fires only when a monopoly is *completed by a
+purchase or trade* (an event a pre-granted-at-setup monopoly never
+produces), and the delayed burst at the stalemate boundary comes from some
+other, rarer trigger (end-of-round settlement/legal-entity processing)
+finally invoking it once.
+
+User's instruction: route this to the architect first to confirm the real
+root cause before deciding what corrected scenario to write — user's own
+expectation is that building should be possible every turn funds allow,
+so a trigger this rare is troubling regardless of the exact mechanism.
+Sending a `note` (no commit — this is a diagnosis request against already-
+merged `main`, not a new specification) pointing here for detail.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 50
+message: asset-rich-billionaire: dog rarely builds during play, see logbook 659e0de
+```
 
 ## 2026-08-16T18:59:47Z — architect review finds asset-rich building-policy behavior
 
@@ -35767,3 +35902,104 @@ diagnosis surfaced on another branch — out of scope here since it wasn't
 part of the merged commit and is a game-wide behavior question, not
 structural cleanup. Domain 398/398, full reactor green (including the
 usually-flaky CLI test this run), acceptance 778/778 run twice.
+
+## 2026-08-16T19:02:33Z — refactorer received coder handoff `asset-rich-billionaire` (architect sign-off)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder b6d3348c16
+```
+
+Action: merged commit `b6d3348c16` as `eb3a4a6`, resolving a `logbook.md`
+conflict with three scattered (non-tail) insertion points on the incoming
+side rather than the usual single append point — reconstructed by taking
+the incoming chain in full (it already carried all three of its own
+insertions correctly) and appending this role's own unique tail (the
+build-trigger-fix review/handoff entries from the previous cycle) after
+it, since that tail's insertion point — after the shared base's original
+end — postdates all three of theirs. No production code changed by this
+handoff: it is purely the architect reviewing my prior `Building.java`
+verification, classifying the fix as observable behavior that needed the
+behavior-owning coder's explicit sign-off (routed at priority 00), and the
+coder confirming the fix already stands and the scenario passes — nothing
+for a refactorer to act on. Confirmed via `git diff d00e47abf8..HEAD --
+':!logbook.md'`: empty.
+
+Verification: domain unit tests still green (unchanged from the prior
+cycle, since no production file changed). Not re-running the full
+acceptance pipeline for a logbook-only diff — the prior cycle's two clean
+778/778 runs already cover this exact code state.
+
+## 2026-08-16T19:02:33Z — refactorer sent asset-rich-billionaire handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: asset-rich-billionaire
+commit: eb3a4a6fea
+```
+
+Priority 00, matching the incoming architect-follow-up loop (the
+architect's own behavior-sign-off request to the coder, now closed).
+Summary: no refactorer-owned changes — this handoff only carried the
+architect's and coder's own review/sign-off notes forward, with no
+production diff to verify beyond what was already confirmed clean in the
+prior cycle (778/778 acceptance, CRAP/DRY clean, mutation sites well
+under threshold).
+
+## 2026-08-16T19:06:00Z — specifier received architect handoff `asset-rich-billionaire` (diagnosis confirmed)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 8048962aa9
+```
+
+Action: merged commit `8048962aa9` as `83b37ae`, resolving a purely
+additive `logbook.md` conflict (both sides added a single new block each,
+no scrambling this time — verified via a sorted-line diff against
+`8048962aa9`'s own logbook.md that nothing was dropped).
+
+Root cause confirmed, and it's bigger than the original diagnosis
+guessed: the coder/refactorer/architect chain found and fixed a narrow
+defect (`Building.firstOfferedBuild` tried the board-earlier, cheaper
+granted group — Orange — first regardless of affordability, so a budget
+that could only cover one group got spent entirely there before the other
+was ever reached; fixed by filtering/sorting granted monopolies by
+affordability). That's real and merged, but it is *not* the reason 88% of
+the 50-game batch showed zero building. The refactorer's own review
+traced the actual cause to `Game.java`: `developAndTrackConsolidation` is
+only ever invoked for the single initiative-winning `builder` player
+(`turnOrder.getFirst()`, fixed for the whole game, never reassigned) — so
+any player who isn't that one fixed "builder", asset-rich or not, never
+calls `Building.develop()` during ordinary turns, no matter what they can
+afford. This is a pre-existing, game-wide characteristic that predates
+this task entirely; it was only asset-rich-billionaire's un-built granted
+monopoly that made it dramatically visible (an ordinary player quietly
+never developing a purchased monopoly looks unremarkable by comparison).
+The math checks out against the batch: with 8 players, a 1-in-8 (~12.5%)
+chance of `dog` being the fixed initiative-winning builder matches the
+observed 6/50 (12%) games where it built normally almost exactly, and
+7-in-8 (~87.5%) matches the observed 44/50 (88%) where it didn't.
+
+The architect's own framing (both the priority-00 routing at
+`654d8fc`/`8048962` and the final acceptance) explicitly keeps this
+separate: the narrow affordability fix is accepted and closed as part of
+`asset-rich-billionaire`; the "only the initiative winner ever develops"
+characteristic is recorded as its own open game-wide behavior question,
+not folded into this task.
+
+Reporting this confirmed diagnosis to the user before deciding on any new
+scenario, per their explicit instruction to confirm root cause first — the
+scope here is materially larger than the original ask (a game engine-wide
+defect, not an asset-rich-billionaire-specific one), so this needs a user
+decision on how to proceed rather than a specifier judgment call.
+2026-08-16T22:15:00Z coder: processed specifier handoff 20260816T200417Z_000192 for turn-development (670b1330f5). Fixed development gating so a non-initiative player develops on their own turn while preserving legal-entity mode behavior. Turn-development acceptance and Greedo legal-entity acceptance pass.

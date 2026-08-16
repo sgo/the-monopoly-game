@@ -52,8 +52,8 @@ Feature: selling property to avoid bankruptcy
 
     Examples:
       | strategy | dog_starting_balance | high_hat_starting_balance | expected_dog_final_balance | expected_high_hat_final_balance |
-      | Greedo | 0 | 200 | 0 | 100 |
-      | Billionaire | 0 | 200 | 0 | 100 |
+      | Greedo | 0 | 200 | 0 | 0 |
+      | Billionaire | 0 | 200 | 0 | 0 |
 
   # distressed-sale-3
   Scenario Outline: a debtor mortgages to the bank instead when a peer's offer does not beat the mortgage value
