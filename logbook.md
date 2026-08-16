@@ -35789,6 +35789,21 @@ pre-existing CLI flake, acceptance 777/778 (one pre-existing, already-
 flagged failure).
 2026-08-16T19:10:00Z coder: processed architect handoff 20260816T190006Z_000292 (654d8fceec). Architect review merged; current Building.java contains the asset-rich monopoly prioritization fix from 91cd44bc84. Targeted asset-rich acceptance was rerun after that fix and passed all 10 scenarios, so the review note describing Red scenario-4 as open is stale relative to current HEAD.
 
+## 2026-08-16T20:21:54Z — architect review finds turn-development behavior change
+
+Merged refactorer commit `c06a194f1a`. The extracted
+`mayDevelopThisTurn` predicate changes observable behavior: every solvent
+player may develop during ordinary turns when legal-entity trading is off;
+legal-entity mode remains restricted to the initiative builder. This is a
+cohesive domain-level policy boundary, but it is coder-owned behavior and
+was routed to coder at priority 00.
+
+Verification: `GameTest` passes (60/60); differential mutation for `Game`
+reports 100 sites with zero differential sites; `turn-development.feature`
+soft acceptance mutation passes 3/3 killed with no survivors or errors. DRY
+reports only the established journalling, constructor, and CLI branch
+duplicates. The generated feature manifest was restored.
+
 ## 2026-08-16T19:12:00Z — accepted asset-rich-billionaire follow-up
 
 Processed refactorer handoff `eb3a4a6fea` as merge `5df5dba`. No new
