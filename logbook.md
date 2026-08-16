@@ -35952,3 +35952,44 @@ scenario, per their explicit instruction to confirm root cause first — the
 scope here is materially larger than the original ask (a game engine-wide
 defect, not an asset-rich-billionaire-specific one), so this needs a user
 decision on how to proceed rather than a specifier judgment call.
+
+## 2026-08-16T20:03:59Z — specifier sends turn-development handoff to coder
+
+User confirmed: fix it, as its own task separate from asset-rich-
+billionaire. Asked how a similar past initiative-tied defect was
+decoupled; found the precedent themselves — `entity-33` (task
+`legal-entity-rent-and-share-defects`, commit `323a3e0`): a legal entity
+dividend was permanently blocked once the shareholder who last
+capitalised it went bankrupt, since only that specific player collecting
+salary again could clear the gate, which a bankrupt player never does.
+Fixed by specifying the correct behavior directly (arrange the buggy
+precondition via test-only Given steps, play a bounded number of rounds,
+assert the correct outcome) rather than describing the implementation fix.
+
+Mirrored that exact pattern here: `turn-development.feature`'s
+`turn-development-1` is `building-1` verbatim with the initiative winner
+flipped from "dog" to "high hat", proving a non-initiative-winning player
+still builds on their own turn when affordable. `building.feature` itself
+couldn't host this — its Background hardcodes "dog" as the initiative
+winner in every one of its scenarios, which is exactly why this defect
+went uncaught until an asset-rich billionaire made it impossible to miss.
+
+Registered the new file on the acceptance pipeline
+(`acceptance/pipeline-features.txt`) to verify red status directly:
+779 tests, 1 failure, isolated to `turn-development-1`
+("Expected 1 houses on RueGrandeDinant but found 0"), 778 unaffected.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: 670b1330f5
+```
+
+Deliberately did not attempt to describe the fix's shape in the handoff
+(e.g. dropping the `isBuilderStillSolvent` check, or the interaction with
+the asset-rich catch-up pass at the end of `Game.play()`) — that's the
+coder's call under their own role rules, same as the entity-33 precedent.
