@@ -35628,3 +35628,12 @@ expectation is that building should be possible every turn funds allow,
 so a trigger this rare is troubling regardless of the exact mechanism.
 Sending a `note` (no commit — this is a diagnosis request against already-
 merged `main`, not a new specification) pointing here for detail.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 50
+message: asset-rich-billionaire: dog rarely builds during play, see logbook 659e0de
+```
