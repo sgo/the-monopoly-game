@@ -35654,6 +35654,16 @@ pre-existing CLI flake, acceptance 777/778 (one pre-existing, already-
 flagged failure).
 2026-08-16T19:10:00Z coder: processed architect handoff 20260816T190006Z_000292 (654d8fceec). Architect review merged; current Building.java contains the asset-rich monopoly prioritization fix from 91cd44bc84. Targeted asset-rich acceptance was rerun after that fix and passed all 10 scenarios, so the review note describing Red scenario-4 as open is stale relative to current HEAD.
 
+## 2026-08-16T19:12:00Z — accepted asset-rich-billionaire follow-up
+
+Processed refactorer handoff `eb3a4a6fea` as merge `5df5dba`. No new
+production changes were introduced; the merged history already contains
+the coder's `Building` fix. Refactorer review confirms the targeted
+asset-rich building fix and refreshed mutation metadata, with full
+acceptance 778/778 on two runs. The broader initiative-winner-only
+development characteristic is recorded as a separate game-wide behavior
+question, not folded into this task.
+
 ## 2026-08-16T18:50:22Z — refactorer received coder handoff `asset-rich-billionaire` (build-trigger fix)
 
 Handoff message received:
