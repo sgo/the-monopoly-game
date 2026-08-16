@@ -35404,3 +35404,4 @@ architect review (one regression found and routed back to coder at
 priority 00, then accepted) are all now on `main`. `cli-year-limit` is
 closed end-to-end. Per role rules, not notifying coder again on my own —
 asking the user for the next feature.
+2026-08-16T18:05:00Z coder: processed specifier handoff 20260816T155232Z_000190_from_specifier_to_coder for asset-rich-billionaire; implemented opt-in strategy flag, orange/red deed grants, standard opening balance, journal/CLI reporting, packaged-jar assertion, and acceptance pipeline registration. Targeted acceptance passes 9/10 scenarios; red-monopoly building scenario remains under investigation.

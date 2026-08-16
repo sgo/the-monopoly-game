@@ -37,6 +37,8 @@ public final class Simulator {
       System.out.println("Stalemate trading enabled");
     if (List.of(arguments).contains("--optional-greedo-legal-entity"))
       System.out.println("Legal entity trading enabled");
+    if (List.of(arguments).contains("--optional-asset-rich-billionaire"))
+      System.out.println("Asset-rich opening enabled");
     for (String argument : arguments) {
       if (argument.startsWith(MAX_YEARS_FLAG)) {
         System.out.println("Year limit is " + argument.substring(MAX_YEARS_FLAG.length()) + " years");
@@ -69,18 +71,20 @@ public final class Simulator {
     int playerCount = arguments.length == 0 ? 2 : Integer.parseInt(arguments[0]);
     boolean stalemateTrading = List.of(arguments).contains("--optional-greedo-stalemate-trading");
     boolean legalEntityTrading = List.of(arguments).contains("--optional-greedo-legal-entity");
+    boolean assetRichOpening = List.of(arguments).contains("--optional-asset-rich-billionaire");
     int maxYears = extractMaxYears(arguments);
     List<String> strategyNames = List.of(arguments).subList(Math.min(1, arguments.length), arguments.length).stream()
         .filter(argument -> !isRecognizedFlag(argument)).toList();
     if (!strategyNames.isEmpty() && strategyNames.size() != playerCount)
       return new Result(1, "Supply one strategy for each player. " + usage());
-    return run(playerCount, strategiesFor(playerCount, strategyNames, stalemateTrading, legalEntityTrading),
+    return run(playerCount, strategiesFor(playerCount, strategyNames, stalemateTrading, legalEntityTrading, assetRichOpening),
         stalemateTrading, legalEntityTrading, maxYears);
   }
 
   private static boolean isRecognizedFlag(String argument) {
     return argument.equals("--optional-greedo-stalemate-trading")
         || argument.equals("--optional-greedo-legal-entity")
+        || argument.equals("--optional-asset-rich-billionaire")
         || argument.startsWith("--max-years");
   }
 
@@ -99,6 +103,12 @@ public final class Simulator {
 
   static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames,
                                           boolean stalemateTrading, boolean legalEntityTrading) {
+    return strategiesFor(playerCount, strategyNames, stalemateTrading, legalEntityTrading, false);
+  }
+
+  static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames,
+                                          boolean stalemateTrading, boolean legalEntityTrading,
+                                          boolean assetRichOpening) {
     List<String> names = strategyNames.isEmpty()
         ? java.util.Collections.nCopies(playerCount, "greedo")
         : strategyNames;
@@ -107,7 +117,7 @@ public final class Simulator {
       String name = names.get(index);
       if (!STRATEGIES.contains(name)) throw new IllegalArgumentException("Unknown strategy: " + name + ".");
       Strategy strategy = name.equals("billionaire")
-          ? new Billionaire(Money.ZERO, stalemateTrading, legalEntityTrading)
+          ? new Billionaire(Money.ZERO, stalemateTrading, legalEntityTrading, true, assetRichOpening)
           : new Greedo(Money.ZERO, stalemateTrading, legalEntityTrading);
       selections.put(Pawn.values()[index].id(), strategy);
     }
@@ -120,6 +130,7 @@ public final class Simulator {
         + System.lineSeparator() + "Optional flags:"
         + System.lineSeparator() + "  --optional-greedo-stalemate-trading"
         + System.lineSeparator() + "  --optional-greedo-legal-entity"
+        + System.lineSeparator() + "  --optional-asset-rich-billionaire"
         + System.lineSeparator() + "  --max-years=N"
         + System.lineSeparator() + "Report file: " + reportPath();
   }

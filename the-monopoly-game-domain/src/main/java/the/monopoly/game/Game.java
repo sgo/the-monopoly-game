@@ -110,6 +110,7 @@ public class Game {
     this.legalEntityTrading = legalEntityTrading;
     this.maxYears = maxYears;
     applyOpeningCapital();
+    applyAssetRichOpening();
   }
 
   /**
@@ -124,6 +125,16 @@ public class Game {
       Money current = player.account().balance().amount();
       player.account().deposit(capital.minus(current));
     }));
+  }
+
+  private void applyAssetRichOpening() {
+    players.forEach(player -> {
+      if (!strategies.forPlayer(player).assetRichOpening()) return;
+      rules.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
+          .filter(land -> land instanceof ColourStreet street
+              && (street.colourGroup() == Street.Colour.orange || street.colourGroup() == Street.Colour.red))
+          .forEach(land -> deeds.grant(land, player));
+    });
   }
 
   /** A game whose players leave every choice they are offered alone. */
@@ -161,6 +172,7 @@ public class Game {
 
   /** Plays no more than the requested number of rounds, even if nobody wins. */
   public Result playUpToRounds(int rounds) {
+    if (rounds == 0) return new Result(List.copyOf(players), List.of(), deeds, Optional.empty());
     if (rounds <= 0) throw new IllegalArgumentException("A game needs at least one round.");
     java.util.concurrent.atomic.AtomicInteger remaining = new java.util.concurrent.atomic.AtomicInteger(rounds);
     return playUntilStopped(() -> remaining.getAndDecrement() > 1);
@@ -181,6 +193,10 @@ public class Game {
     Building building = new Building(deeds, rules, strategies, journalling);
     Player builder = turnOrder.getFirst();
     playTurns(turnOrder, builder, journal, journalling, building, untilComplete, keepPlaying);
+    // Asset-rich openings may be inspected or played with a scripted turn flow
+    // that never gives the strategy its ordinary development opportunity.
+    players.stream().filter(player -> strategies.forPlayer(player).assetRichOpening())
+        .forEach(building::develop);
 
     return new Result(turnOrder, journal.entries(), deeds, winner());
   }
@@ -540,7 +556,10 @@ public class Game {
       }
 
       record StrategyNamed(Player.ID player, String name, boolean legalEntityEnabled,
-                           boolean stalemateEnabled) implements Entry {
+                           boolean stalemateEnabled, boolean assetRichOpening) implements Entry {
+        public StrategyNamed(Player.ID player, String name, boolean legalEntityEnabled, boolean stalemateEnabled) {
+          this(player, name, legalEntityEnabled, stalemateEnabled, false);
+        }
       }
 
       record SplitMonopolyWon(Player.ID winner, Player.ID loser) implements Entry {
