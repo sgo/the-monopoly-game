@@ -72,6 +72,20 @@ final class JournalStepHandlers {
         given("^legal-entity trading is enabled for the \"" + NAME + "\" strategy$",
             (world, arguments) -> world.enableLegalEntityTrading(arguments.text(1))),
 
+        given("^asset-rich opening is enabled for the \"" + NAME + "\" strategy$",
+            (world, arguments) -> world.enableAssetRichOpening(arguments.text(1))),
+
+        then("^the game journal records that the \"Billionaire\" strategy observes asset-rich opening as " + NAME + "$",
+            (world, arguments) -> {
+              boolean expected = expectedTradingState(arguments.text(1));
+              world.awaitGameLog(world.simulatorPlayerCount(), Entry.StrategyNamed.class::isInstance,
+                  "strategy observations");
+              assertThat(world.gameLog().stream().filter(Entry.StrategyNamed.class::isInstance)
+                  .map(Entry.StrategyNamed.class::cast)
+                  .filter(entry -> entry.name().equals("Billionaire"))
+                  .allMatch(entry -> entry.assetRichOpening() == expected)).isTrue();
+            }),
+
         given("^<enabled_flag> trading is enabled for the \"" + NAME + "\" strategy$",
             (world, arguments) -> world.enableStalemateTrading(arguments.text(1))),
 

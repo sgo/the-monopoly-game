@@ -93,7 +93,7 @@ record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds)
     boolean stalemateEnabled = strategy instanceof Greedo greedo && greedo.stalemateTradingEnabled();
     String name = strategy == Strategy.UNDECIDED ? "undecided" : strategy.getClass().getSimpleName();
     journal.log(new Journal.Entry.StrategyNamed(player.id(), name,
-        legalEntityEnabled, stalemateEnabled));
+        legalEntityEnabled, stalemateEnabled, strategy.assetRichOpening()));
   }
 
   public void splitMonopolyWon(Player winner, Player loser) {

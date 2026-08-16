@@ -137,3 +137,16 @@ Feature: Monopoly command line interface
     Examples:
       | raw arguments                   |
       | 2 greedo greedo --max-years=0   |
+
+  # cli-10
+  Scenario Outline: the CLI wires the asset-rich flag the Billionaire strategy observes
+    Given the simulator is configured with the raw arguments "<raw arguments>"
+    When I start the simulator
+    Then the game journal records that pawn "<billionaire pawn>" uses the "Billionaire" strategy
+    And the game journal records that the "Billionaire" strategy observes asset-rich opening as <asset-rich state>
+    When I stop the simulator before the game ends
+    Then the simulator process ends
+
+    Examples:
+      | raw arguments                                            | billionaire pawn | asset-rich state |
+      | 2 greedo billionaire --optional-asset-rich-billionaire   | high hat          | enabled          |
