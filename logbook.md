@@ -35902,3 +35902,53 @@ diagnosis surfaced on another branch — out of scope here since it wasn't
 part of the merged commit and is a game-wide behavior question, not
 structural cleanup. Domain 398/398, full reactor green (including the
 usually-flaky CLI test this run), acceptance 778/778 run twice.
+
+## 2026-08-16T19:06:00Z — specifier received architect handoff `asset-rich-billionaire` (diagnosis confirmed)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 8048962aa9
+```
+
+Action: merged commit `8048962aa9` as `83b37ae`, resolving a purely
+additive `logbook.md` conflict (both sides added a single new block each,
+no scrambling this time — verified via a sorted-line diff against
+`8048962aa9`'s own logbook.md that nothing was dropped).
+
+Root cause confirmed, and it's bigger than the original diagnosis
+guessed: the coder/refactorer/architect chain found and fixed a narrow
+defect (`Building.firstOfferedBuild` tried the board-earlier, cheaper
+granted group — Orange — first regardless of affordability, so a budget
+that could only cover one group got spent entirely there before the other
+was ever reached; fixed by filtering/sorting granted monopolies by
+affordability). That's real and merged, but it is *not* the reason 88% of
+the 50-game batch showed zero building. The refactorer's own review
+traced the actual cause to `Game.java`: `developAndTrackConsolidation` is
+only ever invoked for the single initiative-winning `builder` player
+(`turnOrder.getFirst()`, fixed for the whole game, never reassigned) — so
+any player who isn't that one fixed "builder", asset-rich or not, never
+calls `Building.develop()` during ordinary turns, no matter what they can
+afford. This is a pre-existing, game-wide characteristic that predates
+this task entirely; it was only asset-rich-billionaire's un-built granted
+monopoly that made it dramatically visible (an ordinary player quietly
+never developing a purchased monopoly looks unremarkable by comparison).
+The math checks out against the batch: with 8 players, a 1-in-8 (~12.5%)
+chance of `dog` being the fixed initiative-winning builder matches the
+observed 6/50 (12%) games where it built normally almost exactly, and
+7-in-8 (~87.5%) matches the observed 44/50 (88%) where it didn't.
+
+The architect's own framing (both the priority-00 routing at
+`654d8fc`/`8048962` and the final acceptance) explicitly keeps this
+separate: the narrow affordability fix is accepted and closed as part of
+`asset-rich-billionaire`; the "only the initiative winner ever develops"
+characteristic is recorded as its own open game-wide behavior question,
+not folded into this task.
+
+Reporting this confirmed diagnosis to the user before deciding on any new
+scenario, per their explicit instruction to confirm root cause first — the
+scope here is materially larger than the original ask (a game engine-wide
+defect, not an asset-rich-billionaire-specific one), so this needs a user
+decision on how to proceed rather than a specifier judgment call.
