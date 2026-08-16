@@ -36165,3 +36165,57 @@ Deliberately did not attempt to describe the fix's shape in the handoff
 (e.g. dropping the `isBuilderStillSolvent` check, or the interaction with
 the asset-rich catch-up pass at the end of `Game.play()`) — that's the
 coder's call under their own role rules, same as the entity-33 precedent.
+
+## 2026-08-16T20:27:09Z — specifier received architect handoff `turn-development` (phase complete)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 629f7c5e84
+```
+
+Action: merged commit `629f7c5e84` as `85ec5c7`, resolving a `logbook.md`
+conflict the same way as recent cycles (theirs had several insertion
+points scattered through existing content, not a single append; took it
+in full and appended my own single tail entry — the "sends turn-
+development handoff to coder" entry — after theirs, since it predates
+everything in this merge chronologically only in the sense that it's the
+handoff that *started* this chain, but the chain's own resolution already
+folded it in at the right relative position on their side; verified via a
+sorted-line diff that nothing from either side was dropped).
+
+Fix, as merged: `Game.playTurn`'s development gate changed from
+`isBuilderStillSolvent(player, builder)` to `isPlayerStillSolvent(player)
+&& (!legalEntityTrading || player.id().equals(builder.id()))` — every
+solvent player now develops on their own turn when affordable, *unless*
+legal-entity trading is enabled, in which case the old builder-only
+restriction is deliberately kept (legal-entity mode has its own separate
+entity-level development path via `LegalEntity.operate()`; the coder
+verified this scoping against `EnRulesGreedoLegalEntityAcceptanceTest`
+rather than assuming it, and the architect's follow-up loop confirmed it
+as intentional, not an oversight). This exactly matches what
+`turn-development.feature`'s Background actually pinned — no legal-entity
+flag enabled — so the fix is scoped to what was specified, not broader.
+
+One real side effect, correctly resolved rather than just noted: the
+refactorer found `distressed-sale-2` had a stale expectation baked in
+under the old bug — a non-initiative-winner completing a monopoly via a
+distressed-sale purchase used to keep spending money afterward since it
+could never build; now it correctly builds immediately on the same turn.
+Confirmed via an isolated domain-level reproduction of the exact
+mechanism before correcting the expected balance from $100 to $0 for both
+the Greedo and Billionaire example rows — restoring already-specified
+behavior, not deciding new policy.
+
+Verification across the chain: domain 398/398, full acceptance 779/779
+run multiple times, `turn-development.feature` mutation 3/3 killed with 0
+survivors, differential mutation for `Game` at 100 sites (at, not over,
+threshold) with zero differential sites after extracting
+`mayDevelopThisTurn` to keep CRAP down. `turn-development` is closed
+end-to-end. Per role rules, not notifying coder again on my own — asking
+the user for the next feature. Worth surfacing when I report back: legal-
+entity mode still has the old builder-only development restriction,
+un-touched by this task — a real, separate follow-up if per-player
+development under legal-entity trading turns out to matter too.
