@@ -35580,3 +35580,51 @@ point — so this was resolved somewhere in the coder-to-refactorer handoff,
 just without its own dedicated log entry narrating the fix. `asset-rich-
 billionaire` is closed end-to-end. Per role rules, not notifying coder
 again on my own — asking the user for the next feature.
+
+## 2026-08-16T17:01:17Z — specifier reports a suspected asset-rich-billionaire defect to architect
+
+User asked to run 50 real games (1 asset-rich billionaire + 7 Greedo,
+`--optional-greedo-stalemate-trading --optional-greedo-legal-entity
+--optional-asset-rich-billionaire --max-years=2500`) and check whether the
+billionaire develops its granted land during play. It largely does not.
+
+Method: for each of the 50 runs, found the line index of the game's first
+terminal event (`wins the game` / `ends in a stalemate`) in the
+timestamped journal channel, then counted `dog builds a house`/`builds a
+hotel` occurrences strictly before that line.
+
+Findings:
+- 44/50 (88%) show **zero** `dog` building activity before the game ends,
+  despite `dog` already owning both full monopolies (Orange + Red) from
+  turn zero and steadily banking rent — balances climbing into the tens of
+  thousands over 100–200+ simulated years in several runs.
+- Of those 44: 14 show a sudden burst — up to 4 houses on all 6 granted
+  streets — logged in the same instant as, immediately *after*, the "game
+  ends in a stalemate" line. 30 never build at all, for the entire game.
+- Only 6/50 (12%) show normal, early building during real play, matching
+  what `asset-rich-billionaire-3`/`-4` specify. In the one case checked in
+  detail, that's also a game `dog` goes on to win.
+- No exceptions/crashes in any of the 50 runs. 0/50 hit the 2500-year cap
+  (max age reached: 1701). Outcome split: 40 WIN / 10 STALEMATE, but only
+  13 of the 40 wins go to `dog` — the other 27 scatter across Greedo
+  opponents, a sharp change from the cash-rich Billionaire's 50/50 win-or-
+  survive record in an earlier batch.
+
+This is hard to reconcile with `asset-rich-billionaire-3`/`-4` passing
+13/13 mutations per the refactorer's own log entry above. Working
+hypothesis, NOT verified against the actual implementation: those two
+scenarios arrange affordability via the test-only `pawn dog has $N to
+spend` step, which may poke the build-decision path directly, while cash
+accumulated turn-by-turn through ordinary play never triggers it — plausible
+if the build check normally fires only when a monopoly is *completed by a
+purchase or trade* (an event a pre-granted-at-setup monopoly never
+produces), and the delayed burst at the stalemate boundary comes from some
+other, rarer trigger (end-of-round settlement/legal-entity processing)
+finally invoking it once.
+
+User's instruction: route this to the architect first to confirm the real
+root cause before deciding what corrected scenario to write — user's own
+expectation is that building should be possible every turn funds allow,
+so a trigger this rare is troubling regardless of the exact mechanism.
+Sending a `note` (no commit — this is a diagnosis request against already-
+merged `main`, not a new specification) pointing here for detail.
