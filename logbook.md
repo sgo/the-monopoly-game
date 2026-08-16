@@ -35789,6 +35789,103 @@ pre-existing CLI flake, acceptance 777/778 (one pre-existing, already-
 flagged failure).
 2026-08-16T19:10:00Z coder: processed architect handoff 20260816T190006Z_000292 (654d8fceec). Architect review merged; current Building.java contains the asset-rich monopoly prioritization fix from 91cd44bc84. Targeted asset-rich acceptance was rerun after that fix and passed all 10 scenarios, so the review note describing Red scenario-4 as open is stale relative to current HEAD.
 
+## 2026-08-16T20:07:51Z — refactorer received coder handoff `turn-development`
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder efb2391209
+```
+
+Action: merged commit `efb2391209` as `658bb69`, resolving a `logbook.md`
+conflict the same way as prior cycles (both sides strictly additive over
+the shared `eb3a4a6fea` base; the incoming chain had six insertion points
+scattered through the existing content rather than a single append, so
+reconstructed by taking it in full and appending this role's own unique
+tail — the architect-sign-off entries from the prior cycle — after its
+final insertion point, since that tail postdates all of theirs
+chronologically and the incoming chain's own final block confirmed it).
+This closes the loop the specifier opened directly with the architect's
+diagnosis: `Game.playTurn` only ever called `developAndTrackConsolidation`
+for the single initiative-winning `builder`, game-wide, not just for
+asset-rich strategies — this task fixes that for the non-legal-entity
+case (`670b1330f5` pins the corrected behavior as
+`turn-development.feature`; `efb2391209` changes
+`Game.playTurn`'s development gate from `isBuilderStillSolvent(player,
+builder)` to `isPlayerStillSolvent(player) && (!legalEntityTrading ||
+player.id().equals(builder.id()))` — every player develops on their own
+turn now, unless legal-entity trading is enabled, in which case the old
+builder-only restriction is deliberately kept, verified by the coder
+against `EnRulesGreedoLegalEntityAcceptanceTest` rather than assumed).
+Reviewing under refactorer rules before handing back.
+
+## 2026-08-16T20:07:51Z — refactorer review: `turn-development`
+
+Mutation-site scan: `Game.java` unchanged at 100 sites (at, not over, the
+threshold). CRAP (`crap4java`, domain): the new compound condition in
+`playTurn` pushed it from CC=6/CRAP=6.0 to CC=8/CRAP=8.2 — above
+threshold. Extracted `mayDevelopThisTurn(player, builder)`, restoring
+`playTurn` to CRAP 6.0; the new method itself sits at CRAP 3.4. No other
+violations beyond the two already-documented exceptions. `dry4java` found
+nothing new.
+
+Full acceptance run found a regression: `EnRulesDistressedSaleAcceptanceTest`
+scenario `distressed-sale-2` failed both its Greedo and Billionaire rows
+(index [3]/[4]) — expected `high hat`'s final balance at $100 after buying
+the debtor's spare property (`Lippenslaan Knokke`) in the distressed sale,
+got $0. Confirmed present at the raw coder commit before any refactorer
+edit (`git stash` test). Traced the mechanism with an isolated domain-level
+reproduction matching the scenario's exact setup (dog wins initiative,
+lands on the $100 tax space with $0 to its name, distressed-sells
+`Lippenslaan Knokke` to `high hat` for $100): the journal showed
+`HouseBuilt[player=high hat, land=LippenslaanKnokke, price=100]`
+immediately on high hat's very next turn — buying the spare Orange street
+completes high hat's monopoly (it already held the other two), and
+`playTurn`'s fixed development gate now lets high hat build on its own
+turn, spending exactly the $100 it had left. This is the new, *correct*
+behavior per `turn-development.feature`'s own explicit intent
+("[building] must not depend on who happened to win the initiative
+roll") — `distressed-sale-2`'s $100-unspent expectation was written under
+the old bug (only the initiative winner ever built) and is now stale, not
+a fresh policy question: updated `expected_high_hat_final_balance` to $0
+for both strategy rows. Billionaire reuses Greedo's decisions verbatim
+(documented in `SIMULATOR.md`), so it builds identically — same fix
+covers both rows.
+
+Verification: `mvn test` from the repo root — all modules green except
+the pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` flake. Full
+acceptance pipeline: 779/779 (778 + 1 new `turn-development-1`), run
+twice.
+
+## 2026-08-16T20:07:51Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: c06a194f1a
+```
+
+Priority 50, matching the normal specifier→coder→refactorer→architect
+pipeline flow (this task originated with the specifier writing a
+dedicated scenario off the architect's diagnosis, not an architect
+priority-00 loop). Summary: extracted `Game.mayDevelopThisTurn` to bring
+`playTurn` back under the CRAP threshold after the coder's per-turn
+development fix added a compound condition; found and fixed one stale
+acceptance expectation (`distressed-sale-2`) that assumed the now-fixed
+"only the initiative winner ever builds" bug — the corrected value
+restores already-decided, already-specified behavior rather than deciding
+new policy, confirmed via an isolated domain-level reproduction of the
+exact mechanism (a distressed-sale purchase completing a monopoly,
+followed immediately by a same-turn house build). Domain 398/398, full
+reactor green apart from the known pre-existing CLI flake, acceptance
+779/779 run twice.
+
 ## 2026-08-16T20:21:54Z — architect review finds turn-development behavior change
 
 Merged refactorer commit `c06a194f1a`. The extracted
@@ -36018,3 +36115,4 @@ scope here is materially larger than the original ask (a game engine-wide
 defect, not an asset-rich-billionaire-specific one), so this needs a user
 decision on how to proceed rather than a specifier judgment call.
 2026-08-16T22:15:00Z coder: processed specifier handoff 20260816T200417Z_000192 for turn-development (670b1330f5). Fixed development gating so a non-initiative player develops on their own turn while preserving legal-entity mode behavior. Turn-development acceptance and Greedo legal-entity acceptance pass.
+2026-08-16T22:20:00Z coder: processed architect handoff 20260816T202212Z_000294 (d390a5dc60). Architect review confirms the turn-development diagnosis and records it as a game-wide behavior; current implementation retains the focused specifier fix and its targeted tests pass.
