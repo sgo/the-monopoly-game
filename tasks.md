@@ -763,3 +763,24 @@ didn't already call for.
   next improvement** — at least one entity street not yet at a hotel — and
   `standardBuildCost(entity, deeds)` excludes hotel streets. Pinned by
   `entity-m10`.
+- **`billionaire-strategy`** (done) — adds a second strategy, "Billionaire":
+  reuses "Greedo"'s decision logic verbatim (buying, rent, building, jail
+  fine, inherited mortgages, distressed-sale bidding — all unchanged) and
+  changes only the opening capital, $57,700,000 instead of the standard
+  $1,500, applied once before the game starts as a strategy-level
+  replacement rather than an addition to the usual balance. Not a strategy
+  with genuinely different decision logic per [`SIMULATOR.md`](SIMULATOR.md)'s
+  out-of-scope list — exists to let the CLI simulate a cash-dominant player
+  without inventing new decisions. See `billionaire.feature`.
+- **`cli-year-limit`** (done) — adds an optional `--max-years=N` CLI flag
+  that caps a simulation at N simulated years (player age, incremented on
+  passing/landing Start or being sent to jail); the game stops as soon as
+  any remaining player's age reaches N, recording a full survivor snapshot
+  (final balance and age for everyone left) the same way a stalemate does.
+  Omitted (the default) plays to the game's natural end, unchanged. Exists
+  to let a user avoid waiting through a rare slow-converging or genuinely
+  non-terminating game (see [`SIMULATOR.md`](SIMULATOR.md)'s Billionaire-mix
+  and Greedo-vs-Greedo characteristics) without having to tell the two
+  apart ahead of time. See `year-limit.feature` and the matching
+  `journal-70`/`report-70`/`logging-70`/`cli-8`/`cli-9`/`cli-jar-6`
+  scenarios.

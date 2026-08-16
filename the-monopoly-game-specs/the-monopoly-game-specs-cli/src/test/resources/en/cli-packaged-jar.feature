@@ -62,6 +62,7 @@ Feature: CLI packaged jar
     And the README usage report includes the optional flag "--optional-greedo-stalemate-trading"
     And the README usage report includes the optional flag "--optional-greedo-legal-entity"
     And the README usage report includes the optional flag "--max-years"
+    And the README usage report includes the optional flag "--optional-asset-rich-billionaire"
 
   # cli-jar-6
   Scenario Outline: the packaged jar confirms the configured year limit at the start of the game
@@ -74,3 +75,15 @@ Feature: CLI packaged jar
     Examples:
       | raw arguments                            | year limit |
       | 3 greedo greedo greedo --max-years=500   | 500        |
+
+  # cli-jar-7
+  Scenario Outline: the packaged jar accepts the Billionaire asset-rich flag alongside explicit strategies
+    Given the CLI module has been packaged
+    When I start the packaged simulator jar with the arguments "<raw arguments>"
+    Then the packaged jar's output confirms that asset-rich opening is <state>
+    When I stop the packaged jar
+    Then the packaged jar process ends
+
+    Examples:
+      | raw arguments                                            | state   |
+      | 2 greedo billionaire --optional-asset-rich-billionaire   | enabled |
