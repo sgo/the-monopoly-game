@@ -35502,3 +35502,138 @@ priority 00, then accepted) are all now on `main`. `cli-year-limit` is
 closed end-to-end. Per role rules, not notifying coder again on my own —
 asking the user for the next feature.
 2026-08-16T18:05:00Z coder: processed specifier handoff 20260816T155232Z_000190_from_specifier_to_coder for asset-rich-billionaire; implemented opt-in strategy flag, orange/red deed grants, standard opening balance, journal/CLI reporting, packaged-jar assertion, and acceptance pipeline registration. Targeted acceptance passes 9/10 scenarios; red-monopoly building scenario remains under investigation.
+
+## 2026-08-16T16:04:45Z — refactorer received coder handoff `asset-rich-billionaire`
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 46a7256d83
+```
+
+Action: merged commit `46a7256d83` as `e1bc099`, resolving a `logbook.md`
+conflict that this time included a single stray leftover conflict marker
+(`>>>>>>> 48cd367103`) baked into the coder/specifier chain's own committed
+history — same recurring class of artifact as two earlier incidents this
+project (`8f13cbb`, and one before that). Stripped it the same way:
+reconstructed by taking the upstream chain in full and inserting the
+refactorer's own two entries from the prior `cli-year-limit` follow-up
+cycle at the point the upstream chain's own architect-acceptance entry
+("accepted refactorer follow-up `3c82cac769`") shows they causally
+precede. New production touch for this task: `Simulator.java`
+(`--optional-asset-rich-billionaire` flag), `Game.java`
+(`applyAssetRichOpening`, granting Orange+Red unimproved to any strategy
+that opts in, plus a post-game catch-up `building::develop` call for
+strategies that might not otherwise get a normal turn to build),
+`Billionaire.java`/`Strategy.java` (the new `assetRichOpening()` strategy
+property, replacing the $57.7M opening capital with the standard $1,500
+when enabled), `Deeds.java` (a new `grant` method separate from the
+existing sale path, since this is a free grant with no buyer payment or
+seller). Reviewing under refactorer rules before handing back.
+
+## 2026-08-16T16:04:45Z — refactorer review: `asset-rich-billionaire`
+
+Mutation-site scan on every touched production file before any refactorer
+edit: `Simulator.java` 86, `Game.java` 102, `Journalling.java` 7,
+`Billionaire.java` 10, `Strategy.java` 14, `Deeds.java` 43. `Game.java` was
+over the 100-site threshold by 2, driven by the new
+`applyAssetRichOpening`'s `land instanceof ColourStreet street &&
+(street.colourGroup() == orange || == red)` filter (5 sites: the `!`, the
+`&&`, the `||`, and both `==`s). Simplified to a single `ASSET_RICH_COLOURS
+= Set.of(orange, red)` constant and `.filter(street ->
+ASSET_RICH_COLOURS.contains(street.colourGroup()))`, dropping `Game.java`
+to 98 sites — a genuine simplification (one membership test instead of a
+manual instanceof-cast-and-double-equality chain), not a cosmetic dodge of
+the threshold. CRAP (`crap4java`, domain then cli, flaky
+`SimulatorTest.keepsPlayingUntilToldToStop` skipped for the isolated cli
+measurement only, not committed) found no new violations beyond the three
+already-documented exceptions (`Report.line`, `Game.journalOperation`,
+the untested `Simulator.main` CLI shim, which rose from CRAP 42.0 to
+56.0 at CC=7 after the coder's new `--optional-asset-rich-billionaire`
+echo branch — same shape as every other CLI-echo branch already in that
+method, still 0% unit-covered by design, verified via the packaged-jar
+acceptance scenario instead). `dry4java` found nothing new: the one
+Game.java constructor-overload match and the one Simulator run/start
+overload match are the same pre-existing boilerplate patterns noted in
+every prior cycle.
+
+Full acceptance run found two failures, both confirmed present at the
+coder's raw commit before any refactorer edit (checked via `git stash`):
+
+1. `SpecsCliEnCliPackagedJarAcceptanceTest` — "the README usage report
+   includes the optional flag `--optional-asset-rich-billionaire`" failed
+   because `README.md`'s hand-maintained usage transcript was never
+   updated to match the coder's real `Simulator.usage()` change; it still
+   listed only the stalemate/legal-entity/max-years flags. A stale-copy
+   fix, not new behavior — `Simulator.usage()` already prints the flag,
+   this only corrects the manually-maintained mirror of it in the README
+   to match. Fixed by adding the missing line in the same position
+   `usage()` prints it.
+2. `EnRulesAssetRichBillionaireAcceptanceTest` scenario
+   `asset-rich-billionaire-4` ("an asset-rich billionaire builds evenly
+   across its granted Red monopoly once affordable") — expects 1 house on
+   each of `RueStLeonardLiege`/`LangeSteenstraatKortrijk`/`GrandPlaceMons`
+   after granting dog $450 (exactly 3×$150, the Red group's construction
+   cost), but the game ends with 0 houses built on the first of the three.
+   The identically-shaped Orange scenario (`asset-rich-billionaire-3`,
+   granting $300 = 3×$100) passes. The coder's own logbook entry for this
+   task already flagged this exact scenario as "under investigation"
+   before handing off, so this isn't a new finding — reproduced it
+   independently 4/4 runs (identical failure every time, confirming it's
+   deterministic, not flaky dice-related noise like the `cli-year-limit`
+   issue from two cycles ago). Traced the mechanism partway: the
+   post-game catch-up `building::develop(player)` call in `Game.play()`
+   is the only place an asset-rich strategy's granted-but-unimproved
+   monopoly gets built (since dog may not get an ordinary ownership-
+   triggered turn to develop it through normal play), and `Building`'s
+   own affordability check (`Money.covers`, `>=`) has no off-by-one that
+   would explain a boundary failure at exactly-affordable — tried an
+   isolated domain-level reproduction (constructing a `Game` directly with
+   the same fixed non-double `UNREMARKABLE` roll the acceptance harness
+   falls back to) to pin the exact cause, but it diverged from the real
+   scenario's behavior (the real acceptance test resolves in ~0.01s; the
+   isolated repro ran for 8+ minutes without terminating, so its setup
+   wasn't faithful to whatever makes the real game stop quickly) and
+   wasn't worth continuing to chase — abandoned rather than report an
+   unverified mechanism. This needs the coder's/architect's domain
+   judgment (how the catch-up build interacts with whatever ends the game
+   this quickly, and why Red specifically comes up short), not a
+   refactorer-scope structural fix. Not fixed here.
+
+Verification: `mvn test` from the repo root — all modules green except
+the pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` flake. Full
+acceptance pipeline: 778 scenarios (766 + 12 new for this task), 777/778
+after the README fix — the one remaining failure is the pre-existing,
+already-coder-flagged `asset-rich-billionaire-4` gap described above.
+
+## 2026-08-16T16:04:45Z — refactorer sent asset-rich-billionaire handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: asset-rich-billionaire
+commit: 56d341766c
+```
+
+Priority 50, matching the normal specifier→coder→refactorer→architect
+pipeline flow. Summary: deduplicated `Game.applyAssetRichOpening`'s
+colour-group filter into a `Set`-membership check, bringing `Game.java`
+back under the 100-mutation-site split threshold after the coder's
+addition pushed it to 102 (98 after); fixed a stale `README.md` usage
+transcript missing the new `--optional-asset-rich-billionaire` flag,
+which was failing a packaged-jar acceptance scenario. No CRAP violations
+found beyond the three already-documented exceptions. One genuine,
+deterministic defect remains open and unfixed: `asset-rich-billionaire-4`
+(the Red-monopoly catch-up build scenario) — already flagged by the
+coder as "under investigation" before this handoff, independently
+reproduced 4/4 runs, confirmed unrelated to this refactoring pass (present
+at the raw coder commit), root cause not fully pinned (an isolated
+repro attempt diverged from real test behavior and was abandoned rather
+than guessed at). Domain 398/398, full reactor green apart from the known
+pre-existing CLI flake, acceptance 777/778 (one pre-existing, already-
+flagged failure).
