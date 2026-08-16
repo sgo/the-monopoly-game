@@ -35757,3 +35757,53 @@ diagnosis surfaced on another branch — out of scope here since it wasn't
 part of the merged commit and is a game-wide behavior question, not
 structural cleanup. Domain 398/398, full reactor green (including the
 usually-flaky CLI test this run), acceptance 778/778 run twice.
+
+## 2026-08-16T19:02:33Z — refactorer received coder handoff `asset-rich-billionaire` (architect sign-off)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder b6d3348c16
+```
+
+Action: merged commit `b6d3348c16` as `eb3a4a6`, resolving a `logbook.md`
+conflict with three scattered (non-tail) insertion points on the incoming
+side rather than the usual single append point — reconstructed by taking
+the incoming chain in full (it already carried all three of its own
+insertions correctly) and appending this role's own unique tail (the
+build-trigger-fix review/handoff entries from the previous cycle) after
+it, since that tail's insertion point — after the shared base's original
+end — postdates all three of theirs. No production code changed by this
+handoff: it is purely the architect reviewing my prior `Building.java`
+verification, classifying the fix as observable behavior that needed the
+behavior-owning coder's explicit sign-off (routed at priority 00), and the
+coder confirming the fix already stands and the scenario passes — nothing
+for a refactorer to act on. Confirmed via `git diff d00e47abf8..HEAD --
+':!logbook.md'`: empty.
+
+Verification: domain unit tests still green (unchanged from the prior
+cycle, since no production file changed). Not re-running the full
+acceptance pipeline for a logbook-only diff — the prior cycle's two clean
+778/778 runs already cover this exact code state.
+
+## 2026-08-16T19:02:33Z — refactorer sent asset-rich-billionaire handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: asset-rich-billionaire
+commit: eb3a4a6fea
+```
+
+Priority 00, matching the incoming architect-follow-up loop (the
+architect's own behavior-sign-off request to the coder, now closed).
+Summary: no refactorer-owned changes — this handoff only carried the
+architect's and coder's own review/sign-off notes forward, with no
+production diff to verify beyond what was already confirmed clean in the
+prior cycle (778/778 acceptance, CRAP/DRY clean, mutation sites well
+under threshold).
