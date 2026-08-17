@@ -36508,3 +36508,14 @@ and 8 uncovered sites. Escalated the remaining policy/test-surface conflict
 to the specifier; no phase-complete handoff sent.
 2026-08-17T11:30:00Z coder: processed specifier handoff 20260817T111531Z_000194 (e51cc580d1), resolving logbook merge. New scenario scopes market-deadlock consolidation to the eligible split rather than unrelated board development. Removed global round consolidation marking from ordinary house development; existing legal-entity acceptance still exposes 13 failures, so this remains under architect review.
 2026-08-17T11:45:00Z coder: processed specifier handoff 20260817T113656Z_000195 (405b911cb7), merging corrected legal-entity fixtures so catch-all ownership does not land on a shareholder. No production change in this handoff.
+
+## 2026-08-17T11:48:19Z — architect review: turn-development policy still blocked
+
+Merged refactorer commit `a7a1ad4888`. The cleanup removes the now-dead
+development wrapper and leaves ordinary solvent-player development direct in
+`Game.playTurn`; the fixture corrections are scoped to legal-entity setup.
+Fresh full acceptance on the merged state remains 25 failures out of 781,
+concentrated in legal-entity formation/building/report behavior. Differential
+mutation reports no new sites because the current `Game` manifest already
+matches this merged implementation. The task remains open pending the
+specifier's policy decision; no phase-complete handoff sent.
