@@ -36832,9 +36832,78 @@ recommend specifier/coder investigation rather than a guess. Domain
 398/398 green.
 2026-08-17T13:20:00Z coder: processed specifier handoff 20260817T130848Z_000200 (52a987a86a), merging the user-directed removal of the buyer-identity assertion from share-sale-3. No production change.
 
-## 2026-08-17T13:14:50Z — accepted refactorer turn-development handoff
+## 2026-08-17T13:09:14Z — refactorer received coder handoff `turn-development` (share-sale-3 assertion removed)
 
-Merged refactorer commit `2cf29dfa69`. The fixture corrections and the
-specifier-directed share-sale assertion removal leave 2 acceptance failures,
-both in share-sale behavior. No production code changed; the remaining
-expected-value/bidding policy is routed to the specifier/coder chain.
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 37726457ac
+```
+
+Action: merged commit `37726457ac` as `2cf29df`, resolving a
+six-point `logbook.md` conflict (same per-hunk-anchor methodology as
+every recent cycle; this time the first two hunks split at a different
+boundary than the equivalent content split last cycle, purely a diff-
+algorithm artifact — verified the reassembled total matched byte-for-
+byte via `diff` against both parents before committing, same as always).
+User-directed fix this time, not a specifier inference: `share-sale-3`'s
+"pawn high hat owns Rue Grande Dinant" assertion (checking WHO
+specifically won the distress-sale bid) was removed outright rather than
+corrected to a new value, keeping the assertions that actually matter
+(dog no longer owns it, still holds its entity share, isn't bankrupt).
+Reviewing under refactorer rules before handing back.
+
+## 2026-08-17T13:09:14Z — refactorer review: `turn-development` (share-sale-3 assertion removed)
+
+Full acceptance: **2 failures down to 1**, confirmed fresh. The one
+remaining is `share-sale-6` ("the final shareholder may liquidate the
+legal entity to settle their debt"): dog's final balance expected $440,
+got $40 — exactly dog's *starting* balance, unchanged, suggesting the
+tax-landing/liquidation sequence never actually resolved rather than
+resolving to a different value. Spent real effort tracing this one since
+it's the last blocker: the scenario has no `"will roll N for
+initiative"` steps for any player and no `"every other player can
+complete their turn"` step either, yet doesn't error on a missing queued
+roll the way `World.nextQueuedPawnRoll` normally would for an
+unscripted, unflagged player — worth checking whether `Initiative`
+requests a roll from every entry in `players` including the two pawns
+this scenario's `"X and Y have both gone bankrupt"` setup step already
+marks bankrupt *before* play starts, and whether that interacts with the
+new 4th catch-all player `bankruptPawns` itself introduces (a
+`bidForDistressed`-only override, `builds()` still defaults false, so
+it shouldn't itself be developing). Not confirmed, not fixed — noting
+the specific thread for whoever investigates next rather than leaving a
+bare "still failing."
+
+Verification: `mvn test` — domain green (no code changed this cycle).
+Full acceptance: 781 scenarios, 1 failure, confirmed fresh.
+
+## 2026-08-17T13:09:14Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: 2cf29dfa69
+```
+
+Priority 50, matching the normal pipeline flow. Down to the very last
+failure: 781 scenarios, 1 remaining (`share-sale-6`). No production code
+changed this cycle. Left a specific investigation thread in the review
+entry above (possible `Initiative`-vs-already-bankrupt-players
+interaction, unconfirmed) rather than a bare status, since this is close
+enough to done that the next investigator shouldn't have to start from
+scratch. Domain 398/398 green.
+2026-08-17T13:40:00Z coder: processed specifier handoff 20260817T133207Z_000201 (e3241ea91d), merging the user-directed share-sale-6 fixture setup to pre-develop Pink Realty's streets. No production change.
+
+## 2026-08-17T13:36:44Z — accepted refactorer turn-development handoff
+
+Merged refactorer commit `ffe418e761`. The user-directed share-sale fixture
+correction reduces the verified acceptance result to one remaining failure,
+`share-sale-6`. No production code changed; the final scenario outcome is
+ready for verification.
