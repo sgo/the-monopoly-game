@@ -36310,3 +36310,71 @@ it back for a decision on which direction to take, per workflow rules
 ("the specifier reviews the finding... and decides whether to accept,
 revise, or decline"). Not merging anything yet; no commit exists that
 represents a decided direction.
+
+## 2026-08-17T11:15:03Z — specifier sends legal-entity market-deadlock scoping fix to coder
+
+Talked the policy through with the user. Their framing: the point of
+inaction detection was always to catch a stalemate *forming*, and the
+mechanism has misfired in both directions before — too early (before the
+board even filled up, long since fixed by the `allOwnableSpacesOwned()`
+gate) and, as of today, effectively never (once building stopped being
+restricted to one player). Their call: don't weaken the signal to dodge
+the regression — scope it to the specific eligible split instead, so an
+unrelated player's own unrelated activity can't block a different split's
+detection.
+
+First pass of my own reasoning wrongly assumed `entity-m7` (a negative
+"does not form" case) was among the 25 failures and needed correcting to
+use a trade instead of a development action. User pushed back — it's
+Greedo-only, nothing billionaire-specific about it, why would it be
+affected. Checked out the coder's actual unmerged branch in a temporary
+worktree (read-only inspection, not merged — nothing here represents
+project state until named in a real handoff) rather than continue
+guessing: `entity-m7` isn't touched at all. Every one of the 13
+`greedo-legal-entity.feature` failures is a positive "the entity forms"
+assertion now false, not a negative one — `entity-m1` already gives one
+shareholder "every other ownable space," and once that shareholder can
+legitimately build on its own unrelated monopolies (no longer restricted
+to the initiative winner), the round looks non-quiet and blocks an
+unrelated split's formation. Widening what counts as activity elsewhere
+only makes "not quiet" easier to satisfy, never harder, so negative-case
+scenarios were never at risk.
+
+Landed on the actual design: individual development can never target a
+still-split group in the first place (`Building.develop` requires full
+group ownership, which nobody has by definition while it's split) — so
+development was only ever a *board-wide* "is the whole market still
+moving" proxy, never a real per-split signal, and that proxy stops
+working now that development is routine for everyone. Trade, buyout, and
+bankruptcy stay real per-split signals since they can meaningfully target
+a specific split's own shareholders. So: drop development from per-split
+detection entirely; keep trade/buyout/bankruptcy but scope them to the
+split under consideration.
+
+Added `entity-m11` to `greedo-legal-entity.feature`: a 4th player, not
+one of the eligible split's three shareholders, builds on its own
+unrelated monopoly during the round; the split should still auto-form.
+No existing scenario needed changing — `entity-m1`/`m6`/`m7`/`m10` already
+specify the correct behavior once detection is properly split-scoped,
+they were just blocked by the board-wide implementation.
+
+Validated clean with `gherkin-parser`/`gherkin-ir-dry-checker` (only the
+file's existing baseline possible-synonym/near-duplicate/placeholder-
+variant noise, no new finding kinds). Confirmed red directly against the
+coder's unmerged branch before sending: 781 tests (780 + entity-m11), 14
+`greedo-legal-entity.feature` failures (13 pre-existing + entity-m11),
+failing with exactly "auto-formed into Pink Realty — expected true, got
+false."
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: e51cc580d1
+```
+
+Same task name — this is the same open thread the architect's note
+escalated, not a new task.
