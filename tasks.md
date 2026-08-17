@@ -784,3 +784,42 @@ didn't already call for.
   apart ahead of time. See `year-limit.feature` and the matching
   `journal-70`/`report-70`/`logging-70`/`cli-8`/`cli-9`/`cli-jar-6`
   scenarios.
+- **`asset-rich-billionaire`** (done) — adds an opt-in
+  `--optional-asset-rich-billionaire` flag that changes what the
+  "Billionaire" strategy is granted at the start of the game: instead of
+  the standard $57.7M cash-rich opening, it opens with the ordinary
+  $1,500 balance but starts already owning the whole Orange and Red
+  colour groups outright, unmortgaged and unimproved, building them up
+  itself via ordinary Greedo logic rather than starting with free
+  hotels. Off by default, leaving the existing cash-rich Billionaire
+  behavior unchanged. Portfolio choice (Orange + Red specifically) was
+  derived from the same per-property valuation `Stalemate.threshold()`
+  already uses — these are the game's own `Strategy.HIGHEST`-priority
+  colour groups, together worth ~25.9% of the board by that measure,
+  echoing the real-world statistic that the top 1% of Belgians hold
+  roughly a quarter of all assets. See
+  `asset-rich-billionaire.feature`.
+- **`turn-development`** (done) — fixes a long-standing, game-wide defect
+  found while investigating why the asset-rich billionaire above wasn't
+  developing its granted land during real play: `Game.playTurn` only
+  ever called `Building.develop()` for the single player who won the
+  initiative roll at the start of the game, for the entire game,
+  regardless of strategy — every other player, no matter what they
+  could afford, never developed at all. Batch evidence: a 50-game
+  asset-rich-billionaire run showed it building during real play in only
+  6/50 games (12%) before the fix, vs. 50/50 (100%) after. Fixed so
+  every solvent player may develop on their own turn unconditionally,
+  including when legal-entity trading is enabled — the market-deadlock/
+  quiet-round detector's `roundHadConsolidatingAction` signal was
+  reworked to drop board-wide individual development entirely (it can
+  never target a still-split group in the first place, since developing
+  requires owning the whole group) while keeping trade/buyout/bankruptcy
+  as real per-split signals. Also fixed a systemic test-fixture bug this
+  surfaced along the way: the shared `World.formEntity` test helper
+  defaulted "everything else unowned" to one of the entity's own
+  shareholders, which the fix's now-routine development turned into
+  unintended monopoly-building and bidding side effects across a dozen
+  pre-existing scenarios once that shareholder could legitimately spend
+  its own cash. See `turn-development.feature` and the corrected
+  fixtures across `greedo-legal-entity.feature`, `journal.feature`,
+  `report.feature`, `logging.feature`, and `greedo-share-sale.feature`.
