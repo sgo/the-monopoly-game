@@ -36690,3 +36690,31 @@ whether the buyer's identity is actually load-bearing to the scenario's
 intent (if not, relax the assertion instead of chasing a specific
 winner); `share-sale-6` needs the reinvestment mechanism confirmed before
 just recomputing the number. Reporting both rather than guessing.
+
+## 2026-08-17T13:08:27Z — specifier resolves share-sale-3 per user decision
+
+User's call: the buyer's identity was never load-bearing. Dropped `Then
+pawn "high hat" owns "Rue Grande Dinant"` from `share-sale-3`; kept the
+`high_hat_balance` arrangement (still needed to guarantee a solvent
+bidder exists so the distressed sale actually happens). The scenario's
+real claim — dog sells its own cheaper asset before touching its entity
+share, keeps the share, avoids bankruptcy — is untouched.
+
+Validated clean with `gherkin-parser`/`gherkin-ir-dry-checker` (one new
+finding kind, `duplicate-in-scenario` — confirmed pre-existing and
+unrelated: a different scenario, `share-sale-11`-ish "bought-out entity
+liquidated" repeating `we play up to 1 round` intentionally, not
+something this edit touched or introduced).
+
+Verified against the chain's current tip in a throwaway worktree: 2 → 1
+failure. Only `share-sale-6` remains.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: 52a987a86a
+```
