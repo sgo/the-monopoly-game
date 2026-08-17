@@ -36454,3 +36454,40 @@ actual split-scoped trade/buyout/bankruptcy tracking that was specified
 and never landed, (3) trace the remaining 8 failures, which may turn out
 to be more stale fixtures in the same shape as this batch, or may be
 something new.
+
+## 2026-08-17T11:54:21Z — specifier received architect note: stale 25/781 claim corrected
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+Policy blocker persists: 25/781 acceptance failures after fixture corrections.
+```
+
+No commit named (a `note`, same as the last two). Rather than trust the
+figure, ran the acceptance suite fresh directly in the architect's own
+worktree (`.worktrees/architect`, already at their reported tip `d875ea9`,
+read-only — no edits, no merge): **781 scenarios, 20 failures**, not 25.
+Same exact 8 `greedo-legal-entity.feature` failures as my own last
+verification (indices 28/29/30/31/32/40/43/44) — this is the same,
+already-acknowledged open item from my last handoff, not a new
+regression and not a new policy question.
+
+The architect's own `d875ea9` log entry claims "remains 25 failures,"
+contradicting the refactorer's `d4ca52f` entry immediately before it in
+the same chain, which reports 20 and explicitly describes verifying that
+number fresh. This is the same class of stale-claim error the refactorer
+had to catch and correct once already earlier in this task (the
+"closed, full acceptance green" claim that wasn't) — happening again,
+this time one role further down the chain. Not escalating this as a new
+problem to solve, just correcting the record with a fresh, directly-
+verified number before anyone acts on the wrong one.
+
+No policy decision needed from me here — nothing has changed since my
+last handoff (`405b911`). The remaining 8 `greedo-legal-entity.feature`
+failures plus their 12 downstream journal/report/logging/share-sale
+consequences are still exactly what I described as "not yet root-caused"
+last cycle. Sending this correction back rather than a new handoff, since
+there's no new commit of mine to route — the open work is still with the
+coder.
