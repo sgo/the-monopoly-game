@@ -36561,3 +36561,59 @@ to: coder
 priority: 50
 message: Root cause found: formEntity test helper, not new policy. See logbook 534253b
 ```
+
+## 2026-08-17T12:39:18Z — specifier received architect note: "policy decisions to make," found none — but found and fixed a real dormant bug
+
+User relayed the architect still saw a policy decision pending
+(`00_20260817T123133Z_000302`: "41e991d corrected 25 to 20 total; please
+decide policy for 8 direct root cases"). Checked the architect's own
+worktree tip (now `11fbe24`) rather than answer from memory: the coder
+had already implemented the exact fix direction from my last note
+(`31b21c5`, `formEntity`'s default owner now looks for a non-shareholder
+player first) and the refactorer/architect chain had already merged and
+reviewed it. Ran the suite fresh: 781 scenarios, **8 failures**, down
+from 20 — real, verified progress already in motion before this note
+arrived. No policy question found in any of it.
+
+Kept digging into the 8 rather than stop at "not my problem": 3 of the 8
+remaining `greedo-legal-entity.feature` failures were `entity-6` and
+`entity-8` throwing `"No pawn \"racecar\" is at play"`. Traced via `git
+blame`: both scenarios' `every other ownable space is owned by pawn
+"racecar"` lines date to `98bf5a37`, 2026-08-10 — the same day this
+whole feature file was first written, completely unrelated to anything
+from this week. Neither scenario ever declared a 4th player, so `racecar`
+was never actually registered as a player under the file's 3-player
+Background. This has apparently been a dormant, unexercised bug since
+day one — nothing to do with `turn-development`, just something the
+coder's `formEntity` fix's stricter default-owner lookup happened to
+newly expose by actually trying to resolve `racecar` where it hadn't
+been resolved before. `entity-m1`/`m6`/`m9`/`m11` (my own scenarios) and
+`entity-9`/`entity-10` (pre-existing, using `<player_count>` at 4/8) were
+already fine. Fixed by adding `Given we select 4 players` to both,
+matching `entity-7`'s already-correct pattern right next to them.
+
+Validated clean with `gherkin-parser`/`gherkin-ir-dry-checker` (same
+baseline noise, no new finding kinds). Verified directly against the
+chain's current tip (`11fbe24`) in a throwaway worktree: 8 → 6 total
+failures, legal-entity failures 3 → 1. The one remaining legal-entity
+failure is a different symptom again (a rent-payment assertion — "pawn
+<renter> has paid $<rent> in rent" — expected true, got false), not
+traced yet.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: 0a8d76bbc9
+```
+
+Directly answering the architect's ask: there is no policy decision
+pending from me. The behavior design was settled two rounds ago and
+hasn't needed revisiting since; everything since then — the `formEntity`
+fix, this dormant-bug fix — has been mechanical root-causing and
+test-infrastructure/fixture correction, the same category of work as
+`distressed-sale-2`. 6 failures remain, down from the original 25; still
+open, still being traced, but none of it is a design question.
