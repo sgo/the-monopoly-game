@@ -36617,3 +36617,76 @@ fix, this dormant-bug fix — has been mechanical root-causing and
 test-infrastructure/fixture correction, the same category of work as
 `distressed-sale-2`. 6 failures remain, down from the original 25; still
 open, still being traced, but none of it is a design question.
+
+## 2026-08-17T13:00:42Z — specifier closes greedo-legal-entity.feature: 6 failures -> 2
+
+Kept tracing rather than stop at the report. Found two more instances of
+the exact same shareholder-catch-all collision, in two different shapes:
+
+`journal-63`/`report-63`/`logging-63` (three rendering-surface twins,
+pre-dating this week entirely): identical to `entity-m1`/`m6`/`m9` --
+"every other ownable space is owned by pawn high hat," where high hat is
+also one of the three shareholders. Same fix: 4th non-shareholder player,
+catch-all reassigned to it.
+
+`entity-13` ("rent collected from a tenant is deposited into the
+entity's bank account"): a different shape of the same collision. `we
+select 4 players` auto-assigns `racecar` as the 4th, non-shareholder
+player -- and the coder's `formEntity` fix makes `racecar` the default
+catch-all owner too, since it's the first non-shareholder found. This
+scenario's own test subject -- the rent-paying tenant -- was *also*
+named `racecar`, so the pawn under test and the pawn silently owning
+"everything else" collapsed into the same one. Bumped to 5 players and
+renamed the tenant to `ship` (distinct from `racecar`) to separate the
+two roles.
+
+Verified after each edit in a throwaway worktree against the chain's
+current tip (`a42a57f`), read-only, nothing merged: 6 → 3 → 2.
+`greedo-legal-entity.feature` is now fully green. All four touched files
+validated clean with `gherkin-parser`/`gherkin-ir-dry-checker`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: 5d10d8344e
+```
+
+2 failures remain, both `greedo-share-sale.feature`, both genuinely
+different from everything fixed so far -- not mechanical player/naming
+collisions, but real questions about scenario intent:
+
+**`share-sale-3`** ("a shareholder sells a cheaper personal asset before
+offering their legal-entity share"): expects `pawn "high hat" owns "Rue
+Grande Dinant"` after a distressed sale. Traced via a temporary debug
+print: the buyer is now `racecar` (the new default catch-all owner), not
+`high hat`. Under the old code, `high hat` (the *old* default owner)
+already held the split's other Brown street, so buying this one
+completed its own monopoly and made it bid aggressively — that's why it
+used to win. Now that a non-shareholder holds that other Brown street
+instead, `high hat` has no monopoly-completion incentive left, and
+whoever the new default owner is wins on the same logic instead. The
+scenario's original "high hat wins" outcome was itself a side effect of
+the old bug, not a deliberately chosen policy — its real point (dog
+sells its own asset first, keeps its entity share, avoids bankruptcy) is
+still intact regardless of who buys it.
+
+**`share-sale-6`** ("the final shareholder may liquidate the legal
+entity to settle their debt"): expects `dog`'s final balance at $440;
+gets $40 (dog's unchanged starting balance) instead. Not yet confirmed
+with a debug trace the way the others were, but the mechanism is
+consistent with everything else this cycle: `dog` becomes solvent and
+inherits Pink Realty's undeveloped streets on liquidation, and — now
+that development isn't restricted to one player — very plausibly
+reinvests the liquidated treasury straight into building on them before
+the balance check runs, the same way `distressed-sale-2` needed its
+expectation corrected last cycle.
+
+Not deciding either unilaterally: `share-sale-3` needs someone to decide
+whether the buyer's identity is actually load-bearing to the scenario's
+intent (if not, relax the assertion instead of chasing a specific
+winner); `share-sale-6` needs the reinvestment mechanism confirmed before
+just recomputing the number. Reporting both rather than guessing.
