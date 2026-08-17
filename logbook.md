@@ -36900,3 +36900,62 @@ interaction, unconfirmed) rather than a bare status, since this is close
 enough to done that the next investigator shouldn't have to start from
 scratch. Domain 398/398 green.
 2026-08-17T13:40:00Z coder: processed specifier handoff 20260817T133207Z_000201 (e3241ea91d), merging the user-directed share-sale-6 fixture setup to pre-develop Pink Realty's streets. No production change.
+
+## 2026-08-17T13:32:30Z — refactorer received coder handoff `turn-development` (share-sale-6 fixed — full acceptance green)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 92d1bbbef2
+```
+
+Action: merged commit `92d1bbbef2` as `ffe418e`, resolving a seven-point
+`logbook.md` conflict (same per-hunk-anchor methodology as every recent
+cycle; verified zero removed lines against both parents). User-directed
+fixture fix for the last remaining scenario: `share-sale-6` now
+pre-develops all three of Pink Realty's streets to hotels before marking
+`high hat`/`iron box` bankrupt, rather than leaving them undeveloped —
+not the `Initiative`-vs-bankrupt-players thread this role's last review
+flagged as worth checking; the actual mechanism was about the entity's
+development state at liquidation time. Reviewing under refactorer rules
+before handing back.
+
+## 2026-08-17T13:32:30Z — refactorer review: `turn-development` (full acceptance green)
+
+**Full acceptance: 781/781, zero failures — confirmed fresh, run twice.**
+`mvn test` from the repo root: every module green, including the usually-
+flaky `SimulatorTest.keepsPlayingUntilToldToStop` this run. No production
+code changed this cycle (pure Gherkin fixture data), so nothing for this
+role to structurally verify beyond re-running the full suite, which I did
+rather than trust the "green" claim outright, given this task's own
+history of stale-claim corrections earlier on. `turn-development` is
+genuinely closed this time, twelve refactorer cycles after the coder's
+first attempt surfaced the underlying "only the initiative winner ever
+develops" game-wide characteristic — the resolution touched
+`Game.playTurn`'s development gate, `Game.developAndTrackConsolidation`/
+`resolveMarketDeadlockAtRoundBoundary`'s quiet-round signal, and a long
+tail of Gherkin fixtures whose shared-helper and inline setup both
+assumed the old bug.
+
+Verification: `mvn test` — all modules green, zero exceptions this run.
+Full acceptance: 781 scenarios, 0 failures, run twice.
+
+## 2026-08-17T13:32:30Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: ffe418e761
+```
+
+Priority 50, matching the normal pipeline flow. **Genuinely green this
+time**: 781/781 acceptance, full reactor including the normally-flaky CLI
+test, confirmed via two independent fresh runs rather than trusted from
+narrative. No production code changed this cycle. Recommend this as the
+point to close `turn-development` out for real.
