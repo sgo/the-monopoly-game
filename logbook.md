@@ -36718,3 +36718,55 @@ priority: 50
 task: turn-development
 commit: 52a987a86a
 ```
+
+## 2026-08-17T13:31:41Z — specifier closes turn-development: 781/781, zero failures
+
+Traced `share-sale-6` properly this time (user asked to explain it again;
+went and confirmed with a debug print rather than repeat the untraced
+hypothesis). Exact mechanism, in order: dog liquidates Pink Realty and
+receives $500 (balance $40 − $100 tax + $500 = $440, matching the
+scenario's original expectation at that exact instant); then, now that
+development isn't restricted to the initiative winner, Greedo immediately
+builds 4 houses on the streets dog just inherited, same turn, spending
+exactly $400 back down to the observed $40.
+
+User's call on the fix: rather than recompute `dog_ending` to $40, arrange
+Pink Realty's three streets as already fully developed (hotels) before
+liquidation, so there's nothing left to build. Cleaner than a value
+correction — keeps the scenario's math self-evidently correct (liquidated
+treasury becomes final balance, full stop) instead of coupling it to a
+downstream reinvestment mechanic that has nothing to do with what this
+scenario actually tests.
+
+Validated clean with `gherkin-parser`/`gherkin-ir-dry-checker` (same
+baseline noise as the `share-sale-3` cycle, no new finding kinds).
+Verified against the coder/refactorer/architect chain's current tip in a
+throwaway worktree: **781/781, zero failures.**
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: e3241ea91d
+```
+
+`turn-development` is closed end-to-end. Summary of the whole arc: the
+architect's diagnosis (only the initiative-winning `builder` could ever
+develop, game-wide) → specified per-player development, modeled on the
+`entity-33` precedent → widened to cover legal-entity mode too, per the
+user's call that suppressing a real consolidating action just to force a
+false "quiet" round defeats the market-deadlock detector's own purpose →
+scoped market-deadlock's `roundHadConsolidatingAction` correctly (drop
+board-wide development, since a still-split group can never be
+individually developed anyway) → found and fixed the systemic
+`formEntity` test-helper bug behind it → found and fixed five more
+instances of the same shareholder-catch-all collision across
+`entity-m1`/`m6`/`m9`, `journal-63`/`report-63`/`logging-63`, `entity-6`/
+`entity-8`, and `entity-13` → resolved the two remaining judgment calls
+(`share-sale-3`'s buyer identity, `share-sale-6`'s reinvestment) with the
+user directly. Every fixture correction along the way was verified
+against the coder/refactorer/architect chain's actual current state in a
+throwaway worktree before being reported or committed, not assumed.
