@@ -36611,11 +36611,98 @@ withholding or should attempt to resolve unilaterally. Domain 398/398,
 full reactor green apart from the known pre-existing CLI flake.
 2026-08-17T12:20:00Z coder: processed specifier note handoff 20260817T120547Z_000197. Root cause confirmed in shared World.formEntity fixture: catch-all ownership assigned unrelated board spaces to a shareholder, triggering unintended development. Fixture now assigns catch-all ownership only to a non-shareholder when available.
 
-## 2026-08-17T12:14:04Z — accepted correction for turn-development count
+## 2026-08-17T12:06:33Z — refactorer received coder handoff `turn-development` (further fixture correction)
 
-Processed specifier note `20260817T115455Z_000196` and refactorer handoff
-`1bf4fa2d6e`. Fresh acceptance on the architect tip confirms 781 scenarios
-with 20 failures, matching the refactorer's independent verification; the
-earlier 25-count architect entry was stale. The refactorer cleanup is
-accepted as structural, but the remaining 20 scenarios stay open under
-coder/specifier investigation. No active stake-related task was found.
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 31b21c5fb8
+```
+
+Action: merged commit `31b21c5fb8` as `1bf4fa2`, resolving a `logbook.md`
+conflict with three non-contiguous insertion points on this role's own
+side this time (the last two cycles' entries landed split across three
+separate positions in the incoming chain rather than one clean tail —
+worked out each hunk's exact base-line anchor via `diff` before
+splicing, rather than assuming a single contiguous block the way the
+last several cycles allowed; verified afterward with `diff <(git show
+MERGE_HEAD:logbook.md) <result>` showing zero removed lines). No
+`src/main` production code changed — `World.formEntity`'s catch-all
+ownership assignment (giving every remaining unowned space to a single
+default player so scenarios don't need to enumerate the whole board) used
+to always pick `shareholders.get(1)`, i.e. one of the *entity's own*
+shareholders, who then legitimately builds across everything it was
+handed, draining cash before the entity's own fundability check — same
+"a shareholder can now spend money elsewhere" theme as the earlier
+`distressed-sale-2`/`entity-m1` fixes, just in the shared fixture helper
+rather than individual scenario data. Now picks the first player who
+isn't one of the entity's shareholders. Reviewing under refactorer rules
+before handing back.
+
+## 2026-08-17T12:06:33Z — refactorer review: `turn-development` (further fixture correction)
+
+Real progress: full acceptance went from 20 failures to **8** — confirmed
+via a fresh run on this exact commit. Spot-checked a sample rather than
+assuming uniform root cause, since `World.java` is test-support code
+outside this role's CRAP/mutation/DRY tooling scope (consistent with
+every prior cycle) and there's nothing to structurally clean up here
+regardless: the 8 remaining failures are NOT all one thing.
+`EnRulesGreedoShareSaleAcceptanceTest`'s two failures look like the same
+"stale value now that building is routine" class already fixed twice
+this task (e.g. `dog`'s final balance expected 440, got 40 — consistent
+with an unplanned house purchase). `EnRulesGreedoLegalEntityAcceptanceTest`'s
+three failures are a different shape entirely: `entity-6` and similar
+scenarios reference `pawn "racecar"` as the catch-all owner directly in
+their `Then`/`And` steps ("every other ownable space is owned by pawn
+racecar") but never register that pawn via a `"will roll N for
+initiative"` step the way the scenarios that already pass do — these use
+`Given Pink Realty is formed` as a direct setup shortcut that never
+introduces a 4th player at all, so `World.pawn("racecar")` throws
+"No pawn racecar is at play." That's Gherkin scenario content (or
+conceivably a step-handler robustness question — should "owned by pawn
+X" auto-register X the way some other steps auto-create players?), not
+something a structural refactor should decide or a refactorer should
+edit directly (this project's own precedent: architects don't hand-edit
+Gherkin scenario content, they route it to the specifier). Not
+investigated further; not fixed.
+
+Verification: `mvn test` — domain green (no production file touched this
+cycle, so nothing else to re-verify). Full acceptance: 781 scenarios, 8
+failures, confirmed fresh.
+
+## 2026-08-17T12:06:33Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: 1bf4fa2d6e
+```
+
+Priority 50, matching the normal pipeline flow this task has followed
+throughout (the specifier engaging directly, not an architect review
+loop). Genuine progress to report: 20 failures down to 8 via a shared
+test-fixture fix (`World.formEntity`'s catch-all ownership no longer
+lands on a shareholder). No production code changed this cycle, so
+nothing for this role to structurally clean up. The 8 remaining failures
+split into at least two different root causes on inspection (a handful
+of likely-stale expected values in `greedo-share-sale.feature`, plus a
+`pawn "racecar"` registration gap specific to `Given X is formed`-style
+setup shortcuts in `greedo-legal-entity.feature` that never introduce a
+4th player) — flagging the split rather than treating it as one
+remaining mechanism, since the second kind may need specifier attention
+for the Gherkin content itself. Domain 398/398 green.
+2026-08-17T12:45:00Z coder: processed specifier handoff 20260817T123946Z_000198 (0a8d76bbc9), merging the dormant legal-entity fixture correction that declares racecar as a player for entity-6/entity-8. No production change.
+
+## 2026-08-17T12:44:47Z — accepted refactorer turn-development handoff
+
+Merged refactorer commit `98fbfcf45b`. The shared fixture correction reduces
+the full acceptance result from 20 failures to 8. The remaining failures are
+split between likely stale share-sale expectations and legal-entity scenarios
+that reference `racecar` without registering a fourth player; routed as
+specifier/coder policy and scenario-content work, not structural refactoring.
