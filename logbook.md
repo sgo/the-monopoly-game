@@ -36408,4 +36408,15 @@ formation failures. `GameTest` passes 60/60, but differential mutation of
 sites), so the behavioral test surface is insufficient for this policy.
 Routed back to coder at priority 00; no phase-complete handoff sent.
 2026-08-17T09:30:00Z coder: processed architect handoff 20260817T071129Z_000298 (6ee3de205d). Architect confirms the legal-entity policy remains unresolved: current two-player extension satisfies the new scenario but full acceptance and mutation coverage remain materially red. No further code change made pending policy direction.
+
+## 2026-08-17T11:19:37Z — coder policy fix still has unresolved acceptance failures
+
+Merged coder commit `0138fb99ae`. Removing ordinary building from the
+global quiet-round marker is a coherent implementation of the chosen policy
+for unrelated development, and the new entity regression scenario passes.
+However, full acceptance remains 25 failures out of 781, concentrated in
+legacy legal-entity formation/building/report scenarios. Differential
+mutation of `Game` still reports 22 survivors out of 48 changed mutations
+and 8 uncovered sites. Escalated the remaining policy/test-surface conflict
+to the specifier; no phase-complete handoff sent.
 2026-08-17T11:30:00Z coder: processed specifier handoff 20260817T111531Z_000194 (e51cc580d1), resolving logbook merge. New scenario scopes market-deadlock consolidation to the eligible split rather than unrelated board development. Removed global round consolidation marking from ordinary house development; existing legal-entity acceptance still exposes 13 failures, so this remains under architect review.
