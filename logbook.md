@@ -36117,6 +36117,110 @@ decision on how to proceed rather than a specifier judgment call.
 2026-08-16T22:15:00Z coder: processed specifier handoff 20260816T200417Z_000192 for turn-development (670b1330f5). Fixed development gating so a non-initiative player develops on their own turn while preserving legal-entity mode behavior. Turn-development acceptance and Greedo legal-entity acceptance pass.
 2026-08-16T22:20:00Z coder: processed architect handoff 20260816T202212Z_000294 (d390a5dc60). Architect review confirms the turn-development diagnosis and records it as a game-wide behavior; current implementation retains the focused specifier fix and its targeted tests pass.
 
+## 2026-08-17T06:49:35Z — refactorer received coder handoff `turn-development` (legal-entity follow-up)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 323fd2cae3
+```
+
+Action: merged commit `323fd2cae3` as `8bd368b`, resolving a
+single-insertion-point `logbook.md` conflict the same way as the prior
+sign-off cycle (both sides purely additive at the shared `ee53c68d73`
+base's tail; spliced this role's own unique tail in before the incoming
+chain's "accepted turn-development follow-up" entry, which explicitly
+acknowledges merging `ee53c68d73`). This closes the gap the last two
+cycles deliberately left open: `Game.mayDevelopThisTurn` dropped the
+`!legalEntityTrading || player.id().equals(builder.id())` half of its
+condition entirely, so it's now just `isPlayerStillSolvent(player)` —
+every solvent player develops on their own turn regardless of
+legal-entity trading. Reviewing under refactorer rules before handing
+back.
+
+## 2026-08-17T06:49:35Z — refactorer review: `turn-development` (legal-entity follow-up)
+
+`mayDevelopThisTurn(player, builder)` now ignores its `builder` parameter
+entirely, and tracing the call chain up (`playTurn` → `turnEndsTheGame` →
+`playTurns` → `play`) found `builder` was dead-threaded through all five
+methods with no remaining use anywhere (confirmed exhaustively via `grep
+-n "\bbuilder\b"`). Removed it end to end and collapsed the now-trivial
+`mayDevelopThisTurn` wrapper into a direct `isPlayerStillSolvent(player)`
+call at the one call site in `playTurn`. `Game.java` mutation-site count
+dropped from 100 to 97; CRAP unaffected (both methods were already
+clean, and removing a same-cost pass-through parameter doesn't change
+cyclomatic complexity). `dry4java` found nothing new beyond the
+pre-existing constructor-overload match already on record.
+
+Full acceptance run: 780 scenarios (779 + `turn-development-2`, the new
+legal-entity-mode case), **25 failures**, not a regression I'm
+introducing or a set of stale test values to realign — confirmed present
+at the raw merged commit before any refactorer edit (`git stash` test),
+and the coder's own logbook entry above already names this as a known,
+unresolved consequence ("25 legacy legal-entity/report failures"). Traced
+the actual mechanism precisely, since "encode the prior initiative-
+winner-only behavior" undersells what's happening — these aren't stale
+numbers, several assert a legal entity failed to form at all ("the
+<group> colour group is owned by <entity_name>", "is auto-formed into
+<entity_name>": expected true, got false). Root cause:
+`developAndTrackConsolidation` now runs for every solvent player every
+turn (not just the old single "builder"), and its last line —
+`if (totalDevelopments() > housesBefore) roundHadConsolidatingAction =
+true;` — means *any* player's ordinary house-building anywhere on the
+board now marks the whole round as non-quiet. `completeRound` feeds
+`!roundHadConsolidatingAction` into
+`resolveMarketDeadlockAtRoundBoundary` as `quietRound`, and
+`canFormAtMarketDeadlock` requires `quietRound && collectiveFunding &&
+legalEntityTrading && allOwnableSpacesOwned()` before it will even look
+for a formable entity — so routine per-player building, now happening
+far more often by design, suppresses the exact "nothing else is
+happening" signal the automatic legal-entity-formation-at-market-
+deadlock mechanism depends on. This is a genuine design tension between
+two features this task's own fix creates, not stale expectations to
+realign the way `distressed-sale-2` was last cycle: deciding how a
+"quiet round" should be redefined now that building isn't reserved for
+one designated player is a specifier/coder-level policy call, not
+something a structural cleanup should decide unilaterally. Not fixed
+here; the coder's own commit already flags it as open.
+
+Verification: `mvn test` from the repo root — all modules green except
+the pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` flake
+(domain-only changes, so this doesn't touch the 25 acceptance failures).
+Full acceptance pipeline: 780 scenarios, 25 failures, confirmed identical
+before and after this role's dead-parameter cleanup (the cleanup is a
+pure refactor of already-dead code, uninvolved in the mechanism above).
+
+## 2026-08-17T06:49:35Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: 8d3e37f324
+```
+
+Priority 50, matching the normal specifier→coder→refactorer→architect
+pipeline flow. **This is not a green handoff** — full acceptance is
+780 scenarios, 25 failing, and I am not fixing them: they trace to one
+real design tension the coder's legal-entity fix creates (see the review
+entry above for the exact mechanism), not stale values or something
+safely realignable without a policy call. Flagging plainly rather than
+either silently sitting on the handoff or quietly rewriting 25
+scenarios' expectations to paper over what might still be an open
+question about correct behavior. Own contribution this cycle: removed
+`Player builder`, now fully dead, threaded through five methods
+(`play`/`playTurns`/`turnEndsTheGame`/`playTurn`/`mayDevelopThisTurn`);
+collapsed the now-trivial `mayDevelopThisTurn` wrapper. Domain 398/398,
+full reactor green apart from the known pre-existing CLI flake.
+Recommend routing back to the specifier for a decision on how market-
+deadlock's "quiet round" signal should account for now-routine per-player
+building before this task is considered closed.
+
 ## 2026-08-17T06:59:51Z — architect review finds legal-entity development behavior change
 
 Merged refactorer commit `8d3e37f324`. Removing the stale `builder`
@@ -36280,3 +36384,4 @@ entity mode still has the old builder-only development restriction,
 un-touched by this task — a real, separate follow-up if per-player
 development under legal-entity trading turns out to matter too.
 2026-08-17T08:55:00Z coder: processed specifier handoff 20260817T064754Z_000193 (3d63e62b79). Extended development to non-initiative players under legal-entity trading per updated feature. New turn-development scenarios pass; full acceptance currently reports 25 legacy legal-entity/report failures because those suites encode the prior initiative-winner-only behavior.
+2026-08-17T09:05:00Z coder: processed architect handoff 20260817T070010Z_000296 (17eb7f3442). Architect review records turn-development closed with full acceptance green and mutation coverage complete; current HEAD includes the reviewed Game implementation and distressed-sale expectation correction.
