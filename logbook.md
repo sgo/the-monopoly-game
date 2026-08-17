@@ -36706,3 +36706,8 @@ the full acceptance result from 20 failures to 8. The remaining failures are
 split between likely stale share-sale expectations and legal-entity scenarios
 that reference `racecar` without registering a fourth player; routed as
 specifier/coder policy and scenario-content work, not structural refactoring.
+
+Verification correction: a fresh full acceptance run on the merged tip is
+781 scenarios with 6 failures. The two `racecar` setup cases now pass; the
+remaining failures are one legal-entity rent assertion, two share-sale
+assertions, and three downstream formation/reporting assertions.
