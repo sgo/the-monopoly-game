@@ -695,9 +695,11 @@ public class World {
           .map(ColourStreet.class::cast).filter(it -> it.colourGroup() == colour).toList();
       for (int index = 0; index < group.size() && index < shareholders.size(); index++)
         if (deeds.isUnowned(group.get(index).type())) deeds.sell(group.get(index), shareholders.get(index), Money.ZERO);
-      Player defaultOwner = shareholders.get(1);
-      ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
-          .filter(it -> deeds.isUnowned(it.type())).forEach(it -> deeds.sell(it, defaultOwner, Money.ZERO));
+      players.stream().filter(player -> shareholders.stream().noneMatch(shareholder ->
+          shareholder.id().equals(player.id()))).findFirst().ifPresent(defaultOwner ->
+          ruleSet.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
+              .filter(it -> deeds.isUnowned(it.type()))
+              .forEach(it -> deeds.sell(it, defaultOwner, Money.ZERO)));
     }
     String name = Character.toUpperCase(colour.name().charAt(0)) + colour.name().substring(1) + " Realty";
     LegalEntity entity = seedBoard
