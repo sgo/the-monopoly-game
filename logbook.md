@@ -36500,3 +36500,55 @@ to: architect
 priority: 00
 message: Stale claim: your own worktree tip is 20/781 not 25. See logbook 7fad235
 ```
+
+## 2026-08-17T12:05:13Z — specifier finds the systemic root cause of the remaining 8 legal-entity failures
+
+User relayed that the architect still sees a policy decision pending.
+Checked the architect's own worktree (now `41e991d`) for a new note —
+none queued, and that commit only confirmed the stale-count correction.
+So instead of waiting, went and actually root-caused the remaining 8
+`greedo-legal-entity.feature` failures (entity build/loan scenarios) I'd
+left open last cycle, in a fresh throwaway worktree, read-only, not
+merged.
+
+Traced `entity-16` ("the entity builds as many houses as it can afford at
+the end of the turn") by temporarily printing the game report inline.
+`Given Pink Realty is formed` doesn't just form the entity — it delegates
+to a shared test helper, `World.formEntity`, which auto-assigns every
+still-unowned space on the board to `shareholders.get(1)` (the entity's
+*second* shareholder — `high hat`, in every scenario using this helper)
+as a hardcoded "default owner," so the fixture-only concern of "the board
+must be fully owned" is satisfied. This is the exact same shape of bug I
+fixed for `entity-m1`/`m6`/`m9` last cycle — a shareholder holding
+"everything else" now legitimately spends its own cash developing those
+other monopolies before the scenario's own assertions run — except this
+time it's baked into one shared Java helper used by **10 scenarios** in
+`greedo-legal-entity.feature` alone (plus several in
+`greedo-share-sale.feature`, which reuses the same "X Realty is formed"
+step), not individual Gherkin arrangement lines I can edit directly. Only
+8 of those 10 currently fail — the other 2 apparently don't give the
+default owner enough of an affordable, complete, unrelated monopoly to
+matter in their specific setups — so this isn't hypothetical, it's the
+confirmed, reproducible mechanism behind at least the 8 legal-entity
+failures, and plausibly some of the 3 share-sale and all 6 downstream
+journal/report/logging failures (the same events, different rendering
+surfaces).
+
+This is genuinely test-support Java code (`World.java`'s `formEntity`),
+not Gherkin — outside what I write directly, per role rules. Reporting
+the confirmed mechanism and a concrete fix direction rather than the
+code itself: `formEntity`'s default-owner assignment shouldn't default to
+a shareholder when a non-shareholder player is available (mirroring the
+`entity-m1`/`m6`/`m9`/`m11` fix already established); for scenarios that
+only ever have exactly 3 players and therefore have no non-shareholder to
+fall back to, the helper needs some other guard — e.g. not handing the
+default owner complete, independently-developable monopolies at all,
+since satisfying "board fully owned" never actually required that.
+
+No new *behavior* policy question here — the design (every solvent
+player may develop on their own turn; that's correct) doesn't need
+revisiting again. This is a test-infrastructure fix, and I'm handing it
+to the coder as such rather than writing it myself.
+
+(No commit accompanies this — nothing of mine changed; this is a
+diagnosis to route, same shape as the last note.)
