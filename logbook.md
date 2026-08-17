@@ -36117,6 +36117,20 @@ decision on how to proceed rather than a specifier judgment call.
 2026-08-16T22:15:00Z coder: processed specifier handoff 20260816T200417Z_000192 for turn-development (670b1330f5). Fixed development gating so a non-initiative player develops on their own turn while preserving legal-entity mode behavior. Turn-development acceptance and Greedo legal-entity acceptance pass.
 2026-08-16T22:20:00Z coder: processed architect handoff 20260816T202212Z_000294 (d390a5dc60). Architect review confirms the turn-development diagnosis and records it as a game-wide behavior; current implementation retains the focused specifier fix and its targeted tests pass.
 
+## 2026-08-17T06:59:51Z — architect review finds legal-entity development behavior change
+
+Merged refactorer commit `8d3e37f324`. Removing the stale `builder`
+parameter is structurally sound, but the resulting predicate also removes
+the legal-entity-mode restriction: every solvent player now develops on
+their own turn regardless of that mode. This is observable domain behavior,
+so it remains coder-owned and was routed to coder at priority 00.
+
+Verification: `GameTest` passes (60/60); differential mutation for `Game`
+reports 97 sites with zero differential sites; `turn-development.feature`
+soft acceptance mutation passes 6/6 killed with no survivors or errors. DRY
+reports only the established journalling, constructor, and CLI branch
+duplicates. The generated feature manifest was restored.
+
 ## 2026-08-16T20:24:10Z — refactorer received coder handoff `turn-development` (architect sign-off)
 
 Handoff message received:
