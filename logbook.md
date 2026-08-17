@@ -36698,3 +36698,63 @@ setup shortcuts in `greedo-legal-entity.feature` that never introduce a
 remaining mechanism, since the second kind may need specifier attention
 for the Gherkin content itself. Domain 398/398 green.
 2026-08-17T12:45:00Z coder: processed specifier handoff 20260817T123946Z_000198 (0a8d76bbc9), merging the dormant legal-entity fixture correction that declares racecar as a player for entity-6/entity-8. No production change.
+
+## 2026-08-17T12:40:06Z — refactorer received coder handoff `turn-development` (racecar player fixture)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder d65c1fd1d3
+```
+
+Action: merged commit `d65c1fd1d3` as `98fbfcf`, resolving a four-point
+`logbook.md` conflict (worked out each hunk's base-line anchor precisely
+via `diff` rather than assuming contiguity, same discipline as last
+cycle; verified afterward with zero removed lines against both parents).
+Specifier fix, confirming the exact gap this role flagged last cycle:
+`entity-6`/`entity-8` referenced `pawn "racecar"` in their assertions but
+never declared it as a player (they use `Given Pink Realty is formed` as
+a setup shortcut that skips the normal player-selection step). Fixed by
+adding `Given we select 4 players` before `Pink Realty is formed` in
+both scenarios. Reviewing under refactorer rules before handing back.
+
+## 2026-08-17T12:40:06Z — refactorer review: `turn-development` (racecar player fixture)
+
+Pure Gherkin scenario content, no `src/main` production code touched —
+outside this role's CRAP/mutation/DRY scope, and correctly so (this was
+the Gherkin-content gap this role deliberately declined to edit itself
+last cycle, being specifier territory). Full acceptance: **8 failures
+down to 6**, confirmed fresh — `EnRulesGreedoLegalEntityAcceptanceTest`
+dropped from 3 to 1 (both `racecar` scenarios now pass), leaving one
+failure there this role hasn't inspected in detail. The two
+`EnRulesGreedoShareSaleAcceptanceTest` failures already flagged last
+cycle as likely stale values are unchanged, still open. `Journal`/
+`Logging`/`Report` (1 each) presumably still downstream of the remaining
+legal-entity/share-sale mechanisms.
+
+Verification: `mvn test` — domain green (no production file changed).
+Full acceptance: 781 scenarios, 6 failures, confirmed fresh.
+
+## 2026-08-17T12:40:06Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: 98fbfcf45b
+```
+
+Priority 50, matching the normal pipeline flow. Continued, real progress:
+8 failures down to 6, via a specifier-owned Gherkin fixture correction
+for the exact `pawn "racecar"` registration gap this role flagged last
+cycle rather than editing itself. No production code changed, nothing
+for this role to structurally clean up this cycle. 6 failures remain,
+split across `EnRulesGreedoLegalEntityAcceptanceTest` (1, not yet
+inspected), `EnRulesGreedoShareSaleAcceptanceTest` (2, likely stale
+values per last cycle's flag), and `Journal`/`Logging`/`Report` (1 each,
+presumably downstream). Domain 398/398 green.
