@@ -823,3 +823,259 @@ didn't already call for.
   its own cash. See `turn-development.feature` and the corrected
   fixtures across `greedo-legal-entity.feature`, `journal.feature`,
   `report.feature`, `logging.feature`, and `greedo-share-sale.feature`.
+- **`development-loans`** (specified, pending implementation) — motivated by
+  wanting the asset-rich billionaire above to win over a *longer*, richer
+  game rather than making it artificially harder to win: lets cash-short
+  opponents borrow to develop instead of just stalling out, without letting
+  the bank conjure money from nothing. Adds two opt-in flags:
+  `--optional-development-loans` (a player or legal entity short on cash for
+  a development may borrow from the bank instead of simply being unable to
+  build) and `--optional-development-loans-full-draw` (only meaningful when
+  the first is on; changes the amount borrowed, see below). Off by default;
+  existing behavior is unchanged either way.
+  - **Collateral and sizing.** The loan is secured only by the street and
+    houses/hotel it finances — nothing else the borrower owns is at risk.
+    The bank lends at most 80% of the construction cost being financed (an
+    80% loan-to-value cap, no exceptions). By default it lends only the
+    shortfall between the borrower's cash and the development's cost; with
+    `--optional-development-loans-full-draw`, it always lends the full 80%
+    cap regardless of the actual shortfall. If the shortfall itself exceeds
+    the 80% cap, no loan is raised and the development still cannot happen
+    — borrowing to the cap wouldn't be enough either way.
+  - **Funding (no money-printing).** The bank does not create this money out
+    of nothing: every development loan is funded, dollar for dollar, by
+    another player or legal entity buying a matching bank bond, issued
+    reactively (one bond per loan, sized to it, at the moment the loan is
+    raised — no standing bank reserve). The bond pays its buyer 3% annual
+    yield versus the borrower's 5%, amortizing on the same schedule as the
+    loan (the bank keeps the 2-point spread). Without a buyer able to fund
+    it, no loan is raised and the development doesn't happen, flag or no
+    flag.
+  - **Repayment.** Amortized over 20 years at 5% annual interest: equal
+    annual principal instalments, plus interest on the balance still
+    outstanding that year (so the payment shrinks over time as the balance
+    does). If a borrower can't cover an annual payment in cash, they try to
+    raise it the same way they already would for any other debt (mortgage a
+    spare property, sell to a peer, etc. — the existing distressed-sale
+    cascade) before the loan is treated as defaulted.
+  - **Default.** If nothing can be raised, the bank forecloses — but only on
+    the street and improvements that secured that specific loan. Nothing
+    else the borrower owns is touched, and a foreclosure does not by itself
+    bankrupt the borrower. Foreclosure liquidates the whole collateral
+    package the same way any other forced sale already works in this game:
+    houses/hotel sold back to the bank at half price, then the bare land
+    auctioned to another player (mirroring `bankruptcy-2`'s existing
+    debt-to-the-bank pattern). Once the outstanding balance is covered, any
+    surplus goes back to the borrower, the same way a real-world foreclosure
+    sale works.
+  - **Eligibility.** Both individual players and legal entities can borrow;
+    an entity's bank development loan is a distinct mechanism from its
+    existing internal shareholder "build loan" (`Pink Realty raises a loan
+    of $X`, 5% interest, blocks dividends until repaid) — the two use
+    deliberately different vocabulary (`raises a development loan of $X
+    secured by "<street>"`) to avoid confusion between an entity borrowing
+    from its own shareholders versus borrowing from the bank. Three
+    behaviors differ from the individual-player case, deliberately: (1) the
+    existing "no dividend while a shareholder loan is outstanding" rule
+    extends to cover an outstanding bank development loan too, so the
+    entity can't distribute cash while still servicing 20-year bank debt;
+    (2) an entity's missed-payment fallback is "mortgage another street in
+    the same group that isn't this loan's collateral," not the build-loan
+    shareholder-commitment mechanism, which stays scoped to funding new
+    development only; (3) foreclosure on one of an entity's streets needs
+    no special-case handling — the entity keeps existing and collecting
+    rent on what's left, just loses build rights on that colour group until
+    (if ever) it owns the complete set again, same as any other partial
+    owner, with no interaction with the existing "last shareholder
+    liquidates the entity" mechanic (that's keyed off shareholder count,
+    not property count).
+  - **Observability.** Four events had no journal/report/logging coverage
+    at all: a loan being raised, its annual interest/principal payment, it
+    being fully repaid, and a default/foreclosure. Each is specified for
+    both an individual player and a legal entity (so a batch-run analysis
+    can tell which kind of borrower is involved straight from the log,
+    same as every other event in the game), following the project's
+    existing pattern of one identically-worded scenario per event across
+    `journal.feature` (`"the game journal records that ..."`),
+    `report.feature` (`"the game report says that ..."`), and
+    `logging.feature` (`"the game log records that ..."`) —
+    `journal-71`/`report-71`/`logging-71` through `-78`. The missed-payment
+    mortgage fallback and the mechanical steps of a foreclosure (house sold
+    at half price, land auctioned) reuse the mortgage/sale/auction
+    narration that already exists for other debts; only the loan-specific
+    events above needed new coverage.
+  - **Overfitting audit.** Every individual-player scenario had the same
+    borrower (`dog`, who never wins initiative) and every scenario in both
+    files used the same single collateral street — exactly the shape of
+    two bugs this project has already hit once (`turn-development`,
+    logged above; a similar dividend/initiative-order bug from an earlier
+    session). `development-loans-12` proves the loan mechanism works for
+    the initiative *winner* too (`high hat` borrows against `Meir
+    Antwerpen`/`Nieuwstraat Brussel`, `dog` is the bondholder); `entity-48`
+    proves it isn't tied to `Rue de Diekirch Arlon` specifically
+    (`Bruul Mechelen` instead). A second issue found in the same pass is
+    structural, not fixable by choosing different example numbers: because
+    the interest rate (5%) equals 1/20 (the loan's own term), first-year
+    interest and first-year principal payment are mathematically identical
+    for *any* principal — `development-loans-6`/`entity-44` and their
+    journal/report/logging twins can't actually distinguish a coder
+    swapping "pays $X interest" for "pays $Y principal" from a correct
+    implementation. Fixing that needs a design decision (how to express a
+    loan partway through its term, since `"owes the bank $X"` only
+    captures the current balance) — resolved by extending that same Given
+    with an optional trailing clause, `"... secured by "<street>", N years
+    into its 20-year term"`, defaulting to the start of the term when
+    omitted (so every existing scenario is unaffected). `development-
+    loans-13`/`entity-49` use it to arrange a loan one year in (original
+    principal $400, chosen so both 5% and the fixed $20/year principal
+    payment stay whole dollars for the entire 20-year schedule, not just
+    year one) and assert the second payment: $19 interest vs. $20
+    principal — genuinely different numbers, so a coder swapping which
+    variable holds which value would now fail. No new journal/report/
+    logging scenarios were needed for this: `journal-73`/`74` already
+    prove the narration format is correct for whatever numbers the domain
+    produces; `development-loans-13`/`entity-49` are what prove the domain
+    produces the *right* numbers. Those are separate concerns and the
+    existing narration coverage doesn't need duplicating just because the
+    domain-level example changed.
+  - **Decimal money, game-wide.** This feature is what forced the
+    decision: `Money` gains 2-decimal-place (cent) precision everywhere in
+    the game, not just here, since 5%/3% rarely divide evenly. Display
+    hides trailing zero cents ($140.00 shows as $140), and any calculation
+    landing on a fractional cent resolves via banker's rounding (round
+    half to even). Because of the display rule, none of the ~60
+    already-written scenarios needed to change — every existing example is
+    a whole-dollar amount, so it renders identically whether `Money` is
+    integer or decimal internally. Only `development-loans-13`/`entity-49`
+    were revised, from principal $400 to **$400.10**: $400.10 ÷ 20 is
+    exactly 2000.5 cents, a genuine half-cent tie that banker's rounding
+    resolves to $20.00 (the even cent) rather than the $20.01 ordinary
+    rounding would give; the resulting $380.10 remaining balance produces
+    a second exact tie (1900.5 cents) for year two's interest, again
+    resolving to $19.00. Same final numbers as before, but now only
+    reachable by correctly implementing banker's rounding at two separate
+    ties, not just clean division.
+  - **Bank ledger and capital recycling on default**, superseding the
+    "bondholder cashed out at par + one payment's interest" design
+    immediately above. The bond is a claim on the *bank*, not on one
+    specific loan — the bondholder doesn't know or need to know which loan
+    their money backs, trusting the bank to manage that risk, the same way
+    a real depositor doesn't track which specific mortgage their deposit
+    funds. That reframing fixed a real problem with the previous design:
+    paying a defaulted bond's full 20-year remaining value out immediately
+    would make bonds risk-free (undermining why they yield less than the
+    loan) and could easily exceed what a single street's collateral is
+    worth. The new mechanics:
+    - **The bank's own account** — a new tracked ledger, accumulating the
+      2-point spread from every scheduled payment across every loan
+      (`development-loans-14`/`entity-50`). It exists specifically as a
+      loss-absorption buffer: covers the difference when a foreclosure's
+      proceeds fall short of what a defaulted loan's collateral should
+      have recovered (`development-loans-15`, individual only — see below).
+    - **Recovery target, revised.** On default the bank now recovers the
+      *full outstanding loan value* — principal plus the borrower's 5%
+      interest for the missed payment, i.e. what the borrower would have
+      owed to stay current — not just the bondholder's narrower 3%-based
+      claim. `development-loans-11`/`entity-47` were re-derived: the
+      bondholder's cash balance is asserted *unchanged* (no payout), the
+      bank's account absorbs the recovered value ($21/$42), and only the
+      genuine excess reaches the borrower ($34/$33, both smaller than the
+      superseded $34.40/$33.80 since the recovery target grew from the
+      bond's 3% to the loan's 5%). `journal-81`/`82` (and `report`/
+      `logging` twins) rewritten to narrate the bank's recovery instead of
+      a bondholder payout.
+    - **Recycling.** Once a defaulted loan's value is fully recovered
+      (collateral proceeds, topped up from the bank's account if short),
+      that capital doesn't sit idle or get paid out — it funds the next
+      loan that needs one, the bondholder's investment continuing
+      uninterrupted rather than being cashed out. `development-loans-16`
+      arranges this directly via a new Given (`"the bank holds $X in
+      recycled development-loan capital, no longer securing any loan"`)
+      rather than chaining two full loan lifecycles in one scenario.
+    - **Bond top-up.** When recycled capital only partly covers a new
+      loan's shortfall, a freshly-issued bond covers the rest, the same
+      as an ordinary loan with no recycled capital behind it at all
+      (`development-loans-17`).
+    - **Scoped to individual players for this pass**: `development-loans-
+      15`/`16`/`17` (bank-buffer shortfall coverage, recycled-capital
+      funding, bond top-up) were not mirrored for legal entities, nor
+      given journal/report/logging coverage — unlike everything else in
+      this feature. This is a deliberate, explicit scope cut given how
+      large this feature had already grown, not an oversight; entity
+      mirrors and narration for these three behaviors are the natural next
+      slice if this needs a second pass.
+  - **The bondholder's own side.** Every scenario above proved a loan
+    requires a willing bondholder to exist, but none of them proved the
+    bondholder is actually paid — an easy gap to leave in place, since
+    "no bondholder, no loan" already exercises the bond as a gate. Two
+    more behaviors close it: the bondholder receives their annual payout
+    (3% yield plus the same principal instalment the borrower just paid,
+    the bank keeping only the 2-point spread on interest, never on
+    principal — `development-loans-10`, `entity-46`), and on a default the
+    bondholder is made whole out of the foreclosure proceeds *before* any
+    surplus reaches the borrower, protected by the same 80% loan-to-value
+    cushion that protects the loan itself (`development-loans-11`,
+    `entity-47`, the latter introducing a 5th player, `ship`, as bondholder
+    so the test doesn't conflate "the bondholder" with "the auction
+    winner"). Mirrored into `journal-79` through `82` (and the matching
+    `report`/`logging`) the same way as everything else.
+  - **CLI wiring, game-wide rather than strategy-attached.** Unlike
+    `--optional-greedo-legal-entity`/`--optional-greedo-stalemate-trading`
+    (genuinely strategy-specific: they toggle a *decision an algorithm
+    makes*, which a differently-coded future strategy could answer
+    differently) or `--optional-asset-rich-billionaire` (specific to
+    Billionaire's unique starting-capital substitute), development loans
+    are a *bank rule* — any strategy facing "I want to develop but can't
+    afford it" would use it identically, the same way `--max-years` is a
+    game-wide ending condition tied to no one strategy. `cli-11`/`cli-12`
+    (in `cli.feature`) assert this game-wide, mirroring `journal-51`'s
+    existing `"the game journal records that stalemate trading is
+    <state>"` pattern rather than `cli-6`/`cli-10`'s `"strategy observes
+    X"` framing; `cli-13` proves it explicitly by running a mixed
+    Greedo+Billionaire game and confirming the flag applies the same way
+    regardless. The matching domain-level fact (`journal-83`/`84`, plus
+    `report`/`logging` twins) fills the same gap `journal-51`/`52` already
+    fill for stalemate trading, since `cli-11`/`12` needed it to exist as
+    a real, independently-tested step rather than only appearing at the
+    CLI layer. `cli-jar-8`/`cli-jar-9` (in `cli-packaged-jar.feature`) were
+    already phrased game-wide from the start, so needed no change; `cli-
+    jar-5` still asserts the README usage report names both flags.
+    README's own usage text isn't updated yet — that's implementation-time
+    doc sync, same as every other flag — so `cli-jar-5` will stay red for
+    those two lines until the coder (or a later doc-sync pass) adds them.
+  - Specified in `development-loans.feature` (11 individual-player
+    scenarios: flag on/off baseline, shortfall-vs-full-draw sizing, the 80%
+    cap actually blocking development, no-bondholder-available, first-year
+    interest/principal breakdown, final-payment payoff, mortgage-first-on-
+    missed-payment, default/foreclosure scoped to just the collateralized
+    street, and the two bondholder-side scenarios above) plus `entity-36`
+    through `entity-47` in `greedo-legal-entity.feature` — a deliberate 1:1
+    mirror of every one of those behaviors for a legal-entity borrower (`entity-36`/`41`
+    shortfall-under-cap, `entity-40` flag-off baseline, `entity-41` cap
+    blocks, `entity-42` full-draw, `entity-43` no-bondholder, `entity-44`
+    interest/principal breakdown, `entity-45` final payoff, `entity-38`
+    mortgage-fallback, `entity-39` default/foreclosure), plus `entity-37`
+    for the dividend-block extension that has no individual-player
+    equivalent. Mirrored deliberately rather than relying on "the
+    implementation will obviously share code": this project has already
+    split into separate, diverging branches before when a behavior wasn't
+    spec'd identically for two contexts, so the spec itself is the
+    guardrail against a coder agent implementing the entity path
+    differently from the individual-player path. Deferred for a later
+    pass, once this slice has been through the coder: asserting the
+    bondholder's own cash-flow (interest spread, principal pass-through)
+    directly, rather than only that a loan requires a willing bondholder to
+    exist. Not yet approved/committed as of this writing — still under
+    specifier review.
+  - **Possible gap: no strategy actually prefers buying bonds.** Not yet
+    designed. Development loans only work at all if some player or entity
+    chooses to buy the bond funding one — right now nothing in either
+    strategy's decision logic expresses a preference for doing so.
+    "Billionaire" should plausibly be motivated to prefer buying bonds
+    over buying/developing property, since capital deployment (not
+    day-to-day play) is its whole differentiator. "Greedo" would need a
+    separate, narrower rule — buying a bond only if funds allow, i.e.
+    after its normal purchase/build/reserve priorities are satisfied —
+    but the exact condition (how much spare cash, where it ranks against
+    buying land or building) still needs to be worked out with the user.
+    Flagged 2026-08-18; not yet spec'd.
