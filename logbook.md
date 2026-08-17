@@ -36219,3 +36219,52 @@ the user for the next feature. Worth surfacing when I report back: legal-
 entity mode still has the old builder-only development restriction,
 un-touched by this task — a real, separate follow-up if per-player
 development under legal-entity trading turns out to matter too.
+
+## 2026-08-17T06:47:33Z — specifier extends turn-development to cover legal-entity mode
+
+Raised the follow-up flagged above: is the legal-entity carve-out load-
+bearing (personal development suppressed on purpose to preserve the
+quiet-round detector's existing cadence) or just an unnecessarily narrow
+fix? User's call: not load-bearing, and shouldn't exist — the market-
+deadlock/quiet-round detector is supposed to detect when nobody has a
+consolidating move left to play; suppressing a player's own available
+development specifically to force a false "quiet" round defeats the
+detector's purpose rather than protecting it. Confirmed this doesn't
+require reworking the quiet-round tracking itself:
+`developAndTrackConsolidation` already measures board-wide development
+before/after, not per-player, so once every player may develop, the
+existing tracking sees it correctly with no further change.
+
+Checked for overlap with existing `greedo-legal-entity.feature` coverage
+first: `entity-m7` already proves a non-builder's development blocks
+quiet-round formation, but only via a test-only scripted `pawn "high hat"
+will build a house on "Lippenslaan Knokke"` step — never through the real
+per-turn decision path this task's fix touches. No conflict; this is new
+coverage of the actual mechanism, not a duplicate of an existing
+assertion reached a different way.
+
+Added `turn-development-2` to `turn-development.feature`:
+`turn-development-1` verbatim with `legal-entity trading is enabled for
+the "Greedo" strategy` added. Also updated the feature's own description
+to state this holds regardless of legal-entity trading, and why.
+
+Validated clean with `gherkin-parser`/`gherkin-ir-dry-checker` (one
+low-severity possible-synonym finding, expected given how closely it
+mirrors `turn-development-1` by design). Confirmed red directly: 780
+tests, 1 failure, isolated to `turn-development-2`
+("Expected 1 houses on RueGrandeDinant but found 0") — `turn-
+development-1` still passes, 778 others unaffected.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: 3d63e62b79
+```
+
+Same task name as before — this is a direct continuation/widening of the
+same fix, not a new task, so it carries the same name per the "preserve
+the received task name" convention.
