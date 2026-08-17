@@ -382,9 +382,7 @@ public class Game {
   }
 
   private void developAndTrackConsolidation(Player player, Building building) {
-    int housesBefore = totalDevelopments();
     building.develop(player);
-    if (totalDevelopments() > housesBefore) roundHadConsolidatingAction = true;
   }
 
   private int totalDevelopments() {
