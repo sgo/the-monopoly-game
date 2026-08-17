@@ -100,6 +100,9 @@ Feature: selling legal-entity shares to avoid bankruptcy
   Scenario Outline: the final shareholder may liquidate the legal entity to settle their debt
     Given we select 4 players
     And Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
     And pawn "high hat" and pawn "iron box" have both gone bankrupt
     And pawn "dog" owns no mortgaged property
     And Pink Realty's bank account holds $<entity_balance>

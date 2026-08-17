@@ -36899,3 +36899,4 @@ entry above (possible `Initiative`-vs-already-bankrupt-players
 interaction, unconfirmed) rather than a bare status, since this is close
 enough to done that the next investigator shouldn't have to start from
 scratch. Domain 398/398 green.
+2026-08-17T13:40:00Z coder: processed specifier handoff 20260817T133207Z_000201 (e3241ea91d), merging the user-directed share-sale-6 fixture setup to pre-develop Pink Realty's streets. No production change.
