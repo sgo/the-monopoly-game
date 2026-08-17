@@ -36407,3 +36407,4 @@ formation failures. `GameTest` passes 60/60, but differential mutation of
 `Game` exposes 26 survivors out of 52 changed mutations (plus 6 uncovered
 sites), so the behavioral test surface is insufficient for this policy.
 Routed back to coder at priority 00; no phase-complete handoff sent.
+2026-08-17T09:30:00Z coder: processed architect handoff 20260817T071129Z_000298 (6ee3de205d). Architect confirms the legal-entity policy remains unresolved: current two-player extension satisfies the new scenario but full acceptance and mutation coverage remain materially red. No further code change made pending policy direction.
