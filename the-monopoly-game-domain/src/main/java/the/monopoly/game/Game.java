@@ -248,7 +248,7 @@ public class Game {
     if (deeds.isBankrupt(player)) return false;
     resolveSplitOwnershipAtStart(player, turnOrder, journalling);
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
-    if (isPlayerStillSolvent(player)) developAndTrackConsolidation(player, building);
+    if (mayDevelopThisTurn(player, turnOrder.getFirst())) developAndTrackConsolidation(player, building);
     if (remainingPlayers().size() <= 1) return true;
     if (!Stalemate.reached(rules, players, deeds)) return false;
     if (player.id().equals(turnOrder.getLast().id())) operateLegalEntities(journalling);
@@ -301,6 +301,15 @@ public class Game {
 
   private boolean isPlayerStillSolvent(Player player) {
     return !deeds.isBankrupt(player);
+  }
+
+  private boolean mayDevelopThisTurn(Player player, Player builder) {
+    if (!isPlayerStillSolvent(player)) return false;
+    if (!legalEntityTrading || player.id().equals(builder.id()) || players.size() == 2) return true;
+    return rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
+        .collect(java.util.stream.Collectors.groupingBy(ColourStreet::colourGroup))
+        .values().stream().anyMatch(group -> group.stream().allMatch(street ->
+            deeds.ownerOf(street.type()).filter(player.id()::equals).isPresent()));
   }
 
   private String entityName(Street.Colour colour) {
