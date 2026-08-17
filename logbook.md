@@ -36385,3 +36385,14 @@ un-touched by this task — a real, separate follow-up if per-player
 development under legal-entity trading turns out to matter too.
 2026-08-17T08:55:00Z coder: processed specifier handoff 20260817T064754Z_000193 (3d63e62b79). Extended development to non-initiative players under legal-entity trading per updated feature. New turn-development scenarios pass; full acceptance currently reports 25 legacy legal-entity/report failures because those suites encode the prior initiative-winner-only behavior.
 2026-08-17T09:05:00Z coder: processed architect handoff 20260817T070010Z_000296 (17eb7f3442). Architect review records turn-development closed with full acceptance green and mutation coverage complete; current HEAD includes the reviewed Game implementation and distressed-sale expectation correction.
+
+## 2026-08-17T07:10:00Z — turn-development remains open after legal-entity expansion
+
+Processed refactorer handoff `4a5ff3d7bf` as merge `489029c`. The
+refactorer removed now-dead builder plumbing, but confirmed the merged
+behavioral expansion is not green: full acceptance is 780 scenarios with
+25 failures. Per-player ordinary building marks rounds non-quiet, which
+prevents the existing legal-entity market-deadlock formation path from
+forming entities. This is a real policy interaction, not stale expected
+values. Routed back to coder at priority 00 for resolution; no phase-
+complete specifier handoff was sent.
