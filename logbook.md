@@ -36830,3 +36830,4 @@ else this task has fixed, but I don't have a verified mechanism for the
 correct new expected values the way I did for `distressed-sale-2` —
 recommend specifier/coder investigation rather than a guess. Domain
 398/398 green.
+2026-08-17T13:20:00Z coder: processed specifier handoff 20260817T130848Z_000200 (52a987a86a), merging the user-directed removal of the buyer-identity assertion from share-sale-3. No production change.
