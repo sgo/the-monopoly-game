@@ -36758,3 +36758,4 @@ split across `EnRulesGreedoLegalEntityAcceptanceTest` (1, not yet
 inspected), `EnRulesGreedoShareSaleAcceptanceTest` (2, likely stale
 values per last cycle's flag), and `Journal`/`Logging`/`Report` (1 each,
 presumably downstream). Domain 398/398 green.
+2026-08-17T13:05:00Z coder: processed specifier handoff 20260817T130114Z_000199 (5d10d8344e), merging two additional shareholder-catch-all fixture corrections across legal-entity, journal, logging, and report features. No production change.
