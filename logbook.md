@@ -36609,3 +36609,4 @@ failures are explicitly still under active investigation by the coder
 (their own words: "not yet root-caused") — not something this role is
 withholding or should attempt to resolve unilaterally. Domain 398/398,
 full reactor green apart from the known pre-existing CLI flake.
+2026-08-17T12:20:00Z coder: processed specifier note handoff 20260817T120547Z_000197. Root cause confirmed in shared World.formEntity fixture: catch-all ownership assigned unrelated board spaces to a shareholder, triggering unintended development. Fixture now assigns catch-all ownership only to a non-shareholder when available.
