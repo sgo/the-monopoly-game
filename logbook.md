@@ -36497,3 +36497,115 @@ Routed back to coder at priority 00; no phase-complete handoff sent.
 2026-08-17T09:30:00Z coder: processed architect handoff 20260817T071129Z_000298 (6ee3de205d). Architect confirms the legal-entity policy remains unresolved: current two-player extension satisfies the new scenario but full acceptance and mutation coverage remain materially red. No further code change made pending policy direction.
 2026-08-17T11:30:00Z coder: processed specifier handoff 20260817T111531Z_000194 (e51cc580d1), resolving logbook merge. New scenario scopes market-deadlock consolidation to the eligible split rather than unrelated board development. Removed global round consolidation marking from ordinary house development; existing legal-entity acceptance still exposes 13 failures, so this remains under architect review.
 2026-08-17T11:45:00Z coder: processed specifier handoff 20260817T113656Z_000195 (405b911cb7), merging corrected legal-entity fixtures so catch-all ownership does not land on a shareholder. No production change in this handoff.
+
+## 2026-08-17T11:37:16Z — refactorer received coder handoff `turn-development` (specifier-resolved market-deadlock scoping)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 48cd0fdae1
+```
+
+Action: merged commit `48cd0fdae1` as `0eb0071`, resolving a single-
+insertion-point `logbook.md` conflict the same way as prior cycles (both
+sides purely additive over the shared `4a5ff3d7bf` base; spliced this
+role's own unique tail in before the incoming chain's entry that
+explicitly acknowledges merging `4a5ff3d7bf`). The specifier engaged
+directly with the design tension this role flagged two cycles ago
+(market-deadlock's `quietRound` signal being starved by now-routine
+per-player development) and resolved it: `developAndTrackConsolidation`
+no longer marks `roundHadConsolidatingAction` from board-wide
+`totalDevelopments()` deltas — per `e51cc58`'s reasoning, individual
+development can never target a still-split group (`Building.develop`
+requires full group ownership, which nobody in a split has by
+definition), so board-wide "did anyone build" was only ever a proxy for
+"is the market still moving," and that proxy stopped working once
+building became routine for every player. Trade/buyout/bankruptcy remain
+real per-split signals and are untouched. A follow-up fixture fix
+(`405b911`) reassigned "every other ownable space" from a shareholder to
+a non-shareholder player in three `entity-m1`/`entity-m6`/`entity-m9`
+scenarios that had assumed, under the old bug, that only the initiative
+winner could ever spend money — dropping failures from 25 to 20. Both
+fixes are evidence-based (checked out the coder's unmerged branch
+read-only and reproduced/confirmed the exact failure before writing each
+commit message), not guessed. Reviewing under refactorer rules before
+handing back.
+
+## 2026-08-17T11:37:16Z — refactorer review: `turn-development` (specifier-resolved market-deadlock scoping)
+
+`git diff 4a5ff3d7bf 48cd0fdae1` showed `Game.mayDevelopThisTurn` was
+*reintroduced* with a new legal-entity-specific bypass ("allowed if not
+the round's first player unless the player already owns a complete
+colour group outright") rather than removed — but the fixture-fix
+commit (`405b911`) itself already reported verifying that this bypass
+changes the failure count not at all (25/13 identical with or without
+it) and recommended dropping it in favor of the plain
+`isPlayerStillSolvent(player)` turn-development had already established.
+Verified that claim independently rather than trusting it (same
+discipline the coder used checking out the unmerged branch): reran the
+full suite with the bypass in place (781 scenarios, 20 failures), removed
+it, reran (781/20, identical). Confirmed dead. Removed
+`mayDevelopThisTurn` entirely, restoring `isPlayerStillSolvent(player)`
+directly at the one call site — this also meant `developAndTrackConsolidation`
+no longer did any tracking (that line was the fix's whole point) so its
+name was actively misleading; collapsed it into a direct
+`building.develop(player)` call, and removed `totalDevelopments()`,
+left with no remaining caller by the same change.
+
+Mutation-site scan: `Game.java` had climbed back to 102 (over threshold)
+with the reintroduced `mayDevelopThisTurn`; down to 93 after this
+cleanup. CRAP: `mayDevelopThisTurn` had climbed to 16.5 (CC=5, 22.9%
+coverage — the legal-entity-specific branches were essentially untested,
+consistent with them being dead) before this cleanup; no violations
+beyond the two already-documented exceptions after. `dry4java` found
+nothing new beyond the pre-existing constructor-overload match.
+
+Full acceptance, confirmed identically before and after this role's
+cleanup: **781 scenarios, 20 failures** — `EnRulesGreedoLegalEntityAcceptanceTest`
+(8, entity build/loan scenarios that directly `Given Pink Realty is
+formed` rather than relying on natural market-deadlock formation — a
+different symptom from the 13 fixed), `EnRulesGreedoShareSaleAcceptanceTest`,
+`EnRulesLoggingAcceptanceTest`, `EnRulesJournalAcceptanceTest`,
+`EnRulesReportAcceptanceTest` (the latter three presumably downstream of
+the same 8, not independently root-caused). This is genuinely still open,
+actively-being-investigated work by the coder/specifier/architect chain
+(the coder's own `405b911` commit says so explicitly: "Not yet
+root-caused... I haven't traced the exact mechanism"), not something this
+role is blocking on or should attempt to close — my structural cleanup
+this cycle is scoped to code proven dead by the chain's own verification,
+nothing more.
+
+Verification: `mvn test` — all modules green except the pre-existing CLI
+flake. Full acceptance: 781/20, confirmed via a fresh run on this exact
+commit both before and after this role's edits.
+
+## 2026-08-17T11:37:16Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: a7a1ad4888
+```
+
+Priority 50, matching the normal specifier→coder→refactorer→architect
+pipeline flow (the specifier engaged directly on this task, not via an
+architect priority-00 loop, so this isn't a review-loop return). **Still
+not green — 781 scenarios, 20 failures**, down from 25 via the
+specifier's market-deadlock-scoping design decision and a coder fixture
+fix, both already merged and reviewed structurally sound by this cycle.
+Own contribution: verified and then acted on the coder's own claim that
+the reintroduced `mayDevelopThisTurn` legal-entity bypass has zero effect
+on the failure count (independently confirmed: 781/20 identical with or
+without it), removed it along with the now-dead
+`developAndTrackConsolidation`/`totalDevelopments()`, bringing `Game.java`
+back under both the CRAP and mutation-site thresholds. The remaining 20
+failures are explicitly still under active investigation by the coder
+(their own words: "not yet root-caused") — not something this role is
+withholding or should attempt to resolve unilaterally. Domain 398/398,
+full reactor green apart from the known pre-existing CLI flake.
