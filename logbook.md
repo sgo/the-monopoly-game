@@ -36697,3 +36697,4 @@ setup shortcuts in `greedo-legal-entity.feature` that never introduce a
 4th player) — flagging the split rather than treating it as one
 remaining mechanism, since the second kind may need specifier attention
 for the Gherkin content itself. Domain 398/398 green.
+2026-08-17T12:45:00Z coder: processed specifier handoff 20260817T123946Z_000198 (0a8d76bbc9), merging the dormant legal-entity fixture correction that declares racecar as a player for entity-6/entity-8. No production change.
