@@ -301,7 +301,7 @@ public class Game {
   }
 
   private boolean mayDevelopThisTurn(Player player, Player builder) {
-    return isPlayerStillSolvent(player) && (!legalEntityTrading || player.id().equals(builder.id()));
+    return isPlayerStillSolvent(player);
   }
 
   private boolean isPlayerStillSolvent(Player player) {

@@ -36219,3 +36219,4 @@ the user for the next feature. Worth surfacing when I report back: legal-
 entity mode still has the old builder-only development restriction,
 un-touched by this task — a real, separate follow-up if per-player
 development under legal-entity trading turns out to matter too.
+2026-08-17T08:55:00Z coder: processed specifier handoff 20260817T064754Z_000193 (3d63e62b79). Extended development to non-initiative players under legal-entity trading per updated feature. New turn-development scenarios pass; full acceptance currently reports 25 legacy legal-entity/report failures because those suites encode the prior initiative-winner-only behavior.
