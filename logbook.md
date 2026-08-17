@@ -36378,3 +36378,79 @@ commit: e51cc580d1
 
 Same task name — this is the same open thread the architect's note
 escalated, not a new task.
+
+## 2026-08-17T11:36:27Z — specifier received architect note: still 25/781, mutation survivors
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+Policy still needed: 25/781 acceptance failures; 22 Game mutations survive.
+```
+
+Checked out the coder's actual unmerged branch (`0138fb9`, temporary
+worktree, read-only inspection, nothing merged) instead of continuing to
+reason abstractly. Two findings, one code concern and one confirmed,
+fixed test-fixture issue:
+
+**Code concern, not actioned**: the coder's `mayDevelopThisTurn` didn't
+implement what was specified (drop development from tracking, scope
+trade/buyout/bankruptcy to the split). Instead it kept a legal-entity-
+mode-specific gate with an unrequested "owns a complete colour group"
+bypass condition. Tested directly by temporarily reverting it to plain
+`isPlayerStillSolvent(player)` in the worktree (not committed) — the
+25/13 failure count was identical with or without it, proving that
+bypass isn't the cause of anything and should just be dropped, restoring
+the plain solvency check `turn-development` already established.
+
+**Confirmed and fixed**: temporarily printed the game report inline on
+the failing assertion to see the actual mechanism rather than guess.
+5 of the 13 `greedo-legal-entity.feature` failures (`entity-m1`'s 3 rows,
+`entity-m6`, `entity-m9`) all share one root cause: each gives "every
+other ownable space" to `high hat`, who is also one of the eligible
+split's own three shareholders. Now that development isn't restricted to
+one player, `high hat` legitimately spends its own $1500 across every
+other complete monopoly it owns (confirmed: $850+ spent within the same
+round) before the fundability check for the split runs — genuinely,
+correctly draining the balance it needed to help fund it. Not a design
+flaw; the fixtures assumed, under the old bug, that only the initiative
+winner could ever spend money, guaranteeing everyone else's fundability
+trivially. Same class of correction as `distressed-sale-2` from the
+first `turn-development` cycle — restoring already-decided behavior, not
+new policy. Fixed by reassigning the catch-all ownership to a 4th,
+non-shareholder player (`racecar`), mirroring `entity-m11`'s own already-
+proven-immune pattern. Verified directly: 25 → 20 total failures,
+13 → 8 `greedo-legal-entity.feature` failures, exactly the 5 predicted.
+
+Not yet root-caused: the remaining 8 `greedo-legal-entity.feature`
+failures are a different symptom — entity build/loan scenarios that
+arrange `Given Pink Realty is formed` directly rather than triggering
+market-deadlock naturally — plus the 12 downstream journal/report/
+logging/share-sale failures. Suspect the same "a shareholder can now
+spend elsewhere" theme in a different shape (e.g. losing a shareholder's
+contribution to an entity's build-loan solicitation), but didn't
+confirm the mechanism the way I did above; ran out of productive time
+tracing it through log output that doesn't cleanly correlate to a single
+failing scenario. Handing back with what's confirmed rather than
+continuing to guess.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: 405b911cb7
+```
+
+No further policy question from my side — the design (drop development
+from consolidating-action tracking; per-player development stays
+unconditional, matching what `turn-development` already established) is
+confirmed correct and doesn't need revisiting. What's left is: (1) drop
+the unrequested `mayDevelopThisTurn` bypass entirely, (2) implement the
+actual split-scoped trade/buyout/bankruptcy tracking that was specified
+and never landed, (3) trace the remaining 8 failures, which may turn out
+to be more stale fixtures in the same shape as this batch, or may be
+something new.
