@@ -36907,3 +36907,6 @@ Merged refactorer commit `ffe418e761`. The user-directed share-sale fixture
 correction reduces the verified acceptance result to one remaining failure,
 `share-sale-6`. No production code changed; the final scenario outcome is
 ready for verification.
+
+Final verification on the merged tip: full acceptance is green at 781/781;
+`share-sale-6` now passes. The `turn-development` acceptance work is complete.
