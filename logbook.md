@@ -36415,3 +36415,567 @@ Routed back to coder at priority 00; no phase-complete handoff sent.
 2026-08-17T13:05:00Z coder: processed specifier handoff 20260817T130114Z_000199 (5d10d8344e), merging two additional shareholder-catch-all fixture corrections across legal-entity, journal, logging, and report features. No production change.
 2026-08-17T13:20:00Z coder: processed specifier handoff 20260817T130848Z_000200 (52a987a86a), merging the user-directed removal of the buyer-identity assertion from share-sale-3. No production change.
 2026-08-17T13:40:00Z coder: processed specifier handoff 20260817T133207Z_000201 (e3241ea91d), merging the user-directed share-sale-6 fixture setup to pre-develop Pink Realty's streets. No production change.
+
+## 2026-08-17T06:47:33Z — specifier extends turn-development to cover legal-entity mode
+
+Raised the follow-up flagged above: is the legal-entity carve-out load-
+bearing (personal development suppressed on purpose to preserve the
+quiet-round detector's existing cadence) or just an unnecessarily narrow
+fix? User's call: not load-bearing, and shouldn't exist — the market-
+deadlock/quiet-round detector is supposed to detect when nobody has a
+consolidating move left to play; suppressing a player's own available
+development specifically to force a false "quiet" round defeats the
+detector's purpose rather than protecting it. Confirmed this doesn't
+require reworking the quiet-round tracking itself:
+`developAndTrackConsolidation` already measures board-wide development
+before/after, not per-player, so once every player may develop, the
+existing tracking sees it correctly with no further change.
+
+Checked for overlap with existing `greedo-legal-entity.feature` coverage
+first: `entity-m7` already proves a non-builder's development blocks
+quiet-round formation, but only via a test-only scripted `pawn "high hat"
+will build a house on "Lippenslaan Knokke"` step — never through the real
+per-turn decision path this task's fix touches. No conflict; this is new
+coverage of the actual mechanism, not a duplicate of an existing
+assertion reached a different way.
+
+Added `turn-development-2` to `turn-development.feature`:
+`turn-development-1` verbatim with `legal-entity trading is enabled for
+the "Greedo" strategy` added. Also updated the feature's own description
+to state this holds regardless of legal-entity trading, and why.
+
+Validated clean with `gherkin-parser`/`gherkin-ir-dry-checker` (one
+low-severity possible-synonym finding, expected given how closely it
+mirrors `turn-development-1` by design). Confirmed red directly: 780
+tests, 1 failure, isolated to `turn-development-2`
+("Expected 1 houses on RueGrandeDinant but found 0") — `turn-
+development-1` still passes, 778 others unaffected.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: 3d63e62b79
+```
+
+Same task name as before — this is a direct continuation/widening of the
+same fix, not a new task, so it carries the same name per the "preserve
+the received task name" convention.
+
+## 2026-08-17T07:56:17Z — specifier received architect note: legal-entity policy needed
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+Policy needed: building blocks quiet-round entity formation; 25 failures.
+```
+
+A `note`, no commit — read the full coder/refactorer/architect chain
+directly (`git log`/`git show` on unmerged commits, per workflow rules:
+only inspecting, not merging anything not named in the handoff) to get
+the real mechanism and blast radius before deciding anything:
+
+Removing the legal-entity carve-out entirely (per `turn-development-2`)
+makes `developAndTrackConsolidation` run for every solvent player every
+turn, and its board-wide `roundHadConsolidatingAction = true` check now
+fires far more often — any player's ordinary house-building anywhere
+marks the *whole round* non-quiet, starving
+`resolveMarketDeadlockAtRoundBoundary`'s `quietRound` precondition that
+automatic legal-entity formation depends on. Confirmed by the refactorer
+across two independent fresh runs (not a stale carried-forward claim,
+which the refactorer explicitly caught and corrected on the record after
+the coder/architect chain briefly reported this closed when it wasn't):
+780 scenarios, 25 failures, spanning `EnRulesGreedoLegalEntityAcceptanceTest`,
+`EnRulesGreedoShareSaleAcceptanceTest`, `EnRulesJournalAcceptanceTest`,
+`EnRulesReportAcceptanceTest`, `EnRulesLoggingAcceptanceTest` — several
+assert an entity actually forms and it no longer does, not stale
+narration values. The coder's own attempted narrowing (scoping the
+per-player fix to 2-player legal-entity games only, leaving 3+-player
+split/entity suites on the old builder-only restriction) got it down to
+13 failures but is an arbitrary, unprincipled distinction, not a real
+fix, and still isn't green.
+
+This is a genuine, larger-than-anticipated consequence of the user's own
+design call last cycle, not a bug in how it was implemented — reporting
+it back for a decision on which direction to take, per workflow rules
+("the specifier reviews the finding... and decides whether to accept,
+revise, or decline"). Not merging anything yet; no commit exists that
+represents a decided direction.
+
+## 2026-08-17T11:15:03Z — specifier sends legal-entity market-deadlock scoping fix to coder
+
+Talked the policy through with the user. Their framing: the point of
+inaction detection was always to catch a stalemate *forming*, and the
+mechanism has misfired in both directions before — too early (before the
+board even filled up, long since fixed by the `allOwnableSpacesOwned()`
+gate) and, as of today, effectively never (once building stopped being
+restricted to one player). Their call: don't weaken the signal to dodge
+the regression — scope it to the specific eligible split instead, so an
+unrelated player's own unrelated activity can't block a different split's
+detection.
+
+First pass of my own reasoning wrongly assumed `entity-m7` (a negative
+"does not form" case) was among the 25 failures and needed correcting to
+use a trade instead of a development action. User pushed back — it's
+Greedo-only, nothing billionaire-specific about it, why would it be
+affected. Checked out the coder's actual unmerged branch in a temporary
+worktree (read-only inspection, not merged — nothing here represents
+project state until named in a real handoff) rather than continue
+guessing: `entity-m7` isn't touched at all. Every one of the 13
+`greedo-legal-entity.feature` failures is a positive "the entity forms"
+assertion now false, not a negative one — `entity-m1` already gives one
+shareholder "every other ownable space," and once that shareholder can
+legitimately build on its own unrelated monopolies (no longer restricted
+to the initiative winner), the round looks non-quiet and blocks an
+unrelated split's formation. Widening what counts as activity elsewhere
+only makes "not quiet" easier to satisfy, never harder, so negative-case
+scenarios were never at risk.
+
+Landed on the actual design: individual development can never target a
+still-split group in the first place (`Building.develop` requires full
+group ownership, which nobody has by definition while it's split) — so
+development was only ever a *board-wide* "is the whole market still
+moving" proxy, never a real per-split signal, and that proxy stops
+working now that development is routine for everyone. Trade, buyout, and
+bankruptcy stay real per-split signals since they can meaningfully target
+a specific split's own shareholders. So: drop development from per-split
+detection entirely; keep trade/buyout/bankruptcy but scope them to the
+split under consideration.
+
+Added `entity-m11` to `greedo-legal-entity.feature`: a 4th player, not
+one of the eligible split's three shareholders, builds on its own
+unrelated monopoly during the round; the split should still auto-form.
+No existing scenario needed changing — `entity-m1`/`m6`/`m7`/`m10` already
+specify the correct behavior once detection is properly split-scoped,
+they were just blocked by the board-wide implementation.
+
+Validated clean with `gherkin-parser`/`gherkin-ir-dry-checker` (only the
+file's existing baseline possible-synonym/near-duplicate/placeholder-
+variant noise, no new finding kinds). Confirmed red directly against the
+coder's unmerged branch before sending: 781 tests (780 + entity-m11), 14
+`greedo-legal-entity.feature` failures (13 pre-existing + entity-m11),
+failing with exactly "auto-formed into Pink Realty — expected true, got
+false."
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: e51cc580d1
+```
+
+Same task name — this is the same open thread the architect's note
+escalated, not a new task.
+
+## 2026-08-17T11:36:27Z — specifier received architect note: still 25/781, mutation survivors
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+Policy still needed: 25/781 acceptance failures; 22 Game mutations survive.
+```
+
+Checked out the coder's actual unmerged branch (`0138fb9`, temporary
+worktree, read-only inspection, nothing merged) instead of continuing to
+reason abstractly. Two findings, one code concern and one confirmed,
+fixed test-fixture issue:
+
+**Code concern, not actioned**: the coder's `mayDevelopThisTurn` didn't
+implement what was specified (drop development from tracking, scope
+trade/buyout/bankruptcy to the split). Instead it kept a legal-entity-
+mode-specific gate with an unrequested "owns a complete colour group"
+bypass condition. Tested directly by temporarily reverting it to plain
+`isPlayerStillSolvent(player)` in the worktree (not committed) — the
+25/13 failure count was identical with or without it, proving that
+bypass isn't the cause of anything and should just be dropped, restoring
+the plain solvency check `turn-development` already established.
+
+**Confirmed and fixed**: temporarily printed the game report inline on
+the failing assertion to see the actual mechanism rather than guess.
+5 of the 13 `greedo-legal-entity.feature` failures (`entity-m1`'s 3 rows,
+`entity-m6`, `entity-m9`) all share one root cause: each gives "every
+other ownable space" to `high hat`, who is also one of the eligible
+split's own three shareholders. Now that development isn't restricted to
+one player, `high hat` legitimately spends its own $1500 across every
+other complete monopoly it owns (confirmed: $850+ spent within the same
+round) before the fundability check for the split runs — genuinely,
+correctly draining the balance it needed to help fund it. Not a design
+flaw; the fixtures assumed, under the old bug, that only the initiative
+winner could ever spend money, guaranteeing everyone else's fundability
+trivially. Same class of correction as `distressed-sale-2` from the
+first `turn-development` cycle — restoring already-decided behavior, not
+new policy. Fixed by reassigning the catch-all ownership to a 4th,
+non-shareholder player (`racecar`), mirroring `entity-m11`'s own already-
+proven-immune pattern. Verified directly: 25 → 20 total failures,
+13 → 8 `greedo-legal-entity.feature` failures, exactly the 5 predicted.
+
+Not yet root-caused: the remaining 8 `greedo-legal-entity.feature`
+failures are a different symptom — entity build/loan scenarios that
+arrange `Given Pink Realty is formed` directly rather than triggering
+market-deadlock naturally — plus the 12 downstream journal/report/
+logging/share-sale failures. Suspect the same "a shareholder can now
+spend elsewhere" theme in a different shape (e.g. losing a shareholder's
+contribution to an entity's build-loan solicitation), but didn't
+confirm the mechanism the way I did above; ran out of productive time
+tracing it through log output that doesn't cleanly correlate to a single
+failing scenario. Handing back with what's confirmed rather than
+continuing to guess.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: 405b911cb7
+```
+
+No further policy question from my side — the design (drop development
+from consolidating-action tracking; per-player development stays
+unconditional, matching what `turn-development` already established) is
+confirmed correct and doesn't need revisiting. What's left is: (1) drop
+the unrequested `mayDevelopThisTurn` bypass entirely, (2) implement the
+actual split-scoped trade/buyout/bankruptcy tracking that was specified
+and never landed, (3) trace the remaining 8 failures, which may turn out
+to be more stale fixtures in the same shape as this batch, or may be
+something new.
+
+## 2026-08-17T11:54:21Z — specifier received architect note: stale 25/781 claim corrected
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+Policy blocker persists: 25/781 acceptance failures after fixture corrections.
+```
+
+No commit named (a `note`, same as the last two). Rather than trust the
+figure, ran the acceptance suite fresh directly in the architect's own
+worktree (`.worktrees/architect`, already at their reported tip `d875ea9`,
+read-only — no edits, no merge): **781 scenarios, 20 failures**, not 25.
+Same exact 8 `greedo-legal-entity.feature` failures as my own last
+verification (indices 28/29/30/31/32/40/43/44) — this is the same,
+already-acknowledged open item from my last handoff, not a new
+regression and not a new policy question.
+
+The architect's own `d875ea9` log entry claims "remains 25 failures,"
+contradicting the refactorer's `d4ca52f` entry immediately before it in
+the same chain, which reports 20 and explicitly describes verifying that
+number fresh. This is the same class of stale-claim error the refactorer
+had to catch and correct once already earlier in this task (the
+"closed, full acceptance green" claim that wasn't) — happening again,
+this time one role further down the chain. Not escalating this as a new
+problem to solve, just correcting the record with a fresh, directly-
+verified number before anyone acts on the wrong one.
+
+No policy decision needed from me here — nothing has changed since my
+last handoff (`405b911`). The remaining 8 `greedo-legal-entity.feature`
+failures plus their 12 downstream journal/report/logging/share-sale
+consequences are still exactly what I described as "not yet root-caused"
+last cycle. Sending this correction back rather than a new handoff, since
+there's no new commit of mine to route — the open work is still with the
+coder.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Stale claim: your own worktree tip is 20/781 not 25. See logbook 7fad235
+```
+
+## 2026-08-17T12:05:13Z — specifier finds the systemic root cause of the remaining 8 legal-entity failures
+
+User relayed that the architect still sees a policy decision pending.
+Checked the architect's own worktree (now `41e991d`) for a new note —
+none queued, and that commit only confirmed the stale-count correction.
+So instead of waiting, went and actually root-caused the remaining 8
+`greedo-legal-entity.feature` failures (entity build/loan scenarios) I'd
+left open last cycle, in a fresh throwaway worktree, read-only, not
+merged.
+
+Traced `entity-16` ("the entity builds as many houses as it can afford at
+the end of the turn") by temporarily printing the game report inline.
+`Given Pink Realty is formed` doesn't just form the entity — it delegates
+to a shared test helper, `World.formEntity`, which auto-assigns every
+still-unowned space on the board to `shareholders.get(1)` (the entity's
+*second* shareholder — `high hat`, in every scenario using this helper)
+as a hardcoded "default owner," so the fixture-only concern of "the board
+must be fully owned" is satisfied. This is the exact same shape of bug I
+fixed for `entity-m1`/`m6`/`m9` last cycle — a shareholder holding
+"everything else" now legitimately spends its own cash developing those
+other monopolies before the scenario's own assertions run — except this
+time it's baked into one shared Java helper used by **10 scenarios** in
+`greedo-legal-entity.feature` alone (plus several in
+`greedo-share-sale.feature`, which reuses the same "X Realty is formed"
+step), not individual Gherkin arrangement lines I can edit directly. Only
+8 of those 10 currently fail — the other 2 apparently don't give the
+default owner enough of an affordable, complete, unrelated monopoly to
+matter in their specific setups — so this isn't hypothetical, it's the
+confirmed, reproducible mechanism behind at least the 8 legal-entity
+failures, and plausibly some of the 3 share-sale and all 6 downstream
+journal/report/logging failures (the same events, different rendering
+surfaces).
+
+This is genuinely test-support Java code (`World.java`'s `formEntity`),
+not Gherkin — outside what I write directly, per role rules. Reporting
+the confirmed mechanism and a concrete fix direction rather than the
+code itself: `formEntity`'s default-owner assignment shouldn't default to
+a shareholder when a non-shareholder player is available (mirroring the
+`entity-m1`/`m6`/`m9`/`m11` fix already established); for scenarios that
+only ever have exactly 3 players and therefore have no non-shareholder to
+fall back to, the helper needs some other guard — e.g. not handing the
+default owner complete, independently-developable monopolies at all,
+since satisfying "board fully owned" never actually required that.
+
+No new *behavior* policy question here — the design (every solvent
+player may develop on their own turn; that's correct) doesn't need
+revisiting again. This is a test-infrastructure fix, and I'm handing it
+to the coder as such rather than writing it myself.
+
+(No commit accompanies this — nothing of mine changed; this is a
+diagnosis to route, same shape as the last note.)
+
+Handoff message sent:
+
+```
+type: note
+to: coder
+priority: 50
+message: Root cause found: formEntity test helper, not new policy. See logbook 534253b
+```
+
+## 2026-08-17T12:39:18Z — specifier received architect note: "policy decisions to make," found none — but found and fixed a real dormant bug
+
+User relayed the architect still saw a policy decision pending
+(`00_20260817T123133Z_000302`: "41e991d corrected 25 to 20 total; please
+decide policy for 8 direct root cases"). Checked the architect's own
+worktree tip (now `11fbe24`) rather than answer from memory: the coder
+had already implemented the exact fix direction from my last note
+(`31b21c5`, `formEntity`'s default owner now looks for a non-shareholder
+player first) and the refactorer/architect chain had already merged and
+reviewed it. Ran the suite fresh: 781 scenarios, **8 failures**, down
+from 20 — real, verified progress already in motion before this note
+arrived. No policy question found in any of it.
+
+Kept digging into the 8 rather than stop at "not my problem": 3 of the 8
+remaining `greedo-legal-entity.feature` failures were `entity-6` and
+`entity-8` throwing `"No pawn \"racecar\" is at play"`. Traced via `git
+blame`: both scenarios' `every other ownable space is owned by pawn
+"racecar"` lines date to `98bf5a37`, 2026-08-10 — the same day this
+whole feature file was first written, completely unrelated to anything
+from this week. Neither scenario ever declared a 4th player, so `racecar`
+was never actually registered as a player under the file's 3-player
+Background. This has apparently been a dormant, unexercised bug since
+day one — nothing to do with `turn-development`, just something the
+coder's `formEntity` fix's stricter default-owner lookup happened to
+newly expose by actually trying to resolve `racecar` where it hadn't
+been resolved before. `entity-m1`/`m6`/`m9`/`m11` (my own scenarios) and
+`entity-9`/`entity-10` (pre-existing, using `<player_count>` at 4/8) were
+already fine. Fixed by adding `Given we select 4 players` to both,
+matching `entity-7`'s already-correct pattern right next to them.
+
+Validated clean with `gherkin-parser`/`gherkin-ir-dry-checker` (same
+baseline noise, no new finding kinds). Verified directly against the
+chain's current tip (`11fbe24`) in a throwaway worktree: 8 → 6 total
+failures, legal-entity failures 3 → 1. The one remaining legal-entity
+failure is a different symptom again (a rent-payment assertion — "pawn
+<renter> has paid $<rent> in rent" — expected true, got false), not
+traced yet.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: 0a8d76bbc9
+```
+
+Directly answering the architect's ask: there is no policy decision
+pending from me. The behavior design was settled two rounds ago and
+hasn't needed revisiting since; everything since then — the `formEntity`
+fix, this dormant-bug fix — has been mechanical root-causing and
+test-infrastructure/fixture correction, the same category of work as
+`distressed-sale-2`. 6 failures remain, down from the original 25; still
+open, still being traced, but none of it is a design question.
+
+## 2026-08-17T13:00:42Z — specifier closes greedo-legal-entity.feature: 6 failures -> 2
+
+Kept tracing rather than stop at the report. Found two more instances of
+the exact same shareholder-catch-all collision, in two different shapes:
+
+`journal-63`/`report-63`/`logging-63` (three rendering-surface twins,
+pre-dating this week entirely): identical to `entity-m1`/`m6`/`m9` --
+"every other ownable space is owned by pawn high hat," where high hat is
+also one of the three shareholders. Same fix: 4th non-shareholder player,
+catch-all reassigned to it.
+
+`entity-13` ("rent collected from a tenant is deposited into the
+entity's bank account"): a different shape of the same collision. `we
+select 4 players` auto-assigns `racecar` as the 4th, non-shareholder
+player -- and the coder's `formEntity` fix makes `racecar` the default
+catch-all owner too, since it's the first non-shareholder found. This
+scenario's own test subject -- the rent-paying tenant -- was *also*
+named `racecar`, so the pawn under test and the pawn silently owning
+"everything else" collapsed into the same one. Bumped to 5 players and
+renamed the tenant to `ship` (distinct from `racecar`) to separate the
+two roles.
+
+Verified after each edit in a throwaway worktree against the chain's
+current tip (`a42a57f`), read-only, nothing merged: 6 → 3 → 2.
+`greedo-legal-entity.feature` is now fully green. All four touched files
+validated clean with `gherkin-parser`/`gherkin-ir-dry-checker`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: 5d10d8344e
+```
+
+2 failures remain, both `greedo-share-sale.feature`, both genuinely
+different from everything fixed so far -- not mechanical player/naming
+collisions, but real questions about scenario intent:
+
+**`share-sale-3`** ("a shareholder sells a cheaper personal asset before
+offering their legal-entity share"): expects `pawn "high hat" owns "Rue
+Grande Dinant"` after a distressed sale. Traced via a temporary debug
+print: the buyer is now `racecar` (the new default catch-all owner), not
+`high hat`. Under the old code, `high hat` (the *old* default owner)
+already held the split's other Brown street, so buying this one
+completed its own monopoly and made it bid aggressively — that's why it
+used to win. Now that a non-shareholder holds that other Brown street
+instead, `high hat` has no monopoly-completion incentive left, and
+whoever the new default owner is wins on the same logic instead. The
+scenario's original "high hat wins" outcome was itself a side effect of
+the old bug, not a deliberately chosen policy — its real point (dog
+sells its own asset first, keeps its entity share, avoids bankruptcy) is
+still intact regardless of who buys it.
+
+**`share-sale-6`** ("the final shareholder may liquidate the legal
+entity to settle their debt"): expects `dog`'s final balance at $440;
+gets $40 (dog's unchanged starting balance) instead. Not yet confirmed
+with a debug trace the way the others were, but the mechanism is
+consistent with everything else this cycle: `dog` becomes solvent and
+inherits Pink Realty's undeveloped streets on liquidation, and — now
+that development isn't restricted to one player — very plausibly
+reinvests the liquidated treasury straight into building on them before
+the balance check runs, the same way `distressed-sale-2` needed its
+expectation corrected last cycle.
+
+Not deciding either unilaterally: `share-sale-3` needs someone to decide
+whether the buyer's identity is actually load-bearing to the scenario's
+intent (if not, relax the assertion instead of chasing a specific
+winner); `share-sale-6` needs the reinvestment mechanism confirmed before
+just recomputing the number. Reporting both rather than guessing.
+
+## 2026-08-17T13:08:27Z — specifier resolves share-sale-3 per user decision
+
+User's call: the buyer's identity was never load-bearing. Dropped `Then
+pawn "high hat" owns "Rue Grande Dinant"` from `share-sale-3`; kept the
+`high_hat_balance` arrangement (still needed to guarantee a solvent
+bidder exists so the distressed sale actually happens). The scenario's
+real claim — dog sells its own cheaper asset before touching its entity
+share, keeps the share, avoids bankruptcy — is untouched.
+
+Validated clean with `gherkin-parser`/`gherkin-ir-dry-checker` (one new
+finding kind, `duplicate-in-scenario` — confirmed pre-existing and
+unrelated: a different scenario, `share-sale-11`-ish "bought-out entity
+liquidated" repeating `we play up to 1 round` intentionally, not
+something this edit touched or introduced).
+
+Verified against the chain's current tip in a throwaway worktree: 2 → 1
+failure. Only `share-sale-6` remains.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: 52a987a86a
+```
+
+## 2026-08-17T13:31:41Z — specifier closes turn-development: 781/781, zero failures
+
+Traced `share-sale-6` properly this time (user asked to explain it again;
+went and confirmed with a debug print rather than repeat the untraced
+hypothesis). Exact mechanism, in order: dog liquidates Pink Realty and
+receives $500 (balance $40 − $100 tax + $500 = $440, matching the
+scenario's original expectation at that exact instant); then, now that
+development isn't restricted to the initiative winner, Greedo immediately
+builds 4 houses on the streets dog just inherited, same turn, spending
+exactly $400 back down to the observed $40.
+
+User's call on the fix: rather than recompute `dog_ending` to $40, arrange
+Pink Realty's three streets as already fully developed (hotels) before
+liquidation, so there's nothing left to build. Cleaner than a value
+correction — keeps the scenario's math self-evidently correct (liquidated
+treasury becomes final balance, full stop) instead of coupling it to a
+downstream reinvestment mechanic that has nothing to do with what this
+scenario actually tests.
+
+Validated clean with `gherkin-parser`/`gherkin-ir-dry-checker` (same
+baseline noise as the `share-sale-3` cycle, no new finding kinds).
+Verified against the coder/refactorer/architect chain's current tip in a
+throwaway worktree: **781/781, zero failures.**
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: e3241ea91d
+```
+
+`turn-development` is closed end-to-end. Summary of the whole arc: the
+architect's diagnosis (only the initiative-winning `builder` could ever
+develop, game-wide) → specified per-player development, modeled on the
+`entity-33` precedent → widened to cover legal-entity mode too, per the
+user's call that suppressing a real consolidating action just to force a
+false "quiet" round defeats the market-deadlock detector's own purpose →
+scoped market-deadlock's `roundHadConsolidatingAction` correctly (drop
+board-wide development, since a still-split group can never be
+individually developed anyway) → found and fixed the systemic
+`formEntity` test-helper bug behind it → found and fixed five more
+instances of the same shareholder-catch-all collision across
+`entity-m1`/`m6`/`m9`, `journal-63`/`report-63`/`logging-63`, `entity-6`/
+`entity-8`, and `entity-13` → resolved the two remaining judgment calls
+(`share-sale-3`'s buyer identity, `share-sale-6`'s reinvestment) with the
+user directly. Every fixture correction along the way was verified
+against the coder/refactorer/architect chain's actual current state in a
+throwaway worktree before being reported or committed, not assumed.
+
+## 2026-08-17T22:15:00Z — coder received development-loans handoff
+
+Received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier 761abde835
+```
+
+Merged the specifier's `development-loans` specification commit and began
+implementing the approved behavior slice.

@@ -135,7 +135,7 @@ Feature: Greedo legal entity for a three-way colour-group split
     And pawn "high hat" owns "Bruul Mechelen"
     And pawn "iron box" owns "Place Verte Verviers"
     And every other ownable space is owned by pawn "high hat"
-    And the <group> split is an eligible three-owner split
+    And the <group> split is an eligible three-ownesplit
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     And pawn "high hat" will build a house on "Lippenslaan Knokke"
     When we play up to 1 round
@@ -692,6 +692,290 @@ Feature: Greedo legal entity for a three-way colour-group split
       | houses | surplus | ceiling_share | developed_total | surplus_remaining |
       | 0      | 150     | 0             | 1               | 50                 |
       | 0      | 300     | 0             | 3               | 0                  |
+
+  # entity-36
+  Scenario Outline: Pink Realty takes out a development loan from the bank, funded by a bondholder, when its shareholders decline to finance a build loan
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account holds $<bank_funds>
+    And Pink Realty owns no outstanding loan
+    And pawn "dog" has a balance that allows only $0 toward the entity
+    And pawn "high hat" has a balance that allows only $0 toward the entity
+    And pawn "iron box" has a balance that allows only $0 toward the entity
+    And pawn "racecar" has $500 to spend
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then Pink Realty raises no more than $0 in loans
+    And Pink Realty raises a development loan of $<loan> secured by "Rue de Diekirch Arlon"
+    And the street "Rue de Diekirch Arlon" has 1 house(s) built
+
+    Examples:
+      | bank_funds | loan |
+      | 60         | 40   |
+      | 30         | 70   |
+
+  # entity-37
+  Scenario Outline: no dividend is paid while a bank development loan is still outstanding, even when the entity is fully developed
+    Given we select 4 players
+    And Pink Realty is formed
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And Pink Realty's bank account holds $<surplus>
+    And every other ownable space is owned by pawn "racecar"
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then pawn "dog" receives no dividend from Pink Realty
+
+    Examples:
+      | principal | surplus |
+      | 100       | 150     |
+
+  # entity-38
+  Scenario Outline: an entity short on cash for the annual payment mortgages another street in its own group to cover it, rather than defaulting
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And Pink Realty's bank account holds $<bank_funds>
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then the land "Bruul Mechelen" is mortgaged
+    And Pink Realty owns "Rue de Diekirch Arlon"
+    And Pink Realty owes the bank $<remaining> on the development loan
+
+    Examples:
+      | principal | bank_funds | remaining |
+      | 40        | 0          | 38        |
+
+  # entity-39
+  Scenario Outline: with no cash and no other street left to mortgage, the entity's loan defaults; foreclosure takes only the collateralized street and the entity carries on with what remains
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And the street "Rue de Diekirch Arlon" has 1 house(s) built
+    And the land "Bruul Mechelen" is mortgaged
+    And the land "Place Verte Verviers" is mortgaged
+    And Pink Realty's bank account holds $0
+    And pawn "racecar" will bid $<bid> for "Rue de Diekirch Arlon" at auction
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then Pink Realty does not own "Rue de Diekirch Arlon"
+    And pawn "racecar" owns "Rue de Diekirch Arlon"
+    And the land "Rue de Diekirch Arlon" is mortgaged
+    And Pink Realty owns "Bruul Mechelen"
+    And Pink Realty owns "Place Verte Verviers"
+    And Pink Realty's bank account holds $<bank_ending>
+
+    Examples:
+      | principal | bid | bank_ending |
+      | 40        | 25  | 35          |
+
+  # entity-40
+  Scenario Outline: without the flag, an entity short on cash still cannot develop
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account holds $<bank_funds>
+    And pawn "dog" has a balance that allows only $0 toward the entity
+    And pawn "high hat" has a balance that allows only $0 toward the entity
+    And pawn "iron box" has a balance that allows only $0 toward the entity
+    When we play up to 1 round
+    Then the street "Rue de Diekirch Arlon" has 0 house(s) built
+    And Pink Realty's bank account holds $<bank_ending>
+
+    Examples:
+      | bank_funds | bank_ending |
+      | 60         | 60          |
+
+  # entity-41
+  Scenario Outline: the 80% loan-to-value cap blocks development once the shortfall exceeds it, even with a bondholder available
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account holds $<bank_funds>
+    And pawn "dog" has a balance that allows only $0 toward the entity
+    And pawn "high hat" has a balance that allows only $0 toward the entity
+    And pawn "iron box" has a balance that allows only $0 toward the entity
+    And pawn "racecar" has $500 to spend
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then the street "Rue de Diekirch Arlon" has 0 house(s) built
+    And Pink Realty's bank account holds $<bank_ending>
+
+    Examples:
+      | bank_funds | bank_ending |
+      | 5          | 5           |
+
+  # entity-42
+  Scenario Outline: the full-draw flag always borrows the full 80% loan-to-value cap, regardless of the actual shortfall
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account holds $<bank_funds>
+    And pawn "dog" has a balance that allows only $0 toward the entity
+    And pawn "high hat" has a balance that allows only $0 toward the entity
+    And pawn "iron box" has a balance that allows only $0 toward the entity
+    And pawn "racecar" has $500 to spend
+    And development loans are enabled for the "Greedo" strategy
+    And development loans draw the full amount for the "Greedo" strategy
+    When we play up to 1 round
+    Then the street "Rue de Diekirch Arlon" has 1 house(s) built
+    And Pink Realty raises a development loan of $<loan> secured by "Rue de Diekirch Arlon"
+
+    Examples:
+      | bank_funds | loan |
+      | 60         | 80   |
+      | 30         | 80   |
+
+  # entity-43
+  Scenario Outline: without a bondholder able to fund it, no loan is raised and development does not happen even with the flag enabled
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account holds $<bank_funds>
+    And pawn "dog" has a balance that allows only $0 toward the entity
+    And pawn "high hat" has a balance that allows only $0 toward the entity
+    And pawn "iron box" has a balance that allows only $0 toward the entity
+    And pawn "racecar" has $5 to spend
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then the street "Rue de Diekirch Arlon" has 0 house(s) built
+    And Pink Realty's bank account holds $<bank_ending>
+
+    Examples:
+      | bank_funds | bank_ending |
+      | 60         | 60          |
+
+  # entity-44
+  Scenario Outline: the first annual payment splits into interest and principal, paying down the outstanding balance
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And Pink Realty's bank account holds $<bank_funds>
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then Pink Realty pays the bank $<interest> in interest on the development loan
+    And Pink Realty pays the bank $<principal_payment> in principal on the development loan
+    And Pink Realty owes the bank $<remaining> on the development loan
+
+    Examples:
+      | principal | bank_funds | interest | principal_payment | remaining |
+      | 40        | 100        | 2        | 2                  | 38        |
+
+  # entity-45
+  Scenario Outline: the loan is fully repaid once its final annual payment is made
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And Pink Realty's bank account holds $<bank_funds>
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then Pink Realty's development loan on "Rue de Diekirch Arlon" has been fully repaid
+    And Pink Realty owns no development loan
+
+    Examples:
+      | principal | bank_funds |
+      | 1         | 100        |
+
+  # entity-46
+  Scenario Outline: the bondholder receives their annual payout, split into yield and principal, as the entity repays
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And pawn "racecar" holds the development loan bond secured by "Rue de Diekirch Arlon"
+    And Pink Realty's bank account holds $<bank_funds>
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then pawn "racecar" receives $<yield> interest and $<principal_payment> principal on the development loan bond secured by "Rue de Diekirch Arlon"
+
+    Examples:
+      | principal | bank_funds | yield | principal_payment |
+      | 100       | 200        | 3     | 5                  |
+
+  # entity-47
+  Scenario Outline: on default, the entity's bond is not cashed out but re-collateralized; the bank recovers the full outstanding value before any surplus reaches the entity
+    Given we select 5 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And pawn "ship" holds the development loan bond secured by "Rue de Diekirch Arlon"
+    And pawn "ship" has $<bond_cash> to spend
+    And the bank's account holds $0
+    And the street "Rue de Diekirch Arlon" has 1 house(s) built
+    And the land "Bruul Mechelen" is mortgaged
+    And the land "Place Verte Verviers" is mortgaged
+    And Pink Realty's bank account holds $0
+    And pawn "racecar" will bid $<bid> for "Rue de Diekirch Arlon" at auction
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then pawn "ship"'s account balance is $<bond_cash>
+    And the bank's account holds $<bank_account>
+    And Pink Realty's bank account holds $<bank_ending>
+
+    Examples:
+      | principal | bond_cash | bid | bank_account | bank_ending |
+      | 40        | 500       | 25  | 42           | 33          |
+
+  # entity-48
+  Scenario Outline: the loan mechanism is not tied to which street in the group secures it
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account holds $<bank_funds>
+    And pawn "dog" has a balance that allows only $0 toward the entity
+    And pawn "high hat" has a balance that allows only $0 toward the entity
+    And pawn "iron box" has a balance that allows only $0 toward the entity
+    And pawn "racecar" has $500 to spend
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then the street "Bruul Mechelen" has 1 house(s) built
+    And Pink Realty raises a development loan of $<loan> secured by "Bruul Mechelen"
+
+    Examples:
+      | bank_funds | loan |
+      | 60         | 40   |
+
+  # entity-49
+  Scenario Outline: a later annual payment shows the entity's interest and principal genuinely diverge, not just totalling correctly, and resolves two exact half-cent ties via banker's rounding
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon", 1 year into its 20-year term
+    And Pink Realty's bank account holds $<bank_funds>
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then Pink Realty pays the bank $<interest> interest and $<principal_payment> principal on the development loan secured by "Rue de Diekirch Arlon"
+    And Pink Realty owes the bank $<remaining> on the development loan
+
+    Examples:
+      | principal | bank_funds | interest | principal_payment | remaining |
+      | 400.10    | 100        | 19       | 20                 | 360.10    |
+
+  # entity-50
+  Scenario Outline: the bank's own account accumulates the 2-point spread on the entity's scheduled payment
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And pawn "racecar" holds the development loan bond secured by "Rue de Diekirch Arlon"
+    And Pink Realty's bank account holds $<bank_funds>
+    And the bank's account holds $0
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then the bank's account holds $<bank_spread>
+
+    Examples:
+      | principal | bank_funds | bank_spread |
+      | 40        | 200        | 0.80        |
 
   # Commentary: harness steps required to drive the Greedo entity-build-commit scenarios.
   # The strategy decision point (entity build loan commitment) and these steps are new.

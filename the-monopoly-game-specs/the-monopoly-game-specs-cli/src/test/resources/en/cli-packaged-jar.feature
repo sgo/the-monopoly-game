@@ -63,6 +63,8 @@ Feature: CLI packaged jar
     And the README usage report includes the optional flag "--optional-greedo-legal-entity"
     And the README usage report includes the optional flag "--max-years"
     And the README usage report includes the optional flag "--optional-asset-rich-billionaire"
+    And the README usage report includes the optional flag "--optional-development-loans"
+    And the README usage report includes the optional flag "--optional-development-loans-full-draw"
 
   # cli-jar-6
   Scenario Outline: the packaged jar confirms the configured year limit at the start of the game
@@ -87,3 +89,27 @@ Feature: CLI packaged jar
     Examples:
       | raw arguments                                            | state   |
       | 2 greedo billionaire --optional-asset-rich-billionaire   | enabled |
+
+  # cli-jar-8
+  Scenario Outline: the packaged jar accepts the development-loans flag alongside explicit strategies
+    Given the CLI module has been packaged
+    When I start the packaged simulator jar with the arguments "<raw arguments>"
+    Then the packaged jar's output confirms that development loans is <state>
+    When I stop the packaged jar
+    Then the packaged jar process ends
+
+    Examples:
+      | raw arguments                                        | state   |
+      | 3 greedo greedo greedo --optional-development-loans | enabled |
+
+  # cli-jar-9
+  Scenario Outline: the packaged jar accepts the development-loans full-draw flag alongside explicit strategies
+    Given the CLI module has been packaged
+    When I start the packaged simulator jar with the arguments "<raw arguments>"
+    Then the packaged jar's output confirms that full-draw development loans is <state>
+    When I stop the packaged jar
+    Then the packaged jar process ends
+
+    Examples:
+      | raw arguments                                                                                | state   |
+      | 3 greedo greedo greedo --optional-development-loans --optional-development-loans-full-draw  | enabled |
