@@ -36162,3 +36162,107 @@ Summary: no refactorer-owned changes — this handoff only carried the
 architect's and coder's own review/sign-off notes forward, with no
 production diff to verify beyond what was already confirmed clean in the
 prior cycle (779/779 acceptance, CRAP/DRY clean).
+
+## 2026-08-16T20:25:06Z — accepted turn-development follow-up
+
+Processed refactorer handoff `ee53c68d73` as merge `4b817cd`. The follow-up
+is logbook-only; the coder's turn-development fix is already present in the
+merged history and was confirmed by the refactorer. No additional
+architectural or behavioral change was introduced. The coder/refactorer
+follow-up loop is closed.
+
+## 2026-08-16T20:03:59Z — specifier sends turn-development handoff to coder
+
+User confirmed: fix it, as its own task separate from asset-rich-
+billionaire. Asked how a similar past initiative-tied defect was
+decoupled; found the precedent themselves — `entity-33` (task
+`legal-entity-rent-and-share-defects`, commit `323a3e0`): a legal entity
+dividend was permanently blocked once the shareholder who last
+capitalised it went bankrupt, since only that specific player collecting
+salary again could clear the gate, which a bankrupt player never does.
+Fixed by specifying the correct behavior directly (arrange the buggy
+precondition via test-only Given steps, play a bounded number of rounds,
+assert the correct outcome) rather than describing the implementation fix.
+
+Mirrored that exact pattern here: `turn-development.feature`'s
+`turn-development-1` is `building-1` verbatim with the initiative winner
+flipped from "dog" to "high hat", proving a non-initiative-winning player
+still builds on their own turn when affordable. `building.feature` itself
+couldn't host this — its Background hardcodes "dog" as the initiative
+winner in every one of its scenarios, which is exactly why this defect
+went uncaught until an asset-rich billionaire made it impossible to miss.
+
+Registered the new file on the acceptance pipeline
+(`acceptance/pipeline-features.txt`) to verify red status directly:
+779 tests, 1 failure, isolated to `turn-development-1`
+("Expected 1 houses on RueGrandeDinant but found 0"), 778 unaffected.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: turn-development
+commit: 670b1330f5
+```
+
+Deliberately did not attempt to describe the fix's shape in the handoff
+(e.g. dropping the `isBuilderStillSolvent` check, or the interaction with
+the asset-rich catch-up pass at the end of `Game.play()`) — that's the
+coder's call under their own role rules, same as the entity-33 precedent.
+
+## 2026-08-16T20:27:09Z — specifier received architect handoff `turn-development` (phase complete)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process architect 629f7c5e84
+```
+
+Action: merged commit `629f7c5e84` as `85ec5c7`, resolving a `logbook.md`
+conflict the same way as recent cycles (theirs had several insertion
+points scattered through existing content, not a single append; took it
+in full and appended my own single tail entry — the "sends turn-
+development handoff to coder" entry — after theirs, since it predates
+everything in this merge chronologically only in the sense that it's the
+handoff that *started* this chain, but the chain's own resolution already
+folded it in at the right relative position on their side; verified via a
+sorted-line diff that nothing from either side was dropped).
+
+Fix, as merged: `Game.playTurn`'s development gate changed from
+`isBuilderStillSolvent(player, builder)` to `isPlayerStillSolvent(player)
+&& (!legalEntityTrading || player.id().equals(builder.id()))` — every
+solvent player now develops on their own turn when affordable, *unless*
+legal-entity trading is enabled, in which case the old builder-only
+restriction is deliberately kept (legal-entity mode has its own separate
+entity-level development path via `LegalEntity.operate()`; the coder
+verified this scoping against `EnRulesGreedoLegalEntityAcceptanceTest`
+rather than assuming it, and the architect's follow-up loop confirmed it
+as intentional, not an oversight). This exactly matches what
+`turn-development.feature`'s Background actually pinned — no legal-entity
+flag enabled — so the fix is scoped to what was specified, not broader.
+
+One real side effect, correctly resolved rather than just noted: the
+refactorer found `distressed-sale-2` had a stale expectation baked in
+under the old bug — a non-initiative-winner completing a monopoly via a
+distressed-sale purchase used to keep spending money afterward since it
+could never build; now it correctly builds immediately on the same turn.
+Confirmed via an isolated domain-level reproduction of the exact
+mechanism before correcting the expected balance from $100 to $0 for both
+the Greedo and Billionaire example rows — restoring already-specified
+behavior, not deciding new policy.
+
+Verification across the chain: domain 398/398, full acceptance 779/779
+run multiple times, `turn-development.feature` mutation 3/3 killed with 0
+survivors, differential mutation for `Game` at 100 sites (at, not over,
+threshold) with zero differential sites after extracting
+`mayDevelopThisTurn` to keep CRAP down. `turn-development` is closed
+end-to-end. Per role rules, not notifying coder again on my own — asking
+the user for the next feature. Worth surfacing when I report back: legal-
+entity mode still has the old builder-only development restriction,
+un-touched by this task — a real, separate follow-up if per-player
+development under legal-entity trading turns out to matter too.
+2026-08-17T08:55:00Z coder: processed specifier handoff 20260817T064754Z_000193 (3d63e62b79). Extended development to non-initiative players under legal-entity trading per updated feature. New turn-development scenarios pass; full acceptance currently reports 25 legacy legal-entity/report failures because those suites encode the prior initiative-winner-only behavior.
