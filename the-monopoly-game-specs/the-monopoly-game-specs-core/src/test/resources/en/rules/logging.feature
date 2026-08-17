@@ -885,16 +885,17 @@ Feature: game logging
 
   # logging-63
   Scenario Outline: the log records that <entity_name> is formed, held in equal thirds by the three co-owners
-    Given we select 3 players
+    Given we select 4 players
     And pawn "iron box" will roll 10 for initiative
     And pawn "dog" will roll 7 for initiative
     And pawn "high hat" will roll 4 for initiative
+    And pawn "racecar" will roll 2 for initiative
     And every other player can complete their turn
     And legal-entity trading is enabled for the "Greedo" strategy
     And pawn "dog" owns "Rue de Diekirch Arlon"
     And pawn "high hat" owns "Bruul Mechelen"
     And pawn "iron box" owns "Place Verte Verviers"
-    And every other ownable space is owned by pawn "high hat"
+    And every other ownable space is owned by pawn "racecar"
     When we play up to 1 round
     Then the game log records that <entity_name> is formed, held in equal thirds by pawn "dog", pawn "high hat", and pawn "iron box"
 

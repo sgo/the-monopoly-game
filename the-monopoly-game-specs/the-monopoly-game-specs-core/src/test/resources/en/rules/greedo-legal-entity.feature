@@ -320,7 +320,7 @@ Feature: Greedo legal entity for a three-way colour-group split
 
   # entity-13
   Scenario Outline: rent collected from a tenant is deposited into the entity's bank account
-    Given we select 4 players
+    Given we select 5 players
     And Pink Realty is formed
     And the street "Rue de Diekirch Arlon" has 4 houses built
     And the street "Bruul Mechelen" has 4 houses built
@@ -332,8 +332,8 @@ Feature: Greedo legal entity for a three-way colour-group split
     And pawn "<renter>"'s account balance is $<tenant_balance>
 
     Examples:
-      | renter  | renter_position | renter_street          | rent | tenant_balance |
-      | racecar | 3               | Bruul Mechelen         | 625  | 875           |
+      | renter | renter_position | renter_street          | rent | tenant_balance |
+      | ship   | 3               | Bruul Mechelen         | 625  | 875           |
 
   # entity-21
   Scenario Outline: a shareholder pays rent when landing on their own legal entity's street
