@@ -36770,3 +36770,67 @@ instances of the same shareholder-catch-all collision across
 user directly. Every fixture correction along the way was verified
 against the coder/refactorer/architect chain's actual current state in a
 throwaway worktree before being reported or committed, not assumed.
+
+## 2026-08-17T22:14:00Z — specifier hands off development-loans
+
+New feature, specified end-to-end this session at the user's direction
+(motivated by wanting the asset-rich billionaire to win over a *longer*,
+richer game rather than making it artificially harder to win). Full arc:
+
+- Designed collaboratively with the user in prose before any Gherkin:
+  bank loans capped at 80% loan-to-value, 5% interest amortized over 20
+  years, funded by reactively-issued bank bonds (3% yield) rather than the
+  bank creating money from nothing — deliberately kept distinct from the
+  existing internal shareholder "build loan" vocabulary already in
+  `greedo-legal-entity.feature`.
+- Wrote `development-loans.feature` (individual players) and mirrored
+  every behavior 1:1 for legal entities (`entity-36`–`entity-50` in
+  `greedo-legal-entity.feature`) at the user's explicit insistence: this
+  project has already split into diverging branches before when a
+  behavior wasn't spec'd identically for two contexts, so the mirror is
+  the guardrail, not a nice-to-have.
+- User caught a real observability gap (no journal/report/logging
+  coverage at all) and a real economic gap (bondholder never proven to
+  actually get paid) — both closed, mirrored across borrower types the
+  same way.
+- Self-review pass at the user's prompt ("we've been bitten a few times
+  by [initiative-gated logic]") surfaced two real overfitting risks: every
+  scenario used the same non-initiative-winning borrower and the same
+  single collateral street (fixed via `development-loans-12`/`entity-48`),
+  and a structural numeric collision — 5% interest equals 1/20, so
+  first-year interest and principal payment are mathematically forced
+  equal, meaning no choice of example numbers could ever catch a coder
+  swapping them. Fixed by adding a `"N years into its term"` Given clause
+  and testing year two instead (`development-loans-13`/`entity-49`).
+- User's follow-up question about decimal precision escalated into
+  `Money` gaining 2-decimal-place precision with banker's rounding,
+  game-wide — verified the display rule (trailing zero cents hidden)
+  meant zero pre-existing scenarios needed to change, only the two
+  interest/principal-divergence scenarios above, retuned to $400.10 so
+  the numbers land on genuine half-cent ties.
+- User's final refinement reframed the bond as a claim on the bank, not
+  on one specific loan: on default the bank recovers the full outstanding
+  loan value (topped up from a new bank's-own-account reserve, built from
+  accumulated 2% spread, if the foreclosure alone falls short), and that
+  capital recycles into funding the next loan rather than being cashed
+  out. Scoped deliberately to individual players only for this pass
+  (`development-loans-15`/`16`/`17`, no entity mirror, no narration) given
+  how large the feature had already grown — recorded as an explicit,
+  flagged gap in `tasks.md`, not an oversight.
+- Also recorded, at the user's request: neither strategy currently has
+  any decision logic that would choose to buy a bond in the first place,
+  which the user wants to design together in a future session.
+
+Validated clean with `gherkin-parser`/`gherkin-ir-dry-checker` at every
+step (baseline near-duplicate/possible-synonym noise only, zero
+`duplicate-in-scenario` findings) across all seven touched files.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: development-loans
+commit: 761abde835
+```
