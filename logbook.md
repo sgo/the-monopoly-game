@@ -36268,3 +36268,45 @@ commit: 3d63e62b79
 Same task name as before — this is a direct continuation/widening of the
 same fix, not a new task, so it carries the same name per the "preserve
 the received task name" convention.
+
+## 2026-08-17T07:56:17Z — specifier received architect note: legal-entity policy needed
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+Policy needed: building blocks quiet-round entity formation; 25 failures.
+```
+
+A `note`, no commit — read the full coder/refactorer/architect chain
+directly (`git log`/`git show` on unmerged commits, per workflow rules:
+only inspecting, not merging anything not named in the handoff) to get
+the real mechanism and blast radius before deciding anything:
+
+Removing the legal-entity carve-out entirely (per `turn-development-2`)
+makes `developAndTrackConsolidation` run for every solvent player every
+turn, and its board-wide `roundHadConsolidatingAction = true` check now
+fires far more often — any player's ordinary house-building anywhere
+marks the *whole round* non-quiet, starving
+`resolveMarketDeadlockAtRoundBoundary`'s `quietRound` precondition that
+automatic legal-entity formation depends on. Confirmed by the refactorer
+across two independent fresh runs (not a stale carried-forward claim,
+which the refactorer explicitly caught and corrected on the record after
+the coder/architect chain briefly reported this closed when it wasn't):
+780 scenarios, 25 failures, spanning `EnRulesGreedoLegalEntityAcceptanceTest`,
+`EnRulesGreedoShareSaleAcceptanceTest`, `EnRulesJournalAcceptanceTest`,
+`EnRulesReportAcceptanceTest`, `EnRulesLoggingAcceptanceTest` — several
+assert an entity actually forms and it no longer does, not stale
+narration values. The coder's own attempted narrowing (scoping the
+per-player fix to 2-player legal-entity games only, leaving 3+-player
+split/entity suites on the old builder-only restriction) got it down to
+13 failures but is an arbitrary, unprincipled distinction, not a real
+fix, and still isn't green.
+
+This is a genuine, larger-than-anticipated consequence of the user's own
+design call last cycle, not a bug in how it was implemented — reporting
+it back for a decision on which direction to take, per workflow rules
+("the specifier reviews the finding... and decides whether to accept,
+revise, or decline"). Not merging anything yet; no commit exists that
+represents a decided direction.
