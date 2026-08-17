@@ -36552,3 +36552,12 @@ to the coder as such rather than writing it myself.
 
 (No commit accompanies this — nothing of mine changed; this is a
 diagnosis to route, same shape as the last note.)
+
+Handoff message sent:
+
+```
+type: note
+to: coder
+priority: 50
+message: Root cause found: formEntity test helper, not new policy. See logbook 534253b
+```
