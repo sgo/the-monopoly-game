@@ -36491,3 +36491,12 @@ consequences are still exactly what I described as "not yet root-caused"
 last cycle. Sending this correction back rather than a new handoff, since
 there's no new commit of mine to route — the open work is still with the
 coder.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Stale claim: your own worktree tip is 20/781 not 25. See logbook 7fad235
+```
