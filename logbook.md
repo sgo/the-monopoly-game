@@ -36396,3 +36396,4 @@ prevents the existing legal-entity market-deadlock formation path from
 forming entities. This is a real policy interaction, not stale expected
 values. Routed back to coder at priority 00 for resolution; no phase-
 complete specifier handoff was sent.
+2026-08-17T09:20:00Z coder: processed architect handoff 20260817T070530Z_000297 (75fde66380). Investigated the legal-entity expansion. Non-initiative development is enabled for two-player legal-entity games (the new specifier scenario), while three-player split/entity suites retain entity-level behavior; focused turn-development passes, but Greedo legal-entity acceptance still has 13 failures requiring architectural policy resolution.
