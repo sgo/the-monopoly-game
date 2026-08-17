@@ -36760,9 +36760,81 @@ values per last cycle's flag), and `Journal`/`Logging`/`Report` (1 each,
 presumably downstream). Domain 398/398 green.
 2026-08-17T13:05:00Z coder: processed specifier handoff 20260817T130114Z_000199 (5d10d8344e), merging two additional shareholder-catch-all fixture corrections across legal-entity, journal, logging, and report features. No production change.
 
-## 2026-08-17T13:05:57Z — accepted refactorer turn-development handoff
+## 2026-08-17T13:01:35Z — refactorer received coder handoff `turn-development` (journal/logging/report fixtures)
 
-Merged refactorer commit `881150f325`. The fixture-only correction is
-accepted: the verified full acceptance result is 781 scenarios with 6
-failures. No production code changed; the remaining scenario-policy and
-expected-value questions stay with the specifier/coder chain.
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 40fce80084
+```
+
+Action: merged commit `40fce80084` as `881150f`, resolving a
+five-point `logbook.md` conflict (same precise per-hunk-anchor
+methodology as the last two cycles; verified zero removed lines against
+both parents afterward). Two more specifier fixture fixes: `journal-63`/
+`logging-63`/`report-63` had the exact same shareholder-catch-all shape
+already fixed twice this task (`every other ownable space is owned by
+pawn "high hat"`, a shareholder, now reassigned to a new non-shareholder
+`pawn "racecar"`, with `we select 3 players` bumped to 4 and a `racecar`
+initiative roll added); `entity-13` renamed its own `renter` example row
+from `racecar` to `ship` and bumped to 5 players, since `racecar` is now
+a reserved name for the catch-all default owner elsewhere and collided.
+Reviewing under refactorer rules before handing back.
+
+## 2026-08-17T13:01:35Z — refactorer review: `turn-development` (journal/logging/report fixtures)
+
+Pure Gherkin scenario content again, no `src/main` touched — outside
+this role's tooling scope. Full acceptance: **6 failures down to 2**,
+confirmed fresh, both in `EnRulesGreedoShareSaleAcceptanceTest`
+(`share-sale-3`: "high hat owns Rue Grande Dinant" expected true, got
+false; another scenario: dog's final balance expected 440, got 40).
+Looked at `share-sale-3` directly: dog distress-sells a spare property to
+whichever peer bids, expecting `high hat` to win it — not the
+`formEntity` catch-all default-owner mechanism this task's fixture fixes
+have all targeted, but the *bidding* outcome of `DistressedSale`, which
+depends on each shareholder's own accumulated wealth/property. Since
+`high hat`'s catch-all-derived holdings (and thus spending pattern) have
+changed across every fixture fix this task has made, this could easily
+be the same "a shareholder's own resources shifted" theme in a new
+guise, but unlike `distressed-sale-2` two cycles ago I don't have a
+verified mechanism for *what the new correct value should be* — the
+`distressed-sale-2` fix was safe because the arithmetic was exact and
+checkable by hand; here it would mean guessing at auction/bidding
+outcomes across a chain of upstream fixture changes. Not fixed; flagging
+rather than guessing.
+
+Verification: `mvn test` — domain green (no production file changed).
+Full acceptance: 781 scenarios, 2 failures, confirmed fresh.
+
+## 2026-08-17T13:01:35Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: 881150f325
+```
+
+Priority 50, matching the normal pipeline flow. Very close now: 6
+failures down to 2, both `EnRulesGreedoShareSaleAcceptanceTest`
+(`share-sale-3` and one other), via two more specifier fixture fixes
+following the same shareholder-catch-all pattern already established.
+No production code changed, nothing for this role to structurally clean
+up. The 2 remaining look like the same underlying theme as everything
+else this task has fixed, but I don't have a verified mechanism for the
+correct new expected values the way I did for `distressed-sale-2` —
+recommend specifier/coder investigation rather than a guess. Domain
+398/398 green.
+2026-08-17T13:20:00Z coder: processed specifier handoff 20260817T130848Z_000200 (52a987a86a), merging the user-directed removal of the buyer-identity assertion from share-sale-3. No production change.
+
+## 2026-08-17T13:14:50Z — accepted refactorer turn-development handoff
+
+Merged refactorer commit `2cf29dfa69`. The fixture corrections and the
+specifier-directed share-sale assertion removal leave 2 acceptance failures,
+both in share-sale behavior. No production code changed; the remaining
+expected-value/bidding policy is routed to the specifier/coder chain.
