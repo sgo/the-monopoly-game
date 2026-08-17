@@ -234,7 +234,8 @@ Feature: Greedo legal entity for a three-way colour-group split
 
   # entity-6
   Scenario Outline: the entity repays a shareholder loan with five percent interest on top before paying any dividend
-    Given Pink Realty is formed
+    Given we select 4 players
+    And Pink Realty is formed
     And the street "Rue de Diekirch Arlon" has 4 houses built
     And the street "Bruul Mechelen" has 4 houses built
     And the street "Place Verte Verviers" has 4 houses built
@@ -267,7 +268,8 @@ Feature: Greedo legal entity for a three-way colour-group split
 
   # entity-8
   Scenario Outline: no dividend is paid while any shareholder loan to the entity is still outstanding, even when the entity is fully developed
-    Given Pink Realty is formed
+    Given we select 4 players
+    And Pink Realty is formed
     And the street "Rue de Diekirch Arlon" has a hotel built
     And the street "Bruul Mechelen" has a hotel built
     And the street "Place Verte Verviers" has a hotel built
