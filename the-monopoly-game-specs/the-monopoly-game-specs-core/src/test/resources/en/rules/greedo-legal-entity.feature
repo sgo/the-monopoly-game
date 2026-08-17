@@ -13,14 +13,16 @@ Feature: Greedo legal entity for a three-way colour-group split
   # entity-m1
   Scenario Outline: three Greedo co-owners of a colour group automatically coalesce into a legal entity at market deadlock, holding equal shares
     Given legal-entity trading is enabled for the "Greedo" strategy
+    And we select 4 players
     And pawn "dog" will roll 10 for initiative
     And pawn "high hat" will roll 4 for initiative
     And pawn "iron box" will roll 2 for initiative
+    And pawn "racecar" will roll 3 for initiative
     And every other player can complete their turn
     And pawn "dog" owns "<street_dog>"
     And pawn "high hat" owns "<street_high_hat>"
     And pawn "iron box" owns "<street_iron_box>"
-    And every other ownable space is owned by pawn "high hat"
+    And every other ownable space is owned by pawn "racecar"
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
     Then the <group> colour group is owned by <entity_name>
@@ -103,14 +105,16 @@ Feature: Greedo legal entity for a three-way colour-group split
   # entity-m6
   Scenario Outline: the entity forms at market deadlock when a full round passes with no ownership-consolidating action and an eligible three-owner split can collectively fund the next improvement after base reserves
     Given legal-entity trading is enabled for the "Greedo" strategy
+    And we select 4 players
     And pawn "dog" will roll 10 for initiative
     And pawn "high hat" will roll 4 for initiative
     And pawn "iron box" will roll 2 for initiative
+    And pawn "racecar" will roll 3 for initiative
     And every other player can complete their turn
     And pawn "dog" owns "Rue de Diekirch Arlon"
     And pawn "high hat" owns "Bruul Mechelen"
     And pawn "iron box" owns "Place Verte Verviers"
-    And every other ownable space is owned by pawn "high hat"
+    And every other ownable space is owned by pawn "racecar"
     And the <group> split is an eligible three-owner split
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
@@ -164,14 +168,16 @@ Feature: Greedo legal entity for a three-way colour-group split
   # entity-m9
   Scenario Outline: the pre-stalemate formation trigger is independent of the final cash-threshold stalemate gate
     Given legal-entity trading is enabled for the "Greedo" strategy
+    And we select 4 players
     And pawn "dog" will roll 10 for initiative
     And pawn "high hat" will roll 4 for initiative
     And pawn "iron box" will roll 2 for initiative
+    And pawn "racecar" will roll 3 for initiative
     And every other player can complete their turn
     And pawn "dog" owns "Rue de Diekirch Arlon"
     And pawn "high hat" owns "Bruul Mechelen"
     And pawn "iron box" owns "Place Verte Verviers"
-    And every other ownable space is owned by pawn "high hat"
+    And every other ownable space is owned by pawn "racecar"
     And the <group> split is an eligible three-owner split
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
@@ -203,6 +209,28 @@ Feature: Greedo legal entity for a three-way colour-group split
     Examples:
       | group |
       | pink  |
+
+  # entity-m11
+  Scenario Outline: the entity still forms at market deadlock when an unrelated player takes a consolidating action elsewhere on the board
+    Given legal-entity trading is enabled for the "Greedo" strategy
+    And we select 4 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And pawn "iron box" will roll 2 for initiative
+    And pawn "racecar" will roll 3 for initiative
+    And every other player can complete their turn
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "high hat" owns "Bruul Mechelen"
+    And pawn "iron box" owns "Place Verte Verviers"
+    And every other ownable space is owned by pawn "racecar"
+    And the <group> split's shareholders can collectively fund the next improvement after their base reserves
+    And pawn "racecar" will build a house on "Rue Grande Dinant"
+    When we play up to 1 round
+    Then the <group> colour group is auto-formed into <entity_name>
+
+    Examples:
+      | group | entity_name |
+      | pink  | Pink Realty |
 
   # entity-6
   Scenario Outline: the entity repays a shareholder loan with five percent interest on top before paying any dividend

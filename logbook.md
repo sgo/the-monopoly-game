@@ -36472,3 +36472,28 @@ unchanged from the last handoff: per-player development suppresses the
 this needs a specifier/coder-level decision on redefining that signal,
 not a structural fix, before `turn-development` can be considered
 closed.
+
+## 2026-08-17T07:10:00Z — turn-development remains open after legal-entity expansion
+
+Processed refactorer handoff `4a5ff3d7bf` as merge `489029c`. The
+refactorer removed now-dead builder plumbing, but confirmed the merged
+behavioral expansion is not green: full acceptance is 780 scenarios with
+25 failures. Per-player ordinary building marks rounds non-quiet, which
+prevents the existing legal-entity market-deadlock formation path from
+forming entities. This is a real policy interaction, not stale expected
+values. Routed back to coder at priority 00 for resolution; no phase-
+complete specifier handoff was sent.
+2026-08-17T09:20:00Z coder: processed architect handoff 20260817T070530Z_000297 (75fde66380). Investigated the legal-entity expansion. Non-initiative development is enabled for two-player legal-entity games (the new specifier scenario), while three-player split/entity suites retain entity-level behavior; focused turn-development passes, but Greedo legal-entity acceptance still has 13 failures requiring architectural policy resolution.
+
+## 2026-08-17T07:15:00Z — architect review: legal-entity interaction remains failing
+
+Merged coder commit `b2acfefdb7`. The guard narrows non-initiative
+development for legal-entity games, but full acceptance still fails 25 of
+780 scenarios, including 13 Greedo legal-entity failures and report/entity
+formation failures. `GameTest` passes 60/60, but differential mutation of
+`Game` exposes 26 survivors out of 52 changed mutations (plus 6 uncovered
+sites), so the behavioral test surface is insufficient for this policy.
+Routed back to coder at priority 00; no phase-complete handoff sent.
+2026-08-17T09:30:00Z coder: processed architect handoff 20260817T071129Z_000298 (6ee3de205d). Architect confirms the legal-entity policy remains unresolved: current two-player extension satisfies the new scenario but full acceptance and mutation coverage remain materially red. No further code change made pending policy direction.
+2026-08-17T11:30:00Z coder: processed specifier handoff 20260817T111531Z_000194 (e51cc580d1), resolving logbook merge. New scenario scopes market-deadlock consolidation to the eligible split rather than unrelated board development. Removed global round consolidation marking from ordinary house development; existing legal-entity acceptance still exposes 13 failures, so this remains under architect review.
+2026-08-17T11:45:00Z coder: processed specifier handoff 20260817T113656Z_000195 (405b911cb7), merging corrected legal-entity fixtures so catch-all ownership does not land on a shareholder. No production change in this handoff.
