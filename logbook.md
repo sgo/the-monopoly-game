@@ -37618,3 +37618,39 @@ Verification status:
 The implementation is committed and handed to the refactorer for review;
 acceptance execution must be rerun once a JDK is available and after the
 specifier resolves scenario 12.
+
+## 2026-08-18T08:30:00Z — refactorer review: development-loans acceptance is red
+
+Merged coder `6ed9577` (resolving the `logbook.md` conflict by preserving
+every line from both parents, verified zero removed against either). Set up
+the JDK (`JAVA_HOME` to the sdkman 25.0.2-zulu toolchain — the "no Java
+runtime" report was a missing `JAVA_HOME`, not a missing JDK).
+
+Domain suite is green: 415/415 (388 prior + new loan tests), and the known
+flaky `SimulatorTest.keepsPlayingUntilToldToStop` passed on retry. But the
+FULL acceptance suite is substantially red: 864 tests, 59 failures + 8
+errors across 7 classes (`development-loans`, `greedo-legal-entity`,
+`journal`, `report`, `logging`, `cli`, `cli-packaged-jar`). These are coder-
+scope defects, not refactorer cleanup:
+
+- Compile error in the delivered step handlers (`illegal attempt to
+  redefine an existing match binding`): a dual `instanceof ... it` pattern
+  binding inside one OR, in `GameLogStepHandlers` and `JournalStepHandlers`.
+  Fixed behavior-preservingly by renaming the second binding (`playerDefaulted`).
+- ~30 distinct "Unsupported step" messages: the new dev-loan journal/log/
+  report/packaged-jar steps plus pre-existing legal-entity steps
+  (`<group> split is an eligible three-ownesplit`, `pawn "dog" has a balance
+  that allows only $0 toward the entity`, `<entity_name> builds a house on
+  "..." for $100`) are not registered.
+- `GameLogStepHandlers.java:178` reads capture group 5 in a 4-group regex →
+  `IndexOutOfBoundsException: No group 5`.
+- Production bug: `DevelopmentLoanBook.foreclose` → `Deeds.sellHouse` →
+  `verifyOwner` throws `dog does not own RueGrandeDinant` during foreclosure.
+- `development-loans.feature` scenario 12 still red (`Expected 1 houses on
+  MeirAntwerpen but found 0`), pending the specifier's resolution.
+- README usage report was not updated for `--optional-development-loans`.
+
+Per refactorer ownership (structure-preserving cleanup + verification, not
+completing an incomplete implementation), I am not completing the coder's
+delivery. Handing the verified red state back to the architect for a coder
+follow-up.

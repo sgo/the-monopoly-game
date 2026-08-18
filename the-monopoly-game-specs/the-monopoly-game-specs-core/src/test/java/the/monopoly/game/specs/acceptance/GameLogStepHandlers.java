@@ -149,8 +149,9 @@ final class GameLogStepHandlers {
             (world, arguments) -> logRecords(world, new Claim(entry ->
                 (entry instanceof Entry.EntityDevelopmentLoanDefaulted it
                     && it.name().equals(arguments.text(1)) && it.collateral() == SpaceNames.of(arguments.text(2)))
-                    || (entry instanceof Entry.DevelopmentLoanDefaulted it
-                    && it.borrower().equals(idOf(arguments.text(1))) && it.collateral() == SpaceNames.of(arguments.text(2))),
+                    || (entry instanceof Entry.DevelopmentLoanDefaulted playerDefaulted
+                    && playerDefaulted.borrower().equals(idOf(arguments.text(1)))
+                    && playerDefaulted.collateral() == SpaceNames.of(arguments.text(2))),
                 "development loan default"))),
         then("^the game log records that the bank recovers \\$" + MONEY + " from the foreclosure of \"" + NAME
                 + "\", added to its own account$",
