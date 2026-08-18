@@ -754,8 +754,9 @@ final class JournalStepHandlers {
             (world, arguments) -> assertThat(world.journal()).anyMatch(entry ->
                 (entry instanceof Entry.EntityDevelopmentLoanDefaulted it
                     && it.name().equals(arguments.text(1)) && it.collateral() == SpaceNames.of(arguments.text(2)))
-                    || (entry instanceof Entry.DevelopmentLoanDefaulted it
-                    && it.borrower().equals(idOf(arguments.text(1))) && it.collateral() == SpaceNames.of(arguments.text(2))))),
+                    || (entry instanceof Entry.DevelopmentLoanDefaulted playerDefaulted
+                    && playerDefaulted.borrower().equals(idOf(arguments.text(1)))
+                    && playerDefaulted.collateral() == SpaceNames.of(arguments.text(2))))),
 
         then("^the game journal records that the bank recovers \\$" + MONEY + " from the foreclosure of \"" + NAME
                 + "\", added to its own account$",

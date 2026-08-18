@@ -36386,6 +36386,93 @@ development under legal-entity trading turns out to matter too.
 2026-08-17T08:55:00Z coder: processed specifier handoff 20260817T064754Z_000193 (3d63e62b79). Extended development to non-initiative players under legal-entity trading per updated feature. New turn-development scenarios pass; full acceptance currently reports 25 legacy legal-entity/report failures because those suites encode the prior initiative-winner-only behavior.
 2026-08-17T09:05:00Z coder: processed architect handoff 20260817T070010Z_000296 (17eb7f3442). Architect review records turn-development closed with full acceptance green and mutation coverage complete; current HEAD includes the reviewed Game implementation and distressed-sale expectation correction.
 
+## 2026-08-17T07:00:49Z — refactorer received coder handoff `turn-development` (repeat sign-off)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 0c0e153692
+```
+
+Action: merged commit `0c0e153692` as `4a5ff3d`, resolving a two-point
+`logbook.md` conflict the same way as prior cycles (both sides purely
+additive over the shared `8d3e37f324` base; spliced this role's own
+unique tail in before the incoming chain's "architect review finds
+legal-entity development behavior change" entry, which explicitly
+acknowledges merging `8d3e37f324`). `git diff 8d3e37f324..HEAD --
+':!logbook.md'` is empty — no production code changed since the last
+cycle. Reviewing under refactorer rules before handing back.
+
+## 2026-08-17T07:00:49Z — refactorer review: `turn-development` (repeat sign-off)
+
+The architect's review (`17eb7f344229`) classifies this role's dead-
+`builder`-parameter removal as coder-owned observable behavior — same
+routine pattern as the last two sign-off cycles, and correctly harmless
+on its own (that removal changes nothing; `mayDevelopThisTurn` had
+already dropped the legal-entity restriction in the *prior* coder commit,
+`323fd2cae3`, which this role flagged explicitly last cycle).
+
+**Correcting the record rather than repeating it**: the coder's own
+note above claims "Architect review records turn-development closed
+with full acceptance green," and the architect's review entry likewise
+doesn't mention the 25 acceptance failures at all. Neither is accurate.
+Re-ran the full acceptance suite fresh on this exact merged commit,
+independent of any prior claim: **780 scenarios, 25 failures** —
+identical count, identical scenarios (`EnRulesGreedoLegalEntityAcceptanceTest`,
+`EnRulesLoggingAcceptanceTest`, `EnRulesGreedoShareSaleAcceptanceTest`,
+`EnRulesReportAcceptanceTest`, `EnRulesJournalAcceptanceTest`), to what
+this role found and root-caused two cycles ago. Nothing in this chain's
+commits touches `Game.java`'s market-deadlock/consolidation logic, so
+there was no code change that could have closed the gap — the "green"
+claim traces to a stale copy of an *earlier* status line from before
+`323fd2cae3` existed (the coder's own preceding log line, "Turn-
+development acceptance and Greedo legal-entity acceptance pass," is
+genuinely from that earlier, narrower cycle and got carried forward past
+its expiry), not a fresh verification. Per workflow rules ("ignore sender
+process narrative... decide next actions only from... the current
+project state"), verified empirically rather than trusting the claim.
+
+The root cause remains exactly as previously documented: per-player
+development (now unconditional under legal-entity trading too) sets
+`roundHadConsolidatingAction` far more often, starving
+`resolveMarketDeadlockAtRoundBoundary`'s `quietRound` precondition and
+suppressing automatic legal-entity formation in scenarios that used to
+reliably trigger it. Still not a refactorer-scope fix — it's a policy
+question about what "quiet round" should mean now that building isn't
+reserved for one player.
+
+Verification: `mvn test` — all modules green except the pre-existing CLI
+flake. Full acceptance: 780 scenarios, 25 failures, confirmed via a
+fresh, independent run on this exact commit, not carried forward from
+memory.
+
+## 2026-08-17T07:00:49Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: turn-development
+commit: 4a5ff3d7bf
+```
+
+Priority 00, matching the incoming architect-follow-up loop. **Still not
+green — 25/780 acceptance failures, unchanged from last cycle, freshly
+re-verified rather than assumed.** No refactorer-owned production change
+this cycle (confirmed empty diff). Correcting an inaccurate "closed, full
+acceptance green" claim that appears twice in this chain's own log
+entries but doesn't match the actual test run — flagging explicitly so
+it isn't repeated a third time. The root cause and recommendation are
+unchanged from the last handoff: per-player development suppresses the
+`quietRound` signal `resolveMarketDeadlockAtRoundBoundary` depends on;
+this needs a specifier/coder-level decision on redefining that signal,
+not a structural fix, before `turn-development` can be considered
+closed.
+
 ## 2026-08-17T07:10:00Z — turn-development remains open after legal-entity expansion
 
 Processed refactorer handoff `4a5ff3d7bf` as merge `489029c`. The
@@ -36410,12 +36497,452 @@ Routed back to coder at priority 00; no phase-complete handoff sent.
 2026-08-17T09:30:00Z coder: processed architect handoff 20260817T071129Z_000298 (6ee3de205d). Architect confirms the legal-entity policy remains unresolved: current two-player extension satisfies the new scenario but full acceptance and mutation coverage remain materially red. No further code change made pending policy direction.
 2026-08-17T11:30:00Z coder: processed specifier handoff 20260817T111531Z_000194 (e51cc580d1), resolving logbook merge. New scenario scopes market-deadlock consolidation to the eligible split rather than unrelated board development. Removed global round consolidation marking from ordinary house development; existing legal-entity acceptance still exposes 13 failures, so this remains under architect review.
 2026-08-17T11:45:00Z coder: processed specifier handoff 20260817T113656Z_000195 (405b911cb7), merging corrected legal-entity fixtures so catch-all ownership does not land on a shareholder. No production change in this handoff.
+
+## 2026-08-17T11:37:16Z — refactorer received coder handoff `turn-development` (specifier-resolved market-deadlock scoping)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 48cd0fdae1
+```
+
+Action: merged commit `48cd0fdae1` as `0eb0071`, resolving a single-
+insertion-point `logbook.md` conflict the same way as prior cycles (both
+sides purely additive over the shared `4a5ff3d7bf` base; spliced this
+role's own unique tail in before the incoming chain's entry that
+explicitly acknowledges merging `4a5ff3d7bf`). The specifier engaged
+directly with the design tension this role flagged two cycles ago
+(market-deadlock's `quietRound` signal being starved by now-routine
+per-player development) and resolved it: `developAndTrackConsolidation`
+no longer marks `roundHadConsolidatingAction` from board-wide
+`totalDevelopments()` deltas — per `e51cc58`'s reasoning, individual
+development can never target a still-split group (`Building.develop`
+requires full group ownership, which nobody in a split has by
+definition), so board-wide "did anyone build" was only ever a proxy for
+"is the market still moving," and that proxy stopped working once
+building became routine for every player. Trade/buyout/bankruptcy remain
+real per-split signals and are untouched. A follow-up fixture fix
+(`405b911`) reassigned "every other ownable space" from a shareholder to
+a non-shareholder player in three `entity-m1`/`entity-m6`/`entity-m9`
+scenarios that had assumed, under the old bug, that only the initiative
+winner could ever spend money — dropping failures from 25 to 20. Both
+fixes are evidence-based (checked out the coder's unmerged branch
+read-only and reproduced/confirmed the exact failure before writing each
+commit message), not guessed. Reviewing under refactorer rules before
+handing back.
+
+## 2026-08-17T11:37:16Z — refactorer review: `turn-development` (specifier-resolved market-deadlock scoping)
+
+`git diff 4a5ff3d7bf 48cd0fdae1` showed `Game.mayDevelopThisTurn` was
+*reintroduced* with a new legal-entity-specific bypass ("allowed if not
+the round's first player unless the player already owns a complete
+colour group outright") rather than removed — but the fixture-fix
+commit (`405b911`) itself already reported verifying that this bypass
+changes the failure count not at all (25/13 identical with or without
+it) and recommended dropping it in favor of the plain
+`isPlayerStillSolvent(player)` turn-development had already established.
+Verified that claim independently rather than trusting it (same
+discipline the coder used checking out the unmerged branch): reran the
+full suite with the bypass in place (781 scenarios, 20 failures), removed
+it, reran (781/20, identical). Confirmed dead. Removed
+`mayDevelopThisTurn` entirely, restoring `isPlayerStillSolvent(player)`
+directly at the one call site — this also meant `developAndTrackConsolidation`
+no longer did any tracking (that line was the fix's whole point) so its
+name was actively misleading; collapsed it into a direct
+`building.develop(player)` call, and removed `totalDevelopments()`,
+left with no remaining caller by the same change.
+
+Mutation-site scan: `Game.java` had climbed back to 102 (over threshold)
+with the reintroduced `mayDevelopThisTurn`; down to 93 after this
+cleanup. CRAP: `mayDevelopThisTurn` had climbed to 16.5 (CC=5, 22.9%
+coverage — the legal-entity-specific branches were essentially untested,
+consistent with them being dead) before this cleanup; no violations
+beyond the two already-documented exceptions after. `dry4java` found
+nothing new beyond the pre-existing constructor-overload match.
+
+Full acceptance, confirmed identically before and after this role's
+cleanup: **781 scenarios, 20 failures** — `EnRulesGreedoLegalEntityAcceptanceTest`
+(8, entity build/loan scenarios that directly `Given Pink Realty is
+formed` rather than relying on natural market-deadlock formation — a
+different symptom from the 13 fixed), `EnRulesGreedoShareSaleAcceptanceTest`,
+`EnRulesLoggingAcceptanceTest`, `EnRulesJournalAcceptanceTest`,
+`EnRulesReportAcceptanceTest` (the latter three presumably downstream of
+the same 8, not independently root-caused). This is genuinely still open,
+actively-being-investigated work by the coder/specifier/architect chain
+(the coder's own `405b911` commit says so explicitly: "Not yet
+root-caused... I haven't traced the exact mechanism"), not something this
+role is blocking on or should attempt to close — my structural cleanup
+this cycle is scoped to code proven dead by the chain's own verification,
+nothing more.
+
+Verification: `mvn test` — all modules green except the pre-existing CLI
+flake. Full acceptance: 781/20, confirmed via a fresh run on this exact
+commit both before and after this role's edits.
+
+## 2026-08-17T11:37:16Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: a7a1ad4888
+```
+
+Priority 50, matching the normal specifier→coder→refactorer→architect
+pipeline flow (the specifier engaged directly on this task, not via an
+architect priority-00 loop, so this isn't a review-loop return). **Still
+not green — 781 scenarios, 20 failures**, down from 25 via the
+specifier's market-deadlock-scoping design decision and a coder fixture
+fix, both already merged and reviewed structurally sound by this cycle.
+Own contribution: verified and then acted on the coder's own claim that
+the reintroduced `mayDevelopThisTurn` legal-entity bypass has zero effect
+on the failure count (independently confirmed: 781/20 identical with or
+without it), removed it along with the now-dead
+`developAndTrackConsolidation`/`totalDevelopments()`, bringing `Game.java`
+back under both the CRAP and mutation-site thresholds. The remaining 20
+failures are explicitly still under active investigation by the coder
+(their own words: "not yet root-caused") — not something this role is
+withholding or should attempt to resolve unilaterally. Domain 398/398,
+full reactor green apart from the known pre-existing CLI flake.
 2026-08-17T12:20:00Z coder: processed specifier note handoff 20260817T120547Z_000197. Root cause confirmed in shared World.formEntity fixture: catch-all ownership assigned unrelated board spaces to a shareholder, triggering unintended development. Fixture now assigns catch-all ownership only to a non-shareholder when available.
+
+## 2026-08-17T12:06:33Z — refactorer received coder handoff `turn-development` (further fixture correction)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 31b21c5fb8
+```
+
+Action: merged commit `31b21c5fb8` as `1bf4fa2`, resolving a `logbook.md`
+conflict with three non-contiguous insertion points on this role's own
+side this time (the last two cycles' entries landed split across three
+separate positions in the incoming chain rather than one clean tail —
+worked out each hunk's exact base-line anchor via `diff` before
+splicing, rather than assuming a single contiguous block the way the
+last several cycles allowed; verified afterward with `diff <(git show
+MERGE_HEAD:logbook.md) <result>` showing zero removed lines). No
+`src/main` production code changed — `World.formEntity`'s catch-all
+ownership assignment (giving every remaining unowned space to a single
+default player so scenarios don't need to enumerate the whole board) used
+to always pick `shareholders.get(1)`, i.e. one of the *entity's own*
+shareholders, who then legitimately builds across everything it was
+handed, draining cash before the entity's own fundability check — same
+"a shareholder can now spend money elsewhere" theme as the earlier
+`distressed-sale-2`/`entity-m1` fixes, just in the shared fixture helper
+rather than individual scenario data. Now picks the first player who
+isn't one of the entity's shareholders. Reviewing under refactorer rules
+before handing back.
+
+## 2026-08-17T12:06:33Z — refactorer review: `turn-development` (further fixture correction)
+
+Real progress: full acceptance went from 20 failures to **8** — confirmed
+via a fresh run on this exact commit. Spot-checked a sample rather than
+assuming uniform root cause, since `World.java` is test-support code
+outside this role's CRAP/mutation/DRY tooling scope (consistent with
+every prior cycle) and there's nothing to structurally clean up here
+regardless: the 8 remaining failures are NOT all one thing.
+`EnRulesGreedoShareSaleAcceptanceTest`'s two failures look like the same
+"stale value now that building is routine" class already fixed twice
+this task (e.g. `dog`'s final balance expected 440, got 40 — consistent
+with an unplanned house purchase). `EnRulesGreedoLegalEntityAcceptanceTest`'s
+three failures are a different shape entirely: `entity-6` and similar
+scenarios reference `pawn "racecar"` as the catch-all owner directly in
+their `Then`/`And` steps ("every other ownable space is owned by pawn
+racecar") but never register that pawn via a `"will roll N for
+initiative"` step the way the scenarios that already pass do — these use
+`Given Pink Realty is formed` as a direct setup shortcut that never
+introduces a 4th player at all, so `World.pawn("racecar")` throws
+"No pawn racecar is at play." That's Gherkin scenario content (or
+conceivably a step-handler robustness question — should "owned by pawn
+X" auto-register X the way some other steps auto-create players?), not
+something a structural refactor should decide or a refactorer should
+edit directly (this project's own precedent: architects don't hand-edit
+Gherkin scenario content, they route it to the specifier). Not
+investigated further; not fixed.
+
+Verification: `mvn test` — domain green (no production file touched this
+cycle, so nothing else to re-verify). Full acceptance: 781 scenarios, 8
+failures, confirmed fresh.
+
+## 2026-08-17T12:06:33Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: 1bf4fa2d6e
+```
+
+Priority 50, matching the normal pipeline flow this task has followed
+throughout (the specifier engaging directly, not an architect review
+loop). Genuine progress to report: 20 failures down to 8 via a shared
+test-fixture fix (`World.formEntity`'s catch-all ownership no longer
+lands on a shareholder). No production code changed this cycle, so
+nothing for this role to structurally clean up. The 8 remaining failures
+split into at least two different root causes on inspection (a handful
+of likely-stale expected values in `greedo-share-sale.feature`, plus a
+`pawn "racecar"` registration gap specific to `Given X is formed`-style
+setup shortcuts in `greedo-legal-entity.feature` that never introduce a
+4th player) — flagging the split rather than treating it as one
+remaining mechanism, since the second kind may need specifier attention
+for the Gherkin content itself. Domain 398/398 green.
 2026-08-17T12:45:00Z coder: processed specifier handoff 20260817T123946Z_000198 (0a8d76bbc9), merging the dormant legal-entity fixture correction that declares racecar as a player for entity-6/entity-8. No production change.
+
+## 2026-08-17T12:40:06Z — refactorer received coder handoff `turn-development` (racecar player fixture)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder d65c1fd1d3
+```
+
+Action: merged commit `d65c1fd1d3` as `98fbfcf`, resolving a four-point
+`logbook.md` conflict (worked out each hunk's base-line anchor precisely
+via `diff` rather than assuming contiguity, same discipline as last
+cycle; verified afterward with zero removed lines against both parents).
+Specifier fix, confirming the exact gap this role flagged last cycle:
+`entity-6`/`entity-8` referenced `pawn "racecar"` in their assertions but
+never declared it as a player (they use `Given Pink Realty is formed` as
+a setup shortcut that skips the normal player-selection step). Fixed by
+adding `Given we select 4 players` before `Pink Realty is formed` in
+both scenarios. Reviewing under refactorer rules before handing back.
+
+## 2026-08-17T12:40:06Z — refactorer review: `turn-development` (racecar player fixture)
+
+Pure Gherkin scenario content, no `src/main` production code touched —
+outside this role's CRAP/mutation/DRY scope, and correctly so (this was
+the Gherkin-content gap this role deliberately declined to edit itself
+last cycle, being specifier territory). Full acceptance: **8 failures
+down to 6**, confirmed fresh — `EnRulesGreedoLegalEntityAcceptanceTest`
+dropped from 3 to 1 (both `racecar` scenarios now pass), leaving one
+failure there this role hasn't inspected in detail. The two
+`EnRulesGreedoShareSaleAcceptanceTest` failures already flagged last
+cycle as likely stale values are unchanged, still open. `Journal`/
+`Logging`/`Report` (1 each) presumably still downstream of the remaining
+legal-entity/share-sale mechanisms.
+
+Verification: `mvn test` — domain green (no production file changed).
+Full acceptance: 781 scenarios, 6 failures, confirmed fresh.
+
+## 2026-08-17T12:40:06Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: 98fbfcf45b
+```
+
+Priority 50, matching the normal pipeline flow. Continued, real progress:
+8 failures down to 6, via a specifier-owned Gherkin fixture correction
+for the exact `pawn "racecar"` registration gap this role flagged last
+cycle rather than editing itself. No production code changed, nothing
+for this role to structurally clean up this cycle. 6 failures remain,
+split across `EnRulesGreedoLegalEntityAcceptanceTest` (1, not yet
+inspected), `EnRulesGreedoShareSaleAcceptanceTest` (2, likely stale
+values per last cycle's flag), and `Journal`/`Logging`/`Report` (1 each,
+presumably downstream). Domain 398/398 green.
 2026-08-17T13:05:00Z coder: processed specifier handoff 20260817T130114Z_000199 (5d10d8344e), merging two additional shareholder-catch-all fixture corrections across legal-entity, journal, logging, and report features. No production change.
+
+## 2026-08-17T13:01:35Z — refactorer received coder handoff `turn-development` (journal/logging/report fixtures)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 40fce80084
+```
+
+Action: merged commit `40fce80084` as `881150f`, resolving a
+five-point `logbook.md` conflict (same precise per-hunk-anchor
+methodology as the last two cycles; verified zero removed lines against
+both parents afterward). Two more specifier fixture fixes: `journal-63`/
+`logging-63`/`report-63` had the exact same shareholder-catch-all shape
+already fixed twice this task (`every other ownable space is owned by
+pawn "high hat"`, a shareholder, now reassigned to a new non-shareholder
+`pawn "racecar"`, with `we select 3 players` bumped to 4 and a `racecar`
+initiative roll added); `entity-13` renamed its own `renter` example row
+from `racecar` to `ship` and bumped to 5 players, since `racecar` is now
+a reserved name for the catch-all default owner elsewhere and collided.
+Reviewing under refactorer rules before handing back.
+
+## 2026-08-17T13:01:35Z — refactorer review: `turn-development` (journal/logging/report fixtures)
+
+Pure Gherkin scenario content again, no `src/main` touched — outside
+this role's tooling scope. Full acceptance: **6 failures down to 2**,
+confirmed fresh, both in `EnRulesGreedoShareSaleAcceptanceTest`
+(`share-sale-3`: "high hat owns Rue Grande Dinant" expected true, got
+false; another scenario: dog's final balance expected 440, got 40).
+Looked at `share-sale-3` directly: dog distress-sells a spare property to
+whichever peer bids, expecting `high hat` to win it — not the
+`formEntity` catch-all default-owner mechanism this task's fixture fixes
+have all targeted, but the *bidding* outcome of `DistressedSale`, which
+depends on each shareholder's own accumulated wealth/property. Since
+`high hat`'s catch-all-derived holdings (and thus spending pattern) have
+changed across every fixture fix this task has made, this could easily
+be the same "a shareholder's own resources shifted" theme in a new
+guise, but unlike `distressed-sale-2` two cycles ago I don't have a
+verified mechanism for *what the new correct value should be* — the
+`distressed-sale-2` fix was safe because the arithmetic was exact and
+checkable by hand; here it would mean guessing at auction/bidding
+outcomes across a chain of upstream fixture changes. Not fixed; flagging
+rather than guessing.
+
+Verification: `mvn test` — domain green (no production file changed).
+Full acceptance: 781 scenarios, 2 failures, confirmed fresh.
+
+## 2026-08-17T13:01:35Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: 881150f325
+```
+
+Priority 50, matching the normal pipeline flow. Very close now: 6
+failures down to 2, both `EnRulesGreedoShareSaleAcceptanceTest`
+(`share-sale-3` and one other), via two more specifier fixture fixes
+following the same shareholder-catch-all pattern already established.
+No production code changed, nothing for this role to structurally clean
+up. The 2 remaining look like the same underlying theme as everything
+else this task has fixed, but I don't have a verified mechanism for the
+correct new expected values the way I did for `distressed-sale-2` —
+recommend specifier/coder investigation rather than a guess. Domain
+398/398 green.
 2026-08-17T13:20:00Z coder: processed specifier handoff 20260817T130848Z_000200 (52a987a86a), merging the user-directed removal of the buyer-identity assertion from share-sale-3. No production change.
+
+## 2026-08-17T13:09:14Z — refactorer received coder handoff `turn-development` (share-sale-3 assertion removed)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 37726457ac
+```
+
+Action: merged commit `37726457ac` as `2cf29df`, resolving a
+six-point `logbook.md` conflict (same per-hunk-anchor methodology as
+every recent cycle; this time the first two hunks split at a different
+boundary than the equivalent content split last cycle, purely a diff-
+algorithm artifact — verified the reassembled total matched byte-for-
+byte via `diff` against both parents before committing, same as always).
+User-directed fix this time, not a specifier inference: `share-sale-3`'s
+"pawn high hat owns Rue Grande Dinant" assertion (checking WHO
+specifically won the distress-sale bid) was removed outright rather than
+corrected to a new value, keeping the assertions that actually matter
+(dog no longer owns it, still holds its entity share, isn't bankrupt).
+Reviewing under refactorer rules before handing back.
+
+## 2026-08-17T13:09:14Z — refactorer review: `turn-development` (share-sale-3 assertion removed)
+
+Full acceptance: **2 failures down to 1**, confirmed fresh. The one
+remaining is `share-sale-6` ("the final shareholder may liquidate the
+legal entity to settle their debt"): dog's final balance expected $440,
+got $40 — exactly dog's *starting* balance, unchanged, suggesting the
+tax-landing/liquidation sequence never actually resolved rather than
+resolving to a different value. Spent real effort tracing this one since
+it's the last blocker: the scenario has no `"will roll N for
+initiative"` steps for any player and no `"every other player can
+complete their turn"` step either, yet doesn't error on a missing queued
+roll the way `World.nextQueuedPawnRoll` normally would for an
+unscripted, unflagged player — worth checking whether `Initiative`
+requests a roll from every entry in `players` including the two pawns
+this scenario's `"X and Y have both gone bankrupt"` setup step already
+marks bankrupt *before* play starts, and whether that interacts with the
+new 4th catch-all player `bankruptPawns` itself introduces (a
+`bidForDistressed`-only override, `builds()` still defaults false, so
+it shouldn't itself be developing). Not confirmed, not fixed — noting
+the specific thread for whoever investigates next rather than leaving a
+bare "still failing."
+
+Verification: `mvn test` — domain green (no code changed this cycle).
+Full acceptance: 781 scenarios, 1 failure, confirmed fresh.
+
+## 2026-08-17T13:09:14Z — refactorer sent turn-development handoff to architect
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: 2cf29dfa69
+```
+
+Priority 50, matching the normal pipeline flow. Down to the very last
+failure: 781 scenarios, 1 remaining (`share-sale-6`). No production code
+changed this cycle. Left a specific investigation thread in the review
+entry above (possible `Initiative`-vs-already-bankrupt-players
+interaction, unconfirmed) rather than a bare status, since this is close
+enough to done that the next investigator shouldn't have to start from
+scratch. Domain 398/398 green.
 2026-08-17T13:40:00Z coder: processed specifier handoff 20260817T133207Z_000201 (e3241ea91d), merging the user-directed share-sale-6 fixture setup to pre-develop Pink Realty's streets. No production change.
 
+## 2026-08-17T13:32:30Z — refactorer received coder handoff `turn-development` (share-sale-6 fixed — full acceptance green)
+
+Handoff message received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process coder 92d1bbbef2
+```
+
+Action: merged commit `92d1bbbef2` as `ffe418e`, resolving a seven-point
+`logbook.md` conflict (same per-hunk-anchor methodology as every recent
+cycle; verified zero removed lines against both parents). User-directed
+fixture fix for the last remaining scenario: `share-sale-6` now
+pre-develops all three of Pink Realty's streets to hotels before marking
+`high hat`/`iron box` bankrupt, rather than leaving them undeveloped —
+not the `Initiative`-vs-bankrupt-players thread this role's last review
+flagged as worth checking; the actual mechanism was about the entity's
+development state at liquidation time. Reviewing under refactorer rules
+before handing back.
+
+## 2026-08-17T13:32:30Z — refactorer review: `turn-development` (full acceptance green)
+
+**Full acceptance: 781/781, zero failures — confirmed fresh, run twice.**
+`mvn test` from the repo root: every module green, including the usually-
+flaky `SimulatorTest.keepsPlayingUntilToldToStop` this run. No production
+code changed this cycle (pure Gherkin fixture data), so nothing for this
+role to structurally verify beyond re-running the full suite, which I did
+rather than trust the "green" claim outright, given this task's own
+history of stale-claim corrections earlier on. `turn-development` is
+genuinely closed this time, twelve refactorer cycles after the coder's
+first attempt surfaced the underlying "only the initiative winner ever
+develops" game-wide characteristic — the resolution touched
+`Game.playTurn`'s development gate, `Game.developAndTrackConsolidation`/
+`resolveMarketDeadlockAtRoundBoundary`'s quiet-round signal, and a long
+tail of Gherkin fixtures whose shared-helper and inline setup both
+assumed the old bug.
+
+Verification: `mvn test` — all modules green, zero exceptions this run.
+Full acceptance: 781 scenarios, 0 failures, run twice.
+
+## 2026-08-17T13:32:30Z — refactorer sent turn-development handoff to architect
 ## 2026-08-17T06:47:33Z — specifier extends turn-development to cover legal-entity mode
 
 Raised the follow-up flagged above: is the legal-entity carve-out load-
@@ -36455,6 +36982,19 @@ Handoff message sent:
 
 ```
 type: git_handoff
+to: architect
+priority: 50
+task: turn-development
+commit: ffe418e761
+```
+
+Priority 50, matching the normal pipeline flow. **Genuinely green this
+time**: 781/781 acceptance, full reactor including the normally-flaky CLI
+test, confirmed via two independent fresh runs rather than trusted from
+narrative. No production code changed this cycle. Recommend this as the
+point to close `turn-development` out for real.
+
+## 2026-08-18T06:30:00Z — refactorer received coder handoff `development-loans`
 to: coder
 priority: 50
 task: turn-development
@@ -36472,6 +37012,11 @@ Handoff message received:
 ```
 Re-read your role and constitution.
 
+merge_and_process coder 6ed9577
+```
+
+Action: merge the named commit, then review the implementation under
+refactorer rules before handing back to the architect.
 Policy needed: building blocks quiet-round entity formation; 25 failures.
 ```
 
@@ -37073,3 +37618,46 @@ Verification status:
 The implementation is committed and handed to the refactorer for review;
 acceptance execution must be rerun once a JDK is available and after the
 specifier resolves scenario 12.
+
+## 2026-08-18T08:30:00Z — refactorer review: development-loans acceptance is red
+
+Merged coder `6ed9577` (resolving the `logbook.md` conflict by preserving
+every line from both parents, verified zero removed against either). Set up
+the JDK (`JAVA_HOME` to the sdkman 25.0.2-zulu toolchain — the "no Java
+runtime" report was a missing `JAVA_HOME`, not a missing JDK).
+
+Domain suite is green: 415/415 (388 prior + new loan tests), and the known
+flaky `SimulatorTest.keepsPlayingUntilToldToStop` passed on retry. But the
+FULL acceptance suite is substantially red: 864 tests, 59 failures + 8
+errors across 7 classes (`development-loans`, `greedo-legal-entity`,
+`journal`, `report`, `logging`, `cli`, `cli-packaged-jar`). These are coder-
+scope defects, not refactorer cleanup:
+
+- Compile error in the delivered step handlers (`illegal attempt to
+  redefine an existing match binding`): a dual `instanceof ... it` pattern
+  binding inside one OR, in `GameLogStepHandlers` and `JournalStepHandlers`.
+  Fixed behavior-preservingly by renaming the second binding (`playerDefaulted`).
+- ~30 distinct "Unsupported step" messages: the new dev-loan journal/log/
+  report/packaged-jar steps plus pre-existing legal-entity steps
+  (`<group> split is an eligible three-ownesplit`, `pawn "dog" has a balance
+  that allows only $0 toward the entity`, `<entity_name> builds a house on
+  "..." for $100`) are not registered.
+- `GameLogStepHandlers.java:178` reads capture group 5 in a 4-group regex →
+  `IndexOutOfBoundsException: No group 5`.
+- Production bug: `DevelopmentLoanBook.foreclose` → `Deeds.sellHouse` →
+  `verifyOwner` throws `dog does not own RueGrandeDinant` during foreclosure.
+- `development-loans.feature` scenario 12 still red (`Expected 1 houses on
+  MeirAntwerpen but found 0`), pending the specifier's resolution.
+- README usage report was not updated for `--optional-development-loans`.
+
+Per refactorer ownership (structure-preserving cleanup + verification, not
+completing an incomplete implementation), I am not completing the coder's
+delivery. Handing the verified red state back to the architect for a coder
+follow-up.
+
+## 2026-08-18T06:34:18Z — accepted red development-loans review
+
+Merged refactorer commit `3274c3d674`. The delivery is not accepted: domain
+tests pass, but full acceptance has 59 failures and 8 errors, including
+unregistered steps, a capture-group error, a foreclosure ownership defect,
+and unresolved scenario 12. Routed back to the coder at priority 00.
