@@ -37815,3 +37815,10 @@ with the JDK toolchain set:
 
 Development-loans is functionally complete and green. Handing the verified
 state back to the architect.
+
+## 2026-08-18T14:40:41+02:00 — accepted development-loans completion
+
+Merged refactorer commit `8af8ceb631` and independently reran the full
+acceptance suite. All 19 development-loans scenarios pass; the suite reports
+864 scenarios with 4 unrelated baseline failures in legal-entity, share-sale,
+and report expectations. Development-loans is accepted as complete.
