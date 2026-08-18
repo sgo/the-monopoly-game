@@ -36834,3 +36834,83 @@ priority: 50
 task: development-loans
 commit: 761abde835
 ```
+
+## 2026-08-18T05:36:00Z — specifier receives a coder question on development-loans-12
+
+Handoff received:
+
+```
+type: question
+to: specifier
+priority: 50
+task: development-loans
+FROM: coder
+
+Re-read your role and constitution.
+
+The development-loans implementation is blocked on a specification
+conflict in scenario 12. Please decide which behavior is authoritative:
+
+1. Preserve the existing building rule: Building.develop() continues
+   to build every affordable house/hotel on a player's own turn;
+   correct scenario 12 or its fixture values.
+2. Reserve bondholder liquidity for expected development loans so an
+   earlier development cannot consume funds needed by a later loan in
+   the same round.
+3. Limit automatic development per turn/round when development loans
+   are enabled so the later bondholder remains liquid.
+
+Confirmed facts:
+- Direct Building regression with dog=$500, high hat=$50, both Dark
+  Blue streets owned by high hat, development loans enabled passes and
+  raises a $150 loan.
+- Focused acceptance runs 18/19 scenarios; only scenario 12 fails
+  because dog wins initiative, owns the Brown monopoly, develops it
+  first, and consumes the $500 bondholder balance before high hat's
+  $150 loan is requested.
+- Existing turn-development and building specifications require
+  development on each player's own turn and repeated affordable
+  development, so changing that globally would be a behavior change.
+- Player annual payment, mortgage fallback, collateral-only
+  foreclosure, and foreclosure accounting scenarios pass after the
+  latest fixes.
+```
+
+Action taken: re-read `swarmforge/constitution.prompt` and every article
+it references, and `swarmforge/roles/specifier.prompt`, per the handoff
+body's instruction. Diagnosed the real cause: it is not a behavior
+conflict at all. `Building.develop()`'s every-affordable-house rule
+(`Building.java:32-40`) is correct and is not changing. Scenario 12's
+own fixture accidentally gave dog — who inherits the Background's
+complete Brown monopoly in every scenario in this file — $500 spare
+cash for a scene where dog's role had flipped to "idle bondholder."
+Greedo's greedy `develop()` loop has no way to know that cash was meant
+to stay idle, so it spent it on dog's own houses first, regardless of
+turn order. Confirmed the fix has to be a fixture change, not a
+production-code change: reordering initiative was ruled out because
+`queueInitiativeRoll`/`queuePawnRoll` are FIFO queues consumed once by
+the Background's own declarations (`World.java:399-410`), not
+overridable by repeating the Given step later in the scenario body.
+
+Fixed `development-loans-12`: dog's cash set to $0 (his inherited
+monopoly becomes unbuildable this round regardless of turn order), and
+the idle-bondholder role moved to a fresh third pawn, `"iron box"`,
+which owns no property at all so `Building.develop()` has nothing to
+build for it — mirroring the existing role-separation convention
+already used in `development-loans-9`/`11`. No loan or cash example
+values changed, only the player arrangement. Validated with
+`gherkin-parser`/`gherkin-ir-dry-checker` (baseline near-duplicate/
+possible-synonym/placeholder-variant noise only, zero
+`duplicate-in-scenario`). Walked the user through why `iron box` alone
+is collision-free (owns nothing, so `develop()` returns immediately for
+it) before asking for and receiving approval to hand the decision back.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: development-loans
+commit: 1443aabc80
+```
