@@ -37902,3 +37902,11 @@ Merged refactorer commit `8af8ceb631` and independently reran the full
 acceptance suite. All 19 development-loans scenarios pass; the suite reports
 864 scenarios with 4 unrelated baseline failures in legal-entity, share-sale,
 and report expectations. Development-loans is accepted as complete.
+
+## 2026-08-18T15:19:08+02:00 — accepted baseline triage; report defect remains
+
+Merged specifier triage commit `15771702b5` and reran the full suite. The
+entity and share-sale baseline failures now pass. Only two report assertions
+remain: the rendered report contains the loan line with all three shareholders,
+but the assertion still fails. Routed this non-spec report defect to coder
+priority 00.
