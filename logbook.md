@@ -37971,3 +37971,113 @@ Contents: report loan-cohort assertion aligned with production comma-list
 rendering; Report[88]/[93] now pass; acceptance 864/864 green; domain
 394/394 green. Coder-side implementation change complete — refactorer to
 verify structurally and return the verified state to the architect.
+
+## 2026-08-18T14:02:46Z — clearing processed handoff from queue
+
+```
+id: 20260818T063523Z_000304_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 011a013230
+created_at: 2026-08-18T06:35:23.336935Z
+enqueued_at: 2026-08-18T06:35:24.121885Z
+task: development-loans
+
+Re-read your role and constitution.
+
+merge_and_process architect 011a013230
+```
+
+Reason: content fully processed — the named commit is merged and the work is logged elsewhere in this logbook. Also historically verified but not logged at the time. Removing from queue per workflow.
+
+## 2026-08-18T14:02:46Z — clearing processed handoff from queue
+
+```
+id: 20260818T064039Z_000305_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 90141bfd2b
+created_at: 2026-08-18T06:40:39.400256Z
+enqueued_at: 2026-08-18T06:40:39.828673Z
+task: development-loans
+
+Re-read your role and constitution.
+
+merge_and_process architect 90141bfd2b
+```
+
+Reason: content fully processed — the named commit is merged and the work is logged elsewhere in this logbook. Also historically verified but not logged at the time. Removing from queue per workflow.
+
+## 2026-08-18T14:02:46Z — clearing processed handoff from queue
+
+```
+id: 20260818T090142Z_000306_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 8372ca32aa
+created_at: 2026-08-18T09:01:42.744078Z
+enqueued_at: 2026-08-18T09:01:42.841814Z
+task: development-loans
+
+Re-read your role and constitution.
+
+merge_and_process architect 8372ca32aa
+```
+
+Reason: content fully processed — the named commit is merged and the work is logged elsewhere in this logbook. Also historically verified but not logged at the time. Removing from queue per workflow.
+
+## 2026-08-18T14:02:46Z — clearing processed handoff from queue
+
+```
+id: 20260818T054927Z_000203_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 1443aabc80
+created_at: 2026-08-18T05:49:27.060034Z
+enqueued_at: 2026-08-18T05:49:27.973479Z
+task: development-loans
+
+Re-read your role and constitution.
+
+merge_and_process specifier 1443aabc80
+```
+
+Reason: content fully processed — the named commit is merged and the work is logged elsewhere in this logbook. Also historically verified but not logged at the time. Removing from queue per workflow.
+
+## 2026-08-18T14:02:46Z — clearing processed handoff from queue
+
+```
+id: 20260818T131929Z_000308_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 3e93fc2a56
+created_at: 2026-08-18T13:19:29.402294Z
+enqueued_at: 2026-08-18T13:19:30.252659Z
+task: baseline-triage
+
+Re-read your role and constitution.
+
+merge_and_process architect 3e93fc2a56
+```
+
+Reason: content fully processed — the named commit is merged and the work is logged elsewhere in this logbook. Also historically verified but not logged at the time. Removing from queue per workflow.
