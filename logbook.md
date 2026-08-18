@@ -37902,3 +37902,96 @@ Merged refactorer commit `8af8ceb631` and independently reran the full
 acceptance suite. All 19 development-loans scenarios pass; the suite reports
 864 scenarios with 4 unrelated baseline failures in legal-entity, share-sale,
 and report expectations. Development-loans is accepted as complete.
+
+## 2026-08-18T13:00:00+02:00 — specifier receives architect triage note and merges development-loans
+
+Handoff received:
+
+```
+type: note
+to: specifier
+priority: 00
+
+Re-read your role and constitution.
+
+Triage 4 baseline failures: entity build, share-sale bankruptcy, 2 reports.
+```
+
+No commit was named (a bare note, not a git_handoff), so first merged the
+architect's completed `development-loans` branch tip (`d40056d`) to get the
+code the 4 failures were observed against. `logbook.md` conflicted (both
+branches had appended entries at the same point); resolved by keeping every
+line from both parents, placing the specifier's own `development-loans-12`
+entry chronologically between the coder's "received handoff" and "completed
+implementation slice" entries, matching its real timestamp. Merge committed
+as `8b11ffb`.
+
+Triaged the 4 failures by reading each scenario, its Background, and the
+relevant production/step-handler code, then confirming with a live
+`./acceptance/run-acceptance.sh` run (JDK: sdkman `25.0.2-zulu`):
+
+- `entity-48` (`greedo-legal-entity.feature`) — "BruulMechelen 1 house": not a
+  behavior conflict. `Building.candidateBuildsFor` always resolves a tied
+  (all-level-0) monopoly to its lowest board-position street first, so with
+  every pink street unimproved the entity always develops Rue de Diekirch
+  Arlon, never Bruul Mechelen as asserted. Confirmed by reading `Building.java`
+  directly: mortgaging the other two streets (the technique `entity-47` uses)
+  was considered and rejected — `Building.refusedBuildFor`/
+  `mortgagedMonopoliesOwnedBy` blocks development on the *entire* group the
+  moment any one street in it is mortgaged, so that would have made the
+  scenario refuse to build anywhere, not redirect it. Fixed instead by giving
+  Rue de Diekirch Arlon a pre-built house (`And the street "Rue de Diekirch
+  Arlon" has 1 house(s) built`), which makes Bruul Mechelen the genuine
+  lowest-level (and therefore selected) target — matching the scenario's own
+  stated intent ("the loan mechanism is not tied to which street in the group
+  secures it") instead of just asserting whatever the default happens to be.
+- `share-sale-22` (`greedo-share-sale.feature`) — "dog bankrupt": the scenario
+  never queued initiative or turn rolls, unlike every sibling multi-round
+  scenario in the file (e.g. `share-sale-23`). Confirmed non-deterministic:
+  a real run had iron box win initiative and high hat go bankrupt instead of
+  dog, never exercising the scenario's premise. Fixed by adding explicit rolls
+  so dog wins initiative and lands exactly on the luxury-tax square
+  (`ExtraBelasting`, board position 38, verified against `Official.java`/
+  `Street.java`) from its `starts at position 35` (`ZuidStation`) Given.
+- `report-64`/`report-69` (`report.feature`) — "Pink Realty raises a loan of
+  $50...": both omitted a player-count Given, so they inherited the feature
+  `Background`'s 2-player default instead of the 3 shareholders the assertion
+  names (dog, high hat, iron box). `World.formNamedEntity` only ever seats the
+  first 3 players as shareholders, so with 2 players iron box never existed.
+  Fixed by adding `Given we select 3 players`, matching the working sibling
+  `report-63`'s existing convention.
+
+All three fixture fixes verified together: full acceptance run went from 4
+failures to 2 (`entity-48` and `share-sale-22` now green). Committed as
+`1577170`.
+
+`report-64`/`report-69` remain red after the fixture fix, on a cause outside
+specifier scope: `GameLogStepHandlers.java:240-243`'s step handler for "the
+game report says that <entity> raises a loan of $X from pawn dog, pawn high
+hat, and pawn iron box" hardcodes its search string as
+`"... from dog, high hat, and iron box"` (with "and"), but `Report.java:156-157`
+actually builds that sentence with a plain `Collectors.joining(", ")` — no
+"and" before the last name — so the real report text is "... from dog, high
+hat, iron box" and can never match. This is a project step handler /
+production-code mismatch (`the-monopoly-game-specs-core/src/test/java/.../
+GameLogStepHandlers.java`, not a `.feature` file), outside specifier
+ownership. The Gherkin step text itself already matches this project's
+existing Oxford-comma convention for 3-name shareholder lists (identical
+phrasing already used correctly in `report-63`'s "is formed" scenario, which
+only asserts a prefix and so never actually exercises the join format).
+Recommending `Report.java`'s shareholder-list joining be given proper "X, Y,
+and Z" formatting (the entity always seats exactly 3 shareholders in this
+game, so no general N-item list formatter is needed) rather than dropping
+"and" from the Gherkin to match today's plain join — routed to the architect
+as the authoritative-behavior decision, since the same list-join defect would
+resurface for any future report message stated in natural-English list form.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: baseline-triage
+commit: 15771702b5
+```
