@@ -25,7 +25,13 @@ public final class Billionaire extends Greedo {
 
   public Billionaire(Money reserve, boolean stalemateTrading, boolean legalEntityTrading,
                      boolean appliesOpeningCapital, boolean assetRichOpening) {
-    super(reserve, stalemateTrading, legalEntityTrading);
+    this(reserve, stalemateTrading, legalEntityTrading, appliesOpeningCapital, assetRichOpening, false, false);
+  }
+
+  public Billionaire(Money reserve, boolean stalemateTrading, boolean legalEntityTrading,
+                     boolean appliesOpeningCapital, boolean assetRichOpening,
+                     boolean developmentLoans, boolean fullDrawDevelopmentLoans) {
+    super(reserve, stalemateTrading, legalEntityTrading, developmentLoans, fullDrawDevelopmentLoans);
     this.appliesOpeningCapital = appliesOpeningCapital;
     this.assetRichOpening = assetRichOpening;
   }

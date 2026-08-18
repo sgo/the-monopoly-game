@@ -21,12 +21,21 @@ public class Building {
   private final Rule.Set rules;
   private final Strategy.OfPlayers strategies;
   private final Events events;
+  private final DevelopmentLoanBook developmentLoanBook;
+  private final List<Player> players;
 
   public Building(Deeds deeds, Rule.Set rules, Strategy.OfPlayers strategies, Events events) {
+    this(deeds, rules, strategies, events, null, List.of());
+  }
+
+  public Building(Deeds deeds, Rule.Set rules, Strategy.OfPlayers strategies, Events events,
+                  DevelopmentLoanBook developmentLoanBook, List<Player> players) {
     this.deeds = deeds;
     this.rules = rules;
     this.strategies = strategies;
     this.events = events;
+    this.developmentLoanBook = developmentLoanBook;
+    this.players = List.copyOf(players);
   }
 
   public void develop(Player player) {
@@ -35,7 +44,7 @@ public class Building {
     for (;;) {
       Optional<Build> build = nextBuildFor(player);
       if (build.isEmpty()) return;
-      build.get().apply(deeds, player, events);
+      if (!apply(build.get(), player)) return;
     }
   }
 
@@ -59,8 +68,28 @@ public class Building {
     }
     return monopolies.stream()
         .flatMap(this::candidateBuildsFor)
-        .filter(it -> strategies.forPlayer(player).builds(it.offer(player)))
+        .filter(it -> strategies.forPlayer(player).builds(it.offer(player)) || loanCanFund(it, player))
         .findFirst();
+  }
+
+  private boolean loanCanFund(Build build, Player player) {
+    return developmentLoanBook != null
+        && !build.hotel
+        && strategies.forPlayer(player).developmentLoansEnabled()
+        && !build.offer(player).isAffordable()
+        && developmentLoanBook.canRaise(player, build.street, strategies.forPlayer(player).fullDrawDevelopmentLoans(), players);
+  }
+
+  private boolean apply(Build build, Player player) {
+    if (!build.offer(player).isAffordable()) {
+      if (!loanCanFund(build, player)) return false;
+      DevelopmentLoanBook.Position position = developmentLoanBook.raise(player, build.street,
+          strategies.forPlayer(player).fullDrawDevelopmentLoans(), players).orElse(null);
+      if (position == null) return false;
+      events.developmentLoanRaised(player, position);
+    }
+    build.apply(deeds, player, events);
+    return true;
   }
 
   private int firstLevelCost(List<ColourStreet> group) {
@@ -127,6 +156,9 @@ public class Building {
 
   public interface Events {
     default void builtHouse(Player player, ColourStreet street, Money price) {
+    }
+
+    default void developmentLoanRaised(Player borrower, DevelopmentLoanBook.Position position) {
     }
 
     default void refusedBuilding(Player player, ColourStreet street, Money price) {

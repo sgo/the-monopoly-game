@@ -995,3 +995,252 @@ Feature: game journal
     Examples:
       | year limit | dog_starting_account | dog_final_balance | dog_final_age | high_hat_starting_account | high_hat_final_balance | high_hat_final_age |
       | 1          | 1500                  | 1700               | 1              | 1500                       | 1500                    | 0                   |
+
+  # journal-71
+  Scenario Outline: the journal records a player raising a development loan
+    Given the official rule set
+    And we select 2 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "dog" owns "Rue Grande Dinant"
+    And pawn "dog" owns "Diestsestraat Leuven"
+    And pawn "dog" follows the "Greedo" strategy
+    And pawn "dog" has $<cash> to spend
+    And pawn "high hat" has $500 to spend
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then the game journal records that pawn "dog" raises a development loan of $<loan> from the bank, secured by "Rue Grande Dinant", funded by pawn "high hat"'s bond purchase
+
+    Examples:
+      | cash | loan |
+      | 30   | 20   |
+
+  # journal-72
+  Scenario Outline: the journal records a legal entity raising a development loan
+    Given the official rule set
+    And we select 4 players
+    And Pink Realty is formed
+    And Pink Realty's bank account holds $<bank_funds>
+    And pawn "dog" has a balance that allows only $0 toward the entity
+    And pawn "high hat" has a balance that allows only $0 toward the entity
+    And pawn "iron box" has a balance that allows only $0 toward the entity
+    And pawn "racecar" has $500 to spend
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then the game journal records that Pink Realty raises a development loan of $<loan> from the bank, secured by "Rue de Diekirch Arlon", funded by pawn "racecar"'s bond purchase
+
+    Examples:
+      | bank_funds | loan |
+      | 60         | 40   |
+
+  # journal-73
+  Scenario Outline: the journal records a player's annual development-loan payment split into interest and principal
+    Given the official rule set
+    And we select 2 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "dog" owes the bank $<principal> on a development loan secured by "Rue Grande Dinant"
+    And pawn "dog" has $<cash> to spend
+    And development loans are enabled for the "Greedo" strategy
+    When pawn "dog" grows a year older
+    Then the game journal records that pawn "dog" pays the bank $<interest> interest and $<principal_payment> principal on the development loan secured by "Rue Grande Dinant"
+
+    Examples:
+      | principal | cash | interest | principal_payment |
+      | 20        | 100  | 1        | 1                  |
+
+  # journal-74
+  Scenario Outline: the journal records a legal entity's annual development-loan payment split into interest and principal
+    Given the official rule set
+    And we select 4 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And Pink Realty's bank account holds $<bank_funds>
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then the game journal records that Pink Realty pays the bank $<interest> interest and $<principal_payment> principal on the development loan secured by "Rue de Diekirch Arlon"
+
+    Examples:
+      | principal | bank_funds | interest | principal_payment |
+      | 40        | 100        | 2        | 2                  |
+
+  # journal-75
+  Scenario Outline: the journal records a player's development loan being fully repaid
+    Given the official rule set
+    And we select 2 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "dog" owes the bank $<principal> on a development loan secured by "Rue Grande Dinant"
+    And pawn "dog" has $<cash> to spend
+    And development loans are enabled for the "Greedo" strategy
+    When pawn "dog" grows a year older
+    Then the game journal records that pawn "dog"'s development loan on "Rue Grande Dinant" has been fully repaid
+
+    Examples:
+      | principal | cash |
+      | 1         | 100  |
+
+  # journal-76
+  Scenario Outline: the journal records a legal entity's development loan being fully repaid
+    Given the official rule set
+    And we select 4 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And Pink Realty's bank account holds $<bank_funds>
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then the game journal records that Pink Realty's development loan on "Rue de Diekirch Arlon" has been fully repaid
+
+    Examples:
+      | principal | bank_funds |
+      | 1         | 100        |
+
+  # journal-77
+  Scenario Outline: the journal records a player defaulting on a development loan and the bank foreclosing
+    Given the official rule set
+    And we select 2 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "dog" owes the bank $<principal> on a development loan secured by "Rue Grande Dinant"
+    And the street "Rue Grande Dinant" has 1 house(s) built
+    And pawn "dog" has $0 to spend
+    And pawn "high hat" will bid $<bid> for "Rue Grande Dinant" at auction
+    And development loans are enabled for the "Greedo" strategy
+    When pawn "dog" grows a year older
+    Then the game journal records that pawn "dog" defaults on the development loan secured by "Rue Grande Dinant"; the bank forecloses
+
+    Examples:
+      | principal | bid | interest |
+      | 20        | 30  | 0.60     |
+
+  # journal-78
+  Scenario Outline: the journal records a legal entity defaulting on a development loan and the bank foreclosing
+    Given the official rule set
+    And we select 4 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And the street "Rue de Diekirch Arlon" has 1 house(s) built
+    And the land "Bruul Mechelen" is mortgaged
+    And the land "Place Verte Verviers" is mortgaged
+    And Pink Realty's bank account holds $0
+    And pawn "racecar" will bid $<bid> for "Rue de Diekirch Arlon" at auction
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then the game journal records that Pink Realty defaults on the development loan secured by "Rue de Diekirch Arlon"; the bank forecloses
+
+    Examples:
+      | principal | bid | interest |
+      | 40        | 25  | 1.20     |
+
+  # journal-79
+  Scenario Outline: the journal records a bondholder's annual payout on a player's development loan
+    Given the official rule set
+    And we select 2 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And every other player can complete their turn
+    And pawn "dog" owes the bank $<principal> on a development loan secured by "Rue Grande Dinant"
+    And pawn "high hat" holds the development loan bond secured by "Rue Grande Dinant"
+    And pawn "dog" has $<cash> to spend
+    And pawn "high hat" has $<bond_cash> to spend
+    And development loans are enabled for the "Greedo" strategy
+    When pawn "dog" grows a year older
+    Then the game journal records that pawn "high hat" receives $<yield> interest and $<principal_payment> principal on the development loan bond secured by "Rue Grande Dinant"
+
+    Examples:
+      | principal | cash | bond_cash | yield | principal_payment |
+      | 100       | 200  | 500       | 3     | 5                  |
+
+  # journal-80
+  Scenario Outline: the journal records a bondholder's annual payout on a legal entity's development loan
+    Given the official rule set
+    And we select 4 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And pawn "racecar" holds the development loan bond secured by "Rue de Diekirch Arlon"
+    And Pink Realty's bank account holds $<bank_funds>
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then the game journal records that pawn "racecar" receives $<yield> interest and $<principal_payment> principal on the development loan bond secured by "Rue de Diekirch Arlon"
+
+    Examples:
+      | principal | bank_funds | yield | principal_payment |
+      | 100       | 200        | 3     | 5                  |
+
+  # journal-81
+  Scenario Outline: the journal records the bank recovering a player's foreclosure proceeds into its own account, rather than paying the bondholder out
+    Given the official rule set
+    And we select 3 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And pawn "iron box" will roll 2 for initiative
+    And every other player can complete their turn
+    And pawn "dog" owes the bank $<principal> on a development loan secured by "Rue Grande Dinant"
+    And pawn "high hat" holds the development loan bond secured by "Rue Grande Dinant"
+    And pawn "high hat" has $<bond_cash> to spend
+    And the bank's account holds $0
+    And the street "Rue Grande Dinant" has 1 house(s) built
+    And pawn "dog" has $0 to spend
+    And pawn "iron box" will bid $<bid> for "Rue Grande Dinant" at auction
+    And development loans are enabled for the "Greedo" strategy
+    When pawn "dog" grows a year older
+    Then the game journal records that the bank recovers $<recovered> from the foreclosure of "Rue Grande Dinant", added to its own account
+
+    Examples:
+      | principal | bond_cash | bid | recovered |
+      | 20        | 500       | 30  | 21        |
+
+  # journal-82
+  Scenario Outline: the journal records the bank recovering a legal entity's foreclosure proceeds into its own account, rather than paying the bondholder out
+    Given the official rule set
+    And we select 5 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And pawn "ship" holds the development loan bond secured by "Rue de Diekirch Arlon"
+    And pawn "ship" has $<bond_cash> to spend
+    And the bank's account holds $0
+    And the street "Rue de Diekirch Arlon" has 1 house(s) built
+    And the land "Bruul Mechelen" is mortgaged
+    And the land "Place Verte Verviers" is mortgaged
+    And Pink Realty's bank account holds $0
+    And pawn "racecar" will bid $<bid> for "Rue de Diekirch Arlon" at auction
+    And the last-capitalised shareholder of Pink Realty grows a year older
+    And development loans are enabled for the "Greedo" strategy
+    When we play up to 1 round
+    Then the game journal records that the bank recovers $<recovered> from the foreclosure of "Rue de Diekirch Arlon", added to its own account
+
+    Examples:
+      | principal | bond_cash | bid | recovered |
+      | 40        | 500       | 25  | 42        |
+
+  # journal-83
+  Scenario Outline: the journal records that development loans are enabled, near the start of the game
+    Given development loans are enabled for the "Greedo" strategy
+    When we play the game
+    Then the game journal records that development loans are <state>
+
+    Examples:
+      | state   |
+      | enabled |
+
+  # journal-84
+  Scenario Outline: the journal records that development loans are disabled by default, near the start of the game
+    When we play the game
+    Then the game journal records that development loans are <state>
+
+    Examples:
+      | state    |
+      | disabled |

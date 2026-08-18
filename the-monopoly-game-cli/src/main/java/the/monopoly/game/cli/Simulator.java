@@ -39,6 +39,10 @@ public final class Simulator {
       System.out.println("Legal entity trading enabled");
     if (List.of(arguments).contains("--optional-asset-rich-billionaire"))
       System.out.println("Asset-rich opening enabled");
+    if (List.of(arguments).contains("--optional-development-loans"))
+      System.out.println("Development loans enabled");
+    if (List.of(arguments).contains("--optional-development-loans-full-draw"))
+      System.out.println("Full-draw development loans enabled");
     for (String argument : arguments) {
       if (argument.startsWith(MAX_YEARS_FLAG)) {
         System.out.println("Year limit is " + argument.substring(MAX_YEARS_FLAG.length()) + " years");
@@ -72,19 +76,24 @@ public final class Simulator {
     boolean stalemateTrading = List.of(arguments).contains("--optional-greedo-stalemate-trading");
     boolean legalEntityTrading = List.of(arguments).contains("--optional-greedo-legal-entity");
     boolean assetRichOpening = List.of(arguments).contains("--optional-asset-rich-billionaire");
+    boolean developmentLoans = List.of(arguments).contains("--optional-development-loans");
+    boolean fullDrawDevelopmentLoans = List.of(arguments).contains("--optional-development-loans-full-draw");
     int maxYears = extractMaxYears(arguments);
     List<String> strategyNames = List.of(arguments).subList(Math.min(1, arguments.length), arguments.length).stream()
         .filter(argument -> !isRecognizedFlag(argument)).toList();
     if (!strategyNames.isEmpty() && strategyNames.size() != playerCount)
       return new Result(1, "Supply one strategy for each player. " + usage());
-    return run(playerCount, strategiesFor(playerCount, strategyNames, stalemateTrading, legalEntityTrading, assetRichOpening),
-        stalemateTrading, legalEntityTrading, maxYears);
+    return run(playerCount, strategiesFor(playerCount, strategyNames, stalemateTrading, legalEntityTrading,
+            assetRichOpening, developmentLoans, fullDrawDevelopmentLoans),
+        stalemateTrading, legalEntityTrading, developmentLoans, fullDrawDevelopmentLoans, maxYears);
   }
 
   private static boolean isRecognizedFlag(String argument) {
     return argument.equals("--optional-greedo-stalemate-trading")
         || argument.equals("--optional-greedo-legal-entity")
         || argument.equals("--optional-asset-rich-billionaire")
+        || argument.equals("--optional-development-loans")
+        || argument.equals("--optional-development-loans-full-draw")
         || argument.startsWith("--max-years");
   }
 
@@ -109,6 +118,14 @@ public final class Simulator {
   static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames,
                                           boolean stalemateTrading, boolean legalEntityTrading,
                                           boolean assetRichOpening) {
+    return strategiesFor(playerCount, strategyNames, stalemateTrading, legalEntityTrading,
+        assetRichOpening, false, false);
+  }
+
+  static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames,
+                                          boolean stalemateTrading, boolean legalEntityTrading,
+                                          boolean assetRichOpening, boolean developmentLoans,
+                                          boolean fullDrawDevelopmentLoans) {
     List<String> names = strategyNames.isEmpty()
         ? java.util.Collections.nCopies(playerCount, "greedo")
         : strategyNames;
@@ -117,8 +134,10 @@ public final class Simulator {
       String name = names.get(index);
       if (!STRATEGIES.contains(name)) throw new IllegalArgumentException("Unknown strategy: " + name + ".");
       Strategy strategy = name.equals("billionaire")
-          ? new Billionaire(Money.ZERO, stalemateTrading, legalEntityTrading, true, assetRichOpening)
-          : new Greedo(Money.ZERO, stalemateTrading, legalEntityTrading);
+          ? new Billionaire(Money.ZERO, stalemateTrading, legalEntityTrading, true, assetRichOpening,
+              developmentLoans, fullDrawDevelopmentLoans)
+          : new Greedo(Money.ZERO, stalemateTrading, legalEntityTrading,
+              developmentLoans, fullDrawDevelopmentLoans);
       selections.put(Pawn.values()[index].id(), strategy);
     }
     return player -> selections.get(player.id());
@@ -131,6 +150,8 @@ public final class Simulator {
         + System.lineSeparator() + "  --optional-greedo-stalemate-trading"
         + System.lineSeparator() + "  --optional-greedo-legal-entity"
         + System.lineSeparator() + "  --optional-asset-rich-billionaire"
+        + System.lineSeparator() + "  --optional-development-loans"
+        + System.lineSeparator() + "  --optional-development-loans-full-draw"
         + System.lineSeparator() + "  --max-years=N"
         + System.lineSeparator() + "Report file: " + reportPath();
   }
@@ -157,6 +178,13 @@ public final class Simulator {
     return start(playerCount, strategies, stalemateTrading, legalEntityTrading, maxYears).awaitEnd();
   }
 
+  public static Result run(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading,
+                           boolean legalEntityTrading, boolean developmentLoans,
+                           boolean fullDrawDevelopmentLoans, int maxYears) {
+    return start(playerCount, strategies, stalemateTrading, legalEntityTrading,
+        developmentLoans, fullDrawDevelopmentLoans, maxYears).awaitEnd();
+  }
+
   /**
    * Starts the simulator playing in the background, so its progress can be
    * watched as it happens. The simulation runs until it is {@link
@@ -178,6 +206,13 @@ public final class Simulator {
 
   public static Running start(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading,
                               boolean legalEntityTrading, int maxYears) {
+    return start(playerCount, strategies, stalemateTrading, legalEntityTrading,
+        false, false, maxYears);
+  }
+
+  public static Running start(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading,
+                              boolean legalEntityTrading, boolean developmentLoans,
+                              boolean fullDrawDevelopmentLoans, int maxYears) {
     Result rejected = rejectOutOfRange(playerCount);
     if (rejected == null) rejected = rejectInvalidYearLimit(maxYears);
     if (rejected != null) return new Running(rejected);
@@ -186,7 +221,8 @@ public final class Simulator {
     List<Player> players = rules.players().select(playerCount).toList();
     Deeds deeds = new Deeds();
     return new Running(new Game(rules, players, player -> Cup.of(rules.dice().toList()), strategies, deeds,
-        Cards.Decks.official(deeds), new Jail(rules), stalemateTrading, legalEntityTrading, maxYears));
+        Cards.Decks.official(deeds), new Jail(rules), stalemateTrading, legalEntityTrading,
+        developmentLoans, fullDrawDevelopmentLoans, maxYears));
   }
 
   private static Result rejectOutOfRange(int playerCount) {

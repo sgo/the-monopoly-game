@@ -59,4 +59,16 @@ class MoneyTest {
   void anEqualAmountDoesNotExceedTheOneItMatches() {
     assertThat(new Money(120).exceeds(new Money(120))).isFalse();
   }
+
+  @Test
+  void preservesExactCents() {
+    assertThat(Money.fromDollars("400.10").cents()).isEqualTo(40010);
+    assertThat(Money.fromDollars("400.10")).isEqualTo(Money.fromCents(40010));
+  }
+
+  @Test
+  void roundsPercentageWithBankersRounding() {
+    assertThat(Money.fromDollars("400.10").percentage(5)).isEqualTo(Money.fromDollars("20.00"));
+    assertThat(Money.fromDollars("400.10").percentage(3)).isEqualTo(Money.fromDollars("12.00"));
+  }
 }

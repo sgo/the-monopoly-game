@@ -157,3 +157,25 @@ Then it goes one of two ways.
 Btw, it takes about 30.000 years to destroy the Billionaire. Which is close to the 28.800 years a Belgian has to work to earn the amount of wealth the richest Belgian holds.
 
 **Conclusion: we need a Billionaire that is asset rich... just like in real life.**
+
+#### It's all about assets...
+
+You know. In the real world, billionaires are asset rich. They don't have a lot of money in their bank account. They're actually quite poor that way. Which is why they apply for, and receive, benefits.
+
+Why don't we test that?
+
+In Belgium the 1% own 25% of the GDP.
+Now, Monopoly has only eight players so our one billionaire represents more than just the 1% of the game world.
+
+So I've decided to introduce an optional feature which converts our billionaire into an asset rich one owning 25% of the board and having the same starting capital as everyone else.
+
+Here are the results:
+
+| Condition                           | WIN (bankruptcy-driven) | STALEMATE |
+|-------------------------------------|-------------------------|-----------|
+| **1 Billionaire + 7 Greedo** (n=50) | 50 (100%)               | 0 (0%)    |
+
+An asset rich billionaire always wins!
+So, not having a lot of money in the bank account appears not to matter much.
+
+As for the others. Some managed to almost make $2000 but everyone was destroyed within 4 years. That's the complete absence of social safety nets.

@@ -269,6 +269,36 @@ even with the flag on — but it measurably converts a large share of
 would-be stalemates into an ordinary, decisive bankruptcy ending, and does
 so more often in the trailing player's favor than not.
 
+### Optional: Billionaire asset-rich opening
+
+An opt-in CLI flag, `--optional-asset-rich-billionaire`, changes what the
+"Billionaire" strategy (see [Key concepts](#billionaire) above) is
+granted at the start of the game. Off (the default), Billionaire keeps
+its existing cash-rich opening — the usual \$57,700,000 balance and no
+land. With the flag enabled, Billionaire is asset-rich instead: it opens
+with the ordinary \$1,500 balance, but the game starts it out already
+owning the whole Orange and Red colour groups outright — unmortgaged,
+but with no houses built yet. It builds them up itself, at Greedo's own
+ordinary pace, exactly like any other player who happens to already own
+a complete monopoly.
+
+Measured directly, playing 50 real 8-player games (1 asset-rich
+billionaire + 7 Greedo, both optional Greedo flags on,
+`--max-years=2500`), after the above fix:
+
+- **50/50 games ended in an ordinary win for the billionaire** — every
+  single one, a sharp contrast with the cash-rich version's 15/50 (see
+  [Known characteristic: a Billionaire-mix endgame](#known-characteristic-a-billionaire-mix-endgame-is-slow-converging-not-perpetual)
+  below). Median age at win: 4 years (min 1, max 11) — far faster than
+  any other matchup measured in this document.
+- The other 7 Greedo opponents rarely get anywhere before being
+  eliminated: pooled across all 350 opponent-instances (7 players × 50
+  games), peak balance reached (measured at each player's own turn
+  start) had a median of exactly $1,500 — never exceeding starting
+  cash — and topped out at $1,953. Only 29/50 games saw any opponent
+  build so much as a single house before being wiped out; the other 21
+  ended with zero opponent development at all.
+
 ### Known characteristic: legal entity narrows, but doesn't guarantee, 3+-player resolution
 
 The legal-entity mechanism above removes the specific 3+-way colour-group-
@@ -372,13 +402,16 @@ The game result report and journal should have a human-readable format.
 - writes the final game report to a file, which defaults to
   `the-monopoly-game.report` in the system temporary directory
 
-Two optional flags extend the Greedo strategy's behaviour (both opt-in; neither
-is on by default):
+Four optional flags extend the default behaviour (all opt-in; none is on
+by default):
 - `--optional-greedo-stalemate-trading` — enables the peer-trade/buyout bridge
   described under [Optional: Greedo stalemate trading](#optional-greedo-stalemate-trading).
 - `--optional-greedo-legal-entity` — enables the legal-entity mechanism for
   3+-way colour-group splits described under
   [Optional: Legal entity for 3+-way colour-group splits](#optional-legal-entity-for-3-way-colour-group-splits).
+- `--optional-asset-rich-billionaire` — switches the "Billionaire" strategy
+  from its default cash-rich opening to an asset-rich one, described under
+  [Optional: Billionaire asset-rich opening](#optional-billionaire-asset-rich-opening).
 - `--max-years=N` — caps the simulation at N simulated years (passes through
   Go/jail). The game stops when any remaining player's age reaches N. The
   default (omitted) lets the game play to its natural end.

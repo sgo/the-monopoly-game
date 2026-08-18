@@ -24,18 +24,37 @@ final class LegalEntityBuilding {
 
   static LegalEntity.Operation buildAsMuchAsAffordable(LegalEntity entity, Deeds deeds,
                                                         Strategy.OfPlayers strategies, Rule.Set rules) {
+    return buildAsMuchAsAffordable(entity, deeds, strategies, rules, null, List.of());
+  }
+
+  static LegalEntity.Operation buildAsMuchAsAffordable(LegalEntity entity, Deeds deeds,
+                                                        Strategy.OfPlayers strategies, Rule.Set rules,
+                                                        DevelopmentLoanBook developmentLoanBook,
+                                                        List<Player> players) {
     List<ColourStreet> plan = solicitCommitmentIfNeeded(entity, deeds, strategies, rules,
         affordableBuildPlan(entity, deeds));
+    if (developmentLoanBook != null && players != null
+        && entity.shareholders().stream().anyMatch(player -> strategies.forPlayer(player).developmentLoansEnabled())) {
+      while (plan.size() < Math.min(2, entity.streets().size())) {
+        ColourStreet candidate = cheapestBuildableStreet(entity, deeds, plan, canReachHotels(entity));
+        if (candidate == null) break;
+        plan = append(plan, candidate);
+      }
+    }
     if (plan.isEmpty()) return null;
 
     Money shortfall = totalConstructionCost(plan).minus(entity.bankBalance());
-    Money loanRaised = financeShortfall(entity, shortfall, strategies, rules, deeds);
+    Financing financing = financeShortfall(entity, plan, shortfall, strategies, rules, deeds,
+        developmentLoanBook, players);
+    if (shortfall.amount() > 0 && financing.amount().equals(Money.ZERO) && financing.position() == null) return null;
     plan.forEach(street -> buildOneImprovement(entity, deeds, street));
 
     ColourStreet firstBuilt = plan.getFirst();
-    return loanRaised.equals(Money.ZERO)
+    if (financing.position() != null)
+      return new LegalEntity.Operation.DevelopmentLoanRaisedAndHouseBuilt(financing.position(), firstBuilt);
+    return financing.amount().equals(Money.ZERO)
         ? new LegalEntity.Operation.HouseBuilt(firstBuilt)
-        : new LegalEntity.Operation.LoanRaisedAndHouseBuilt(loanRaised, firstBuilt);
+        : new LegalEntity.Operation.LoanRaisedAndHouseBuilt(financing.amount(), firstBuilt);
   }
 
   /**
@@ -63,14 +82,23 @@ final class LegalEntityBuilding {
         && entity.shareholders().stream().allMatch(player -> strategies.forPlayer(player).legalEntityTradingEnabled());
   }
 
-  private static Money financeShortfall(LegalEntity entity, Money shortfall, Strategy.OfPlayers strategies,
-                                        Rule.Set rules, Deeds deeds) {
-    if (shortfall.amount() <= 0) return Money.ZERO;
+  private static Financing financeShortfall(LegalEntity entity, List<ColourStreet> plan, Money shortfall,
+                                             Strategy.OfPlayers strategies, Rule.Set rules, Deeds deeds,
+                                             DevelopmentLoanBook developmentLoanBook, List<Player> players) {
+    if (shortfall.amount() <= 0) return Financing.none();
     if (strategies != null && rules != null) {
       commitToBuildIfAllAgree(entity, shortfall, strategies, rules, deeds);
-      if (!canBorrowForBuilding(entity, shortfall)) return Money.ZERO;
+      if (canBorrowForBuilding(entity, shortfall)) return new Financing(borrowShortfall(entity, shortfall), null);
+      if (developmentLoanBook != null && players != null && !plan.isEmpty()
+          && entity.shareholders().stream().anyMatch(player -> strategies.forPlayer(player).developmentLoansEnabled())) {
+        return developmentLoanBook.raise(entity, totalConstructionCost(plan), plan.getFirst().type(),
+                entity.shareholders().stream().anyMatch(player -> strategies.forPlayer(player).fullDrawDevelopmentLoans()), players)
+            .map(position -> new Financing(position.loan().originalPrincipal(), position))
+            .orElseGet(Financing::none);
+      }
+      return Financing.none();
     }
-    return borrowShortfall(entity, shortfall);
+    return new Financing(borrowShortfall(entity, shortfall), null);
   }
 
   private static List<ColourStreet> affordableBuildPlan(LegalEntity entity, Deeds deeds) {
@@ -103,6 +131,12 @@ final class LegalEntityBuilding {
     if (startedWithTreasuryFunds && !plan.isEmpty()
         && (entity.buildCommitmentsEmpty() || plan.size() >= entity.streets().size())) return true;
     return !canBorrowForBuilding(entity, shortfall);
+  }
+
+  private static List<ColourStreet> append(List<ColourStreet> plan, ColourStreet street) {
+    List<ColourStreet> extended = new ArrayList<>(plan);
+    extended.add(street);
+    return extended;
   }
 
   private static Money totalConstructionCost(List<ColourStreet> plan) {
@@ -181,6 +215,12 @@ final class LegalEntityBuilding {
     }
     entity.clearBuildCommitments();
     return shortfall;
+  }
+
+  private record Financing(Money amount, DevelopmentLoanBook.Position position) {
+    private static Financing none() {
+      return new Financing(Money.ZERO, null);
+    }
   }
 
   /** Splits an amount across shareholders as evenly as possible; earlier shareholders absorb any remainder. */
