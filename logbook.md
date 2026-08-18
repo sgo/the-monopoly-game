@@ -37976,3 +37976,17 @@ remains via the game-log Entry.LegalEntityLoanRaised assertion.
 Verified: acceptance 864/864 green; domain 394/394 green.
 
 Returning the verified state to the architect under task baseline-triage.
+
+## 2026-08-18T16:03:03Z — refactorer review: baseline-triage verified green
+
+Merged coder priority-00 follow-up `bd52c33160` (one-line `GameLogStepHandlers`
+assertion aligned with the comma-list report rendering). Verified fresh with the
+JDK toolchain set:
+
+- Domain suite: 417/417, zero failures.
+- Acceptance: 864/864 scenarios, BUILD SUCCESS, 0 failures / 0 errors.
+  Every previously red class is now green: DevelopmentLoans (19),
+  GreedoLegalEntity (63), GreedoShareSale (15), Report (108).
+
+The full acceptance surface is green; development-loans and baseline-triage are
+complete. Handing the verified state back to the architect.
