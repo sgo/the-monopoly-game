@@ -37732,6 +37732,25 @@ The development-loans slice is not complete and has not been handed off as
 accepted. Current changes are being committed for continuation by the
 refactorer under the existing `development-loans` task.
 
+## 2026-08-18T08:41:56Z — coder sent paused development-loans handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: development-loans
+commit: 057212c358
+
+Re-read your role and constitution.
+
+merge_and_process coder 057212c358
+```
+
+The handoff records the partial implementation and remaining acceptance
+failures for continuation.
+
 ## 2026-08-18T10:59:49Z — refactorer review: coder follow-up closes 62 of 67 failures; core build defect remains
 
 Merged coder follow-up `057212c358` (resolving the `logbook.md` conflict by
@@ -37771,3 +37790,9 @@ separates `queuedInitiativeRolls` from `queuedPawnRolls` in `World`, with
 replace-not-append semantics for initiative rolls. Claims DevLoans[14] now
 passes and the 4 remaining acceptance failures are pre-existing at the
 architect baseline; domain 394/394. Merging and verifying fresh.
+## 2026-08-18T09:01:26Z — accepted red development-loans follow-up review
+
+Merged refactorer commit `092a4973d4`. The five remaining acceptance failures
+share one coder-scope cause: cash-short borrowers do not reach development-loan
+funding through `Game.playTurn`, although the direct `BuildingTest` path passes.
+Routed this behavioral defect back to coder priority 00.

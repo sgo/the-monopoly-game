@@ -76,6 +76,7 @@ public class World {
   private Map<Dice.Face, Integer> rolls;
   private final Deque<Roll> queuedRolls = new ArrayDeque<>();
   private final Map<String, Deque<Roll>> queuedPawnRolls = new HashMap<>();
+  private final Map<String, Deque<Roll>> queuedInitiativeRolls = new HashMap<>();
   private final Deque<String> queuedChanceCards = new ArrayDeque<>();
   private final Deque<String> queuedCommunityChestCards = new ArrayDeque<>();
   private final Map<String, Strategy> pawnStrategies = new HashMap<>();
@@ -430,7 +431,7 @@ public class World {
    * specified, so the dice are made to add up to it.
    */
   public void queueInitiativeRoll(String pawnName, int total) {
-    queuePawnRoll(pawnName, rollTotalling(total));
+    queuedInitiativeRolls.put(pawnName, new ArrayDeque<>(List.of(rollTotalling(total))));
   }
 
   /** Queues what a pawn's next throw of the dice will come up, in order. */
@@ -439,7 +440,20 @@ public class World {
   }
 
   public void rollForInitiative() {
-    turnOrder = new Initiative(player -> nextQueuedPawnRoll(player).total()).order(players());
+    turnOrder = new Initiative(player -> nextInitiativeRoll(player).total()).order(players());
+  }
+
+  private Roll nextInitiativeRoll(Player player) {
+    Deque<Roll> queued = queuedInitiativeRolls.get(player.id().value());
+    if (queued != null && !queued.isEmpty()) return queued.removeFirst();
+    if (othersRollWhatTheyLike) return UNREMARKABLE;
+    return nextQueuedPawnRoll(player);
+  }
+
+  private Roll nextInitiativeOrPawnRoll(Player player) {
+    Deque<Roll> queued = queuedInitiativeRolls.get(player.id().value());
+    if (queued != null && !queued.isEmpty()) return queued.removeFirst();
+    return nextQueuedPawnRoll(player);
   }
 
   public void playGame() {
@@ -454,7 +468,7 @@ public class World {
     gameStarted = true;
     Cards.Decks officialDecks = Cards.Decks.official(deeds == null ? deeds = new Deeds() : deeds);
     Game game = new Game(
-        ruleSet, players(), player -> () -> nextQueuedPawnRoll(player), this::strategyOf,
+        ruleSet, players(), player -> () -> nextInitiativeOrPawnRoll(player), this::strategyOf,
         deeds == null ? deeds = new Deeds() : deeds,
         new Cards.Decks() {
           @Override
