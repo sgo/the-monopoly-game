@@ -246,12 +246,18 @@ Feature: development loans
       | 20        | 500       | 30  | 21           | 34         |
 
   # development-loans-12
-  Scenario Outline: the loan mechanism is not tied to who won initiative; the initiative winner can borrow too
-    Given pawn "high hat" owns "Meir Antwerpen"
+  Scenario Outline: the loan mechanism is not tied to who won initiative; a player other than the Background's usual borrower can raise one too
+    Given we select 3 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And pawn "iron box" will roll 2 for initiative
+    And every other player can complete their turn
+    And pawn "high hat" owns "Meir Antwerpen"
     And pawn "high hat" owns "Nieuwstraat Brussel"
     And pawn "high hat" follows the "Greedo" strategy
     And pawn "high hat" has $<cash> to spend
-    And pawn "dog" has $500 to spend
+    And pawn "dog" has $0 to spend
+    And pawn "iron box" has $500 to spend
     And development loans are enabled for the "Greedo" strategy
     When we play up to 1 round
     Then the street "Meir Antwerpen" has 1 house(s) built
