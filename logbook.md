@@ -37655,6 +37655,22 @@ completing an incomplete implementation), I am not completing the coder's
 delivery. Handing the verified red state back to the architect for a coder
 follow-up.
 
+## 2026-08-18T08:41:56Z — refactorer received coder follow-up `development-loans`
+
+Handoff message received:
+
+```
+merge_and_process coder 057212c358
+```
+
+Coder follow-up (architect priority-00 loop) that addresses the concrete
+defects: entity spare-property mortgage fallback, no second entity operation
+after a service/foreclosure, corrected foreclosure improvement-proceeds
+accounting, README and step-handler additions. Coder's own log reports five
+acceptance failures remaining plus a new failing `GameTest` reproduction of a
+build defect at the `Game` boundary, marked "not complete, not handed off as
+accepted; committed for continuation by the refactorer." Merging and verifying
+before deciding next steps.
 ## 2026-08-18T06:34:18Z — accepted red development-loans review
 
 Merged refactorer commit `3274c3d674`. The delivery is not accepted: domain
@@ -37734,3 +37750,33 @@ merge_and_process coder 057212c358
 
 The handoff records the partial implementation and remaining acceptance
 failures for continuation.
+
+## 2026-08-18T10:59:49Z — refactorer review: coder follow-up closes 62 of 67 failures; core build defect remains
+
+Merged coder follow-up `057212c358` (resolving the `logbook.md` conflict by
+preserving every line from both parents). Set up the JDK (`JAVA_HOME` to the
+sdkman 25.0.2-zulu toolchain) and re-verified fresh.
+
+Domain suite: 394 tests, 1 failure — the coder's own new reproduction
+`GameTest.aLoanEnabledInitiativeWinnerDevelopsAfterTheirTurn`
+(`expected: 1 but was: 0` houses on `MeirAntwerpen`). Acceptance: 864
+scenarios, 5 failures / 0 errors (down from 59F+8E on the prior cycle). The
+five are `dev-loans` scenario 12 (`MeirAntwerpen` 1 house),
+`greedo-legal-entity` (`BruulMechelen` 1 house), `greedo-share-sale` (`dog`
+bankrupt), and two `report` assertions (`Pink Realty raises a loan of $50...`
+plus the paired build). They all trace to one remaining behavioural defect: a
+cash-short borrower does not develop through a development loan at the `Game`
+boundary. The `BuildingTest` variant passes (`building.develop(highHat)` called
+directly with a 2-player list and a ready `$500` bondholder), but the full-game
+path through `Game.playTurn` yields zero houses.
+
+This is a behavioural (coder-scope) defect, not structure-preserving cleanup,
+so I am not fixing it. Handing the verified red state back to the architect
+for a coder follow-up on the `Game.playTurn` development-loan integration.
+
+## 2026-08-18T09:01:26Z — accepted red development-loans follow-up review
+
+Merged refactorer commit `092a4973d4`. The five remaining acceptance failures
+share one coder-scope cause: cash-short borrowers do not reach development-loan
+funding through `Game.playTurn`, although the direct `BuildingTest` path passes.
+Routed this behavioral defect back to coder priority 00.
