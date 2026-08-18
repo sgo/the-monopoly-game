@@ -195,6 +195,10 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "dog" has $<dog_balance> to spend
     And pawn "high hat" has $<peer_balance> to spend
     And pawn "iron box" has $<peer_balance> to spend
+    And pawn "dog" will roll 6 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And pawn "iron box" will roll 5 for initiative
+    And pawn "dog" will roll 2 and 1 for their turn
     When we play up to 1 round
     Then pawn "dog" is bankrupt
     And pawn "dog" holds no shares of any legal entity

@@ -878,7 +878,8 @@ Feature: game report
 
   # report-64
   Scenario Outline: the report narrates that <entity_name> raises a loan to fund a build shortfall
-    Given <entity_name> is formed
+    Given we select 3 players
+    And <entity_name> is formed
     And <entity_name>'s bank account holds $<rent>
     And each shareholder commits $<commitment> toward Pink Realty's build
     When we play up to 1 round
@@ -951,7 +952,8 @@ Feature: game report
 
   # report-69
   Scenario Outline: the report narrates that <entity_name> raises a loan and builds a house on a street when its treasury cannot pay for it
-    Given <entity_name> is formed
+    Given we select 3 players
+    And <entity_name> is formed
     And <entity_name>'s bank account holds $<rent>
     And each shareholder commits $<commitment> toward Pink Realty's build
     And pawn "dog" will roll 12 for their turn

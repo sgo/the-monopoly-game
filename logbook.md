@@ -37589,6 +37589,86 @@ merge_and_process specifier 761abde835
 Merged the specifier's `development-loans` specification commit and began
 implementing the approved behavior slice.
 
+## 2026-08-18T05:36:00Z — specifier receives a coder question on development-loans-12
+
+Handoff received:
+
+```
+type: question
+to: specifier
+priority: 50
+task: development-loans
+FROM: coder
+
+Re-read your role and constitution.
+
+The development-loans implementation is blocked on a specification
+conflict in scenario 12. Please decide which behavior is authoritative:
+
+1. Preserve the existing building rule: Building.develop() continues
+   to build every affordable house/hotel on a player's own turn;
+   correct scenario 12 or its fixture values.
+2. Reserve bondholder liquidity for expected development loans so an
+   earlier development cannot consume funds needed by a later loan in
+   the same round.
+3. Limit automatic development per turn/round when development loans
+   are enabled so the later bondholder remains liquid.
+
+Confirmed facts:
+- Direct Building regression with dog=$500, high hat=$50, both Dark
+  Blue streets owned by high hat, development loans enabled passes and
+  raises a $150 loan.
+- Focused acceptance runs 18/19 scenarios; only scenario 12 fails
+  because dog wins initiative, owns the Brown monopoly, develops it
+  first, and consumes the $500 bondholder balance before high hat's
+  $150 loan is requested.
+- Existing turn-development and building specifications require
+  development on each player's own turn and repeated affordable
+  development, so changing that globally would be a behavior change.
+- Player annual payment, mortgage fallback, collateral-only
+  foreclosure, and foreclosure accounting scenarios pass after the
+  latest fixes.
+```
+
+Action taken: re-read `swarmforge/constitution.prompt` and every article
+it references, and `swarmforge/roles/specifier.prompt`, per the handoff
+body's instruction. Diagnosed the real cause: it is not a behavior
+conflict at all. `Building.develop()`'s every-affordable-house rule
+(`Building.java:32-40`) is correct and is not changing. Scenario 12's
+own fixture accidentally gave dog — who inherits the Background's
+complete Brown monopoly in every scenario in this file — $500 spare
+cash for a scene where dog's role had flipped to "idle bondholder."
+Greedo's greedy `develop()` loop has no way to know that cash was meant
+to stay idle, so it spent it on dog's own houses first, regardless of
+turn order. Confirmed the fix has to be a fixture change, not a
+production-code change: reordering initiative was ruled out because
+`queueInitiativeRoll`/`queuePawnRoll` are FIFO queues consumed once by
+the Background's own declarations (`World.java:399-410`), not
+overridable by repeating the Given step later in the scenario body.
+
+Fixed `development-loans-12`: dog's cash set to $0 (his inherited
+monopoly becomes unbuildable this round regardless of turn order), and
+the idle-bondholder role moved to a fresh third pawn, `"iron box"`,
+which owns no property at all so `Building.develop()` has nothing to
+build for it — mirroring the existing role-separation convention
+already used in `development-loans-9`/`11`. No loan or cash example
+values changed, only the player arrangement. Validated with
+`gherkin-parser`/`gherkin-ir-dry-checker` (baseline near-duplicate/
+possible-synonym/placeholder-variant noise only, zero
+`duplicate-in-scenario`). Walked the user through why `iron box` alone
+is collision-free (owns nothing, so `develop()` returns immediately for
+it) before asking for and receiving approval to hand the decision back.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: development-loans
+commit: 1443aabc80
+```
+
 ## 2026-08-18T06:30:00Z — coder completed development-loans implementation slice
 
 Implemented the approved development-loan behavior across the domain and
@@ -37796,6 +37876,36 @@ Merged refactorer commit `092a4973d4`. The five remaining acceptance failures
 share one coder-scope cause: cash-short borrowers do not reach development-loan
 funding through `Game.playTurn`, although the direct `BuildingTest` path passes.
 Routed this behavioral defect back to coder priority 00.
+## 2026-08-18T12:33:23Z — coder follow-up: initiative-roll override fix closes DevLoans[14]
+
+Commit: d202277. Handoff: .swarmforge/handoffs/outbox/00_20260818T123243Z_27190_from_coder_to_refactorer.handoff
+
+DevLoans[14] root cause identified: shared queuedPawnRolls kept an
+overridden initiative roll from the background next to the scenario's
+override. The game's own initiative consumed the background value; the
+scenario's replacement then surfaced as the pawn's turn roll rather
+than the UNREMARKABLE fallback.
+
+Fix: queuedInitiativeRolls (replace-on-queue) separate from
+queuedPawnRolls (append). Game Cups consult initiative queue first,
+then turn queue. DevLoans[14] now passes.
+
+Remaining acceptance failures: 4, all pre-existing at the architect
+baseline: ShareSale[14], LegalEntity[61], Report[88], Report[93].
+These are fixture/spec-level defects, not regressions.
+
+Domain suite: 394/394 green. Handoff sent to refactorer.
+## 2026-08-18T13:39:00Z — coder: received stale specifier handoff 50_20260817T221400Z_000202
+
+Handoff received: type git_handoff, from specifier, task development-loans, commit 761abde835.
+Merge result: already up to date — the specifier commit is an ancestor of the
+current branch (merge-base equals the specifier commit). The handoff is a stale
+queued notification for the development-loans spec slice that was already
+implemented, verified, and followed up (commits d202277, 81def0d).
+
+Action taken: no code changes required. State re-verified after receipt:
+domain suite green; acceptance 864 scenarios with only the 4 pre-existing
+baseline failures (ShareSale[14], LegalEntity[61], Report[88]/[93]).
 
 ## 2026-08-18T14:32:20Z — refactorer review: initiative-roll fix closes development-loans; 4 pre-existing failures remain
 
@@ -37829,3 +37939,40 @@ the report renders the loan cohort as a plain comma list (no `and`), while the
 `GameLogStepHandlers` loan handler hardcoded `from dog, high hat, and iron
 box`. One-line alignment of the assertion with production rendering. Claims
 acceptance 864/864 and domain 394/394 green. Merging and verifying fresh.
+## 2026-08-18T14:40:41+02:00 — accepted development-loans completion
+
+Merged refactorer commit `8af8ceb631` and independently reran the full
+acceptance suite. All 19 development-loans scenarios pass; the suite reports
+864 scenarios with 4 unrelated baseline failures in legal-entity, share-sale,
+and report expectations. Development-loans is accepted as complete.
+
+## 2026-08-18T15:19:08+02:00 — accepted baseline triage; report defect remains
+
+Merged specifier triage commit `15771702b5` and reran the full suite. The
+entity and share-sale baseline failures now pass. Only two report assertions
+remain: the rendered report contains the loan line with all three shareholders,
+but the assertion still fails. Routed this non-spec report defect to coder
+priority 00.
+## 2026-08-18T14:00:32Z — coder: received architect handoff 00_20260818T131929Z_000308 (baseline-triage)
+
+Handoff received: type git_handoff, from architect, task baseline-triage, commit 3e93fc2a56.
+
+Merged the routing commit. The architect's note: four baseline failures
+triaged by specifier commit 15771702b5 down to two; 'the rendered report
+contains the loan line with all three shareholders, but the assertion still
+fails' — routed to coder priority 00 as a non-spec report defect.
+
+Root cause: the report-renders the loan line as 'Pink Realty raises a loan
+of $50 from dog, high hat, iron box' (comma list, no and) while the
+acceptance assertion expected 'from dog, high hat, and iron box'. Both
+sibling report handlers for the same tri-shareholder phrase ('is formed,
+held in equal thirds by', 'pays each of') assert only the prefix — the loan
+handler was the inconsistent outlier.
+
+Fix: GameLogStepHandlers — the loan-cohort report assertion now matches the
+production comma-list rendering. Event-level coverage of the loan itself
+remains via the game-log Entry.LegalEntityLoanRaised assertion.
+
+Verified: acceptance 864/864 green; domain 394/394 green.
+
+Returning the verified state to the architect under task baseline-triage.
