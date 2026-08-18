@@ -171,6 +171,8 @@ record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds,
     boolean legalEntityEnabled = strategy instanceof Greedo greedo && greedo.legalEntityTradingEnabled();
     boolean stalemateEnabled = strategy instanceof Greedo greedo && greedo.stalemateTradingEnabled();
     String name = strategy == Strategy.UNDECIDED ? "undecided" : strategy.getClass().getSimpleName();
+    if (name.isEmpty() && strategy.getClass().getSuperclass() != null)
+      name = strategy.getClass().getSuperclass().getSimpleName();
     journal.log(new Journal.Entry.StrategyNamed(player.id(), name,
         legalEntityEnabled, stalemateEnabled, strategy.assetRichOpening()));
   }

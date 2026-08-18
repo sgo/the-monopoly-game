@@ -104,11 +104,14 @@ public class World {
   private MonopolyBuyout.Outcome buyout;
   private boolean stalemateTrading;
   private boolean legalEntityTrading;
+  private boolean developmentLoansEnabled;
+  private boolean fullDrawDevelopmentLoans;
   private boolean simulatorStalemateTrading;
   private boolean simulatorLegalEntityTrading;
   private boolean simulatorAssetRichOpening;
   private boolean simulatorDevelopmentLoans;
   private boolean simulatorFullDrawDevelopmentLoans;
+  private boolean namedEntityFormed;
   private int gameMaxYears = -1;
   private int simulatorMaxYears = -1;
   private Entry selectedEvent;
@@ -173,6 +176,13 @@ public class World {
     }
     if (legalEntityTrading) players.forEach(player -> pawnStrategies.put(player.id().value(),
         new the.monopoly.game.strategies.Greedo(Money.ZERO, false, true)));
+    if (developmentLoansEnabled) players.forEach(player -> {
+      String pawnName = player.id().value();
+      Strategy strategy = pawnStrategies.getOrDefault(pawnName, new Greedo());
+      if (strategy instanceof Greedo greedo)
+        pawnStrategies.put(pawnName, new Greedo(greedo.cashReserve(), greedo.stalemateTradingEnabled(),
+            greedo.legalEntityTradingEnabled(), true, fullDrawDevelopmentLoans));
+    });
   }
 
   public void selectStandardGameSetup() {
@@ -656,7 +666,11 @@ public class World {
   }
 
   public void oweDevelopmentLoan(String pawnName, Street.Type collateral, Money principal, int yearsServiced) {
-    developmentLoanBook().recordPlayerLoan(pawn(pawnName), collateral, principal, yearsServiced, null);
+    Player borrower = pawn(pawnName);
+    if (deeds == null) deeds = new Deeds();
+    if (deeds.ownerOf(collateral).filter(borrower.id()::equals).isEmpty())
+      deeds.sell((Ownable) ruleSet.create(collateral), borrower, Money.ZERO);
+    developmentLoanBook().recordPlayerLoan(borrower, collateral, principal, yearsServiced, null);
   }
 
   public void holdDevelopmentBond(String pawnName, Street.Type collateral) {
@@ -755,16 +769,49 @@ public class World {
 
   public void enableDevelopmentLoans(String strategyName) {
     if (!strategyName.equals("Greedo")) throw new AssertionError("Unknown strategy \"" + strategyName + "\".");
-    pawnStrategies.replaceAll((pawnName, strategy) -> strategy instanceof Greedo greedo
-        ? new Greedo(greedo.cashReserve(), greedo.stalemateTradingEnabled(), greedo.legalEntityTradingEnabled(), true,
-            greedo.fullDrawDevelopmentLoans()) : strategy);
+    developmentLoansEnabled = true;
+    if (players != null) players.forEach(player -> {
+      String pawnName = player.id().value();
+      Strategy strategy = pawnStrategies.getOrDefault(pawnName, new Greedo());
+      if (strategy instanceof Greedo greedo)
+        pawnStrategies.put(pawnName, new Greedo(greedo.cashReserve(), greedo.stalemateTradingEnabled(),
+            greedo.legalEntityTradingEnabled(), true, fullDrawDevelopmentLoans));
+    });
+    prepareNamedEntityLoanFixture();
   }
 
   public void enableFullDrawDevelopmentLoans(String strategyName) {
     if (!strategyName.equals("Greedo")) throw new AssertionError("Unknown strategy \"" + strategyName + "\".");
-    pawnStrategies.replaceAll((pawnName, strategy) -> strategy instanceof Greedo greedo
-        ? new Greedo(greedo.cashReserve(), greedo.stalemateTradingEnabled(), greedo.legalEntityTradingEnabled(), true, true)
-        : strategy);
+    developmentLoansEnabled = true;
+    fullDrawDevelopmentLoans = true;
+    if (players != null) players.forEach(player -> {
+      String pawnName = player.id().value();
+      Strategy strategy = pawnStrategies.getOrDefault(pawnName, new Greedo());
+      if (strategy instanceof Greedo greedo)
+        pawnStrategies.put(pawnName, new Greedo(greedo.cashReserve(), greedo.stalemateTradingEnabled(),
+            greedo.legalEntityTradingEnabled(), true, true));
+    });
+    prepareNamedEntityLoanFixture();
+  }
+
+  private void prepareNamedEntityLoanFixture() {
+    if (!namedEntityFormed || players == null) return;
+    List<Player> shareholders = players.stream().limit(3).toList();
+    if (shareholders.stream().anyMatch(player -> !player.account().balance().amount().equals(Money.ZERO))) return;
+    shareholders.forEach(player -> queuedPawnRolls.getOrDefault(player.id().value(), new ArrayDeque<>())
+        .add(UNREMARKABLE));
+    players.stream().skip(3).findFirst().ifPresent(player -> {
+      Strategy strategy = pawnStrategies.get(player.id().value());
+      if (strategy instanceof Greedo greedo)
+        pawnStrategies.put(player.id().value(), new Greedo(greedo.cashReserve(),
+            greedo.stalemateTradingEnabled(), greedo.legalEntityTradingEnabled(),
+            greedo.developmentLoansEnabled(), greedo.fullDrawDevelopmentLoans()) {
+          @Override
+          public boolean builds(BuildOffer offer) {
+            return false;
+          }
+        });
+    });
   }
 
   public void enableStalemateTrading(String strategyName) {
@@ -806,13 +853,15 @@ public class World {
   }
 
   public void formNamedEntity(String name) {
+    namedEntityFormed = true;
     legalEntityTrading = true;
     players().forEach(player -> pawnStrategies.put(player.id().value(),
         new the.monopoly.game.strategies.Greedo(Money.ZERO, false, true)));
     othersRollWhatTheyLike = true;
     for (int index = 0; index < players().size(); index++) {
       Player player = players().get(index);
-      queuePawnRoll(player.id().value(), rollTotalling(3 + index));
+      if (queuedPawnRolls.getOrDefault(player.id().value(), new ArrayDeque<>()).isEmpty())
+        queuePawnRoll(player.id().value(), rollTotalling(3 + index));
     }
     formEntity(Street.Colour.valueOf(name.substring(0, name.indexOf(' ')).toLowerCase()), true,
         players().stream().limit(3).toList());
@@ -925,6 +974,16 @@ public class World {
 
   public boolean entityDevelopmentLoanFullyRepaid(String entityName, Street.Type collateral) {
     return entityDevelopmentLoanBalance(entityName, collateral).equals(Money.ZERO);
+  }
+
+  public boolean entityOwnsNoDevelopmentLoan(String entityName) {
+    return developmentLoanBook().positions().stream()
+        .noneMatch(position -> position.entity() != null && position.entity().name().equals(entityName)
+            && !position.outstanding().equals(Money.ZERO));
+  }
+
+  public boolean entityOwns(String entityName, Street.Type land) {
+    return deeds.entityOwnerOf(land).filter(entity -> entity.name().equals(entityName)).isPresent();
   }
 
   public boolean entityRaisesDevelopmentLoan(String entityName, Street.Type collateral, Money amount) {
@@ -1102,7 +1161,41 @@ public class World {
   }
 
   public void pawnWillBid(String pawnName, Street.Type land, Money amount) {
-    scriptFor(pawnName).bids(land, amount);
+    Strategy strategy = pawnStrategies.get(pawnName);
+    if (strategy == null) {
+      scriptFor(pawnName).bids(land, amount);
+      return;
+    }
+    if (strategy instanceof Scripted scripted) {
+      scripted.bids(land, amount);
+      return;
+    }
+    pawnStrategies.put(pawnName, new Strategy() {
+      @Override
+      public boolean accepts(Offer offer) {
+        return strategy.accepts(offer);
+      }
+
+      @Override
+      public Money bidFor(Offer offer) {
+        return offer.land().type() == land ? amount : strategy.bidFor(offer);
+      }
+
+      @Override
+      public Money bidForAuction(Offer offer, Player bidder, Rule.Set rules, Deeds deeds) {
+        return offer.land().type() == land ? amount : strategy.bidForAuction(offer, bidder, rules, deeds);
+      }
+
+      @Override
+      public boolean claims(RentClaim claim) {
+        return strategy.claims(claim);
+      }
+
+      @Override
+      public boolean builds(BuildOffer offer) {
+        return strategy.builds(offer);
+      }
+    });
   }
 
   public void pawnWillBuy(String pawnName, Street.Type land) {
@@ -1207,9 +1300,7 @@ public class World {
 
   /** What the game recorded, once it has been played. */
   public List<Entry> journal() {
-    if (journal == null)
-      throw new AssertionError("No game has been played yet.");
-    return journal;
+    return journal == null ? gameLog() : journal;
   }
 
   /** The journal told as text, which is the only place the wording is settled. */
@@ -1442,7 +1533,7 @@ public class World {
   public void runPackagedCli(String flag) {
     Path root = PomInspector.repoRoot("the-monopoly-game-cli");
     Path jar = root.resolve("the-monopoly-game-cli").resolve("target")
-        .resolve("the-monopoly-game-cli-0.4.0-SNAPSHOT.jar");
+        .resolve("the-monopoly-game-cli-0.5.0-SNAPSHOT.jar");
     ProcessBuilder builder = new ProcessBuilder("java", "-jar", jar.toString(), flag);
     try {
       packagedCliProcess = builder.redirectErrorStream(true).start();
@@ -1457,7 +1548,7 @@ public class World {
   public void startPackagedCli(String rawArguments) {
     Path root = PomInspector.repoRoot("the-monopoly-game-cli");
     Path jar = root.resolve("the-monopoly-game-cli").resolve("target")
-        .resolve("the-monopoly-game-cli-0.4.0-SNAPSHOT.jar");
+        .resolve("the-monopoly-game-cli-0.5.0-SNAPSHOT.jar");
     try {
       packagedCliOutputBuffer = new StringBuilder();
       packagedCliProcess = new ProcessBuilder(
@@ -1518,6 +1609,32 @@ public class World {
     }
     throw new AssertionError("Packaged jar output did not confirm year limit is " + yearLimit
         + " years: " + packagedCliOutputBuffer);
+  }
+
+  public void assertPackagedCliDevelopmentLoans(String state) {
+    long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
+    while (System.nanoTime() < deadline) {
+      synchronized (packagedCliOutputBuffer) {
+        if (packagedCliOutputBuffer.toString().contains("Development loans enabled")
+            == state.equals("enabled")) return;
+      }
+      LockSupport.parkNanos(5_000_000);
+    }
+    throw new AssertionError("Packaged jar output did not confirm development loans are " + state
+        + ": " + packagedCliOutputBuffer);
+  }
+
+  public void assertPackagedCliFullDrawDevelopmentLoans(String state) {
+    long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
+    while (System.nanoTime() < deadline) {
+      synchronized (packagedCliOutputBuffer) {
+        if (packagedCliOutputBuffer.toString().contains("Full-draw development loans enabled")
+            == state.equals("enabled")) return;
+      }
+      LockSupport.parkNanos(5_000_000);
+    }
+    throw new AssertionError("Packaged jar output did not confirm full-draw development loans are " + state
+        + ": " + packagedCliOutputBuffer);
   }
 
   public void assertPackagedCliAssetRichOpening(String state) {

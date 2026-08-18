@@ -106,8 +106,6 @@ final class GameLogStepHandlers {
 
   static List<StepHandler> handlers() {
     return List.of(
-        then("^the game log records that development loans are " + NAME + "$",
-            (world, arguments) -> logRecords(world, developmentLoans(arguments.text(1), false))),
         then("^the game log records that full-draw development loans are " + NAME + "$",
             (world, arguments) -> logRecords(world, developmentLoans(arguments.text(1), true))),
         then("^the game log records that " + NAME + " is formed, held in equal thirds by pawn \"" + NAME
@@ -132,18 +130,47 @@ final class GameLogStepHandlers {
                 && it.tenant().equals(idOf(arguments.text(1))) && it.rent().amount() == arguments.number(2)
                 && it.name().equals(arguments.text(3)) && it.land().equals(SpaceNames.of(arguments.text(4))),
                 "entity rent paid"))),
+        then("^the game log records that pawn \"" + NAME + "\" raises a development loan of \\$" + MONEY
+                + " from the bank, secured by \"" + NAME + "\", funded by pawn \"" + NAME + "\"'s bond purchase$",
+            (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.DevelopmentLoanRaised it
+                && it.borrower().equals(idOf(arguments.text(1))) && it.amount().equals(money(arguments.text(2)))
+                && it.collateral() == SpaceNames.of(arguments.text(3))
+                && it.bondholder().value().equals(arguments.text(4)), "player development loan raised"))),
+        then("^the game log records that pawn \"" + NAME + "\" pays the bank \\$" + MONEY
+                + " interest and \\$" + MONEY + " principal on the development loan secured by \"" + NAME + "\"$",
+            (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.DevelopmentLoanPayment it
+                && it.borrower().equals(idOf(arguments.text(1))) && it.interest().equals(money(arguments.text(2)))
+                && it.principal().equals(money(arguments.text(3))) && it.collateral() == SpaceNames.of(arguments.text(4)),
+                "player development loan payment"))),
+        then("^the game log records that pawn \"" + NAME + "\"'s development loan on \"" + NAME
+                + "\" has been fully repaid$",
+            (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.DevelopmentLoanRepaid it
+                && it.borrower().equals(idOf(arguments.text(1))) && it.collateral() == SpaceNames.of(arguments.text(2)),
+                "player development loan repaid"))),
+        then("^the game log records that pawn \"" + NAME + "\" receives \\$" + MONEY
+                + " interest and \\$" + MONEY + " principal on the development loan bond secured by \"" + NAME + "\"$",
+            (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.DevelopmentBondPayment it
+                && it.bondholder().equals(idOf(arguments.text(1))) && it.yield().equals(money(arguments.text(2)))
+                && it.principal().equals(money(arguments.text(3))) && it.collateral() == SpaceNames.of(arguments.text(4)),
+                "player development bond payment"))),
+        then("^the game log records that development loans are " + NAME + "$",
+            (world, arguments) -> logRecords(world, developmentLoans(arguments.text(1), false))),
         then("^the game log records that " + NAME + " raises a development loan of \\$" + MONEY
                 + " from the bank, secured by \"" + NAME + "\", funded by pawn \"" + NAME + "\"'s bond purchase$",
             (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.EntityDevelopmentLoanRaised it
                 && it.name().equals(arguments.text(1)) && it.amount().equals(money(arguments.text(2)))
-                && it.collateral() == SpaceNames.of(arguments.text(4))
-                && it.bondholder().value().equals(arguments.text(6)), "entity development loan raised"))),
+                && it.collateral() == SpaceNames.of(arguments.text(3))
+                && it.bondholder().value().equals(arguments.text(4)), "entity development loan raised"))),
+        then("^the game log records that " + NAME + " builds a house on \"" + NAME + "\" for \\$" + VALUE + "$",
+            (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.LegalEntityHouseBuilt it
+                && it.name().equals(arguments.text(1)) && it.land() == SpaceNames.of(arguments.text(2))
+                && it.price().amount() == arguments.number(3), "entity house built"))),
         then("^the game log records that " + NAME + " pays the bank \\$" + MONEY
                 + " interest and \\$" + MONEY + " principal on the development loan secured by \"" + NAME + "\"$",
             (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.EntityDevelopmentLoanPayment it
                 && it.name().equals(arguments.text(1)) && it.interest().equals(money(arguments.text(2)))
                 && it.principal().equals(money(arguments.text(3)))
-                && it.collateral() == SpaceNames.of(arguments.text(5)), "entity development loan payment"))),
+                && it.collateral() == SpaceNames.of(arguments.text(4)), "entity development loan payment"))),
         then("^the game log records that " + NAME + " defaults on the development loan secured by \"" + NAME
                 + "\"; the bank forecloses$",
             (world, arguments) -> logRecords(world, new Claim(entry ->
@@ -153,6 +180,11 @@ final class GameLogStepHandlers {
                     && playerDefaulted.borrower().equals(idOf(arguments.text(1)))
                     && playerDefaulted.collateral() == SpaceNames.of(arguments.text(2))),
                 "development loan default"))),
+        then("^the game log records that pawn \"" + NAME + "\" defaults on the development loan secured by \""
+                + NAME + "\"; the bank forecloses$",
+            (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.DevelopmentLoanDefaulted it
+                && it.borrower().equals(idOf(arguments.text(1)))
+                && it.collateral() == SpaceNames.of(arguments.text(2)), "player development loan default"))),
         then("^the game log records that the bank recovers \\$" + MONEY + " from the foreclosure of \"" + NAME
                 + "\", added to its own account$",
             (world, arguments) -> logRecords(world, new Claim(entry -> entry instanceof Entry.DevelopmentLoanRecovered it
@@ -166,30 +198,59 @@ final class GameLogStepHandlers {
         then("^the game report says that " + NAME + " is formed, held in equal thirds by pawn \"" + NAME
                 + "\", pawn \"" + NAME + "\", and pawn \"" + NAME + "\"$",
             (world, arguments) -> says(world, arguments.text(1) + " is formed, held in equal thirds by")),
+        then("^the game report says that pawn \"" + NAME + "\" raises a development loan of \\$" + MONEY
+                + " from the bank, secured by \"" + NAME + "\", funded by pawn \"" + NAME + "\"'s bond purchase$",
+            (world, arguments) -> says(world, arguments.text(1) + " raises a development loan of $"
+                + money(arguments.text(2)).amount() + " from the bank, secured by "
+                + reportSpace(arguments.text(3)) + ", funded by " + arguments.text(4) + "'s bond purchase")),
+        then("^the game report says that pawn \"" + NAME + "\" pays the bank \\$" + MONEY
+                + " interest and \\$" + MONEY + " principal on the development loan secured by \"" + NAME + "\"$",
+            (world, arguments) -> says(world, arguments.text(1) + " pays the bank $"
+                + money(arguments.text(2)).amount() + " interest and $" + money(arguments.text(3)).amount()
+                + " principal on the development loan secured by " + reportSpace(arguments.text(4)))), 
+        then("^the game report says that pawn \"" + NAME + "\"'s development loan on \"" + NAME
+                + "\" has been fully repaid$",
+            (world, arguments) -> says(world, arguments.text(1) + "'s development loan on "
+                + reportSpace(arguments.text(2)) + " has been fully repaid")),
+        then("^the game report says that pawn \"" + NAME + "\" receives \\$" + MONEY
+                + " interest and \\$" + MONEY + " principal on the development loan bond secured by \"" + NAME + "\"$",
+            (world, arguments) -> says(world, arguments.text(1) + " receives $"
+                + money(arguments.text(2)).amount() + " interest and $" + money(arguments.text(3)).amount()
+                + " principal on the development loan bond secured by " + reportSpace(arguments.text(4)))), 
+        then("^the game report says that development loans are " + NAME + "$",
+            (world, arguments) -> says(world, "development loans are " + arguments.text(1))),
         then("^the game report says that " + NAME + " raises a development loan of \\$" + MONEY
                 + " from the bank, secured by \"" + NAME + "\", funded by pawn \"" + NAME + "\"'s bond purchase$",
             (world, arguments) -> says(world, arguments.text(1) + " raises a development loan of $"
                 + money(arguments.text(2)).amount() + " from the bank, secured by "
-                + SpaceNames.of(arguments.text(4)).name() + ", funded by " + arguments.text(6) + "'s bond purchase")),
+                + reportSpace(arguments.text(3)) + ", funded by " + arguments.text(4) + "'s bond purchase")), 
         then("^the game report says that " + NAME + " pays the bank \\$" + MONEY
                 + " interest and \\$" + MONEY + " principal on the development loan secured by \"" + NAME + "\"$",
             (world, arguments) -> says(world, arguments.text(1) + " pays the bank $" + money(arguments.text(2)).amount()
                 + " interest and $" + money(arguments.text(3)).amount() + " principal on the development loan secured by "
-                + SpaceNames.of(arguments.text(5)).name())),
+                + reportSpace(arguments.text(4)))), 
         then("^the game report says that " + NAME + " defaults on the development loan secured by \"" + NAME
                 + "\"; the bank forecloses$",
             (world, arguments) -> says(world, arguments.text(1) + " defaults on the development loan secured by "
-                + SpaceNames.of(arguments.text(2)).name() + "; the bank forecloses")),
+                + reportSpace(arguments.text(2)) + "; the bank forecloses")),
+        then("^the game report says that pawn \"" + NAME + "\" defaults on the development loan secured by \""
+                + NAME + "\"; the bank forecloses$",
+            (world, arguments) -> says(world, arguments.text(1) + " defaults on the development loan secured by "
+                + reportSpace(arguments.text(2)) + "; the bank forecloses")),
+        then("^the game report says that " + NAME + " raises a loan of \\$" + VALUE
+                + " from pawn \"dog\", pawn \"high hat\", and pawn \"iron box\"$",
+            (world, arguments) -> says(world, arguments.text(1) + " raises a loan of $"
+                + arguments.number(2) + " from dog, high hat, and iron box")), 
         then("^the game report says that the bank recovers \\$" + MONEY + " from the foreclosure of \"" + NAME
                 + "\", added to its own account$",
             (world, arguments) -> says(world, "The bank recovers $" + money(arguments.text(1)).amount()
-                + " from the foreclosure of " + SpaceNames.of(arguments.text(2)).name() + ", added to its own account")),
+                + " from the foreclosure of " + reportSpace(arguments.text(2)) + ", added to its own account")),
         then("^the game report says that " + NAME + "'s development loan on \"" + NAME
                 + "\" has been fully repaid$",
             (world, arguments) -> says(world, arguments.text(1) + "'s development loan on "
-                + SpaceNames.of(arguments.text(2)).name() + " has been fully repaid")),
+                + reportSpace(arguments.text(2)) + " has been fully repaid")),
         then("^the game report says that " + NAME + " pays pawn \"" + NAME + "\" \\$" + VALUE
-                + " for the loan$",
+                + " for the loan$", 
             (world, arguments) -> says(world, arguments.text(1) + " repays " + arguments.text(2)
                 + " $" + arguments.number(3) + " for the loan")),
         then("^the game report says that " + NAME + " pays each of pawn \"" + NAME + "\", pawn \""
@@ -1099,5 +1160,12 @@ final class GameLogStepHandlers {
             (world, arguments) -> saysInOrder(world, "The year limit was reached",
                 arguments.text(1) + "'s final balance is $" + arguments.number(2)))
     );
+  }
+
+  private static String reportSpace(String featureName) {
+    return switch (SpaceNames.of(featureName)) {
+      case RueDeDiekirchArlon -> "Rue de Diekirch Arlon";
+      default -> SpaceNames.of(featureName).name().replaceAll("(?<=[a-z])(?=[A-Z])", " ");
+    };
   }
 }
