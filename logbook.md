@@ -37661,3 +37661,20 @@ Merged refactorer commit `3274c3d674`. The delivery is not accepted: domain
 tests pass, but full acceptance has 59 failures and 8 errors, including
 unregistered steps, a capture-group error, a foreclosure ownership defect,
 and unresolved scenario 12. Routed back to the coder at priority 00.
+
+## 2026-08-18T06:45:00Z — coder verified architect priority-00 development-loans follow-up
+
+Merged architect commit `011a013230` as merge commit `5176a68`. The
+architect follow-up removes the old per-player development gate and now calls
+`Building.develop` whenever the player remains solvent, resolving the routed
+scenario-12 round-policy conflict while preserving the development-loan
+wiring and journal/report behavior.
+
+Verification:
+
+- `./acceptance/run-acceptance.sh` parsed and generated every pipeline feature,
+  including `development-loans.feature`, and failed only when Maven attempted
+  to start because this environment has no Java runtime.
+- `git diff --check HEAD^ HEAD` passes and the worktree is clean.
+- No additional coder-owned implementation change was required; return the
+  verified priority-00 state directly to the architect.
