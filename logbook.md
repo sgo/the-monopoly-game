@@ -37754,3 +37754,20 @@ path through `Game.playTurn` yields zero houses.
 This is a behavioural (coder-scope) defect, not structure-preserving cleanup,
 so I am not fixing it. Handing the verified red state back to the architect
 for a coder follow-up on the `Game.playTurn` development-loan integration.
+
+## 2026-08-18T12:32:44Z — refactorer received coder priority-00 follow-up
+
+Handoff message received:
+
+```
+Follow-up: initiative-roll fix closes DevLoans[14]
+merge_and_process coder d202277
+```
+
+Coder traces the previously reported `Game.playTurn` build defect to a
+spec-fixture leak, not production behaviour: the shared `queuedPawnRolls` queue
+leaked a scenario's re-declared initiative roll into the turn roll. Fix
+separates `queuedInitiativeRolls` from `queuedPawnRolls` in `World`, with
+replace-not-append semantics for initiative rolls. Claims DevLoans[14] now
+passes and the 4 remaining acceptance failures are pre-existing at the
+architect baseline; domain 394/394. Merging and verifying fresh.
