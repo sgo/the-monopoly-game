@@ -37963,3 +37963,11 @@ remains via the game-log Entry.LegalEntityLoanRaised assertion.
 Verified: acceptance 864/864 green; domain 394/394 green.
 
 Returning the verified state to the architect under task baseline-triage.
+## 2026-08-18T14:01:12Z — coder: sent refactorer handoff (baseline-triage)
+
+Handoff sent: type git_handoff, to refactorer, priority 00, task baseline-triage, commit bd52c33160.
+
+Contents: report loan-cohort assertion aligned with production comma-list
+rendering; Report[88]/[93] now pass; acceptance 864/864 green; domain
+394/394 green. Coder-side implementation change complete — refactorer to
+verify structurally and return the verified state to the architect.
