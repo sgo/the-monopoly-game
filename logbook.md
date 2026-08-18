@@ -37876,6 +37876,36 @@ Merged refactorer commit `092a4973d4`. The five remaining acceptance failures
 share one coder-scope cause: cash-short borrowers do not reach development-loan
 funding through `Game.playTurn`, although the direct `BuildingTest` path passes.
 Routed this behavioral defect back to coder priority 00.
+## 2026-08-18T12:33:23Z — coder follow-up: initiative-roll override fix closes DevLoans[14]
+
+Commit: d202277. Handoff: .swarmforge/handoffs/outbox/00_20260818T123243Z_27190_from_coder_to_refactorer.handoff
+
+DevLoans[14] root cause identified: shared queuedPawnRolls kept an
+overridden initiative roll from the background next to the scenario's
+override. The game's own initiative consumed the background value; the
+scenario's replacement then surfaced as the pawn's turn roll rather
+than the UNREMARKABLE fallback.
+
+Fix: queuedInitiativeRolls (replace-on-queue) separate from
+queuedPawnRolls (append). Game Cups consult initiative queue first,
+then turn queue. DevLoans[14] now passes.
+
+Remaining acceptance failures: 4, all pre-existing at the architect
+baseline: ShareSale[14], LegalEntity[61], Report[88], Report[93].
+These are fixture/spec-level defects, not regressions.
+
+Domain suite: 394/394 green. Handoff sent to refactorer.
+## 2026-08-18T13:39:00Z — coder: received stale specifier handoff 50_20260817T221400Z_000202
+
+Handoff received: type git_handoff, from specifier, task development-loans, commit 761abde835.
+Merge result: already up to date — the specifier commit is an ancestor of the
+current branch (merge-base equals the specifier commit). The handoff is a stale
+queued notification for the development-loans spec slice that was already
+implemented, verified, and followed up (commits d202277, 81def0d).
+
+Action taken: no code changes required. State re-verified after receipt:
+domain suite green; acceptance 864 scenarios with only the 4 pre-existing
+baseline failures (ShareSale[14], LegalEntity[61], Report[88]/[93]).
 
 ## 2026-08-18T14:32:20Z — refactorer review: initiative-roll fix closes development-loans; 4 pre-existing failures remain
 
@@ -37896,6 +37926,19 @@ with the JDK toolchain set:
 Development-loans is functionally complete and green. Handing the verified
 state back to the architect.
 
+## 2026-08-18T14:01:05Z — refactorer received coder priority-00 follow-up (`baseline-triage`)
+
+Handoff message received:
+
+```
+merge_and_process coder bd52c33160
+```
+
+New task `baseline-triage`. The coder fixes the `Report[88]/[93]` assertion —
+the report renders the loan cohort as a plain comma list (no `and`), while the
+`GameLogStepHandlers` loan handler hardcoded `from dog, high hat, and iron
+box`. One-line alignment of the assertion with production rendering. Claims
+acceptance 864/864 and domain 394/394 green. Merging and verifying fresh.
 ## 2026-08-18T14:40:41+02:00 — accepted development-loans completion
 
 Merged refactorer commit `8af8ceb631` and independently reran the full
@@ -37995,3 +38038,55 @@ priority: 00
 task: baseline-triage
 commit: 15771702b5
 ```
+
+## 2026-08-18T15:19:08+02:00 — accepted baseline triage; report defect remains
+
+Merged specifier triage commit `15771702b5` and reran the full suite. The
+entity and share-sale baseline failures now pass. Only two report assertions
+remain: the rendered report contains the loan line with all three shareholders,
+but the assertion still fails. Routed this non-spec report defect to coder
+priority 00.
+## 2026-08-18T14:00:32Z — coder: received architect handoff 00_20260818T131929Z_000308 (baseline-triage)
+
+Handoff received: type git_handoff, from architect, task baseline-triage, commit 3e93fc2a56.
+
+Merged the routing commit. The architect's note: four baseline failures
+triaged by specifier commit 15771702b5 down to two; 'the rendered report
+contains the loan line with all three shareholders, but the assertion still
+fails' — routed to coder priority 00 as a non-spec report defect.
+
+Root cause: the report-renders the loan line as 'Pink Realty raises a loan
+of $50 from dog, high hat, iron box' (comma list, no and) while the
+acceptance assertion expected 'from dog, high hat, and iron box'. Both
+sibling report handlers for the same tri-shareholder phrase ('is formed,
+held in equal thirds by', 'pays each of') assert only the prefix — the loan
+handler was the inconsistent outlier.
+
+Fix: GameLogStepHandlers — the loan-cohort report assertion now matches the
+production comma-list rendering. Event-level coverage of the loan itself
+remains via the game-log Entry.LegalEntityLoanRaised assertion.
+
+Verified: acceptance 864/864 green; domain 394/394 green.
+
+Returning the verified state to the architect under task baseline-triage.
+
+## 2026-08-18T16:03:03Z — refactorer review: baseline-triage verified green
+
+Merged coder priority-00 follow-up `bd52c33160` (one-line `GameLogStepHandlers`
+assertion aligned with the comma-list report rendering). Verified fresh with the
+JDK toolchain set:
+
+- Domain suite: 417/417, zero failures.
+- Acceptance: 864/864 scenarios, BUILD SUCCESS, 0 failures / 0 errors.
+  Every previously red class is now green: DevelopmentLoans (19),
+  GreedoLegalEntity (63), GreedoShareSale (15), Report (108).
+
+The full acceptance surface is green; development-loans and baseline-triage are
+complete. Handing the verified state back to the architect.
+
+## 2026-08-18T16:04:45+02:00 — accepted baseline-triage completion
+
+Merged refactorer commit `b89c9f3cb3` and independently reran the full suite:
+864/864 acceptance scenarios pass with zero failures and zero errors. The
+baseline-triage task and the previously completed development-loans task are
+accepted as complete.
