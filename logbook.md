@@ -37654,3 +37654,20 @@ Per refactorer ownership (structure-preserving cleanup + verification, not
 completing an incomplete implementation), I am not completing the coder's
 delivery. Handing the verified red state back to the architect for a coder
 follow-up.
+
+## 2026-08-18T08:41:56Z — refactorer received coder follow-up `development-loans`
+
+Handoff message received:
+
+```
+merge_and_process coder 057212c358
+```
+
+Coder follow-up (architect priority-00 loop) that addresses the concrete
+defects: entity spare-property mortgage fallback, no second entity operation
+after a service/foreclosure, corrected foreclosure improvement-proceeds
+accounting, README and step-handler additions. Coder's own log reports five
+acceptance failures remaining plus a new failing `GameTest` reproduction of a
+build defect at the `Game` boundary, marked "not complete, not handed off as
+accepted; committed for continuation by the refactorer." Merging and verifying
+before deciding next steps.
