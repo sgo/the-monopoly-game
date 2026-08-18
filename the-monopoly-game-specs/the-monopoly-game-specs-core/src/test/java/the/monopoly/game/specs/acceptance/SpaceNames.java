@@ -35,6 +35,7 @@ final class SpaceNames {
       Map.entry("Veldstraat Gent", VeldstraatGent),
       Map.entry("Boulevard d'Avroy Liège", BoulevardDAvroyLiege),
       Map.entry("Meir Antwerpen", MeirAntwerpen),
+      Map.entry("Nieuwstraat Brussel", NieuwstraatBrussel),
       Map.entry("Nieuwstraat (Brussel) / Rue Neuve (Bruxelles)", NieuwstraatBrussel),
 
       Map.entry("Noord Station / Gare du Nord", NoordStation),

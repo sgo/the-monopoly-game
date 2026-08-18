@@ -14,6 +14,7 @@ import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.rules.Cards;
 import the.monopoly.game.rules.Deeds;
+import the.monopoly.game.rules.DevelopmentLoanBook;
 import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
@@ -82,6 +83,7 @@ public class World {
   private boolean othersRollWhatTheyLike;
   private List<Entry> journal;
   private Deeds deeds;
+  private DevelopmentLoanBook developmentLoanBook;
   private Jail jail = new Jail(ruleSet);
   private boolean monopolyRunsCompleted;
   private Integer simulatorPlayers;
@@ -105,6 +107,8 @@ public class World {
   private boolean simulatorStalemateTrading;
   private boolean simulatorLegalEntityTrading;
   private boolean simulatorAssetRichOpening;
+  private boolean simulatorDevelopmentLoans;
+  private boolean simulatorFullDrawDevelopmentLoans;
   private int gameMaxYears = -1;
   private int simulatorMaxYears = -1;
   private Entry selectedEvent;
@@ -121,7 +125,13 @@ public class World {
 
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
+    developmentLoanBook = null;
     jail = new Jail(ruleSet);
+  }
+
+  private DevelopmentLoanBook developmentLoanBook() {
+    if (developmentLoanBook == null) developmentLoanBook = new DevelopmentLoanBook(ruleSet.bank());
+    return developmentLoanBook;
   }
 
   public Rule.Set ruleSet() {
@@ -222,15 +232,21 @@ public class World {
   }
 
   public void giveSimulatorArgument(String argument) {
-    if (!argument.equals("--optional-greedo-stalemate-trading")) {
-      throw new AssertionError("Unknown simulator argument: " + argument);
+    switch (argument) {
+      case "--optional-greedo-stalemate-trading" -> simulatorStalemateTrading = true;
+      case "--optional-development-loans" -> simulatorDevelopmentLoans = true;
+      case "--optional-development-loans-full-draw" -> {
+        simulatorDevelopmentLoans = true;
+        simulatorFullDrawDevelopmentLoans = true;
+      }
+      default -> throw new AssertionError("Unknown simulator argument: " + argument);
     }
-    simulatorStalemateTrading = true;
   }
 
   public void runSimulator() {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
-    simulatorResult = Simulator.run(simulatorPlayers, simulatorStrategies, false, false, simulatorMaxYears);
+    simulatorResult = Simulator.run(simulatorPlayers, simulatorStrategies, false, false,
+        simulatorDevelopmentLoans, simulatorFullDrawDevelopmentLoans, simulatorMaxYears);
   }
 
   public Simulator.Result simulatorResult() {
@@ -247,7 +263,7 @@ public class World {
   public void startSimulator() {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
     runningSimulator = Simulator.start(simulatorPlayers, simulatorStrategies, simulatorStalemateTrading,
-        simulatorLegalEntityTrading, simulatorMaxYears);
+        simulatorLegalEntityTrading, simulatorDevelopmentLoans, simulatorFullDrawDevelopmentLoans, simulatorMaxYears);
   }
 
   public void stopSimulator() {
@@ -308,6 +324,8 @@ public class World {
     simulatorStalemateTrading = arguments.contains("--optional-greedo-stalemate-trading");
     simulatorLegalEntityTrading = arguments.contains("--optional-greedo-legal-entity");
     simulatorAssetRichOpening = arguments.contains("--optional-asset-rich-billionaire");
+    simulatorDevelopmentLoans = arguments.contains("--optional-development-loans");
+    simulatorFullDrawDevelopmentLoans = arguments.contains("--optional-development-loans-full-draw");
     simulatorMaxYears = -1;
     for (String argument : arguments) {
       if (argument.startsWith("--max-years=")) {
@@ -319,8 +337,9 @@ public class World {
     simulatorStrategies = player -> names.get(player.id().value().equals("dog") ? 0 : 1)
         .equals("billionaire")
         ? new Billionaire(Money.ZERO, simulatorStalemateTrading, simulatorLegalEntityTrading, true,
-            simulatorAssetRichOpening)
-        : new Greedo(Money.ZERO, simulatorStalemateTrading, simulatorLegalEntityTrading);
+            simulatorAssetRichOpening, simulatorDevelopmentLoans, simulatorFullDrawDevelopmentLoans)
+        : new Greedo(Money.ZERO, simulatorStalemateTrading, simulatorLegalEntityTrading,
+            simulatorDevelopmentLoans, simulatorFullDrawDevelopmentLoans);
   }
 
   public void resolveSplitMonopoly(String firstPawn, String secondPawn) {
@@ -442,7 +461,10 @@ public class World {
         jail,
         stalemateTrading,
         legalEntityTrading,
-        gameMaxYears
+        players().stream().anyMatch(player -> strategyOf(player).developmentLoansEnabled()),
+        players().stream().anyMatch(player -> strategyOf(player).fullDrawDevelopmentLoans()),
+        gameMaxYears,
+        developmentLoanBook()
     );
     Game.Result result = play.apply(game);
     turnOrder = result.turnOrder();
@@ -633,8 +655,116 @@ public class World {
     return deeds != null && deeds.isMortgaged(ownable(land));
   }
 
+  public void oweDevelopmentLoan(String pawnName, Street.Type collateral, Money principal, int yearsServiced) {
+    developmentLoanBook().recordPlayerLoan(pawn(pawnName), collateral, principal, yearsServiced, null);
+  }
+
+  public void holdDevelopmentBond(String pawnName, Street.Type collateral) {
+    DevelopmentLoanBook.Position position = developmentLoanBook().securedBy(collateral)
+        .orElseThrow(() -> new AssertionError("No development loan is secured by " + collateral + "."));
+    developmentLoanBook().assignBondholder(position, pawn(pawnName));
+  }
+
+  public void growPawnOlder(String pawnName) {
+    DevelopmentLoanBook.Position position = developmentLoanBook().positions().stream()
+        .filter(it -> it.borrower() != null && it.borrower().id().value().equals(pawnName))
+        .findFirst().orElseThrow(() -> new AssertionError("Pawn has no development loan."));
+    var payment = developmentLoanBook().service(position);
+    if (payment.isEmpty()) {
+      raiseLoanPaymentFromSpareProperty(position);
+      payment = developmentLoanBook().service(position);
+    }
+    if (payment.isPresent()) {
+      DevelopmentLoanBook.Payment value = payment.orElseThrow();
+      record(new Entry.DevelopmentLoanPayment(position.borrower().id(), position.collateral(),
+          value.interest(), value.principal()));
+      if (position.bondholder() != null) record(new Entry.DevelopmentBondPayment(
+          position.bondholder().id(), position.collateral(), value.bondInterest(), value.principal()));
+      if (position.loan().isRepaid()) record(new Entry.DevelopmentLoanRepaid(
+          position.borrower().id(), position.collateral()));
+    } else {
+      record(new Entry.DevelopmentLoanDefaulted(position.borrower().id(), position.collateral()));
+      DevelopmentLoanBook.Foreclosure foreclosure =
+          developmentLoanBook().foreclose(position, deeds, ruleSet, players(), this::strategyOf);
+      record(new Entry.DevelopmentLoanRecovered(position.collateral(), foreclosure.recovered()));
+    }
+  }
+
+  private void raiseLoanPaymentFromSpareProperty(DevelopmentLoanBook.Position position) {
+    Player borrower = position.borrower();
+    Money due = developmentLoanBook().paymentDue(position);
+    ColourStreet collateral = colourStreet(position.collateral());
+    for (Street.Type type : deeds.landOwnedBy(borrower)) {
+      if (type == position.collateral()) continue;
+      Street space = ruleSet.create(type);
+      if (space instanceof ColourStreet street && street.colourGroup() == collateral.colourGroup()) continue;
+      Ownable land = ownable(type);
+      if (deeds.isMortgaged(land)) continue;
+      deeds.mortgage(land, borrower);
+      if (borrower.account().balance().amount().covers(due)) return;
+    }
+  }
+
+  public Money developmentLoanBalance(String pawnName, Street.Type collateral) {
+    return developmentLoanBook().securedBy(collateral).filter(position -> position.borrower() != null
+            && position.borrower().id().value().equals(pawnName))
+        .map(DevelopmentLoanBook.Position::outstanding).orElse(Money.ZERO);
+  }
+
+  public boolean developmentLoanFullyRepaid(String pawnName, Street.Type collateral) {
+    return developmentLoanBalance(pawnName, collateral).equals(Money.ZERO);
+  }
+
+  public boolean ownsNoDevelopmentLoan(String pawnName) {
+    return developmentLoanBook().positions().stream()
+        .noneMatch(position -> position.borrower() != null && position.borrower().id().value().equals(pawnName)
+            && !position.outstanding().equals(Money.ZERO));
+  }
+
+  public Money developmentLoanBankBalance() {
+    return developmentLoanBook().bankBalance();
+  }
+
+  public Money recycledDevelopmentLoanCapital() {
+    return developmentLoanBook().recycledCapital();
+  }
+
+  public void setDevelopmentLoanBankBalance(Money amount) {
+    developmentLoanBook().setBankBalance(amount);
+  }
+
+  public void setRecycledDevelopmentLoanCapital(Money amount) {
+    developmentLoanBook().setRecycledCapital(amount);
+  }
+
+  public boolean pawnRaisesDevelopmentLoan(String pawnName, Street.Type collateral, Money amount) {
+    return developmentLoanBook().securedBy(collateral).filter(position -> position.borrower() != null
+        && position.borrower().id().value().equals(pawnName)
+        && position.outstanding().equals(amount)).isPresent();
+  }
+
+  public boolean bondholderReceived(String pawnName, Street.Type collateral, Money yield, Money principal) {
+    return journal != null && journal.stream().anyMatch(entry -> entry instanceof Entry.DevelopmentBondPayment it
+        && it.bondholder().value().equals(pawnName) && it.collateral() == collateral
+        && it.yield().equals(yield) && it.principal().equals(principal));
+  }
+
   public void pawnFollows(String pawnName, Strategy strategy) {
     pawnStrategies.put(pawnName, strategy);
+  }
+
+  public void enableDevelopmentLoans(String strategyName) {
+    if (!strategyName.equals("Greedo")) throw new AssertionError("Unknown strategy \"" + strategyName + "\".");
+    pawnStrategies.replaceAll((pawnName, strategy) -> strategy instanceof Greedo greedo
+        ? new Greedo(greedo.cashReserve(), greedo.stalemateTradingEnabled(), greedo.legalEntityTradingEnabled(), true,
+            greedo.fullDrawDevelopmentLoans()) : strategy);
+  }
+
+  public void enableFullDrawDevelopmentLoans(String strategyName) {
+    if (!strategyName.equals("Greedo")) throw new AssertionError("Unknown strategy \"" + strategyName + "\".");
+    pawnStrategies.replaceAll((pawnName, strategy) -> strategy instanceof Greedo greedo
+        ? new Greedo(greedo.cashReserve(), greedo.stalemateTradingEnabled(), greedo.legalEntityTradingEnabled(), true, true)
+        : strategy);
   }
 
   public void enableStalemateTrading(String strategyName) {
@@ -781,6 +911,31 @@ public class World {
   public void entityOwes(String entityName, Money principal) {
     deeds.legalEntities().stream().filter(it -> it.name().equals(entityName)).findFirst()
         .orElseThrow(() -> new AssertionError("Unknown entity " + entityName)).recordLoan(principal);
+  }
+
+  public void oweEntityDevelopmentLoan(String entityName, Street.Type collateral, Money principal, int yearsServiced) {
+    developmentLoanBook().recordEntityLoan(legalEntity(entityName), collateral, principal, yearsServiced, null);
+  }
+
+  public Money entityDevelopmentLoanBalance(String entityName, Street.Type collateral) {
+    return developmentLoanBook().securedBy(collateral)
+        .filter(position -> position.entity() != null && position.entity().name().equals(entityName))
+        .map(DevelopmentLoanBook.Position::outstanding).orElse(Money.ZERO);
+  }
+
+  public boolean entityDevelopmentLoanFullyRepaid(String entityName, Street.Type collateral) {
+    return entityDevelopmentLoanBalance(entityName, collateral).equals(Money.ZERO);
+  }
+
+  public boolean entityRaisesDevelopmentLoan(String entityName, Street.Type collateral, Money amount) {
+    return developmentLoanBook().securedBy(collateral).filter(position -> position.entity() != null
+        && position.entity().name().equals(entityName) && position.outstanding().equals(amount)).isPresent();
+  }
+
+  public void holdEntityDevelopmentBond(String pawnName, Street.Type collateral) {
+    DevelopmentLoanBook.Position position = developmentLoanBook().securedBy(collateral)
+        .orElseThrow(() -> new AssertionError("No development loan is secured by " + collateral + "."));
+    developmentLoanBook().assignBondholder(position, pawn(pawnName));
   }
 
   public void entityRaisesLoan(String entityName, Money amount) {
@@ -1036,6 +1191,7 @@ public class World {
    */
   private void record(Entry entry) {
     Journal journal = new Journal();
+    if (this.journal != null) this.journal.forEach(journal::log);
     journal.log(entry);
     this.journal = journal.entries();
   }

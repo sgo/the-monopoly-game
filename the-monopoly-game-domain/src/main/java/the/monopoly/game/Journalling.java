@@ -15,15 +15,19 @@ import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.LegalEntity;
 import the.monopoly.game.rules.Rent;
+import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Taxes;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Greedo;
 import the.monopoly.game.strategies.Strategy;
 
+import java.util.List;
 import java.util.Map;
 
 /** Writes down what a turn and a sale say they did, as the game's account of it. */
-record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds)
+record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds,
+                   the.monopoly.game.rules.DevelopmentLoanBook developmentLoanBook,
+                   Rule.Set rules, List<Player> players, Strategy.OfPlayers strategies)
     implements Turn.Events, LandSale.Events, Rent.Events, Building.Events, Cards.Events, Taxes.Events, Jail.Events, Bankruptcy.Events {
   int age(Player player) {
     return ages.getOrDefault(player.id(), 0);
@@ -48,6 +52,71 @@ record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds)
     ageAfter(player);
     deeds.legalEntities().forEach(entity -> entity.shareholderGrewOlder(player));
     journal.log(new Journal.Entry.SalaryCollected(player.id(), salary));
+    developmentLoanBook.positions().stream()
+        .filter(position -> position.borrower() != null && position.borrower().id().equals(player.id()))
+        .forEach(this::serviceDevelopmentLoan);
+  }
+
+  private void serviceDevelopmentLoan(the.monopoly.game.rules.DevelopmentLoanBook.Position position) {
+    java.util.Optional<the.monopoly.game.rules.DevelopmentLoanBook.Payment> payment =
+        developmentLoanBook.service(position);
+    if (payment.isPresent()) {
+      serviceDevelopmentLoan(position, payment.orElseThrow());
+      return;
+    }
+    mortgageSpareProperty(position);
+    developmentLoanBook.service(position).ifPresentOrElse(
+        value -> serviceDevelopmentLoan(position, value),
+        () -> {
+          developmentLoanDefaulted(position);
+          the.monopoly.game.rules.DevelopmentLoanBook.Foreclosure foreclosure =
+              developmentLoanBook.foreclose(position, deeds, rules, players, strategies);
+          journal.log(new Journal.Entry.DevelopmentLoanRecovered(position.collateral(), foreclosure.recovered()));
+        });
+  }
+
+  private void mortgageSpareProperty(the.monopoly.game.rules.DevelopmentLoanBook.Position position) {
+    if (position.borrower() == null) return;
+    ColourStreet collateral = (ColourStreet) rules.create(position.collateral());
+    Money due = developmentLoanBook.paymentDue(position);
+    for (Street.Type type : deeds.landOwnedBy(position.borrower())) {
+      if (type == position.collateral()) continue;
+      Street space = rules.create(type);
+      if (space instanceof ColourStreet street && street.colourGroup() == collateral.colourGroup()) continue;
+      Ownable land = (Ownable) space;
+      if (deeds.isMortgaged(land)) continue;
+      deeds.mortgage(land, position.borrower());
+      if (position.borrower().account().balance().amount().covers(due)) return;
+    }
+  }
+
+  void serviceDevelopmentLoan(the.monopoly.game.rules.DevelopmentLoanBook.Position position,
+                              the.monopoly.game.rules.DevelopmentLoanBook.Payment payment) {
+      if (position.borrower() != null) {
+        journal.log(new Journal.Entry.DevelopmentLoanPayment(position.borrower().id(), position.collateral(),
+            payment.interest(), payment.principal()));
+        if (position.bondholder() != null) journal.log(new Journal.Entry.DevelopmentBondPayment(
+            position.bondholder().id(), position.collateral(), payment.bondInterest(), payment.principal()));
+        if (position.loan().isRepaid()) journal.log(new Journal.Entry.DevelopmentLoanRepaid(
+            position.borrower().id(), position.collateral()));
+      } else {
+        journal.log(new Journal.Entry.EntityDevelopmentLoanPayment(position.entity().name(), position.collateral(),
+            payment.interest(), payment.principal()));
+        if (position.bondholder() != null) journal.log(new Journal.Entry.DevelopmentBondPayment(
+            position.bondholder().id(), position.collateral(), payment.bondInterest(), payment.principal()));
+        if (position.loan().isRepaid()) journal.log(new Journal.Entry.EntityDevelopmentLoanRepaid(
+            position.entity().name(), position.collateral()));
+      }
+  }
+
+  void developmentLoanDefaulted(the.monopoly.game.rules.DevelopmentLoanBook.Position position) {
+    if (position.borrower() != null) journal.log(new Journal.Entry.DevelopmentLoanDefaulted(
+        position.borrower().id(), position.collateral()));
+    else journal.log(new Journal.Entry.EntityDevelopmentLoanDefaulted(position.entity().name(), position.collateral()));
+  }
+
+  void developmentLoanRecovered(the.monopoly.game.rules.DevelopmentLoanBook.Position position, Money amount) {
+    journal.log(new Journal.Entry.DevelopmentLoanRecovered(position.collateral(), amount));
   }
 
   @Override
@@ -88,6 +157,16 @@ record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds)
     journal.log(new Journal.Entry.StalemateTrading(enabled));
   }
 
+  public void developmentLoans(boolean enabled, boolean fullDraw) {
+    journal.log(new Journal.Entry.DevelopmentLoans(enabled, fullDraw));
+  }
+
+  @Override
+  public void developmentLoanRaised(Player borrower, the.monopoly.game.rules.DevelopmentLoanBook.Position position) {
+    journal.log(new Journal.Entry.DevelopmentLoanRaised(borrower.id(), position.collateral(),
+        position.loan().originalPrincipal(), position.bondholder() == null ? null : position.bondholder().id()));
+  }
+
   public void strategyNamed(Player player, Strategy strategy) {
     boolean legalEntityEnabled = strategy instanceof Greedo greedo && greedo.legalEntityTradingEnabled();
     boolean stalemateEnabled = strategy instanceof Greedo greedo && greedo.stalemateTradingEnabled();
@@ -112,6 +191,11 @@ record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds)
   public void entityLoanRaised(LegalEntity entity, Money amount) {
     journal.log(new Journal.Entry.LegalEntityLoanRaised(entity.name(), amount,
         entity.shareholders().stream().map(Player::id).toList()));
+  }
+
+  public void entityDevelopmentLoanRaised(LegalEntity entity, the.monopoly.game.rules.DevelopmentLoanBook.Position position) {
+    journal.log(new Journal.Entry.EntityDevelopmentLoanRaised(entity.name(), position.collateral(),
+        position.loan().originalPrincipal(), position.bondholder() == null ? null : position.bondholder().id()));
   }
 
   public void entityLoanRepaid(LegalEntity entity, Player shareholder, Money principal, Money repayment) {

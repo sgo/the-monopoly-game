@@ -150,3 +150,41 @@ Feature: Monopoly command line interface
     Examples:
       | raw arguments                                            | billionaire pawn | asset-rich state |
       | 2 greedo billionaire --optional-asset-rich-billionaire   | high hat          | enabled          |
+
+  # cli-11
+  Scenario Outline: the CLI wires the development-loans flag, game-wide rather than to any one strategy
+    Given the simulator is configured with the raw arguments "<raw arguments>"
+    When I start the simulator
+    Then the game journal records that development loans are <state>
+    When I stop the simulator before the game ends
+    Then the simulator process ends
+
+    Examples:
+      | raw arguments                                | state   |
+      | 2 greedo greedo --optional-development-loans | enabled |
+
+  # cli-12
+  Scenario Outline: the CLI wires the development-loans full-draw flag, game-wide rather than to any one strategy
+    Given the simulator is configured with the raw arguments "<raw arguments>"
+    When I start the simulator
+    Then the game journal records that full-draw development loans are <state>
+    When I stop the simulator before the game ends
+    Then the simulator process ends
+
+    Examples:
+      | raw arguments                                                                       | state   |
+      | 2 greedo greedo --optional-development-loans --optional-development-loans-full-draw | enabled |
+
+  # cli-13
+  Scenario Outline: the development-loans flag applies the same way regardless of which strategies are playing
+    Given the simulator is configured with the raw arguments "<raw arguments>"
+    When I start the simulator
+    Then the game journal records that pawn "<billionaire pawn>" uses the "Billionaire" strategy
+    And the game journal records that pawn "<greedo pawn>" uses the "Greedo" strategy
+    And the game journal records that development loans are <state>
+    When I stop the simulator before the game ends
+    Then the simulator process ends
+
+    Examples:
+      | raw arguments                                     | billionaire pawn | greedo pawn | state   |
+      | 2 greedo billionaire --optional-development-loans | high hat         | dog         | enabled |

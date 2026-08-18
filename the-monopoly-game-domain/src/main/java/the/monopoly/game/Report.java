@@ -58,6 +58,33 @@ public final class Report {
       case Entry.PeerTrade it -> name(it.trader()) + " trades " + boardSpaceName(it.offered()) + " to "
           + name(it.partner()) + " for " + boardSpaceName(it.wanted());
       case Entry.StalemateTrading it -> "stalemate trading is " + (it.enabled() ? "enabled" : "disabled");
+      case Entry.DevelopmentLoans it -> "development loans are " + (it.enabled() ? "enabled" : "disabled")
+          + (it.fullDraw() ? " with full draw" : "");
+      case Entry.DevelopmentLoanRaised it -> name(it.borrower()) + " raises a development loan of $"
+          + it.amount().amount() + " from the bank, secured by " + spaceName(it.collateral())
+          + fundedBy(it.bondholder());
+      case Entry.EntityDevelopmentLoanRaised it -> it.name() + " raises a development loan of $"
+          + it.amount().amount() + " from the bank, secured by " + spaceName(it.collateral())
+          + fundedBy(it.bondholder());
+      case Entry.DevelopmentLoanPayment it -> name(it.borrower()) + " pays the bank $"
+          + it.interest().amount() + " interest and $" + it.principal().amount()
+          + " principal on the development loan secured by " + spaceName(it.collateral());
+      case Entry.DevelopmentBondPayment it -> name(it.bondholder()) + " receives $"
+          + it.yield().amount() + " interest and $" + it.principal().amount()
+          + " principal on the development loan bond secured by " + spaceName(it.collateral());
+      case Entry.DevelopmentLoanRepaid it -> name(it.borrower()) + "'s development loan on "
+          + spaceName(it.collateral()) + " has been fully repaid";
+      case Entry.DevelopmentLoanDefaulted it -> name(it.borrower()) + " defaults on the development loan secured by "
+          + spaceName(it.collateral()) + "; the bank forecloses";
+      case Entry.DevelopmentLoanRecovered it -> "The bank recovers $" + it.amount().amount()
+          + " from the foreclosure of " + spaceName(it.collateral()) + ", added to its own account";
+      case Entry.EntityDevelopmentLoanPayment it -> it.name() + " pays the bank $"
+          + it.interest().amount() + " interest and $" + it.principal().amount()
+          + " principal on the development loan secured by " + spaceName(it.collateral());
+      case Entry.EntityDevelopmentLoanRepaid it -> it.name() + "'s development loan on "
+          + spaceName(it.collateral()) + " has been fully repaid";
+      case Entry.EntityDevelopmentLoanDefaulted it -> it.name() + " defaults on the development loan secured by "
+          + spaceName(it.collateral()) + "; the bank forecloses";
       case Entry.StrategyNamed it -> name(it.player()) + " uses " + it.name()
           + " (legal-entity trading is " + (it.legalEntityEnabled() ? "enabled" : "disabled")
           + ", stalemate trading is " + (it.stalemateEnabled() ? "enabled" : "disabled") + ")";
@@ -139,6 +166,10 @@ public final class Report {
           + " and receives $" + it.amount().amount();
       case Entry.Won it -> name(it.player()) + " wins the game";
     };
+  }
+
+  private static String fundedBy(the.monopoly.game.components.players.Player.ID bondholder) {
+    return bondholder == null ? "" : ", funded by " + name(bondholder) + "'s bond purchase";
   }
 
   private static String declineLine(Entry.PurchaseDeclined it) {
