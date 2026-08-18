@@ -85,7 +85,7 @@ class GameTest {
     deeds.sell(meir, players.get(1), meir.price());
     deeds.sell(nieuwstraat, players.get(1), nieuwstraat.price());
     players.get(0).account().withdraw(new Money(1500));
-    players.get(1).account().withdraw(new Money(1450));
+    players.get(1).account().withdraw(new Money(700));
     players.get(2).account().withdraw(new Money(1000));
 
     Map<Player.ID, Cup> cups = Map.of(
@@ -98,15 +98,17 @@ class GameTest {
         players.get(2).id(), new Greedo());
     DevelopmentLoanBook loans = new DevelopmentLoanBook(ruleSet.bank());
 
-    Game.Result result = new Game(
+    Game game = new Game(
         ruleSet, players, player -> cups.get(player.id()),
         player -> strategies.get(player.id()), deeds, Cards.Decks.EMPTY, new Jail(ruleSet),
-        false, false, true, false, -1, loans).playUpToRounds(1);
+        false, false, true, false, -1, loans);
+    Game.Result result = game.playUpToRounds(1);
 
     assertThat(deeds.housesBuiltOn(meir)).isEqualTo(1);
     assertThat(loans.securedBy(Street.Type.MeirAntwerpen).orElseThrow().outstanding())
         .isEqualTo(new Money(150));
   }
+
 
   @Test
   void aGameAccountsForEachTurnAsItIsTaken() {
