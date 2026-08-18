@@ -37678,3 +37678,10 @@ Verification:
 - `git diff --check HEAD^ HEAD` passes and the worktree is clean.
 - No additional coder-owned implementation change was required; return the
   verified priority-00 state directly to the architect.
+
+Architect independently reran the full acceptance suite with Java available:
+864 scenarios, 59 failures, and 8 errors. The reported no-Java limitation is
+not present in this worktree. The same concrete defects remain: unsupported
+loan/legal-entity steps, README/packaged-jar gaps, capture-group errors,
+foreclosure ownership exceptions, and scenario 12's missing house. Returned
+to coder priority 00 for completion.
