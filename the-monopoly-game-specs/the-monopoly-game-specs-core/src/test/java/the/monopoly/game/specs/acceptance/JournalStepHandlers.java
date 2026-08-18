@@ -64,6 +64,9 @@ final class JournalStepHandlers {
         given("^the " + NAME + " split is an eligible three-owner split$",
             (world, arguments) -> world.marketDeadlockEligible(arguments.text(1))),
 
+        given("^the " + NAME + " split is an eligible three-ownesplit$",
+            (world, arguments) -> world.marketDeadlockEligible(arguments.text(1))),
+
         step("^the round completes with (no|a) ownership-consolidating action$",
             (world, arguments) -> world.completeMarketDeadlockRound(arguments.text(1))),
 
@@ -242,8 +245,8 @@ final class JournalStepHandlers {
             (world, arguments) -> assertThat(world.entityLoan("Pink Realty"))
                 .isEqualTo(money(arguments.number(1)))),
 
-        given("^pawn \"" + NAME + "\" has a balance that allows only \\$(<ceiling_share>|<share>) toward the entity$",
-            (world, arguments) -> world.arrangePawnBalance(arguments.text(1), money(arguments.number(2)))),
+        given("^pawn \"" + NAME + "\" has a balance that allows only \\$(<ceiling_share>|<share>|-?[0-9,]+(?:\\.[0-9]{1,2})?) toward the entity$",
+            (world, arguments) -> world.arrangePawnBalance(arguments.text(1), money(arguments.text(2)))),
 
         given("^each shareholder commits \\$(<share>|<commitment>) toward Pink Realty's build$",
             (world, arguments) -> world.shareholdersCommitToBuild("Pink Realty", money(arguments.number(1)))),
@@ -732,22 +735,80 @@ final class JournalStepHandlers {
         step("^pawn \"" + NAME + "\" grows a year older$",
             (world, arguments) -> world.growPawnOlder(arguments.text(1))),
 
+        then("^the game journal records that pawn \"" + NAME + "\" raises a development loan of \\$" + MONEY
+                + " from the bank, secured by \"" + NAME + "\", funded by pawn \"" + NAME + "\"'s bond purchase$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.DevelopmentLoanRaised it
+                && it.borrower().equals(idOf(arguments.text(1)))
+                && it.amount().equals(money(arguments.text(2)))
+                && it.collateral() == SpaceNames.of(arguments.text(3))
+                && it.bondholder().value().equals(arguments.text(4)), "player development loan raised"))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" pays the bank \\$" + MONEY
+                + " interest and \\$" + MONEY + " principal on the development loan secured by \"" + NAME + "\"$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.DevelopmentLoanPayment it
+                && it.borrower().equals(idOf(arguments.text(1)))
+                && it.interest().equals(money(arguments.text(2)))
+                && it.principal().equals(money(arguments.text(3)))
+                && it.collateral() == SpaceNames.of(arguments.text(4)), "player development loan payment"))),
+
+        then("^the game journal records that pawn \"" + NAME + "\"'s development loan on \"" + NAME
+                + "\" has been fully repaid$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.DevelopmentLoanRepaid it
+                && it.borrower().equals(idOf(arguments.text(1)))
+                && it.collateral() == SpaceNames.of(arguments.text(2)), "player development loan repaid"))),
+
+        then("^the game journal records that pawn \"" + NAME + "\" receives \\$" + MONEY
+                + " interest and \\$" + MONEY + " principal on the development loan bond secured by \"" + NAME + "\"$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.DevelopmentBondPayment it
+                && it.bondholder().equals(idOf(arguments.text(1)))
+                && it.yield().equals(money(arguments.text(2)))
+                && it.principal().equals(money(arguments.text(3)))
+                && it.collateral() == SpaceNames.of(arguments.text(4)), "player development bond payment"))),
+
+        then("^the game journal records that full-draw development loans are " + NAME + "$",
+            (world, arguments) -> records(world, Claim.of(new Entry.DevelopmentLoans(
+                true, arguments.text(1).equals("enabled"))))),
+
+        then("^the game journal records that development loans are " + NAME + "$",
+            (world, arguments) -> records(world, Claim.of(new Entry.DevelopmentLoans(
+                arguments.text(1).equals("enabled"), false)))), 
+
         then("^the game journal records that " + NAME + " raises a development loan of \\$" + MONEY
                 + " from the bank, secured by \"" + NAME + "\", funded by pawn \"" + NAME + "\"'s bond purchase$",
             (world, arguments) -> assertThat(world.entityRaisesDevelopmentLoan(arguments.text(1),
                 SpaceNames.of(arguments.text(3)), money(arguments.text(2)))).isTrue()),
 
-        then("^" + NAME + " raises a development loan of \\$" + MONEY + " secured by \"" + NAME + "\"$",
+        then("^(?!the game (?:journal|log) records that |the game report says that )" + NAME
+                + " raises a development loan of \\$" + MONEY + " secured by \"" + NAME + "\"$",
             (world, arguments) -> assertThat(world.entityRaisesDevelopmentLoan(arguments.text(1),
                 SpaceNames.of(arguments.text(3)), money(arguments.text(2)))).isTrue()),
 
-        then("^" + NAME + " pays the bank \\$" + MONEY + " in interest on the development loan$",
+        then("^(?!the game (?:journal|log) records that |the game report says that )" + NAME
+                + " pays the bank \\$" + MONEY + " in interest on the development loan$",
             (world, arguments) -> assertThat(world.journal()).anyMatch(entry -> entry instanceof Entry.EntityDevelopmentLoanPayment it
                 && it.name().equals(arguments.text(1)) && it.interest().equals(money(arguments.text(2))))),
 
-        then("^" + NAME + " pays the bank \\$" + MONEY + " in principal on the development loan$",
+        then("^(?!the game (?:journal|log) records that |the game report says that )" + NAME
+                + " pays the bank \\$" + MONEY + " in principal on the development loan$",
             (world, arguments) -> assertThat(world.journal()).anyMatch(entry -> entry instanceof Entry.EntityDevelopmentLoanPayment it
                 && it.name().equals(arguments.text(1)) && it.principal().equals(money(arguments.text(2))))),
+
+        then("^the game journal records that " + NAME + " pays the bank \\$" + MONEY
+                + " interest and \\$" + MONEY + " principal on the development loan secured by \"" + NAME + "\"$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.EntityDevelopmentLoanPayment it
+                && it.name().equals(arguments.text(1)) && it.interest().equals(money(arguments.text(2)))
+                && it.principal().equals(money(arguments.text(3)))
+                && it.collateral() == SpaceNames.of(arguments.text(4)), "entity development loan payment"))),
+
+        then("^the game journal records that " + NAME + "'s development loan on \"" + NAME
+                + "\" has been fully repaid$",
+            (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.EntityDevelopmentLoanRepaid it
+                && it.name().equals(arguments.text(1)) && it.collateral() == SpaceNames.of(arguments.text(2)),
+                "entity development loan repaid"))),
+
+        then("^(?!the game (?:journal|log) records that |the game report says that )" + NAME
+                + " owns no development loan$",
+            (world, arguments) -> assertThat(world.entityOwnsNoDevelopmentLoan(arguments.text(1))).isTrue()),
 
         then("^the game journal records that " + NAME + " defaults on the development loan secured by \"" + NAME
                 + "\"; the bank forecloses$",
@@ -764,7 +825,8 @@ final class JournalStepHandlers {
                 && it.collateral() == SpaceNames.of(arguments.text(2))
                 && it.amount().equals(money(arguments.text(1))))),
 
-        then("^" + NAME + "'s development loan on \"" + NAME + "\" has been fully repaid$",
+        then("^(?!the game (?:journal|log) records that |the game report says that )" + NAME
+                + "'s development loan on \"" + NAME + "\" has been fully repaid$",
             (world, arguments) -> assertThat(world.entityDevelopmentLoanFullyRepaid(arguments.text(1),
                 SpaceNames.of(arguments.text(2)))).isTrue()),
 
@@ -772,6 +834,31 @@ final class JournalStepHandlers {
                 + " principal on the development loan bond secured by \"" + NAME + "\"$",
             (world, arguments) -> assertThat(world.bondholderReceived(arguments.text(1),
                 SpaceNames.of(arguments.text(4)), money(arguments.text(2)), money(arguments.text(3)))).isTrue()),
+
+        then("^(?!the game (?:journal|log) records that |the game report says that )" + NAME
+                + " owes the bank \\$" + MONEY + " on the development loan$",
+            (world, arguments) -> assertThat(world.entityDevelopmentLoanBalance(arguments.text(1), Street.Type.RueDeDiekirchArlon))
+                .isEqualTo(money(arguments.text(2)))),
+
+        then("^(?!the game (?:journal|log) records that |the game report says that )" + NAME
+                + " pays the bank \\$" + MONEY + " interest and \\$" + MONEY
+                + " principal on the development loan secured by \"" + NAME + "\"$",
+            (world, arguments) -> assertThat(world.journal()).anyMatch(entry -> entry instanceof Entry.EntityDevelopmentLoanPayment it
+                && it.name().equals(arguments.text(1)) && it.interest().equals(money(arguments.text(2)))
+                && it.principal().equals(money(arguments.text(3)))
+                && it.collateral() == SpaceNames.of(arguments.text(4)))),
+
+        then("^" + NAME + " owns \"" + NAME + "\"$",
+            (world, arguments) -> assertThat(world.entityOwns(arguments.text(1), SpaceNames.of(arguments.text(2)))).isTrue()),
+
+        then("^" + NAME + " does not own \"" + NAME + "\"$",
+            (world, arguments) -> assertThat(world.entityOwns(arguments.text(1), SpaceNames.of(arguments.text(2)))).isFalse()),
+
+        then("^the game journal records that pawn \"" + NAME + "\" defaults on the development loan secured by \"" + NAME
+                + "\"; the bank forecloses$",
+            (world, arguments) -> assertThat(world.journal()).anyMatch(entry -> entry instanceof Entry.DevelopmentLoanDefaulted it
+                && it.borrower().equals(idOf(arguments.text(1)))
+                && it.collateral() == SpaceNames.of(arguments.text(2)))),
 
         then("^pawn \"" + NAME + "\" pays the bank \\$" + MONEY + " in interest on the development loan$",
             (world, arguments) -> assertThat(world.journal()).anyMatch(entry -> entry instanceof Entry.DevelopmentLoanPayment it
@@ -782,6 +869,12 @@ final class JournalStepHandlers {
             (world, arguments) -> assertThat(world.journal()).anyMatch(entry -> entry instanceof Entry.DevelopmentLoanPayment it
                 && it.borrower().equals(idOf(arguments.text(1)))
                 && it.principal().equals(money(arguments.text(2))))),
+
+        then("^pawn \"" + NAME + "\" defaults on the development loan secured by \"" + NAME
+                + "\"; the bank forecloses$",
+            (world, arguments) -> assertThat(world.journal()).anyMatch(entry -> entry instanceof Entry.DevelopmentLoanDefaulted it
+                && it.borrower().equals(idOf(arguments.text(1)))
+                && it.collateral() == SpaceNames.of(arguments.text(2)))),
 
         then("^pawn \"" + NAME + "\" owes the bank \\$" + MONEY + " on the development loan$",
             (world, arguments) -> assertThat(world.developmentLoanBalance(arguments.text(1), Street.Type.RueGrandeDinant))

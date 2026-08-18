@@ -73,6 +73,7 @@ public final class DevelopmentLoanBook {
 
   public Position recordEntityLoan(LegalEntity borrower, Street.Type collateral, Money principal, int yearsServiced,
                                    Player bondholder) {
+    borrower.recordDevelopmentLoan(principal);
     Position position = new Position(borrower.name(), null, borrower, collateral,
         new DevelopmentLoan(principal, yearsServiced), bondholder);
     positions.add(position);
@@ -164,6 +165,7 @@ public final class DevelopmentLoanBook {
     if (!borrowerBalance(position).covers(total)) return Optional.empty();
 
     DevelopmentLoan.Payment payment = position.loan().serviceNextYear();
+    if (position.entity() != null) position.entity().reduceDevelopmentLoan(payment.principal());
     withdrawFromBorrower(position, payment.borrowerTotal());
     if (position.bondholder() != null)
       position.bondholder().account().deposit(payment.bondInterest().plus(payment.principal()));
@@ -235,8 +237,16 @@ public final class DevelopmentLoanBook {
     LegalEntity borrower = position.entity();
     ColourStreet collateral = (ColourStreet) rules.create(position.collateral());
     Money proceeds = Money.ZERO;
-    if (deeds.hasHotelOn(collateral)) proceeds = proceeds.plus(deeds.exchangeHotelForHouses(collateral, borrower));
-    while (deeds.housesBuiltOn(collateral) > 0) proceeds = proceeds.plus(deeds.sellHouse(collateral, borrower));
+    if (deeds.hasHotelOn(collateral)) {
+      Money refund = deeds.exchangeHotelForHouses(collateral, borrower);
+      borrower.withdrawFromBank(refund);
+      proceeds = proceeds.plus(refund);
+    }
+    while (deeds.housesBuiltOn(collateral) > 0) {
+      Money refund = deeds.sellHouse(collateral, borrower);
+      borrower.withdrawFromBank(refund);
+      proceeds = proceeds.plus(refund);
+    }
     Ownable land = collateral;
     deeds.arrangeMortgaged(land);
     Auction.Bidders bidders = Auction.qualified(players, land,
@@ -268,6 +278,7 @@ public final class DevelopmentLoanBook {
     Money surplus = proceeds.minus(recoveredFromSale);
     recycledCapital = recycledCapital.plus(recovered);
     position.loan().serviceToZero();
+    if (position.entity() != null) position.entity().clearDevelopmentLoan();
     if (!surplus.equals(Money.ZERO)) {
       if (position.borrower() != null) position.borrower().account().deposit(surplus);
       else position.entity().depositToBank(surplus);

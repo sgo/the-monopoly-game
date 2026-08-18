@@ -113,6 +113,9 @@ public final class LegalEntity {
     bankAccount.deposit(amount);
   }
   public void recordLoan(Money amount) { loan = loan.plus(amount); }
+  void recordDevelopmentLoan(Money amount) { loan = loan.plus(amount); }
+  void reduceDevelopmentLoan(Money principal) { loan = loan.minus(principal); }
+  void clearDevelopmentLoan() { loan = Money.ZERO; }
   public void receiveRent(ColourStreet street) { rentReceivedOn = street; }
   public boolean receivedRent() { return rentReceivedOn != null; }
   public void recordShareholderPayment(Player shareholder, Money amount) {

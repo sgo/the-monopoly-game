@@ -35,10 +35,9 @@ final class LegalEntityBuilding {
         affordableBuildPlan(entity, deeds));
     if (developmentLoanBook != null && players != null
         && entity.shareholders().stream().anyMatch(player -> strategies.forPlayer(player).developmentLoansEnabled())) {
-      while (plan.size() < Math.min(2, entity.streets().size())) {
+      if (plan.isEmpty()) {
         ColourStreet candidate = cheapestBuildableStreet(entity, deeds, plan, canReachHotels(entity));
-        if (candidate == null) break;
-        plan = append(plan, candidate);
+        if (candidate != null) plan = append(plan, candidate);
       }
     }
     if (plan.isEmpty()) return null;

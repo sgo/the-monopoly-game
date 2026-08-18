@@ -222,7 +222,7 @@ public class Game {
     journal.log(new Journal.Entry.Start(ids(players)));
     deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
-    if (developmentLoans) journalling.developmentLoans(true, fullDrawDevelopmentLoans);
+    journalling.developmentLoans(developmentLoans, fullDrawDevelopmentLoans);
     players.forEach(player -> journalling.strategyNamed(player, strategies.forPlayer(player)));
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
@@ -313,24 +313,42 @@ public class Game {
 
   private boolean operateLegalEntities(Journalling journalling) {
     deeds.legalEntities().forEach(entity -> {
-      developmentLoanBook.positions().stream()
+      boolean loanServiced = developmentLoanBook.positions().stream()
           .filter(position -> position.entity() == entity && !position.outstanding().equals(Money.ZERO))
-          .forEach(position -> serviceEntityDevelopmentLoan(position, journalling));
-      operateEntity(entity, journalling);
+          .map(position -> serviceEntityDevelopmentLoan(position, journalling))
+          .reduce(false, (serviced, current) -> serviced || current);
+      if (!loanServiced) operateEntity(entity, journalling);
     });
     return true;
   }
 
-  private void serviceEntityDevelopmentLoan(DevelopmentLoanBook.Position position, Journalling journalling) {
+  private boolean serviceEntityDevelopmentLoan(DevelopmentLoanBook.Position position, Journalling journalling) {
     Optional<DevelopmentLoanBook.Payment> payment = developmentLoanBook.service(position);
+    if (payment.isEmpty()) {
+      mortgageEntitySpareProperty(position);
+      payment = developmentLoanBook.service(position);
+    }
     if (payment.isPresent()) {
       journalling.serviceDevelopmentLoan(position, payment.orElseThrow());
-    } else {
-      DevelopmentLoanBook.Foreclosure foreclosure =
-          developmentLoanBook.forecloseEntity(position, deeds, rules, players, strategies);
-      journalling.developmentLoanDefaulted(position);
-      journalling.developmentLoanRecovered(position, foreclosure.recovered());
+      return true;
     }
+    DevelopmentLoanBook.Foreclosure foreclosure =
+        developmentLoanBook.forecloseEntity(position, deeds, rules, players, strategies);
+    journalling.developmentLoanDefaulted(position);
+    journalling.developmentLoanRecovered(position, foreclosure.recovered());
+    return true;
+  }
+
+  private void mortgageEntitySpareProperty(DevelopmentLoanBook.Position position) {
+    LegalEntity entity = position.entity();
+    rules.streets()
+        .filter(Ownable.class::isInstance)
+        .map(Ownable.class::cast)
+        .filter(land -> deeds.entityOwnerOf(land.type()).filter(entity::equals).isPresent())
+        .filter(land -> land.type() != position.collateral())
+        .filter(land -> !deeds.isMortgaged(land))
+        .findFirst()
+        .ifPresent(land -> deeds.mortgage(land, entity));
   }
 
   private void operateEntity(LegalEntity entity, Journalling journalling) {

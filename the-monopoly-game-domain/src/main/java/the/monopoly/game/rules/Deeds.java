@@ -101,6 +101,13 @@ public class Deeds {
         .toList();
   }
 
+  public List<Street.Type> landOwnedBy(LegalEntity entity) {
+    return entityOwners.entrySet().stream()
+        .filter(it -> it.getValue().equals(entity))
+        .map(Map.Entry::getKey)
+        .toList();
+  }
+
   public void transferWithoutPayment(Ownable land, Player from, Player to) {
     verifyOwner(land, from);
     owners.put(land.type(), to.id());

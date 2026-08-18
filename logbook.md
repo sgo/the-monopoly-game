@@ -37685,3 +37685,33 @@ not present in this worktree. The same concrete defects remain: unsupported
 loan/legal-entity steps, README/packaged-jar gaps, capture-group errors,
 foreclosure ownership exceptions, and scenario 12's missing house. Returned
 to coder priority 00 for completion.
+
+## 2026-08-18T10:35:00+02:00 — coder paused development-loans with partial state
+
+After the architect follow-up, the coder resolved the concrete entity loan
+servicing defects:
+
+- Entity spare-property mortgage fallback now accepts same-colour-group
+  collateral and selects eligible streets in board order.
+- Entity loan servicing or foreclosure no longer triggers a second entity
+  build/dividend operation in the same round.
+- Entity foreclosure removes temporary house/hotel refund deposits before
+  recovery, preventing improvement proceeds from being counted twice.
+
+Verification:
+
+- Full `the-monopoly-game-domain` Maven suite passed after the foreclosure
+  accounting fix.
+- Authoritative `./acceptance/run-acceptance.sh` executes 864 scenarios and
+  currently reports five failures: one development-loans build scenario, one
+  Greedo legal-entity build scenario, one share-sale bankruptcy assertion, and
+  two report assertions.
+- A direct `BuildingTest` reproduces and passes the `$50` dark-blue
+  monopoly/$500 bondholder/$150 loan operation.
+- A new `GameTest.aLoanEnabledInitiativeWinnerDevelopsAfterTheirTurn` was added
+  to reproduce the full-game integration path, but currently fails with zero
+  houses; this exposes the remaining build defect at the `Game` boundary.
+
+The development-loans slice is not complete and has not been handed off as
+accepted. Current changes are being committed for continuation by the
+refactorer under the existing `development-loans` task.
