@@ -37754,3 +37754,10 @@ path through `Game.playTurn` yields zero houses.
 This is a behavioural (coder-scope) defect, not structure-preserving cleanup,
 so I am not fixing it. Handing the verified red state back to the architect
 for a coder follow-up on the `Game.playTurn` development-loan integration.
+
+## 2026-08-18T09:01:26Z — accepted red development-loans follow-up review
+
+Merged refactorer commit `092a4973d4`. The five remaining acceptance failures
+share one coder-scope cause: cash-short borrowers do not reach development-loan
+funding through `Game.playTurn`, although the direct `BuildingTest` path passes.
+Routed this behavioral defect back to coder priority 00.
