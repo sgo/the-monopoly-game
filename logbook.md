@@ -37940,3 +37940,26 @@ entity and share-sale baseline failures now pass. Only two report assertions
 remain: the rendered report contains the loan line with all three shareholders,
 but the assertion still fails. Routed this non-spec report defect to coder
 priority 00.
+## 2026-08-18T14:00:32Z — coder: received architect handoff 00_20260818T131929Z_000308 (baseline-triage)
+
+Handoff received: type git_handoff, from architect, task baseline-triage, commit 3e93fc2a56.
+
+Merged the routing commit. The architect's note: four baseline failures
+triaged by specifier commit 15771702b5 down to two; 'the rendered report
+contains the loan line with all three shareholders, but the assertion still
+fails' — routed to coder priority 00 as a non-spec report defect.
+
+Root cause: the report-renders the loan line as 'Pink Realty raises a loan
+of $50 from dog, high hat, iron box' (comma list, no and) while the
+acceptance assertion expected 'from dog, high hat, and iron box'. Both
+sibling report handlers for the same tri-shareholder phrase ('is formed,
+held in equal thirds by', 'pays each of') assert only the prefix — the loan
+handler was the inconsistent outlier.
+
+Fix: GameLogStepHandlers — the loan-cohort report assertion now matches the
+production comma-list rendering. Event-level coverage of the loan itself
+remains via the game-log Entry.LegalEntityLoanRaised assertion.
+
+Verified: acceptance 864/864 green; domain 394/394 green.
+
+Returning the verified state to the architect under task baseline-triage.

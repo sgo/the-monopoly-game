@@ -240,7 +240,7 @@ final class GameLogStepHandlers {
         then("^the game report says that " + NAME + " raises a loan of \\$" + VALUE
                 + " from pawn \"dog\", pawn \"high hat\", and pawn \"iron box\"$",
             (world, arguments) -> says(world, arguments.text(1) + " raises a loan of $"
-                + arguments.number(2) + " from dog, high hat, and iron box")), 
+                + arguments.number(2) + " from dog, high hat, iron box")), 
         then("^the game report says that the bank recovers \\$" + MONEY + " from the foreclosure of \"" + NAME
                 + "\", added to its own account$",
             (world, arguments) -> says(world, "The bank recovers $" + money(arguments.text(1)).amount()
