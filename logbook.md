@@ -37780,3 +37780,41 @@ Merged refactorer commit `092a4973d4`. The five remaining acceptance failures
 share one coder-scope cause: cash-short borrowers do not reach development-loan
 funding through `Game.playTurn`, although the direct `BuildingTest` path passes.
 Routed this behavioral defect back to coder priority 00.
+## 2026-08-18T12:33:23Z — coder follow-up: initiative-roll override fix closes DevLoans[14]
+
+Commit: d202277. Handoff: .swarmforge/handoffs/outbox/00_20260818T123243Z_27190_from_coder_to_refactorer.handoff
+
+DevLoans[14] root cause identified: shared queuedPawnRolls kept an
+overridden initiative roll from the background next to the scenario's
+override. The game's own initiative consumed the background value; the
+scenario's replacement then surfaced as the pawn's turn roll rather
+than the UNREMARKABLE fallback.
+
+Fix: queuedInitiativeRolls (replace-on-queue) separate from
+queuedPawnRolls (append). Game Cups consult initiative queue first,
+then turn queue. DevLoans[14] now passes.
+
+Remaining acceptance failures: 4, all pre-existing at the architect
+baseline: ShareSale[14], LegalEntity[61], Report[88], Report[93].
+These are fixture/spec-level defects, not regressions.
+
+Domain suite: 394/394 green. Handoff sent to refactorer.
+## 2026-08-18T12:33:35Z — coder follow-up: initiative-roll override fix closes DevLoans[14]
+
+Commit: d202277. Handoff: .swarmforge/handoffs/outbox/00_20260818T123243Z_27190_from_coder_to_refactorer.handoff
+
+DevLoans[14] root cause identified: shared queuedPawnRolls kept an
+overridden initiative roll from the background next to the scenario's
+override. The game's own initiative consumed the background value; the
+scenario's replacement then surfaced as the pawn's turn roll rather
+than the UNREMARKABLE fallback.
+
+Fix: queuedInitiativeRolls (replace-on-queue) separate from
+queuedPawnRolls (append). Game Cups consult initiative queue first,
+then turn queue. DevLoans[14] now passes.
+
+Remaining acceptance failures: 4, all pre-existing at the architect
+baseline: ShareSale[14], LegalEntity[61], Report[88], Report[93].
+These are fixture/spec-level defects, not regressions.
+
+Domain suite: 394/394 green. Handoff sent to refactorer.
