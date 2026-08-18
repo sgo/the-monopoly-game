@@ -37731,3 +37731,26 @@ Verification:
 The development-loans slice is not complete and has not been handed off as
 accepted. Current changes are being committed for continuation by the
 refactorer under the existing `development-loans` task.
+
+## 2026-08-18T10:59:49Z — refactorer review: coder follow-up closes 62 of 67 failures; core build defect remains
+
+Merged coder follow-up `057212c358` (resolving the `logbook.md` conflict by
+preserving every line from both parents). Set up the JDK (`JAVA_HOME` to the
+sdkman 25.0.2-zulu toolchain) and re-verified fresh.
+
+Domain suite: 394 tests, 1 failure — the coder's own new reproduction
+`GameTest.aLoanEnabledInitiativeWinnerDevelopsAfterTheirTurn`
+(`expected: 1 but was: 0` houses on `MeirAntwerpen`). Acceptance: 864
+scenarios, 5 failures / 0 errors (down from 59F+8E on the prior cycle). The
+five are `dev-loans` scenario 12 (`MeirAntwerpen` 1 house),
+`greedo-legal-entity` (`BruulMechelen` 1 house), `greedo-share-sale` (`dog`
+bankrupt), and two `report` assertions (`Pink Realty raises a loan of $50...`
+plus the paired build). They all trace to one remaining behavioural defect: a
+cash-short borrower does not develop through a development loan at the `Game`
+boundary. The `BuildingTest` variant passes (`building.develop(highHat)` called
+directly with a 2-player list and a ready `$500` bondholder), but the full-game
+path through `Game.playTurn` yields zero houses.
+
+This is a behavioural (coder-scope) defect, not structure-preserving cleanup,
+so I am not fixing it. Handing the verified red state back to the architect
+for a coder follow-up on the `Game.playTurn` development-loan integration.
