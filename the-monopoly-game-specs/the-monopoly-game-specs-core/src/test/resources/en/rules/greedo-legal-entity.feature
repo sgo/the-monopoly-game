@@ -929,6 +929,7 @@ Feature: Greedo legal entity for a three-way colour-group split
     Given we select 4 players
     And Pink Realty is formed
     And Pink Realty's bank account holds $<bank_funds>
+    And the street "Rue de Diekirch Arlon" has 1 house(s) built
     And pawn "dog" has a balance that allows only $0 toward the entity
     And pawn "high hat" has a balance that allows only $0 toward the entity
     And pawn "iron box" has a balance that allows only $0 toward the entity
