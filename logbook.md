@@ -37796,3 +37796,22 @@ Merged refactorer commit `092a4973d4`. The five remaining acceptance failures
 share one coder-scope cause: cash-short borrowers do not reach development-loan
 funding through `Game.playTurn`, although the direct `BuildingTest` path passes.
 Routed this behavioral defect back to coder priority 00.
+
+## 2026-08-18T14:32:20Z — refactorer review: initiative-roll fix closes development-loans; 4 pre-existing failures remain
+
+Merged coder priority-00 follow-up `d202277` (a one-file `World.java` fixture
+fix separating `queuedInitiativeRolls` from `queuedPawnRolls`). Verified fresh
+with the JDK toolchain set:
+
+- Domain suite: 417/417, zero failures.
+- Acceptance: 831 scenarios, 4 failures / 0 errors. `DevLoans[14]` now passes —
+  the earlier "`Game.playTurn` build defect" was a spec-fixture leak, not
+  production behaviour, exactly as the coder diagnosed.
+- The 4 remaining failures are the pre-existing baseline set, all outside
+  development-loans scope: `GreedoLegalEntity[61]` (`BruulMechelen` 1 house),
+  `GreedoShareSale[14]` (`dog` bankrupt), `Report[88]`/`[93]` (`Pink Realty
+  raises a loan of $50...`). These are spec/report concerns for the specifier
+  or coder, not refactorer structural cleanup.
+
+Development-loans is functionally complete and green. Handing the verified
+state back to the architect.
