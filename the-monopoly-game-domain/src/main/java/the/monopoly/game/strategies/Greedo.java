@@ -20,6 +20,8 @@ public class Greedo implements Strategy {
   private final Money reserve;
   private final boolean stalemateTrading;
   private final boolean legalEntityTrading;
+  private final boolean developmentLoans;
+  private final boolean fullDrawDevelopmentLoans;
 
   public Greedo() {
     this(Money.ZERO, false);
@@ -34,9 +36,16 @@ public class Greedo implements Strategy {
   }
 
   public Greedo(Money reserve, boolean stalemateTrading, boolean legalEntityTrading) {
+    this(reserve, stalemateTrading, legalEntityTrading, false, false);
+  }
+
+  public Greedo(Money reserve, boolean stalemateTrading, boolean legalEntityTrading,
+                boolean developmentLoans, boolean fullDrawDevelopmentLoans) {
     this.reserve = reserve;
     this.stalemateTrading = stalemateTrading;
     this.legalEntityTrading = legalEntityTrading;
+    this.developmentLoans = developmentLoans;
+    this.fullDrawDevelopmentLoans = fullDrawDevelopmentLoans;
   }
 
   public boolean stalemateTradingEnabled() {
@@ -46,6 +55,16 @@ public class Greedo implements Strategy {
   @Override
   public boolean legalEntityTradingEnabled() {
     return legalEntityTrading;
+  }
+
+  @Override
+  public boolean developmentLoansEnabled() {
+    return developmentLoans;
+  }
+
+  @Override
+  public boolean fullDrawDevelopmentLoans() {
+    return fullDrawDevelopmentLoans;
   }
 
   @Override

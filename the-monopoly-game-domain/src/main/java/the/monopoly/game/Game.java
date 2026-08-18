@@ -12,6 +12,7 @@ import the.monopoly.game.rules.Building;
 import the.monopoly.game.rules.Bankruptcy;
 import the.monopoly.game.rules.Cards;
 import the.monopoly.game.rules.Deeds;
+import the.monopoly.game.rules.DevelopmentLoanBook;
 import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
@@ -58,6 +59,9 @@ public class Game {
   private final Jail jail;
   private final boolean stalemateTrading;
   private final boolean legalEntityTrading;
+  private final boolean developmentLoans;
+  private final boolean fullDrawDevelopmentLoans;
+  private final DevelopmentLoanBook developmentLoanBook;
   private final int maxYears;
   private boolean automaticMarketDeadlock = true;
   private boolean roundHadConsolidatingAction;
@@ -102,6 +106,25 @@ public class Game {
       Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
       Cards.Decks decks, Jail jail, boolean stalemateTrading, boolean legalEntityTrading, int maxYears
   ) {
+    this(rules, players, cups, strategies, deeds, decks, jail, stalemateTrading, legalEntityTrading,
+        anyStrategyEnablesDevelopmentLoans(players, strategies), anyStrategyUsesFullLoanDraw(players, strategies), maxYears);
+  }
+
+  public Game(
+      Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
+      Cards.Decks decks, Jail jail, boolean stalemateTrading, boolean legalEntityTrading,
+      boolean developmentLoans, boolean fullDrawDevelopmentLoans, int maxYears
+  ) {
+    this(rules, players, cups, strategies, deeds, decks, jail, stalemateTrading, legalEntityTrading,
+        developmentLoans, fullDrawDevelopmentLoans, maxYears, null);
+  }
+
+  public Game(
+      Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
+      Cards.Decks decks, Jail jail, boolean stalemateTrading, boolean legalEntityTrading,
+      boolean developmentLoans, boolean fullDrawDevelopmentLoans, int maxYears,
+      DevelopmentLoanBook developmentLoanBook
+  ) {
     this.rules = rules;
     this.players = players;
     this.cups = cups;
@@ -111,9 +134,20 @@ public class Game {
     this.jail = jail;
     this.stalemateTrading = stalemateTrading;
     this.legalEntityTrading = legalEntityTrading;
+    this.developmentLoans = developmentLoans;
+    this.fullDrawDevelopmentLoans = fullDrawDevelopmentLoans;
+    this.developmentLoanBook = developmentLoanBook == null ? new DevelopmentLoanBook(rules.bank()) : developmentLoanBook;
     this.maxYears = maxYears;
     applyOpeningCapital();
     applyAssetRichOpening();
+  }
+
+  private static boolean anyStrategyEnablesDevelopmentLoans(List<Player> players, Strategy.OfPlayers strategies) {
+    return players.stream().anyMatch(player -> strategies.forPlayer(player).developmentLoansEnabled());
+  }
+
+  private static boolean anyStrategyUsesFullLoanDraw(List<Player> players, Strategy.OfPlayers strategies) {
+    return players.stream().anyMatch(player -> strategies.forPlayer(player).fullDrawDevelopmentLoans());
   }
 
   /**
@@ -183,16 +217,18 @@ public class Game {
   private Result play(boolean untilComplete, BooleanSupplier keepPlaying) {
     var journal = new Journal();
     Map<Player.ID, Integer> ages = new HashMap<>();
-    Journalling journalling = new Journalling(journal, ages, deeds);
+    Journalling journalling = new Journalling(journal, ages, deeds, developmentLoanBook,
+        rules, players, strategies);
     journal.log(new Journal.Entry.Start(ids(players)));
     deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
+    if (developmentLoans) journalling.developmentLoans(true, fullDrawDevelopmentLoans);
     players.forEach(player -> journalling.strategyNamed(player, strategies.forPlayer(player)));
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
 
     jail.observe(journalling);
-    Building building = new Building(deeds, rules, strategies, journalling);
+    Building building = new Building(deeds, rules, strategies, journalling, developmentLoanBook, players);
     playTurns(turnOrder, journal, journalling, building, untilComplete, keepPlaying);
     // Asset-rich openings may be inspected or played with a scripted turn flow
     // that never gives the strategy its ordinary development opportunity.
@@ -276,8 +312,25 @@ public class Game {
   }
 
   private boolean operateLegalEntities(Journalling journalling) {
-    deeds.legalEntities().forEach(entity -> operateEntity(entity, journalling));
+    deeds.legalEntities().forEach(entity -> {
+      developmentLoanBook.positions().stream()
+          .filter(position -> position.entity() == entity && !position.outstanding().equals(Money.ZERO))
+          .forEach(position -> serviceEntityDevelopmentLoan(position, journalling));
+      operateEntity(entity, journalling);
+    });
     return true;
+  }
+
+  private void serviceEntityDevelopmentLoan(DevelopmentLoanBook.Position position, Journalling journalling) {
+    Optional<DevelopmentLoanBook.Payment> payment = developmentLoanBook.service(position);
+    if (payment.isPresent()) {
+      journalling.serviceDevelopmentLoan(position, payment.orElseThrow());
+    } else {
+      DevelopmentLoanBook.Foreclosure foreclosure =
+          developmentLoanBook.forecloseEntity(position, deeds, rules, players, strategies);
+      journalling.developmentLoanDefaulted(position);
+      journalling.developmentLoanRecovered(position, foreclosure.recovered());
+    }
   }
 
   private void operateEntity(LegalEntity entity, Journalling journalling) {
@@ -286,12 +339,16 @@ public class Game {
   }
 
   private void journalOperation(LegalEntity entity, Journalling journalling) {
-    switch (entity.operate(deeds, strategies, rules)) {
+    switch (entity.operate(deeds, strategies, rules, developmentLoanBook, players)) {
       case LegalEntity.Operation.LoanRepaid it ->
           journalling.entityLoanRepaid(entity, it.shareholder(), it.principal(), it.repayment());
       case LegalEntity.Operation.HouseBuilt it -> journalling.entityHouseBuilt(entity, it.street());
       case LegalEntity.Operation.LoanRaisedAndHouseBuilt it -> {
         journalling.entityLoanRaised(entity, it.loan());
+        journalling.entityHouseBuilt(entity, it.street());
+      }
+      case LegalEntity.Operation.DevelopmentLoanRaisedAndHouseBuilt it -> {
+        journalling.entityDevelopmentLoanRaised(entity, it.position());
         journalling.entityHouseBuilt(entity, it.street());
       }
       case LegalEntity.Operation.DividendPaid it -> journalling.entityDividendPaid(entity, it.amount());
@@ -561,6 +618,44 @@ public class Game {
       }
 
       record StalemateTrading(boolean enabled) implements Entry {
+      }
+
+      record DevelopmentLoans(boolean enabled, boolean fullDraw) implements Entry {
+      }
+
+      record DevelopmentLoanRaised(Player.ID borrower, Street.Type collateral, Money amount,
+                                   Player.ID bondholder) implements Entry {
+      }
+
+      record DevelopmentLoanPayment(Player.ID borrower, Street.Type collateral,
+                                    Money interest, Money principal) implements Entry {
+      }
+
+      record DevelopmentBondPayment(Player.ID bondholder, Street.Type collateral,
+                                    Money yield, Money principal) implements Entry {
+      }
+
+      record DevelopmentLoanRepaid(Player.ID borrower, Street.Type collateral) implements Entry {
+      }
+
+      record DevelopmentLoanDefaulted(Player.ID borrower, Street.Type collateral) implements Entry {
+      }
+
+      record DevelopmentLoanRecovered(Street.Type collateral, Money amount) implements Entry {
+      }
+
+      record EntityDevelopmentLoanRaised(String name, Street.Type collateral, Money amount,
+                                          Player.ID bondholder) implements Entry {
+      }
+
+      record EntityDevelopmentLoanPayment(String name, Street.Type collateral,
+                                          Money interest, Money principal) implements Entry {
+      }
+
+      record EntityDevelopmentLoanRepaid(String name, Street.Type collateral) implements Entry {
+      }
+
+      record EntityDevelopmentLoanDefaulted(String name, Street.Type collateral) implements Entry {
       }
 
       record StrategyNamed(Player.ID player, String name, boolean legalEntityEnabled,

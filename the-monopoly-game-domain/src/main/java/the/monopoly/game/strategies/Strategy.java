@@ -60,6 +60,16 @@ public interface Strategy {
     return false;
   }
 
+  /** Whether development loans are enabled for the game using this strategy. */
+  default boolean developmentLoansEnabled() {
+    return false;
+  }
+
+  /** Whether enabled development loans draw their full 80% loan-to-value cap. */
+  default boolean fullDrawDevelopmentLoans() {
+    return false;
+  }
+
   /** Whether to pay the fine to begin this turn outside jail. */
   default boolean pays(JailFine fine) {
     return false;

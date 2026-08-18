@@ -112,6 +112,12 @@ public class Deeds {
     improvements.remove(land.type());
   }
 
+  public void returnToBank(Ownable land, LegalEntity owner) {
+    verifyEntityOwner(land, owner);
+    entityOwners.remove(land.type());
+    improvements.remove(land.type());
+  }
+
   /**
    * Hands the title to a buyer, who pays the bank what the land went for. That
    * is the price on the board when it is bought, and the winning bid when it is
@@ -119,6 +125,7 @@ public class Deeds {
    */
   public void sell(Ownable land, Player buyer, Money price) {
     buyer.account().withdraw(price);
+    entityOwners.remove(land.type());
     owners.put(land.type(), buyer.id());
   }
 
@@ -174,6 +181,14 @@ public class Deeds {
     Mortgage mortgage = Mortgage.on(land);
     mortgages.put(land.type(), mortgage);
     owner.account().deposit(mortgage.value());
+    return mortgage.value();
+  }
+
+  public Money mortgage(Ownable land, LegalEntity owner) {
+    verifyEntityOwner(land, owner);
+    Mortgage mortgage = Mortgage.on(land);
+    mortgages.put(land.type(), mortgage);
+    owner.depositToBank(mortgage.value());
     return mortgage.value();
   }
 
@@ -241,6 +256,19 @@ public class Deeds {
     return refund(land, owner, current.withOneLessHouse(), land.houseConstructionCost());
   }
 
+  public Money sellHouse(ColourStreet land, LegalEntity owner) {
+    verifyEntityOwner(land, owner);
+    Improvement current = improvementOn(land);
+    if (current.hotel())
+      throw new IllegalStateException(land.type() + " has a hotel, not a house to sell.");
+    if (current.houses() <= 0)
+      throw new IllegalStateException(land.type() + " has no house to sell.");
+    Money refund = half(land.houseConstructionCost());
+    improvements.put(land.type(), current.withOneLessHouse());
+    owner.depositToBank(refund);
+    return refund;
+  }
+
   public Money exchangeHotelForHouses(ColourStreet land, Player owner) {
     verifyOwner(land, owner);
     if (!improvementOn(land).hotel())
@@ -249,6 +277,16 @@ public class Deeds {
         land, owner,
         Improvement.withHouses(land.hotelConstructionRequiresNumberOfHouses()), hotelValueOf(land)
     );
+  }
+
+  public Money exchangeHotelForHouses(ColourStreet land, LegalEntity owner) {
+    verifyEntityOwner(land, owner);
+    if (!improvementOn(land).hotel())
+      throw new IllegalStateException(land.type() + " has no hotel to exchange.");
+    Money refund = half(hotelValueOf(land));
+    improvements.put(land.type(), Improvement.withHouses(land.hotelConstructionRequiresNumberOfHouses()));
+    owner.depositToBank(refund);
+    return refund;
   }
 
   private Money refund(ColourStreet land, Player owner, Improvement newImprovement, Money fullPrice) {
@@ -265,6 +303,11 @@ public class Deeds {
   private void verifyOwner(Ownable land, Player owner) {
     if (ownerOf(land.type()).filter(owner.id()::equals).isEmpty())
       throw new IllegalStateException(owner.id().value() + " does not own " + land.type() + ".");
+  }
+
+  private void verifyEntityOwner(Ownable land, LegalEntity owner) {
+    if (entityOwnerOf(land.type()).filter(owner::equals).isEmpty())
+      throw new IllegalStateException(owner.name() + " does not own " + land.type() + ".");
   }
 
   private Mortgage mortgageOn(Ownable land) {

@@ -37043,3 +37043,33 @@ merge_and_process specifier 761abde835
 
 Merged the specifier's `development-loans` specification commit and began
 implementing the approved behavior slice.
+
+## 2026-08-18T06:30:00Z — coder completed development-loans implementation slice
+
+Implemented the approved development-loan behavior across the domain and
+acceptance adapters:
+
+- Added cent-precise `Money`, loan amortization, 80% LTV funding, recycled
+  capital, bondholder sourcing, collateral locking, servicing, and foreclosure
+  orchestration in `DevelopmentLoanBook`.
+- Integrated player and legal-entity development loans into `Game`,
+  `Building`, `LegalEntity`, and `LegalEntityBuilding`, including entity bank
+  financing and collateral-specific foreclosure.
+- Added player payment fallback through spare-property mortgage, default and
+  recovery journal entries, and matching report/log assertions.
+- Registered player/entity loan acceptance steps and direct World lifecycle
+  helpers, including bondholder and recovery assertions.
+- Prevented entity construction from applying an unfunded financing plan.
+
+Verification status:
+
+- Previously verified before the final adapter/lifecycle edits: full domain
+  suite 388/388; focused loan tests and foreclosure tests pass; focused
+  development-loans acceptance 18/19 scenarios pass, with scenario 12 blocked
+  by the specification conflict already routed to the specifier.
+- Current rerun is blocked because this environment has no Java runtime;
+  `mvn` reports “Unable to locate a Java Runtime”. `git diff --check` passes.
+
+The implementation is committed and handed to the refactorer for review;
+acceptance execution must be rerun once a JDK is available and after the
+specifier resolves scenario 12.

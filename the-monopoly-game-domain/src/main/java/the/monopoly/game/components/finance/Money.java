@@ -1,28 +1,84 @@
 package the.monopoly.game.components.finance;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /**
  * An amount of game money. A plain value: it knows how to combine with other
  * amounts and nothing about where an amount came from.
  */
-public record Money(int amount) {
+public final class Money {
   public static final Money ZERO = new Money(0);
 
+  private final long cents;
+
+  public Money(int amount) {
+    this.cents = amount * 100L;
+  }
+
+  private Money(long cents, boolean exactCents) {
+    this.cents = cents;
+  }
+
+  public static Money fromCents(long cents) {
+    return new Money(cents, true);
+  }
+
+  public static Money fromDollars(String amount) {
+    BigDecimal dollars = new BigDecimal(amount);
+    return fromCents(dollars.movePointRight(2).setScale(0, RoundingMode.UNNECESSARY).longValueExact());
+  }
+
+  /** Whole-dollar view retained for the existing rules and their reports. */
+  public int amount() {
+    return Math.toIntExact(cents / 100);
+  }
+
+  public long cents() {
+    return cents;
+  }
+
   public Money plus(Money money) {
-    return new Money(amount + money.amount());
+    return fromCents(cents + money.cents);
   }
 
   public Money minus(Money money) {
-    return new Money(amount - money.amount);
+    return fromCents(cents - money.cents);
   }
 
   /** Whether this amount is enough to pay that one. */
   public boolean covers(Money price) {
-    return amount >= price.amount;
+    return cents >= price.cents;
   }
 
   /** Whether this amount is more than that one, as one bid beats another. */
   public boolean exceeds(Money other) {
-    return amount > other.amount;
+    return cents > other.cents;
+  }
+
+  /** Multiply by a rate and round an exact half-cent to the even cent. */
+  public Money percentage(int percent) {
+    BigDecimal result = BigDecimal.valueOf(cents)
+        .multiply(BigDecimal.valueOf(percent))
+        .divide(BigDecimal.valueOf(100), 0, RoundingMode.HALF_EVEN);
+    return fromCents(result.longValueExact());
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    return other instanceof Money money && cents == money.cents;
+  }
+
+  @Override
+  public int hashCode() {
+    return Long.hashCode(cents);
+  }
+
+  @Override
+  public String toString() {
+    return cents % 100 == 0
+        ? "Money[amount=" + amount() + "]"
+        : "Money[cents=" + cents + "]";
   }
 }
 
