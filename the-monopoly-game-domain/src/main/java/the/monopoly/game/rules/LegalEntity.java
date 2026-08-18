@@ -113,6 +113,9 @@ public final class LegalEntity {
     bankAccount.deposit(amount);
   }
   public void recordLoan(Money amount) { loan = loan.plus(amount); }
+  void recordDevelopmentLoan(Money amount) { loan = loan.plus(amount); }
+  void reduceDevelopmentLoan(Money principal) { loan = loan.minus(principal); }
+  void clearDevelopmentLoan() { loan = Money.ZERO; }
   public void receiveRent(ColourStreet street) { rentReceivedOn = street; }
   public boolean receivedRent() { return rentReceivedOn != null; }
   public void recordShareholderPayment(Player shareholder, Money amount) {
@@ -154,8 +157,14 @@ public final class LegalEntity {
   }
 
   public Operation operate(Deeds deeds, Strategy.OfPlayers strategies, Rule.Set rules) {
+    return operate(deeds, strategies, rules, null, List.of());
+  }
+
+  public Operation operate(Deeds deeds, Strategy.OfPlayers strategies, Rule.Set rules,
+                           DevelopmentLoanBook developmentLoanBook, List<Player> players) {
     if (!hasShareholders()) return new Operation.NoAction();
-    Operation building = LegalEntityBuilding.buildAsMuchAsAffordable(this, deeds, strategies, rules);
+    Operation building = LegalEntityBuilding.buildAsMuchAsAffordable(this, deeds, strategies, rules,
+        developmentLoanBook, players);
     return building != null ? operatedAs(building) : settled(deeds);
   }
 
@@ -222,6 +231,10 @@ public final class LegalEntity {
     }
 
     record LoanRaisedAndHouseBuilt(Money loan, ColourStreet street) implements Operation {
+    }
+
+    record DevelopmentLoanRaisedAndHouseBuilt(DevelopmentLoanBook.Position position, ColourStreet street)
+        implements Operation {
     }
 
     record DividendPaid(Money amount) implements Operation {

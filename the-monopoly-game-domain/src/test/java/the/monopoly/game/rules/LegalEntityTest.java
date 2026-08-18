@@ -388,6 +388,26 @@ class LegalEntityTest {
   }
 
   @Test
+  void developmentLoanFinancesOnlyTheFirstImprovementInAnOperation() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    ColourStreet collateral = entity.streets().getFirst();
+    Player bondholder = player("racecar");
+    bondholder.account().deposit(new Money(500));
+    entity.depositToBank(new Money(60));
+    DevelopmentLoanBook book = new DevelopmentLoanBook(rules.bank());
+    Strategy.OfPlayers strategies = player -> new Greedo(Money.ZERO, false, true, true, false);
+
+    LegalEntity.Operation operation = entity.operate(deeds, strategies, rules, book,
+        List.of(dog, highHat, ironBox, bondholder));
+
+    assertThat(operation).isInstanceOf(LegalEntity.Operation.DevelopmentLoanRaisedAndHouseBuilt.class);
+    assertThat(book.securedBy(collateral.type()).orElseThrow().outstanding()).isEqualTo(new Money(40));
+    assertThat(deeds.housesBuiltOn(collateral)).isEqualTo(1);
+    assertThat(entity.bankBalance()).isEqualTo(Money.ZERO);
+  }
+
+  @Test
   void cannotFundANextImprovementOnceEveryStreetHasAHotelEvenWithWillingShareholders() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);

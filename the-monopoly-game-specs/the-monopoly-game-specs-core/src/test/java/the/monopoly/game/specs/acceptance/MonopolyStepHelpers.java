@@ -22,6 +22,7 @@ import static the.monopoly.game.specs.acceptance.GameAccount.Claim;
 final class MonopolyStepHelpers {
   /** Either a literal amount or a {@code <placeholder>} naming an example column. */
   static final String VALUE = "(<[^<>]+>|-?[0-9,]+)";
+  static final String MONEY = "(<[^<>]+>|-?[0-9,]+(?:\\.[0-9]{1,2})?)";
   static final String NAME = "(<[^<>]+>|[^\"]+)";
   static final String UNQUOTED_NAME = "(<[^<>]+>|.+?)";
   static final String UNQUOTED_NAME_WITHOUT_ORDERING =
@@ -175,6 +176,11 @@ final class MonopolyStepHelpers {
 
   static Claim stalemateTrading(String state) {
     return Claim.of(new Entry.StalemateTrading(state.equals("enabled")));
+  }
+
+  static Claim developmentLoans(String state, boolean fullDraw) {
+    boolean enabled = state.equals("enabled");
+    return Claim.of(new Entry.DevelopmentLoans(enabled, fullDraw && enabled));
   }
 
   static Claim splitMonopolyWon(String winner, String loser) {
@@ -398,5 +404,9 @@ final class MonopolyStepHelpers {
 
   static Money money(int amount) {
     return new Money(amount);
+  }
+
+  static Money money(String amount) {
+    return Money.fromDollars(amount);
   }
 }

@@ -14,6 +14,7 @@ import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.components.streets.TaxSpace;
 import the.monopoly.game.rules.Cards;
 import the.monopoly.game.rules.Deeds;
+import the.monopoly.game.rules.DevelopmentLoanBook;
 import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.strategies.Greedo;
@@ -65,6 +66,7 @@ class GameTest {
     assertThat(result.journal()).startsWith(
         new Entry.Start(List.of(Pawn.dog.id(), Pawn.high_hat.id(), Pawn.iron_box.id())),
         new Entry.StalemateTrading(false),
+        new Entry.DevelopmentLoans(false, false),
         new Entry.StrategyNamed(Pawn.dog.id(), "undecided", false, false),
         new Entry.StrategyNamed(Pawn.high_hat.id(), "undecided", false, false),
         new Entry.StrategyNamed(Pawn.iron_box.id(), "undecided", false, false),
@@ -74,6 +76,39 @@ class GameTest {
         new Entry.InitiativeWon(Pawn.high_hat.id())
     );
   }
+
+  @Test
+  void aLoanEnabledInitiativeWinnerDevelopsAfterTheirTurn() {
+    Deeds deeds = new Deeds();
+    ColourStreet meir = (ColourStreet) ruleSet.create(Street.Type.MeirAntwerpen);
+    ColourStreet nieuwstraat = (ColourStreet) ruleSet.create(Street.Type.NieuwstraatBrussel);
+    deeds.sell(meir, players.get(1), meir.price());
+    deeds.sell(nieuwstraat, players.get(1), nieuwstraat.price());
+    players.get(0).account().withdraw(new Money(1500));
+    players.get(1).account().withdraw(new Money(700));
+    players.get(2).account().withdraw(new Money(1000));
+
+    Map<Player.ID, Cup> cups = Map.of(
+        players.get(0).id(), Cup.of(new Roll(5, 5), new Roll(4, 6)),
+        players.get(1).id(), Cup.of(new Roll(2, 2), new Roll(4, 6)),
+        players.get(2).id(), Cup.of(new Roll(1, 1), new Roll(4, 6)));
+    Map<Player.ID, Strategy> strategies = Map.of(
+        players.get(0).id(), new Greedo(),
+        players.get(1).id(), new Greedo(Money.ZERO, false, false, true, false),
+        players.get(2).id(), new Greedo());
+    DevelopmentLoanBook loans = new DevelopmentLoanBook(ruleSet.bank());
+
+    Game game = new Game(
+        ruleSet, players, player -> cups.get(player.id()),
+        player -> strategies.get(player.id()), deeds, Cards.Decks.EMPTY, new Jail(ruleSet),
+        false, false, true, false, -1, loans);
+    Game.Result result = game.playUpToRounds(1);
+
+    assertThat(deeds.housesBuiltOn(meir)).isEqualTo(1);
+    assertThat(loans.securedBy(Street.Type.MeirAntwerpen).orElseThrow().outstanding())
+        .isEqualTo(new Money(150));
+  }
+
 
   @Test
   void aGameAccountsForEachTurnAsItIsTaken() {
