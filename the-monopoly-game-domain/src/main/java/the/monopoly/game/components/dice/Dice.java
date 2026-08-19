@@ -9,15 +9,29 @@ import java.util.stream.Stream;
  * to six of them but the one {@link Type} the rules currently call for.
  */
 public class Dice {
-  private final ThreadLocal<Random> random = ThreadLocal.withInitial(Random::new);
+  private final java.util.function.Supplier<Random> random;
   private final Face[] faces;
 
   public Dice(Face... faces) {
+    ThreadLocal<Random> threadLocal = ThreadLocal.withInitial(Random::new);
+    this(threadLocal::get, faces);
+  }
+
+  public Dice(Random random, Face... faces) {
+    this(() -> random, faces);
+  }
+
+  private Dice(java.util.function.Supplier<Random> random, Face... faces) {
+    this.random = random;
     this.faces = faces;
   }
 
   public Stream<Face> faces() {
     return Stream.of(faces);
+  }
+
+  public Dice withRandom(Random random) {
+    return new Dice(random, faces);
   }
 
   public Face roll() {
@@ -38,6 +52,10 @@ public class Dice {
 
     public Dice create() {
       return new Dice(faces);
+    }
+
+    public Dice create(Random random) {
+      return new Dice(random, faces);
     }
   }
 }

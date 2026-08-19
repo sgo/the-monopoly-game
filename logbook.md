@@ -37946,6 +37946,99 @@ acceptance suite. All 19 development-loans scenarios pass; the suite reports
 864 scenarios with 4 unrelated baseline failures in legal-entity, share-sale,
 and report expectations. Development-loans is accepted as complete.
 
+## 2026-08-18T13:00:00+02:00 — specifier receives architect triage note and merges development-loans
+
+Handoff received:
+
+```
+type: note
+to: specifier
+priority: 00
+
+Re-read your role and constitution.
+
+Triage 4 baseline failures: entity build, share-sale bankruptcy, 2 reports.
+```
+
+No commit was named (a bare note, not a git_handoff), so first merged the
+architect's completed `development-loans` branch tip (`d40056d`) to get the
+code the 4 failures were observed against. `logbook.md` conflicted (both
+branches had appended entries at the same point); resolved by keeping every
+line from both parents, placing the specifier's own `development-loans-12`
+entry chronologically between the coder's "received handoff" and "completed
+implementation slice" entries, matching its real timestamp. Merge committed
+as `8b11ffb`.
+
+Triaged the 4 failures by reading each scenario, its Background, and the
+relevant production/step-handler code, then confirming with a live
+`./acceptance/run-acceptance.sh` run (JDK: sdkman `25.0.2-zulu`):
+
+- `entity-48` (`greedo-legal-entity.feature`) — "BruulMechelen 1 house": not a
+  behavior conflict. `Building.candidateBuildsFor` always resolves a tied
+  (all-level-0) monopoly to its lowest board-position street first, so with
+  every pink street unimproved the entity always develops Rue de Diekirch
+  Arlon, never Bruul Mechelen as asserted. Confirmed by reading `Building.java`
+  directly: mortgaging the other two streets (the technique `entity-47` uses)
+  was considered and rejected — `Building.refusedBuildFor`/
+  `mortgagedMonopoliesOwnedBy` blocks development on the *entire* group the
+  moment any one street in it is mortgaged, so that would have made the
+  scenario refuse to build anywhere, not redirect it. Fixed instead by giving
+  Rue de Diekirch Arlon a pre-built house (`And the street "Rue de Diekirch
+  Arlon" has 1 house(s) built`), which makes Bruul Mechelen the genuine
+  lowest-level (and therefore selected) target — matching the scenario's own
+  stated intent ("the loan mechanism is not tied to which street in the group
+  secures it") instead of just asserting whatever the default happens to be.
+- `share-sale-22` (`greedo-share-sale.feature`) — "dog bankrupt": the scenario
+  never queued initiative or turn rolls, unlike every sibling multi-round
+  scenario in the file (e.g. `share-sale-23`). Confirmed non-deterministic:
+  a real run had iron box win initiative and high hat go bankrupt instead of
+  dog, never exercising the scenario's premise. Fixed by adding explicit rolls
+  so dog wins initiative and lands exactly on the luxury-tax square
+  (`ExtraBelasting`, board position 38, verified against `Official.java`/
+  `Street.java`) from its `starts at position 35` (`ZuidStation`) Given.
+- `report-64`/`report-69` (`report.feature`) — "Pink Realty raises a loan of
+  $50...": both omitted a player-count Given, so they inherited the feature
+  `Background`'s 2-player default instead of the 3 shareholders the assertion
+  names (dog, high hat, iron box). `World.formNamedEntity` only ever seats the
+  first 3 players as shareholders, so with 2 players iron box never existed.
+  Fixed by adding `Given we select 3 players`, matching the working sibling
+  `report-63`'s existing convention.
+
+All three fixture fixes verified together: full acceptance run went from 4
+failures to 2 (`entity-48` and `share-sale-22` now green). Committed as
+`1577170`.
+
+`report-64`/`report-69` remain red after the fixture fix, on a cause outside
+specifier scope: `GameLogStepHandlers.java:240-243`'s step handler for "the
+game report says that <entity> raises a loan of $X from pawn dog, pawn high
+hat, and pawn iron box" hardcodes its search string as
+`"... from dog, high hat, and iron box"` (with "and"), but `Report.java:156-157`
+actually builds that sentence with a plain `Collectors.joining(", ")` — no
+"and" before the last name — so the real report text is "... from dog, high
+hat, iron box" and can never match. This is a project step handler /
+production-code mismatch (`the-monopoly-game-specs-core/src/test/java/.../
+GameLogStepHandlers.java`, not a `.feature` file), outside specifier
+ownership. The Gherkin step text itself already matches this project's
+existing Oxford-comma convention for 3-name shareholder lists (identical
+phrasing already used correctly in `report-63`'s "is formed" scenario, which
+only asserts a prefix and so never actually exercises the join format).
+Recommending `Report.java`'s shareholder-list joining be given proper "X, Y,
+and Z" formatting (the entity always seats exactly 3 shareholders in this
+game, so no general N-item list formatter is needed) rather than dropping
+"and" from the Gherkin to match today's plain join — routed to the architect
+as the authoritative-behavior decision, since the same list-join defect would
+resurface for any future report message stated in natural-English list form.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: baseline-triage
+commit: 15771702b5
+```
+
 ## 2026-08-18T15:19:08+02:00 — accepted baseline triage; report defect remains
 
 Merged specifier triage commit `15771702b5` and reran the full suite. The
@@ -38006,3 +38099,193 @@ profile, and the `CharacterizationTest`/`CharacterizationConfig`/`GameBreakdown`
 golden-master machinery with 8 checked-in JSON baseline fixtures. Claims domain
 394/394, CLI SimulatorTest 12/12, characterization 8/8, acceptance 864/864.
 Merging, reviewing structure and reproducibility, and verifying fresh.
+## 2026-08-18T16:04:45+02:00 — accepted baseline-triage completion
+
+Merged refactorer commit `b89c9f3cb3` and independently reran the full suite:
+864/864 acceptance scenarios pass with zero failures and zero errors. The
+baseline-triage task and the previously completed development-loans task are
+accepted as complete.
+
+## 2026-08-18T15:19:50+02:00 — specifier receives phase-complete baseline-triage sync
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: baseline-triage
+commit: 4d7365733e
+
+Re-read your role and constitution.
+
+merge_and_process architect 4d7365733e
+```
+
+Merged commit `4d73657` (architect's "accepted baseline-triage completion").
+`logbook.md` conflicted again at the same append point; resolved the same way
+as the `development-loans` merge — kept every line from both parents in
+sequence (this specifier's own triage entry, then the architect/coder/
+refactorer chain that closed it out). Merge committed as `5fa3906`.
+
+Coder resolved the routed report-list-formatting defect by aligning
+`GameLogStepHandlers`'s loan-cohort assertion to the existing plain
+comma-list rendering, rather than adding "and" formatting to `Report.java` as
+I had recommended — a reasonable, lower-risk call since it changes test
+assertions rather than production narration text, and it is now independently
+verified green (864/864 acceptance, 417/417 domain) by the refactorer and
+architect. No specifier action needed on that decision.
+
+This syncs the specifier branch to the completed `development-loans` and
+`baseline-triage` state. Per role rules, asking the user for the next feature
+to specify; no new coder handoff will be sent until they approve one.
+
+## 2026-08-18T14:01:12Z — coder: sent refactorer handoff (baseline-triage)
+
+Handoff sent: type git_handoff, to refactorer, priority 00, task baseline-triage, commit bd52c33160.
+
+Contents: report loan-cohort assertion aligned with production comma-list
+rendering; Report[88]/[93] now pass; acceptance 864/864 green; domain
+394/394 green. Coder-side implementation change complete — refactorer to
+verify structurally and return the verified state to the architect.
+
+## 2026-08-18T14:02:46Z — clearing processed handoff from queue
+
+```
+id: 20260818T063523Z_000304_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 011a013230
+created_at: 2026-08-18T06:35:23.336935Z
+enqueued_at: 2026-08-18T06:35:24.121885Z
+task: development-loans
+
+Re-read your role and constitution.
+
+merge_and_process architect 011a013230
+```
+
+Reason: content fully processed — the named commit is merged and the work is logged elsewhere in this logbook. Also historically verified but not logged at the time. Removing from queue per workflow.
+
+## 2026-08-18T14:02:46Z — clearing processed handoff from queue
+
+```
+id: 20260818T064039Z_000305_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 90141bfd2b
+created_at: 2026-08-18T06:40:39.400256Z
+enqueued_at: 2026-08-18T06:40:39.828673Z
+task: development-loans
+
+Re-read your role and constitution.
+
+merge_and_process architect 90141bfd2b
+```
+
+Reason: content fully processed — the named commit is merged and the work is logged elsewhere in this logbook. Also historically verified but not logged at the time. Removing from queue per workflow.
+
+## 2026-08-18T14:02:46Z — clearing processed handoff from queue
+
+```
+id: 20260818T090142Z_000306_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 8372ca32aa
+created_at: 2026-08-18T09:01:42.744078Z
+enqueued_at: 2026-08-18T09:01:42.841814Z
+task: development-loans
+
+Re-read your role and constitution.
+
+merge_and_process architect 8372ca32aa
+```
+
+Reason: content fully processed — the named commit is merged and the work is logged elsewhere in this logbook. Also historically verified but not logged at the time. Removing from queue per workflow.
+
+## 2026-08-18T14:02:46Z — clearing processed handoff from queue
+
+```
+id: 20260818T054927Z_000203_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 1443aabc80
+created_at: 2026-08-18T05:49:27.060034Z
+enqueued_at: 2026-08-18T05:49:27.973479Z
+task: development-loans
+
+Re-read your role and constitution.
+
+merge_and_process specifier 1443aabc80
+```
+
+Reason: content fully processed — the named commit is merged and the work is logged elsewhere in this logbook. Also historically verified but not logged at the time. Removing from queue per workflow.
+
+## 2026-08-18T14:02:46Z — clearing processed handoff from queue
+
+```
+id: 20260818T131929Z_000308_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 3e93fc2a56
+created_at: 2026-08-18T13:19:29.402294Z
+enqueued_at: 2026-08-18T13:19:30.252659Z
+task: baseline-triage
+
+Re-read your role and constitution.
+
+merge_and_process architect 3e93fc2a56
+```
+
+Reason: content fully processed — the named commit is merged and the work is logged elsewhere in this logbook. Also historically verified but not logged at the time. Removing from queue per workflow.
+
+## 2026-08-19T19:02:00Z — coder: received specifier handoff 50_20260819T185819Z_000205 (characterization-tests)
+
+Handoff received: type git_handoff, from specifier, task characterization-tests, commit b202c7ef59.
+Merged the specification commit. The spec defines a JUnit characterization
+suite (`mvn test -P characterization-tests`) that runs 8 fixed game setups
+through the real CLI entry point, 5 seeds each, extracts a generic outcome/age
+breakdown plus flag-specific extras (loans, entities, peer trades), and diffs
+against checked-in JSON baselines under `src/test/resources/characterization`.
+
+Prerequisite identified: Dice and Cards used unseeded randomness. Implemented
+seeded/reproducible play:
+- `Dice` now accepts an injected `Random` and exposes `withRandom(Random)`.
+- `Cards.Decks` gains `official(Deeds, Random)` for deterministic shuffling.
+- `Simulator` parses `--seed=N`, threads it through `start`/`run`, and only
+  uses seeded components when a seed is supplied; default games remain
+  unseeded and non-deterministic.
+- CLI pom adds `unit-tests` and `characterization-tests` profiles matching the
+  existing domain property-tests pattern.
+- Added `CharacterizationConfig` (8 configs), `GameBreakdown` (parsing,
+  aggregation, JSON serialization), and `CharacterizationTest`.
+- Generated the 8 initial baseline fixtures with
+  `-DgenerateCharacterizationBaselines=true`.
+
+Verified:
+- Domain suite: 394/394 green.
+- CLI default `SimulatorTest`: 12/12 green.
+- Characterization profile: 8/8 green.
+- Acceptance suite: 864/864 green.
+
+Sending refactorer handoff for structural review.

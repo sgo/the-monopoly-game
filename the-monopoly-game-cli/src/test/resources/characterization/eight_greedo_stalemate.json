@@ -1,0 +1,6 @@
+{
+  "outcomes": {"ordinary_win": 5},
+  "winners": {"iron box": 2, "racecar": 1, "dog": 1, "thimble": 1},
+  "ageAtEnd": {"min": 8, "max": 24, "mean": 12.2, "median": 10},
+  "trades": {"peerTrades": 3}
+}

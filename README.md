@@ -36,9 +36,10 @@ temporary directory.
 ## Building and testing
 
 ```sh
-mvn test                        # unit tests, all modules
-mvn test -P property-tests      # property-based tests
-./acceptance/run-acceptance.sh  # regenerates and runs the full Gherkin acceptance suite
+mvn test                              # unit tests, all modules
+mvn test -P property-tests            # property-based tests
+mvn test -P characterization-tests    # full-game regression suite, see CHARACTERIZATION-TESTS.md
+./acceptance/run-acceptance.sh        # regenerates and runs the full Gherkin acceptance suite
 ```
 
 The acceptance suite requires an [APS](https://github.com/unclebob/Acceptance-Pipeline-Specification)
@@ -52,6 +53,10 @@ checkout; set `APS_HOME` or place one at `./tmp/aps`.
 - [`SIMULATOR.md`](SIMULATOR.md) — the CLI simulator's design: the pluggable
   strategy abstraction, the "Greedo" strategy's full decision logic, the
   distressed-sale mechanic, and known characteristics/limitations.
+- [`CHARACTERIZATION-TESTS.md`](CHARACTERIZATION-TESTS.md) — a JUnit suite
+  that plays full games across a fixed set of setups and compares the
+  outcome against a checked-in baseline, to catch whole-system regressions
+  that isolated rule tests can miss.
 
 ## Purpose of this project
 

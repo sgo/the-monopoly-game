@@ -17,6 +17,13 @@ summarize them here.
 
 For more details see [simulator.md](SIMULATOR.md#Greedo)
 
+### The Billionaire
+
+- Behaves like Greedo
+- Has two modes of extreme wealth
+  - Starts the game with \$57.7 million.
+  - Starts the game owning 25% of the board.
+
 ## Observations
 
 ### A Game of Greedos
@@ -179,3 +186,21 @@ An asset rich billionaire always wins!
 So, not having a lot of money in the bank account appears not to matter much.
 
 As for the others. Some managed to almost make $2000 but everyone was destroyed within 4 years. That's the complete absence of social safety nets.
+
+#### Collateralized Loans & Corporate Bonds
+
+In an attempt to prolong the game with an asset-rich billionaire I decided to introduce the ability to take out loans from the bank.
+
+Now the game already has a system like it, but it requires that you sell all the houses on it and then mortgage the undeveloped land instead. This would dry up your income stream and would be very punishing.  So, instead you can now take out a loan where the asset you're going to build with it is the collateral. Not just the land. But also the houses and hotels.
+
+The bank can't just hand over money to anyone who asks. As that would equate to quantitative easing and cause inflation. At this point I did not want to program in the effects of inflation so no loans backed by money printing.
+
+Instead, the bank needs to sell corporate bonds to finance their loans. Corporate bonds ar essentially loans from other players to the bank. In practice if someone asks for a $100 loan with an interest rate of 5% then the bank will need a corporate bond for $100 with an interest rate of 3%. The bank will then pocket the remaining 2% should the player default, the collateral does not cover the difference and the corporate bond can not be reallocated to another loan in time.
+
+So, did this help expanding the duration of the game beyond the ~4 years the asset-rich bilionaire needed to win the game?
+
+No, it didn't. Loans were taken out. They weren't even primarily backed by the billionaire. The billionaire was the primary one taking out loans in fact. And he was doing this to buy up th entire board and win the game. If anything, it made things easier as money no longer was an obstacle. And it already wasn't. So, the billionaire would win the game 100% of the time within ~4 years even with loans in play.
+
+I suppose we can't blame our players from trying to win the game. And I don't think we should make them self-aware enough that winning the game means starvation even for them. Because when we look at billionaires in the real world they don't show any signs of self awareness. They'll push for war and more tax exemptions and more subsidies paid with taxes from regular people.
+
+So, I just don't see any mechanic other than government imposed regulation or taxes that could stop the billionaire from buying up the whole board.

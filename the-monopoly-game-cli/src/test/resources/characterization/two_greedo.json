@@ -1,0 +1,5 @@
+{
+  "outcomes": {"ordinary_win": 5},
+  "winners": {"dog": 4, "high hat": 1},
+  "ageAtEnd": {"min": 6, "max": 22, "mean": 14.0, "median": 14}
+}
