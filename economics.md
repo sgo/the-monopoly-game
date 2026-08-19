@@ -97,6 +97,19 @@ And when the game does end in a stalemate it is because most of the time everyon
 While the shareholders themselves live in a sort of equilibrium because of the shared income from the legal entity. Then
 the imbalance among them does push the game into a duration of thousands of years.
 
+**Update:** the 80% stalemate-trading-alone figure above is stale — it was measured five days before a bug fix
+(`efb2391`, "Allow each player to develop on turn") changed the outcome entirely. `Game.java` had picked a single
+`builder` once, at game start, from the initiative roll, and only that one player was ever allowed to develop *for the
+whole game* — regardless of who trading actually handed a completed colour group to. So even when stalemate trading
+successfully assembled a monopoly for one of the other seven players, they could never build on it, and their cost of
+moving around the board stayed below salary forever: exactly the stalemate mechanism described above, just caused by a
+development gate rather than by trading being ineffective. Once every solvent player could develop on their own turn
+(still restricted to the legal-entity `builder` specifically when entity trading is on), a completed monopoly starts
+earning real rent immediately. The fresh characterization baseline for this exact config (8 Greedo, stalemate trading
+only, no legal entities — `eight_greedo_stalemate.json`) now shows **0% stalemate, 100% ordinary win** across 50 games.
+Legal entities are still a real, separate mechanism — they solve the different problem of a group split three ways,
+which trading alone still can't consolidate — but they were never the fix for *this* number.
+
 ### How Long Does a Game Last?
 
 Especially for games ending in a stalemate, one can wonder how long it took to reach that state.
