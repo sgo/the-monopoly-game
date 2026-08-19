@@ -39049,3 +39049,53 @@ table vs. per-config `<details>` blocks with the full breakdown — both
 currently uncommitted in the working tree, built from the pre-extension
 baseline data). Not yet resolved which to keep; the newly-landed `core`
 fields give Option B (full breakdown) meaningfully more to show now.
+
+## 2026-08-19T23:15:00+02:00 — specifier finalizes the README characterization section and specifies its sync check
+
+At the user's direction ("I actually like both"), refreshed both README
+draft options with the newly-landed `core` breakdown fields (bankruptcies,
+auction-vs-purchase ratio, mortgages, income composition) plus loan
+servicing for the two billionaire configs, then iterated through a series
+of small user-directed edits: escaped every `$` for Markdown (`\$`, since
+unescaped it can be read as math-delimiter syntax) except the one already
+inside a fenced code block; dropped the Summary table's `Config` and
+`Winners` columns; changed outcome figures to percentage-with-count (e.g.
+`88% win (44)`); renamed "Option A/B" to "Summary"/"Detailed Breakdown";
+replaced each Detailed Breakdown block's raw config identifier
+(`eight_greedo`) with the same players/strategies/flags combination shown
+in the Summary table; moved the whole section above "Running the
+simulator", then moved "Purpose of this project" above that. Caught and
+fixed one self-inflicted issue while doing the reorders: the section's own
+intro paragraph went missing during one of the line-number-based splices
+(a boundary miscount, not a deliberate edit) — reported it to the user
+rather than staying quiet, and rewrote it as part of the next edit anyway
+(dropping the by-then-inaccurate "draft, comparing two options" framing,
+since the user had already settled on keeping both).
+
+Specified the sync check the user asked for last: extending
+`CHARACTERIZATION-TESTS.md` with a new "README sync check" section.
+Settled the one real design fork with the user first — verify specific
+figures against each fixture (Option A) versus generate the section from
+the fixtures and diff byte-for-byte (Option B) — recommending and going
+with Option A specifically so the hand-written analytical asides (the
+`eight_greedo` income-scale comment, the "350 total = exactly 7 losers ×
+50 games" arithmetic notes) don't have to be stripped out just to make an
+exact-text regeneration diff work. The new check reads `README.md` and
+every baseline fixture directly (no packaging/CLI invocation needed) and
+verifies every data point shown for a config against that config's
+fixture, including figures the README derives rather than copies verbatim
+(outcome percentages, the auction ratio) — same principle `cli-jar-5`
+already applies to the `-h` usage text, just against the JSON baselines
+instead of the packaged jar.
+
+Committed both files together as `7f9ab82`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: characterization-tests
+commit: 7f9ab82230
+```
