@@ -38451,3 +38451,12 @@ parallel as specified.
 
 Forwarding the same task to coder at priority 00 from the current logged
 architect commit.
+
+## 2026-08-19T20:07:00Z — coder follow-up: bump characterization SEEDS 5->50
+
+Merged architect priority-00 routing d9070e6978. The specifier followed up that
+the characterization suite must run 50 seeds per configuration (not 5), parallel.
+
+Fix: CharacterizationTest SEEDS now 1..50. Regenerated all 8 baseline fixtures
+from the 50-seed runs (12.2s parallel). Verified: characterization 8/8,
+acceptance 864/864, domain 394/394. Sending to refactorer.
