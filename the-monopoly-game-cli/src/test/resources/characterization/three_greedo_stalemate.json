@@ -1,6 +1,6 @@
 {
-  "outcomes": {"ordinary_win": 5},
-  "winners": {"dog": 1, "high hat": 2, "iron box": 2},
-  "ageAtEnd": {"min": 10, "max": 13, "mean": 12.0, "median": 12},
-  "trades": {"peerTrades": 1}
+  "outcomes": {"ordinary_win": 50},
+  "winners": {"dog": 13, "high hat": 16, "iron box": 21},
+  "ageAtEnd": {"min": 5, "max": 28, "mean": 14.7, "median": 13},
+  "trades": {"peerTrades": 11}
 }
