@@ -39435,3 +39435,58 @@ This is being sent to the specifier for a decision on whether the lenient
 transitional behavior is intended or whether strict size equality should be
 restored. The task is not phase-complete pending that decision.
 
+## 2026-08-20T00:35:00+02:00 — specifier receives the config-matrix-split priority-00 sync and decides the ReadmeSyncTest strictness question
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: characterization-tests
+
+Re-read your role and constitution.
+
+merge_and_process architect 2ce667f85d
+```
+
+Merged commit `2ce667f8` (architect's routing of the config-matrix-split
+review, including the coder's own acknowledgment of the misrouted handoff
+this specifier declined earlier — logged as `## 2026-08-20T00:10:00Z —
+coder handoff error: misrouted to specifier with wrong priority`, matching
+this specifier's own finding independently). `logbook.md` conflicted
+across two regions; resolved using `git show <ref>:logbook.md` on both
+parents against their merge-base (`13d3477`) rather than trusting the raw
+conflict markers, since one architect-side entry (`## ...refactorer
+received coder readme-sync-check`) turned out to be a genuine byte-for-byte
+duplicate of one already on this branch under a different heading/
+timestamp — caught by diffing content, not just headings, before including
+it. Merge committed as `d9d2d6e`. The real work (9-config split, renamed/
+regenerated fixtures, README update) merged automatically with zero
+conflicts — only `logbook.md` needed manual resolution.
+
+Ran `mvn test -Pcharacterization-tests` fresh: BUILD SUCCESS, 10/10 green
+(1 ReadmeSync + 9 Characterization).
+
+The architect's routing included a real decision this specifier owns: the
+refactorer flagged that `ReadmeSyncTest` checks `Math.min(blocks.size(),
+configs.length)` rather than exact equality, anticipating the transitional
+"config exists, README block doesn't yet" state this specifier's own
+`a9d1063f46` note described. Decided against the leniency and documented
+why directly in `CHARACTERIZATION-TESTS.md`: `min()` gives zero protection
+against the exact drift this test exists to catch — a future config added
+without its README block would stay green forever instead of failing
+loudly — and the transitional gap it was built for never actually
+persisted as committed history, since README and fixtures landed together
+in the coder's own commit. Committed as `43ac27d`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: characterization-tests
+commit: 43ac27d76b
+```
+
