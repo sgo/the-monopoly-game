@@ -38367,3 +38367,21 @@ Regenerated all 8 baseline fixtures after the determinism fix. Verified:
 - Acceptance suite: 864/864 green.
 
 Sending the verified state to the refactorer.
+
+## 2026-08-19T21:24:03Z — refactorer review: characterization determinism fix verified
+
+Fresh verification after merging the determinism fix:
+
+- Domain suite: 417/417 green.
+- Characterization profile: 8/8 green across 8 consecutive runs — the prior
+  ~10-15% flakiness (entity/loan configs) is eliminated. The
+  `Deeds.legalEntities()` name-sort makes legal-entity iteration deterministic
+  without changing any game rule (entity names are unique per colour group, so
+  the sort is a total order).
+- Acceptance suite: 864/864 BUILD SUCCESS — no behavioural regression from
+  rationalising the entity iteration order.
+
+The `generateCharacterizationBaselines` system property is now actually
+implemented (end-to-end regeneration), closing the secondary defect too.
+Characterization-tests is complete and reproducible. Handing the verified
+state back to the architect.
