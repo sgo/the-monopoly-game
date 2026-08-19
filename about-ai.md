@@ -285,3 +285,30 @@ Some more specification ended up settling the issues and resulted in the coder u
 
 Not at all so different as what happens with humans.
 The test harness made sure nothing would regress.
+
+## BDUF: Big Design Up Front?
+
+When I looked for advice on agentic software development I would find things like...
+
+- Use TDD, author the tests and let the AI implement them.
+- Keep workloads small.
+
+Yet, I've been working on this Monopoly simulator here and not authoring any TDD tests and I've let the agents work on large feature sets at once.
+
+So, does that mean Big Design up Front is feasible once more?
+
+Not, quite.
+I haven't been authoring any unit tests because their format is too technical for me to review. Even though I'm a programmer with the AI writing all the code I'm just too unfamiliar with their code for this to be comfortable. And they are too time-consuming for me to write. The agents are instructed to apply TDD themselves to point them to their own mistakes.
+
+Instead, I'm using Behavior Driven Development or Specification by Example or Acceptance Test Driven Development. The AI will then simply work until they've implemented all those functional tests. Which ca take quite some time.
+
+So, do I write the BDD scenarios?
+No, I let the AI agents write them as well.
+
+Basically, I just have a conversation with them onthe functionality I want and then ask them to write scenarios for it. I then review those scenarios and ask for modifications.
+
+Finally, you can ask them to implement them. If you ask them to implement a large amount at once it can feel slow as they fight their way through them. The scenarios can also be inconsistent and will have to be adjusted. For the AI to figure out this is the case it can take some time.
+
+So overall, the advice to let them work on smaller chunks of functionality still applies.
+
+I updated the strategy of my agents to ensure they don't hand over all the scenarios at once.
