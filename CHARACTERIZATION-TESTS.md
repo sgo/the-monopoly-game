@@ -89,17 +89,37 @@ breakdowns isolates that flag's effect specifically.
 Computed once per game from its log, then aggregated across the config's
 seeds into the value actually compared against the baseline. Two parts:
 
-**Generic core** — present for every config, regardless of flags:
+**Generic core** — present for every config, regardless of flags. Everything
+here is a mechanic that's always potentially active, not gated behind an
+optional flag, so tracking it only for some configs would leave the others
+blind to a regression in it:
 - Outcome distribution: how each of the config's runs ended (ordinary win,
   stalemate, year-limit reached), and, for ordinary wins, which pawn won
   how many times.
 - Age at game end: min, max, mean, median across the config's runs.
+- Bankruptcy count, broken down by who received the assets (a specific
+  pawn, or "the bank"). Today only the eventual winner is visible in the
+  breakdown; a regression that changes how or when a *non*-winning player
+  goes bankrupt is otherwise invisible even though the winner and age
+  stats can look identical.
+- Auctions: count, and direct-purchase count alongside it (so the ratio
+  between the two is derivable) — a core board mechanic, not currently
+  tracked at all.
+- Mortgage count.
+- Income composition, summed across all players: salary collected, rent
+  collected, direct bank payments (Chance/Community Chest), each as a
+  total $.
 
 **Extras** — present only for a config where the relevant flag is active,
 absent (not zeroed) otherwise, so a baseline never carries meaningless
 always-empty fields:
 - `--optional-development-loans`: loans raised (count, total $), borrower
-  breakdown by pawn, bondholder breakdown by pawn, defaults count.
+  breakdown by pawn, bondholder breakdown by pawn, defaults count — plus
+  loan *servicing*: total interest paid and total principal paid by
+  borrowers, and, on the bondholder side, total interest and principal
+  actually received. Today only origination is tracked; a regression that
+  broke the repayment schedule or interest calculation entirely wouldn't
+  move any currently-tracked field.
 - `--optional-greedo-legal-entity`: entities formed count, entities
   dissolved count.
 - `--optional-greedo-stalemate-trading`: peer trades executed count.
@@ -107,7 +127,10 @@ always-empty fields:
 This schema is expected to grow (new extras for new flags, e.g. the
 backlogged war-profits-tax feature once it ships) without invalidating
 existing baseline fixtures for configs that don't use the new flag — adding
-a field must not require touching every other config's fixture.
+a field must not require touching every other config's fixture. Adding a
+*generic core* field is different: since it applies to every config, all 8
+baselines need regenerating together when one is added or changed — as they
+will the first time these new core fields ship.
 
 ## Baseline comparison
 

@@ -38140,6 +38140,134 @@ This syncs the specifier branch to the completed `development-loans` and
 `baseline-triage` state. Per role rules, asking the user for the next feature
 to specify; no new coder handoff will be sent until they approve one.
 
+## 2026-08-19T00:00:00+02:00 — specifier drafts and backlogs war-profits-tax; specifies characterization-tests
+
+At the user's direction, ran 5 then 50 simulated 8-player games (1
+asset-rich billionaire + 7 Greedo, both optional Greedo flags on,
+development loans on, `--max-years=2500`) via the CLI simulator to see
+whether development loans extended the billionaire's win time beyond the
+documented ~4-year baseline. They didn't (A/B: 3.86 vs 4.00 mean years,
+Welch t=-0.49, not significant). Follow-up analysis at the user's request
+covered who takes out loans (individual players only — zero legal entities
+ever formed with a billionaire present, since its asset-rich opening denies
+the market-deadlock condition entity formation needs), whether the dominant
+bondholder (`high hat`) profits from it (no — recovers 16.5% of what it
+lends before going bankrupt in 50/50 games), its other income sources
+(67% salary, not rent — it never builds a real property base), and auction
+frequency/pricing (2.4% of land acquisitions, bimodal: 62.5% at an
+apparent 50% floor, 37.5% well above listed, netting 167% of listed value
+in aggregate — the opposite of the user's "desperate seller" hypothesis).
+Caught and reported a double-counting bug partway through (each game log
+contains the full narration twice — a live SLF4J stream plus the final
+printed report — so unanchored aggregate greps were counting every event
+twice); corrected figures given once found.
+
+Traced the billionaire's dominance to `--optional-asset-rich-billionaire`
+itself: it grants the entire Orange and Red colour groups at game setup,
+free and unmortgaged — confirmed directly in a real game log (dog builds
+houses on the Red group turn one with no prior "buys" event for any of
+those streets). Dog mortgages *least* of any player (61 times vs. 94-122
+for Greedo opponents), refuting the user's mortgage-driven-expansion
+hypothesis.
+
+This led to a new feature, designed collaboratively with the user in prose
+before any Gherkin, motivated by `economics.md`'s conclusion that no
+capital-access mechanic can slow a strategy that isn't optimizing for game
+length — only an asymmetric rule can: a "war profits tax" on rental income,
+progressive by board-ownership share (0% below 25%, climbing to 400% at
+100%), assessed annually per player against rent collected since their
+last assessment (not land value itself), paid into a new government
+account. Real design iteration during drafting:
+
+- User's own insight: reuse `Stalemate.threshold(rules)`'s existing
+  per-space valuation for ownership share instead of inventing a new one.
+  Corrected a real arithmetic bug I introduced computing it (off-by-one
+  regex group — used `rentForFourHouses` instead of `rentForOneHotel`):
+  true total is $22,790, not the $18,970 first reported, matching
+  `economics.md`'s existing "~$22,000" note.
+- User's follow-up: value owned land by its *current* development state
+  (vacant/house-tier/hotel), not always the hotel-level ceiling used for
+  the board total — so buying undeveloped land can't trigger a big bill,
+  only actually building it can.
+- Verified against `Bankruptcy.java` while drafting the inheritance
+  scenario: a bankrupt debtor already has every house sold and everything
+  mortgageable mortgaged before land transfers to the creditor, so
+  inherited land always arrives bare, never with prior development intact
+  — rewrote that scenario around the real mechanic instead of my first
+  (wrong) assumption.
+- Deliberately left open, not specified: whether a development loan can
+  cover a tax shortfall (today's loans are wired specifically to
+  house/hotel construction, not general debt relief) — removed a scenario
+  that assumed it could rather than guess.
+- User caught two structural gaps after the first draft: no journal/log
+  coverage (only report), and no coverage of the tax-payment event or CLI
+  wiring at all. Fixed by mirroring the exact existing convention:
+  dedicated scenarios added to `journal.feature`/`logging.feature`/
+  `report.feature` (payment event, government final balance, enabled/
+  disabled-by-default) and `cli.feature`/`cli-packaged-jar.feature`
+  (flag wiring, README usage-report listing), matching how
+  `development-loans` did it, rather than folding narration checks into
+  the domain feature file.
+
+Validated every touched/new file with `gherkin-parser` at each step, and
+`gherkin-ir-dry-checker` on the full set at the end: only 2
+`duplicate-in-scenario` findings in `war-profits-tax.feature`, both
+intentional repeated `grows a year older` triggers (counter-reset and
+self-correction scenarios); fixed the one real thing dry-check surfaced
+(two step-text variants, `land`/`other land`, for the same fixture,
+unified to one). Everything else was the same near-duplicate/
+possible-synonym/placeholder-variant baseline noise this project already
+tolerates elsewhere.
+
+At the user's direction, applied the new backlog workflow (see
+`swarmforge/roles/specifier.prompt`) to park the entire result rather than
+hand any of it to coder yet: moved `war-profits-tax.feature` whole into
+`the-monopoly-game-specs/backlog/en/rules/`, and reverted my additions to
+the four already-tracked, already-pipelined files back to their committed
+state, placing copies of just the new scenarios (plus, for
+`cli-packaged-jar.feature`, a note about the one-line `cli-jar-5` edit
+that couldn't be parked as a standalone scenario) into matching backlog
+files under `the-monopoly-game-specs/backlog/en/rules/` and
+`the-monopoly-game-specs/backlog/specs-cli/en/`. Confirmed clean:
+`git status` showed only the new backlog directory, the five pipelined
+files unchanged. Committed at the user's request together with their own
+`economics.md`/`about-ai.md` documentation of this session's design
+conversation and backlog-workflow decision (commit `5b31a88`), and
+separately the `specifier.prompt` backlog-workflow edit itself (commit
+`f5a58f1`), which had been sitting uncommitted since earlier in the
+session.
+
+Separately, the user asked for a JUnit-integrated characterization-test
+suite: run the CLI simulator many times across a fixed set of game setups,
+extract the same kind of breakdown produced ad hoc above, and diff it
+against a checked-in baseline to catch whole-system regressions, to be run
+whenever the architect accepts a feature-complete report. Identified this
+as coder-owned implementation work, not something to build directly as
+specifier, and turned it into a design doc instead of Gherkin (it's test
+infrastructure, not player-facing game behavior, so it doesn't fit the
+APS/journal/report narration model). Settled with the user, one question
+at a time: fixed RNG seeds over statistical tolerance (found and flagged
+two real unseeded-randomness sources needing a fix first: `Dice.java` and
+`Cards.java`'s deck shuffling); a generic-plus-extras breakdown schema
+that can grow without invalidating existing fixtures; the specific 8 game
+configs (tuned collaboratively — user added and then had me reconcile
+several isolated-single-flag variants against my first draft, then dropped
+one and applied `--max-years=2500` uniformly); and one checked-in JSON
+fixture per config with named-field diff failures. Wrote up as
+`CHARACTERIZATION-TESTS.md` (README.md updated to reference it and list
+the new `mvn test -P characterization-tests` profile), committed as
+`b202c7e`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: characterization-tests
+commit: b202c7ef59
+```
+
 ## 2026-08-18T14:01:12Z — coder: sent refactorer handoff (baseline-triage)
 
 Handoff sent: type git_handoff, to refactorer, priority 00, task baseline-triage, commit bd52c33160.
@@ -38394,6 +38522,126 @@ the architect worktree; `mvn test -Pcharacterization-tests` passes. The suite
 is accepted with deterministic entity ordering and working baseline
 regeneration.
 
+Merged refactorer commit `cb7ee814a5`. Re-ran the characterization profile in
+the architect worktree; `mvn test -Pcharacterization-tests` passes. The suite
+is accepted with deterministic entity ordering and working baseline
+regeneration.
+
+## 2026-08-19T21:39:33+02:00 — specifier receives phase-complete characterization-tests sync
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: characterization-tests
+
+Re-read your role and constitution.
+
+merge_and_process architect 05227c501a
+```
+
+Merged commit `05227c5` (architect's "accepted characterization-tests
+completion"). `logbook.md` conflicted at the same append point as every prior
+sync; resolved by keeping every line from both parents in sequence (this
+specifier's own entry, then the coder/refactorer/architect chain that
+implemented and closed it out). Merge committed as `6e59fc0`.
+
+Worth noting for future specifier-side design of anything touching legal
+entities or other collection-backed domain state: the refactorer found a
+real nondeterminism source I had no way to anticipate from the spec side —
+`Deeds.legalEntities()` iterated a `HashMap`, so even fully seeded dice/cards
+still produced different entity-servicing order (and therefore different
+aggregate outcomes) across JVM launches. Fixed with a deterministic sort by
+entity name, no rule-behavior change. The `generateCharacterizationBaselines`
+regeneration path coder first claimed working was actually a no-op; fixed in
+the same follow-up. Both were coder-scope defects, correctly not attempted by
+the refactorer.
+
+This syncs the specifier branch to the completed `characterization-tests`
+state. Per role rules, asking the user for the next feature to specify; no
+new coder handoff will be sent until they approve one.
+
+## 2026-08-19T22:05:00+02:00 — specifier flags a post-acceptance spec-compliance gap: characterization-tests runs sequentially, not in parallel
+
+At the user's request, inspected the accepted characterization-tests suite
+for a different concern (whether the log files it writes deduplicate the
+stdout/report double-narration found earlier this session) — confirmed
+clean: `CharacterizationTest` captures `Simulator.execute(args).output()`
+in-process (the plain `Report.of(journal)` return value), never goes
+through `Simulator.main()`'s SLF4J-logging path, so there is nothing to
+deduplicate. Verified directly against a real leftover log
+(`target/characterization-logs/two_greedo/seed-1.log`): `"The game starts
+with"` appears exactly once in 625 lines.
+
+The user then raised a second, separate concern: `CHARACTERIZATION-TESTS.md`
+specified "Games run in parallel (multiple processes or threads —
+implementation's choice) to keep wall-clock time reasonable." The delivered
+implementation does not do this at either level:
+
+- `CharacterizationTest.characterization()`'s seed loop is a plain
+  sequential `for (long seed : SEEDS)`, not a parallel stream.
+- No `junit-platform.properties` exists anywhere in
+  `the-monopoly-game-cli`, and the `characterization-tests` Surefire
+  profile only sets `<groups>characterization-test</groups>` — no parallel
+  execution configured at the JUnit or Surefire level either, so even the
+  8 `@ParameterizedTest` config invocations run one after another.
+
+Timed the full profile fresh: `mvn test -Pcharacterization-tests` (8
+configs × 5 seeds = 40 games) takes 12 seconds wall-clock. Not currently
+painful — these games are fast to simulate — but the spec called for
+parallelism specifically because this is expected to grow (more configs,
+more seeds, eventually the backlogged war-profits-tax feature's own
+extras), and nothing here currently honors that.
+
+Since the task is already accepted and merged, routing this to the
+architect as a follow-up finding rather than fixing it myself (out of
+specifier scope) or reopening the task unilaterally. Suggested fix:
+`Stream.of(SEEDS).parallel().forEach(...)` for the seed loop (the user's
+own suggestion), plus/or JUnit 5 parallel execution config for the config
+invocations — either satisfies the spec's "implementation's choice"
+framing.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 50
+message: characterization-tests seed loop runs sequentially, not parallel as spec'd
+```
+
+## 2026-08-19T22:15:00+02:00 — specifier bundles a second characterization-tests ask into the same follow-up
+
+The user separately noticed `CharacterizationTest.SEEDS` has only 5 entries
+(`{1L, 2L, 3L, 4L, 5L}`), not 50 — confirmed, and confirmed this actually
+matches what `CHARACTERIZATION-TESTS.md` specified ("Five seeds per config
+is a reasonable starting point"), so unlike the parallelism gap this is not
+a coder defect, just the original spec's number.
+
+Discussed with the user why more seeds are worth it here specifically: this
+suite does an *exact* diff against a baseline, not a statistical/tolerance
+comparison, so the value of more seeds isn't smoothing variance — it's
+code-path coverage. A regression only shows up if at least one seed's
+dice/card sequence actually exercises the affected behavior; 5 sequences
+cover a lot less of the game's possible paths than 50 do, for a cost that
+stays low since games are fast (and gets lower once the parallelism fix
+above lands). The user agreed and asked to bump `SEEDS` from 5 to 50
+entries, bundled into the same architect follow-up as the parallelism gap
+logged just above, rather than as a separate ask.
+
+Handoff message sent (a second note, since the first had already been
+queued before this came up; both are meant to be read and actioned
+together):
+
+```
+type: note
+to: architect
+priority: 50
+message: characterization-tests follow-up: also bump SEEDS 5->50, see logbook
+```
+
 ## 2026-08-19T19:57:40Z — architect processes specifier characterization note
 
 Handoff message received:
@@ -38603,3 +38851,18 @@ and runs them in parallel, both already verified green in the prior cycle
 architect's rejection was based on a stale snapshot that predated the 50-seed
 bump; the requirement is satisfied in the actual code. Confirming the
 50-seed/parallel characterization-tests state is complete and phase-correct.
+## 2026-08-19T20:40:00Z — coder: process specifier breakdown-extension 3b8121f0c2
+
+Merged specifier git_handoff 3b8121f0c2 (`Extend the characterization-test
+breakdown`). Implemented in GameBreakdown:
+
+Generic core (always present): bankruptcies broken down by asset recipient,
+auction count + direct-purchase count, mortgage count, income composition
+(salary/rent/bank payments totals summed across all players).
+
+Loans extra: loan servicing — total interest and principal paid by borrowers, and
+total interest and principal received on the bondholder side.
+
+ All 8 baselines regenerated together (generic-core change touches every config).
+Verified: characterization 8/8, domain 394/394, CLI SimulatorTest 12/12,
+acceptance 864/864. Committed 9a3b86e.

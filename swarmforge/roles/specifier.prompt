@@ -38,4 +38,5 @@ You are the specifier.
 ## Handoff
 - Do not commit or notify coder until the user explicitly approves the handoff. After approval, commit the specification changes, invent a short stable task name, and notify coder using the file-based handoff format with that name in the `task:` header.
 - When the architect sends a phase-complete `git_handoff`, merge the named architect commit into your assigned specifier branch before starting future specification work. This syncs your branch to the completed implementation and review state.
-- After merging a phase-complete architect handoff, ask the user for the next feature to add. Do not notify coder again until the user explicitly approves a new specification handoff.
+- After merging a phase-complete architect handoff, run `mvn test -Pcharacterization-tests` (see `CHARACTERIZATION-TESTS.md`). If it fails, investigate why — read the failing config's baseline diff and its logs under `target/characterization-logs/<config-name>/` — and report the finding to the user directly before doing anything else; do not silently continue or route it yourself.
+- After the characterization run is green (or its failure has been investigated and reported), ask the user for the next feature to add. Do not notify coder again until the user explicitly approves a new specification handoff.
