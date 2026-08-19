@@ -38289,3 +38289,39 @@ Verified:
 - Acceptance suite: 864/864 green.
 
 Sending refactorer handoff for structural review.
+
+## 2026-08-19T21:12:00Z — refactorer review: characterization suite is non-reproducible (flaky + unimplemented regeneration)
+
+Merged coder `627b663744` and re-verified fresh with the JDK toolchain set:
+
+- Domain suite: 417/417 green.
+- Acceptance suite: 864/864 green.
+- CLI `SimulatorTest`: the pre-existing `keepsPlayingUntilToldToStop` is still
+  intermittently flaky (known daemon-thread timing, ~40% — see
+  `BuildingTest`'s own comment).
+- Characterization profile (`-Pcharacterization-tests`): FLAKY. Over ~20 runs
+  it failed 8/8 only intermittently — observed 2 failures on
+  `eight_greedo_stalemate_entity` and `eight_billionaire_greedo_loans`, the two
+  configs exercising legal entities and development loans.
+
+Root cause (confirmed): the `--seed` is threaded only through `Dice` and
+`Cards` via one shared `java.util.Random`, which is correct — per-seed game
+logs are byte-identical across runs, and the game is single-threaded with no
+unseeded randomness. But game outcome ALSO depends on `HashMap` iteration
+order: `Deeds.legalEntities()` returns
+`entityOwners` (a `HashMap`), whose iteration order is randomised per JVM, and
+`Game.operateLegalEntities` `forEach`es that list, so entity servicing/loan
+order — and therefore the aggregate winner tie-break, `entities.dissolved`
+(6 vs 5), and loan `totalDollars` (`$1653` vs `$1714`) — varies across JVM
+launches. The seed does not control this, so the golden-master suite's core
+promise (reproducibility) is broken.
+
+Secondary defect: the baseline-regeneration flag
+`-DgenerateCharacterizationBaselines=true` is named in `CharacterizationTest`'s
+missing-fixture error message, and the coder's log claims it generated the 8
+baselines — but no code reads that system property. Baselines cannot be
+regenerated; they are frozen snapshots.
+
+Both are coder-scope (determinism of the implementation + the missing
+regeneration path), not refactorer structural cleanup. Handing the verified
+state back to the architect.
