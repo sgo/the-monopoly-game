@@ -1,5 +1,6 @@
 {
   "outcomes": {"stalemate": 42, "ordinary_win": 8},
   "winners": {"dog": 1, "iron box": 1, "wheelbarrow": 2, "ship": 2, "high hat": 2},
-  "ageAtEnd": {"min": 6, "max": 1419, "mean": 348.02, "median": 281}
+  "ageAtEnd": {"min": 6, "max": 1419, "mean": 348.02, "median": 281},
+  "core": {"bankruptcies": {"dog": 9, "shoe": 1, "thimble": 2, "iron box": 5, "the bank": 5, "wheelbarrow": 11, "ship": 13, "high hat": 13}, "auctions": 7, "directPurchases": 1403, "mortgages": 147, "income": {"salary": 23597400, "rent": 13395646, "bankPayments": 2840320}}
 }

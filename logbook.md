@@ -38753,14 +38753,18 @@ parallel per the specification. Handing the verified state back to the
 architect.
 
 ## 2026-08-19T20:06:00Z — architect rejects incomplete seed-count follow-up
+## 2026-08-19T20:07:00Z — coder follow-up: bump characterization SEEDS 5->50
 
-Merged refactorer commit `a45e33b130` and reviewed the returned
-`CharacterizationTest`. Parallel execution is implemented and verified, but
-the seed array remains `{1L, 2L, 3L, 4L, 5L}`. This does not satisfy the
-specifier's follow-up requiring 50 seeds per configuration.
+Merged architect priority-00 routing d9070e6978. The specifier followed up that
+the characterization suite must run 50 seeds per configuration (not 5), parallel.
+
+Fix: CharacterizationTest SEEDS now 1..50. Regenerated all 8 baseline fixtures
+from the 50-seed runs (12.2s parallel). Verified: characterization 8/8,
+acceptance 864/864, domain 394/394. Sending to refactorer.
 
 Routed the missing seed-count change back to coder at priority 00. The task
 remains open and is not phase-complete.
+
 
 ## 2026-08-19T20:07:05Z — refactorer received coder priority-00 follow-up (seed count 5→50)
 
@@ -38774,21 +38778,27 @@ Specifier follow-up: the suite must run 50 seeds per config (not 5),
 parallel. Coder bumps `SEEDS` to `1..50` and regenerates all 8 baselines from
 the 50-seed runs. Merging and verifying.
 
-Added the seed-count requirement to the existing coder follow-up: the
-characterization suite must run 50 seeds per configuration and execute them in
-parallel as specified.
+## 2026-08-19T20:06:00Z — architect rejects incomplete seed-count follow-up
 
-Forwarding the same task to coder at priority 00 from the current logged
-architect commit.
+Merged refactorer commit `a45e33b130` and reviewed the returned
+`CharacterizationTest`. Parallel execution is implemented and verified, but
+the seed array remains `{1L, 2L, 3L, 4L, 5L}`. This does not satisfy the
+specifier's follow-up requiring 50 seeds per configuration.
 
-## 2026-08-19T20:07:00Z — coder follow-up: bump characterization SEEDS 5->50
+Routed the missing seed-count change back to coder at priority 00. The task
+remains open and is not phase-complete.
 
-Merged architect priority-00 routing d9070e6978. The specifier followed up that
-the characterization suite must run 50 seeds per configuration (not 5), parallel.
+## 2026-08-19T20:15:00Z — coder: resolves architect seed-count rejection (a81ca4d...)
 
-Fix: CharacterizationTest SEEDS now 1..50. Regenerated all 8 baseline fixtures
-from the 50-seed runs (12.2s parallel). Verified: characterization 8/8,
-acceptance 864/864, domain 394/394. Sending to refactorer.
+Merged architect priority-00 rejection routing a81ca4d9c8: it rejected the
+refactorer's returned CharacterizationTest for keeping seeds at {1..5}, routing
+back to coder. However, the coder's own commit 6286a168 (bumping SEEDS to
+1..50 and regenerating baselines) was already in the ancestry of this merge.
+
+Re-verified the current HEAD state: SEEDS = 1..50, characterization 8/8,
+acceptance 864/864. The rejection was based on a stale refactorer snapshot, not
+on the actual coder work; no additional code change was needed. Confirming the
+50-seed requirement is satisfied and re-submitting through the normal loop.
 
 ## 2026-08-19T22:10:25Z — refactorer review: seed-count bump 5→50 verified
 
@@ -38818,7 +38828,6 @@ Verification in the architect worktree:
 
 The characterization-tests task is complete and is being handed to the
 specifier as the required phase-complete synchronization.
-
 ## 2026-08-19T22:12:00+02:00 — specifier receives phase-complete sync for the parallelism/seed-count follow-up; first run under the new verification rule
 
 Handoff received:
@@ -38899,3 +38908,104 @@ priority: 50
 task: characterization-tests
 commit: 3b8121f0c2
 ```
+
+## 2026-08-19T20:30:18Z — refactorer received coder priority-00 follow-up (stale seed-count rejection resolution)
+
+Handoff message received:
+
+```
+merge_and_process coder d68929c2d6
+```
+
+Coder resolves an architect rejection (`a81ca4d`) that was based on a stale
+refactorer snapshot still showing `SEEDS = {1..5}`. The coder's 50-seed bump
+(`6286a16`) was already in the ancestry. Log-only follow-up; merging and
+re-confirming no code change is required and the 50-seed work is present.
+
+## 2026-08-19T20:30:18Z — refactorer review: stale seed-count rejection resolved
+
+Confirmed log-only follow-up (`d68929c2d6`): `git diff d689812..HEAD` (excluding
+logbook.md) is empty — no production or test code changed. The current
+`CharacterizationTest` already declares `SEEDS = LongStream.rangeClosed(1, 50)`
+and runs them in parallel, both already verified green in the prior cycle
+(domain 417/417, characterization 8/8 at 50 seeds, acceptance 864/864). The
+architect's rejection was based on a stale snapshot that predated the 50-seed
+bump; the requirement is satisfied in the actual code. Confirming the
+50-seed/parallel characterization-tests state is complete and phase-correct.
+
+## 2026-08-19T20:39:24Z — refactorer received architect routing (characterization breakdown extension)
+
+Handoff message received:
+
+```
+merge_and_process architect f213073b2f
+```
+
+Architect routes the coder's breakdown-extension work (`9a3b86e`, driven by
+specifier note `3b8121f`) for structural review. `GameBreakdown` gains a
+generic `Core` (bankruptcies by recipient, auctions, direct purchases,
+mortgages, income composition) and `LoanExtras` loan-servicing totals. Merging
+and reviewing for parser correctness, then verifying.
+
+## 2026-08-19T20:40:00Z — coder: process specifier breakdown-extension 3b8121f0c2
+
+Merged specifier git_handoff 3b8121f0c2 (`Extend the characterization-test
+breakdown`). Implemented in GameBreakdown:
+
+Generic core (always present): bankruptcies broken down by asset recipient,
+auction count + direct-purchase count, mortgage count, income composition
+(salary/rent/bank payments totals summed across all players).
+
+Loans extra: loan servicing — total interest and principal paid by borrowers, and
+total interest and principal received on the bondholder side.
+
+All 8 baselines regenerated together (generic-core change touches every config).
+Verified: characterization 8/8, domain 394/394, CLI SimulatorTest 12/12,
+acceptance 864/864. Committed 9a3b86e.
+
+## 2026-08-19T20:41:00Z — architect routes characterization breakdown extension
+
+Received coder handoff:
+
+```
+merge_and_process coder a858c7418a
+```
+
+Merged the coder commit. It adds the requested characterization breakdown
+extension and regenerates all eight baselines. Routed the behavior/test change
+to refactorer for structural review at priority 00.
+
+## 2026-08-19T22:41:59Z — refactorer review: characterization breakdown extension verified
+
+Structural review of `GameBreakdown` extension (`9a3b86e`) + fresh verification:
+
+- Validated every new parser string against production `Report.java`. Each
+  heuristic maps exactly to a production entry: `" goes bankrupt to "` →
+  `Bankrupt`; `" wins the auction for "` → `AuctionWon` (correctly excludes
+  distressed-sale/split-monopoly); `" buys "` → `Bought` (unique — no other
+  line contains " buys "); `" mortgages "` → `Mortgaged` (excludes
+  "lifts/keep the mortgage"); `"collects a salary of $"` → `SalaryCollected`;
+  `" rent "` → `RentPaid`/`LegalEntityRentPaid`; `"receives $"+ " from the
+  bank"` → `BankReceived` (correctly excludes bond payments lacking that
+  phrase); loan servicing `" pays the bank $… interest and $… principal"` and
+  `" receives $… on the … loan bond"` → `DevelopmentLoanPayment` /
+  `DevelopmentBondPayment`.
+- Determinism preserved: characterization profile 8/8 green across 3 fresh
+  runs (~11.3s) with the new `Core` fields.
+- Domain suite: 417/417 green; acceptance: 864/864 BUILD SUCCESS.
+- CLI `SimulatorTest.keepsPlayingUntilToldToStop` is a pre-existing ~80%-rate
+  timing flake (4/5 failures in full-suite runs; source comment at
+  `SimulatorTest.java:134` documents the unseeded 8-player game vs fixed 1s
+  sleep). Untouched by this change (diff confirms neither `SimulatorTest` nor
+  `cli/src/main` modified since `c1c4b0b`), so not a regression.
+
+The breakdown extension is structurally sound and regression-detection
+coverage is meaningfully improved (bankruptcies/auctions/mortgages/income/loan
+servicing are now tracked). Handing the verified state back to the architect.
+
+## 2026-08-19T22:43:00Z — accepted characterization breakdown extension
+
+Merged refactorer commit `aa2565d2ba`. Accepted the `GameBreakdown` extension
+after the refactorer's structural review and verification. The characterization
+task is complete with the new generic and loan-servicing breakdown fields, and
+is being synchronized to the specifier at phase completion.
