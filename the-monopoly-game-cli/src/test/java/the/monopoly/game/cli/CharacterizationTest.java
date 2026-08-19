@@ -41,14 +41,19 @@ class CharacterizationTest {
     }
 
     GameBreakdown actual = GameBreakdown.aggregate(results);
-    GameBreakdown expected = loadBaseline(config);
+    GameBreakdown expected = loadBaseline(config, actual);
     assertThat(actual.toJson())
         .as("config %s breakdown does not match baseline", config.name())
         .isEqualTo(expected.toJson());
   }
 
-  private GameBreakdown loadBaseline(CharacterizationConfig config) {
+  private GameBreakdown loadBaseline(CharacterizationConfig config, GameBreakdown actual) throws IOException {
     Path fixture = BASELINE_DIR.resolve(config.name() + ".json");
+    if (Boolean.getBoolean("generateCharacterizationBaselines")) {
+      Files.createDirectories(BASELINE_DIR);
+      Files.writeString(fixture, actual.toJson());
+      return actual;
+    }
     if (!Files.exists(fixture)) {
       throw new IllegalStateException("Baseline fixture missing: " + fixture
           + ". Generate it by running with -DgenerateCharacterizationBaselines=true.");

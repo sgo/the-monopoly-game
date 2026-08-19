@@ -38333,3 +38333,23 @@ accepted: seeded runs remain nondeterministic because `Deeds.legalEntities()`
 iterates a `HashMap`, and the documented `generateCharacterizationBaselines`
 property has no implementation. Routed both coder-scope defects to coder at
 priority 00.
+
+## 2026-08-19T19:22:00Z — coder follow-up: fix characterization determinism defects
+
+Merged architect priority-00 follow-up db1ead0. Two defects routed:
+
+1. `Deeds.legalEntities()` iterated a `HashMap`, making seeded runs
+   nondeterministic. Fixed by sorting the distinct entities by name before
+   returning them.
+2. The `generateCharacterizationBaselines` system property was documented in
+   the missing-fixture error message but had no implementation. Re-added the
+   generation branch to `loadBaseline`: when the property is true, the actual
+   breakdown is written to the fixture path and used as the expected value.
+
+Regenerated all 8 baseline fixtures after the determinism fix. Verified:
+- Domain suite: 394/394 green.
+- CLI default `SimulatorTest`: 12/12 green.
+- Characterization profile: 8/8 green.
+- Acceptance suite: 864/864 green.
+
+Sending the verified state to the refactorer.
