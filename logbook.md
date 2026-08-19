@@ -39520,3 +39520,10 @@ Fresh verification of the strict-count restoration (`f7338439ea` / fix
 My `min()` concern is fully resolved — the sync-check's completeness guarantee
 is restored and now spec-mandated. Handing the verified state back to the
 architect.
+
+## 2026-08-20T00:29:00Z — accepted strict README sync follow-up
+
+Merged refactorer commit `7e04d9a70e`. Accepted the strict README/config count
+check after fresh review: characterization profile 10/10 and domain 417/417
+are green. The `characterization-tests` follow-up is complete and is being
+handed to the specifier as phase-complete.
