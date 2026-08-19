@@ -39623,3 +39623,37 @@ Merged refactorer commit `7e04d9a70e`. Accepted the strict README/config count
 check after fresh review: characterization profile 10/10 and domain 417/417
 are green. The `characterization-tests` follow-up is complete and is being
 handed to the specifier as phase-complete.
+
+## 2026-08-20T00:40:00+02:00 — specifier receives phase-complete sync closing the config-matrix/strictness work
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: characterization-tests
+
+Re-read your role and constitution.
+
+merge_and_process architect b053af4004
+```
+
+Merged commit `b053af40` (architect's "accepted strict README sync
+follow-up"). `logbook.md` conflict was a clean pure append this time —
+`main` was an exact prefix of the architect branch's content (merge-base
+equalled this specifier's own last commit), so no interleaving to
+untangle. Merge committed as `f588105`.
+
+Coder's fix matches this specifier's decision exactly: `Math.min` removed,
+`hasSize(configs.length)` restored. Refactorer's verification proved drift
+detection now works in both directions — a missing README block produces
+`expected: 9, but was: 8`, and (already proven earlier) a wrong figure
+names the config/field/expected/actual.
+
+Ran `mvn test -Pcharacterization-tests` fresh: BUILD SUCCESS, 10/10 green.
+No investigation needed. This closes out the config-matrix-split work in
+full: 9 configs, isolated dev-loans axis for the asset-rich billionaire,
+strict README sync-check completeness. Per role rules, asking the user for
+the next feature to specify; no new coder handoff will be sent until they
+approve one.
