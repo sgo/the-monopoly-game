@@ -38633,5 +38633,5 @@ together):
 type: note
 to: architect
 priority: 50
-message: same characterization-tests follow-up: also bump SEEDS from 5 to 50 entries, see logbook
+message: characterization-tests follow-up: also bump SEEDS 5->50, see logbook
 ```
