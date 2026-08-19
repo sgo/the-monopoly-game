@@ -38893,3 +38893,31 @@ merge_and_process coder a858c7418a
 Merged the coder commit. It adds the requested characterization breakdown
 extension and regenerates all eight baselines. Routed the behavior/test change
 to refactorer for structural review at priority 00.
+
+## 2026-08-19T22:41:59Z — refactorer review: characterization breakdown extension verified
+
+Structural review of `GameBreakdown` extension (`9a3b86e`) + fresh verification:
+
+- Validated every new parser string against production `Report.java`. Each
+  heuristic maps exactly to a production entry: `" goes bankrupt to "` →
+  `Bankrupt`; `" wins the auction for "` → `AuctionWon` (correctly excludes
+  distressed-sale/split-monopoly); `" buys "` → `Bought` (unique — no other
+  line contains " buys "); `" mortgages "` → `Mortgaged` (excludes
+  "lifts/keep the mortgage"); `"collects a salary of $"` → `SalaryCollected`;
+  `" rent "` → `RentPaid`/`LegalEntityRentPaid`; `"receives $"+ " from the
+  bank"` → `BankReceived` (correctly excludes bond payments lacking that
+  phrase); loan servicing `" pays the bank $… interest and $… principal"` and
+  `" receives $… on the … loan bond"` → `DevelopmentLoanPayment` /
+  `DevelopmentBondPayment`.
+- Determinism preserved: characterization profile 8/8 green across 3 fresh
+  runs (~11.3s) with the new `Core` fields.
+- Domain suite: 417/417 green; acceptance: 864/864 BUILD SUCCESS.
+- CLI `SimulatorTest.keepsPlayingUntilToldToStop` is a pre-existing ~80%-rate
+  timing flake (4/5 failures in full-suite runs; source comment at
+  `SimulatorTest.java:134` documents the unseeded 8-player game vs fixed 1s
+  sleep). Untouched by this change (diff confirms neither `SimulatorTest` nor
+  `cli/src/main` modified since `c1c4b0b`), so not a regression.
+
+The breakdown extension is structurally sound and regression-detection
+coverage is meaningfully improved (bankruptcies/auctions/mortgages/income/loan
+servicing are now tracked). Handing the verified state back to the architect.
