@@ -38555,3 +38555,18 @@ Fresh verification after merging the seed-count bump (`556cd5455b`):
 Characterization-tests is complete and spec-compliant: 50 seeds per config,
 parallel, deterministic, reproducible. Handing the verified state back to the
 architect.
+
+## 2026-08-19T20:11:58Z — accepted characterization-tests seed-count follow-up
+
+Merged refactorer commit `d689812eed` (merge commit `6d2ccb1`). The returned
+implementation uses seeds 1 through 50 per configuration with parallel
+execution and regenerated matching baselines.
+
+Verification in the architect worktree:
+
+- Domain suite: 394/394 green.
+- Characterization profile: 8/8 green.
+- `mvn test -Pcharacterization-tests`: BUILD SUCCESS.
+
+The characterization-tests task is complete and is being handed to the
+specifier as the required phase-complete synchronization.
