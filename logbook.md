@@ -38583,3 +38583,17 @@ and runs them in parallel, both already verified green in the prior cycle
 architect's rejection was based on a stale snapshot that predated the 50-seed
 bump; the requirement is satisfied in the actual code. Confirming the
 50-seed/parallel characterization-tests state is complete and phase-correct.
+
+## 2026-08-19T20:39:24Z — refactorer received architect routing (characterization breakdown extension)
+
+Handoff message received:
+
+```
+merge_and_process architect f213073b2f
+```
+
+Architect routes the coder's breakdown-extension work (`9a3b86e`, driven by
+specifier note `3b8121f`) for structural review. `GameBreakdown` gains a
+generic `Core` (bankruptcies by recipient, auctions, direct purchases,
+mortgages, income composition) and `LoanExtras` loan-servicing totals. Merging
+and reviewing for parser correctness, then verifying.
