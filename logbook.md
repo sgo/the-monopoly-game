@@ -38834,3 +38834,25 @@ total interest and principal received on the bondholder side.
 All 8 baselines regenerated together (generic-core change touches every config).
 Verified: characterization 8/8, domain 394/394, CLI SimulatorTest 12/12,
 acceptance 864/864. Committed 9a3b86e.
+
+## 2026-08-19T19:10:00Z — clearing processed handoff from queue
+
+```
+id: 20260819T202511Z_000208_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 3b8121f0c2
+created_at: 2026-08-19T20:25:11.901198Z
+enqueued_at: 2026-08-19T20:25:12.849226Z
+task: characterization-tests
+
+Re-read your role and constitution.
+
+merge_and_process specifier 3b8121f0c2
+```
+
+Reason: breakdown extension implemented, verified, handed to architect. Removing from queue.
