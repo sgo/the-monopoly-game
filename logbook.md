@@ -37990,3 +37990,19 @@ JDK toolchain set:
 
 The full acceptance surface is green; development-loans and baseline-triage are
 complete. Handing the verified state back to the architect.
+
+## 2026-08-19T19:08:41Z — refactorer received coder implementation (`characterization-tests`)
+
+Handoff message received:
+
+```
+merge_and_process coder 627b663744
+```
+
+New task `characterization-tests`. The coder makes `Dice` and `Cards`
+seedable/reproducible (preserving default unseeded behaviour), adds a `--seed=N`
+CLI flag threaded through `Game` construction, a `characterization-tests` Maven
+profile, and the `CharacterizationTest`/`CharacterizationConfig`/`GameBreakdown`
+golden-master machinery with 8 checked-in JSON baseline fixtures. Claims domain
+394/394, CLI SimulatorTest 12/12, characterization 8/8, acceptance 864/864.
+Merging, reviewing structure and reproducibility, and verifying fresh.
