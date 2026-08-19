@@ -39314,3 +39314,124 @@ content (including the logbook deletions) reached `main`. A new,
 properly-routed architect handoff for the same underlying task
 (`characterization-tests`, commit `2ce667f85d`) has since arrived and is
 being processed next in its place.
+
+## 2026-08-19T22:13:32Z — refactorer received coder config-matrix split (c2e812766a)
+
+Handoff message received:
+
+```
+merge_and_process coder c2e812766a
+```
+
+Specifier-driven split (note `a9d1063`): configs 7/8 lose unconditional
+`--optional-development-loans`; new config 9 isolates asset-rich + dev-loans.
+8 → 9 configs, baselines regenerated, README updated (now 9 `<details>` blocks),
+`ReadmeSyncTest` relaxed from `hasSize` to `min(blocks, configs)`. Merging and
+reviewing — with attention to that `ReadmeSyncTest` weakening.
+
+id: 20260819T215050Z_000210
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: a9d1063f46
+task: characterization-tests
+
+Re-read your role and constitution.
+
+merge_and_process specifier a9d1063f46
+```
+
+Specifier's `a9d1063f46` restructured the config matrix in
+`CHARACTERIZATION-TESTS.md`: eight → nine configs, splitting
+development loans out of configs 7 (cash-rich) and 8 (asset-rich)
+into its own axis. Both billionaire configs had `--optional-development-loans`
+on unconditionally, so neither isolated that flag's effect from the
+billionaire's opening mode. New config 9 reintroduces asset-rich +
+dev-loans as its own entry, paired against config 8 the same way 7/8
+already isolate cash-rich vs asset-rich.
+
+Renames expected:
+- `eight_billionaire_greedo_loans` → `eight_billionaire_greedo`
+  (cash-rich, no dev-loans)
+- `eight_billionaire_greedo_loans_asset_rich` → `eight_billionaire_greedo_asset_rich`
+  (asset-rich, no dev-loans)
+- New: `eight_billionaire_greedo_asset_rich_loans`
+  (asset-rich + dev-loans, reusing the identifier that previously held
+  what this config now represents)
+
+README.md's characteristics section is intentionally left untouched
+(specifier's note: "until real baseline data exists to update it with")
+— same approach as the original section-write, done after the spec, not
+before. The `ReadmeSyncTest` will continue to validate the existing 8
+blocks against the 8 currently-in-README baselines; the 9th fixture
+will exist on disk but won't be referenced by README until the user
+adds a 9th `<details>` block.
+
+## 2026-08-20T00:10:00Z — coder handoff error: misrouted to specifier with wrong priority
+
+After applying the config-matrix split from specifier handoff
+`a9d1063f46`, I sent `00_20260819T220836Z_000200_from_coder_to_specifier`
+incorrectly:
+
+- **Wrong recipient.** Per the specifier's task name (`characterization-tests`)
+  and the normal coder→refactorer pipeline, this implementation work should
+  have gone to the **refactorer**, not back to the specifier. Sending back
+  to specifier only happens when the spec needs revision or there's an
+  architect review loop — neither applies here.
+- **Wrong priority.** Used `00` (architect review-loop priority). Per the
+  constitution, `00` is reserved for architect follow-ups. Normal
+  coder→refactorer handoffs use `50`.
+- **Wrong draft path.** Used `/tmp/handoff.draft` instead of
+  `./tmp/refactorer-handoff.txt` in the worktree.
+
+The misrouted handoff is already in the specifier's inbox
+(`/Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/00_20260819T220836Z_000200_from_coder_to_specifier.handoff`)
+and cannot be recalled. Sending the correct handoff below; the specifier
+will see both, but the correct one to act on is `50` to refactorer with
+priority 50.
+
+Corrected handoff: `50_20260820T000000Z_000XXX_from_coder_to_refactorer`
+pointing at commit `2ef1c30dfb`, task `characterization-tests`.
+
+## 2026-08-20T00:16:30Z — refactorer review: config-matrix split verified, one rigor concern flagged
+
+Structural review of the 8→9 config split (`2ef1c30`) + fresh verification:
+
+- Split is correct: configs 7/8 both carried `--optional-development-loans`
+  unconditionally, so neither isolated the flag's own effect from the
+  billionaire opening mode — the specifier's rationale is sound. New config 9
+  (`eight_billionaire_greedo_asset_rich_loans`) re-isolates asset-rich +
+  dev-loans against config 8 (`..._asset_rich`, no loans), mirroring 7/8.
+- Renames/regeneration clean: 9 configs ↔ 9 fixtures ↔ 9 README `<details>`
+  blocks; every baseline regenerated from 50 fresh seeds.
+- Verification: characterization profile 10/10 green (1 ReadmeSync + 9
+  Characterization) across 3 runs; domain 417/417; acceptance BUILD SUCCESS.
+
+CONCERN (routing back for a decision, not a hard reject): `ReadmeSyncTest`
+was relaxed from `assertThat(blocks).hasSize(configs.length)` to
+`int limit = Math.min(blocks.size(), configs.length)`. This removes the
+guarantee that every config has a README `<details>` block — a future config
+added without its README block would now pass silently, which is precisely the
+drift the sync-check exists to catch. In the current state it is moot (9 = 9),
+but the weakening is a latent regression in the test's completeness. The
+specifier's note anticipated a transient trailing-README state, yet the coder
+shipped README fully in sync in the same commit, so `min()` is not strictly
+needed now. Flagging for the architect/specifier to confirm whether the lenient
+`min()` semantics are intended long-term or should revert to the strict
+`hasSize` once README/figures coexist end-to-end.
+
+Handing the verified state back to the architect.
+
+## 2026-08-20T00:20:00Z — architect routes README sync strictness decision
+
+Merged refactorer commit `4bc0923dc5`. The nine-config split and regenerated
+baselines are verified, but the refactorer identified a policy concern:
+`ReadmeSyncTest` now permits fewer README blocks than characterization configs
+via `Math.min`, weakening the guarantee that every config is documented.
+
+This is being sent to the specifier for a decision on whether the lenient
+transitional behavior is intended or whether strict size equality should be
+restored. The task is not phase-complete pending that decision.
+
