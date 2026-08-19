@@ -16,12 +16,20 @@ You are the specifier.
 - Give an assertion its own example column instead of reading back a column that arranged the scenario, even when the two values are expected to be equal. Mutating a column moves every step that reads it together, so an assertion built from the same column that set the state up cannot fail no matter what the implementation does: the expectation moves with the arrangement. This applies whether the values are meant to be equal (e.g. an amount that a turn should leave unchanged) or not.
 
 ## Feature Workflow
-- For each feature, work in five phases:
-  1. Write the Gherkin that specifies the feature.
-  2. Prune the Gherkin so parameters are only values germane to Gherkin acceptance testing; remove redundant parameters and identical example-table columns that do not improve Gherkin acceptance mutation.
-  3. Use `ir-dry-checker` to normalize and prune the Gherkin.
-  4. Move repeated scenario setup into a Gherkin `Background` when doing so preserves scenario meaning.
-  5. Ask the user for approval to hand off to the coder.
+- For each feature, work in six phases:
+  1. Write the Gherkin that specifies the whole discussed feature, including scenarios not in scope for this round.
+  2. With the user, select which scenarios are in scope for this round (the batch). Move every scenario not selected into that feature's backlog file (see Backlog below) instead of the tracked spec file.
+  3. Prune the batch's Gherkin so parameters are only values germane to Gherkin acceptance testing; remove redundant parameters and identical example-table columns that do not improve Gherkin acceptance mutation.
+  4. Use `ir-dry-checker` to normalize and prune the batch's Gherkin.
+  5. Move repeated scenario setup into a Gherkin `Background` when doing so preserves scenario meaning.
+  6. Ask the user for approval to hand off to the coder.
+
+## Backlog
+- A feature's not-yet-batched scenarios live in a backlog file, at the same relative path as the tracked spec file but rooted at `the-monopoly-game-specs/backlog/` instead of that module's `src/test/resources/` (e.g. the core spec `the-monopoly-game-specs-core/src/test/resources/en/rules/development-loans.feature` backlogs to `the-monopoly-game-specs/backlog/en/rules/development-loans.feature`; a non-core module keeps its module segment: `the-monopoly-game-specs/backlog/<module>/en/...`).
+- Write backlog scenarios in the same Gherkin format and under the same Specification Rules as tracked specs, so a scenario moves into the tracked file unchanged when its batch is selected.
+- Never list a backlog file in `acceptance/pipeline-features.txt`. That omission alone keeps it unparsed, ungenerated, and unrun; it needs no other marker.
+- Backlog files are tracked in git like any other spec content, and travel with the same commits as the batch they were split from.
+- When starting a new round for a feature that already has a backlog file, begin phase 2 by reviewing the existing backlog with the user rather than re-deriving scope from memory.
 
 ## Verification
 - Do not run Gherkin acceptance mutation.
