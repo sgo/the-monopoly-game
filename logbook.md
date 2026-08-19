@@ -38084,6 +38084,21 @@ JDK toolchain set:
 The full acceptance surface is green; development-loans and baseline-triage are
 complete. Handing the verified state back to the architect.
 
+## 2026-08-19T19:08:41Z — refactorer received coder implementation (`characterization-tests`)
+
+Handoff message received:
+
+```
+merge_and_process coder 627b663744
+```
+
+New task `characterization-tests`. The coder makes `Dice` and `Cards`
+seedable/reproducible (preserving default unseeded behaviour), adds a `--seed=N`
+CLI flag threaded through `Game` construction, a `characterization-tests` Maven
+profile, and the `CharacterizationTest`/`CharacterizationConfig`/`GameBreakdown`
+golden-master machinery with 8 checked-in JSON baseline fixtures. Claims domain
+394/394, CLI SimulatorTest 12/12, characterization 8/8, acceptance 864/864.
+Merging, reviewing structure and reproducibility, and verifying fresh.
 ## 2026-08-18T16:04:45+02:00 — accepted baseline-triage completion
 
 Merged refactorer commit `b89c9f3cb3` and independently reran the full suite:
@@ -38275,33 +38290,46 @@ Verified:
 
 Sending refactorer handoff for structural review.
 
-## 2026-08-19T19:08:41Z — coder: sent refactorer handoff (characterization-tests)
+## 2026-08-19T21:12:00Z — refactorer review: characterization suite is non-reproducible (flaky + unimplemented regeneration)
 
-Handoff sent: type git_handoff, to refactorer, priority 50, task characterization-tests, commit $(git rev-parse HEAD | head -c10).
+Merged coder `627b663744` and re-verified fresh with the JDK toolchain set:
 
-Refactorer to review structural/dependency aspects of the new CLI test
-profile, baseline fixtures, and hand-rolled JSON utilities.
+- Domain suite: 417/417 green.
+- Acceptance suite: 864/864 green.
+- CLI `SimulatorTest`: the pre-existing `keepsPlayingUntilToldToStop` is still
+  intermittently flaky (known daemon-thread timing, ~40% — see
+  `BuildingTest`'s own comment).
+- Characterization profile (`-Pcharacterization-tests`): FLAKY. Over ~20 runs
+  it failed 8/8 only intermittently — observed 2 failures on
+  `eight_greedo_stalemate_entity` and `eight_billionaire_greedo_loans`, the two
+  configs exercising legal entities and development loans.
 
-## 2026-08-19T19:09:00Z — clearing processed handoff from queue
+Root cause (confirmed): the `--seed` is threaded only through `Dice` and
+`Cards` via one shared `java.util.Random`, which is correct — per-seed game
+logs are byte-identical across runs, and the game is single-threaded with no
+unseeded randomness. But game outcome ALSO depends on `HashMap` iteration
+order: `Deeds.legalEntities()` returns
+`entityOwners` (a `HashMap`), whose iteration order is randomised per JVM, and
+`Game.operateLegalEntities` `forEach`es that list, so entity servicing/loan
+order — and therefore the aggregate winner tie-break, `entities.dissolved`
+(6 vs 5), and loan `totalDollars` (`$1653` vs `$1714`) — varies across JVM
+launches. The seed does not control this, so the golden-master suite's core
+promise (reproducibility) is broken.
 
-```
-id: 20260819T185819Z_000205_from_specifier
-from: specifier
-to: coder
-recipient: coder
-priority: 50
-type: git_handoff
-role: specifier
-commit: b202c7ef59
-created_at: 2026-08-19T18:58:19.692430Z
-enqueued_at: 2026-08-19T18:58:20.324008Z
-task: characterization-tests
-dequeued_at: 2026-08-19T18:58:31.914696Z
+Secondary defect: the baseline-regeneration flag
+`-DgenerateCharacterizationBaselines=true` is named in `CharacterizationTest`'s
+missing-fixture error message, and the coder's log claims it generated the 8
+baselines — but no code reads that system property. Baselines cannot be
+regenerated; they are frozen snapshots.
 
-Re-read your role and constitution.
+Both are coder-scope (determinism of the implementation + the missing
+regeneration path), not refactorer structural cleanup. Handing the verified
+state back to the architect.
 
-merge_and_process specifier b202c7ef59
-```
+## 2026-08-19T19:17:48Z — rejected red characterization-tests review
 
-Reason: content fully processed — the characterization-tests spec was merged,
-implemented, verified, and handed to the refactorer. Removing from queue.
+Merged refactorer commit `118b347b7b`. The characterization suite is not
+accepted: seeded runs remain nondeterministic because `Deeds.legalEntities()`
+iterates a `HashMap`, and the documented `generateCharacterizationBaselines`
+property has no implementation. Routed both coder-scope defects to coder at
+priority 00.
