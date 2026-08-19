@@ -39490,3 +39490,136 @@ task: characterization-tests
 commit: 43ac27d76b
 ```
 
+
+
+## 2026-08-20T00:13:32Z — coder sent handoff to refactorer
+
+Corrected handoff queued:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: characterization-tests
+commit: c2e812766a
+```
+
+Resending the same `2ef1c30dfb` implementation work (config-matrix
+split + ReadmeSyncTest) to the correct next pipeline role (refactorer)
+at the correct normal priority (50), under the specifier's original
+stable task name (`characterization-tests`). The misrouted
+`00`/`to: specifier` handoff from 00:08:36Z is still in the specifier's
+inbox and the specifier can ignore it.
+
+## 2026-08-20T00:16:30Z — refactorer review: config-matrix split verified, one rigor concern flagged
+
+Structural review of the 8→9 config split (`2ef1c30`) + fresh verification:
+
+- Split is correct: configs 7/8 both carried `--optional-development-loans`
+  unconditionally, so neither isolated the flag's own effect from the
+  billionaire opening mode — the specifier's rationale is sound. New config 9
+  (`eight_billionaire_greedo_asset_rich_loans`) re-isolates asset-rich +
+  dev-loans against config 8 (`..._asset_rich`, no loans), mirroring 7/8.
+- Renames/regeneration clean: 9 configs ↔ 9 fixtures ↔ 9 README `<details>`
+  blocks; every baseline regenerated from 50 fresh seeds.
+- Verification: characterization profile 10/10 green (1 ReadmeSync + 9
+  Characterization) across 3 runs; domain 417/417; acceptance BUILD SUCCESS.
+
+CONCERN (routing back for a decision, not a hard reject): `ReadmeSyncTest`
+was relaxed from `assertThat(blocks).hasSize(configs.length)` to
+`int limit = Math.min(blocks.size(), configs.length)`. This removes the
+guarantee that every config has a README `<details>` block — a future config
+added without its README block would now pass silently, which is precisely the
+drift the sync-check exists to catch. In the current state it is moot (9 = 9),
+but the weakening is a latent regression in the test's completeness. The
+specifier's note anticipated a transient trailing-README state, yet the coder
+shipped README fully in sync in the same commit, so `min()` is not strictly
+needed now. Flagging for the architect/specifier to confirm whether the lenient
+`min()` semantics are intended long-term or should revert to the strict
+`hasSize` once README/figures coexist end-to-end.
+
+Handing the verified state back to the architect.
+
+## 2026-08-20T00:20:00Z — architect routes README sync strictness decision
+
+Merged refactorer commit `4bc0923dc5`. The nine-config split and regenerated
+baselines are verified, but the refactorer identified a policy concern:
+`ReadmeSyncTest` now permits fewer README blocks than characterization configs
+via `Math.min`, weakening the guarantee that every config is documented.
+
+This is being sent to the specifier for a decision on whether the lenient
+transitional behavior is intended or whether strict size equality should be
+restored. The task is not phase-complete pending that decision.
+
+## 2026-08-20T00:23:00Z — architect accepts strict README sync decision
+
+Merged specifier decision commit `43ac27d76b`. The specification now explicitly
+requires `ReadmeSyncTest` to fail when README block count differs from
+`CharacterizationConfig.values()`. Routed this coder-scope implementation
+change at priority 00; the task remains open until refactorer review returns.
+
+## 2026-08-20T00:26:00Z — coder applied strict README sync decision
+
+Architect handoff `ddc1924a91` (priority 00, ref `43ac27d76b`):
+`ReadmeSyncTest` must require exact equality between README block count
+and `CharacterizationConfig.values()`, not `Math.min`. The lenient
+`min()` semantics I shipped with the config-matrix split (commit
+`2ef1c30dfb`) would have let a future config added without its README
+block stay green forever — defeating the whole point of the sync check.
+
+Reverted to `assertThat(blocks).hasSize(configs.length)`.
+
+Confirmed drift detection works the other direction now too: stripped
+the last `<details>` block from README → ReadmeSyncTest failed with
+"expected: 9, but was: 8" (block count mismatch), then restored the
+block and confirmed green.
+
+Verification (`mvn -pl :the-monopoly-game-cli test -P characterization-tests`):
+10 tests, 0 failures (1 ReadmeSync + 9 Characterization).
+
+## 2026-08-20T00:27:00Z — architect routes strict README sync fix
+
+Received coder handoff `merge_and_process coder e68a2af558`. The coder
+restored exact README/config count equality and verified that removing a
+`<details>` block fails with the expected count mismatch. Forwarding the
+implementation to refactorer at priority 00.
+
+## 2026-08-19T22:27:29Z — refactorer received architect routing (strict README sync fix)
+
+Handoff message received:
+
+```
+merge_and_process architect f7338439ea
+```
+
+The architect/specifier accepted my `min()` concern and ruled decisively
+(`43ac27d`): the count check must be strict equality. Fix `e68a2af` restores
+`hasSize(configs.length)` and `CHARACTERIZATION-TESTS.md` now codifies the
+exact-count requirement. The coder's `8ee958426e` (logbook-only) is subsumed in
+this chain. Merging and verifying the strict check is restored and green.
+
+## 2026-08-20T00:27:59Z — refactorer review: strict README sync fix verified
+
+Fresh verification of the strict-count restoration (`f7338439ea` / fix
+`e68a2af`):
+
+- `ReadmeSyncTest` now asserts `hasSize(configs.length)`; the `Math.min`
+  relaxation is gone (grep confirms no `min` remains). The in-code comment
+  documents why strict equality is required, and `CHARACTERIZATION-TESTS.md`
+  now codifies the exact-count rule so it can't be silently reintroduced.
+- Drift detection in both directions is proven by the coder (missing block →
+  "expected: 9, but was: 8") and now structurally guaranteed for the forward
+  direction that `min()` had left blind.
+- Verification: characterization profile 10/10 green (1 ReadmeSync + 9
+  Characterization); domain 417/417.
+
+My `min()` concern is fully resolved — the sync-check's completeness guarantee
+is restored and now spec-mandated. Handing the verified state back to the
+architect.
+
+## 2026-08-20T00:29:00Z — accepted strict README sync follow-up
+
+Merged refactorer commit `7e04d9a70e`. Accepted the strict README/config count
+check after fresh review: characterization profile 10/10 and domain 417/417
+are green. The `characterization-tests` follow-up is complete and is being
+handed to the specifier as phase-complete.
