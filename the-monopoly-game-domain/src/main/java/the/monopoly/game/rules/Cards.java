@@ -19,6 +19,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.Consumer;
 
 import static the.monopoly.game.components.streets.Street.Type.AlgemeenFonds;
@@ -394,7 +395,11 @@ public final class Cards implements Landings {
     }
 
     static Decks official(Deeds deeds) {
-      return new OfficialDecks(deeds);
+      return official(deeds, new Random());
+    }
+
+    static Decks official(Deeds deeds, Random random) {
+      return new OfficialDecks(deeds, random);
     }
 
     Decks EMPTY = new Decks() {
@@ -418,7 +423,7 @@ public final class Cards implements Landings {
     private final WithholdingDeck chance;
     private final WithholdingDeck communityChest;
 
-    private OfficialDecks(Deeds deeds) {
+    private OfficialDecks(Deeds deeds, Random random) {
       chance = new WithholdingDeck(
           deeds, Deeds.RetainedCard.CHANCE_GET_OUT_OF_JAIL_FREE, CHANCE_GET_OUT_OF_JAIL_FREE_CARD,
           List.of(
@@ -438,7 +443,7 @@ public final class Cards implements Landings {
               "Ga door naar Noord Station / Gare du Nord. If you pass START, collect M200.",
               "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50.",
               "Je lening is afbetaald. Je ontvangt M150."
-          )
+          ), random
       );
       communityChest = new WithholdingDeck(
           deeds, Deeds.RetainedCard.COMMUNITY_CHEST_GET_OUT_OF_JAIL_FREE, COMMUNITY_CHEST_GET_OUT_OF_JAIL_FREE_CARD,
@@ -459,7 +464,7 @@ public final class Cards implements Landings {
               "Je vrienden in het dierenasiel zijn je dankbaar voor je gulheid. je betaald M50.",
               "Je had beter deelgenomen aan het renovatie project — je zou waardevolle vaardigheden geleerd hebben! Betaal M40 voor elk huis wat je bezit. M115 voor elk hotel.",
               "je organiseert een wafelbak voor de plaatstelijke school. Je ontvangt M25."
-          )
+          ), random
       );
     }
 
@@ -488,12 +493,13 @@ public final class Cards implements Landings {
       private String withheld;
 
       private WithholdingDeck(
-          Deeds deeds, Deeds.RetainedCard retainedCard, String getOutOfJailFreeCard, List<String> cards
+          Deeds deeds, Deeds.RetainedCard retainedCard, String getOutOfJailFreeCard, List<String> cards,
+          Random random
       ) {
         this.deeds = deeds;
         this.retainedCard = retainedCard;
         this.getOutOfJailFreeCard = getOutOfJailFreeCard;
-        this.cards = shuffled(cards);
+        this.cards = shuffled(cards, random);
       }
 
       private String draw() {
@@ -507,9 +513,9 @@ public final class Cards implements Landings {
         return card;
       }
 
-      private static Deque<String> shuffled(List<String> cards) {
+      private static Deque<String> shuffled(List<String> cards, Random random) {
         var shuffled = new ArrayList<>(cards);
-        Collections.shuffle(shuffled);
+        Collections.shuffle(shuffled, random);
         return new ArrayDeque<>(shuffled);
       }
     }

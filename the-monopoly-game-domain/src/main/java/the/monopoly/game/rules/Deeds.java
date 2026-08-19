@@ -57,7 +57,9 @@ public class Deeds {
   }
 
   public List<LegalEntity> legalEntities() {
-    return entityOwners.values().stream().distinct().toList();
+    return entityOwners.values().stream().distinct()
+        .sorted(java.util.Comparator.comparing(LegalEntity::name))
+        .toList();
   }
 
   /** Whether buying this utility would deny another player, or complete this buyer's own, monopoly. */
