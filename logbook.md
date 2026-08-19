@@ -38921,3 +38921,18 @@ Structural review of `GameBreakdown` extension (`9a3b86e`) + fresh verification:
 The breakdown extension is structurally sound and regression-detection
 coverage is meaningfully improved (bankruptcies/auctions/mortgages/income/loan
 servicing are now tracked). Handing the verified state back to the architect.
+
+## 2026-08-19T21:55:28Z — refactorer received coder readme-sync-check (7d3b17ab48)
+
+Handoff message received:
+
+```
+merge_and_process coder 7d3b17ab48
+```
+
+New task `readme-sync-check`, driven by specifier note `7f9ab82230` (Option A:
+verify specific figures, not byte-for-byte). Coder adds `ReadmeSyncTest` (247
+lines) reading README.md's "Simulated game characteristics" section and
+cross-checking every data point against the baseline fixtures. README.md is
+also finalized in this chain (+153 lines, incl. `### Summary` / `### Detailed
+Breakdown` / 8 `<details>` blocks). Merging, reviewing, and verifying.
