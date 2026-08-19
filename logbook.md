@@ -39049,3 +39049,55 @@ table vs. per-config `<details>` blocks with the full breakdown — both
 currently uncommitted in the working tree, built from the pre-extension
 baseline data). Not yet resolved which to keep; the newly-landed `core`
 fields give Option B (full breakdown) meaningfully more to show now.
+
+## 2026-08-19T23:53:00Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260819T211347Z_000209
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 7f9ab82230
+task: characterization-tests
+
+Re-read your role and constitution.
+```
+
+Specifier's `7f9ab82230` added a `README sync check` section to
+`CHARACTERIZATION-TESTS.md` and finalized `README.md`'s "Simulated game
+characteristics" layout (Summary table + Detailed Breakdown `<details>`
+blocks). Spec asked for a new test in the same `characterization-tests`
+profile that reads `README.md` and every baseline fixture directly and
+checks every factual data point — Summary rows, Detailed bullets,
+loan/entity/peer-trade figures — against the fixture.
+
+Implemented `the-monopoly-game-cli/src/test/java/the/monopoly/game/cli/ReadmeSyncTest.java`:
+- Parses each `<details>` block under "Detailed Breakdown" in README.md.
+- Pairs them by document order against `CharacterizationConfig.values()`.
+- Compares Outcome (with percentages re-derived from outcomes map),
+  Age (Summary column + Detailed form), Bankruptcies/Winners/Borrowers/
+  Bondholders (as multisets of name→count — README uses inconsistent
+  ordering across configs), Auctions (count + 1-decimal % + land
+  acquisitions total), Mortgages, Income (salary/rent/bankPayments,
+  comma-grouped, with `\$`), and — when present — Loans, Servicing,
+  Entities, Peer trades.
+- Failure messages name the config + field + both expected (from fixture)
+  and actual (from README).
+
+Confirmed drift detection: temporarily bumped `two_greedo.json`'s salary
+by 1 → ReadmeSyncTest failed with the exact config/field/expected/actual
+message and pointed at `salary \$324,600` vs `\$324,601`. Restored the
+fixture; test green again.
+
+Verification (`mvn -pl :the-monopoly-game-cli test -P characterization-tests`):
+9 tests, 0 failures (1 new ReadmeSync + 8 Characterization).
+
+Note: `SimulatorTest.keepsPlayingUntilToldToStop` failed during ad-hoc
+runs in this session but is pre-existing flake — fails identically with
+my changes stashed, unrelated to the README sync work. Characterization
+profile (the scope of this handoff) is green.
+
