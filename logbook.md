@@ -38556,3 +38556,52 @@ the refactorer.
 This syncs the specifier branch to the completed `characterization-tests`
 state. Per role rules, asking the user for the next feature to specify; no
 new coder handoff will be sent until they approve one.
+
+## 2026-08-19T22:05:00+02:00 — specifier flags a post-acceptance spec-compliance gap: characterization-tests runs sequentially, not in parallel
+
+At the user's request, inspected the accepted characterization-tests suite
+for a different concern (whether the log files it writes deduplicate the
+stdout/report double-narration found earlier this session) — confirmed
+clean: `CharacterizationTest` captures `Simulator.execute(args).output()`
+in-process (the plain `Report.of(journal)` return value), never goes
+through `Simulator.main()`'s SLF4J-logging path, so there is nothing to
+deduplicate. Verified directly against a real leftover log
+(`target/characterization-logs/two_greedo/seed-1.log`): `"The game starts
+with"` appears exactly once in 625 lines.
+
+The user then raised a second, separate concern: `CHARACTERIZATION-TESTS.md`
+specified "Games run in parallel (multiple processes or threads —
+implementation's choice) to keep wall-clock time reasonable." The delivered
+implementation does not do this at either level:
+
+- `CharacterizationTest.characterization()`'s seed loop is a plain
+  sequential `for (long seed : SEEDS)`, not a parallel stream.
+- No `junit-platform.properties` exists anywhere in
+  `the-monopoly-game-cli`, and the `characterization-tests` Surefire
+  profile only sets `<groups>characterization-test</groups>` — no parallel
+  execution configured at the JUnit or Surefire level either, so even the
+  8 `@ParameterizedTest` config invocations run one after another.
+
+Timed the full profile fresh: `mvn test -Pcharacterization-tests` (8
+configs × 5 seeds = 40 games) takes 12 seconds wall-clock. Not currently
+painful — these games are fast to simulate — but the spec called for
+parallelism specifically because this is expected to grow (more configs,
+more seeds, eventually the backlogged war-profits-tax feature's own
+extras), and nothing here currently honors that.
+
+Since the task is already accepted and merged, routing this to the
+architect as a follow-up finding rather than fixing it myself (out of
+specifier scope) or reopening the task unilaterally. Suggested fix:
+`Stream.of(SEEDS).parallel().forEach(...)` for the seed loop (the user's
+own suggestion), plus/or JUnit 5 parallel execution config for the config
+invocations — either satisfies the spec's "implementation's choice"
+framing.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 50
+message: characterization-tests seed loop runs sequentially, not parallel as spec'd
+```
