@@ -39009,3 +39009,43 @@ Merged refactorer commit `aa2565d2ba`. Accepted the `GameBreakdown` extension
 after the refactorer's structural review and verification. The characterization
 task is complete with the new generic and loan-servicing breakdown fields, and
 is being synchronized to the specifier at phase completion.
+
+## 2026-08-19T23:00:00+02:00 — specifier receives phase-complete sync for the breakdown-schema extension
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: characterization-tests
+
+Re-read your role and constitution.
+
+merge_and_process architect 643dd53ef2
+```
+
+Merged commit `643dd53` (architect's "accepted characterization breakdown
+extension" — coder added the `core` block: bankruptcies by asset recipient,
+auctions, direct purchases, mortgages, income composition, plus loan
+servicing on the `development-loans` extra, per this specifier's note
+`3b8121f0c2`). `logbook.md` conflicted at a single, cleanly two-block append
+point this time; resolved the same way as always. Merge committed as
+`3d3f063`.
+
+Spot-checked one regenerated baseline (`two_greedo.json`) against what it
+held before this change: every pre-existing field (outcomes, winners,
+ageAtEnd) is byte-identical, only the new `core` block was added — confirms
+determinism held across the regeneration coder had to do for all 8
+baselines together (a generic-core field touches every config).
+
+Ran `mvn test -Pcharacterization-tests` fresh per this specifier's own
+verification rule: BUILD SUCCESS, zero ERROR/FAIL lines. No investigation
+needed.
+
+Separately, still mid-discussion with the user about presenting the
+characterization baselines in `README.md` (two draft options — a headline
+table vs. per-config `<details>` blocks with the full breakdown — both
+currently uncommitted in the working tree, built from the pre-extension
+baseline data). Not yet resolved which to keep; the newly-landed `core`
+fields give Option B (full breakdown) meaningfully more to show now.
