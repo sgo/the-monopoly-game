@@ -39241,3 +39241,37 @@ ReadmeSyncTest 1/1 and CharacterizationTest 8/8, 9/9 total, BUILD SUCCESS.
 
 The README synchronization task is complete and is being handed to the
 specifier as phase-complete.
+
+## 2026-08-20T00:05:00+02:00 — specifier receives phase-complete sync for readme-sync-check
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: readme-sync-check
+
+Re-read your role and constitution.
+
+merge_and_process architect 13d347711a
+```
+
+Merged commit `13d3477` (architect's "accepted readme-sync-check" — coder
+implemented `ReadmeSyncTest`, driven by this specifier's note `7f9ab82230`).
+`logbook.md` conflicted at a clean two-block append point; resolved the
+same way as always. Merge committed as `2edea6a`.
+
+Notable from the coder/refactorer chain: they proved the drift detection
+actually works, not just that it compiles — temporarily bumped
+`two_greedo.json`'s salary by $1 and confirmed the test failed with the
+exact config/field/expected/actual message, then restored the fixture.
+Good verification discipline, matching this suite's own "failure names
+what changed" design goal.
+
+Ran `mvn test -Pcharacterization-tests` fresh per this specifier's own
+verification rule: BUILD SUCCESS, zero ERROR/FAIL lines (9 tests: 1
+ReadmeSync + 8 Characterization). No investigation needed. Note: this sync
+predates the 9-config development-loans split sent afterward (commit
+`a9d1063f46`, task `characterization-tests`) — that work is still in
+flight separately and hasn't reached this specifier yet.
