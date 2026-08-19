@@ -1,0 +1,8 @@
+{
+  "outcomes": {"ordinary_win": 43, "stalemate": 7},
+  "winners": {"dog": 43},
+  "ageAtEnd": {"min": 5, "max": 57, "mean": 16.54, "median": 12},
+  "core": {"bankruptcies": {"the bank": 102, "dog": 147, "iron box": 15, "racecar": 13, "ship": 14, "thimble": 11, "high hat": 15, "shoe": 12, "wheelbarrow": 13}, "auctions": 21, "directPurchases": 1516, "mortgages": 732, "income": {"salary": 606800, "rent": 2807207, "bankPayments": 71030}},
+  "entities": {"formed": 106, "dissolved": 54},
+  "trades": {"peerTrades": 6}
+}

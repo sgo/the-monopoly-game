@@ -10,8 +10,9 @@ enum CharacterizationConfig {
   eight_greedo(8, allGreedo(8), List.of()),
   eight_greedo_stalemate(8, allGreedo(8), List.of("--optional-greedo-stalemate-trading")),
   eight_greedo_stalemate_entity(8, allGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity")),
-  eight_billionaire_greedo_loans(8, billionaireThenGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity", "--optional-development-loans")),
-  eight_billionaire_greedo_loans_asset_rich(8, billionaireThenGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity", "--optional-development-loans", "--optional-asset-rich-billionaire"));
+  eight_billionaire_greedo(8, billionaireThenGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity")),
+  eight_billionaire_greedo_asset_rich(8, billionaireThenGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity", "--optional-asset-rich-billionaire")),
+  eight_billionaire_greedo_asset_rich_loans(8, billionaireThenGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity", "--optional-asset-rich-billionaire", "--optional-development-loans"));
 
   private final int playerCount;
   private final List<String> strategies;

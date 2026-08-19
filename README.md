@@ -31,8 +31,9 @@ fixtures by the same test suite (see `README sync check` in
 | 8 | Greedo | — | 16% win (8), 84% stalemate (42) | 6 / 281 / 348.02 / 1419 |
 | 8 | Greedo | peer-trading | 100% win (50) | 4 / 10 / 11.8 / 28 |
 | 8 | Greedo | peer-trading + legal-entity | 100% win (50) | 5 / 11 / 11.2 / 23 |
-| 8 | 1 Billionaire (cash-rich) + 7 Greedo | peer-trading + legal-entity + dev-loans | 88% win (44), 12% stalemate (6) | 5 / 11 / 19.02 / 143 |
-| 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + dev-loans + asset-rich | 100% win (50) | 1 / 4 / 4.0 / 12 |
+| 8 | 1 Billionaire (cash-rich) + 7 Greedo | peer-trading + legal-entity | 86% win (43), 14% stalemate (7) | 5 / 12 / 16.54 / 57 |
+| 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich | 100% win (50) | 1 / 4 / 4.12 / 10 |
+| 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich + dev-loans | 100% win (50) | 1 / 4 / 4.0 / 12 |
 
 Full breakdown for any config lives in
 [`the-monopoly-game-cli/src/test/resources/characterization/`](the-monopoly-game-cli/src/test/resources/characterization/).
@@ -122,26 +123,37 @@ Full breakdown for any config lives in
 </details>
 
 <details>
-<summary>8 players — 1 Billionaire (cash-rich) + 7 Greedo — peer-trading + legal-entity + dev-loans</summary>
+<summary>8 players — 1 Billionaire (cash-rich) + 7 Greedo — peer-trading + legal-entity</summary>
 
-- Outcome: 88% win (44), 12% stalemate (6)
-- Winners: dog 44
-- Age at end: min 5, median 11, mean 19.02, max 143
-- Bankruptcies: dog 174, the bank 71, ship 21, high hat 18, racecar 16, shoe 15, iron box 14, wheelbarrow 12, thimble 3
-- Auctions: 14 (0.9% of 1,482 land acquisitions)
-- Mortgages: 737
-- Income: salary \$653,600, rent \$2,988,328, bank payments \$77,870
-- Loans: 327 raised, \$20,738 total, 2 defaults
-  - Borrowers: Pink Realty 49, Yellow Realty 43, high hat 41, ship 41, Green Realty 31, racecar 31, shoe 28, iron box 27, wheelbarrow 22, thimble 14
-  - Bondholders: dog 275, high hat 32, iron box 9, racecar 5, wheelbarrow 3, thimble 1, ship 1, shoe 1
-  - Servicing: borrowers paid \$4,497 interest + \$8,296 principal; bondholders received \$2,163 interest + \$8,296 principal (the bank keeps the interest spread, same as the development-loans design)
-- Entities: 107 formed, 59 dissolved
-- Peer trades: 7
+- Outcome: 86% win (43), 14% stalemate (7)
+- Winners: dog 43
+- Age at end: min 5, median 12, mean 16.54, max 57
+- Bankruptcies: dog 147, the bank 102, high hat 15, iron box 15, ship 14, racecar 13, wheelbarrow 13, shoe 12, thimble 11
+- Auctions: 21 (1.4% of 1,537 land acquisitions)
+- Mortgages: 732
+- Income: salary \$606,800, rent \$2,807,207, bank payments \$71,030
+- Entities: 106 formed, 54 dissolved
+- Peer trades: 6
 
 </details>
 
 <details>
-<summary>8 players — 1 Billionaire (asset-rich) + 7 Greedo — peer-trading + legal-entity + dev-loans + asset-rich</summary>
+<summary>8 players — 1 Billionaire (asset-rich) + 7 Greedo — peer-trading + legal-entity + asset-rich</summary>
+
+- Outcome: 100% win (50)
+- Winners: dog 50
+- Age at end: min 1, median 4, mean 4.12, max 10
+- Bankruptcies: dog 309, the bank 13, ship 5, racecar 5, high hat 5, wheelbarrow 5, iron box 4, shoe 3, thimble 1
+- Auctions: 32 (3.1% of 1,026 land acquisitions)
+- Mortgages: 824
+- Income: salary \$174,600, rent \$754,039, bank payments \$23,605
+- Entities: 3 formed, 3 dissolved
+- Peer trades: 0
+
+</details>
+
+<details>
+<summary>8 players — 1 Billionaire (asset-rich) + 7 Greedo — peer-trading + legal-entity + asset-rich + dev-loans</summary>
 
 - Outcome: 100% win (50)
 - Winners: dog 49, ship 1

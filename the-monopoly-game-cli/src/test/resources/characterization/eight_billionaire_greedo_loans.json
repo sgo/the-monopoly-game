@@ -1,9 +1,0 @@
-{
-  "outcomes": {"ordinary_win": 44, "stalemate": 6},
-  "winners": {"dog": 44},
-  "ageAtEnd": {"min": 5, "max": 143, "mean": 19.02, "median": 11},
-  "core": {"bankruptcies": {"dog": 174, "iron box": 14, "the bank": 71, "racecar": 16, "thimble": 3, "high hat": 18, "shoe": 15, "wheelbarrow": 12, "ship": 21}, "auctions": 14, "directPurchases": 1468, "mortgages": 737, "income": {"salary": 653600, "rent": 2988328, "bankPayments": 77870}},
-  "loans": {"loansRaised": 327, "totalDollars": 20738, "borrowers": {"iron box": 27, "Green Realty": 31, "Yellow Realty": 43, "racecar": 31, "Pink Realty": 49, "thimble": 14, "high hat": 41, "wheelbarrow": 22, "shoe": 28, "ship": 41}, "bondholders": {"dog": 275, "high hat": 32, "racecar": 5, "iron box": 9, "wheelbarrow": 3, "shoe": 1, "ship": 1, "thimble": 1}, "defaults": 2, "interestPaid": 4497, "principalPaid": 8296, "bondInterestReceived": 2163, "bondPrincipalReceived": 8296},
-  "entities": {"formed": 107, "dissolved": 59},
-  "trades": {"peerTrades": 7}
-}

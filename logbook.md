@@ -39101,7 +39101,57 @@ runs in this session but is pre-existing flake — fails identically with
 my changes stashed, unrelated to the README sync work. Characterization
 profile (the scope of this handoff) is green.
 
-## 2026-08-19T21:55:28Z — refactorer received coder readme-sync-check (7d3b17ab48)
+## 2026-08-19T23:15:00+02:00 — specifier finalizes the README characterization section and specifies its sync check
+
+At the user's direction ("I actually like both"), refreshed both README
+draft options with the newly-landed `core` breakdown fields (bankruptcies,
+auction-vs-purchase ratio, mortgages, income composition) plus loan
+servicing for the two billionaire configs, then iterated through a series
+of small user-directed edits: escaped every `$` for Markdown (`\$`, since
+unescaped it can be read as math-delimiter syntax) except the one already
+inside a fenced code block; dropped the Summary table's `Config` and
+`Winners` columns; changed outcome figures to percentage-with-count (e.g.
+`88% win (44)`); renamed "Option A/B" to "Summary"/"Detailed Breakdown";
+replaced each Detailed Breakdown block's raw config identifier
+(`eight_greedo`) with the same players/strategies/flags combination shown
+in the Summary table; moved the whole section above "Running the
+simulator", then moved "Purpose of this project" above that. Caught and
+fixed one self-inflicted issue while doing the reorders: the section's own
+intro paragraph went missing during one of the line-number-based splices
+(a boundary miscount, not a deliberate edit) — reported it to the user
+rather than staying quiet, and rewrote it as part of the next edit anyway
+(dropping the by-then-inaccurate "draft, comparing two options" framing,
+since the user had already settled on keeping both).
+
+Specified the sync check the user asked for last: extending
+`CHARACTERIZATION-TESTS.md` with a new "README sync check" section.
+Settled the one real design fork with the user first — verify specific
+figures against each fixture (Option A) versus generate the section from
+the fixtures and diff byte-for-byte (Option B) — recommending and going
+with Option A specifically so the hand-written analytical asides (the
+`eight_greedo` income-scale comment, the "350 total = exactly 7 losers ×
+50 games" arithmetic notes) don't have to be stripped out just to make an
+exact-text regeneration diff work. The new check reads `README.md` and
+every baseline fixture directly (no packaging/CLI invocation needed) and
+verifies every data point shown for a config against that config's
+fixture, including figures the README derives rather than copies verbatim
+(outcome percentages, the auction ratio) — same principle `cli-jar-5`
+already applies to the `-h` usage text, just against the JSON baselines
+instead of the packaged jar.
+
+Committed both files together as `7f9ab82`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: characterization-tests
+commit: 7f9ab82230
+```
+
+## 2026-08-19T23:56:00Z — coder received handoff from specifier
 
 Handoff message received:
 
@@ -39151,3 +39201,112 @@ ReadmeSyncTest 1/1 and CharacterizationTest 8/8, 9/9 total, BUILD SUCCESS.
 
 The README synchronization task is complete and is being handed to the
 specifier as phase-complete.
+
+## 2026-08-19T22:13:32Z — refactorer received coder config-matrix split (c2e812766a)
+
+Handoff message received:
+
+```
+merge_and_process coder c2e812766a
+```
+
+Specifier-driven split (note `a9d1063`): configs 7/8 lose unconditional
+`--optional-development-loans`; new config 9 isolates asset-rich + dev-loans.
+8 → 9 configs, baselines regenerated, README updated (now 9 `<details>` blocks),
+`ReadmeSyncTest` relaxed from `hasSize` to `min(blocks, configs)`. Merging and
+reviewing — with attention to that `ReadmeSyncTest` weakening.
+
+id: 20260819T215050Z_000210
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: a9d1063f46
+task: characterization-tests
+
+Re-read your role and constitution.
+
+merge_and_process specifier a9d1063f46
+```
+
+Specifier's `a9d1063f46` restructured the config matrix in
+`CHARACTERIZATION-TESTS.md`: eight → nine configs, splitting
+development loans out of configs 7 (cash-rich) and 8 (asset-rich)
+into its own axis. Both billionaire configs had `--optional-development-loans`
+on unconditionally, so neither isolated that flag's effect from the
+billionaire's opening mode. New config 9 reintroduces asset-rich +
+dev-loans as its own entry, paired against config 8 the same way 7/8
+already isolate cash-rich vs asset-rich.
+
+Renames expected:
+- `eight_billionaire_greedo_loans` → `eight_billionaire_greedo`
+  (cash-rich, no dev-loans)
+- `eight_billionaire_greedo_loans_asset_rich` → `eight_billionaire_greedo_asset_rich`
+  (asset-rich, no dev-loans)
+- New: `eight_billionaire_greedo_asset_rich_loans`
+  (asset-rich + dev-loans, reusing the identifier that previously held
+  what this config now represents)
+
+README.md's characteristics section is intentionally left untouched
+(specifier's note: "until real baseline data exists to update it with")
+— same approach as the original section-write, done after the spec, not
+before. The `ReadmeSyncTest` will continue to validate the existing 8
+blocks against the 8 currently-in-README baselines; the 9th fixture
+will exist on disk but won't be referenced by README until the user
+adds a 9th `<details>` block.
+
+## 2026-08-20T00:10:00Z — coder handoff error: misrouted to specifier with wrong priority
+
+After applying the config-matrix split from specifier handoff
+`a9d1063f46`, I sent `00_20260819T220836Z_000200_from_coder_to_specifier`
+incorrectly:
+
+- **Wrong recipient.** Per the specifier's task name (`characterization-tests`)
+  and the normal coder→refactorer pipeline, this implementation work should
+  have gone to the **refactorer**, not back to the specifier. Sending back
+  to specifier only happens when the spec needs revision or there's an
+  architect review loop — neither applies here.
+- **Wrong priority.** Used `00` (architect review-loop priority). Per the
+  constitution, `00` is reserved for architect follow-ups. Normal
+  coder→refactorer handoffs use `50`.
+- **Wrong draft path.** Used `/tmp/handoff.draft` instead of
+  `./tmp/refactorer-handoff.txt` in the worktree.
+
+The misrouted handoff is already in the specifier's inbox
+(`/Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/00_20260819T220836Z_000200_from_coder_to_specifier.handoff`)
+and cannot be recalled. Sending the correct handoff below; the specifier
+will see both, but the correct one to act on is `50` to refactorer with
+priority 50.
+
+Corrected handoff: `50_20260820T000000Z_000XXX_from_coder_to_refactorer`
+pointing at commit `2ef1c30dfb`, task `characterization-tests`.
+
+## 2026-08-20T00:16:30Z — refactorer review: config-matrix split verified, one rigor concern flagged
+
+Structural review of the 8→9 config split (`2ef1c30`) + fresh verification:
+
+- Split is correct: configs 7/8 both carried `--optional-development-loans`
+  unconditionally, so neither isolated the flag's own effect from the
+  billionaire opening mode — the specifier's rationale is sound. New config 9
+  (`eight_billionaire_greedo_asset_rich_loans`) re-isolates asset-rich +
+  dev-loans against config 8 (`..._asset_rich`, no loans), mirroring 7/8.
+- Renames/regeneration clean: 9 configs ↔ 9 fixtures ↔ 9 README `<details>`
+  blocks; every baseline regenerated from 50 fresh seeds.
+- Verification: characterization profile 10/10 green (1 ReadmeSync + 9
+  Characterization) across 3 runs; domain 417/417; acceptance BUILD SUCCESS.
+
+CONCERN (routing back for a decision, not a hard reject): `ReadmeSyncTest`
+was relaxed from `assertThat(blocks).hasSize(configs.length)` to
+`int limit = Math.min(blocks.size(), configs.length)`. This removes the
+guarantee that every config has a README `<details>` block — a future config
+added without its README block would now pass silently, which is precisely the
+drift the sync-check exists to catch. In the current state it is moot (9 = 9),
+but the weakening is a latent regression in the test's completeness. The
+specifier's note anticipated a transient trailing-README state, yet the coder
+shipped README fully in sync in the same commit, so `min()` is not strictly
+needed now. Flagging for the architect/specifier to confirm whether the lenient
+`min()` semantics are intended long-term or should revert to the strict
+`hasSize` once README/figures coexist end-to-end.
+
+Handing the verified state back to the architect.
