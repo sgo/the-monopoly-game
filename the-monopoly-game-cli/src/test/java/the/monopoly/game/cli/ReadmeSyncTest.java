@@ -31,13 +31,14 @@ class ReadmeSyncTest {
     String readme = Files.readString(README);
     List<String> blocks = parseDetailBlocks(readme);
     CharacterizationConfig[] configs = CharacterizationConfig.values();
-    // The README may document fewer configs than CharacterizationConfig.values() while a new
-    // config's fixture has just been added but its <details> block hasn't been written yet —
-    // the specifier leaves the README trailing in that case so the test only verifies what
-    // the README does claim, and a stale README that hasn't caught up to a rename still
-    // produces a clear failure on the renamed config.
-    int limit = Math.min(blocks.size(), configs.length);
-    for (int i = 0; i < limit; i++) {
+    // Per CHARACTERIZATION-TESTS.md, every config must have a matching <details> block in
+    // the README. A config added without its block (or a renamed one the README hasn't
+    // caught up with) has to fail this test loudly — that's exactly the drift the
+    // sync-check exists to catch. Permitting min(blocks, configs) would let a missing
+    // block stay green forever.
+    assertThat(blocks).as("one detail block per characterization config").hasSize(configs.length);
+
+    for (int i = 0; i < configs.length; i++) {
       validate(configs[i], blocks.get(i), readme);
     }
   }

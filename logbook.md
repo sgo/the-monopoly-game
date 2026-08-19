@@ -39461,3 +39461,23 @@ Merged specifier decision commit `43ac27d76b`. The specification now explicitly
 requires `ReadmeSyncTest` to fail when README block count differs from
 `CharacterizationConfig.values()`. Routed this coder-scope implementation
 change at priority 00; the task remains open until refactorer review returns.
+
+## 2026-08-20T00:26:00Z — coder applied strict README sync decision
+
+Architect handoff `ddc1924a91` (priority 00, ref `43ac27d76b`):
+`ReadmeSyncTest` must require exact equality between README block count
+and `CharacterizationConfig.values()`, not `Math.min`. The lenient
+`min()` semantics I shipped with the config-matrix split (commit
+`2ef1c30dfb`) would have let a future config added without its README
+block stay green forever — defeating the whole point of the sync check.
+
+Reverted to `assertThat(blocks).hasSize(configs.length)`.
+
+Confirmed drift detection works the other direction now too: stripped
+the last `<details>` block from README → ReadmeSyncTest failed with
+"expected: 9, but was: 8" (block count mismatch), then restored the
+block and confirmed green.
+
+Verification (`mvn -pl :the-monopoly-game-cli test -P characterization-tests`):
+10 tests, 0 failures (1 ReadmeSync + 9 Characterization).
+
