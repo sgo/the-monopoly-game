@@ -39115,3 +39115,30 @@ lines) reading README.md's "Simulated game characteristics" section and
 cross-checking every data point against the baseline fixtures. README.md is
 also finalized in this chain (+153 lines, incl. `### Summary` / `### Detailed
 Breakdown` / 8 `<details>` blocks). Merging, reviewing, and verifying.
+
+## 2026-08-19T23:55:00Z — refactorer review: readme-sync-check verified
+
+Structural review of `ReadmeSyncTest` + fresh verification:
+
+- Correctly scoped via `@Tag("characterization-test")`; reads README.md and
+  fixtures directly (no CLI invocation), matching the specifier's Option-A
+  "verify specific figures" choice.
+- Meaningful assertions: `hasSize(configs.length)` guarantees all 8 configs are
+  covered; `isEqualTo` on every field (null → fail); `assertNameMultiset` uses
+  `containsExactlyInAnyOrderEntriesOf` to tolerate README's inconsistent name
+  ordering; `assertContains` only where analytical asides follow the data.
+  Failure messages name config + field + expected + actual.
+- Drift detection is genuine: coder proved salary+1 → clean config/field/
+  expected/actual failure; I confirmed the fixture still parses and the test
+  is green 3/3.
+- Verification: characterization profile 9/9 green (1 ReadmeSync + 8
+  Characterization) across 3 runs; domain 417/417. README finalized structure
+  (`### Summary` + 8 `<details>` blocks) is present and matches.
+
+Minor notes (acceptable per Option A, not defects): the `<details>` blocks are
+paired to `CharacterizationConfig.values()` by document order (a README reorder
+would silently re-pair config↔fixture), and `formatMean` uses `Double.toString`
+(relying on README/JSON double formatting staying aligned). Both are deliberate
+trade-offs the specifier chose over byte-for-byte regeneration.
+
+Handing the verified state back to the architect.
