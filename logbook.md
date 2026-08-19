@@ -38458,3 +38458,23 @@ flagged in logbook for visibility.
 
 Verified: characterization profile 8/8 green; acceptance 864/864 green;
 domain 394/394 green. Sending to refactorer.
+
+## 2026-08-19T22:03:57Z — refactorer review: parallel seed execution verified
+
+Fresh verification after merging the parallel-seed follow-up:
+
+- Reviewed `CharacterizationTest`: bounded fixed pool sized to
+  `availableProcessors()`; `Future` results collected in seed order so
+  `GameBreakdown.aggregate` stays deterministic; `IOException` rethrown,
+  `InterruptedException` restores the flag, `ExecutionException` unwraps the
+  cause; `createDirectories` correctly moved into each worker. Thread-safe —
+  each seed builds its own `Simulator`/`Game`/`Random(seed)` with no shared
+  static state.
+- Domain suite: 417/417 green.
+- Characterization profile: 8/8 green across 6 consecutive runs, wall clock
+  ~5.2s (was ~8.6s sequential) — deterministic, reproducible, and ~38% faster.
+- Acceptance suite: 864/864 BUILD SUCCESS — no regression.
+
+Characterization-tests is complete: deterministic, reproducible, and now
+parallel per the specification. Handing the verified state back to the
+architect.
