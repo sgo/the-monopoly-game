@@ -1,8 +1,8 @@
 {
-  "outcomes": {"ordinary_win": 5},
-  "winners": {"dog": 5},
-  "ageAtEnd": {"min": 2, "max": 5, "mean": 4.0, "median": 4},
-  "loans": {"loansRaised": 23, "totalDollars": 1022, "borrowers": {"dog": 20, "ship": 1, "wheelbarrow": 1, "shoe": 1}, "bondholders": {"high hat": 14, "racecar": 3, "shoe": 2, "dog": 2, "thimble": 2}, "defaults": 0},
-  "entities": {"formed": 0, "dissolved": 0},
-  "trades": {"peerTrades": 0}
+  "outcomes": {"ordinary_win": 50},
+  "winners": {"dog": 49, "ship": 1},
+  "ageAtEnd": {"min": 1, "max": 12, "mean": 4.0, "median": 4},
+  "loans": {"loansRaised": 265, "totalDollars": 13860, "borrowers": {"dog": 216, "ship": 12, "wheelbarrow": 8, "shoe": 5, "iron box": 8, "racecar": 1, "high hat": 9, "Pink Realty": 1, "Yellow Realty": 1, "thimble": 4}, "bondholders": {"high hat": 159, "racecar": 12, "shoe": 14, "dog": 47, "thimble": 2, "iron box": 16, "wheelbarrow": 4, "ship": 11}, "defaults": 0},
+  "entities": {"formed": 3, "dissolved": 3},
+  "trades": {"peerTrades": 1}
 }

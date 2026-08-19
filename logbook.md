@@ -38514,7 +38514,13 @@ implemented (end-to-end regeneration), closing the secondary defect too.
 Characterization-tests is complete and reproducible. Handing the verified
 state back to the architect.
 
+## 2026-08-19T20:01:13Z — refactorer received coder priority-00 follow-up (parallel seed execution)
 ## 2026-08-19T21:25:22+02:00 — accepted characterization-tests completion
+
+Merged refactorer commit `cb7ee814a5`. Re-ran the characterization profile in
+the architect worktree; `mvn test -Pcharacterization-tests` passes. The suite
+is accepted with deterministic entity ordering and working baseline
+regeneration.
 
 Merged refactorer commit `cb7ee814a5`. Re-ran the characterization profile in
 the architect worktree; `mvn test -Pcharacterization-tests` passes. The suite
@@ -38635,3 +38641,180 @@ to: architect
 priority: 50
 message: characterization-tests follow-up: also bump SEEDS 5->50, see logbook
 ```
+
+## 2026-08-19T19:57:40Z — architect processes specifier characterization note
+
+Handoff message received:
+
+```
+merge_and_process coder 69c69259aa
+```
+
+Architect priority-00 routing; the specifier noted the seed loop runs
+sequentially rather than in parallel as specified. Coder parallelises the five
+seeds per config across a `availableProcessors()`-sized fixed thread pool,
+collecting results in seed order so `GameBreakdown.aggregate` stays
+deterministic. Merging and verifying — with emphasis on confirming
+determinism/reproducibility survives the concurrency (no shared-state race).
+id: 20260819T195357Z_000206_from_specifier
+from: specifier
+to: architect
+priority: 50
+type: note
+task: characterization-tests
+
+Re-read your role and constitution.
+
+characterization-tests seed loop runs sequentially, not parallel as spec'd
+```
+
+Confirmed the implementation runs the five seeds synchronously despite the
+specification requiring parallel execution. Routed this coder-scope gap at
+priority 00.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: characterization-tests
+commit: 05227c501a
+```
+
+The coder must implement the specified parallel seed execution and return the
+same task through the normal coder/refactorer review loop.
+
+## 2026-08-19T19:59:02Z — architect processes characterization seed-count note
+
+Handoff message received:
+
+```
+id: 20260819T195857Z_000207_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 50
+type: note
+message: characterization-tests follow-up: also bump SEEDS 5->50, see logbook
+
+Re-read your role and constitution.
+
+characterization-tests follow-up: also bump SEEDS 5->50, see logbook
+```
+
+Added the seed-count requirement to the existing coder follow-up: the
+characterization suite must run 50 seeds per configuration and execute them in
+parallel as specified.
+
+Forwarding the same task to coder at priority 00 from the current logged
+architect commit.
+
+## 2026-08-19T20:05:00Z — coder follow-up: parallelize characterization seed execution
+
+Merged architect priority-00 routing 6fbb79b90c. The specifier noted the seed
+loop runs sequentially, not in parallel as specified. Architected the coder
+gap at priority 00.
+
+Fix: CharacterizationTest now runs the five seeds for each config across a
+fixed thread pool sized to available processors, matching the spec's parallel
+execution requirement and reducing wall clock (measured 8.58s -> 5.32s locally
+before bundling). Worker exceptions are rethrown as the original checked type
+or an AssertionError for diagnostics; log files still written per-seed per-config
+under target/characterization-logs/<config>/seed-<N>.log.
+
+Note: the pre-existing SimulatorTest.keepsPlayingUntilToldToStop flake surfaced
+during verification (1/5 pass in isolation). Its own source comment documents
+that an unseeded 8-player game can occasionally finish within the fixed 1s
+sleep. Unrelated to this change (seeded path only) and not introduced by it;
+flagged in logbook for visibility.
+
+Verified: characterization profile 8/8 green; acceptance 864/864 green;
+domain 394/394 green. Sending to refactorer.
+
+## 2026-08-19T22:03:57Z — refactorer review: parallel seed execution verified
+
+Fresh verification after merging the parallel-seed follow-up:
+
+- Reviewed `CharacterizationTest`: bounded fixed pool sized to
+  `availableProcessors()`; `Future` results collected in seed order so
+  `GameBreakdown.aggregate` stays deterministic; `IOException` rethrown,
+  `InterruptedException` restores the flag, `ExecutionException` unwraps the
+  cause; `createDirectories` correctly moved into each worker. Thread-safe —
+  each seed builds its own `Simulator`/`Game`/`Random(seed)` with no shared
+  static state.
+- Domain suite: 417/417 green.
+- Characterization profile: 8/8 green across 6 consecutive runs, wall clock
+  ~5.2s (was ~8.6s sequential) — deterministic, reproducible, and ~38% faster.
+- Acceptance suite: 864/864 BUILD SUCCESS — no regression.
+
+Characterization-tests is complete: deterministic, reproducible, and now
+parallel per the specification. Handing the verified state back to the
+architect.
+
+## 2026-08-19T20:06:00Z — architect rejects incomplete seed-count follow-up
+
+Merged refactorer commit `a45e33b130` and reviewed the returned
+`CharacterizationTest`. Parallel execution is implemented and verified, but
+the seed array remains `{1L, 2L, 3L, 4L, 5L}`. This does not satisfy the
+specifier's follow-up requiring 50 seeds per configuration.
+
+Routed the missing seed-count change back to coder at priority 00. The task
+remains open and is not phase-complete.
+
+## 2026-08-19T20:07:05Z — refactorer received coder priority-00 follow-up (seed count 5→50)
+
+Handoff message received:
+
+```
+merge_and_process coder 556cd5455b
+```
+
+Specifier follow-up: the suite must run 50 seeds per config (not 5),
+parallel. Coder bumps `SEEDS` to `1..50` and regenerates all 8 baselines from
+the 50-seed runs. Merging and verifying.
+
+Added the seed-count requirement to the existing coder follow-up: the
+characterization suite must run 50 seeds per configuration and execute them in
+parallel as specified.
+
+Forwarding the same task to coder at priority 00 from the current logged
+architect commit.
+
+## 2026-08-19T20:07:00Z — coder follow-up: bump characterization SEEDS 5->50
+
+Merged architect priority-00 routing d9070e6978. The specifier followed up that
+the characterization suite must run 50 seeds per configuration (not 5), parallel.
+
+Fix: CharacterizationTest SEEDS now 1..50. Regenerated all 8 baseline fixtures
+from the 50-seed runs (12.2s parallel). Verified: characterization 8/8,
+acceptance 864/864, domain 394/394. Sending to refactorer.
+
+## 2026-08-19T22:10:25Z — refactorer review: seed-count bump 5→50 verified
+
+Fresh verification after merging the seed-count bump (`556cd5455b`):
+
+- Domain suite: 417/417 green.
+- Characterization profile: 8/8 green across 3 runs, ~12.2s — now runs the
+  spec-mandated 50 seeds per config in parallel and remains deterministic
+  (regenerated baselines match).
+- Acceptance suite: 864/864 BUILD SUCCESS — no regression.
+
+Characterization-tests is complete and spec-compliant: 50 seeds per config,
+parallel, deterministic, reproducible. Handing the verified state back to the
+architect.
+
+## 2026-08-19T20:11:58Z — accepted characterization-tests seed-count follow-up
+
+Merged refactorer commit `d689812eed` (merge commit `6d2ccb1`). The returned
+implementation uses seeds 1 through 50 per configuration with parallel
+execution and regenerated matching baselines.
+
+Verification in the architect worktree:
+
+- Domain suite: 394/394 green.
+- Characterization profile: 8/8 green.
+- `mvn test -Pcharacterization-tests`: BUILD SUCCESS.
+
+The characterization-tests task is complete and is being handed to the
+specifier as the required phase-complete synchronization.
