@@ -1,0 +1,5 @@
+{
+  "outcomes": {"stalemate": 5},
+  "winners": {},
+  "ageAtEnd": {"min": 202, "max": 1143, "mean": 471.2, "median": 286}
+}

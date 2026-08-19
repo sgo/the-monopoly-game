@@ -38243,3 +38243,34 @@ merge_and_process architect 3e93fc2a56
 ```
 
 Reason: content fully processed — the named commit is merged and the work is logged elsewhere in this logbook. Also historically verified but not logged at the time. Removing from queue per workflow.
+
+## 2026-08-19T19:02:00Z — coder: received specifier handoff 50_20260819T185819Z_000205 (characterization-tests)
+
+Handoff received: type git_handoff, from specifier, task characterization-tests, commit b202c7ef59.
+Merged the specification commit. The spec defines a JUnit characterization
+suite (`mvn test -P characterization-tests`) that runs 8 fixed game setups
+through the real CLI entry point, 5 seeds each, extracts a generic outcome/age
+breakdown plus flag-specific extras (loans, entities, peer trades), and diffs
+against checked-in JSON baselines under `src/test/resources/characterization`.
+
+Prerequisite identified: Dice and Cards used unseeded randomness. Implemented
+seeded/reproducible play:
+- `Dice` now accepts an injected `Random` and exposes `withRandom(Random)`.
+- `Cards.Decks` gains `official(Deeds, Random)` for deterministic shuffling.
+- `Simulator` parses `--seed=N`, threads it through `start`/`run`, and only
+  uses seeded components when a seed is supplied; default games remain
+  unseeded and non-deterministic.
+- CLI pom adds `unit-tests` and `characterization-tests` profiles matching the
+  existing domain property-tests pattern.
+- Added `CharacterizationConfig` (8 configs), `GameBreakdown` (parsing,
+  aggregation, JSON serialization), and `CharacterizationTest`.
+- Generated the 8 initial baseline fixtures with
+  `-DgenerateCharacterizationBaselines=true`.
+
+Verified:
+- Domain suite: 394/394 green.
+- CLI default `SimulatorTest`: 12/12 green.
+- Characterization profile: 8/8 green.
+- Acceptance suite: 864/864 green.
+
+Sending refactorer handoff for structural review.

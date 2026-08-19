@@ -1,0 +1,8 @@
+{
+  "outcomes": {"ordinary_win": 5},
+  "winners": {"dog": 5},
+  "ageAtEnd": {"min": 2, "max": 5, "mean": 4.0, "median": 4},
+  "loans": {"loansRaised": 23, "totalDollars": 1022, "borrowers": {"dog": 20, "ship": 1, "wheelbarrow": 1, "shoe": 1}, "bondholders": {"high hat": 14, "racecar": 3, "shoe": 2, "dog": 2, "thimble": 2}, "defaults": 0},
+  "entities": {"formed": 0, "dissolved": 0},
+  "trades": {"peerTrades": 0}
+}

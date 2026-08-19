@@ -1,0 +1,8 @@
+{
+  "outcomes": {"ordinary_win": 4, "stalemate": 1},
+  "winners": {"dog": 4},
+  "ageAtEnd": {"min": 8, "max": 33, "mean": 15.4, "median": 12},
+  "loans": {"loansRaised": 24, "totalDollars": 1653, "borrowers": {"iron box": 5, "Green Realty": 3, "Yellow Realty": 5, "racecar": 5, "Pink Realty": 4, "thimble": 2}, "bondholders": {"dog": 19, "high hat": 5}, "defaults": 0},
+  "entities": {"formed": 12, "dissolved": 5},
+  "trades": {"peerTrades": 1}
+}
