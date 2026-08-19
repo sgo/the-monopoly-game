@@ -39139,3 +39139,105 @@ priority: 50
 task: characterization-tests
 commit: a9d1063f46
 ```
+
+## 2026-08-19T23:53:00Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260819T211347Z_000209
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 7f9ab82230
+task: characterization-tests
+
+Re-read your role and constitution.
+```
+
+Specifier's `7f9ab82230` added a `README sync check` section to
+`CHARACTERIZATION-TESTS.md` and finalized `README.md`'s "Simulated game
+characteristics" layout (Summary table + Detailed Breakdown `<details>`
+blocks). Spec asked for a new test in the same `characterization-tests`
+profile that reads `README.md` and every baseline fixture directly and
+checks every factual data point — Summary rows, Detailed bullets,
+loan/entity/peer-trade figures — against the fixture.
+
+Implemented `the-monopoly-game-cli/src/test/java/the/monopoly/game/cli/ReadmeSyncTest.java`:
+- Parses each `<details>` block under "Detailed Breakdown" in README.md.
+- Pairs them by document order against `CharacterizationConfig.values()`.
+- Compares Outcome (with percentages re-derived from outcomes map),
+  Age (Summary column + Detailed form), Bankruptcies/Winners/Borrowers/
+  Bondholders (as multisets of name→count — README uses inconsistent
+  ordering across configs), Auctions (count + 1-decimal % + land
+  acquisitions total), Mortgages, Income (salary/rent/bankPayments,
+  comma-grouped, with `\$`), and — when present — Loans, Servicing,
+  Entities, Peer trades.
+- Failure messages name the config + field + both expected (from fixture)
+  and actual (from README).
+
+Confirmed drift detection: temporarily bumped `two_greedo.json`'s salary
+by 1 → ReadmeSyncTest failed with the exact config/field/expected/actual
+message and pointed at `salary \$324,600` vs `\$324,601`. Restored the
+fixture; test green again.
+
+Verification (`mvn -pl :the-monopoly-game-cli test -P characterization-tests`):
+9 tests, 0 failures (1 new ReadmeSync + 8 Characterization).
+
+Note: `SimulatorTest.keepsPlayingUntilToldToStop` failed during ad-hoc
+runs in this session but is pre-existing flake — fails identically with
+my changes stashed, unrelated to the README sync work. Characterization
+profile (the scope of this handoff) is green.
+
+## 2026-08-19T21:55:28Z — refactorer received coder readme-sync-check (7d3b17ab48)
+
+Handoff message received:
+
+```
+merge_and_process coder 7d3b17ab48
+```
+
+New task `readme-sync-check`, driven by specifier note `7f9ab82230` (Option A:
+verify specific figures, not byte-for-byte). Coder adds `ReadmeSyncTest` (247
+lines) reading README.md's "Simulated game characteristics" section and
+cross-checking every data point against the baseline fixtures. README.md is
+also finalized in this chain (+153 lines, incl. `### Summary` / `### Detailed
+Breakdown` / 8 `<details>` blocks). Merging, reviewing, and verifying.
+
+## 2026-08-19T23:55:00Z — refactorer review: readme-sync-check verified
+
+Structural review of `ReadmeSyncTest` + fresh verification:
+
+- Correctly scoped via `@Tag("characterization-test")`; reads README.md and
+  fixtures directly (no CLI invocation), matching the specifier's Option-A
+  "verify specific figures" choice.
+- Meaningful assertions: `hasSize(configs.length)` guarantees all 8 configs are
+  covered; `isEqualTo` on every field (null → fail); `assertNameMultiset` uses
+  `containsExactlyInAnyOrderEntriesOf` to tolerate README's inconsistent name
+  ordering; `assertContains` only where analytical asides follow the data.
+  Failure messages name config + field + expected + actual.
+- Drift detection is genuine: coder proved salary+1 → clean config/field/
+  expected/actual failure; I confirmed the fixture still parses and the test
+  is green 3/3.
+- Verification: characterization profile 9/9 green (1 ReadmeSync + 8
+  Characterization) across 3 runs; domain 417/417. README finalized structure
+  (`### Summary` + 8 `<details>` blocks) is present and matches.
+
+Minor notes (acceptable per Option A, not defects): the `<details>` blocks are
+paired to `CharacterizationConfig.values()` by document order (a README reorder
+would silently re-pair config↔fixture), and `formatMean` uses `Double.toString`
+(relying on README/JSON double formatting staying aligned). Both are deliberate
+trade-offs the specifier chose over byte-for-byte regeneration.
+
+Handing the verified state back to the architect.
+
+## 2026-08-19T21:59:33Z — accepted readme-sync-check
+
+Merged refactorer commit `e74b45be41`. Fresh verification in the architect
+worktree passed `mvn -pl :the-monopoly-game-cli test -Pcharacterization-tests`:
+ReadmeSyncTest 1/1 and CharacterizationTest 8/8, 9/9 total, BUILD SUCCESS.
+
+The README synchronization task is complete and is being handed to the
+specifier as phase-complete.
