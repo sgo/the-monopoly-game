@@ -66,7 +66,7 @@ starting point.
 
 ## Game setups
 
-Eight configs, each additionally run with `--max-years=2500` as a safety
+Nine configs, each additionally run with `--max-years=2500` as a safety
 cap against a run that never naturally terminates:
 
 | # | Players | Strategies | Optional flags |
@@ -77,12 +77,22 @@ cap against a run that never naturally terminates:
 | 4 | 8 | Greedo | none |
 | 5 | 8 | Greedo | `--optional-greedo-stalemate-trading` |
 | 6 | 8 | Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` |
-| 7 | 8 | 1 Billionaire (cash-rich, default) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-development-loans` |
-| 8 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-development-loans` `--optional-asset-rich-billionaire` |
+| 7 | 8 | 1 Billionaire (cash-rich, default) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` |
+| 8 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-asset-rich-billionaire` |
+| 9 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-asset-rich-billionaire` `--optional-development-loans` |
 
 Configs 7 and 8 are identical except for the one flag that matters
 (`--optional-asset-rich-billionaire`), so a comparison between their two
-breakdowns isolates that flag's effect specifically.
+breakdowns isolates that flag's effect specifically. Configs 8 and 9 are
+likewise identical except for `--optional-development-loans`, isolating
+that flag's effect specifically for the asset-rich billionaire — the two
+prior configs (formerly `eight_billionaire_greedo_loans` and
+`eight_billionaire_greedo_loans_asset_rich`) both had development loans on
+unconditionally, which never let the flag's own effect be isolated from
+the billionaire's opening mode. Renaming both to drop the now-inaccurate
+`_loans` (they no longer have loans on) is expected as part of this
+change; config 9 reuses the identifier the asset-rich config previously
+had, since it now holds what that config used to represent.
 
 ## The breakdown
 
