@@ -39193,6 +39193,17 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-20T00:20:00Z — architect routes README sync strictness decision
+
+Merged refactorer commit `4bc0923dc5`. The nine-config split and regenerated
+baselines are verified, but the refactorer identified a policy concern:
+`ReadmeSyncTest` now permits fewer README blocks than characterization configs
+via `Math.min`, weakening the guarantee that every config is documented.
+
+This is being sent to the specifier for a decision on whether the lenient
+transitional behavior is intended or whether strict size equality should be
+restored. The task is not phase-complete pending that decision.
+
 ## 2026-08-19T21:59:33Z — accepted readme-sync-check
 
 Merged refactorer commit `e74b45be41`. Fresh verification in the architect
