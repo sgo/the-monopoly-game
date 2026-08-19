@@ -38353,3 +38353,34 @@ Regenerated all 8 baseline fixtures after the determinism fix. Verified:
 - Acceptance suite: 864/864 green.
 
 Sending the verified state to the refactorer.
+
+## 2026-08-19T19:20:56Z — coder: sent refactorer handoff (characterization-tests priority-00 follow-up)
+
+Handoff sent: type git_handoff, to refactorer, priority 00, task characterization-tests, commit 2edcc04421.
+
+Refactorer to review the determinism fix (sorted legalEntities) and baseline
+regeneration property implementation.
+
+## 2026-08-19T19:21:00Z — clearing processed handoff from queue
+
+```
+id: 20260819T191804Z_000310_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: db1ead0fab
+created_at: 2026-08-19T19:18:04.182210Z
+enqueued_at: 2026-08-19T18:58:04.752412Z
+task: characterization-tests
+dequeued_at: 2026-08-19T19:18:07.775021Z
+
+Re-read your role and constitution.
+
+merge_and_process architect db1ead0fab
+```
+
+Reason: content fully processed — both routed determinism defects fixed,
+verified, and handed to the refactorer. Removing from queue.
