@@ -38437,6 +38437,21 @@ commit: 05227c501a
 The coder must implement the specified parallel seed execution and return the
 same task through the normal coder/refactorer review loop.
 
+## 2026-08-19T19:59:02Z — architect processes characterization seed-count note
+
+Handoff message received:
+
+```
+id: 20260819T195857Z_000207_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 50
+type: note
+message: characterization-tests follow-up: also bump SEEDS 5->50, see logbook
+
+Re-read your role and constitution.
+
 ## 2026-08-19T20:05:00Z — coder follow-up: parallelize characterization seed execution
 
 Merged architect priority-00 routing 6fbb79b90c. The specifier noted the seed
@@ -38490,3 +38505,19 @@ merge_and_process coder 556cd5455b
 Specifier follow-up: the suite must run 50 seeds per config (not 5),
 parallel. Coder bumps `SEEDS` to `1..50` and regenerates all 8 baselines from
 the 50-seed runs. Merging and verifying.
+
+Added the seed-count requirement to the existing coder follow-up: the
+characterization suite must run 50 seeds per configuration and execute them in
+parallel as specified.
+
+Forwarding the same task to coder at priority 00 from the current logged
+architect commit.
+
+## 2026-08-19T20:07:00Z — coder follow-up: bump characterization SEEDS 5->50
+
+Merged architect priority-00 routing d9070e6978. The specifier followed up that
+the characterization suite must run 50 seeds per configuration (not 5), parallel.
+
+Fix: CharacterizationTest SEEDS now 1..50. Regenerated all 8 baseline fixtures
+from the 50-seed runs (12.2s parallel). Verified: characterization 8/8,
+acceptance 864/864, domain 394/394. Sending to refactorer.

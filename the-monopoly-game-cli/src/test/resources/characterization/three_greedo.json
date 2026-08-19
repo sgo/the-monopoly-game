@@ -1,5 +1,5 @@
 {
-  "outcomes": {"ordinary_win": 4, "stalemate": 1},
-  "winners": {"dog": 1, "high hat": 2, "iron box": 1},
-  "ageAtEnd": {"min": 10, "max": 174, "mean": 44.2, "median": 12}
+  "outcomes": {"ordinary_win": 39, "stalemate": 11},
+  "winners": {"dog": 5, "high hat": 17, "iron box": 17},
+  "ageAtEnd": {"min": 5, "max": 392, "mean": 67.88, "median": 14}
 }

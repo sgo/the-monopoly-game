@@ -1,7 +1,7 @@
 {
-  "outcomes": {"ordinary_win": 5},
-  "winners": {"iron box": 2, "racecar": 2, "ship": 1},
-  "ageAtEnd": {"min": 9, "max": 14, "mean": 10.8, "median": 11},
-  "entities": {"formed": 12, "dissolved": 6},
-  "trades": {"peerTrades": 1}
+  "outcomes": {"ordinary_win": 50},
+  "winners": {"iron box": 7, "racecar": 6, "ship": 7, "shoe": 8, "thimble": 4, "dog": 10, "wheelbarrow": 2, "high hat": 6},
+  "ageAtEnd": {"min": 5, "max": 23, "mean": 11.2, "median": 11},
+  "entities": {"formed": 99, "dissolved": 51},
+  "trades": {"peerTrades": 4}
 }
