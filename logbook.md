@@ -38605,3 +38605,33 @@ to: architect
 priority: 50
 message: characterization-tests seed loop runs sequentially, not parallel as spec'd
 ```
+
+## 2026-08-19T22:15:00+02:00 — specifier bundles a second characterization-tests ask into the same follow-up
+
+The user separately noticed `CharacterizationTest.SEEDS` has only 5 entries
+(`{1L, 2L, 3L, 4L, 5L}`), not 50 — confirmed, and confirmed this actually
+matches what `CHARACTERIZATION-TESTS.md` specified ("Five seeds per config
+is a reasonable starting point"), so unlike the parallelism gap this is not
+a coder defect, just the original spec's number.
+
+Discussed with the user why more seeds are worth it here specifically: this
+suite does an *exact* diff against a baseline, not a statistical/tolerance
+comparison, so the value of more seeds isn't smoothing variance — it's
+code-path coverage. A regression only shows up if at least one seed's
+dice/card sequence actually exercises the affected behavior; 5 sequences
+cover a lot less of the game's possible paths than 50 do, for a cost that
+stays low since games are fast (and gets lower once the parallelism fix
+above lands). The user agreed and asked to bump `SEEDS` from 5 to 50
+entries, bundled into the same architect follow-up as the parallelism gap
+logged just above, rather than as a separate ask.
+
+Handoff message sent (a second note, since the first had already been
+queued before this came up; both are meant to be read and actioned
+together):
+
+```
+type: note
+to: architect
+priority: 50
+message: same characterization-tests follow-up: also bump SEEDS from 5 to 50 entries, see logbook
+```
