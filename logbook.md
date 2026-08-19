@@ -38513,3 +38513,15 @@ specifier's follow-up requiring 50 seeds per configuration.
 
 Routed the missing seed-count change back to coder at priority 00. The task
 remains open and is not phase-complete.
+
+## 2026-08-19T20:15:00Z — coder: resolves architect seed-count rejection (a81ca4d...)
+
+Merged architect priority-00 rejection routing a81ca4d9c8: it rejected the
+refactorer's returned CharacterizationTest for keeping seeds at {1..5}, routing
+back to coder. However, the coder's own commit 6286a168 (bumping SEEDS to
+1..50 and regenerating baselines) was already in the ancestry of this merge.
+
+Re-verified the current HEAD state: SEEDS = 1..50, characterization 8/8,
+acceptance 864/864. The rejection was based on a stale refactorer snapshot, not
+on the actual coder work; no additional code change was needed. Confirming the
+50-seed requirement is satisfied and re-submitting through the normal loop.
