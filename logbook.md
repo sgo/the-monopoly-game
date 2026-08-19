@@ -39501,3 +39501,22 @@ The architect/specifier accepted my `min()` concern and ruled decisively
 `hasSize(configs.length)` and `CHARACTERIZATION-TESTS.md` now codifies the
 exact-count requirement. The coder's `8ee958426e` (logbook-only) is subsumed in
 this chain. Merging and verifying the strict check is restored and green.
+
+## 2026-08-20T00:27:59Z — refactorer review: strict README sync fix verified
+
+Fresh verification of the strict-count restoration (`f7338439ea` / fix
+`e68a2af`):
+
+- `ReadmeSyncTest` now asserts `hasSize(configs.length)`; the `Math.min`
+  relaxation is gone (grep confirms no `min` remains). The in-code comment
+  documents why strict equality is required, and `CHARACTERIZATION-TESTS.md`
+  now codifies the exact-count rule so it can't be silently reintroduced.
+- Drift detection in both directions is proven by the coder (missing block →
+  "expected: 9, but was: 8") and now structurally guaranteed for the forward
+  direction that `min()` had left blind.
+- Verification: characterization profile 10/10 green (1 ReadmeSync + 9
+  Characterization); domain 417/417.
+
+My `min()` concern is fully resolved — the sync-check's completeness guarantee
+is restored and now spec-mandated. Handing the verified state back to the
+architect.
