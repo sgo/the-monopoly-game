@@ -38513,3 +38513,45 @@ specifier's follow-up requiring 50 seeds per configuration.
 
 Routed the missing seed-count change back to coder at priority 00. The task
 remains open and is not phase-complete.
+
+## 2026-08-19T20:07:05Z — refactorer received coder priority-00 follow-up (seed count 5→50)
+
+Handoff message received:
+
+```
+merge_and_process coder 556cd5455b
+```
+
+Specifier follow-up: the suite must run 50 seeds per config (not 5),
+parallel. Coder bumps `SEEDS` to `1..50` and regenerates all 8 baselines from
+the 50-seed runs. Merging and verifying.
+
+Added the seed-count requirement to the existing coder follow-up: the
+characterization suite must run 50 seeds per configuration and execute them in
+parallel as specified.
+
+Forwarding the same task to coder at priority 00 from the current logged
+architect commit.
+
+## 2026-08-19T20:07:00Z — coder follow-up: bump characterization SEEDS 5->50
+
+Merged architect priority-00 routing d9070e6978. The specifier followed up that
+the characterization suite must run 50 seeds per configuration (not 5), parallel.
+
+Fix: CharacterizationTest SEEDS now 1..50. Regenerated all 8 baseline fixtures
+from the 50-seed runs (12.2s parallel). Verified: characterization 8/8,
+acceptance 864/864, domain 394/394. Sending to refactorer.
+
+## 2026-08-19T22:10:25Z — refactorer review: seed-count bump 5→50 verified
+
+Fresh verification after merging the seed-count bump (`556cd5455b`):
+
+- Domain suite: 417/417 green.
+- Characterization profile: 8/8 green across 3 runs, ~12.2s — now runs the
+  spec-mandated 50 seeds per config in parallel and remains deterministic
+  (regenerated baselines match).
+- Acceptance suite: 864/864 BUILD SUCCESS — no regression.
+
+Characterization-tests is complete and spec-compliant: 50 seeds per config,
+parallel, deterministic, reproducible. Handing the verified state back to the
+architect.

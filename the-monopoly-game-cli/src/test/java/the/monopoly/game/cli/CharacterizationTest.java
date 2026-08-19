@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Tag("characterization-test")
 class CharacterizationTest {
 
-  private static final long[] SEEDS = {1L, 2L, 3L, 4L, 5L};
+  private static final long[] SEEDS = java.util.stream.LongStream.rangeClosed(1, 50).toArray();
   private static final int MAX_YEARS = 2500;
   private static final Path LOG_DIR = Path.of("target", "characterization-logs");
   private static final Path BASELINE_DIR = Path.of("src", "test", "resources", "characterization");
