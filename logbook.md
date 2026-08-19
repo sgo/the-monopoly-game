@@ -38124,3 +38124,131 @@ architect. No specifier action needed on that decision.
 This syncs the specifier branch to the completed `development-loans` and
 `baseline-triage` state. Per role rules, asking the user for the next feature
 to specify; no new coder handoff will be sent until they approve one.
+
+## 2026-08-19T00:00:00+02:00 — specifier drafts and backlogs war-profits-tax; specifies characterization-tests
+
+At the user's direction, ran 5 then 50 simulated 8-player games (1
+asset-rich billionaire + 7 Greedo, both optional Greedo flags on,
+development loans on, `--max-years=2500`) via the CLI simulator to see
+whether development loans extended the billionaire's win time beyond the
+documented ~4-year baseline. They didn't (A/B: 3.86 vs 4.00 mean years,
+Welch t=-0.49, not significant). Follow-up analysis at the user's request
+covered who takes out loans (individual players only — zero legal entities
+ever formed with a billionaire present, since its asset-rich opening denies
+the market-deadlock condition entity formation needs), whether the dominant
+bondholder (`high hat`) profits from it (no — recovers 16.5% of what it
+lends before going bankrupt in 50/50 games), its other income sources
+(67% salary, not rent — it never builds a real property base), and auction
+frequency/pricing (2.4% of land acquisitions, bimodal: 62.5% at an
+apparent 50% floor, 37.5% well above listed, netting 167% of listed value
+in aggregate — the opposite of the user's "desperate seller" hypothesis).
+Caught and reported a double-counting bug partway through (each game log
+contains the full narration twice — a live SLF4J stream plus the final
+printed report — so unanchored aggregate greps were counting every event
+twice); corrected figures given once found.
+
+Traced the billionaire's dominance to `--optional-asset-rich-billionaire`
+itself: it grants the entire Orange and Red colour groups at game setup,
+free and unmortgaged — confirmed directly in a real game log (dog builds
+houses on the Red group turn one with no prior "buys" event for any of
+those streets). Dog mortgages *least* of any player (61 times vs. 94-122
+for Greedo opponents), refuting the user's mortgage-driven-expansion
+hypothesis.
+
+This led to a new feature, designed collaboratively with the user in prose
+before any Gherkin, motivated by `economics.md`'s conclusion that no
+capital-access mechanic can slow a strategy that isn't optimizing for game
+length — only an asymmetric rule can: a "war profits tax" on rental income,
+progressive by board-ownership share (0% below 25%, climbing to 400% at
+100%), assessed annually per player against rent collected since their
+last assessment (not land value itself), paid into a new government
+account. Real design iteration during drafting:
+
+- User's own insight: reuse `Stalemate.threshold(rules)`'s existing
+  per-space valuation for ownership share instead of inventing a new one.
+  Corrected a real arithmetic bug I introduced computing it (off-by-one
+  regex group — used `rentForFourHouses` instead of `rentForOneHotel`):
+  true total is $22,790, not the $18,970 first reported, matching
+  `economics.md`'s existing "~$22,000" note.
+- User's follow-up: value owned land by its *current* development state
+  (vacant/house-tier/hotel), not always the hotel-level ceiling used for
+  the board total — so buying undeveloped land can't trigger a big bill,
+  only actually building it can.
+- Verified against `Bankruptcy.java` while drafting the inheritance
+  scenario: a bankrupt debtor already has every house sold and everything
+  mortgageable mortgaged before land transfers to the creditor, so
+  inherited land always arrives bare, never with prior development intact
+  — rewrote that scenario around the real mechanic instead of my first
+  (wrong) assumption.
+- Deliberately left open, not specified: whether a development loan can
+  cover a tax shortfall (today's loans are wired specifically to
+  house/hotel construction, not general debt relief) — removed a scenario
+  that assumed it could rather than guess.
+- User caught two structural gaps after the first draft: no journal/log
+  coverage (only report), and no coverage of the tax-payment event or CLI
+  wiring at all. Fixed by mirroring the exact existing convention:
+  dedicated scenarios added to `journal.feature`/`logging.feature`/
+  `report.feature` (payment event, government final balance, enabled/
+  disabled-by-default) and `cli.feature`/`cli-packaged-jar.feature`
+  (flag wiring, README usage-report listing), matching how
+  `development-loans` did it, rather than folding narration checks into
+  the domain feature file.
+
+Validated every touched/new file with `gherkin-parser` at each step, and
+`gherkin-ir-dry-checker` on the full set at the end: only 2
+`duplicate-in-scenario` findings in `war-profits-tax.feature`, both
+intentional repeated `grows a year older` triggers (counter-reset and
+self-correction scenarios); fixed the one real thing dry-check surfaced
+(two step-text variants, `land`/`other land`, for the same fixture,
+unified to one). Everything else was the same near-duplicate/
+possible-synonym/placeholder-variant baseline noise this project already
+tolerates elsewhere.
+
+At the user's direction, applied the new backlog workflow (see
+`swarmforge/roles/specifier.prompt`) to park the entire result rather than
+hand any of it to coder yet: moved `war-profits-tax.feature` whole into
+`the-monopoly-game-specs/backlog/en/rules/`, and reverted my additions to
+the four already-tracked, already-pipelined files back to their committed
+state, placing copies of just the new scenarios (plus, for
+`cli-packaged-jar.feature`, a note about the one-line `cli-jar-5` edit
+that couldn't be parked as a standalone scenario) into matching backlog
+files under `the-monopoly-game-specs/backlog/en/rules/` and
+`the-monopoly-game-specs/backlog/specs-cli/en/`. Confirmed clean:
+`git status` showed only the new backlog directory, the five pipelined
+files unchanged. Committed at the user's request together with their own
+`economics.md`/`about-ai.md` documentation of this session's design
+conversation and backlog-workflow decision (commit `5b31a88`), and
+separately the `specifier.prompt` backlog-workflow edit itself (commit
+`f5a58f1`), which had been sitting uncommitted since earlier in the
+session.
+
+Separately, the user asked for a JUnit-integrated characterization-test
+suite: run the CLI simulator many times across a fixed set of game setups,
+extract the same kind of breakdown produced ad hoc above, and diff it
+against a checked-in baseline to catch whole-system regressions, to be run
+whenever the architect accepts a feature-complete report. Identified this
+as coder-owned implementation work, not something to build directly as
+specifier, and turned it into a design doc instead of Gherkin (it's test
+infrastructure, not player-facing game behavior, so it doesn't fit the
+APS/journal/report narration model). Settled with the user, one question
+at a time: fixed RNG seeds over statistical tolerance (found and flagged
+two real unseeded-randomness sources needing a fix first: `Dice.java` and
+`Cards.java`'s deck shuffling); a generic-plus-extras breakdown schema
+that can grow without invalidating existing fixtures; the specific 8 game
+configs (tuned collaboratively — user added and then had me reconcile
+several isolated-single-flag variants against my first draft, then dropped
+one and applied `--max-years=2500` uniformly); and one checked-in JSON
+fixture per config with named-field diff failures. Wrote up as
+`CHARACTERIZATION-TESTS.md` (README.md updated to reference it and list
+the new `mvn test -P characterization-tests` profile), committed as
+`b202c7e`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: characterization-tests
+commit: b202c7ef59
+```
