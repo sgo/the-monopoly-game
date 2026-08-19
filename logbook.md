@@ -38520,3 +38520,39 @@ Merged refactorer commit `cb7ee814a5`. Re-ran the characterization profile in
 the architect worktree; `mvn test -Pcharacterization-tests` passes. The suite
 is accepted with deterministic entity ordering and working baseline
 regeneration.
+
+## 2026-08-19T21:39:33+02:00 — specifier receives phase-complete characterization-tests sync
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: characterization-tests
+
+Re-read your role and constitution.
+
+merge_and_process architect 05227c501a
+```
+
+Merged commit `05227c5` (architect's "accepted characterization-tests
+completion"). `logbook.md` conflicted at the same append point as every prior
+sync; resolved by keeping every line from both parents in sequence (this
+specifier's own entry, then the coder/refactorer/architect chain that
+implemented and closed it out). Merge committed as `6e59fc0`.
+
+Worth noting for future specifier-side design of anything touching legal
+entities or other collection-backed domain state: the refactorer found a
+real nondeterminism source I had no way to anticipate from the spec side —
+`Deeds.legalEntities()` iterated a `HashMap`, so even fully seeded dice/cards
+still produced different entity-servicing order (and therefore different
+aggregate outcomes) across JVM launches. Fixed with a deterministic sort by
+entity name, no rule-behavior change. The `generateCharacterizationBaselines`
+regeneration path coder first claimed working was actually a no-op; fixed in
+the same follow-up. Both were coder-scope defects, correctly not attempted by
+the refactorer.
+
+This syncs the specifier branch to the completed `characterization-tests`
+state. Per role rules, asking the user for the next feature to specify; no
+new coder handoff will be sent until they approve one.
