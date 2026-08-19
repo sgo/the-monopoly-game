@@ -38325,3 +38325,18 @@ regenerated; they are frozen snapshots.
 Both are coder-scope (determinism of the implementation + the missing
 regeneration path), not refactorer structural cleanup. Handing the verified
 state back to the architect.
+
+## 2026-08-19T19:20:56Z — refactorer received coder priority-00 follow-up (`characterization-tests`)
+
+Handoff message received:
+
+```
+merge_and_process coder 2edcc0468f
+```
+
+Coder addresses both defects: sorts `Deeds.legalEntities()` by entity name
+(eliminating the `HashMap` iteration nondeterminism) and re-implements the
+`generateCharacterizationBaselines` system property in `CharacterizationTest`.
+Claims domain 394/394, SimulatorTest 12/12, characterization 8/8, acceptance
+864/864. Merging and verifying fresh — with emphasis on confirming the
+flakiness is gone (multiple characterization runs).
