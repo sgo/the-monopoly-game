@@ -38863,6 +38863,18 @@ auction count + direct-purchase count, mortgage count, income composition
 Loans extra: loan servicing — total interest and principal paid by borrowers, and
 total interest and principal received on the bondholder side.
 
- All 8 baselines regenerated together (generic-core change touches every config).
+All 8 baselines regenerated together (generic-core change touches every config).
 Verified: characterization 8/8, domain 394/394, CLI SimulatorTest 12/12,
 acceptance 864/864. Committed 9a3b86e.
+
+## 2026-08-19T20:41:00Z — architect routes characterization breakdown extension
+
+Received coder handoff:
+
+```
+merge_and_process coder a858c7418a
+```
+
+Merged the coder commit. It adds the requested characterization breakdown
+extension and regenerates all eight baselines. Routed the behavior/test change
+to refactorer for structural review at priority 00.
