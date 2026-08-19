@@ -38427,53 +38427,27 @@ commit: 05227c501a
 The coder must implement the specified parallel seed execution and return the
 same task through the normal coder/refactorer review loop.
 
-## 2026-08-19T20:05:00Z — coder follow-up: parallelize characterization seed execution
+## 2026-08-19T19:59:02Z — architect processes characterization seed-count note
 
-Merged architect priority-00 routing 6fbb79b90c. The specifier noted the seed
-loop runs sequentially, not in parallel as specified. Architected the coder
-gap at priority 00.
-
-Fix: CharacterizationTest now runs the five seeds for each config across a
-fixed thread pool sized to available processors, matching the spec's parallel
-execution requirement and reducing wall clock (measured 8.58s -> 5.32s locally
-before bundling). Worker exceptions are rethrown as the original checked type
-or an AssertionError for diagnostics; log files still written per-seed per-config
-under target/characterization-logs/<config>/seed-<N>.log.
-
-Note: the pre-existing SimulatorTest.keepsPlayingUntilToldToStop flake surfaced
-during verification (1/5 pass in isolation). Its own source comment documents
-that an unseeded 8-player game can occasionally finish within the fixed 1s
-sleep. Unrelated to this change (seeded path only) and not introduced by it;
-flagged in logbook for visibility.
-
-Verified: characterization profile 8/8 green; acceptance 864/864 green;
-domain 394/394 green. Sending to refactorer.
-
-## 2026-08-19T20:01:13Z — coder: sent refactorer handoff (characterization-tests parallelism follow-up)
-
-Handoff sent: type git_handoff, to refactorer, priority 00, task characterization-tests, commit 69c6925d78.
-
-Refactorer to review the thread-pool seed execution.
-
-## 2026-08-19T20:01:30Z — clearing processed handoff from queue
+Handoff message received:
 
 ```
-id: 20260819T195810Z_000313_from_architect
-from: architect
-to: coder
-recipient: coder
-priority: 00
-type: git_handoff
-role: architect
-commit: 6fbb79b90c
-created_at: 2026-08-19T19:58:10.774588Z
-enqueued_at: 2026-08-19T19:58:11.776304Z
-task: characterization-tests
-dequeued_at: 2026-08-19T19:58:13.620260Z
+id: 20260819T195857Z_000207_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 50
+type: note
+message: characterization-tests follow-up: also bump SEEDS 5->50, see logbook
 
 Re-read your role and constitution.
 
-merge_and_process architect 6fbb79b90c
+characterization-tests follow-up: also bump SEEDS 5->50, see logbook
 ```
 
-Reason: seed parallelism implemented, verified, and handed to refactorer. Removing from queue.
+Added the seed-count requirement to the existing coder follow-up: the
+characterization suite must run 50 seeds per configuration and execute them in
+parallel as specified.
+
+Forwarding the same task to coder at priority 00 from the current logged
+architect commit.
