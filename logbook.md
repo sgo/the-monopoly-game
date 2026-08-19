@@ -39481,3 +39481,9 @@ block and confirmed green.
 Verification (`mvn -pl :the-monopoly-game-cli test -P characterization-tests`):
 10 tests, 0 failures (1 ReadmeSync + 9 Characterization).
 
+## 2026-08-20T00:27:00Z — architect routes strict README sync fix
+
+Received coder handoff `merge_and_process coder e68a2af558`. The coder
+restored exact README/config count equality and verified that removing a
+`<details>` block fails with the expected count mismatch. Forwarding the
+implementation to refactorer at priority 00.
