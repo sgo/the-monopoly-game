@@ -38426,3 +38426,28 @@ commit: 05227c501a
 
 The coder must implement the specified parallel seed execution and return the
 same task through the normal coder/refactorer review loop.
+
+## 2026-08-19T19:59:02Z — architect processes characterization seed-count note
+
+Handoff message received:
+
+```
+id: 20260819T195857Z_000207_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 50
+type: note
+message: characterization-tests follow-up: also bump SEEDS 5->50, see logbook
+
+Re-read your role and constitution.
+
+characterization-tests follow-up: also bump SEEDS 5->50, see logbook
+```
+
+Added the seed-count requirement to the existing coder follow-up: the
+characterization suite must run 50 seeds per configuration and execute them in
+parallel as specified.
+
+Forwarding the same task to coder at priority 00 from the current logged
+architect commit.
