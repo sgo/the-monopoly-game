@@ -39223,3 +39223,23 @@ priority 50.
 Corrected handoff: `50_20260820T000000Z_000XXX_from_coder_to_refactorer`
 pointing at commit `2ef1c30dfb`, task `characterization-tests`.
 
+
+## 2026-08-20T00:13:32Z — coder sent handoff to refactorer
+
+Corrected handoff queued:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: characterization-tests
+commit: c2e812766a
+```
+
+Resending the same `2ef1c30dfb` implementation work (config-matrix
+split + ReadmeSyncTest) to the correct next pipeline role (refactorer)
+at the correct normal priority (50), under the specifier's original
+stable task name (`characterization-tests`). The misrouted
+`00`/`to: specifier` handoff from 00:08:36Z is still in the specifier's
+inbox and the specifier can ignore it.
+
