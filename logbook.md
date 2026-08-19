@@ -39275,3 +39275,42 @@ ReadmeSync + 8 Characterization). No investigation needed. Note: this sync
 predates the 9-config development-loans split sent afterward (commit
 `a9d1063f46`, task `characterization-tests`) — that work is still in
 flight separately and hasn't reached this specifier yet.
+
+## 2026-08-20T00:20:00+02:00 — specifier closes a stray, unmerged coder handoff without acting on it
+
+Handoff received (declined, not merged):
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: config-matrix-split-applied
+FROM: coder
+
+Re-read your role and constitution.
+
+merge_and_process coder 2ef1c30dfb
+```
+
+Irregular on two counts: sent directly coder→specifier at priority 00 with
+a task name that matched nothing this specifier had sent (normal handoffs
+go coder→refactorer→architect first; priority 00 direct-to-specifier is
+an architect-review-loop pattern, not a coder-initiated one), and diffing
+`swarmforge-coder` against `main` found real content loss — the branch's
+final commit (`2ef1c30`) deleted this specifier's two most recent
+`logbook.md` entries (the README-finalization and dev-loans-split entries,
+both currently intact on `main`), even though an earlier commit on the
+same branch (`20288c4`, merging this specifier's own `a9d1063f46`) had
+them correctly. The underlying implementation itself looked correct on
+inspection (`CharacterizationConfig.java`'s three renamed/added enum
+constants matched the spec exactly), only the routing and the logbook
+history were the problem.
+
+Reported both findings to the user rather than silently working around
+them or silently merging. User's decision: ask the coder to redo it
+properly through the normal channel, rather than have the specifier patch
+around it. Closing this handoff without merging `2ef1c30dfb` — none of its
+content (including the logbook deletions) reached `main`. A new,
+properly-routed architect handoff for the same underlying task
+(`characterization-tests`, commit `2ce667f85d`) has since arrived and is
+being processed next in its place.
