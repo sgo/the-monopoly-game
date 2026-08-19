@@ -39099,3 +39099,43 @@ priority: 50
 task: characterization-tests
 commit: 7f9ab82230
 ```
+
+## 2026-08-19T23:45:00+02:00 — specifier splits development loans out of the two billionaire configs
+
+Separately, the user noticed something real while reading the fresh
+Detailed Breakdown data: both billionaire configs (`eight_billionaire_
+greedo_loans` cash-rich, `eight_billionaire_greedo_loans_asset_rich`
+asset-rich) had `--optional-development-loans` on unconditionally, so
+neither config ever isolated the loans flag's own effect from the
+billionaire's opening mode — unlike configs 7/8 themselves, which already
+isolate cash-rich vs. asset-rich by differing in exactly one flag. First
+request from the user was ambiguous as literally written (asking to add a
+config identical to one that already existed); asked for clarification
+rather than guessing, and confirmed: both existing billionaire configs
+lose development loans, and a new third config reintroduces the asset-rich
++ loans combination as its own distinct config.
+
+Extended `CHARACTERIZATION-TESTS.md`'s game-setup table to 9 configs.
+Config 9 pairs against config 8 the same way 7/8 already isolate
+cash-rich-vs-asset-rich, this time isolating development loans
+specifically for the asset-rich billionaire. Noted the expected renaming
+consequence: configs 7 and 8 keeping `_loans` in their identifiers would
+now be actively misleading (they no longer have loans on), so both should
+drop it; config 9 reuses the asset-rich config's old identifier since it
+now holds what that config used to represent. Left `README.md`'s
+characterization section untouched for now — it still describes the old
+8-config state, to be updated once real baseline data exists for the new
+config, same order of operations as the section's original authoring
+(written after `CHARACTERIZATION-TESTS.md` existed, not before).
+
+Committed as `a9d1063`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: characterization-tests
+commit: a9d1063f46
+```
