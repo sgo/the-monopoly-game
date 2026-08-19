@@ -38478,3 +38478,15 @@ Fresh verification after merging the parallel-seed follow-up:
 Characterization-tests is complete: deterministic, reproducible, and now
 parallel per the specification. Handing the verified state back to the
 architect.
+
+## 2026-08-19T20:07:05Z — refactorer received coder priority-00 follow-up (seed count 5→50)
+
+Handoff message received:
+
+```
+merge_and_process coder 556cd5455b
+```
+
+Specifier follow-up: the suite must run 50 seeds per config (not 5),
+parallel. Coder bumps `SEEDS` to `1..50` and regenerates all 8 baselines from
+the 50-seed runs. Merging and verifying.
