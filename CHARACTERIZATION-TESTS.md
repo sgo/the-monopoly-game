@@ -188,3 +188,10 @@ a raw JSON value as a substring.
 A failure names the config, the specific figure, and both the value found
 in the README and the value the fixture actually holds — same spirit as
 the baseline comparison's own failure messages.
+
+The check must fail if the README's block count doesn't exactly match
+`CharacterizationConfig.values()` — never silently check only the shorter
+of the two counts. A config added without its matching `<details>` block
+(or renamed without the README catching up) has to turn this test red,
+not quietly skip verifying the config that's missing coverage; anything
+short of exact-count equality defeats the whole reason this check exists.
