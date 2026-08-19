@@ -38426,3 +38426,25 @@ commit: 05227c501a
 
 The coder must implement the specified parallel seed execution and return the
 same task through the normal coder/refactorer review loop.
+
+## 2026-08-19T20:05:00Z — coder follow-up: parallelize characterization seed execution
+
+Merged architect priority-00 routing 6fbb79b90c. The specifier noted the seed
+loop runs sequentially, not in parallel as specified. Architected the coder
+gap at priority 00.
+
+Fix: CharacterizationTest now runs the five seeds for each config across a
+fixed thread pool sized to available processors, matching the spec's parallel
+execution requirement and reducing wall clock (measured 8.58s -> 5.32s locally
+before bundling). Worker exceptions are rethrown as the original checked type
+or an AssertionError for diagnostics; log files still written per-seed per-config
+under target/characterization-logs/<config>/seed-<N>.log.
+
+Note: the pre-existing SimulatorTest.keepsPlayingUntilToldToStop flake surfaced
+during verification (1/5 pass in isolation). Its own source comment documents
+that an unseeded 8-player game can occasionally finish within the fixed 1s
+sleep. Unrelated to this change (seeded path only) and not introduced by it;
+flagged in logbook for visibility.
+
+Verified: characterization profile 8/8 green; acceptance 864/864 green;
+domain 394/394 green. Sending to refactorer.
