@@ -38325,3 +38325,11 @@ regenerated; they are frozen snapshots.
 Both are coder-scope (determinism of the implementation + the missing
 regeneration path), not refactorer structural cleanup. Handing the verified
 state back to the architect.
+
+## 2026-08-19T19:17:48Z — rejected red characterization-tests review
+
+Merged refactorer commit `118b347b7b`. The characterization suite is not
+accepted: seeded runs remain nondeterministic because `Deeds.legalEntities()`
+iterates a `HashMap`, and the documented `generateCharacterizationBaselines`
+property has no implementation. Routed both coder-scope defects to coder at
+priority 00.
