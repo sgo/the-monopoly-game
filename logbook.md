@@ -38326,6 +38326,20 @@ Both are coder-scope (determinism of the implementation + the missing
 regeneration path), not refactorer structural cleanup. Handing the verified
 state back to the architect.
 
+## 2026-08-19T19:20:56Z — refactorer received coder priority-00 follow-up (`characterization-tests`)
+
+Handoff message received:
+
+```
+merge_and_process coder 2edcc0468f
+```
+
+Coder addresses both defects: sorts `Deeds.legalEntities()` by entity name
+(eliminating the `HashMap` iteration nondeterminism) and re-implements the
+`generateCharacterizationBaselines` system property in `CharacterizationTest`.
+Claims domain 394/394, SimulatorTest 12/12, characterization 8/8, acceptance
+864/864. Merging and verifying fresh — with emphasis on confirming the
+flakiness is gone (multiple characterization runs).
 ## 2026-08-19T19:17:48Z — rejected red characterization-tests review
 
 Merged refactorer commit `118b347b7b`. The characterization suite is not
@@ -38354,33 +38368,27 @@ Regenerated all 8 baseline fixtures after the determinism fix. Verified:
 
 Sending the verified state to the refactorer.
 
-## 2026-08-19T19:20:56Z — coder: sent refactorer handoff (characterization-tests priority-00 follow-up)
+## 2026-08-19T21:24:03Z — refactorer review: characterization determinism fix verified
 
-Handoff sent: type git_handoff, to refactorer, priority 00, task characterization-tests, commit 2edcc04421.
+Fresh verification after merging the determinism fix:
 
-Refactorer to review the determinism fix (sorted legalEntities) and baseline
-regeneration property implementation.
+- Domain suite: 417/417 green.
+- Characterization profile: 8/8 green across 8 consecutive runs — the prior
+  ~10-15% flakiness (entity/loan configs) is eliminated. The
+  `Deeds.legalEntities()` name-sort makes legal-entity iteration deterministic
+  without changing any game rule (entity names are unique per colour group, so
+  the sort is a total order).
+- Acceptance suite: 864/864 BUILD SUCCESS — no behavioural regression from
+  rationalising the entity iteration order.
 
-## 2026-08-19T19:21:00Z — clearing processed handoff from queue
+The `generateCharacterizationBaselines` system property is now actually
+implemented (end-to-end regeneration), closing the secondary defect too.
+Characterization-tests is complete and reproducible. Handing the verified
+state back to the architect.
 
-```
-id: 20260819T191804Z_000310_from_architect
-from: architect
-to: coder
-recipient: coder
-priority: 00
-type: git_handoff
-role: architect
-commit: db1ead0fab
-created_at: 2026-08-19T19:18:04.182210Z
-enqueued_at: 2026-08-19T18:58:04.752412Z
-task: characterization-tests
-dequeued_at: 2026-08-19T19:18:07.775021Z
+## 2026-08-19T21:25:22+02:00 — accepted characterization-tests completion
 
-Re-read your role and constitution.
-
-merge_and_process architect db1ead0fab
-```
-
-Reason: content fully processed — both routed determinism defects fixed,
-verified, and handed to the refactorer. Removing from queue.
+Merged refactorer commit `cb7ee814a5`. Re-ran the characterization profile in
+the architect worktree; `mvn test -Pcharacterization-tests` passes. The suite
+is accepted with deterministic entity ordering and working baseline
+regeneration.
