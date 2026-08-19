@@ -39142,3 +39142,17 @@ would silently re-pair config↔fixture), and `formatMean` uses `Double.toString
 trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
+
+## 2026-08-19T22:13:32Z — refactorer received coder config-matrix split (c2e812766a)
+
+Handoff message received:
+
+```
+merge_and_process coder c2e812766a
+```
+
+Specifier-driven split (note `a9d1063`): configs 7/8 lose unconditional
+`--optional-development-loans`; new config 9 isolates asset-rich + dev-loans.
+8 → 9 configs, baselines regenerated, README updated (now 9 `<details>` blocks),
+`ReadmeSyncTest` relaxed from `hasSize` to `min(blocks, configs)`. Merging and
+reviewing — with attention to that `ReadmeSyncTest` weakening.
