@@ -38818,3 +38818,84 @@ Verification in the architect worktree:
 
 The characterization-tests task is complete and is being handed to the
 specifier as the required phase-complete synchronization.
+
+## 2026-08-19T22:12:00+02:00 — specifier receives phase-complete sync for the parallelism/seed-count follow-up; first run under the new verification rule
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: characterization-tests
+
+Re-read your role and constitution.
+
+merge_and_process architect d346b9c2c2
+```
+
+Merged commit `d346b9c` (architect's "accepted characterization-tests
+seed-count follow-up" — the coder/refactorer/architect loop that
+parallelised the seed execution and bumped `SEEDS` to 50, both routed from
+this specifier's two notes above). `logbook.md` conflicted across three
+separate regions this time — my two notes were sent while the architect's
+own routing/coder/refactorer chain was already appending, so the two
+sequences interleaved more than a simple two-block append. Fetched each
+parent's full tail directly via `git show <ref>:logbook.md` rather than
+trying to reconstruct correct content from the tangled markers, to avoid
+guessing at fragments; caught and fixed one self-introduced duplicate (a
+bodyless heading line that was already present in the shared unconflicted
+prefix, which I'd redundantly re-inserted) before committing. Merge
+committed as `c6329c6`.
+
+This is the first phase-complete sync since this specifier's own role
+prompt gained the "run characterization tests after every phase-complete
+sync" rule (commit `0d78234`, added at the user's direction earlier this
+session). Ran `mvn test -Pcharacterization-tests` fresh: BUILD SUCCESS,
+zero ERROR/FAIL lines, real parallelism confirmed (655% CPU, ~15s for the
+full reactor build including all other tests). No investigation needed;
+proceeding per role rules.
+
+## 2026-08-19T22:30:00+02:00 — specifier extends the characterization breakdown schema after an independent cross-check
+
+At the user's request, took the fresh 50-seed logs for
+`eight_billionaire_greedo_loans_asset_rich` (from the run just above) and
+computed an independent breakdown by hand, then diffed it field-by-field
+against the checked-in baseline. Every field the baseline currently tracks
+matched exactly — outcomes, winners, age stats, loan origination
+(borrower/bondholder breakdown down to the exact count), defaults, peer
+trades — a solid independent cross-check on `GameBreakdown`'s own logic.
+One apparent mismatch (entity dissolutions: I got 0, baseline said 3) was a
+bug in my own regex, not the baseline — dissolution narrates as `"X
+liquidates Y and receives $Z"`, not `"is dissolved"`; fixed and it matched.
+
+Computed several dimensions the schema doesn't track at all and discussed
+with the user which were worth adding. All were: bankruptcies (350 in this
+config's 50 games, only the eventual winner is currently visible in the
+breakdown at all), auctions (24, 2.41% of land acquisitions — a core board
+mechanic, not gated behind any flag), mortgages (850, same), loan
+*servicing* (only $1,193 interest + $1,495 principal actually collected
+against $13,860 originated — the existing `development-loans` extra
+tracks origination only, so a regression that broke repayment or interest
+calculation entirely wouldn't move any currently-tracked field), and
+income composition (salary/rent/bank-card totals, lower-stakes but
+requested alongside the rest).
+
+Extended `CHARACTERIZATION-TESTS.md`: bankruptcies/auctions/mortgages/
+income move into generic core (always active, not flag-gated, unlike the
+existing extras); loan servicing extends the existing
+`--optional-development-loans` extra. Flagged the one real implementation
+consequence: since a generic-core field applies to every config, all 8
+baselines need regenerating together the first time these ship — unlike an
+extras-only addition, which only touches the configs using that flag.
+Committed as `3b8121f`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: characterization-tests
+commit: 3b8121f0c2
+```
