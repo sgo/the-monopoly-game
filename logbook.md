@@ -39196,3 +39196,30 @@ blocks against the 8 currently-in-README baselines; the 9th fixture
 will exist on disk but won't be referenced by README until the user
 adds a 9th `<details>` block.
 
+
+## 2026-08-20T00:10:00Z — coder handoff error: misrouted to specifier with wrong priority
+
+After applying the config-matrix split from specifier handoff
+`a9d1063f46`, I sent `00_20260819T220836Z_000200_from_coder_to_specifier`
+incorrectly:
+
+- **Wrong recipient.** Per the specifier's task name (`characterization-tests`)
+  and the normal coder→refactorer pipeline, this implementation work should
+  have gone to the **refactorer**, not back to the specifier. Sending back
+  to specifier only happens when the spec needs revision or there's an
+  architect review loop — neither applies here.
+- **Wrong priority.** Used `00` (architect review-loop priority). Per the
+  constitution, `00` is reserved for architect follow-ups. Normal
+  coder→refactorer handoffs use `50`.
+- **Wrong draft path.** Used `/tmp/handoff.draft` instead of
+  `./tmp/refactorer-handoff.txt` in the worktree.
+
+The misrouted handoff is already in the specifier's inbox
+(`/Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/00_20260819T220836Z_000200_from_coder_to_specifier.handoff`)
+and cannot be recalled. Sending the correct handoff below; the specifier
+will see both, but the correct one to act on is `00` to refactorer with
+priority 50.
+
+Corrected handoff: `50_20260820T000000Z_000XXX_from_coder_to_refactorer`
+pointing at commit `2ef1c30dfb`, task `characterization-tests`.
+
