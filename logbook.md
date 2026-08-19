@@ -38818,3 +38818,19 @@ Verification in the architect worktree:
 
 The characterization-tests task is complete and is being handed to the
 specifier as the required phase-complete synchronization.
+
+## 2026-08-19T20:40:00Z — coder: process specifier breakdown-extension 3b8121f0c2
+
+Merged specifier git_handoff 3b8121f0c2 (`Extend the characterization-test
+breakdown`). Implemented in GameBreakdown:
+
+Generic core (always present): bankruptcies broken down by asset recipient,
+auction count + direct-purchase count, mortgage count, income composition
+(salary/rent/bank payments totals summed across all players).
+
+Loans extra: loan servicing — total interest and principal paid by borrowers, and
+total interest and principal received on the bondholder side.
+
+All 8 baselines regenerated together (generic-core change touches every config).
+Verified: characterization 8/8, domain 394/394, CLI SimulatorTest 12/12,
+acceptance 864/864. Committed 9a3b86e.
