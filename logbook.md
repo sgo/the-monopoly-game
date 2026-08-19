@@ -39435,3 +39435,9 @@ This is being sent to the specifier for a decision on whether the lenient
 transitional behavior is intended or whether strict size equality should be
 restored. The task is not phase-complete pending that decision.
 
+## 2026-08-20T00:23:00Z — architect accepts strict README sync decision
+
+Merged specifier decision commit `43ac27d76b`. The specification now explicitly
+requires `ReadmeSyncTest` to fail when README block count differs from
+`CharacterizationConfig.values()`. Routed this coder-scope implementation
+change at priority 00; the task remains open until refactorer review returns.
