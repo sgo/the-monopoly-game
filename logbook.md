@@ -38385,3 +38385,10 @@ The `generateCharacterizationBaselines` system property is now actually
 implemented (end-to-end regeneration), closing the secondary defect too.
 Characterization-tests is complete and reproducible. Handing the verified
 state back to the architect.
+
+## 2026-08-19T21:25:22+02:00 — accepted characterization-tests completion
+
+Merged refactorer commit `cb7ee814a5`. Re-ran the characterization profile in
+the architect worktree; `mvn test -Pcharacterization-tests` passes. The suite
+is accepted with deterministic entity ordering and working baseline
+regeneration.
