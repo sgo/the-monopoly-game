@@ -38828,6 +38828,87 @@ Verification in the architect worktree:
 
 The characterization-tests task is complete and is being handed to the
 specifier as the required phase-complete synchronization.
+## 2026-08-19T22:12:00+02:00 — specifier receives phase-complete sync for the parallelism/seed-count follow-up; first run under the new verification rule
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: characterization-tests
+
+Re-read your role and constitution.
+
+merge_and_process architect d346b9c2c2
+```
+
+Merged commit `d346b9c` (architect's "accepted characterization-tests
+seed-count follow-up" — the coder/refactorer/architect loop that
+parallelised the seed execution and bumped `SEEDS` to 50, both routed from
+this specifier's two notes above). `logbook.md` conflicted across three
+separate regions this time — my two notes were sent while the architect's
+own routing/coder/refactorer chain was already appending, so the two
+sequences interleaved more than a simple two-block append. Fetched each
+parent's full tail directly via `git show <ref>:logbook.md` rather than
+trying to reconstruct correct content from the tangled markers, to avoid
+guessing at fragments; caught and fixed one self-introduced duplicate (a
+bodyless heading line that was already present in the shared unconflicted
+prefix, which I'd redundantly re-inserted) before committing. Merge
+committed as `c6329c6`.
+
+This is the first phase-complete sync since this specifier's own role
+prompt gained the "run characterization tests after every phase-complete
+sync" rule (commit `0d78234`, added at the user's direction earlier this
+session). Ran `mvn test -Pcharacterization-tests` fresh: BUILD SUCCESS,
+zero ERROR/FAIL lines, real parallelism confirmed (655% CPU, ~15s for the
+full reactor build including all other tests). No investigation needed;
+proceeding per role rules.
+
+## 2026-08-19T22:30:00+02:00 — specifier extends the characterization breakdown schema after an independent cross-check
+
+At the user's request, took the fresh 50-seed logs for
+`eight_billionaire_greedo_loans_asset_rich` (from the run just above) and
+computed an independent breakdown by hand, then diffed it field-by-field
+against the checked-in baseline. Every field the baseline currently tracks
+matched exactly — outcomes, winners, age stats, loan origination
+(borrower/bondholder breakdown down to the exact count), defaults, peer
+trades — a solid independent cross-check on `GameBreakdown`'s own logic.
+One apparent mismatch (entity dissolutions: I got 0, baseline said 3) was a
+bug in my own regex, not the baseline — dissolution narrates as `"X
+liquidates Y and receives $Z"`, not `"is dissolved"`; fixed and it matched.
+
+Computed several dimensions the schema doesn't track at all and discussed
+with the user which were worth adding. All were: bankruptcies (350 in this
+config's 50 games, only the eventual winner is currently visible in the
+breakdown at all), auctions (24, 2.41% of land acquisitions — a core board
+mechanic, not gated behind any flag), mortgages (850, same), loan
+*servicing* (only $1,193 interest + $1,495 principal actually collected
+against $13,860 originated — the existing `development-loans` extra
+tracks origination only, so a regression that broke repayment or interest
+calculation entirely wouldn't move any currently-tracked field), and
+income composition (salary/rent/bank-card totals, lower-stakes but
+requested alongside the rest).
+
+Extended `CHARACTERIZATION-TESTS.md`: bankruptcies/auctions/mortgages/
+income move into generic core (always active, not flag-gated, unlike the
+existing extras); loan servicing extends the existing
+`--optional-development-loans` extra. Flagged the one real implementation
+consequence: since a generic-core field applies to every config, all 8
+baselines need regenerating together the first time these ship — unlike an
+extras-only addition, which only touches the configs using that flag.
+Committed as `3b8121f`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: characterization-tests
+commit: 3b8121f0c2
+```
+
 ## 2026-08-19T20:30:18Z — refactorer received coder priority-00 follow-up (stale seed-count rejection resolution)
 
 Handoff message received:
@@ -38921,6 +39002,104 @@ Structural review of `GameBreakdown` extension (`9a3b86e`) + fresh verification:
 The breakdown extension is structurally sound and regression-detection
 coverage is meaningfully improved (bankruptcies/auctions/mortgages/income/loan
 servicing are now tracked). Handing the verified state back to the architect.
+
+## 2026-08-19T22:43:00Z — accepted characterization breakdown extension
+
+Merged refactorer commit `aa2565d2ba`. Accepted the `GameBreakdown` extension
+after the refactorer's structural review and verification. The characterization
+task is complete with the new generic and loan-servicing breakdown fields, and
+is being synchronized to the specifier at phase completion.
+
+## 2026-08-19T23:00:00+02:00 — specifier receives phase-complete sync for the breakdown-schema extension
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: characterization-tests
+
+Re-read your role and constitution.
+
+merge_and_process architect 643dd53ef2
+```
+
+Merged commit `643dd53` (architect's "accepted characterization breakdown
+extension" — coder added the `core` block: bankruptcies by asset recipient,
+auctions, direct purchases, mortgages, income composition, plus loan
+servicing on the `development-loans` extra, per this specifier's note
+`3b8121f0c2`). `logbook.md` conflicted at a single, cleanly two-block append
+point this time; resolved the same way as always. Merge committed as
+`3d3f063`.
+
+Spot-checked one regenerated baseline (`two_greedo.json`) against what it
+held before this change: every pre-existing field (outcomes, winners,
+ageAtEnd) is byte-identical, only the new `core` block was added — confirms
+determinism held across the regeneration coder had to do for all 8
+baselines together (a generic-core field touches every config).
+
+Ran `mvn test -Pcharacterization-tests` fresh per this specifier's own
+verification rule: BUILD SUCCESS, zero ERROR/FAIL lines. No investigation
+needed.
+
+Separately, still mid-discussion with the user about presenting the
+characterization baselines in `README.md` (two draft options — a headline
+table vs. per-config `<details>` blocks with the full breakdown — both
+currently uncommitted in the working tree, built from the pre-extension
+baseline data). Not yet resolved which to keep; the newly-landed `core`
+fields give Option B (full breakdown) meaningfully more to show now.
+
+## 2026-08-19T23:53:00Z — coder received handoff from specifier
+
+Handoff message received:
+
+```
+id: 20260819T211347Z_000209
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 7f9ab82230
+task: characterization-tests
+
+Re-read your role and constitution.
+```
+
+Specifier's `7f9ab82230` added a `README sync check` section to
+`CHARACTERIZATION-TESTS.md` and finalized `README.md`'s "Simulated game
+characteristics" layout (Summary table + Detailed Breakdown `<details>`
+blocks). Spec asked for a new test in the same `characterization-tests`
+profile that reads `README.md` and every baseline fixture directly and
+checks every factual data point — Summary rows, Detailed bullets,
+loan/entity/peer-trade figures — against the fixture.
+
+Implemented `the-monopoly-game-cli/src/test/java/the/monopoly/game/cli/ReadmeSyncTest.java`:
+- Parses each `<details>` block under "Detailed Breakdown" in README.md.
+- Pairs them by document order against `CharacterizationConfig.values()`.
+- Compares Outcome (with percentages re-derived from outcomes map),
+  Age (Summary column + Detailed form), Bankruptcies/Winners/Borrowers/
+  Bondholders (as multisets of name→count — README uses inconsistent
+  ordering across configs), Auctions (count + 1-decimal % + land
+  acquisitions total), Mortgages, Income (salary/rent/bankPayments,
+  comma-grouped, with `\$`), and — when present — Loans, Servicing,
+  Entities, Peer trades.
+- Failure messages name the config + field + both expected (from fixture)
+  and actual (from README).
+
+Confirmed drift detection: temporarily bumped `two_greedo.json`'s salary
+by 1 → ReadmeSyncTest failed with the exact config/field/expected/actual
+message and pointed at `salary \$324,600` vs `\$324,601`. Restored the
+fixture; test green again.
+
+Verification (`mvn -pl :the-monopoly-game-cli test -P characterization-tests`):
+9 tests, 0 failures (1 new ReadmeSync + 8 Characterization).
+
+Note: `SimulatorTest.keepsPlayingUntilToldToStop` failed during ad-hoc
+runs in this session but is pre-existing flake — fails identically with
+my changes stashed, unrelated to the README sync work. Characterization
+profile (the scope of this handoff) is green.
 
 ## 2026-08-19T21:55:28Z — refactorer received coder readme-sync-check (7d3b17ab48)
 

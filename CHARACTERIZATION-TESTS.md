@@ -142,3 +142,39 @@ how much (e.g. `winner distribution: expected {billionaire: 8}, got
 {billionaire: 7, high hat: 1}`), not just "test failed" — the point is
 telling a developer what changed, pointing them at the matching log
 directory to see why.
+
+## README sync check
+
+`README.md`'s "Simulated game characteristics" section (the `Summary` table
+and the `Detailed Breakdown` `<details>` blocks) presents these same
+baselines for a human reader. It must not be able to silently drift from
+the fixtures it's describing — the same principle `cli-jar-5` already
+applies to keeping the README's `-h` usage text in sync with the real CLI
+output, just against the baseline JSONs instead of the packaged jar.
+
+A test, part of the same `characterization-tests` profile, reads
+`README.md` and every baseline fixture directly (no packaging or CLI
+invocation needed — the ground truth is already on disk) and checks that
+every data point shown for a config matches that config's fixture:
+
+- Summary table row: the outcome percentages and counts, and the age
+  min/median/mean/max.
+- Detailed Breakdown block: everything the Summary row has, plus winners,
+  bankruptcies, auction count and its percentage of total land
+  acquisitions, mortgage count, income composition, and — for the two
+  configs that have them — loan origination/servicing, entity, and
+  peer-trade figures.
+
+Only the factual data points are checked, not the hand-written analytical
+asides (e.g. the `eight_greedo` income-scale comment, the "350 total =
+exactly 7 losers × 50 games" arithmetic notes) — those reflect human
+judgment about what's worth pointing out, not something derived
+mechanically from a fixture, so there's nothing to verify them against.
+Some of the checked figures are themselves derived from the fixture rather
+than copied verbatim (the outcome percentages, the auction-vs-purchase
+ratio) — the test needs to reproduce that derivation, not just search for
+a raw JSON value as a substring.
+
+A failure names the config, the specific figure, and both the value found
+in the README and the value the fixture actually holds — same spirit as
+the baseline comparison's own failure messages.
