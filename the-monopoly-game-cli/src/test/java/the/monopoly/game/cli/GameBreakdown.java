@@ -1,7 +1,5 @@
 package the.monopoly.game.cli;
 
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +7,6 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * The aggregated result of running one characterization config across its seeds.
@@ -18,6 +15,7 @@ record GameBreakdown(
     Map<String, Integer> outcomes,
     Map<String, Integer> winners,
     Stats ageAtEnd,
+    Core core,
     Optional<LoanExtras> loans,
     Optional<EntityExtras> entities,
     Optional<TradeExtras> trades
@@ -35,6 +33,7 @@ record GameBreakdown(
       result.winner().ifPresent(w -> winners.merge(w, 1, Integer::sum));
     }
 
+    Core core = results.stream().map(GameResult::core).reduce(Core::merge).orElse(Core.empty());
     LoanExtras loans = results.stream().map(GameResult::loans).filter(Optional::isPresent).map(Optional::get)
         .reduce(LoanExtras::merge).orElse(null);
     EntityExtras entities = results.stream().map(GameResult::entities).filter(Optional::isPresent).map(Optional::get)
@@ -42,7 +41,7 @@ record GameBreakdown(
     TradeExtras trades = results.stream().map(GameResult::trades).filter(Optional::isPresent).map(Optional::get)
         .reduce(TradeExtras::merge).orElse(null);
 
-    return new GameBreakdown(outcomes, winners, Stats.of(ages),
+    return new GameBreakdown(outcomes, winners, Stats.of(ages), core,
         Optional.ofNullable(loans), Optional.ofNullable(entities), Optional.ofNullable(trades));
   }
 
@@ -51,7 +50,8 @@ record GameBreakdown(
     json.append("{\n");
     json.append("  \"outcomes\": ").append(mapToJson(outcomes)).append(",\n");
     json.append("  \"winners\": ").append(mapToJson(winners)).append(",\n");
-    json.append("  \"ageAtEnd\": ").append(ageAtEnd.toJson());
+    json.append("  \"ageAtEnd\": ").append(ageAtEnd.toJson()).append(",\n");
+    json.append("  \"core\": ").append(core.toJson());
     loans.ifPresent(it -> json.append(",\n  \"loans\": ").append(it.toJson()));
     entities.ifPresent(it -> json.append(",\n  \"entities\": ").append(it.toJson()));
     trades.ifPresent(it -> json.append(",\n  \"trades\": ").append(it.toJson()));
@@ -65,6 +65,7 @@ record GameBreakdown(
         parseStringIntMap(fields.get("outcomes")),
         parseStringIntMap(fields.get("winners")),
         Stats.fromJson(fields.get("ageAtEnd")),
+        Core.fromJson(fields.get("core")),
         Optional.ofNullable(fields.get("loans")).map(LoanExtras::fromJson),
         Optional.ofNullable(fields.get("entities")).map(EntityExtras::fromJson),
         Optional.ofNullable(fields.get("trades")).map(TradeExtras::fromJson));
@@ -104,6 +105,10 @@ record GameBreakdown(
       fields.put(key, value);
     }
     return fields;
+  }
+
+  private static long parseLong(String value) {
+    return Long.parseLong(value.trim());
   }
 
   private static List<String> splitTopLevelEntries(String content) {
@@ -204,8 +209,74 @@ record GameBreakdown(
     }
   }
 
+  /**
+   * Generic core statistics, always present for every config regardless of flags.
+   */
+  record Core(Map<String, Integer> bankruptcies, int auctions, int directPurchases,
+             int mortgages, Income income) {
+
+    static Core empty() {
+      return new Core(new LinkedHashMap<>(), 0, 0, 0, Income.empty());
+    }
+
+    Core merge(Core other) {
+      return new Core(
+          mergeMaps(bankruptcies, other.bankruptcies),
+          auctions + other.auctions,
+          directPurchases + other.directPurchases,
+          mortgages + other.mortgages,
+          income.merge(other.income));
+    }
+
+    String toJson() {
+      return "{\"bankruptcies\": " + mapToJson(bankruptcies)
+          + ", \"auctions\": " + auctions
+          + ", \"directPurchases\": " + directPurchases
+          + ", \"mortgages\": " + mortgages
+          + ", \"income\": " + income.toJson() + "}";
+    }
+
+    static Core fromJson(String json) {
+      Map<String, String> fields = parseObject(json);
+      return new Core(
+          parseStringIntMap(fields.get("bankruptcies")),
+          Integer.parseInt(fields.get("auctions")),
+          Integer.parseInt(fields.get("directPurchases")),
+          Integer.parseInt(fields.get("mortgages")),
+          Income.fromJson(fields.get("income")));
+    }
+  }
+
+  /**
+   * Income composition, summed across all players.
+   */
+  record Income(long salary, long rent, long bankPayments) {
+
+    static Income empty() {
+      return new Income(0, 0, 0);
+    }
+
+    Income merge(Income other) {
+      return new Income(salary + other.salary, rent + other.rent, bankPayments + other.bankPayments);
+    }
+
+    String toJson() {
+      return "{\"salary\": " + salary + ", \"rent\": " + rent + ", \"bankPayments\": " + bankPayments + "}";
+    }
+
+    static Income fromJson(String json) {
+      Map<String, String> fields = parseObject(json);
+      return new Income(
+          parseLong(fields.get("salary")),
+          parseLong(fields.get("rent")),
+          parseLong(fields.get("bankPayments")));
+    }
+  }
+
   record LoanExtras(int loansRaised, int totalDollars, Map<String, Integer> borrowers,
-                    Map<String, Integer> bondholders, int defaults) {
+                    Map<String, Integer> bondholders, int defaults,
+                    long interestPaid, long principalPaid, long bondInterestReceived,
+                    long bondPrincipalReceived) {
 
     LoanExtras merge(LoanExtras other) {
       return new LoanExtras(
@@ -213,13 +284,20 @@ record GameBreakdown(
           totalDollars + other.totalDollars,
           mergeMaps(borrowers, other.borrowers),
           mergeMaps(bondholders, other.bondholders),
-          defaults + other.defaults);
+          defaults + other.defaults,
+          interestPaid + other.interestPaid,
+          principalPaid + other.principalPaid,
+          bondInterestReceived + other.bondInterestReceived,
+          bondPrincipalReceived + other.bondPrincipalReceived);
     }
 
     String toJson() {
       return "{\"loansRaised\": " + loansRaised + ", \"totalDollars\": " + totalDollars
           + ", \"borrowers\": " + mapToJson(borrowers) + ", \"bondholders\": " + mapToJson(bondholders)
-          + ", \"defaults\": " + defaults + "}";
+          + ", \"defaults\": " + defaults
+          + ", \"interestPaid\": " + interestPaid + ", \"principalPaid\": " + principalPaid
+          + ", \"bondInterestReceived\": " + bondInterestReceived
+          + ", \"bondPrincipalReceived\": " + bondPrincipalReceived + "}";
     }
 
     static LoanExtras fromJson(String json) {
@@ -229,7 +307,11 @@ record GameBreakdown(
           Integer.parseInt(fields.get("totalDollars")),
           parseStringIntMap(fields.get("borrowers")),
           parseStringIntMap(fields.get("bondholders")),
-          Integer.parseInt(fields.get("defaults")));
+          Integer.parseInt(fields.get("defaults")),
+          parseLong(fields.get("interestPaid")),
+          parseLong(fields.get("principalPaid")),
+          parseLong(fields.get("bondInterestReceived")),
+          parseLong(fields.get("bondPrincipalReceived")));
     }
   }
 
@@ -271,6 +353,29 @@ record GameBreakdown(
     return merged;
   }
 
+  /** The number of dollars at the start of {@code rest}, i.e. after {@code marker}. */
+  private static long dollarsAfter(String line, String marker) {
+    int start = line.indexOf(marker);
+    if (start < 0) return 0;
+    String rest = line.substring(start + marker.length());
+    int end = 0;
+    while (end < rest.length() && Character.isDigit(rest.charAt(end))) end++;
+    if (end == 0) return 0;
+    return Long.parseLong(rest.substring(0, end));
+  }
+
+  /** The dollar amount appearing just before " rent " in a rent-payment line. */
+  private static long rentIn(String line) {
+    int rent = line.indexOf(" rent ");
+    if (rent < 0) return 0;
+    int dollar = line.lastIndexOf('$', rent);
+    if (dollar < 0) return 0;
+    int end = dollar + 1;
+    while (end < line.length() && Character.isDigit(line.charAt(end))) end++;
+    if (end == dollar + 1) return 0;
+    return Long.parseLong(line.substring(dollar + 1, end));
+  }
+
   /**
    * A single game's parsed report.
    */
@@ -278,6 +383,7 @@ record GameBreakdown(
     private final String outcome;
     private final Optional<String> winner;
     private final OptionalInt finalAge;
+    private final Core core;
     private final Optional<LoanExtras> loans;
     private final Optional<EntityExtras> entities;
     private final Optional<TradeExtras> trades;
@@ -311,14 +417,28 @@ record GameBreakdown(
 
       Map<String, Integer> borrowers = new LinkedHashMap<>();
       Map<String, Integer> bondholders = new LinkedHashMap<>();
+      Map<String, Integer> bankruptcies = new LinkedHashMap<>();
       int loansRaised = 0;
       int totalDollars = 0;
       int defaults = 0;
+      int auctions = 0;
+      int directPurchases = 0;
+      int mortgages = 0;
+      long salary = 0;
+      long rent = 0;
+      long bankPayments = 0;
+      long interestPaid = 0;
+      long principalPaid = 0;
+      long bondInterestReceived = 0;
+      long bondPrincipalReceived = 0;
       int formed = 0;
       int dissolved = 0;
       int peerTrades = 0;
 
       for (String line : lines) {
+        // Loan handling only counts when the config enables development loans,
+        // because a plain land game never emits these lines and counting absent
+        // mechanics would be misleading under a loans extra.
         if (developmentLoans) {
           int raisesAt = line.indexOf(" raises a development loan of $");
           if (raisesAt >= 0) {
@@ -339,6 +459,16 @@ record GameBreakdown(
           if (line.contains(" defaults on the development loan")) {
             defaults++;
           }
+          if (line.contains(" pays the bank $") && line.contains(" interest and $")
+              && line.contains(" principal on the development loan")) {
+            interestPaid += dollarsAfter(line, " pays the bank $");
+            principalPaid += dollarsAfter(line, " interest and $");
+          }
+          if (line.contains(" receives $") && line.contains(" interest and $")
+              && line.contains(" principal on the development loan bond")) {
+            bondInterestReceived += dollarsAfter(line, " receives $");
+            bondPrincipalReceived += dollarsAfter(line, " interest and $");
+          }
         }
         if (legalEntityTrading) {
           if (line.contains(" is formed, held in equal thirds by ")) formed++;
@@ -347,10 +477,29 @@ record GameBreakdown(
         if (stalemateTrading) {
           if (line.contains(" trades ") && line.contains(" to ") && line.contains(" for ")) peerTrades++;
         }
+
+        // Generic core accounting happens unconditionally: these lines are exactly
+        // the mechanics the spec wants visible for every config.
+        int bankruptAt = line.indexOf(" goes bankrupt to ");
+        if (bankruptAt >= 0) {
+          String recipient = line.substring(bankruptAt + " goes bankrupt to ".length());
+          bankruptcies.merge(recipient, 1, Integer::sum);
+        }
+        if (line.contains(" wins the auction for ")) auctions++;
+        if (line.contains(" buys ")) directPurchases++;
+        if (line.contains(" mortgages ")) mortgages++;
+
+        if (line.contains("collects a salary of $")) salary += dollarsAfter(line, "collects a salary of $");
+        if (line.contains(" rent ")) rent += rentIn(line);
+        if (line.contains("receives $") && line.contains(" from the bank"))
+          bankPayments += dollarsAfter(line, "receives $");
       }
 
+      this.core = new Core(bankruptcies, auctions, directPurchases, mortgages,
+          new Income(salary, rent, bankPayments));
       this.loans = developmentLoans
-          ? Optional.of(new LoanExtras(loansRaised, totalDollars, borrowers, bondholders, defaults))
+          ? Optional.of(new LoanExtras(loansRaised, totalDollars, borrowers, bondholders, defaults,
+              interestPaid, principalPaid, bondInterestReceived, bondPrincipalReceived))
           : Optional.empty();
       this.entities = legalEntityTrading
           ? Optional.of(new EntityExtras(formed, dissolved))
@@ -363,6 +512,7 @@ record GameBreakdown(
     String outcome() { return outcome; }
     Optional<String> winner() { return winner; }
     OptionalInt finalAge() { return finalAge; }
+    Core core() { return core; }
     Optional<LoanExtras> loans() { return loans; }
     Optional<EntityExtras> entities() { return entities; }
     Optional<TradeExtras> trades() { return trades; }
