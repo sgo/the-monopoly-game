@@ -39272,3 +39272,32 @@ priority 50.
 
 Corrected handoff: `50_20260820T000000Z_000XXX_from_coder_to_refactorer`
 pointing at commit `2ef1c30dfb`, task `characterization-tests`.
+
+## 2026-08-20T00:16:30Z — refactorer review: config-matrix split verified, one rigor concern flagged
+
+Structural review of the 8→9 config split (`2ef1c30`) + fresh verification:
+
+- Split is correct: configs 7/8 both carried `--optional-development-loans`
+  unconditionally, so neither isolated the flag's own effect from the
+  billionaire opening mode — the specifier's rationale is sound. New config 9
+  (`eight_billionaire_greedo_asset_rich_loans`) re-isolates asset-rich +
+  dev-loans against config 8 (`..._asset_rich`, no loans), mirroring 7/8.
+- Renames/regeneration clean: 9 configs ↔ 9 fixtures ↔ 9 README `<details>`
+  blocks; every baseline regenerated from 50 fresh seeds.
+- Verification: characterization profile 10/10 green (1 ReadmeSync + 9
+  Characterization) across 3 runs; domain 417/417; acceptance BUILD SUCCESS.
+
+CONCERN (routing back for a decision, not a hard reject): `ReadmeSyncTest`
+was relaxed from `assertThat(blocks).hasSize(configs.length)` to
+`int limit = Math.min(blocks.size(), configs.length)`. This removes the
+guarantee that every config has a README `<details>` block — a future config
+added without its README block would now pass silently, which is precisely the
+drift the sync-check exists to catch. In the current state it is moot (9 = 9),
+but the weakening is a latent regression in the test's completeness. The
+specifier's note anticipated a transient trailing-README state, yet the coder
+shipped README fully in sync in the same commit, so `min()` is not strictly
+needed now. Flagging for the architect/specifier to confirm whether the lenient
+`min()` semantics are intended long-term or should revert to the strict
+`hasSize` once README/figures coexist end-to-end.
+
+Handing the verified state back to the architect.
