@@ -39232,6 +39232,15 @@ would silently re-pair config↔fixture), and `formatMean` uses `Double.toString
 trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
+## 2026-08-20T15:50:00Z — architect verifies war-profits-tax observability
+
+Processed refactorer handoff `000182` at `d3d97c484d` and merged it as
+`4ca5b42`. Independent checks: acceptance 898/898; serial Maven domain 411/411
+and CLI 20/20; changed `Game.java` mutation sites 2/2 killed. DRY reported
+only the two existing duplicated Game blocks. Soft acceptance mutation found
+one new CLI survivor: changing expected war-profits-tax state `enabled` to
+`eNabled` still passes. Sent that policy/assertion question to the specifier;
+phase cannot advance until it is resolved.
 
 ## 2026-08-20T15:10:00Z — architect payment/enforcement verification
 
