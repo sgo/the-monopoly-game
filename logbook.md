@@ -39812,5 +39812,19 @@ the 422 over-summed by including property reports).
 
 Committing the `SimulatorFlags` extraction, the property test, and this audit.
 
+## 2026-08-20T10:42:00Z — refactorer: note on `SimulatorTest.keepsPlayingUntilToldToStop`
+
+During final verification the pre-existing flaky timing test
+`SimulatorTest.keepsPlayingUntilToldToStop` (SimulatorTest.java:146) failed
+consistently in this environment: it sleeps 1000 ms then asserts `isPlaying()`
+is true, and the unseeded 8-player game now reliably finishes within that
+window (so the game legitimately completes before the assertion). Confirmed
+pre-existing and unrelated to the `SimulatorFlags` extraction: reproduced the
+same failure at the merge commit `8242bb6` (before the refactor), and
+`Simulator.start(8, ...)` does not even route through the flag parser. The
+other 11 `SimulatorTest` methods pass (11/11). This is the test already
+flagged flaky in earlier reviews, not a regression from this work; left
+untouched (a `Thread.sleep` race, and adjusting it is out of scope).
+
 Handing the verified state back to the architect.
 
