@@ -40728,3 +40728,5 @@ acceptance 883/883, WarProfitsTaxBook mutation 1/1 killed, and all changed
 Journalling payment branches killed. Remaining Journalling survivors are
 pre-existing unrelated branches. Regenerated mutation manifests are included
 in this commit; phase-complete handoff follows to the specifier.
+Sent phase-complete git handoff `50_20260820T130818Z_000341` to the specifier
+at commit `b2e386eecb`.
