@@ -41308,3 +41308,25 @@ Verification:
 - Characterization profile: 12/12 pass.
 - Full domain suite: 412/412 pass.
 - Acceptance pipeline: 901/901 pass.
+
+## 2026-08-20T15:10:00Z — refactorer processes coder handoff `a63f146689` (survivors at first tax)
+
+Merged the war-profits-tax survivor-tracking characterization baseline. This
+is test-side harness only (no production source changed):
+`GameBreakdown.WarProfitsTaxExtras` now also tracks the number of solvent
+players at the moment the Billionaire pays their first war tax, aggregated
+into `survivorsAtFirstTax` Stats across seeds; `CharacterizationTest` verifies
+the counting (only at the Billionaire's first tax, empty when no Billionaire);
+`CharacterizationConfig`/README sync updated; config-10 50-seed fixture gains
+`survivorsAtFirstTax` {min 2, median 4, mean 3.96, max 7} (48 of 50 seeds).
+
+The merge's large `Journalling.java` diff was pure `mutate4java-manifest`
+reflow (module/scope hashes recomputed); no code change there.
+
+Refactorer verification (all green):
+- Characterization 13/13 (+1 survivor-tracking test).
+- Domain 412/412; CLI 19/19 excluding the documented pre-existing
+  `keepsPlayingUntilToldToStop` timing flake; acceptance 901/901.
+- No production source changed → no new mutation sites or CRAP breach.
+
+Handing the verified state back to the architect.
