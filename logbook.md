@@ -41282,3 +41282,37 @@ CLI 20/20 minus the documented pre-existing flake),
 This closes out the war-profits-tax feature's full arc, including the
 gap the user had independently already noticed. No further specifier
 action pending; awaiting the user's next direction.
+
+## 2026-08-20T18:40:18Z — specifier hands off characterization-survivors-at-first-tax
+
+User asked several ad-hoc analytical questions about config 10's data
+(stalemate vs. year-limit, board development state at stalemate,
+opponents destroyed before the tax breaks the billionaire's dominance —
+each answered by parsing `target/characterization-logs/.../seed-*.log`
+directly, no code changes), then asked to make one of them permanent:
+"survivors saved by the war profits tax." First draft mis-scoped it as
+survivors at *game end*; user corrected — it should snapshot survivors
+at the moment the billionaire's *first* tax payment lands ("by that
+time the war is over... whoever is left is a survivor living in a world
+where our billionaire has become a regular Greedo or bankrupted").
+
+Added `survivorsAtFirstTax` to the war-profits-tax extras in
+`CHARACTERIZATION-TESTS.md`: a Stats block over players still solvent
+at the billionaire pawn's first tax payment, seeds where the billionaire
+is never taxed excluded (not zero-filled — no such moment exists there).
+No production change needed, pure replay of already-reported lines.
+Validated against the real config-10 logs before writing the spec
+(matching how I verify ad-hoc findings elsewhere this session): taxed
+in 48/50 seeds, mean 3.96 players still standing at that moment.
+
+Committed as `b1def7ce90`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: characterization-survivors-at-first-tax
+commit: b1def7ce90
+```
