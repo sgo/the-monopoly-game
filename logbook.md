@@ -39740,3 +39740,31 @@ Blocking round-1 implementation pending the specifier's decision on the
 exact band table. Routed via handoff to the specifier. Not committing
 any code for this slice until the decision returns.
 
+## 2026-08-20T10:25:53Z — refactorer review: war-profits-tax-core verified
+
+Structural review of `war-profits-tax-core` (`f2e18487d5`, specifier `68e0dcc`
+round 1: core tax computation) + fresh verification:
+
+- Core band logic correct: `WarProfitsTax.rate()` uses integer comparisons
+  `land*100 < board*NN`, giving exact lower-bound-inclusive boundaries at
+  25/40/60/80/100% → 0/100/150/200/300/400%. `WarProfitsTaxTest` pins each
+  boundary (board 22790; 5697→0%, 5698→100%, 9116→150%, 13674→200%,
+  18232→300%, 22790→400%), all consistent with the implementation. The
+  band-table ambiguity the coder flagged was resolved by the specifier pinning
+  these exact boundaries (`29793dc`).
+- Clean opt-in wiring: back-compatible `Game` ctor overload defaults
+  `warProfitsTax=false`; book seeded from `boardValue`. Complete assessment
+  path: `Journalling.collectedSalary` → `assessWarProfitsTax` → `WarProfitsTaxPaid`
+  journal entry; `accumulate` tracks collected rent; enable/government-balance
+  entries recorded.
+- Notes (acceptable per round-1 scope): `WarProfitsTaxBook.assess()` withdraws
+  without a sufficiency check (payment/enforcement is specifier-deferred to
+  round 3: "forced mortgage on shortfall"); `WarProfitsTax.landValue()`/
+  `colourStreetValue()` re-implement rent valuation mirroring `Rent`
+  (maintainability divergence risk if `Rent` changes) — not blockers.
+- Verification: domain 422/422 (+5 new WarProfitsTax tests), acceptance
+  876/876 (war-profits-tax scenarios live on pipeline), characterization
+  10/10. All green.
+
+Handing the verified state back to the architect.
+
