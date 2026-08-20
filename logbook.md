@@ -40286,3 +40286,25 @@ priority: 50
 task: war-profits-tax-ownership-share
 commit: b5f607a52b
 ```
+
+## 2026-08-20T14:05:00Z — coder completes war-profits-tax round 2
+
+Processed newer specifier handoff `e6224758bc`, which corrected the
+bankruptcy-inheritance fixture: the rent trigger now exceeds all mortgageable
+collateral and Dog's pre-existing ownership is represented by real developed
+land. The acceptance harness preserves the existing strategy behavior outside
+war-profits-tax scenarios while retaining `Greedo` metadata in tax scenarios so
+existing inherited-mortgage settlement lifts the transferred mortgages.
+Updated packaged CLI acceptance paths from the stale `0.5.0` artifact name to
+the current `0.6.0` artifact name.
+
+Verification:
+
+- Focused WarProfitsTaxTest: 7/7 pass.
+- Domain suite: 401/401 pass.
+- Round-2 war-profits-tax acceptance: 17/17 pass.
+- Full acceptance pipeline: 881/881 pass.
+- One isolated CLI year-limit acceptance failure was intermittent; the focused
+  class passed on rerun and the final full acceptance run passed.
+
+The corrected ownership-share slice is complete and ready for refactorer review.

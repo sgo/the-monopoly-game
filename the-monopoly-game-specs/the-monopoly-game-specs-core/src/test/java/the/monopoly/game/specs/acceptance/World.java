@@ -581,15 +581,60 @@ public class World {
 
   public void pawnWillClaimRent(String pawnName) {
     Strategy strategy = pawnStrategies.getOrDefault(pawnName, Strategy.UNDECIDED);
-    pawnStrategies.put(pawnName, new Strategy() {
+    final Strategy baseStrategy = strategy == Strategy.UNDECIDED
+        ? new the.monopoly.game.strategies.Greedo() : strategy;
+    if (warProfitsTaxEnabled && baseStrategy instanceof the.monopoly.game.strategies.Greedo greedo) {
+      pawnStrategies.put(pawnName, new the.monopoly.game.strategies.Greedo(
+          greedo.cashReserve(), greedo.stalemateTradingEnabled(), greedo.legalEntityTradingEnabled(),
+          greedo.developmentLoansEnabled(), greedo.fullDrawDevelopmentLoans()) {
+        @Override
+        public boolean claims(RentClaim claim) {
+          return true;
+        }
+      });
+      return;
+    }
+    pawnStrategies.put(pawnName, rentClaimingStrategy(baseStrategy));
+  }
+
+  private Strategy rentClaimingStrategy(Strategy baseStrategy) {
+    if (warProfitsTaxEnabled) {
+      return new Greedo() {
+        @Override
+        public boolean accepts(Offer offer) {
+          return baseStrategy.accepts(offer);
+        }
+
+        @Override
+        public Money bidFor(Offer offer) {
+          return baseStrategy.bidFor(offer);
+        }
+
+        @Override
+        public boolean claims(RentClaim claim) {
+          return true;
+        }
+
+        @Override
+        public boolean builds(BuildOffer offer) {
+          return baseStrategy.builds(offer);
+        }
+
+        @Override
+        public boolean pays(JailFine fine) {
+          return baseStrategy.pays(fine);
+        }
+      };
+    }
+    return new Strategy() {
       @Override
       public boolean accepts(Offer offer) {
-        return strategy.accepts(offer);
+        return baseStrategy.accepts(offer);
       }
 
       @Override
       public Money bidFor(Offer offer) {
-        return strategy.bidFor(offer);
+        return baseStrategy.bidFor(offer);
       }
 
       @Override
@@ -599,14 +644,14 @@ public class World {
 
       @Override
       public boolean builds(BuildOffer offer) {
-        return strategy.builds(offer);
+        return baseStrategy.builds(offer);
       }
 
       @Override
       public boolean pays(JailFine fine) {
-        return strategy.pays(fine);
+        return baseStrategy.pays(fine);
       }
-    });
+    };
   }
 
   /**
@@ -1602,7 +1647,7 @@ public class World {
   public void runPackagedCli(String flag) {
     Path root = PomInspector.repoRoot("the-monopoly-game-cli");
     Path jar = root.resolve("the-monopoly-game-cli").resolve("target")
-        .resolve("the-monopoly-game-cli-0.5.0-SNAPSHOT.jar");
+        .resolve("the-monopoly-game-cli-0.6.0-SNAPSHOT.jar");
     ProcessBuilder builder = new ProcessBuilder("java", "-jar", jar.toString(), flag);
     try {
       packagedCliProcess = builder.redirectErrorStream(true).start();
@@ -1617,7 +1662,7 @@ public class World {
   public void startPackagedCli(String rawArguments) {
     Path root = PomInspector.repoRoot("the-monopoly-game-cli");
     Path jar = root.resolve("the-monopoly-game-cli").resolve("target")
-        .resolve("the-monopoly-game-cli-0.5.0-SNAPSHOT.jar");
+        .resolve("the-monopoly-game-cli-0.6.0-SNAPSHOT.jar");
     try {
       packagedCliOutputBuffer = new StringBuilder();
       packagedCliProcess = new ProcessBuilder(
