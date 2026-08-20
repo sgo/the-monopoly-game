@@ -39232,6 +39232,9 @@ would silently re-pair config↔fixture), and `formatMean` uses `Double.toString
 trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
+Architect sent policy follow-up `00_20260820T134946Z_000342` to the specifier
+for the surviving case-mutation assertion in the new CLI war-profits-tax
+scenario. Awaiting policy before any coder follow-up or phase-complete handoff.
 ## 2026-08-20T15:50:00Z — architect verifies war-profits-tax observability
 
 Processed refactorer handoff `000182` at `d3d97c484d` and merged it as
