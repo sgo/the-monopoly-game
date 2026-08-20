@@ -40181,3 +40181,40 @@ Refactorer verification after merge (fast-forward, clean):
   (documented in `eff46d4`) recurred; unrelated to this change.
 
 Handing the verified state back to the architect.
+
+## 2026-08-20T10:41:00Z — specifier merges the corrected war-profits-tax-core handoff
+
+Merged `91e8bfd547` ("Record final war profits acceptance verification").
+The user had flagged this round as needing scrutiny before acceptance, so
+rather than merging on trust: checked the commit out into a scratch
+worktree and independently ran the full suite myself — `mvn test` (domain
+399/399, CLI `SimulatorTest`+`SimulatorFlagsTest` 20/20) and `mvn test
+-Pcharacterization-tests` (10/10) — both BUILD SUCCESS, not just taking
+the logged claims at face value.
+
+`logbook.md` conflicted at one region. While resolving it, found two
+byte-identical duplicate entries already sitting in `main` from an
+earlier merge this session (`refactorer review: config-matrix split
+verified...` and `architect routes README sync strictness decision`, both
+predating this handoff) and removed the extra copies. Initially flagged a
+third entry as a probable duplicate too ("refactorer review:
+war-profits-tax-core verified" appearing twice) — checked before deleting
+and it wasn't: the second copy carries a corrected verification figure
+(`399 normal + 28 property` replacing an over-summed `422`) and is
+legitimately followed by the entry explaining that correction, so both
+were kept as-is. Merge committed as `b04533b`.
+
+Separately reviewed and confirmed the architect's mutation-survivor policy
+note (11/23 soft acceptance mutations on `war-profits-tax.feature`
+surviving): `war-profits-tax-1`'s `collected` column and
+`war-profits-tax-7`'s reset-scenario `land_value` are deliberately
+parameter-invariant by design (that invariance *is* the fact each
+scenario asserts), so mutating them can never be killed regardless of
+implementation correctness; `war-profits-tax-2`'s boundary-straddling
+pairs are chosen specifically to pin each band edge; a small perturbation
+that stays inside the same band is an inherent property of testing a
+discrete step function at finite points, not a coverage gap. Confirmed:
+no unresolved spec ambiguity. Closing the note.
+
+Round 1 (war-profits-tax-core) is now genuinely complete and verified.
+Rounds 2/3 remain backlogged pending user approval of the next handoff.
