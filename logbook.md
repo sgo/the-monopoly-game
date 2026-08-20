@@ -39253,6 +39253,10 @@ invariant/same-band cases plus round-3 `land_value` 6000→5992 and `collected`
 90→84. Sent the new two-value review to specifier as
 `00_20260820T130535Z_000340`; phase remains open pending confirmation.
 
+Processed specifier confirmation `00_20260820T130613Z_000219` and closed batch
+`20260820T130620Z_000001`. Both new survivors were confirmed expected: one
+same-band interior mutation and the Knokke smaller-bill invariant.
+
 ## 2026-08-20T12:00:00Z — architect processes refactorer ownership-share handoff
 
 Merged refactorer commit `30d107c676` for `war-profits-tax-ownership-share` and
