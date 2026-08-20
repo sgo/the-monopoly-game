@@ -39233,6 +39233,17 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-20T12:45:00Z — architect final verification and corrected handoff preparation
+
+Completed the constitution-required final verification for `war-profits-tax-core`:
+
+- Java mutation was rerun with the worker-relative Maven POM: `SimulatorFlags` 9/9 killed, `Simulator` 91/91 killed, `WarProfitsTax` 20/20 killed, `Game` 106/106 killed, `Journalling` 23/23 killed, and `Report` 5/5 killed; no survivors or uncovered sites. The earlier absolute-POM survivor report was invalid because it tested the original checkout rather than the mutation worker.
+- `dry4java` reported only established overload/delegation and event-entry families; no new duplication attributable to this change.
+- Full soft acceptance mutation completed without runner errors. The new `war-profits-tax.feature` had 23 mutations: 12 killed and 11 survived. The survivors are the intentional no-tax collected-rent variants below 25% and value changes that remain inside the same tax band; they do not expose an unresolved policy ambiguity. The feature explicitly states the no-tax invariant and pins every band boundary. Other features completed as reported by the runner; packaged CLI mutations were 14/14 killed.
+- A targeted replay initially used an incorrect worker path and temporarily corrupted only the ignored temporary CLI Maven artifact. Rebuilt and reinstalled the artifact into `tmp/m2`; no tracked production or specification content was changed by that replay.
+
+The previous phase-complete specifier handoff `20260820T082928Z_000324` remains superseded. A corrected current-HEAD handoff will be sent only after this entry is committed and the final normal test/property checks complete.
+
 ## 2026-08-20T11:15:00Z — architect mutation verification completed
 
 After correcting the mutation runner command to use the worker-relative
