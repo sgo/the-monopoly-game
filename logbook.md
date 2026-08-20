@@ -40796,3 +40796,39 @@ acceptance 883/883, WarProfitsTaxBook mutation 1/1 killed, and all changed
 Journalling payment branches killed. Remaining Journalling survivors are
 pre-existing unrelated branches. Regenerated mutation manifests are included
 in this commit; phase-complete handoff follows to the specifier.
+
+## 2026-08-20T13:08:18Z — specifier merges the war-profits-tax feature to completion
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: war-profits-tax-payment
+
+Re-read your role and constitution.
+
+merge_and_process architect b2e386eecb
+```
+
+Merged `b2e386e` (architect's closed payment-phase verification, on top
+of a genuine production change this round: `WarProfitsTaxBook.assess`
+gained a `raiseShortfall` callback, `Journalling` wires it to mortgage
+unencumbered owned land in board order — closing the round-1-noted gap
+where `assess()` withdrew without a sufficiency check). `logbook.md`
+conflicted at one clean two-block append point; resolved the usual way,
+including two missing-blank-line formatting fixes. Merge committed as
+`df2958b`.
+
+Verified fresh with a full `clean` rebuild: `mvn test` (domain 410/410,
+CLI 20/20 minus the documented pre-existing flake),
+`mvn test -Pcharacterization-tests` (10/10), and
+`acceptance/run-acceptance.sh` (883/883, `EnRulesWarProfitsTaxAcceptanceTest`
+now 19/19 — all three rounds). All green.
+
+The war-profits-tax domain feature is complete: all 10 scenarios tracked,
+implemented, Java- and acceptance-mutation-clean, every suite green.
+Observability (journal/logging/report) and CLI wiring remain backlogged
+as the only pieces not yet specified for this feature. Per role rules,
+no new coder handoff until the user approves one.
