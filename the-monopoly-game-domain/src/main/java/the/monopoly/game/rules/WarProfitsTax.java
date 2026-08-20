@@ -1,6 +1,11 @@
 package the.monopoly.game.rules;
 
 import the.monopoly.game.components.finance.Money;
+import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
+import the.monopoly.game.components.streets.Ownable;
+import the.monopoly.game.components.streets.Station;
+import the.monopoly.game.components.streets.Utility;
 
 /**
  * The core war-profits-tax computation: which tax rate a player's current
@@ -58,5 +63,51 @@ public final class WarProfitsTax {
    */
   public static Money tax(Money boardValue, Money landValue, Money collected) {
     return collected.percentage(rate(boardValue, landValue));
+  }
+
+  /**
+   * The current rent value of a player's land, the numerator of their
+   * ownership share. Mirrors {@link Rent}'s valuation: vacant rent for an
+   * undeveloped street (doubled when the player holds the whole colour
+   * group), the matching house-tier rent as houses go up, hotel rent once
+   * complete, and the owned-count rent for stations. Mortgaged land and
+   * entity-owned land contribute nothing — only the player's own, unencumbered
+   * holdings count.
+   */
+  public static Money landValue(Rule.Set rules, Deeds deeds, Player player) {
+    Money total = Money.ZERO;
+    for (the.monopoly.game.components.streets.Street street : rules.streets().toList()) {
+      if (!(street instanceof Ownable land)) continue;
+      if (deeds.ownerOf(land.type()).filter(player.id()::equals).isEmpty()) continue;
+      if (deeds.isMortgaged(land)) continue;
+      total = total.plus(switch (land) {
+        case ColourStreet colour -> colourStreetValue(rules, deeds, player, colour);
+        case Station ignored -> stationValue(rules, deeds, player);
+        case Utility ignored -> Money.ZERO;
+        default -> Money.ZERO;
+      });
+    }
+    return total;
+  }
+
+  private static Money colourStreetValue(Rule.Set rules, Deeds deeds, Player player, ColourStreet street) {
+    if (deeds.hasHotelOn(street)) return street.rentForOneHotel();
+    int houses = deeds.housesBuiltOn(street);
+    if (houses > 0) return street.rentForHouses(houses);
+    boolean monopoly = rules.streets()
+        .filter(ColourStreet.class::isInstance)
+        .map(ColourStreet.class::cast)
+        .filter(it -> it.colourGroup() == street.colourGroup())
+        .allMatch(it -> deeds.ownerOf(it.type()).filter(player.id()::equals).isPresent() && !deeds.isMortgaged(it));
+    return monopoly ? street.vacantRent().plus(street.vacantRent()) : street.vacantRent();
+  }
+
+  private static Money stationValue(Rule.Set rules, Deeds deeds, Player player) {
+    int owned = (int) rules.streets().filter(Station.class::isInstance)
+        .filter(it -> deeds.ownerOf(it.type()).filter(player.id()::equals).isPresent()).count();
+    return rules.streets().filter(Station.class::isInstance).findFirst()
+        .map(Station.class::cast)
+        .map(station -> station.rentForOwning(owned))
+        .orElse(Money.ZERO);
   }
 }

@@ -24,6 +24,8 @@ import the.monopoly.game.rules.Rent;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Stalemate;
 import the.monopoly.game.rules.Taxes;
+import the.monopoly.game.rules.WarProfitsTax;
+import the.monopoly.game.rules.WarProfitsTaxBook;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
 import the.monopoly.game.strategies.Greedo;
@@ -62,6 +64,8 @@ public class Game {
   private final boolean developmentLoans;
   private final boolean fullDrawDevelopmentLoans;
   private final DevelopmentLoanBook developmentLoanBook;
+  private final boolean warProfitsTax;
+  private final WarProfitsTaxBook warProfitsTaxBook;
   private final int maxYears;
   private boolean automaticMarketDeadlock = true;
   private boolean roundHadConsolidatingAction;
@@ -125,6 +129,16 @@ public class Game {
       boolean developmentLoans, boolean fullDrawDevelopmentLoans, int maxYears,
       DevelopmentLoanBook developmentLoanBook
   ) {
+    this(rules, players, cups, strategies, deeds, decks, jail, stalemateTrading, legalEntityTrading,
+        developmentLoans, fullDrawDevelopmentLoans, maxYears, developmentLoanBook, false);
+  }
+
+  public Game(
+      Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
+      Cards.Decks decks, Jail jail, boolean stalemateTrading, boolean legalEntityTrading,
+      boolean developmentLoans, boolean fullDrawDevelopmentLoans, int maxYears,
+      DevelopmentLoanBook developmentLoanBook, boolean warProfitsTax
+  ) {
     this.rules = rules;
     this.players = players;
     this.cups = cups;
@@ -137,6 +151,8 @@ public class Game {
     this.developmentLoans = developmentLoans;
     this.fullDrawDevelopmentLoans = fullDrawDevelopmentLoans;
     this.developmentLoanBook = developmentLoanBook == null ? new DevelopmentLoanBook(rules.bank()) : developmentLoanBook;
+    this.warProfitsTax = warProfitsTax;
+    this.warProfitsTaxBook = new WarProfitsTaxBook(rules.bank(), WarProfitsTax.boardValue(rules));
     this.maxYears = maxYears;
     applyOpeningCapital();
     applyAssetRichOpening();
@@ -218,11 +234,12 @@ public class Game {
     var journal = new Journal();
     Map<Player.ID, Integer> ages = new HashMap<>();
     Journalling journalling = new Journalling(journal, ages, deeds, developmentLoanBook,
-        rules, players, strategies);
+        rules, players, strategies, warProfitsTaxBook, warProfitsTax);
     journal.log(new Journal.Entry.Start(ids(players)));
     deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
     journalling.developmentLoans(developmentLoans, fullDrawDevelopmentLoans);
+    if (warProfitsTax) journal.log(new Journal.Entry.WarProfitsTaxEnabled(true));
     players.forEach(player -> journalling.strategyNamed(player, strategies.forPlayer(player)));
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
@@ -309,6 +326,7 @@ public class Game {
       journal.log(new Journal.Entry.FinalBalance(it.id(), it.account().balance().amount()));
       journal.log(new Journal.Entry.FinalAge(it.id(), journalling.age(it)));
     });
+    if (warProfitsTax) journal.log(new Journal.Entry.GovernmentBalance(warProfitsTaxBook.governmentBalance()));
   }
 
   private boolean operateLegalEntities(Journalling journalling) {
@@ -777,6 +795,15 @@ public class Game {
       }
 
       record YearLimitReached() implements Entry {
+      }
+
+      record WarProfitsTaxEnabled(boolean enabled) implements Entry {
+      }
+
+      record WarProfitsTaxPaid(Player.ID payer, Money amount) implements Entry {
+      }
+
+      record GovernmentBalance(Money amount) implements Entry {
       }
 
       record FinalBalance(Player.ID player, Money balance) implements Entry {
