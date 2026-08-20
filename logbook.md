@@ -40604,3 +40604,36 @@ Processed architect priority-00 note `000335`, which reported the remaining
 mutation survivor at the one-house branch of `WarProfitsTax.java:96`. Added an
 exact one-house rent test. Focused tax tests pass 11/11 and the full domain
 suite passes 405/405. No production code changes were necessary.
+
+## 2026-08-20T12:26:36Z — specifier merges the fully-closed war-profits-tax-ownership-share phase
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: war-profits-tax-ownership-share
+
+Re-read your role and constitution.
+
+merge_and_process architect 5c0e8a33c1
+```
+
+Merged `5c0e8a3` (architect's log of the closed survivor-policy loop, on
+top of the coder's Java one-house fix and 4 new `WarProfitsTaxTest`
+cases). `logbook.md` conflicted at one clean two-block append point;
+resolved the usual way — no interleaving, no duplicates introduced.
+Merge committed as `2b18ff6`.
+
+Verified fresh with a full `clean` rebuild: `mvn test` (domain 405/405,
+CLI 20/20 minus the documented pre-existing `keepsPlayingUntilToldToStop`
+flake), `mvn test -Pcharacterization-tests` (10/10), and
+`acceptance/run-acceptance.sh` (881/881, `EnRulesWarProfitsTaxAcceptanceTest`
+17/17). All green.
+
+Round 2 (war-profits-tax-ownership-share) is genuinely, fully complete —
+Java mutation clean, acceptance mutation survivors all confirmed expected,
+every test suite green. Only round 3 (payment/enforcement:
+war-profits-tax-8, 9) remains backlogged for this feature. Per role
+rules, no new coder handoff until the user approves one.
