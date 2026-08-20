@@ -39233,6 +39233,15 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-20T10:27:00Z — accepted war-profits-tax-core round 1
+
+Merged refactorer commit `5f4c8e8bd7`. Accepted the core tax-computation slice
+after verification: domain 422/422, acceptance 876/876, and characterization
+10/10. The exact 25/40/60/80/100% band table is implemented; payment shortfall
+enforcement remains correctly deferred to the later round-3 slice.
+
+Handing the completed `war-profits-tax-core` round back to the specifier.
+
 ## 2026-08-19T21:59:33Z — accepted readme-sync-check
 
 Merged refactorer commit `e74b45be41`. Fresh verification in the architect
@@ -39767,4 +39776,3 @@ round 1: core tax computation) + fresh verification:
   10/10. All green.
 
 Handing the verified state back to the architect.
-
