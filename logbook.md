@@ -39787,3 +39787,15 @@ length in the logbook (Aug 19–20) and in `sent/`. Re-ran
 `ReadmeSyncTest` under the `characterization-tests` profile to confirm no
 drift: 1/1 pass. No coder-owned changes are needed; marking the stale
 in-process handoff complete.
+
+## 2026-08-20T08:42:00Z — coder verifies architect strict-README-sync handoff
+
+The architect priority-00 follow-up (`ddc1924a91`, task
+`characterization-tests`, "Record strict README sync decision") is already an
+ancestor of HEAD. The routed coder change it references — strict `hasSize`
+equality of README detail-block count against
+`CharacterizationConfig.values().length` — is present at
+`ReadmeSyncTest.java:39`, and the refactorer review already returned
+("strict README sync fix verified"). Re-ran `ReadmeSyncTest`: 1/1 pass. No
+further coder-owned changes needed; handing the verified state back to the
+architect per the architect-originated priority-00 rule.
