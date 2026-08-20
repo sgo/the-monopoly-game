@@ -84,6 +84,8 @@ class ReadmeSyncTest {
     assertField(block, "War-profits tax", tax.payments() + " payments, \\$" + dollars(tax.totalDollars()) + " total", configLabel);
     assertNameMultiset(block, "Tax payers", tax.payers(), configLabel);
     assertField(block, "Government balance", detailedAgeFromBaseline(tax.governmentBalance()), configLabel);
+    tax.survivorsAtFirstTax().ifPresent(stats ->
+        assertField(block, "Survivors at first tax", detailedAgeFromBaseline(stats), configLabel));
   }
 
   private void validateLoans(String block, GameBreakdown.LoanExtras loans, String configLabel) {

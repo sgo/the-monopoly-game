@@ -41156,6 +41156,43 @@ correcting the doc, since the underlying question — should an ordinary
 win also report a final government balance? — is a product decision,
 not just a docs fix.
 
+## 2026-08-20T17:36:20Z — specifier hands off war-profits-tax-ordinary-win-balance
+
+User confirmed: yes, ordinary wins should log the final government
+balance too (had already noticed this and was planning to ask for it
+independently). Added journal-89/logging-89/report-89, each pinning the
+same setup: dog pays war-profits tax, then high hat (given only $5)
+lands on a tax space it can't cover and goes bankrupt to the bank,
+leaving dog the winner in a 2-player game — reusing the existing
+journal-22-style "force an ordinary win" pattern. The journal/log/report
+must still show the government's final balance even though the game
+ended via `Won`, not `Stalemate`/`YearLimitReached`.
+
+This is a production fix (`Journalling.won()` needs to log
+`GovernmentBalance` too, mirroring `Game.logGameEnd`), not just spec/
+harness wiring — flagged that explicitly in the commit message, along
+with the follow-on consequence: once it lands, config 10's
+characterization baseline needs regenerating, since `governmentBalance`
+will then genuinely cover all 50 seeds instead of only the 13 that
+happened to end in stalemate.
+
+Ran `bb gherkin-parser` + `bb gherkin-ir-dry-checker` against all three
+modified files: no new `duplicate-in-scenario` or `placeholder-variant`
+findings tied to the new scenarios, only the same near-duplicate
+token-overlap noise every large file in this pair produces.
+
+Committed as `5eca564519`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: war-profits-tax-ordinary-win-balance
+commit: 5eca564519
+```
+
 ## 2026-08-20T19:50:00Z — coder processes war-profits-tax-ordinary-win-balance
 
 Complete handoff received:
@@ -41207,5 +41244,91 @@ Refactorer verification (all green):
   this merge and outside the war-profits scope (same entity-loan machinery
   flagged in the round-4 CRAP audit).
 - Mutation sites: Journalling 24 (unchanged), no new sites introduced.
+
+Handing the verified state back to the architect.
+
+## 2026-08-20T17:46:21Z — specifier merges war-profits-tax-ordinary-win-balance
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: war-profits-tax-ordinary-win-balance
+
+Re-read your role and constitution.
+
+merge_and_process architect e96211d154
+```
+
+Merged `e96211d`: the fix is exactly the one line expected —
+`Journalling.won()` now also logs `GovernmentBalance` when war-profits-tax
+is enabled, mirroring `Game.logGameEnd`. `logbook.md` conflicted at one
+clean two-block append point; resolved the usual way. Merge committed as
+`47f8cab`.
+
+Confirmed the config-10 baseline was regenerated as flagged: `governmentBalance`
+now reads min 0 / max 10956 / mean 5509.12 / median 5335 across all 50
+seeds — min 0 replacing the impossible-under-the-old-mechanism min 3002,
+and the higher max/mean reflecting ordinary-win seeds where dog paid tax
+repeatedly before eventually winning, now finally counted. This is exactly
+what my original `CHARACTERIZATION-TESTS.md` wording described — it's now
+actually true of the mechanism, not just the outcome.
+
+Verified fresh with a full `clean` rebuild: `mvn test` (domain 412/412,
+CLI 20/20 minus the documented pre-existing flake),
+`mvn test -Pcharacterization-tests` (12/12), and
+`acceptance/run-acceptance.sh` (901/901). All green.
+
+This closes out the war-profits-tax feature's full arc, including the
+gap the user had independently already noticed. No further specifier
+action pending; awaiting the user's next direction.
+
+## 2026-08-20T20:25:00Z — coder processes characterization-survivors-at-first-tax
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+merge_and_process specifier b1def7ce90
+```
+
+Added the optional `survivorsAtFirstTax` Stats block to the war-profits-tax
+characterization extras. The parser identifies the `Billionaire` pawn from
+the strategy lines, replays startup players and bankruptcy debtors in report
+order, and captures the number of solvent players at that pawn's first tax
+payment. Games without a billionaire or without a billionaire tax event omit
+the field. Added focused tests for both the metric and omission behavior,
+README synchronization, and regenerated config 10's baseline.
+
+Config-10 survivor Stats: min 2, median 4, mean
+3.9583333333333335, max 7 (48 of 50 seeds included).
+
+Verification:
+
+- Characterization profile: 12/12 pass.
+- Full domain suite: 412/412 pass.
+- Acceptance pipeline: 901/901 pass.
+
+## 2026-08-20T15:10:00Z — refactorer processes coder handoff `a63f146689` (survivors at first tax)
+
+Merged the war-profits-tax survivor-tracking characterization baseline. This
+is test-side harness only (no production source changed):
+`GameBreakdown.WarProfitsTaxExtras` now also tracks the number of solvent
+players at the moment the Billionaire pays their first war tax, aggregated
+into `survivorsAtFirstTax` Stats across seeds; `CharacterizationTest` verifies
+the counting (only at the Billionaire's first tax, empty when no Billionaire);
+`CharacterizationConfig`/README sync updated; config-10 50-seed fixture gains
+`survivorsAtFirstTax` {min 2, median 4, mean 3.96, max 7} (48 of 50 seeds).
+
+The merge's large `Journalling.java` diff was pure `mutate4java-manifest`
+reflow (module/scope hashes recomputed); no code change there.
+
+Refactorer verification (all green):
+- Characterization 13/13 (+1 survivor-tracking test).
+- Domain 412/412; CLI 19/19 excluding the documented pre-existing
+  `keepsPlayingUntilToldToStop` timing flake; acceptance 901/901.
+- No production source changed → no new mutation sites or CRAP breach.
 
 Handing the verified state back to the architect.
