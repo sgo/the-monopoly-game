@@ -40637,3 +40637,40 @@ Java mutation clean, acceptance mutation survivors all confirmed expected,
 every test suite green. Only round 3 (payment/enforcement:
 war-profits-tax-8, 9) remains backlogged for this feature. Per role
 rules, no new coder handoff until the user approves one.
+
+## 2026-08-20T12:37:58Z — specifier hands off war-profits-tax-payment (round 3, final)
+
+User approved round 3. Promoted war-profits-tax-8, 9 (multi-player
+government-account accumulation, tax bill forcing a mortgage when cash is
+short) from `backlog/en/rules/war-profits-tax.feature` to the tracked
+file, unchanged and with original stable indices. Spot-checked both
+against real board data before promoting (learned that lesson from
+round 2's scenario 5): scenario 8 uses only the synthetic land-value stub
+(dog/high hat own no real land, so the stub still governs); scenario 9's
+six real hotel-built properties total ~$7,464 (32.7% share, band1, 100%
+rate), and mortgaging Lippenslaan Knokke — the one undeveloped property
+dog holds — raises exactly $90, matching the $90 tax bill precisely. Both
+check out; no redesign needed this round.
+
+All three rounds of the domain feature are now tracked in one file.
+Deleted the now-empty `backlog/en/rules/war-profits-tax.feature` and
+updated the five sibling backlog files' headers (journal/logging/report,
+cli/cli-packaged-jar) to point at the tracked file instead of "also
+backlogged" — those remain the only parked pieces of this feature.
+
+Ran `bb gherkin-parser` + `bb gherkin-ir-dry-checker` against the full
+10-scenario file: 29 findings, all expected — the same two intentional
+double "grows a year older" steps, plus paraphrase/synonym noise scaling
+with the larger file. Nothing to normalize.
+
+Committed as `5094191b43`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: war-profits-tax-payment
+commit: 5094191b43
+```
