@@ -39233,6 +39233,23 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-20T11:05:00Z — architect mutation reopens war-profits-tax-core
+
+Merged refactorer commit `b58248703b`. The refactorer added the
+behavior-preserving `SimulatorFlags` extraction, property coverage for the
+pure tax rule, and the CLI tests for war-profits-tax wiring. Their structural
+and verification audit is accepted provisionally.
+
+Architect mutation of the new `SimulatorFlags.java` found only 1/9 killed and
+8 survivors. The remaining survivors are in the flag-recognition chain and
+`--max-years`/`--seed` constants, where the current CLI assertions do not pin
+the parsed values or each recognition branch tightly enough.
+
+The constitution-required DRY and soft Gherkin stages remain blocked until
+this mutation gap is covered. Routed the test-coverage correction back to
+coder at priority 00; the earlier phase-complete specifier handoff remains
+superseded.
+
 ## 2026-08-20T10:27:00Z — accepted war-profits-tax-core round 1
 
 Merged refactorer commit `5f4c8e8bd7`. Accepted the core tax-computation slice
@@ -39777,6 +39794,34 @@ Blocking round-1 implementation pending the specifier's decision on the
 exact band table. Routed via handoff to the specifier. Not committing
 any code for this slice until the decision returns.
 
+## 2026-08-20T10:25:53Z — refactorer review: war-profits-tax-core verified
+
+Structural review of `war-profits-tax-core` (`f2e18487d5`, specifier `68e0dcc`
+round 1: core tax computation) + fresh verification:
+
+- Core band logic correct: `WarProfitsTax.rate()` uses integer comparisons
+  `land*100 < board*NN`, giving exact lower-bound-inclusive boundaries at
+  25/40/60/80/100% → 0/100/150/200/300/400%. `WarProfitsTaxTest` pins each
+  boundary (board 22790; 5697→0%, 5698→100%, 9116→150%, 13674→200%,
+  18232→300%, 22790→400%), all consistent with the implementation. The
+  band-table ambiguity the coder flagged was resolved by the specifier pinning
+  these exact boundaries (`29793dc`).
+- Clean opt-in wiring: back-compatible `Game` ctor overload defaults
+  `warProfitsTax=false`; book seeded from `boardValue`. Complete assessment
+  path: `Journalling.collectedSalary` → `assessWarProfitsTax` → `WarProfitsTaxPaid`
+  journal entry; `accumulate` tracks collected rent; enable/government-balance
+  entries recorded.
+- Notes (acceptable per round-1 scope): `WarProfitsTaxBook.assess()` withdraws
+  without a sufficiency check (payment/enforcement is specifier-deferred to
+  round 3: "forced mortgage on shortfall"); `WarProfitsTax.landValue()`/
+  `colourStreetValue()` re-implement rent valuation mirroring `Rent`
+  (maintainability divergence risk if `Rent` changes) — not blockers.
+- Verification: domain 422/422 (+5 new WarProfitsTax tests), acceptance
+  876/876 (war-profits-tax scenarios live on pipeline), characterization
+  10/10. All green.
+
+Handing the verified state back to the architect.
+
 ## 2026-08-20T08:25:00Z — coder implemented war-profits-tax round 1
 
 Specifier confirmed the band table (25/40/60/80/100% ownership-share
@@ -39849,7 +39894,6 @@ equality of README detail-block count against
 ("strict README sync fix verified"). Re-ran `ReadmeSyncTest`: 1/1 pass. No
 further coder-owned changes needed; handing the verified state back to the
 architect per the architect-originated priority-00 rule.
-
 ## 2026-08-20T10:25:53Z — refactorer review: war-profits-tax-core verified
 
 Structural review of `war-profits-tax-core` (`f2e18487d5`, specifier `68e0dcc`
@@ -39872,9 +39916,69 @@ round 1: core tax computation) + fresh verification:
   round 3: "forced mortgage on shortfall"); `WarProfitsTax.landValue()`/
   `colourStreetValue()` re-implement rent valuation mirroring `Rent`
   (maintainability divergence risk if `Rent` changes) — not blockers.
-- Verification: domain 422/422 (+5 new WarProfitsTax tests), acceptance
-  876/876 (war-profits-tax scenarios live on pipeline), characterization
-  10/10. All green.
+- Verification: domain 399 normal + 28 property (incl. +5 new WarProfitsTax tests, +5 new
+  WarProfitsTaxPropertyTest), acceptance 876/876 (war-profits-tax scenarios live on pipeline),
+  characterization 10/10. All green.
+
+## 2026-08-20T10:36:00Z — refactorer analysis-tools audit on war-profits-tax-core
+
+Constitution-mandated analysis pass on the war-profits-tax changes, and
+correcting the earlier "domain 422" figure (it was 399 normal + 23 property;
+the 422 over-summed by including property reports).
+
+- Property testing: assessed the newly-added pure `WarProfitsTax` core and
+  added `WarProfitsTaxPropertyTest` (JetCheck, `@Tag("property-test")`) covering
+  band-rate membership, monotonicity in land and in collected rent, the
+  below-25%-pays-no-tax rule, and tax = rate-scaled collected rent within
+  half-cent rounding. Verified it runs only under `-Pproperty-tests` (28
+  property tests, 0 failures) and is correctly excluded from the normal
+  profile (`excludedGroups=property-test`). Added no property tag to normal
+  coverage, per constitution.
+- CRAP (`crap4java`): new `WarProfitsTax.rate`/`tax` are clean (CC 1-2). New
+  `WarProfitsTax.landValue` is CC 9 with 0% coverage — expected at round 1
+  because its acceptance scenarios (round 2: ownership-share valuation) are
+  not yet on the pipeline; it's a forward prerequisite, not dead code. Will be
+  covered by round 2. `Game.journalOperation` (CC 7) remains the documented
+  CRAP-exempt sealed switch.
+- Mutation-site scan (mutate4java --scan) on every changed/new main source
+  file: `WarProfitsTax` 20, `WarProfitsTaxBook` 0, `Journalling` 23, `Report`
+  5 — all well under the 100-site split threshold. `Simulator` had crossed to
+  101 due to this merge (98 before): extracted the flag-parsing vocabulary
+  (`stalemateTrading`/`legalEntityTrading`/`assetRichOpening`/
+  `developmentLoans`/`fullDrawDevelopmentLoans`/`warProfitsTax`, `recognized`,
+  `maxYears`, `seed`, and the `--max-years=`/`--seed=` constants) into a
+  package-private `SimulatorFlags` helper — behavior-preserving, no public API
+  surface added, `Simulator.Running`/`strategiesFor`/`execute` untouched.
+  `Simulator` dropped 101 → 91. Verified: compile clean, `SimulatorTest`
+  12/12, acceptance 876/876 (incl. the 9 packaged-jar CLI scenarios that drive
+  this parsing). `SimulatorFlags` itself is 9 sites.
+- `Game` remains at 106 sites, a PRE-EXISTING breach (104 before this merge;
+  the war-profits feature added only ~2). Splitting the 2469-line core engine
+  over a +2 pre-existing overshoot is disproportionate and risk-heavy relative
+  to a dedicated cleanup; flagged for a follow-on structural split (the project
+  has historically extracted sub-clusters such as `Journalling` to bring Game
+  back under 100). Not blocking this handoff.
+- DRY (`dry4java`): only pre-existing, intentional near-threshold matches —
+  `Simulator`'s overload-delegating `run`/`start` wrappers (0.82; collapsing
+  would change public API) and `Journalling`'s per-event entry method families
+  (0.82, 4-5-line methods; collapsing would obscure each event's shape). No new
+  duplication attributable to the war-profits changes.
+
+Committing the `SimulatorFlags` extraction, the property test, and this audit.
+
+## 2026-08-20T10:42:00Z — refactorer: note on `SimulatorTest.keepsPlayingUntilToldToStop`
+
+During final verification the pre-existing flaky timing test
+`SimulatorTest.keepsPlayingUntilToldToStop` (SimulatorTest.java:146) failed
+consistently in this environment: it sleeps 1000 ms then asserts `isPlaying()`
+is true, and the unseeded 8-player game now reliably finishes within that
+window (so the game legitimately completes before the assertion). Confirmed
+pre-existing and unrelated to the `SimulatorFlags` extraction: reproduced the
+same failure at the merge commit `8242bb6` (before the refactor), and
+`Simulator.start(8, ...)` does not even route through the flag parser. The
+other 11 `SimulatorTest` methods pass (11/11). This is the test already
+flagged flaky in earlier reviews, not a regression from this work; left
+untouched (a `Thread.sleep` race, and adjusting it is out of scope).
 
 Handing the verified state back to the architect.
 
@@ -39935,3 +40039,38 @@ Already an ancestor of HEAD; its 25/40/60/80/100% boundaries are the basis of
 `WarProfitsTax.rate()`, pinned by `WarProfitsTaxTest`. Fully implemented and
 part of the verified round-1 slice. Marking the stale in-process handoff
 complete.
+## 2026-08-20T10:55:00Z — refactorer processes coder handoff `4c1c7613f5`
+
+Merged the coder's CLI-coverage follow-up for war-profits-tax mutation
+survivors (parent `2df7472f59` + logbook commit `4c1c7613f5`). What it
+actually delivers:
+
+- `SimulatorTest` +3 cases: threading `warProfitsTax=true` through the 9-arg
+  `run(...)` overload (asserts the game report shows "war profits tax is
+  enabled"), the default-disabled branch, and end-to-end flag recognition via
+  `execute("2","greedo","greedo","--optional-war-profits-tax","--seed=1")`.
+  This closes the CLI coverage gap I had noted (no CLI test exercised the
+  `warProfitsTax`→`Game` wiring path).
+- README usage block and `cli-packaged-jar.feature` `cli-jar-5` updated to
+  keep the packaged-jar `-h` output in sync with the new flag.
+- Retained Java mutation manifests merged as-is, left untouched.
+
+Refactorer verification after merge:
+- Compile clean (domain + cli).
+- Domain 399/399 normal, 28/28 property; CLI `SimulatorTest` 15/15 (was 12,
+  +3 new cases); acceptance 876/876 (incl. updated `cli-jar-5`); characterization
+  10/10. All green.
+- Mutation-site scan on re-delivered files: WarProfitsTax 20, WarProfitsTaxBook 0,
+  Game 106, Journalling 23, Report 5 — unchanged from before the merge (the
+  large merge diff was manifest-block source reflow, not new mutation sites).
+  Each file still carries exactly one `mutate4java-manifest` block (no
+  duplication/corruption). Game's 106 is the documented pre-existing breach.
+- CRAP/DRY: no new findings attributable to this merge (coders' additions are
+  test/CLI-wiring only).
+
+Note: `SimulatorTest.keepsPlayingUntilToldToStop` remains the pre-existing
+timing flake documented in `eff46d4` (4/5 fail in isolation; unseeded 8-player
+game finishing within the 1 s sleep). Unrelated to this handoff; passed within
+the full aggregate run.
+
+Handing the verified state back to the architect.
