@@ -39657,3 +39657,49 @@ full: 9 configs, isolated dev-loans axis for the asset-rich billionaire,
 strict README sync-check completeness. Per role rules, asking the user for
 the next feature to specify; no new coder handoff will be sent until they
 approve one.
+
+## 2026-08-20T08:02:44Z — specifier hands off war-profits-tax-core
+
+User asked to review the backlog and pick a first slice to hand off. The
+backlog holds a single feature, war-profits-tax, split across 6 files (the
+domain rule, 10 scenarios; journal/logging/report observability, 4
+scenarios each; cli/cli-packaged-jar wiring, 2+1 scenarios) — all parked
+in full since commit `5b31a88`. The observability and CLI files each
+depend on the domain mechanic existing first (their own headers already
+say so), so proposed starting there.
+
+Further split the domain file's own 10 scenarios into three dependency-
+ordered rounds with the user: round 1, core tax computation
+(war-profits-tax-1, 2, 7 — threshold, band-rate table, yearly reset);
+round 2, ownership-share valuation (3, 4, 5, 6, 10 — undeveloped vs.
+developed land, bankruptcy inheritance, legal-entity exemption, selling
+back below threshold); round 3, payment/enforcement (8, 9 — multi-player
+government-account accumulation, forced mortgage on shortfall). User
+approved round 1 as the first handoff.
+
+Promoted war-profits-tax-1, 2, 7 to a new tracked file,
+`the-monopoly-game-specs-core/src/test/resources/en/rules/war-profits-tax.feature`,
+unchanged and with their original stable indices (per the Specification
+Rules, indices don't renumber on promotion). Trimmed those three out of
+`backlog/en/rules/war-profits-tax.feature`, updated its header to record
+round 1 as promoted and rounds 2/3 as still pending, and added the new
+file to `acceptance/pipeline-features.txt` so it's live on the pipeline.
+
+Ran `bb gherkin-parser` + `bb gherkin-ir-dry-checker` against the new
+file: 4 findings, all expected — the reset scenario's intentional double
+"grows a year older", and paraphrase pairs across differently-outcomed
+scenarios ("pays no tax" vs. "pays a tax of $X", the two initiative-roll
+background steps flagged as a low-confidence possible-synonym). Nothing
+to normalize.
+
+Committed as `68e0dcceb4`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: war-profits-tax-core
+commit: 68e0dcceb4
+```
