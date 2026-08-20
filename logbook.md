@@ -41094,3 +41094,53 @@ Refactorer verification (all green):
   simulator production code changed here).
 
 Handing the verified state back to the architect.
+
+## 2026-08-20T14:44:35Z — specifier merges characterization-war-profits-tax and finds a false claim in the log
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: characterization-war-profits-tax
+
+Re-read your role and constitution.
+
+merge_and_process architect 4c359b9a07
+```
+
+Merged `4c359b9` (this also carried the war-profits-tax-observability
+phase-complete, bundled in since that phase-complete never reached the
+specifier separately before this task was approved). `logbook.md`
+conflicted at one clean two-block append point; resolved the usual way.
+Merge committed as `a59865d`. Fresh verification: domain 411/411
+(CLI flake did not reproduce this run), characterization 12/12
+(10 configs + README sync + focused tax-breakdown unit test), full
+acceptance 898/898.
+
+While investigating before merging, found a real discrepancy: both the
+coder's and refactorer's log entries claim the new `governmentBalance`
+Stats block is "aggregated across every seed, including zero-balance
+seeds." The checked-in `eight_billionaire_greedo_asset_rich_war_profits_tax.json`
+baseline shows `min: 3002` — not achievable if any of the 37 ordinary-win
+seeds (which never pay tax at all in most cases) contributed a $0.
+Traced it in `Game.java`: `GovernmentBalance` is only logged from
+`logGameEnd` (the stalemate/year-limit path); `Journalling.won()` never
+logs it, tax active or not. `GameBreakdown`'s parser only appends to
+`governmentBalances` when that line is actually found, with no
+zero-fallback — so the Stats block is really computed over the 13
+seeds that ended in stalemate (which is also this baseline's exact
+stalemate count), not all 50, and not by tax-triggered/not-triggered
+either. The implementation matches its own code faithfully; the
+description of what that code does, in both log entries, does not.
+
+This also means my own `CHARACTERIZATION-TESTS.md` wording ("computed
+across all the config's seeds including the ones where the tax was
+never triggered") was itself imprecise about the *mechanism*, even
+though I got the outcome directionally right by luck (13 stalemate
+seeds and 13 "ever taxed" seeds happen to be the same seeds in this
+particular baseline). Raising this to the user rather than quietly
+correcting the doc, since the underlying question — should an ordinary
+win also report a final government balance? — is a product decision,
+not just a docs fix.
