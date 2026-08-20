@@ -21,8 +21,8 @@ For more details see [simulator.md](SIMULATOR.md#Greedo)
 
 - Behaves like Greedo
 - Has two modes of extreme wealth
-  - Starts the game with \$57.7 million.
-  - Starts the game owning 25% of the board.
+    - Starts the game with \$57.7 million.
+    - Starts the game owning 25% of the board.
 
 ## Observations
 
@@ -62,10 +62,14 @@ The table below shows the impact this sudden sense of cooperation had on the out
 | Stalemate         | **22%** (11)           | **0%** (0)          |
 | Bankruptcy winner | 78% (39)               | 100% (50)           |
 
-Now the results above were observed both in games of three and eight Greedos. However, the first time the peer-trading feature was added there was still an undiscovered bug preventing eight player games from breaking the stalemate. As a result I assumed this was because as soon as colour groups become split between
+Now the results above were observed both in games of three and eight Greedos. However, the first time the peer-trading
+feature was added there was still an undiscovered bug preventing eight player games from breaking the stalemate. As a
+result I assumed this was because as soon as colour groups become split between
 three instead of two players, making a mutually beneficial trade becomes almost impossible.
 
-This was false. Instead, a bug prevented most players from developing their properties even if they handed each other monopolies. This issue has since been resolved and peer-trading breaks a stalemate 100% of the time even with eight players.
+This was false. Instead, a bug prevented most players from developing their properties even if they handed each other
+monopolies. This issue has since been resolved and peer-trading breaks a stalemate 100% of the time even with eight
+players.
 
 ##### Legal Entities
 
@@ -80,7 +84,8 @@ as it comes in. After development rental income will also be used to repay the l
 no further development is possible and no more loans need to be repaid the legal entity will pay out dividends to the
 shareholders.
 
-As this functionality was introduced following a bug preventing peer-trading from breaking the stalemate with eight players this functionality has no appreciable effect in eight player games.
+As this functionality was introduced following a bug preventing peer-trading from breaking the stalemate with eight
+players this functionality has no appreciable effect in eight player games.
 
 |                   | With peer trading (n=50) | With legal entities (n=50) |
 |-------------------|--------------------------|----------------------------|
@@ -116,14 +121,16 @@ the game with a starting capital well above the standard $1500.**
 ### The Billionaire
 
 To determine what a billionaire would be in the game of Monopoly I looked up the median income of a Belgian. Which
-equates to €3728. Or €44736 per year. At this rate a Belgian needs **28866 years** to earn the full wealth of the richest
+equates to €3728. Or €44736 per year. At this rate a Belgian needs **28866 years** to earn the full wealth of the
+richest
 Belgian. (€12 913 683 000)
 
 Given the yearly salary in Monopoly is $400 a billionaire in Monopoly would have \$57.7 million.
 
 #### It's all about money...
 
-The first version of our Billionaire strategy is one that starts the game with \$57.7 million instead of the standard \$1500. Otherwise, the Billionaire is identical to Greedo.
+The first version of our Billionaire strategy is one that starts the game with \$57.7 million instead of the standard
+\$1500. Otherwise, the Billionaire is identical to Greedo.
 
 What does this mean for the game?
 I ran 50 games with peer trading and legal entity formation enabled.
@@ -134,37 +141,43 @@ I ran 50 games with peer trading and legal entity formation enabled.
 | **8 Greedo, no Billionaire** (n=50) | 50 (100%)               | 0 (0%)    |
 
 Visibly, the Billionaire made the stalemate outcome more likely.
-Not because he prevents other players from acquiring all the properties but because they simply can't bankrupt him before they reach the stalemate condition. (\$22000)
+Not because he prevents other players from acquiring all the properties but because they simply can't bankrupt him
+before they reach the stalemate condition. (\$22000)
 
 So are Billionaires a stabilising force on the economy in spite of the obvious inequality?
 
-Not quite. You see these stalemates weren't of the happily ever after type. Most of the time everyone got destroyed except for one lucky and one unlucky one. And we should classify these three as follows...
+Not quite. You see these stalemates weren't of the happily ever after type. Most of the time everyone got destroyed
+except for one lucky and one unlucky one. And we should classify these three as follows...
 
 * The Billionaire
 * The Multi Millionaire
 * The Millionaire
 
-So where most of the other players simply bankrupted these guys picked up their wealth potential. The Millionaire is actually the unlucky one as around the 15.000 year mark he is destroyed by the other two.
+So where most of the other players simply bankrupted these guys picked up their wealth potential. The Millionaire is
+actually the unlucky one as around the 15.000 year mark he is destroyed by the other two.
 
 Then it goes one of two ways.
 
 1. The Billionaire destroys the Multi Millionaire because of his financial advantage.
 2. The Multi Millionaire slowly destroys the Billionaire because he happened to be asset poor.
 
-Btw, it takes about 30.000 years to destroy the Billionaire. Which is close to the 28.800 years a Belgian has to work to earn the amount of wealth the richest Belgian holds.
+Btw, it takes about 30.000 years to destroy the Billionaire. Which is close to the 28.800 years a Belgian has to work to
+earn the amount of wealth the richest Belgian holds.
 
 **Conclusion: we need a Billionaire that is asset rich... just like in real life.**
 
 #### It's all about assets...
 
-You know. In the real world, billionaires are asset rich. They don't have a lot of money in their bank account. They're actually quite poor that way. Which is why they apply for, and receive, benefits.
+You know. In the real world, billionaires are asset rich. They don't have a lot of money in their bank account. They're
+actually quite poor that way. Which is why they apply for, and receive, benefits.
 
 Why don't we test that?
 
 In Belgium the 1% own 25% of the GDP.
 Now, Monopoly has only eight players so our one billionaire represents more than just the 1% of the game world.
 
-So I've decided to introduce an optional feature which converts our billionaire into an asset rich one owning 25% of the board and having the same starting capital as everyone else.
+So I've decided to introduce an optional feature which converts our billionaire into an asset rich one owning 25% of the
+board and having the same starting capital as everyone else.
 
 Here are the results:
 
@@ -175,22 +188,72 @@ Here are the results:
 An asset rich billionaire always wins!
 So, not having a lot of money in the bank account appears not to matter much.
 
-As for the others. Some managed to almost make $2000 but everyone was destroyed within 4 years. That's the complete absence of social safety nets.
+As for the others. Some managed to almost make $2000 but everyone was destroyed within 4 years. That's the complete
+absence of social safety nets.
 
 #### Collateralized Loans & Corporate Bonds
 
-In an attempt to prolong the game with an asset-rich billionaire I decided to introduce the ability to take out loans from the bank.
+In an attempt to prolong the game with an asset-rich billionaire I decided to introduce the ability to take out loans
+from the bank.
 
-Now the game already has a system like it, but it requires that you sell all the houses on it and then mortgage the undeveloped land instead. This would dry up your income stream and would be very punishing.  So, instead you can now take out a loan where the asset you're going to build with it is the collateral. Not just the land. But also the houses and hotels.
+Now the game already has a system like it, but it requires that you sell all the houses on it and then mortgage the
+undeveloped land instead. This would dry up your income stream and would be very punishing. So, instead you can now take
+out a loan where the asset you're going to build with it is the collateral. Not just the land. But also the houses and
+hotels.
 
-The bank can't just hand over money to anyone who asks. As that would equate to quantitative easing and cause inflation. At this point I did not want to program in the effects of inflation so no loans backed by money printing.
+The bank can't just hand over money to anyone who asks. As that would equate to quantitative easing and cause inflation.
+At this point I did not want to program in the effects of inflation so no loans backed by money printing.
 
-Instead, the bank needs to sell corporate bonds to finance their loans. Corporate bonds ar essentially loans from other players to the bank. In practice if someone asks for a \$100 loan with an interest rate of 5% then the bank will need a corporate bond for \$100 with an interest rate of 3%. The bank will then pocket the remaining 2% should the player default, the collateral does not cover the difference and the corporate bond can not be reallocated to another loan in time.
+Instead, the bank needs to sell corporate bonds to finance their loans. Corporate bonds ar essentially loans from other
+players to the bank. In practice if someone asks for a \$100 loan with an interest rate of 5% then the bank will need a
+corporate bond for \$100 with an interest rate of 3%. The bank will then pocket the remaining 2% should the player
+default, the collateral does not cover the difference and the corporate bond can not be reallocated to another loan in
+time.
 
-So, did this help expanding the duration of the game beyond the ~4 years the asset-rich bilionaire needed to win the game?
+So, did this help expanding the duration of the game beyond the ~4 years the asset-rich bilionaire needed to win the
+game?
 
-No, it didn't. Loans were taken out. They weren't even primarily backed by the billionaire. The billionaire was the primary one taking out loans in fact. And he was doing this to buy up th entire board and win the game. If anything, it made things easier as money no longer was an obstacle. And it already wasn't. So, the billionaire would win the game 100% of the time within ~4 years even with loans in play.
+No, it didn't. Loans were taken out. They weren't even primarily backed by the billionaire. The billionaire was the
+primary one taking out loans in fact. And he was doing this to buy up th entire board and win the game. If anything, it
+made things easier as money no longer was an obstacle. And it already wasn't. So, the billionaire would win the game
+100% of the time within ~4 years even with loans in play.
 
-I suppose we can't blame our players from trying to win the game. And I don't think we should make them self-aware enough that winning the game means starvation even for them. Because when we look at billionaires in the real world they don't show any signs of self awareness. They'll push for war and more tax exemptions and more subsidies paid with taxes from regular people.
+I suppose we can't blame our players from trying to win the game. And I don't think we should make them self-aware
+enough that winning the game means starvation even for them. Because when we look at billionaires in the real world they
+don't show any signs of self-awareness. They'll push for war and more tax exemptions and more subsidies paid with taxes
+from regular people.
 
-So, I just don't see any mechanic other than government imposed regulation or taxes that could stop the billionaire from buying up the whole board.
+So, I just don't see any mechanic other than government-imposed regulation or taxes that could stop the billionaire from
+buying up the whole board.
+
+#### War Profits Tax
+
+Given the asset-rich billionaire destroys the game world within 4 years. In comes the war profits tax.
+
+The war profits tax is a tax on rental income specifically. It kicks in once a player has developed 25% of the board's
+wealth. In the case of our billionaire that means he has put hotels on his streets.
+
+The tax rates are as follows:
+
+| Ownership share | Rate |
+|-----------------|------|
+| below 25%       | 0%   |
+| 25% – 40%       | 100% |
+| 40% – 60%       | 150% |
+| 60% – 80%       | 200% |
+| 80% – 100%      | 300% |
+| 100%            | 400% |
+
+The point here is not to discuss if these rates are fair. They kick in too late, and when they do, they hit hard.
+
+Here's the effect of the tax.
+
+| Condition                                             | WIN (bankruptcy-driven) | STALEMATE |
+|-------------------------------------------------------|-------------------------|-----------|
+| **1 Billionaire + 7 Greedo** (n=50)                   | 50 (100%)               | 0 (0%)    |
+| **1 Billionaire + 7 Greedo** + war profits tax (n=50) | 37 (74%)                | 13 (26%)  |
+
+The Billionaire is no longer guaranteed a win. In fact, among those 37 bankruptcies, our Billionaire only represents 13% of the wins. While representing 12,5% of the players. Thus, the war profits tax guarantees equal opportunity if not a happily ever after for everyone.
+
+Because, by the time the war profits tax neutralizes the threat of the Billionaire, he's already had the time to wipe out ~4 of his opponents. 
+
