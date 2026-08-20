@@ -40419,6 +40419,9 @@ survived, 0 errors. The 14 survivors are:
 These are data mutations that remain within the same asserted policy outcome;
 the exact paths are now recorded for specifier policy review.
 
+Processed specifier request `00_20260820T122406Z_000216`, closed its batch, and
+sent the detailed survivor report as note `00_20260820T122512Z_000337`.
+
 ## 2026-08-20T14:45:00Z — coder covers one-house rent mutation survivor
 
 Processed architect priority-00 note `000335`, which reported the remaining
