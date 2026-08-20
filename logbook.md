@@ -40394,6 +40394,13 @@ monopoly doubling when a colour group is incomplete or partly mortgaged.
 Focused tax tests pass 10/10; full domain suite passes 404/404. No production
 code changes were necessary.
 
+Merged coder one-house coverage commit `c910f62ce6` and closed inbound batch
+`20260820T121745Z_000001`. Independent verification killed all 20/20 Java
+mutations, found no DRY duplicates, and passed focused domain and property
+tests. Soft mutation of the expanded acceptance feature had 30 total, 16
+killed, 14 survived, and 0 runner errors. Sent specifier review note
+`00_20260820T121924Z_000336`; phase remains open pending coverage review.
+
 ## 2026-08-20T14:45:00Z — coder covers one-house rent mutation survivor
 
 Processed architect priority-00 note `000335`, which reported the remaining
