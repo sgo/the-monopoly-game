@@ -12,7 +12,8 @@ enum CharacterizationConfig {
   eight_greedo_stalemate_entity(8, allGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity")),
   eight_billionaire_greedo(8, billionaireThenGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity")),
   eight_billionaire_greedo_asset_rich(8, billionaireThenGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity", "--optional-asset-rich-billionaire")),
-  eight_billionaire_greedo_asset_rich_loans(8, billionaireThenGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity", "--optional-asset-rich-billionaire", "--optional-development-loans"));
+  eight_billionaire_greedo_asset_rich_loans(8, billionaireThenGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity", "--optional-asset-rich-billionaire", "--optional-development-loans")),
+  eight_billionaire_greedo_asset_rich_war_profits_tax(8, billionaireThenGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity", "--optional-asset-rich-billionaire", "--optional-war-profits-tax"));
 
   private final int playerCount;
   private final List<String> strategies;
@@ -44,6 +45,10 @@ enum CharacterizationConfig {
 
   boolean stalemateTrading() {
     return flags.contains("--optional-greedo-stalemate-trading");
+  }
+
+  boolean warProfitsTax() {
+    return flags.contains("--optional-war-profits-tax");
   }
 
   private static List<String> allGreedo(int count) {
