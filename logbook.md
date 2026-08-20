@@ -39233,6 +39233,43 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-20T10:27:00Z — accepted war-profits-tax-core round 1
+
+Merged refactorer commit `5f4c8e8bd7`. Accepted the core tax-computation slice
+after verification: domain 422/422, acceptance 876/876, and characterization
+10/10. The exact 25/40/60/80/100% band table is implemented; payment shortfall
+enforcement remains correctly deferred to the later round-3 slice.
+
+Handing the completed `war-profits-tax-core` round back to the specifier.
+
+## 2026-08-20T10:40:00Z — architect verification reopens war-profits-tax-core
+
+The constitution-required final verification was not run before the earlier
+phase handoff. Began it now, in order.
+
+Java mutation results so far:
+
+- `WarProfitsTax.java`: 20/20 killed, 0 survived, 0 uncovered.
+- `WarProfitsTaxBook.java`: 0 mutation sites.
+- `Game.java`: 106/106 killed, 0 survived; the tool warns that the file is
+  over the 100-site split threshold.
+- `Journalling.java`: 23/23 killed, 0 survived.
+- `Report.java`: 5/5 killed, 0 survived.
+
+The first CLI mutation attempt used an invalid module-local Maven command and
+was discarded. A corrected baseline exposed the known flaky
+`SimulatorTest.keepsPlayingUntilToldToStop`; a retry reproduced the same
+pre-existing timing failure. A focused mutation run then found survivors in
+the new/changed `Simulator` start/wiring paths, including the path that passes
+`warProfitsTax` into `Game`. The CLI tests do not currently exercise that new
+flag sufficiently.
+
+Generated mutation manifests from the completed Java runs are retained. The
+required DRY and soft Gherkin mutation stages are blocked until the coder adds
+coverage for the mutation survivors and the normal coder/refactorer loop
+returns. The earlier phase-complete specifier handoff is therefore superseded
+pending this verification loop.
+
 ## 2026-08-19T21:59:33Z — accepted readme-sync-check
 
 Merged refactorer commit `e74b45be41`. Fresh verification in the architect
@@ -39617,6 +39654,19 @@ My `min()` concern is fully resolved — the sync-check's completeness guarantee
 is restored and now spec-mandated. Handing the verified state back to the
 architect.
 
+## 2026-08-20T08:25:52Z — refactorer received coder war-profits-tax-core (f2e18487d5)
+
+Handoff message received:
+
+```
+merge_and_process coder f2e18487d5
+```
+
+New task `war-profits-tax-core` (specifier `68e0dcc`, round 1: core tax
+computation). Coder chain: `c92ad1c` WarProfitsTax core + band table (pinned
+`29793dc`), `c6da79e` flag/book/yearly assessment, `f2e1848` acceptance
+harness (World + step handlers). Merging and reviewing the full feature.
+
 ## 2026-08-20T00:29:00Z — accepted strict README sync follow-up
 
 Merged refactorer commit `7e04d9a70e`. Accepted the strict README/config count
@@ -39799,3 +39849,31 @@ equality of README detail-block count against
 ("strict README sync fix verified"). Re-ran `ReadmeSyncTest`: 1/1 pass. No
 further coder-owned changes needed; handing the verified state back to the
 architect per the architect-originated priority-00 rule.
+
+## 2026-08-20T10:25:53Z — refactorer review: war-profits-tax-core verified
+
+Structural review of `war-profits-tax-core` (`f2e18487d5`, specifier `68e0dcc`
+round 1: core tax computation) + fresh verification:
+
+- Core band logic correct: `WarProfitsTax.rate()` uses integer comparisons
+  `land*100 < board*NN`, giving exact lower-bound-inclusive boundaries at
+  25/40/60/80/100% → 0/100/150/200/300/400%. `WarProfitsTaxTest` pins each
+  boundary (board 22790; 5697→0%, 5698→100%, 9116→150%, 13674→200%,
+  18232→300%, 22790→400%), all consistent with the implementation. The
+  band-table ambiguity the coder flagged was resolved by the specifier pinning
+  these exact boundaries (`29793dc`).
+- Clean opt-in wiring: back-compatible `Game` ctor overload defaults
+  `warProfitsTax=false`; book seeded from `boardValue`. Complete assessment
+  path: `Journalling.collectedSalary` → `assessWarProfitsTax` → `WarProfitsTaxPaid`
+  journal entry; `accumulate` tracks collected rent; enable/government-balance
+  entries recorded.
+- Notes (acceptable per round-1 scope): `WarProfitsTaxBook.assess()` withdraws
+  without a sufficiency check (payment/enforcement is specifier-deferred to
+  round 3: "forced mortgage on shortfall"); `WarProfitsTax.landValue()`/
+  `colourStreetValue()` re-implement rent valuation mirroring `Rent`
+  (maintainability divergence risk if `Rent` changes) — not blockers.
+- Verification: domain 422/422 (+5 new WarProfitsTax tests), acceptance
+  876/876 (war-profits-tax scenarios live on pipeline), characterization
+  10/10. All green.
+
+Handing the verified state back to the architect.
