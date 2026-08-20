@@ -39915,3 +39915,14 @@ and the `config-matrix-split-applied` chain (incl. the coder→specifier routing
 for the serial-label split) is recorded at length in the logbook (Aug 19).
 Characterization tests pass 10/10. No coder-owned changes are needed; marking
 the stale in-process handoff complete.
+
+## 2026-08-20T08:46:00Z — coder resolves a stale war-profits-tax-core spec handoff
+
+`ready_for_next.sh` surfaced the original specifier `git_handoff` for
+`war-profits-tax-core` (`68e0dcceb4`, "Specify war-profits-tax round 1: core
+tax computation"). Already an ancestor of HEAD and fully implemented: the round-1
+slice (core rule + unit tests, opt-in flag + book wiring, acceptance harness)
+is committed (`c92ad1c`/`c6da79e`/`f2e1848`), and has since passed the
+refactorer review and the architect's Java mutation pass with only a CLI
+coverage gap, which the coder closed in `2df7472f59`. Nothing new to do;
+marking the stale in-process handoff complete.
