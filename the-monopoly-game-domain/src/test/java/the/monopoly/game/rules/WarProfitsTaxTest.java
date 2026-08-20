@@ -56,6 +56,17 @@ class WarProfitsTaxTest {
   }
 
   @Test
+  void landValueUsesTheOneHouseRentForOneHouse() {
+    Deeds deeds = new Deeds();
+    Player dog = player("dog");
+    ColourStreet meir = street(Street.Type.MeirAntwerpen);
+    deeds.sell(meir, dog, Money.ZERO);
+    deeds.arrangeHouses(meir, 1);
+
+    assertThat(WarProfitsTax.landValue(rules, deeds, dog)).isEqualTo(meir.rentForHouses(1));
+  }
+
+  @Test
   void landValueUsesTheCurrentHouseTierRent() {
     Deeds deeds = new Deeds();
     Player dog = player("dog");
