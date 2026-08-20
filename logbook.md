@@ -40447,3 +40447,32 @@ commits, `57e2b10`/`c910f62`, merged through `9523dd4`/`736c17a`). No
 git_handoff has reached the specifier for this state yet. Logging receipt
 and waiting for the actual corrected phase handoff rather than reviewing an
 already-stale snapshot.
+
+## 2026-08-20T12:24:06Z — specifier corrects course: 000336 needed an actual answer, not a close
+
+User relayed that the architect expected a response to
+`00_20260820T121924Z_000336` ("Soft acceptance mutation: 16/30 killed, 14
+survived; review coverage"). The prior entry closed it as a stale snapshot
+without ever answering the review it asked for — checking the architect
+worktree confirmed `0b8d607` explicitly says "phase remains open pending
+coverage review," i.e. the architect is genuinely blocked on a specifier
+determination, not just broadcasting status.
+
+The note carries no per-mutation detail (unlike the Java-mutation notes to
+coder, which name exact line numbers), so there isn't enough here to give a
+real determination — round 1's precedent (11/23 survivors, all traced to
+scenarios whose asserted outcome is deliberately invariant to one of their
+own parameters) is a plausible shape for these 14 too, given round 2 added
+three more "pays no tax regardless of X" scenarios (3, 6, 10) that would
+survive the same way scenario 1 already does, but that is pattern-matching,
+not verification. Sent a note back asking for the scenario/step-level list
+rather than guessing.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Send per-scenario detail for the 14 survivors; can't judge from aggregate alone.
+```
