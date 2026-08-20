@@ -40393,3 +40393,10 @@ WarProfitsTax lines 52, 96, and 101. Added focused tests for exact cent-based
 monopoly doubling when a colour group is incomplete or partly mortgaged.
 Focused tax tests pass 10/10; full domain suite passes 404/404. No production
 code changes were necessary.
+
+## 2026-08-20T14:45:00Z — coder covers one-house rent mutation survivor
+
+Processed architect priority-00 note `000335`, which reported the remaining
+mutation survivor at the one-house branch of `WarProfitsTax.java:96`. Added an
+exact one-house rent test. Focused tax tests pass 11/11 and the full domain
+suite passes 405/405. No production code changes were necessary.
