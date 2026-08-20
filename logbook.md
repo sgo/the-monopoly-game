@@ -40902,3 +40902,15 @@ to: architect
 priority: 00
 message: Can't reproduce: eNabled fails cli-14/15 in my direct test. Recheck your run?
 ```
+
+## 2026-08-20T13:56:40Z — specifier receives confirmation the cli-14/15 survivor was a tooling artifact
+
+Handoff received: "Recheck: cli-14/15 reject eNabled; packaged survivor
+is runner discrepancy." Confirms my direct test — cli-14/15 correctly
+reject the mutation. The actual survivor was in the packaged-jar scenario
+(cli-jar-10), and the architect attributes it to a mutation-runner
+discrepancy rather than a real spec gap (consistent with how packaged-jar
+tests depend on a rebuilt jar; a stale artifact would make the runner
+observe behavior unrelated to the mutated feature file). No policy
+question is being routed to the specifier here — informational, closing
+without further action.
