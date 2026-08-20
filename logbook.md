@@ -39964,3 +39964,39 @@ acceptance 876/876. All green. Committed as `2df7472f59`.
 The architect's retained Java manifests (the `mutate4java-manifest` comment
 blocks appended to WarProfitsTax/WarProfitsTaxBook/Game/Journalling/Report
 sources) were merged as-is and left untouched.
+
+## 2026-08-20T10:55:00Z — refactorer processes coder handoff `4c1c7613f5`
+
+Merged the coder's CLI-coverage follow-up for war-profits-tax mutation
+survivors (parent `2df7472f59` + logbook commit `4c1c7613f5`). What it
+actually delivers:
+
+- `SimulatorTest` +3 cases: threading `warProfitsTax=true` through the 9-arg
+  `run(...)` overload (asserts the game report shows "war profits tax is
+  enabled"), the default-disabled branch, and end-to-end flag recognition via
+  `execute("2","greedo","greedo","--optional-war-profits-tax","--seed=1")`.
+  This closes the CLI coverage gap I had noted (no CLI test exercised the
+  `warProfitsTax`→`Game` wiring path).
+- README usage block and `cli-packaged-jar.feature` `cli-jar-5` updated to
+  keep the packaged-jar `-h` output in sync with the new flag.
+- Retained Java mutation manifests merged as-is, left untouched.
+
+Refactorer verification after merge:
+- Compile clean (domain + cli).
+- Domain 399/399 normal, 28/28 property; CLI `SimulatorTest` 15/15 (was 12,
+  +3 new cases); acceptance 876/876 (incl. updated `cli-jar-5`); characterization
+  10/10. All green.
+- Mutation-site scan on re-delivered files: WarProfitsTax 20, WarProfitsTaxBook 0,
+  Game 106, Journalling 23, Report 5 — unchanged from before the merge (the
+  large merge diff was manifest-block source reflow, not new mutation sites).
+  Each file still carries exactly one `mutate4java-manifest` block (no
+  duplication/corruption). Game's 106 is the documented pre-existing breach.
+- CRAP/DRY: no new findings attributable to this merge (coders' additions are
+  test/CLI-wiring only).
+
+Note: `SimulatorTest.keepsPlayingUntilToldToStop` remains the pre-existing
+timing flake documented in `eff46d4` (4/5 fail in isolation; unseeded 8-player
+game finishing within the 1 s sleep). Unrelated to this handoff; passed within
+the full aggregate run.
+
+Handing the verified state back to the architect.
