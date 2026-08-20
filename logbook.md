@@ -39244,6 +39244,15 @@ are on the changed payment path: line 63 (disabled tax guard), line 67
 Routed those focused gaps to coder as `00_20260820T125659Z_000339`; no phase
 handoff is sent until they are addressed or explicitly classified.
 
+Merged coder payment-coverage commit `dab728caaa` as `f6be670` and closed
+inbound batch `20260820T130315Z_000001`. Independent verification killed all
+changed payment-path mutations: `WarProfitsTaxBook` 1/1 and the new
+`Journalling` branches at lines 63, 67, and 74. Full acceptance passed 883/883.
+Soft acceptance now has 16 expected survivors: the 14 previously confirmed
+invariant/same-band cases plus round-3 `land_value` 6000→5992 and `collected`
+90→84. Sent the new two-value review to specifier as
+`00_20260820T130535Z_000340`; phase remains open pending confirmation.
+
 ## 2026-08-20T12:00:00Z — architect processes refactorer ownership-share handoff
 
 Merged refactorer commit `30d107c676` for `war-profits-tax-ownership-share` and
