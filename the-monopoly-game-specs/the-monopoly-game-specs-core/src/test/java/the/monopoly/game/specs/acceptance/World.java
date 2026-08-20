@@ -113,6 +113,11 @@ public class World {
   private boolean simulatorDevelopmentLoans;
   private boolean simulatorFullDrawDevelopmentLoans;
   private boolean namedEntityFormed;
+  private boolean warProfitsTaxEnabled;
+  private final Map<String, Money> pawnLandWorthRent = new HashMap<>();
+  private final Map<String, Money> pawnCollectedRent = new HashMap<>();
+  private final Map<String, Money> lastWarProfitsTaxPaid = new HashMap<>();
+  private Money governmentBalance = Money.ZERO;
   private int gameMaxYears = -1;
   private int simulatorMaxYears = -1;
   private Entry selectedEvent;
@@ -694,9 +699,11 @@ public class World {
   }
 
   public void growPawnOlder(String pawnName) {
+    assessWarProfitsTax(pawnName);
     DevelopmentLoanBook.Position position = developmentLoanBook().positions().stream()
         .filter(it -> it.borrower() != null && it.borrower().id().value().equals(pawnName))
-        .findFirst().orElseThrow(() -> new AssertionError("Pawn has no development loan."));
+        .findFirst().orElse(null);
+    if (position == null) return;
     var payment = developmentLoanBook().service(position);
     if (payment.isEmpty()) {
       raiseLoanPaymentFromSpareProperty(position);
@@ -716,6 +723,42 @@ public class World {
           developmentLoanBook().foreclose(position, deeds, ruleSet, players(), this::strategyOf);
       record(new Entry.DevelopmentLoanRecovered(position.collateral(), foreclosure.recovered()));
     }
+  }
+
+  private void assessWarProfitsTax(String pawnName) {
+    if (!warProfitsTaxEnabled) return;
+    Money landValue = pawnLandWorthRent.getOrDefault(pawnName, Money.ZERO);
+    Money collected = pawnCollectedRent.getOrDefault(pawnName, Money.ZERO);
+    Money board = the.monopoly.game.rules.WarProfitsTax.boardValue(ruleSet);
+    Money tax = the.monopoly.game.rules.WarProfitsTax.tax(board, landValue, collected);
+    pawnCollectedRent.put(pawnName, Money.ZERO);
+    governmentBalance = governmentBalance.plus(tax);
+    lastWarProfitsTaxPaid.put(pawnName, tax);
+    if (!tax.equals(Money.ZERO)) record(new Entry.WarProfitsTaxPaid(pawn(pawnName).id(), tax));
+  }
+
+  public void enableWarProfitsTax() {
+    warProfitsTaxEnabled = true;
+  }
+
+  public void setLandWorthRent(String pawnName, Money value) {
+    pawnLandWorthRent.put(pawnName, value);
+  }
+
+  public void setCollectedRentSinceAssessment(String pawnName, Money value) {
+    pawnCollectedRent.put(pawnName, value);
+  }
+
+  public Money governmentAccountBalance() {
+    return governmentBalance;
+  }
+
+  public boolean paysWarProfitsTax(String pawnName, Money amount) {
+    return amount.equals(lastWarProfitsTaxPaid.getOrDefault(pawnName, new Money(-1)));
+  }
+
+  public boolean paysNoWarProfitsTax(String pawnName) {
+    return Money.ZERO.equals(lastWarProfitsTaxPaid.getOrDefault(pawnName, new Money(-1)));
   }
 
   private void raiseLoanPaymentFromSpareProperty(DevelopmentLoanBook.Position position) {
