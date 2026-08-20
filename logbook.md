@@ -40655,3 +40655,33 @@ Verification:
 - Payment acceptance: 19/19 pass.
 - Domain suite: 407/407 pass.
 - Full acceptance pipeline: 883/883 pass.
+
+## 2026-08-20T13:10:00Z — refactorer processes coder handoff `8f39e2b172` (round 3: payment/enforcement)
+
+Merged the round-3 war-profits-tax payment-enforcement completion. This is
+genuine domain production code this time, not just harness/spec:
+- `WarProfitsTaxBook.assess(player, landValue, raiseShortfall)` — new overload;
+  when the player's balance can't cover the owed tax, it invokes the callback
+  with the shortfall before withdrawing. Old 2-arg `assess` delegates with an
+  empty callback (back-compatible). This closes the round-1 noted gap where
+  `assess()` withdrew without a sufficiency check.
+- `Journalling.assessWarProfitsTax` now supplies `raiseShortfall` →
+  `mortgageWarProfitsTaxCollateral` (mortgages unencumbered owned land in board
+  order until the shortfall is covered).
+- `WarProfitsTaxTest` +6 focused cases; live `war-profits-tax.feature` +52
+  round-3 scenarios; `World` harness mirrors the mortgage path.
+
+Refactorer verification (all green):
+- Domain 407/407 (+6 payment tests) + 28/28 property.
+- Acceptance 883/883 (+2 round-3 scenarios; was 881).
+- CLI 19/19 excluding the documented pre-existing
+  `keepsPlayingUntilToldToStop` timing flake; characterization 10/10.
+- Mutation-site scan: WarProfitsTaxBook 1, Journalling 24, WarProfitsTax 20,
+  Game 106 (documented pre-existing breach) — all under threshold except
+  Game's known breach.
+- CRAP: `WarProfitsTaxBook.assess` (new) 3.0 at 82.4% cov (fine);
+  `setGovernmentBalance` is CRAP 12.0 at 0% coverage — a PRE-EXISTING public
+  setter with no production call sites, not introduced by round 3. Recorded,
+  not forced-refactored (unused accessor outside the active path).
+
+Handing the verified state back to the architect.
