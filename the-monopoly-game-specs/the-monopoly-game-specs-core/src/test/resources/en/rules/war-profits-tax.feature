@@ -1,12 +1,13 @@
 # language: en
 
-# Rounds 1-2 of 3 for this feature: the core tax computation (threshold,
-# band rate, yearly reset) and ownership-share valuation (buying vs.
-# developing land, bankruptcy inheritance, legal entities, selling back
-# below threshold). Payment/enforcement (multi-player accumulation, forced
-# mortgage on shortfall) remains backlogged at
-# ../../../../../backlog/en/rules/war-profits-tax.feature, to follow once
-# this round lands.
+# All 3 rounds of this feature are now here: the core tax computation
+# (threshold, band rate, yearly reset), ownership-share valuation (buying
+# vs. developing land, bankruptcy inheritance, legal entities, selling
+# back below threshold), and payment/enforcement (multi-player
+# accumulation, forced mortgage on shortfall). Observability
+# (journal/logging/report) and CLI wiring remain backlogged at
+# ../../backlog/en/rules/journal.feature, logging.feature, report.feature,
+# and ../../backlog/specs-cli/en/cli.feature, cli-packaged-jar.feature.
 
 Feature: war profits tax
   An opt-in flag, `--optional-war-profits-tax`, taxes rental income once a
@@ -218,3 +219,40 @@ Feature: war profits tax
     Examples:
       | collected |
       | 1000      |
+
+  # war-profits-tax-8
+  Scenario Outline: tax paid by multiple players accumulates together in the same government account
+    Given pawn "dog"'s land is currently worth $<land_value> in rent
+    And pawn "high hat"'s land is currently worth $<land_value> in rent
+    And pawn "dog" has collected $1000 in rent since their last war profits tax assessment
+    And pawn "high hat" has collected $1000 in rent since their last war profits tax assessment
+    When pawn "dog" grows a year older
+    And pawn "high hat" grows a year older
+    Then the government's account holds $<government_account>
+
+    Examples:
+      | land_value | government_account |
+      | 6000       | 2000                |
+
+  # war-profits-tax-9
+  Scenario Outline: a tax bill larger than the player's cash forces a mortgage, the same as any other unpayable debt
+    Given pawn "dog" owns "Meir Antwerpen"
+    And pawn "dog" owns "Nieuwstraat Brussel"
+    And pawn "dog" owns "Boulevard Tirou Charleroi"
+    And pawn "dog" owns "Veldstraat Gent"
+    And pawn "dog" owns "Boulevard d'Avroy Liège"
+    And pawn "dog" owns "Lippenslaan Knokke"
+    And the street "Meir Antwerpen" has a hotel built
+    And the street "Nieuwstraat Brussel" has a hotel built
+    And the street "Boulevard Tirou Charleroi" has a hotel built
+    And the street "Veldstraat Gent" has a hotel built
+    And the street "Boulevard d'Avroy Liège" has a hotel built
+    And pawn "dog" has collected $<collected> in rent since their last war profits tax assessment
+    And pawn "dog" has $0 to spend
+    When pawn "dog" grows a year older
+    Then the land "Lippenslaan Knokke" is mortgaged
+    And pawn "dog" is not bankrupt
+
+    Examples:
+      | collected |
+      | 90        |

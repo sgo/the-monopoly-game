@@ -1,8 +1,8 @@
 # language: en
 
-# Backlog scenarios for the war-profits-tax feature (see
-# ../../../the-monopoly-game-specs-core/src/test/resources/en/rules/war-profits-tax.feature,
-# also backlogged). When this batch is promoted, move these scenarios into
+# Backlog scenarios for the war-profits-tax feature (now fully tracked at
+# ../../../the-monopoly-game-specs-core/src/test/resources/en/rules/war-profits-tax.feature).
+# When this batch is promoted, move these scenarios into
 # the tracked en/rules/logging.feature unchanged, renumbering logging-N to
 # continue that file's own sequence (next free index at the time these were
 # written was logging-85).
