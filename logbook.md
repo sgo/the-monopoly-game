@@ -39244,6 +39244,12 @@ Completed the constitution-required final verification for `war-profits-tax-core
 
 The previous phase-complete specifier handoff `20260820T082928Z_000324` remains superseded. A corrected current-HEAD handoff will be sent only after this entry is committed and the final normal test/property checks complete.
 
+Sent corrective communications after commit `91e8bfd547`:
+
+- `00_20260820T103956Z_000327` to specifier: priority-00 git handoff for policy review.
+- `00_20260820T104009Z_000328` to specifier: priority-00 note identifying the 11 expected survivors.
+- `50_20260820T104017Z_000329` to specifier: corrected phase-complete git handoff, superseding `000324`.
+
 ## 2026-08-20T11:15:00Z — architect mutation verification completed
 
 After correcting the mutation runner command to use the worker-relative
