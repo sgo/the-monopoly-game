@@ -27,8 +27,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** Thin command boundary for running a configured Monopoly simulation. */
 public final class Simulator {
   private static final Set<String> STRATEGIES = Set.of("greedo", "billionaire");
-  private static final String MAX_YEARS_FLAG = "--max-years=";
-  private static final String SEED_FLAG = "--seed=";
 
   private Simulator() {
   }
@@ -48,11 +46,11 @@ public final class Simulator {
     if (List.of(arguments).contains("--optional-war-profits-tax"))
       System.out.println("War profits tax enabled");
     for (String argument : arguments) {
-      if (argument.startsWith(MAX_YEARS_FLAG)) {
-        System.out.println("Year limit is " + argument.substring(MAX_YEARS_FLAG.length()) + " years");
+      if (argument.startsWith(SimulatorFlags.MAX_YEARS_FLAG)) {
+        System.out.println("Year limit is " + argument.substring(SimulatorFlags.MAX_YEARS_FLAG.length()) + " years");
       }
-      if (argument.startsWith(SEED_FLAG)) {
-        System.out.println("Seed is " + argument.substring(SEED_FLAG.length()));
+      if (argument.startsWith(SimulatorFlags.SEED_FLAG)) {
+        System.out.println("Seed is " + argument.substring(SimulatorFlags.SEED_FLAG.length()));
       }
     }
     Result result = execute(arguments);
@@ -80,51 +78,22 @@ public final class Simulator {
 
   private static Result runSelected(String... arguments) {
     int playerCount = arguments.length == 0 ? 2 : Integer.parseInt(arguments[0]);
-    boolean stalemateTrading = List.of(arguments).contains("--optional-greedo-stalemate-trading");
-    boolean legalEntityTrading = List.of(arguments).contains("--optional-greedo-legal-entity");
-    boolean assetRichOpening = List.of(arguments).contains("--optional-asset-rich-billionaire");
-    boolean developmentLoans = List.of(arguments).contains("--optional-development-loans");
-    boolean fullDrawDevelopmentLoans = List.of(arguments).contains("--optional-development-loans-full-draw");
-    boolean warProfitsTax = List.of(arguments).contains("--optional-war-profits-tax");
-    int maxYears = extractMaxYears(arguments);
-    Long seed = extractSeed(arguments);
+    boolean stalemateTrading = SimulatorFlags.stalemateTrading(arguments);
+    boolean legalEntityTrading = SimulatorFlags.legalEntityTrading(arguments);
+    boolean assetRichOpening = SimulatorFlags.assetRichOpening(arguments);
+    boolean developmentLoans = SimulatorFlags.developmentLoans(arguments);
+    boolean fullDrawDevelopmentLoans = SimulatorFlags.fullDrawDevelopmentLoans(arguments);
+    boolean warProfitsTax = SimulatorFlags.warProfitsTax(arguments);
+    int maxYears = SimulatorFlags.maxYears(arguments);
+    Long seed = SimulatorFlags.seed(arguments);
     List<String> strategyNames = List.of(arguments).subList(Math.min(1, arguments.length), arguments.length).stream()
-        .filter(argument -> !isRecognizedFlag(argument)).toList();
+        .filter(argument -> !SimulatorFlags.recognized(argument)).toList();
     if (!strategyNames.isEmpty() && strategyNames.size() != playerCount)
       return new Result(1, "Supply one strategy for each player. " + usage());
     return run(playerCount, strategiesFor(playerCount, strategyNames, stalemateTrading, legalEntityTrading,
             assetRichOpening, developmentLoans, fullDrawDevelopmentLoans),
         stalemateTrading, legalEntityTrading, developmentLoans, fullDrawDevelopmentLoans, maxYears, seed,
         warProfitsTax);
-  }
-
-  private static boolean isRecognizedFlag(String argument) {
-    return argument.equals("--optional-greedo-stalemate-trading")
-        || argument.equals("--optional-greedo-legal-entity")
-        || argument.equals("--optional-asset-rich-billionaire")
-        || argument.equals("--optional-development-loans")
-        || argument.equals("--optional-development-loans-full-draw")
-        || argument.equals("--optional-war-profits-tax")
-        || argument.startsWith("--max-years")
-        || argument.startsWith(SEED_FLAG);
-  }
-
-  private static int extractMaxYears(String... arguments) {
-    for (String argument : arguments) {
-      if (argument.startsWith(MAX_YEARS_FLAG)) {
-        return Integer.parseInt(argument.substring(MAX_YEARS_FLAG.length()));
-      }
-    }
-    return -1;
-  }
-
-  private static Long extractSeed(String... arguments) {
-    for (String argument : arguments) {
-      if (argument.startsWith(SEED_FLAG)) {
-        return Long.parseLong(argument.substring(SEED_FLAG.length()));
-      }
-    }
-    return null;
   }
 
   static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames) {

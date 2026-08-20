@@ -39762,9 +39762,55 @@ round 1: core tax computation) + fresh verification:
   round 3: "forced mortgage on shortfall"); `WarProfitsTax.landValue()`/
   `colourStreetValue()` re-implement rent valuation mirroring `Rent`
   (maintainability divergence risk if `Rent` changes) — not blockers.
-- Verification: domain 422/422 (+5 new WarProfitsTax tests), acceptance
-  876/876 (war-profits-tax scenarios live on pipeline), characterization
-  10/10. All green.
+- Verification: domain 399 normal + 28 property (incl. +5 new WarProfitsTax tests, +5 new
+  WarProfitsTaxPropertyTest), acceptance 876/876 (war-profits-tax scenarios live on pipeline),
+  characterization 10/10. All green.
+
+## 2026-08-20T10:36:00Z — refactorer analysis-tools audit on war-profits-tax-core
+
+Constitution-mandated analysis pass on the war-profits-tax changes, and
+correcting the earlier "domain 422" figure (it was 399 normal + 23 property;
+the 422 over-summed by including property reports).
+
+- Property testing: assessed the newly-added pure `WarProfitsTax` core and
+  added `WarProfitsTaxPropertyTest` (JetCheck, `@Tag("property-test")`) covering
+  band-rate membership, monotonicity in land and in collected rent, the
+  below-25%-pays-no-tax rule, and tax = rate-scaled collected rent within
+  half-cent rounding. Verified it runs only under `-Pproperty-tests` (28
+  property tests, 0 failures) and is correctly excluded from the normal
+  profile (`excludedGroups=property-test`). Added no property tag to normal
+  coverage, per constitution.
+- CRAP (`crap4java`): new `WarProfitsTax.rate`/`tax` are clean (CC 1-2). New
+  `WarProfitsTax.landValue` is CC 9 with 0% coverage — expected at round 1
+  because its acceptance scenarios (round 2: ownership-share valuation) are
+  not yet on the pipeline; it's a forward prerequisite, not dead code. Will be
+  covered by round 2. `Game.journalOperation` (CC 7) remains the documented
+  CRAP-exempt sealed switch.
+- Mutation-site scan (mutate4java --scan) on every changed/new main source
+  file: `WarProfitsTax` 20, `WarProfitsTaxBook` 0, `Journalling` 23, `Report`
+  5 — all well under the 100-site split threshold. `Simulator` had crossed to
+  101 due to this merge (98 before): extracted the flag-parsing vocabulary
+  (`stalemateTrading`/`legalEntityTrading`/`assetRichOpening`/
+  `developmentLoans`/`fullDrawDevelopmentLoans`/`warProfitsTax`, `recognized`,
+  `maxYears`, `seed`, and the `--max-years=`/`--seed=` constants) into a
+  package-private `SimulatorFlags` helper — behavior-preserving, no public API
+  surface added, `Simulator.Running`/`strategiesFor`/`execute` untouched.
+  `Simulator` dropped 101 → 91. Verified: compile clean, `SimulatorTest`
+  12/12, acceptance 876/876 (incl. the 9 packaged-jar CLI scenarios that drive
+  this parsing). `SimulatorFlags` itself is 9 sites.
+- `Game` remains at 106 sites, a PRE-EXISTING breach (104 before this merge;
+  the war-profits feature added only ~2). Splitting the 2469-line core engine
+  over a +2 pre-existing overshoot is disproportionate and risk-heavy relative
+  to a dedicated cleanup; flagged for a follow-on structural split (the project
+  has historically extracted sub-clusters such as `Journalling` to bring Game
+  back under 100). Not blocking this handoff.
+- DRY (`dry4java`): only pre-existing, intentional near-threshold matches —
+  `Simulator`'s overload-delegating `run`/`start` wrappers (0.82; collapsing
+  would change public API) and `Journalling`'s per-event entry method families
+  (0.82, 4-5-line methods; collapsing would obscure each event's shape). No new
+  duplication attributable to the war-profits changes.
+
+Committing the `SimulatorFlags` extraction, the property test, and this audit.
 
 Handing the verified state back to the architect.
 
