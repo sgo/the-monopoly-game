@@ -40699,3 +40699,10 @@ Refactorer verification (all green):
   not forced-refactored (unused accessor outside the active path).
 
 Handing the verified state back to the architect.
+## 2026-08-20T15:20:00Z — coder covers Journalling payment mutation survivors
+
+Processed architect priority-00 note `000339`, which identified survivors in
+`Journalling.java` at lines 63, 67, and 74. Added `JournallingTest` to exercise
+the real production tax-assessment path for disabled tax, zero-tax/no mortgage,
+and shortfall traversal past an already mortgaged property. Focused tests pass
+3/3 and the full domain suite passes 410/410.
