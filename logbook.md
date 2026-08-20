@@ -40870,7 +40870,6 @@ Verification:
 - Focused Game/Journalling/Report tests: 87/87 pass.
 - Full domain suite: 411/411 pass.
 - Full acceptance pipeline: 898/898 pass.
-
 ## 2026-08-20T13:45:00Z — refactorer processes coder handoff `ad43a16fbd` (round 4: observability)
 
 Merged the war-profits-tax observability completion. Production change is one
@@ -40910,5 +40909,141 @@ war-profits rounds:
 CRAP on `WarProfitsTaxBook.assess` (new, round 3) was 3.0/82.4% cov (fine);
 the pre-existing `setGovernmentBalance` CRAP 12.0/0% (unused setter) is
 documented in the round-3 entry. No war-profits-introduced CRAP breach exists.
+
+Handing the verified state back to the architect.
+
+## 2026-08-20T13:18:54Z — specifier hands off war-profits-tax-observability (final piece)
+
+User approved. Promoted the last 5 backlogged files for this feature:
+journal-85..88, logging-85..88, report-85..88 (tax-payment narration,
+final government-balance, enabled/disabled-by-default pair, unchanged
+from the backlog), and cli-14/15, cli-jar-10 (flag wiring). Verified
+current next-free indices against each tracked file before appending
+(84/84/84/13/9) — all matched the backlog's own assumptions exactly.
+Noticed `cli-jar-5`'s `--optional-war-profits-tax` line was already
+present, added incidentally during round 1's CLI mutation-coverage fix,
+so only the new scenario itself needed promoting there.
+
+Deleted all 5 backlog files (each held only this feature's content); the
+entire `backlog/` directory is now empty project-wide.
+
+Ran `bb gherkin-parser` + `bb gherkin-ir-dry-checker` against each of the
+5 modified tracked files. No new `duplicate-in-scenario` findings
+anywhere. The `possible-synonym`/`near-duplicate` counts are large
+because journal/logging/report are big, mature files — checked
+specifically for findings naming a war-profits-tax scenario: all are
+low-confidence token-overlap against unrelated pre-existing scenarios
+that happen to share phrasing ("records... payment", "pays..."), not
+real duplication. `cli.feature`/`cli-jar.feature` show zero
+war-profits-tax-related findings at all.
+
+Committed as `1dbff7417c`. This closes out war-profits-tax in full —
+every scenario across every file for this feature is now tracked.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: war-profits-tax-observability
+commit: 1dbff7417c
+```
+
+## 2026-08-20T13:49:46Z — specifier investigates a reported CLI survivor and can't reproduce it
+
+Handoff received: "New CLI survivor: war tax expected enabled->eNabled
+still passes; decide policy." Before ruling on policy, checked whether
+this is real, given `state.equals("enabled")` (the actual comparison,
+found at `MonopolyStepHelpers.warProfitsTax`) is case-sensitive — a
+mutated "eNabled" should build a `WarProfitsTaxEnabled(false)` claim,
+which should fail against a journal that actually records
+`WarProfitsTaxEnabled(true)`, not survive.
+
+Verified directly rather than trust the report: in the coder worktree,
+temporarily changed cli-14's Examples `state` from `enabled` to
+`eNabled` and ran `acceptance/run-acceptance.sh`. It failed exactly as
+predicted — `AssertionError: The game journal records no
+WarProfitsTaxEnabled[enabled=false]; it records: ... WarProfitsTaxEnabled
+[enabled=true] ...`. Repeated for cli-15 (billionaire/greedo variant):
+same result, failed as expected. Reverted both edits afterward
+(`git checkout --`); worktree left clean.
+
+Cannot confirm this survivor exists as reported. Sent a note back to the
+architect describing the discrepancy rather than either accepting the
+claim or inventing a policy determination for something unverified.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Can't reproduce: eNabled fails cli-14/15 in my direct test. Recheck your run?
+```
+
+## 2026-08-20T13:56:40Z — specifier receives confirmation the cli-14/15 survivor was a tooling artifact
+
+Handoff received: "Recheck: cli-14/15 reject eNabled; packaged survivor
+is runner discrepancy." Confirms my direct test — cli-14/15 correctly
+reject the mutation. The actual survivor was in the packaged-jar scenario
+(cli-jar-10), and the architect attributes it to a mutation-runner
+discrepancy rather than a real spec gap (consistent with how packaged-jar
+tests depend on a rebuilt jar; a stale artifact would make the runner
+observe behavior unrelated to the mutated feature file). No policy
+question is being routed to the specifier here — informational, closing
+without further action.
+
+## 2026-08-20T17:30:00Z — coder processes characterization-war-profits-tax handoff
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+merge_and_process specifier 4d90b5a13c
+```
+
+Merged the characterization specification and resolved the logbook merge
+conflict by preserving both the specifier's observability history and the
+coder's implementation history. Added characterization config 10 for the
+asset-rich Billionaire plus Greedo with `--optional-war-profits-tax`.
+Extended `GameBreakdown` with optional war-profits-tax payment count/total,
+payer counts, and final government-balance Stats aggregated across every
+seed, including zero-balance seeds. Added focused parsing, aggregation, and
+JSON round-trip coverage. Updated README sync validation and README's
+Summary/Detailed Breakdown data for all ten configs. Generated the config-10
+50-seed baseline.
+
+Verification:
+
+- Characterization profile: 12/12 pass (10 configs, README sync, focused tax breakdown test).
+- Full domain suite: 411/411 pass.
+- The existing unseeded `SimulatorTest.keepsPlayingUntilToldToStop` timing
+  assertion failed in the CLI module and on an isolated rerun; no simulator
+  production code was changed for this unrelated flake.
+
+## 2026-08-20T14:45:00Z — refactorer processes coder handoff `436bd72e11` (characterization-war-profits-tax)
+
+Merged the war-profits-tax characterization baseline. This is test-side
+harness work: `CharacterizationConfig` gains config 10 (asset-rich Billionaire
++ Greedo with `--optional-war-profits-tax`); `GameBreakdown.WarProfitsTaxExtras`
+records payment count/total-dollars, per-payer counts, and final
+government-balance Stats aggregated across every seed (incl. zero-balance
+seeds), serialised to a fixture; `CharacterizationTest` adds focused
+parsing/aggregation/JSON round-trip coverage; new 50-seed fixture
+`eight_billionaire_greedo_asset_rich_war_profits_tax.json`; README sync
+validation + Summary/Detailed Breakdown updated for all ten configs.
+
+(Logbook merge conflict during this merge: my round-4/CRAP-audit notes
+coexisted with the coder's specifier-observability + characterization history;
+resolved by preserving both chronologically.)
+
+Refactorer verification (all green):
+- Characterization 12/12 (10 configs + README sync + focused tax-breakdown
+  test) — includes the new config-10 50-seed baseline.
+- Full domain suite 411/411.
+- CLI 19/19 excluding the documented pre-existing
+  `SimulatorTest.keepsPlayingUntilToldToStop` timing flake (recurred; no
+  simulator production code changed here).
 
 Handing the verified state back to the architect.

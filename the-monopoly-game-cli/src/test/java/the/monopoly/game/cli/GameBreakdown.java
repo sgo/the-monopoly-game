@@ -18,7 +18,8 @@ record GameBreakdown(
     Core core,
     Optional<LoanExtras> loans,
     Optional<EntityExtras> entities,
-    Optional<TradeExtras> trades
+    Optional<TradeExtras> trades,
+    Optional<WarProfitsTaxExtras> warProfitsTax
 ) {
 
   static GameBreakdown aggregate(List<GameResult> results) {
@@ -40,9 +41,12 @@ record GameBreakdown(
         .reduce(EntityExtras::merge).orElse(null);
     TradeExtras trades = results.stream().map(GameResult::trades).filter(Optional::isPresent).map(Optional::get)
         .reduce(TradeExtras::merge).orElse(null);
+    WarProfitsTaxExtras warProfitsTax = results.stream().map(GameResult::warProfitsTax)
+        .filter(Optional::isPresent).map(Optional::get).reduce(WarProfitsTaxExtras::merge).orElse(null);
 
     return new GameBreakdown(outcomes, winners, Stats.of(ages), core,
-        Optional.ofNullable(loans), Optional.ofNullable(entities), Optional.ofNullable(trades));
+        Optional.ofNullable(loans), Optional.ofNullable(entities), Optional.ofNullable(trades),
+        Optional.ofNullable(warProfitsTax));
   }
 
   String toJson() {
@@ -55,6 +59,7 @@ record GameBreakdown(
     loans.ifPresent(it -> json.append(",\n  \"loans\": ").append(it.toJson()));
     entities.ifPresent(it -> json.append(",\n  \"entities\": ").append(it.toJson()));
     trades.ifPresent(it -> json.append(",\n  \"trades\": ").append(it.toJson()));
+    warProfitsTax.ifPresent(it -> json.append(",\n  \"warProfitsTax\": ").append(it.toJson()));
     json.append("\n}");
     return json.toString();
   }
@@ -68,7 +73,8 @@ record GameBreakdown(
         Core.fromJson(fields.get("core")),
         Optional.ofNullable(fields.get("loans")).map(LoanExtras::fromJson),
         Optional.ofNullable(fields.get("entities")).map(EntityExtras::fromJson),
-        Optional.ofNullable(fields.get("trades")).map(TradeExtras::fromJson));
+        Optional.ofNullable(fields.get("trades")).map(TradeExtras::fromJson),
+        Optional.ofNullable(fields.get("warProfitsTax")).map(WarProfitsTaxExtras::fromJson));
   }
 
   private static String mapToJson(Map<String, Integer> map) {
@@ -347,6 +353,36 @@ record GameBreakdown(
     }
   }
 
+  record WarProfitsTaxExtras(int payments, long totalDollars, Map<String, Integer> payers,
+                             Stats governmentBalance, List<Integer> governmentBalances) {
+
+    WarProfitsTaxExtras merge(WarProfitsTaxExtras other) {
+      List<Integer> balances = new java.util.ArrayList<>(governmentBalances);
+      balances.addAll(other.governmentBalances);
+      return new WarProfitsTaxExtras(
+          payments + other.payments,
+          totalDollars + other.totalDollars,
+          mergeMaps(payers, other.payers),
+          Stats.of(balances), balances);
+    }
+
+    String toJson() {
+      return "{\"payments\": " + payments + ", \"totalDollars\": " + totalDollars
+          + ", \"payers\": " + mapToJson(payers)
+          + ", \"governmentBalance\": " + governmentBalance.toJson() + "}";
+    }
+
+    static WarProfitsTaxExtras fromJson(String json) {
+      Map<String, String> fields = parseObject(json);
+      return new WarProfitsTaxExtras(
+          Integer.parseInt(fields.get("payments")),
+          parseLong(fields.get("totalDollars")),
+          parseStringIntMap(fields.get("payers")),
+          Stats.fromJson(fields.get("governmentBalance")),
+          List.of());
+    }
+  }
+
   private static Map<String, Integer> mergeMaps(Map<String, Integer> a, Map<String, Integer> b) {
     Map<String, Integer> merged = new LinkedHashMap<>(a);
     b.forEach((k, v) -> merged.merge(k, v, Integer::sum));
@@ -387,8 +423,10 @@ record GameBreakdown(
     private final Optional<LoanExtras> loans;
     private final Optional<EntityExtras> entities;
     private final Optional<TradeExtras> trades;
+    private final Optional<WarProfitsTaxExtras> warProfitsTax;
 
-    GameResult(String report, boolean developmentLoans, boolean legalEntityTrading, boolean stalemateTrading) {
+    GameResult(String report, boolean developmentLoans, boolean legalEntityTrading, boolean stalemateTrading,
+               boolean warProfitsTax) {
       List<String> lines = report.lines().toList();
       Optional<String> won = lines.stream().filter(line -> line.contains(" wins the game")).findFirst()
           .map(line -> line.substring(0, line.indexOf(" wins the game")));
@@ -434,6 +472,10 @@ record GameBreakdown(
       int formed = 0;
       int dissolved = 0;
       int peerTrades = 0;
+      int taxPayments = 0;
+      long taxDollars = 0;
+      Map<String, Integer> taxPayers = new LinkedHashMap<>();
+      List<Integer> governmentBalances = new java.util.ArrayList<>();
 
       for (String line : lines) {
         // Loan handling only counts when the config enables development loans,
@@ -477,6 +519,18 @@ record GameBreakdown(
         if (stalemateTrading) {
           if (line.contains(" trades ") && line.contains(" to ") && line.contains(" for ")) peerTrades++;
         }
+        if (warProfitsTax) {
+          int taxAt = line.indexOf(" pays a war profits tax of $");
+          if (taxAt >= 0) {
+            String payer = line.substring(0, taxAt);
+            long amount = dollarsAfter(line, " pays a war profits tax of $");
+            taxPayments++;
+            taxDollars += amount;
+            taxPayers.merge(payer, 1, Integer::sum);
+          }
+          if (line.contains("The government's account holds $"))
+            governmentBalances.add((int) dollarsAfter(line, "The government's account holds $"));
+        }
 
         // Generic core accounting happens unconditionally: these lines are exactly
         // the mechanics the spec wants visible for every config.
@@ -507,6 +561,10 @@ record GameBreakdown(
       this.trades = stalemateTrading
           ? Optional.of(new TradeExtras(peerTrades))
           : Optional.empty();
+      this.warProfitsTax = warProfitsTax
+          ? Optional.of(new WarProfitsTaxExtras(taxPayments, taxDollars, taxPayers,
+              Stats.of(governmentBalances), governmentBalances))
+          : Optional.empty();
     }
 
     String outcome() { return outcome; }
@@ -516,5 +574,6 @@ record GameBreakdown(
     Optional<LoanExtras> loans() { return loans; }
     Optional<EntityExtras> entities() { return entities; }
     Optional<TradeExtras> trades() { return trades; }
+    Optional<WarProfitsTaxExtras> warProfitsTax() { return warProfitsTax; }
   }
 }

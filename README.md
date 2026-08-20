@@ -34,6 +34,7 @@ fixtures by the same test suite (see `README sync check` in
 | 8 | 1 Billionaire (cash-rich) + 7 Greedo | peer-trading + legal-entity | 86% win (43), 14% stalemate (7) | 5 / 12 / 16.54 / 57 |
 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich | 100% win (50) | 1 / 4 / 4.12 / 10 |
 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich + dev-loans | 100% win (50) | 1 / 4 / 4.0 / 12 |
+| 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich + war-profits-tax | 74% win (37), 26% stalemate (13) | 0 / 17 / 81.62 / 454 |
 
 Full breakdown for any config lives in
 [`the-monopoly-game-cli/src/test/resources/characterization/`](the-monopoly-game-cli/src/test/resources/characterization/).
@@ -168,6 +169,24 @@ Full breakdown for any config lives in
   - Servicing: borrowers paid \$1,193 interest + \$1,495 principal; bondholders received \$629 interest + \$1,495 principal
 - Entities: 3 formed, 3 dissolved
 - Peer trades: 1
+
+</details>
+
+<details>
+<summary>8 players — 1 Billionaire (asset-rich) + 7 Greedo — peer-trading + legal-entity + asset-rich + war-profits-tax</summary>
+
+- Outcome: 74% win (37), 26% stalemate (13)
+- Winners: ship 4, dog 5, iron box 9, thimble 5, high hat 3, shoe 5, racecar 4, wheelbarrow 2
+- Age at end: min 0, median 17, mean 81.62, max 454
+- Bankruptcies: dog 183, the bank 64, racecar 17, iron box 16, thimble 11, high hat 11, ship 9, shoe 9, wheelbarrow 11
+- Auctions: 148 (10.9% of 1,360 land acquisitions)
+- Mortgages: 755
+- Income: salary \$1,881,600, rent \$1,910,428, bank payments \$224,990
+- Entities: 23 formed, 3 dissolved
+- Peer trades: 1
+- War-profits tax: 52 payments, \$275,456 total
+- Tax payers: dog 48, racecar 2, iron box 2
+- Government balance: min 3002, median 5333, mean 5226.0, max 7499
 
 </details>
 
