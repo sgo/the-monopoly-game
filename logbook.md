@@ -39232,13 +39232,22 @@ would silently re-pair config↔fixture), and `formatMean` uses `Double.toString
 trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
+## 2026-08-20T19:50:00Z — architect closes ordinary-win balance phase
+
+Processed refactorer handoff `000185` at `96df989718` and merged it. Independent
+verification passes: full Maven suite 412/412, characterization 12/12,
+acceptance pipeline green, and differential `Journalling.java` mutation 20/20
+killed with all changed ordinary-win paths covered. DRY reports only the
+pre-existing journal-entry repetition families. Phase is complete for the
+specifier.
 ## 2026-08-20T16:45:00Z — architect closes characterization phase
 
 Processed refactorer handoff `000184` at `e9645b76b5` and merged it. Independent
 verification passes: characterization profile 12/12 (including config 10's
 war-profits-tax baseline), full domain suite 411/411, and DRY reports no
 duplicate candidates in the new `GameBreakdown`/`CharacterizationConfig`
-paths. The phase is complete and is handed to the specifier.
+paths. The phase is complete and is handed to the specifier. Sent phase-
+complete handoff `50_20260820T144435Z_000344` at commit `4c359b9a07`.
 Architect sent policy follow-up `00_20260820T134946Z_000342` to the specifier
 for the surviving case-mutation assertion in the new CLI war-profits-tax
 scenario. Awaiting policy before any coder follow-up or phase-complete handoff.
@@ -41181,3 +41190,57 @@ priority: 50
 task: war-profits-tax-ordinary-win-balance
 commit: 5eca564519
 ```
+
+## 2026-08-20T19:50:00Z — coder processes war-profits-tax-ordinary-win-balance
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+merge_and_process specifier 5eca564519
+```
+
+The approved scenarios require the final government balance to be
+observable after an ordinary win, not only after a stalemate or year
+limit. Added the minimal production change in `Journalling.won`: when
+war-profits-tax is enabled, the existing `WarProfitsTaxBook` balance is
+logged after the winner and final age entries. Added focused enabled and
+disabled unit coverage in `JournallingTest`.
+
+Regenerated config 10's characterization baseline so its government
+balance Stats now cover all 50 final balances: min 0, max 10956, mean
+5509.12, median 5335. Updated the matching README detail line.
+
+Verification:
+
+- Focused Game/Journalling/Report tests: 88/88 pass.
+- Acceptance pipeline: 901/901 pass, including journal/logging/report
+  ordinary-win scenarios.
+- Characterization profile: 12/12 pass.
+- Full domain suite: 412/412 pass.
+
+## 2026-08-20T15:00:00Z — refactorer processes coder handoff `9300e1fb54` (ordinary-win balance)
+
+Merged the war-profits-tax ordinary-win balance completion. Production
+change is one line in `Journalling.won()`: when war-profits-tax is enabled,
+it now also logs `Journal.Entry.GovernmentBalance(...)` after the
+ordinary-win Won/FinalAge entries — so an ordinary win's report shows the
+final government balance. `Game.java`'s large merge diff is only the
+`mutate4java-manifest` module/semantic hashes recomputing; no code change
+there. Feature/CLI specs updated for the new ordinary-win narration.
+
+Refactorer verification (all green):
+- Domain 412/412 (+1 new `JournallingTest`) + 28/28 property.
+- Acceptance 901/901 (+3 ordinary-win balance scenarios; was 898).
+- CLI 19/19 excluding the documented pre-existing
+  `keepsPlayingUntilToldToStop` timing flake; characterization 12/12.
+- CRAP: `won` 2.0 (100% cov, now covered); war-profits methods
+  `assessWarProfitsTax` 3.0 / `mortgageWarProfitsTaxCollateral` 5.0 (97.9%)
+  all green. The file's CRAP 72.0 is `Journalling.mortgageSpareProperty`
+  (CC 8, 0%) — the pre-existing legal-entity development-loan collateral
+  mortgage, distinct from `mortgageWarProfitsTaxCollateral`, unchanged by
+  this merge and outside the war-profits scope (same entity-loan machinery
+  flagged in the round-4 CRAP audit).
+- Mutation sites: Journalling 24 (unchanged), no new sites introduced.
+
+Handing the verified state back to the architect.
