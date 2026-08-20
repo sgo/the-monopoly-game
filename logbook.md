@@ -39726,3 +39726,40 @@ while the actual spec intent could differ.
 Blocking round-1 implementation pending the specifier's decision on the
 exact band table. Routed via handoff to the specifier. Not committing
 any code for this slice until the decision returns.
+
+## 2026-08-20T10:35:00Z — specifier resolves the band-table ambiguity
+
+Merged coder's `94f5936095` (pure logbook append, no conflicting content
+beyond the usual two-block interleave) as `ca7ee83`.
+
+Confirmed coder's inference with the user: 25/40/60/80/100% ownership
+share -> 0/100/150/200/300/400% rate, each band's lower bound inclusive.
+Spelled that out as an explicit table in the feature narrative (both the
+tracked round-1 file and the backlog's full-feature copy, so future
+rounds don't inherit the same ambiguity), and reworked
+`war-profits-tax-2`'s Examples table: instead of five points sitting
+safely inside each band, it's now nine points in boundary-straddling
+pairs — $1 short of a threshold (top of the lower band) paired with
+the threshold itself (bottom of the next band) — so a wrong boundary
+choice fails at least one assertion instead of passing by luck. Added a
+matching near-boundary row ($5,697, just under the 25% floor) to
+`war-profits-tax-1`, combined with a large collected amount to also
+reinforce that scenario's "no matter how much rent was collected" claim
+in the same row.
+
+Re-ran `bb gherkin-parser` + `bb gherkin-ir-dry-checker`: same 4 expected
+findings as before (intentional double "grows a year older", paraphrase
+pairs), unchanged by the added example rows. Markdown table in the
+narrative parses cleanly — ignored, as it's prose, not Background/steps.
+
+Committed as `29793dc`. Unblocking coder.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: war-profits-tax-core
+commit: 29793dc9b9
+```
