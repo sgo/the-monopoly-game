@@ -77,6 +77,13 @@ class ReadmeSyncTest {
         assertField(block, "Entities", entities.formed() + " formed, " + entities.dissolved() + " dissolved", configLabel));
     baseline.trades().ifPresent(trades ->
         assertField(block, "Peer trades", String.valueOf(trades.peerTrades()), configLabel));
+    baseline.warProfitsTax().ifPresent(tax -> validateWarProfitsTax(block, tax, configLabel));
+  }
+
+  private void validateWarProfitsTax(String block, GameBreakdown.WarProfitsTaxExtras tax, String configLabel) {
+    assertField(block, "War-profits tax", tax.payments() + " payments, \\$" + dollars(tax.totalDollars()) + " total", configLabel);
+    assertNameMultiset(block, "Tax payers", tax.payers(), configLabel);
+    assertField(block, "Government balance", detailedAgeFromBaseline(tax.governmentBalance()), configLabel);
   }
 
   private void validateLoans(String block, GameBreakdown.LoanExtras loans, String configLabel) {

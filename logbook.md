@@ -40931,3 +40931,31 @@ tests depend on a rebuilt jar; a stale artifact would make the runner
 observe behavior unrelated to the mutated feature file). No policy
 question is being routed to the specifier here — informational, closing
 without further action.
+
+## 2026-08-20T17:30:00Z — coder processes characterization-war-profits-tax handoff
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+merge_and_process specifier 4d90b5a13c
+```
+
+Merged the characterization specification and resolved the logbook merge
+conflict by preserving both the specifier's observability history and the
+coder's implementation history. Added characterization config 10 for the
+asset-rich Billionaire plus Greedo with `--optional-war-profits-tax`.
+Extended `GameBreakdown` with optional war-profits-tax payment count/total,
+payer counts, and final government-balance Stats aggregated across every
+seed, including zero-balance seeds. Added focused parsing, aggregation, and
+JSON round-trip coverage. Updated README sync validation and README's
+Summary/Detailed Breakdown data for all ten configs. Generated the config-10
+50-seed baseline.
+
+Verification:
+
+- Characterization profile: 12/12 pass (10 configs, README sync, focused tax breakdown test).
+- Full domain suite: 411/411 pass.
+- The existing unseeded `SimulatorTest.keepsPlayingUntilToldToStop` timing
+  assertion failed in the CLI module and on an isolated rerun; no simulator
+  production code was changed for this unrelated flake.
