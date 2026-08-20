@@ -49,6 +49,37 @@ class WarProfitsTaxTest {
   }
 
   @Test
+  void exactTwentyFivePercentOwnershipEntersTheFirstTaxBand() {
+    long exact = boardValue.cents() * 25 / 100;
+    assertThat(WarProfitsTax.rate(boardValue, Money.fromCents(exact - 1))).isZero();
+    assertThat(WarProfitsTax.rate(boardValue, Money.fromCents(exact))).isEqualTo(100);
+  }
+
+  @Test
+  void landValueUsesTheCurrentHouseTierRent() {
+    Deeds deeds = new Deeds();
+    Player dog = player("dog");
+    ColourStreet meir = street(Street.Type.MeirAntwerpen);
+    deeds.sell(meir, dog, Money.ZERO);
+    deeds.arrangeHouses(meir, 2);
+
+    assertThat(WarProfitsTax.landValue(rules, deeds, dog)).isEqualTo(meir.rentForHouses(2));
+  }
+
+  @Test
+  void landValueDoesNotDoubleVacantRentWithoutAnUnmortgagedMonopoly() {
+    Deeds deeds = new Deeds();
+    Player dog = player("dog");
+    ColourStreet meir = street(Street.Type.MeirAntwerpen);
+    ColourStreet nieuwstraat = street(Street.Type.NieuwstraatBrussel);
+    deeds.sell(meir, dog, Money.ZERO);
+    deeds.sell(nieuwstraat, dog, Money.ZERO);
+    deeds.arrangeMortgaged(nieuwstraat);
+
+    assertThat(WarProfitsTax.landValue(rules, deeds, dog)).isEqualTo(meir.vacantRent());
+  }
+
+  @Test
   void landValueUsesVacantRentForOwnedUndevelopedLand() {
     Deeds deeds = new Deeds();
     Player dog = player("dog");
