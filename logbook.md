@@ -40378,3 +40378,12 @@ review-loop outcome before returning the state to the architect under the same
 The review-loop commit did not address the independently discovered mutation
 survivors. Sent explicit survivor details to coder as note
 `00_20260820T121203Z_000334`; task remains open pending new coverage.
+
+## 2026-08-20T14:35:00Z — coder kills three WarProfitsTax mutation survivors
+
+Processed architect priority-00 note `000334`, which identified survivors at
+WarProfitsTax lines 52, 96, and 101. Added focused tests for exact cent-based
+25% threshold behavior, intermediate house-tier rent, and the absence of
+monopoly doubling when a colour group is incomplete or partly mortgaged.
+Focused tax tests pass 10/10; full domain suite passes 404/404. No production
+code changes were necessary.
