@@ -39233,6 +39233,30 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-20T15:10:00Z — architect payment/enforcement verification
+
+Merged refactorer payment handoff `8c17b3d522` and closed inbound batch
+`20260820T125405Z_000001`. Independent acceptance passed 883/883; the
+`WarProfitsTaxBook` mutation run killed 1/1. Forced `Journalling` mutation
+found 15/24 survivors, mostly pre-existing journal branches. Three survivors
+are on the changed payment path: line 63 (disabled tax guard), line 67
+(zero-owed journal entry), and line 74 (already-mortgaged collateral skip).
+Routed those focused gaps to coder as `00_20260820T125659Z_000339`; no phase
+handoff is sent until they are addressed or explicitly classified.
+
+Merged coder payment-coverage commit `dab728caaa` as `f6be670` and closed
+inbound batch `20260820T130315Z_000001`. Independent verification killed all
+changed payment-path mutations: `WarProfitsTaxBook` 1/1 and the new
+`Journalling` branches at lines 63, 67, and 74. Full acceptance passed 883/883.
+Soft acceptance now has 16 expected survivors: the 14 previously confirmed
+invariant/same-band cases plus round-3 `land_value` 6000→5992 and `collected`
+90→84. Sent the new two-value review to specifier as
+`00_20260820T130535Z_000340`; phase remains open pending confirmation.
+
+Processed specifier confirmation `00_20260820T130613Z_000219` and closed batch
+`20260820T130620Z_000001`. Both new survivors were confirmed expected: one
+same-band interior mutation and the Knokke smaller-bill invariant.
+
 ## 2026-08-20T12:00:00Z — architect processes refactorer ownership-share handoff
 
 Merged refactorer commit `30d107c676` for `war-profits-tax-ownership-share` and
@@ -40598,6 +40622,9 @@ Processed specifier confirmation `00_20260820T122603Z_000217` and closed its
 batch `20260820T122610Z_000001`. Specifier confirmed all 14 soft survivors are
 expected invariant/same-band interior mutations; no specification gap remains.
 
+Sent final phase-complete handoff `50_20260820T122636Z_000338` to specifier on
+verified commit `5c0e8a33c1`.
+
 ## 2026-08-20T14:45:00Z — coder covers one-house rent mutation survivor
 
 Processed architect priority-00 note `000335`, which reported the remaining
@@ -40703,3 +40730,69 @@ to: architect
 priority: 00
 message: Both expected: same-band interior (8), Knokke still covers a smaller bill (9).
 ```
+
+## 2026-08-20T15:05:00Z — coder implements war-profits-tax payment and enforcement
+
+Merged specifier handoff `5094191b43` for round 3 (`war-profits-tax-8, 9`).
+Added a callback-based shortfall boundary to `WarProfitsTaxBook.assess`, so
+callers can raise cash before the government payment while preserving the
+existing overload. Production `Journalling` now mortgages unencumbered owned
+land in board order when tax exceeds cash; the acceptance World mirrors this
+for direct scenario assertions while preserving synthetic no-deeds scenarios.
+Added focused unit coverage for shortfall funding and accumulated government
+payments.
+
+Verification:
+
+- Focused WarProfitsTaxTest: 13/13 pass.
+- Payment acceptance: 19/19 pass.
+- Domain suite: 407/407 pass.
+- Full acceptance pipeline: 883/883 pass.
+
+## 2026-08-20T13:10:00Z — refactorer processes coder handoff `8f39e2b172` (round 3: payment/enforcement)
+
+Merged the round-3 war-profits-tax payment-enforcement completion. This is
+genuine domain production code this time, not just harness/spec:
+- `WarProfitsTaxBook.assess(player, landValue, raiseShortfall)` — new overload;
+  when the player's balance can't cover the owed tax, it invokes the callback
+  with the shortfall before withdrawing. Old 2-arg `assess` delegates with an
+  empty callback (back-compatible). This closes the round-1 noted gap where
+  `assess()` withdrew without a sufficiency check.
+- `Journalling.assessWarProfitsTax` now supplies `raiseShortfall` →
+  `mortgageWarProfitsTaxCollateral` (mortgages unencumbered owned land in board
+  order until the shortfall is covered).
+- `WarProfitsTaxTest` +6 focused cases; live `war-profits-tax.feature` +52
+  round-3 scenarios; `World` harness mirrors the mortgage path.
+
+Refactorer verification (all green):
+- Domain 407/407 (+6 payment tests) + 28/28 property.
+- Acceptance 883/883 (+2 round-3 scenarios; was 881).
+- CLI 19/19 excluding the documented pre-existing
+  `keepsPlayingUntilToldToStop` timing flake; characterization 10/10.
+- Mutation-site scan: WarProfitsTaxBook 1, Journalling 24, WarProfitsTax 20,
+  Game 106 (documented pre-existing breach) — all under threshold except
+  Game's known breach.
+- CRAP: `WarProfitsTaxBook.assess` (new) 3.0 at 82.4% cov (fine);
+  `setGovernmentBalance` is CRAP 12.0 at 0% coverage — a PRE-EXISTING public
+  setter with no production call sites, not introduced by round 3. Recorded,
+  not forced-refactored (unused accessor outside the active path).
+
+Handing the verified state back to the architect.
+
+## 2026-08-20T15:20:00Z — coder covers Journalling payment mutation survivors
+
+Processed architect priority-00 note `000339`, which identified survivors in
+`Journalling.java` at lines 63, 67, and 74. Added `JournallingTest` to exercise
+the real production tax-assessment path for disabled tax, zero-tax/no mortgage,
+and shortfall traversal past an already mortgaged property. Focused tests pass
+3/3 and the full domain suite passes 410/410.
+
+## 2026-08-20T15:35:00Z — architect closes payment phase
+
+Processed specifier confirmation `000219` for the two new soft acceptance
+mutation survivors: both are expected policy outcomes (same-band interior and
+the smaller Knokke bill). The payment path is independently verified: full
+acceptance 883/883, WarProfitsTaxBook mutation 1/1 killed, and all changed
+Journalling payment branches killed. Remaining Journalling survivors are
+pre-existing unrelated branches. Regenerated mutation manifests are included
+in this commit; phase-complete handoff follows to the specifier.

@@ -1,6 +1,7 @@
 package the.monopoly.game.rules;
 
 import org.junit.jupiter.api.Test;
+import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
@@ -8,6 +9,7 @@ import the.monopoly.game.components.streets.Ownable;
 import the.monopoly.game.components.streets.Street;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,6 +20,42 @@ class WarProfitsTaxTest {
   @Test
   void boardValueMatchesTheStalemateThreshold() {
     assertThat(boardValue).isEqualTo(new Money(22790));
+  }
+
+  @Test
+  void assessmentRaisesTheCashShortfallBeforePayingGovernment() {
+    Bank.Simple bank = new Bank.Simple();
+    Player dog = player(bank, "dog");
+    WarProfitsTaxBook book = new WarProfitsTaxBook(bank, boardValue);
+    book.accumulate(dog, new Money(1000));
+    AtomicReference<Money> requested = new AtomicReference<>();
+
+    Money paid = book.assess(dog, new Money(5698), shortfall -> {
+      requested.set(shortfall);
+      dog.account().deposit(shortfall);
+    });
+
+    assertThat(requested).hasValue(new Money(1000));
+    assertThat(paid).isEqualTo(new Money(1000));
+    assertThat(dog.account().balance().amount()).isEqualTo(Money.ZERO);
+    assertThat(book.governmentBalance()).isEqualTo(new Money(1000));
+  }
+
+  @Test
+  void assessmentsAccumulateTaxesInTheGovernmentAccount() {
+    Bank.Simple bank = new Bank.Simple();
+    Player dog = player(bank, "dog");
+    Player highHat = player(bank, "high hat");
+    WarProfitsTaxBook book = new WarProfitsTaxBook(bank, boardValue);
+    book.accumulate(dog, new Money(1000));
+    book.accumulate(highHat, new Money(1000));
+    dog.account().deposit(new Money(1000));
+    highHat.account().deposit(new Money(1000));
+
+    book.assess(dog, new Money(6000));
+    book.assess(highHat, new Money(6000));
+
+    assertThat(book.governmentBalance()).isEqualTo(new Money(2000));
   }
 
   @Test
@@ -141,8 +179,12 @@ class WarProfitsTaxTest {
   }
 
   private Player player(String name) {
+    return player(rules.bank(), name);
+  }
+
+  private Player player(Bank bank, String name) {
     Player.ID id = new Player.ID(name);
-    rules.bank().createAccountFor(id);
-    return new Player(id, rules.bank().accountOf(id));
+    bank.createAccountFor(id);
+    return new Player(id, bank.accountOf(id));
   }
 }

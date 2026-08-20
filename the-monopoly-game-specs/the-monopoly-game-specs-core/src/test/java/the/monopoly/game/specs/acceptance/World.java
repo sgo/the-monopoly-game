@@ -781,6 +781,10 @@ public class World {
     Money collected = pawnCollectedRent.getOrDefault(pawnName, Money.ZERO);
     Money board = the.monopoly.game.rules.WarProfitsTax.boardValue(ruleSet);
     Money tax = the.monopoly.game.rules.WarProfitsTax.tax(board, landValue, collected);
+    Player player = pawn(pawnName);
+    Money balance = player.account().balance().amount();
+    if (!balance.covers(tax)) mortgageTaxShortfall(player, tax.minus(balance));
+    player.account().withdraw(tax);
     pawnCollectedRent.put(pawnName, Money.ZERO);
     governmentBalance = governmentBalance.plus(tax);
     lastWarProfitsTaxPaid.put(pawnName, tax);
@@ -792,6 +796,17 @@ public class World {
     if (deeds != null && !deeds.landOwnedBy(owner).isEmpty())
       return the.monopoly.game.rules.WarProfitsTax.landValue(ruleSet, deeds, owner);
     return pawnLandWorthRent.getOrDefault(pawnName, Money.ZERO);
+  }
+
+  private void mortgageTaxShortfall(Player player, Money shortfall) {
+    if (deeds == null) return;
+    for (Street.Type type : ruleSet.gameboard().layout()) {
+      if (!deeds.landOwnedBy(player).contains(type)) continue;
+      Ownable land = ownable(type);
+      if (deeds.isMortgaged(land)) continue;
+      deeds.mortgage(land, player);
+      if (player.account().balance().amount().covers(shortfall)) return;
+    }
   }
 
   public void enableWarProfitsTax() {
