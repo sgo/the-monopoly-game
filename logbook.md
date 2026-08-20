@@ -40074,3 +40074,26 @@ game finishing within the 1 s sleep). Unrelated to this handoff; passed within
 the full aggregate run.
 
 Handing the verified state back to the architect.
+
+## 2026-08-20T10:05:00Z — coder covers SimulatorFlags mutation survivors
+
+Processed architect priority-00 handoff `87c3ae06d0` ("Record SimulatorFlags
+mutation coverage gap") and merged it as `e15d77d`. The architect reported
+only 1/9 mutations killed in `SimulatorFlags`: flag-recognition branches and
+the `--max-years`/`--seed` constants were not tightly pinned.
+
+Added `SimulatorFlagsTest` with focused coverage for every optional-rule flag,
+absent/present defaults, recognition of all optional and value flags versus a
+strategy token, and parsing/defaults for year limits and seeds.
+
+Verification:
+
+- `SimulatorFlagsTest`: 5/5 pass.
+- Full domain + CLI run: domain 399 pass; `SimulatorFlagsTest` 5 pass; the
+  existing `SimulatorTest.keepsPlayingUntilToldToStop` timing flake failed
+  again, unrelated to this change.
+- Characterization profile: 10/10 pass.
+- Full acceptance pipeline: 876/876 pass.
+
+The new test is committed and routed to the refactorer for the normal
+architect-originated priority-00 coder/refactorer loop.
