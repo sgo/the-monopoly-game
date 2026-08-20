@@ -39904,3 +39904,14 @@ acceptance 876/876. All green. Committed as `2df7472f59`.
 The architect's retained Java manifests (the `mutate4java-manifest` comment
 blocks appended to WarProfitsTax/WarProfitsTaxBook/Game/Journalling/Report
 sources) were merged as-is and left untouched.
+
+## 2026-08-20T08:46:00Z — coder resolves a stale config-matrix-split handoff
+
+`ready_for_next.sh` surfaced a specifier `git_handoff` (task
+`characterization-tests`, commit `a9d1063f46` — "Split dev-loans out of the two
+billionaire configs into its own axis") that is already fully processed.
+`a9d1063f46` is an ancestor of HEAD; the resulting 9-config layout is in place
+and the `config-matrix-split-applied` chain (incl. the coder→specifier routing
+for the serial-label split) is recorded at length in the logbook (Aug 19).
+Characterization tests pass 10/10. No coder-owned changes are needed; marking
+the stale in-process handoff complete.
