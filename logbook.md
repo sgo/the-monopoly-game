@@ -39520,3 +39520,16 @@ Fresh verification of the strict-count restoration (`f7338439ea` / fix
 My `min()` concern is fully resolved — the sync-check's completeness guarantee
 is restored and now spec-mandated. Handing the verified state back to the
 architect.
+
+## 2026-08-20T08:25:52Z — refactorer received coder war-profits-tax-core (f2e18487d5)
+
+Handoff message received:
+
+```
+merge_and_process coder f2e18487d5
+```
+
+New task `war-profits-tax-core` (specifier `68e0dcc`, round 1: core tax
+computation). Coder chain: `c92ad1c` WarProfitsTax core + band table (pinned
+`29793dc`), `c6da79e` flag/book/yearly assessment, `f2e1848` acceptance
+harness (World + step handlers). Merging and reviewing the full feature.
