@@ -39253,6 +39253,8 @@ Routed the missing coverage to coder priority 00 as handoff
 `00_20260820T120347Z_000332` on commit `e1229e3dc1`. The prior phase-complete
 handoff `000331` is superseded pending the coder/refactorer loop.
 
+Sent supersession note `00_20260820T120422Z_000333` to specifier.
+
 ## 2026-08-20T12:45:00Z — architect final verification and corrected handoff preparation
 
 Completed the constitution-required final verification for `war-profits-tax-core`:
