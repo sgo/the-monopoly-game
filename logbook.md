@@ -39926,3 +39926,12 @@ is committed (`c92ad1c`/`c6da79e`/`f2e1848`), and has since passed the
 refactorer review and the architect's Java mutation pass with only a CLI
 coverage gap, which the coder closed in `2df7472f59`. Nothing new to do;
 marking the stale in-process handoff complete.
+
+## 2026-08-20T08:46:00Z — coder resolves a stale war-profits-tax band-table handoff
+
+`ready_for_next.sh` surfaced the specifier's band-table pinning commit
+(`29793dc9b9`, "Pin the war-profits-tax band table's exact boundaries").
+Already an ancestor of HEAD; its 25/40/60/80/100% boundaries are the basis of
+`WarProfitsTax.rate()`, pinned by `WarProfitsTaxTest`. Fully implemented and
+part of the verified round-1 slice. Marking the stale in-process handoff
+complete.
