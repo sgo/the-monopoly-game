@@ -40401,6 +40401,24 @@ tests. Soft mutation of the expanded acceptance feature had 30 total, 16
 killed, 14 survived, and 0 runner errors. Sent specifier review note
 `00_20260820T121924Z_000336`; phase remains open pending coverage review.
 
+## 2026-08-20T14:50:00Z — architect details soft acceptance survivors
+
+Re-ran `war-profits-tax.feature` with JSON mutation reporting. Summary: 26
+executed mutations (2 scenarios skipped, 4 mutations skipped), 12 killed, 14
+survived, 0 errors. The 14 survivors are:
+
+- scenario 1 (`below 25%`): `collected` 1000→1009, `land_value` 5000→5005;
+  `collected` 50000→49998, `land_value` 5697→5689.
+- scenario 2 (band boundaries): `land_value` 5698→5702; 9115→9113;
+  13673→13666; 18232→18234; 22789→22786; 22790→22797.
+- scenario 7 (counter reset): `land_value` 10000→10003.
+- scenario 3 (undeveloped land): `collected` 500→499.
+- scenario 6 (legal-entity exemption): `collected` 500→506.
+- scenario 10 (selling back below threshold): `collected` 1000→992.
+
+These are data mutations that remain within the same asserted policy outcome;
+the exact paths are now recorded for specifier policy review.
+
 ## 2026-08-20T14:45:00Z — coder covers one-house rent mutation survivor
 
 Processed architect priority-00 note `000335`, which reported the remaining
