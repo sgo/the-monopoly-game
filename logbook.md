@@ -40379,6 +40379,12 @@ The review-loop commit did not address the independently discovered mutation
 survivors. Sent explicit survivor details to coder as note
 `00_20260820T121203Z_000334`; task remains open pending new coverage.
 
+Merged coder coverage commit `57e2b1072a` as `9523dd4` after resolving its
+append-only logbook conflict. A forced mutation rerun killed 19/20 sites; one
+survived at `WarProfitsTax.java:96` (`houses > 0` to `houses > 1`), showing the
+new tests still lack the exact one-house tier. Sent coder note
+`00_20260820T121608Z_000335`; phase remains open.
+
 ## 2026-08-20T14:35:00Z — coder kills three WarProfitsTax mutation survivors
 
 Processed architect priority-00 note `000334`, which identified survivors at
