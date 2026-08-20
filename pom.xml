@@ -5,7 +5,7 @@
 
     <groupId>the.monopoly.game</groupId>
     <artifactId>the-monopoly-game</artifactId>
-    <version>0.5.0-SNAPSHOT</version>
+    <version>0.6.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -19,12 +19,12 @@
             <dependency>
                 <groupId>the.monopoly.game</groupId>
                 <artifactId>the-monopoly-game-domain</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>the.monopoly.game</groupId>
                 <artifactId>the-monopoly-game-cli</artifactId>
-                <version>0.5.0-SNAPSHOT</version>
+                <version>0.6.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>

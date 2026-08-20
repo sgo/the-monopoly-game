@@ -735,6 +735,27 @@ final class JournalStepHandlers {
         step("^pawn \"" + NAME + "\" grows a year older$",
             (world, arguments) -> world.growPawnOlder(arguments.text(1))),
 
+        given("^the war profits tax is enabled$",
+            (world, arguments) -> world.enableWarProfitsTax()),
+
+        given("^pawn \"" + NAME + "\"'s land is currently worth \\$" + MONEY + " in rent$",
+            (world, arguments) -> world.setLandWorthRent(arguments.text(1), money(arguments.text(2)))),
+
+        given("^pawn \"" + NAME + "\" has collected \\$" + MONEY
+                + " in rent since their last war profits tax assessment$",
+            (world, arguments) -> world.setCollectedRentSinceAssessment(arguments.text(1), money(arguments.text(2)))),
+
+        then("^pawn \"" + NAME + "\" pays the government a war profits tax of \\$" + MONEY + "$",
+            (world, arguments) -> assertThat(world.paysWarProfitsTax(arguments.text(1), money(arguments.text(2))))
+                .isTrue()),
+
+        then("^pawn \"" + NAME + "\" pays no war profits tax$",
+            (world, arguments) -> assertThat(world.paysNoWarProfitsTax(arguments.text(1))).isTrue()),
+
+        then("^the government's account holds \\$" + MONEY + "$",
+            (world, arguments) -> assertThat(world.governmentAccountBalance())
+                .isEqualTo(money(arguments.text(1)))),
+
         then("^the game journal records that pawn \"" + NAME + "\" raises a development loan of \\$" + MONEY
                 + " from the bank, secured by \"" + NAME + "\", funded by pawn \"" + NAME + "\"'s bond purchase$",
             (world, arguments) -> records(world, new Claim(entry -> entry instanceof Entry.DevelopmentLoanRaised it

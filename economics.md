@@ -28,18 +28,18 @@ For more details see [simulator.md](SIMULATOR.md#Greedo)
 
 ### A Game of Greedos
 
-A game of 3 Greedos runs forever 50% of the time.
+A game of 3 Greedos runs forever 22% of the time.
 
 The reason being that as a result of randomness the streets in the more expensive colour groups will be divided over the
 different players. As a result, none of them can develop the streets and charge expensive rent. Thus, the cost of moving
-around the board never exceeds the $400 salary gained each turn, and everyone just becomes rich.
+around the board never exceeds the \$200 salary gained each turn, and everyone just becomes rich.
 
 I ended up programming this as a stalemate condition on the simulation when every player on the board accumulated wealth
 equal or larger than the full wealth of the board. So, the cost of all fully developed spaces and their potential rent
 income. This total wealth amounts to around $22000.
 
 It's interesting to observe that in a world where everyone is greedy to a fault and has equal opportunity, they live
-happily ever after one out of two games.
+happily ever after one out of five games.
 
 #### Doesn't Want to Live Happily Ever After
 
@@ -57,21 +57,15 @@ best positioned to win the game.
 
 The table below shows the impact this sudden sense of cooperation had on the outcome of the game.
 
-|                   | Without trading (n=1000) | With trading (n=1000) |
-|-------------------|--------------------------|-----------------------|
-| Stalemate         | **48.2%** (482)          | **17.6%** (176)       |
-| Bankruptcy winner | 51.8% (518)              | 82.4% (824)           |
+|                   | Without trading (n=50) | With trading (n=50) |
+|-------------------|------------------------|---------------------|
+| Stalemate         | **22%** (11)           | **0%** (0)          |
+| Bankruptcy winner | 78% (39)               | 100% (50)           |
 
-Finally, in all games where a stalemate is forming and trading happens, one of the less wealthy Greedos wins **~63%** of
-the time.
+Now the results above were observed both in games of three and eight Greedos. However, the first time the peer-trading feature was added there was still an undiscovered bug preventing eight player games from breaking the stalemate. As a result I assumed this was because as soon as colour groups become split between
+three instead of two players, making a mutually beneficial trade becomes almost impossible.
 
-Now the results above were observed in a game of 3 Greedos. As soon as you have more and especially with 8 Greedos you
-would still get a stalemate almost 100% of the time. This is because as soon as colour groups becomes split between
-three instead of two players, making a mutually beneficial trade becomes almost impossible. The three players would need
-to hold three streets from three different colour groups, and all three of them would need to hold at least one street
-in the same three colour groups. Which is near impossible to happen.
-
-So, how to break the stalemate with 8 Greedos?
+This was false. Instead, a bug prevented most players from developing their properties even if they handed each other monopolies. This issue has since been resolved and peer-trading breaks a stalemate 100% of the time even with eight players.
 
 ##### Legal Entities
 
@@ -86,29 +80,12 @@ as it comes in. After development rental income will also be used to repay the l
 no further development is possible and no more loans need to be repaid the legal entity will pay out dividends to the
 shareholders.
 
-As a result of this change the stalemate is broken ~85% of the time even with eight Greedos.
+As this functionality was introduced following a bug preventing peer-trading from breaking the stalemate with eight players this functionality has no appreciable effect in eight player games.
 
-|                   | With stalemate trading (n=20) | With legal entities (n=20) |
-|-------------------|-------------------------------|----------------------------|
-| Stalemate         | **80%** (16)                  | **15%** (3)                |
-| Bankruptcy winner | 20% (4)                       | 85% (17)                   |
-
-And when the game does end in a stalemate it is because most of the time everyone but the shareholders are destroyed.
-While the shareholders themselves live in a sort of equilibrium because of the shared income from the legal entity. Then
-the imbalance among them does push the game into a duration of thousands of years.
-
-**Update:** the 80% stalemate-trading-alone figure above is stale — it was measured five days before a bug fix
-(`efb2391`, "Allow each player to develop on turn") changed the outcome entirely. `Game.java` had picked a single
-`builder` once, at game start, from the initiative roll, and only that one player was ever allowed to develop *for the
-whole game* — regardless of who trading actually handed a completed colour group to. So even when stalemate trading
-successfully assembled a monopoly for one of the other seven players, they could never build on it, and their cost of
-moving around the board stayed below salary forever: exactly the stalemate mechanism described above, just caused by a
-development gate rather than by trading being ineffective. Once every solvent player could develop on their own turn
-(still restricted to the legal-entity `builder` specifically when entity trading is on), a completed monopoly starts
-earning real rent immediately. The fresh characterization baseline for this exact config (8 Greedo, stalemate trading
-only, no legal entities — `eight_greedo_stalemate.json`) now shows **0% stalemate, 100% ordinary win** across 50 games.
-Legal entities are still a real, separate mechanism — they solve the different problem of a group split three ways,
-which trading alone still can't consolidate — but they were never the fix for *this* number.
+|                   | With peer trading (n=50) | With legal entities (n=50) |
+|-------------------|--------------------------|----------------------------|
+| Stalemate         | **0%** (0)               | **0%** (0)                 |
+| Bankruptcy winner | 100% (50)                | 100% (50)                  |
 
 ### How Long Does a Game Last?
 
@@ -153,8 +130,8 @@ I ran 50 games with peer trading and legal entity formation enabled.
 
 | Condition                           | WIN (bankruptcy-driven) | STALEMATE |
 |-------------------------------------|-------------------------|-----------|
-| **1 Billionaire + 7 Greedo** (n=50) | 15 (30%)                | 35 (70%)  |
-| **8 Greedo, no Billionaire** (n=50) | 44 (88%)                | 6 (12%)   |
+| **1 Billionaire + 7 Greedo** (n=50) | 44 (88%)                | 6 (12%)   |
+| **8 Greedo, no Billionaire** (n=50) | 50 (100%)               | 0 (0%)    |
 
 Visibly, the Billionaire made the stalemate outcome more likely.
 Not because he prevents other players from acquiring all the properties but because they simply can't bankrupt him before they reach the stalemate condition. (\$22000)
@@ -208,7 +185,7 @@ Now the game already has a system like it, but it requires that you sell all the
 
 The bank can't just hand over money to anyone who asks. As that would equate to quantitative easing and cause inflation. At this point I did not want to program in the effects of inflation so no loans backed by money printing.
 
-Instead, the bank needs to sell corporate bonds to finance their loans. Corporate bonds ar essentially loans from other players to the bank. In practice if someone asks for a $100 loan with an interest rate of 5% then the bank will need a corporate bond for $100 with an interest rate of 3%. The bank will then pocket the remaining 2% should the player default, the collateral does not cover the difference and the corporate bond can not be reallocated to another loan in time.
+Instead, the bank needs to sell corporate bonds to finance their loans. Corporate bonds ar essentially loans from other players to the bank. In practice if someone asks for a \$100 loan with an interest rate of 5% then the bank will need a corporate bond for \$100 with an interest rate of 3%. The bank will then pocket the remaining 2% should the player default, the collateral does not cover the difference and the corporate bond can not be reallocated to another loan in time.
 
 So, did this help expanding the duration of the game beyond the ~4 years the asset-rich bilionaire needed to win the game?
 

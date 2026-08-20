@@ -54,6 +54,7 @@ en/rules/utility-rent.feature
 en/rules/year-limit.feature
 en/rules/asset-rich-billionaire.feature
 en/rules/development-loans.feature
+en/rules/war-profits-tax.feature
 en/monopoly.feature
 specs-cli:en/cli.feature
 specs-cli:en/cli-slf4j-config.feature

@@ -39395,6 +39395,102 @@ priority 50.
 Corrected handoff: `50_20260820T000000Z_000XXX_from_coder_to_refactorer`
 pointing at commit `2ef1c30dfb`, task `characterization-tests`.
 
+## 2026-08-20T00:16:30Z — refactorer review: config-matrix split verified, one rigor concern flagged
+
+Structural review of the 8→9 config split (`2ef1c30`) + fresh verification:
+
+- Split is correct: configs 7/8 both carried `--optional-development-loans`
+  unconditionally, so neither isolated the flag's own effect from the
+  billionaire opening mode — the specifier's rationale is sound. New config 9
+  (`eight_billionaire_greedo_asset_rich_loans`) re-isolates asset-rich +
+  dev-loans against config 8 (`..._asset_rich`, no loans), mirroring 7/8.
+- Renames/regeneration clean: 9 configs ↔ 9 fixtures ↔ 9 README `<details>`
+  blocks; every baseline regenerated from 50 fresh seeds.
+- Verification: characterization profile 10/10 green (1 ReadmeSync + 9
+  Characterization) across 3 runs; domain 417/417; acceptance BUILD SUCCESS.
+
+CONCERN (routing back for a decision, not a hard reject): `ReadmeSyncTest`
+was relaxed from `assertThat(blocks).hasSize(configs.length)` to
+`int limit = Math.min(blocks.size(), configs.length)`. This removes the
+guarantee that every config has a README `<details>` block — a future config
+added without its README block would now pass silently, which is precisely the
+drift the sync-check exists to catch. In the current state it is moot (9 = 9),
+but the weakening is a latent regression in the test's completeness. The
+specifier's note anticipated a transient trailing-README state, yet the coder
+shipped README fully in sync in the same commit, so `min()` is not strictly
+needed now. Flagging for the architect/specifier to confirm whether the lenient
+`min()` semantics are intended long-term or should revert to the strict
+`hasSize` once README/figures coexist end-to-end.
+
+Handing the verified state back to the architect.
+
+## 2026-08-20T00:20:00Z — architect routes README sync strictness decision
+
+Merged refactorer commit `4bc0923dc5`. The nine-config split and regenerated
+baselines are verified, but the refactorer identified a policy concern:
+`ReadmeSyncTest` now permits fewer README blocks than characterization configs
+via `Math.min`, weakening the guarantee that every config is documented.
+
+This is being sent to the specifier for a decision on whether the lenient
+transitional behavior is intended or whether strict size equality should be
+restored. The task is not phase-complete pending that decision.
+
+## 2026-08-20T00:35:00+02:00 — specifier receives the config-matrix-split priority-00 sync and decides the ReadmeSyncTest strictness question
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: characterization-tests
+
+Re-read your role and constitution.
+
+merge_and_process architect 2ce667f85d
+```
+
+Merged commit `2ce667f8` (architect's routing of the config-matrix-split
+review, including the coder's own acknowledgment of the misrouted handoff
+this specifier declined earlier — logged as `## 2026-08-20T00:10:00Z —
+coder handoff error: misrouted to specifier with wrong priority`, matching
+this specifier's own finding independently). `logbook.md` conflicted
+across two regions; resolved using `git show <ref>:logbook.md` on both
+parents against their merge-base (`13d3477`) rather than trusting the raw
+conflict markers, since one architect-side entry (`## ...refactorer
+received coder readme-sync-check`) turned out to be a genuine byte-for-byte
+duplicate of one already on this branch under a different heading/
+timestamp — caught by diffing content, not just headings, before including
+it. Merge committed as `d9d2d6e`. The real work (9-config split, renamed/
+regenerated fixtures, README update) merged automatically with zero
+conflicts — only `logbook.md` needed manual resolution.
+
+Ran `mvn test -Pcharacterization-tests` fresh: BUILD SUCCESS, 10/10 green
+(1 ReadmeSync + 9 Characterization).
+
+The architect's routing included a real decision this specifier owns: the
+refactorer flagged that `ReadmeSyncTest` checks `Math.min(blocks.size(),
+configs.length)` rather than exact equality, anticipating the transitional
+"config exists, README block doesn't yet" state this specifier's own
+`a9d1063f46` note described. Decided against the leniency and documented
+why directly in `CHARACTERIZATION-TESTS.md`: `min()` gives zero protection
+against the exact drift this test exists to catch — a future config added
+without its README block would stay green forever instead of failing
+loudly — and the transitional gap it was built for never actually
+persisted as committed history, since README and fixtures landed together
+in the coder's own commit. Committed as `43ac27d`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: characterization-tests
+commit: 43ac27d76b
+```
+
+
 
 ## 2026-08-20T00:13:32Z — coder sent handoff to refactorer
 
@@ -39533,3 +39629,114 @@ New task `war-profits-tax-core` (specifier `68e0dcc`, round 1: core tax
 computation). Coder chain: `c92ad1c` WarProfitsTax core + band table (pinned
 `29793dc`), `c6da79e` flag/book/yearly assessment, `f2e1848` acceptance
 harness (World + step handlers). Merging and reviewing the full feature.
+
+## 2026-08-20T00:29:00Z — accepted strict README sync follow-up
+
+Merged refactorer commit `7e04d9a70e`. Accepted the strict README/config count
+check after fresh review: characterization profile 10/10 and domain 417/417
+are green. The `characterization-tests` follow-up is complete and is being
+handed to the specifier as phase-complete.
+
+## 2026-08-20T00:40:00+02:00 — specifier receives phase-complete sync closing the config-matrix/strictness work
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: characterization-tests
+
+Re-read your role and constitution.
+
+merge_and_process architect b053af4004
+```
+
+Merged commit `b053af40` (architect's "accepted strict README sync
+follow-up"). `logbook.md` conflict was a clean pure append this time —
+`main` was an exact prefix of the architect branch's content (merge-base
+equalled this specifier's own last commit), so no interleaving to
+untangle. Merge committed as `f588105`.
+
+Coder's fix matches this specifier's decision exactly: `Math.min` removed,
+`hasSize(configs.length)` restored. Refactorer's verification proved drift
+detection now works in both directions — a missing README block produces
+`expected: 9, but was: 8`, and (already proven earlier) a wrong figure
+names the config/field/expected/actual.
+
+Ran `mvn test -Pcharacterization-tests` fresh: BUILD SUCCESS, 10/10 green.
+No investigation needed. This closes out the config-matrix-split work in
+full: 9 configs, isolated dev-loans axis for the asset-rich billionaire,
+strict README sync-check completeness. Per role rules, asking the user for
+the next feature to specify; no new coder handoff will be sent until they
+approve one.
+
+## 2026-08-20T08:02:44Z — specifier hands off war-profits-tax-core
+
+User asked to review the backlog and pick a first slice to hand off. The
+backlog holds a single feature, war-profits-tax, split across 6 files (the
+domain rule, 10 scenarios; journal/logging/report observability, 4
+scenarios each; cli/cli-packaged-jar wiring, 2+1 scenarios) — all parked
+in full since commit `5b31a88`. The observability and CLI files each
+depend on the domain mechanic existing first (their own headers already
+say so), so proposed starting there.
+
+Further split the domain file's own 10 scenarios into three dependency-
+ordered rounds with the user: round 1, core tax computation
+(war-profits-tax-1, 2, 7 — threshold, band-rate table, yearly reset);
+round 2, ownership-share valuation (3, 4, 5, 6, 10 — undeveloped vs.
+developed land, bankruptcy inheritance, legal-entity exemption, selling
+back below threshold); round 3, payment/enforcement (8, 9 — multi-player
+government-account accumulation, forced mortgage on shortfall). User
+approved round 1 as the first handoff.
+
+Promoted war-profits-tax-1, 2, 7 to a new tracked file,
+`the-monopoly-game-specs-core/src/test/resources/en/rules/war-profits-tax.feature`,
+unchanged and with their original stable indices (per the Specification
+Rules, indices don't renumber on promotion). Trimmed those three out of
+`backlog/en/rules/war-profits-tax.feature`, updated its header to record
+round 1 as promoted and rounds 2/3 as still pending, and added the new
+file to `acceptance/pipeline-features.txt` so it's live on the pipeline.
+
+Ran `bb gherkin-parser` + `bb gherkin-ir-dry-checker` against the new
+file: 4 findings, all expected — the reset scenario's intentional double
+"grows a year older", and paraphrase pairs across differently-outcomed
+scenarios ("pays no tax" vs. "pays a tax of $X", the two initiative-roll
+background steps flagged as a low-confidence possible-synonym). Nothing
+to normalize.
+
+Committed as `68e0dcceb4`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: war-profits-tax-core
+commit: 68e0dcceb4
+```
+
+## 2026-08-20T10:20:00Z — coder found war-profits-tax band-table ambiguity
+
+Merged specifier handoff `68e0dcceb4` (task `war-profits-tax-core`,
+round 1 of 3: threshold, band-rate table, yearly reset).
+
+`war-profits-tax-2` pins five (land_value → tax-on-$1000-collected)
+points: 6000→1000 (100%), 10000→1500 (150%), 14000→2000 (200%),
+19000→3000 (300%), 22790→4000 (400%). 22790 matches `Stalemate.threshold`
+exactly (colour 21850 + stations 800 + utilities 140 = 22790), so 22790
+is the full-board denominator.
+
+The feature text says only "below 25% → 0%; at/above 25% climbs in bands
+to 400% at full board" and never lists the band *boundaries*. The five
+example points are consistent with ownership-share boundaries at
+25/40/60/80/100% mapping to 100/150/200/300/400%, but that is an
+inference, not a stated rule. A wrong boundary set makes the acceptance
+examples (which land at 26.3%, 43.9%, 61.4%, 83.4%, 100%) green by luck
+while the actual spec intent could differ.
+
+Blocking round-1 implementation pending the specifier's decision on the
+exact band table. Routed via handoff to the specifier. Not committing
+any code for this slice until the decision returns.
+

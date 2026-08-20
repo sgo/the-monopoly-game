@@ -27,7 +27,8 @@ import java.util.Map;
 /** Writes down what a turn and a sale say they did, as the game's account of it. */
 record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds,
                    the.monopoly.game.rules.DevelopmentLoanBook developmentLoanBook,
-                   Rule.Set rules, List<Player> players, Strategy.OfPlayers strategies)
+                   Rule.Set rules, List<Player> players, Strategy.OfPlayers strategies,
+                   the.monopoly.game.rules.WarProfitsTaxBook warProfitsTaxBook, boolean warProfitsTax)
     implements Turn.Events, LandSale.Events, Rent.Events, Building.Events, Cards.Events, Taxes.Events, Jail.Events, Bankruptcy.Events {
   int age(Player player) {
     return ages.getOrDefault(player.id(), 0);
@@ -52,9 +53,17 @@ record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds,
     ageAfter(player);
     deeds.legalEntities().forEach(entity -> entity.shareholderGrewOlder(player));
     journal.log(new Journal.Entry.SalaryCollected(player.id(), salary));
+    assessWarProfitsTax(player);
     developmentLoanBook.positions().stream()
         .filter(position -> position.borrower() != null && position.borrower().id().equals(player.id()))
         .forEach(this::serviceDevelopmentLoan);
+  }
+
+  private void assessWarProfitsTax(Player player) {
+    if (!warProfitsTax) return;
+    Money owed = warProfitsTaxBook.assess(player,
+        the.monopoly.game.rules.WarProfitsTax.landValue(rules, deeds, player));
+    if (!owed.equals(Money.ZERO)) journal.log(new Journal.Entry.WarProfitsTaxPaid(player.id(), owed));
   }
 
   private void serviceDevelopmentLoan(the.monopoly.game.rules.DevelopmentLoanBook.Position position) {
@@ -267,6 +276,7 @@ record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds,
   @Override
   public void paid(Player tenant, Player owner, Ownable land, Money rent) {
     journal.log(new Journal.Entry.RentPaid(tenant.id(), owner.id(), land.type(), rent));
+    if (warProfitsTax) warProfitsTaxBook.accumulate(owner, rent);
   }
 
   @Override

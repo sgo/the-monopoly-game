@@ -1,11 +1,18 @@
 # language: en
 
-# Backlog: parked in full, nothing handed off to coder yet. Sibling
-# backlog files: ../../backlog/en/rules/journal.feature, logging.feature,
-# report.feature (observability), and
+# Round 1 (war-profits-tax-1, 2, 7: core tax computation) has been
+# promoted to the tracked
+# ../../../the-monopoly-game-specs-core/src/test/resources/en/rules/war-profits-tax.feature.
+# Remaining here: round 2, ownership-share valuation (war-profits-tax-3,
+# 4, 5, 6, 10), and round 3, payment/enforcement (war-profits-tax-8, 9).
+# Indices are stable and not renumbered when a round is promoted.
+#
+# Sibling backlog files: ../../backlog/en/rules/journal.feature,
+# logging.feature, report.feature (observability), and
 # ../../backlog/specs-cli/en/cli.feature, cli-packaged-jar.feature (CLI
-# wiring). When promoting, see each sibling file's own header for exactly
-# where its scenarios move.
+# wiring) — all still blocked on round 1's tracked mechanic existing.
+# When promoting, see each sibling file's own header for exactly where
+# its scenarios move.
 
 Feature: war profits tax
   An opt-in flag, `--optional-war-profits-tax`, taxes rental income once a
@@ -24,9 +31,20 @@ Feature: war profits tax
   the same "grows a year older" trigger development loan payments already
   use — that accumulated rent is taxed at a rate set by the player's
   *current* ownership share at that moment, then the counter resets to
-  zero for the next year. Below 25% ownership, the rate is 0%. At and
-  above 25% it climbs in bands, reaching 400% at full board ownership — a
-  rate above 100% means the player owes more than they collected that
+  zero for the next year. The rate is set by fixed bands, each band's
+  lower bound inclusive (a share exactly at a boundary belongs to the
+  higher band):
+
+  | Ownership share | Rate |
+  |------------------|------|
+  | below 25%        | 0%   |
+  | 25% – 40%         | 100% |
+  | 40% – 60%         | 150% |
+  | 60% – 80%         | 200% |
+  | 80% – 100%        | 300% |
+  | 100%              | 400% |
+
+  A rate above 100% means the player owes more than they collected that
   year, out of pocket.
 
   A shortfall is handled exactly like any other unpayable debt already is
@@ -50,33 +68,6 @@ Feature: war profits tax
     And pawn "high hat" will roll 4 for initiative
     And every other player can complete their turn
     And the war profits tax is enabled
-
-  # war-profits-tax-1
-  Scenario Outline: below 25% ownership, no war profits tax is owed no matter how much rent was collected
-    Given pawn "dog"'s land is currently worth $<land_value> in rent
-    And pawn "dog" has collected $<collected> in rent since their last war profits tax assessment
-    When pawn "dog" grows a year older
-    Then pawn "dog" pays no war profits tax
-    And the government's account holds $0
-
-    Examples:
-      | land_value | collected |
-      | 5000       | 1000      |
-
-  # war-profits-tax-2
-  Scenario Outline: the tax rate climbs in bands as ownership share crosses 25%, applied to the rent collected that year
-    Given pawn "dog"'s land is currently worth $<land_value> in rent
-    And pawn "dog" has collected $1000 in rent since their last war profits tax assessment
-    When pawn "dog" grows a year older
-    Then pawn "dog" pays the government a war profits tax of $<tax>
-
-    Examples:
-      | land_value | tax  |
-      | 6000       | 1000 |
-      | 10000      | 1500 |
-      | 14000      | 2000 |
-      | 19000      | 3000 |
-      | 22790      | 4000 |
 
   # war-profits-tax-3
   Scenario Outline: buying land does not by itself trigger a large tax bill, because undeveloped land is worth its vacant rent, not its hotel rent
@@ -155,18 +146,6 @@ Feature: war profits tax
     Examples:
       | collected |
       | 500       |
-
-  # war-profits-tax-7
-  Scenario Outline: the rent-collected counter resets to zero after each assessment, so a quiet year owes nothing even at a high ownership share
-    Given pawn "dog"'s land is currently worth $<land_value> in rent
-    And pawn "dog" has collected $1000 in rent since their last war profits tax assessment
-    When pawn "dog" grows a year older
-    And pawn "dog" grows a year older
-    Then pawn "dog" pays no war profits tax
-
-    Examples:
-      | land_value |
-      | 10000      |
 
   # war-profits-tax-8
   Scenario Outline: tax paid by multiple players accumulates together in the same government account
