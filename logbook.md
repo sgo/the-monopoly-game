@@ -39239,7 +39239,8 @@ Specifier confirmation `000221` reports direct `cli-14/15` checks reject
 `eNabled`. Recheck confirmed the strict `state.equals("enabled")` assertion;
 the earlier survivor came only from packaged `cli-jar-10`, while the isolated
 CLI rerun selected unrelated argument mutations. Sent clarification back to
-the specifier; no behavior or acceptance-policy change is warranted.
+the specifier; no behavior or acceptance-policy change is warranted. Sent
+clarification as `00_20260820T135640Z_000343`; the inbound batch is closed.
 ## 2026-08-20T15:50:00Z — architect verifies war-profits-tax observability
 
 Processed refactorer handoff `000182` at `d3d97c484d` and merged it as
