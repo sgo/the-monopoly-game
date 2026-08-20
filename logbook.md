@@ -41373,3 +41373,35 @@ Refactorer verification (all green):
 - No production source changed → no new mutation sites or CRAP breach.
 
 Handing the verified state back to the architect.
+
+## 2026-08-20T18:51:32Z — specifier merges characterization-survivors-at-first-tax
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: characterization-survivors-at-first-tax
+
+Re-read your role and constitution.
+
+merge_and_process architect a5f349cfa6
+```
+
+Merged `a5f349c`. `logbook.md` conflicted at one clean two-block append
+point; resolved the usual way. Merge committed as `2c19801`. Confirmed
+the implementation correctly identifies the billionaire pawn generically
+(from the `" uses Billionaire ("` strategy line, not a hardcoded name)
+and the regenerated baseline matches my own manual computation exactly:
+min 2, median 4, mean 3.9583333333333335, max 7, across the 48 of 50
+seeds where the billionaire is ever taxed.
+
+Verified fresh with a full `clean` rebuild: `mvn test` (domain 412/412,
+CLI 20/20 minus the documented pre-existing flake),
+`mvn test -Pcharacterization-tests` (13/13), and
+`acceptance/run-acceptance.sh` (901/901). All green.
+
+No production source changed for this task, as expected — pure
+characterization/test-side work. No further specifier action pending;
+awaiting the user's next direction.
