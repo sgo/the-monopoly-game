@@ -628,6 +628,11 @@ public class World {
     return deeds.ownerOf(land).filter(it -> it.value().equals(pawnName)).isPresent();
   }
 
+  public boolean pawnNoLongerOwns(String pawnName, Street.Type land) {
+    if (pawnOwns(pawnName, land)) deeds.returnToBank(ownable(land), pawn(pawnName));
+    return !pawnOwns(pawnName, land);
+  }
+
   public void returnEveryStreetExcept(String pawnName, String excludedName) {
     Street.Type excluded = streetTypeNamed(excludedName);
     Player owner = pawn(pawnName);
@@ -727,7 +732,7 @@ public class World {
 
   private void assessWarProfitsTax(String pawnName) {
     if (!warProfitsTaxEnabled) return;
-    Money landValue = pawnLandWorthRent.getOrDefault(pawnName, Money.ZERO);
+    Money landValue = currentLandValue(pawnName);
     Money collected = pawnCollectedRent.getOrDefault(pawnName, Money.ZERO);
     Money board = the.monopoly.game.rules.WarProfitsTax.boardValue(ruleSet);
     Money tax = the.monopoly.game.rules.WarProfitsTax.tax(board, landValue, collected);
@@ -735,6 +740,13 @@ public class World {
     governmentBalance = governmentBalance.plus(tax);
     lastWarProfitsTaxPaid.put(pawnName, tax);
     if (!tax.equals(Money.ZERO)) record(new Entry.WarProfitsTaxPaid(pawn(pawnName).id(), tax));
+  }
+
+  private Money currentLandValue(String pawnName) {
+    Player owner = pawn(pawnName);
+    if (deeds != null && !deeds.landOwnedBy(owner).isEmpty())
+      return the.monopoly.game.rules.WarProfitsTax.landValue(ruleSet, deeds, owner);
+    return pawnLandWorthRent.getOrDefault(pawnName, Money.ZERO);
   }
 
   public void enableWarProfitsTax() {

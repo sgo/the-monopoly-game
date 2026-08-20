@@ -40231,3 +40231,31 @@ A second priority-50 `git_handoff` for the same commit (`91e8bfd547`)
 arrived right behind the priority-00 note just closed above. `91e8bfd547`
 is already an ancestor of `HEAD` (merged as `b04533b` in the entry above).
 No new content to process; marking complete without reprocessing.
+
+## 2026-08-20T13:10:00Z — coder implements war-profits-tax round 2 ownership valuation
+
+Merged specifier handoff `b5f607a52b` (ownership-share valuation). The
+production `WarProfitsTax.landValue(...)` path was already present from round
+1; the acceptance harness now uses it whenever a pawn has direct owned land,
+while retaining synthetic land values for round-1 computation-only scenarios.
+Added current ownership behavior for the acceptance action `pawn ... no longer
+owns ...`, including `And` keyword matching and deed removal before the next
+assessment.
+
+Added focused `WarProfitsTaxTest` coverage for undeveloped monopoly vacant rent,
+current hotel rent, and exclusion of mortgaged/legal-entity land.
+
+Verification:
+
+- Focused tax tests: 7/7 pass.
+- Domain suite: 401/401 pass.
+- Round-2 acceptance: 16/17 pass; all ownership valuation scenarios pass.
+- Full acceptance: 881 tests, 1 failure, only the bankruptcy-inheritance
+  fixture. High hat has three properties and $0, but existing bankruptcy
+  servicing mortgages `Boulevard Tirou Charleroi` for $150 to pay the $35 rent,
+  leaving $115; the scenario expects bankruptcy and conflicts with current
+  bankruptcy behavior. No bankruptcy production logic was changed.
+
+Valid tax/acceptance changes remain ready for commit; the fixture discrepancy
+is routed to the specifier for clarification before altering unrelated
+bankruptcy rules.

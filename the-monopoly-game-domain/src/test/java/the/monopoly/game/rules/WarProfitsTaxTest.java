@@ -2,6 +2,12 @@ package the.monopoly.game.rules;
 
 import org.junit.jupiter.api.Test;
 import the.monopoly.game.components.finance.Money;
+import the.monopoly.game.components.players.Player;
+import the.monopoly.game.components.streets.ColourStreet;
+import the.monopoly.game.components.streets.Ownable;
+import the.monopoly.game.components.streets.Street;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,7 +49,58 @@ class WarProfitsTaxTest {
   }
 
   @Test
-  void belowThresholdPaysNoTaxRegardlessOfCollected() {
-    assertThat(WarProfitsTax.tax(boardValue, new Money(5697), new Money(50000))).isEqualTo(Money.ZERO);
+  void landValueUsesVacantRentForOwnedUndevelopedLand() {
+    Deeds deeds = new Deeds();
+    Player dog = player("dog");
+    ColourStreet meir = street(Street.Type.MeirAntwerpen);
+    ColourStreet nieuwstraat = street(Street.Type.NieuwstraatBrussel);
+    deeds.sell(meir, dog, Money.ZERO);
+    deeds.sell(nieuwstraat, dog, Money.ZERO);
+
+    Money expected = meir.vacantRent().plus(meir.vacantRent())
+        .plus(nieuwstraat.vacantRent()).plus(nieuwstraat.vacantRent());
+    assertThat(WarProfitsTax.landValue(rules, deeds, dog)).isEqualTo(expected);
+  }
+
+  @Test
+  void landValueUsesCurrentHotelRentForDevelopedLand() {
+    Deeds deeds = new Deeds();
+    Player dog = player("dog");
+    List<ColourStreet> streets = List.of(
+        street(Street.Type.MeirAntwerpen),
+        street(Street.Type.NieuwstraatBrussel),
+        street(Street.Type.BoulevardTirouCharleroi),
+        street(Street.Type.VeldstraatGent),
+        street(Street.Type.BoulevardDAvroyLiege));
+    streets.forEach(street -> {
+      deeds.sell(street, dog, Money.ZERO);
+      deeds.arrangeHotel(street);
+    });
+
+    Money expected = streets.stream().map(ColourStreet::rentForOneHotel).reduce(Money.ZERO, Money::plus);
+    assertThat(WarProfitsTax.landValue(rules, deeds, dog)).isEqualTo(expected);
+  }
+
+  @Test
+  void landValueExcludesMortgagedAndLegalEntityLand() {
+    Deeds deeds = new Deeds();
+    Player dog = player("dog");
+    ColourStreet direct = street(Street.Type.MeirAntwerpen);
+    deeds.sell(direct, dog, Money.ZERO);
+    deeds.arrangeMortgaged(direct);
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, List.of(dog), rules);
+    deeds.form(entity);
+
+    assertThat(WarProfitsTax.landValue(rules, deeds, dog)).isEqualTo(Money.ZERO);
+  }
+
+  private ColourStreet street(Street.Type type) {
+    return (ColourStreet) rules.create(type);
+  }
+
+  private Player player(String name) {
+    Player.ID id = new Player.ID(name);
+    rules.bank().createAccountFor(id);
+    return new Player(id, rules.bank().accountOf(id));
   }
 }
