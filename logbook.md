@@ -39775,3 +39775,15 @@ Committed as `c92ad1c` (core), `c6da79e` (wiring), `f2e1848` (acceptance
 harness). Round 2 (rent-collection accumulation off real rent events and
 government-account drainage) and round 3 (cash-sufficiency / mortgage
 fallback) remain for later slices.
+
+## 2026-08-20T08:40:00Z — coder resolves a stale characterization-tests handoff
+
+`ready_for_next.sh` surfaced a specifier
+`git_handoff` (task `characterization-tests`, commit `7f9ab82230`) that is
+already fully processed. `7f9ab82230` is an ancestor of HEAD; `ReadmeSyncTest`
+(Option A "verify specific figures") is present and green. The
+architect/refactorer review cycle for it (strict README sync) is recorded at
+length in the logbook (Aug 19–20) and in `sent/`. Re-ran
+`ReadmeSyncTest` under the `characterization-tests` profile to confirm no
+drift: 1/1 pass. No coder-owned changes are needed; marking the stale
+in-process handoff complete.
