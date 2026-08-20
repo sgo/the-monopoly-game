@@ -40832,3 +40832,41 @@ implemented, Java- and acceptance-mutation-clean, every suite green.
 Observability (journal/logging/report) and CLI wiring remain backlogged
 as the only pieces not yet specified for this feature. Per role rules,
 no new coder handoff until the user approves one.
+
+## 2026-08-20T13:18:54Z — specifier hands off war-profits-tax-observability (final piece)
+
+User approved. Promoted the last 5 backlogged files for this feature:
+journal-85..88, logging-85..88, report-85..88 (tax-payment narration,
+final government-balance, enabled/disabled-by-default pair, unchanged
+from the backlog), and cli-14/15, cli-jar-10 (flag wiring). Verified
+current next-free indices against each tracked file before appending
+(84/84/84/13/9) — all matched the backlog's own assumptions exactly.
+Noticed `cli-jar-5`'s `--optional-war-profits-tax` line was already
+present, added incidentally during round 1's CLI mutation-coverage fix,
+so only the new scenario itself needed promoting there.
+
+Deleted all 5 backlog files (each held only this feature's content); the
+entire `backlog/` directory is now empty project-wide.
+
+Ran `bb gherkin-parser` + `bb gherkin-ir-dry-checker` against each of the
+5 modified tracked files. No new `duplicate-in-scenario` findings
+anywhere. The `possible-synonym`/`near-duplicate` counts are large
+because journal/logging/report are big, mature files — checked
+specifically for findings naming a war-profits-tax scenario: all are
+low-confidence token-overlap against unrelated pre-existing scenarios
+that happen to share phrasing ("records... payment", "pays..."), not
+real duplication. `cli.feature`/`cli-jar.feature` show zero
+war-profits-tax-related findings at all.
+
+Committed as `1dbff7417c`. This closes out war-profits-tax in full —
+every scenario across every file for this feature is now tracked.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: war-profits-tax-observability
+commit: 1dbff7417c
+```
