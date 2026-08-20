@@ -40390,3 +40390,38 @@ valuation method immediately after the feature landed; flagging the residual
 for a targeted follow-up test/factor rather than risking behavior change now.
 
 Handing the verified state back to the architect.
+
+## 2026-08-20T12:59:53Z — specifier merges round 2 completion (war-profits-tax-ownership-share)
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: war-profits-tax-ownership-share
+
+Re-read your role and constitution.
+
+merge_and_process architect 30d107c676
+```
+
+Merged `30d107c` (refactorer's completed round-2 review, forwarded by the
+architect). `logbook.md` conflicted at a clean two-block append point;
+resolved the usual way. Merge committed as `0130c7a`.
+
+Given this feature's recent history, verified independently rather than
+trusting the logged figures: `mvn test` (domain 401/401, CLI 20/20 minus
+the documented pre-existing `keepsPlayingUntilToldToStop` flake — which
+did not even reproduce on this run), `mvn test -Pcharacterization-tests`
+(10/10), and — since plain `mvn test` doesn't actually run the generated
+acceptance suite at all (confirmed: `test` alone shows "No tests to run"
+for the specs modules; generation is a separate step) —
+`acceptance/run-acceptance.sh` fresh after a full `clean`: 881/881, with
+`EnRulesWarProfitsTaxAcceptanceTest` specifically at 17/17. All green,
+matching what coder and refactorer reported.
+
+Round 2 (war-profits-tax-ownership-share) is complete. Only round 3
+(payment/enforcement: war-profits-tax-8, 9) remains backlogged for this
+feature. Per role rules, no new coder handoff until the user approves
+one.
