@@ -41172,3 +41172,29 @@ Verification:
   ordinary-win scenarios.
 - Characterization profile: 12/12 pass.
 - Full domain suite: 412/412 pass.
+
+## 2026-08-20T15:00:00Z — refactorer processes coder handoff `9300e1fb54` (ordinary-win balance)
+
+Merged the war-profits-tax ordinary-win balance completion. Production
+change is one line in `Journalling.won()`: when war-profits-tax is enabled,
+it now also logs `Journal.Entry.GovernmentBalance(...)` after the
+ordinary-win Won/FinalAge entries — so an ordinary win's report shows the
+final government balance. `Game.java`'s large merge diff is only the
+`mutate4java-manifest` module/semantic hashes recomputing; no code change
+there. Feature/CLI specs updated for the new ordinary-win narration.
+
+Refactorer verification (all green):
+- Domain 412/412 (+1 new `JournallingTest`) + 28/28 property.
+- Acceptance 901/901 (+3 ordinary-win balance scenarios; was 898).
+- CLI 19/19 excluding the documented pre-existing
+  `keepsPlayingUntilToldToStop` timing flake; characterization 12/12.
+- CRAP: `won` 2.0 (100% cov, now covered); war-profits methods
+  `assessWarProfitsTax` 3.0 / `mortgageWarProfitsTaxCollateral` 5.0 (97.9%)
+  all green. The file's CRAP 72.0 is `Journalling.mortgageSpareProperty`
+  (CC 8, 0%) — the pre-existing legal-entity development-loan collateral
+  mortgage, distinct from `mortgageWarProfitsTaxCollateral`, unchanged by
+  this merge and outside the war-profits scope (same entity-loan machinery
+  flagged in the round-4 CRAP audit).
+- Mutation sites: Journalling 24 (unchanged), no new sites introduced.
+
+Handing the verified state back to the architect.
