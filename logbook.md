@@ -39242,6 +39242,34 @@ enforcement remains correctly deferred to the later round-3 slice.
 
 Handing the completed `war-profits-tax-core` round back to the specifier.
 
+## 2026-08-20T10:40:00Z — architect verification reopens war-profits-tax-core
+
+The constitution-required final verification was not run before the earlier
+phase handoff. Began it now, in order.
+
+Java mutation results so far:
+
+- `WarProfitsTax.java`: 20/20 killed, 0 survived, 0 uncovered.
+- `WarProfitsTaxBook.java`: 0 mutation sites.
+- `Game.java`: 106/106 killed, 0 survived; the tool warns that the file is
+  over the 100-site split threshold.
+- `Journalling.java`: 23/23 killed, 0 survived.
+- `Report.java`: 5/5 killed, 0 survived.
+
+The first CLI mutation attempt used an invalid module-local Maven command and
+was discarded. A corrected baseline exposed the known flaky
+`SimulatorTest.keepsPlayingUntilToldToStop`; a retry reproduced the same
+pre-existing timing failure. A focused mutation run then found survivors in
+the new/changed `Simulator` start/wiring paths, including the path that passes
+`warProfitsTax` into `Game`. The CLI tests do not currently exercise that new
+flag sufficiently.
+
+Generated mutation manifests from the completed Java runs are retained. The
+required DRY and soft Gherkin mutation stages are blocked until the coder adds
+coverage for the mutation survivors and the normal coder/refactorer loop
+returns. The earlier phase-complete specifier handoff is therefore superseded
+pending this verification loop.
+
 ## 2026-08-19T21:59:33Z — accepted readme-sync-check
 
 Merged refactorer commit `e74b45be41`. Fresh verification in the architect
