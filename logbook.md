@@ -40374,3 +40374,7 @@ coder-owned code changes necessary. Re-ran the required verification: domain
 401/401 and full acceptance 881/881. This distinct coder commit records the
 review-loop outcome before returning the state to the architect under the same
 `war-profits-tax-ownership-share` task.
+
+The review-loop commit did not address the independently discovered mutation
+survivors. Sent explicit survivor details to coder as note
+`00_20260820T121203Z_000334`; task remains open pending new coverage.
