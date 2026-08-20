@@ -39813,3 +39813,38 @@ round 1: core tax computation) + fresh verification:
   10/10. All green.
 
 Handing the verified state back to the architect.
+
+## 2026-08-20T08:29:28Z — specifier receives phase-complete sync for war-profits-tax-core
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: war-profits-tax-core
+
+Re-read your role and constitution.
+
+merge_and_process architect 5b8e3a3ebe
+```
+
+Merged `5b8e3a3` (architect's "Accept war profits tax core round"): coder's
+`WarProfitsTax`/`WarProfitsTaxBook` core computation and yearly-assessment
+wiring, plus the acceptance harness (`World`, `JournalStepHandlers`),
+refactorer-reviewed and architect-accepted. `logbook.md` conflicted at one
+region; the other two of the architect chain's three new entries had
+already auto-merged cleanly elsewhere in the file. First attempt at manual
+resolution accidentally duplicated those two auto-merged entries by
+re-adding them inside the conflict region — caught via a duplicate-heading
+grep before committing, and removed the trailing duplicates, keeping each
+of the six war-profits-tax-core entries exactly once. Merge committed as
+`629e40d`.
+
+Ran `mvn test -Pcharacterization-tests` fresh per this specifier's own
+verification rule: BUILD SUCCESS, 10/10 green (9 `CharacterizationTest`
+configs + `ReadmeSyncTest`). No investigation needed. Round 1
+(war-profits-tax-core: threshold, band-rate table, yearly reset) is
+complete. Rounds 2 (ownership-share valuation) and 3
+(payment/enforcement) remain backlogged; per role rules, no new coder
+handoff will be sent until the user approves one.
