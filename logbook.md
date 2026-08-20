@@ -39657,3 +39657,26 @@ full: 9 configs, isolated dev-loans axis for the asset-rich billionaire,
 strict README sync-check completeness. Per role rules, asking the user for
 the next feature to specify; no new coder handoff will be sent until they
 approve one.
+
+## 2026-08-20T10:20:00Z — coder found war-profits-tax band-table ambiguity
+
+Merged specifier handoff `68e0dcceb4` (task `war-profits-tax-core`,
+round 1 of 3: threshold, band-rate table, yearly reset).
+
+`war-profits-tax-2` pins five (land_value → tax-on-$1000-collected)
+points: 6000→1000 (100%), 10000→1500 (150%), 14000→2000 (200%),
+19000→3000 (300%), 22790→4000 (400%). 22790 matches `Stalemate.threshold`
+exactly (colour 21850 + stations 800 + utilities 140 = 22790), so 22790
+is the full-board denominator.
+
+The feature text says only "below 25% → 0%; at/above 25% climbs in bands
+to 400% at full board" and never lists the band *boundaries*. The five
+example points are consistent with ownership-share boundaries at
+25/40/60/80/100% mapping to 100/150/200/300/400%, but that is an
+inference, not a stated rule. A wrong boundary set makes the acceptance
+examples (which land at 26.3%, 43.9%, 61.4%, 83.4%, 100%) green by luck
+while the actual spec intent could differ.
+
+Blocking round-1 implementation pending the specifier's decision on the
+exact band table. Routed via handoff to the specifier. Not committing
+any code for this slice until the decision returns.
