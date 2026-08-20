@@ -41244,3 +41244,41 @@ Refactorer verification (all green):
 - Mutation sites: Journalling 24 (unchanged), no new sites introduced.
 
 Handing the verified state back to the architect.
+
+## 2026-08-20T17:46:21Z — specifier merges war-profits-tax-ordinary-win-balance
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: war-profits-tax-ordinary-win-balance
+
+Re-read your role and constitution.
+
+merge_and_process architect e96211d154
+```
+
+Merged `e96211d`: the fix is exactly the one line expected —
+`Journalling.won()` now also logs `GovernmentBalance` when war-profits-tax
+is enabled, mirroring `Game.logGameEnd`. `logbook.md` conflicted at one
+clean two-block append point; resolved the usual way. Merge committed as
+`47f8cab`.
+
+Confirmed the config-10 baseline was regenerated as flagged: `governmentBalance`
+now reads min 0 / max 10956 / mean 5509.12 / median 5335 across all 50
+seeds — min 0 replacing the impossible-under-the-old-mechanism min 3002,
+and the higher max/mean reflecting ordinary-win seeds where dog paid tax
+repeatedly before eventually winning, now finally counted. This is exactly
+what my original `CHARACTERIZATION-TESTS.md` wording described — it's now
+actually true of the mechanism, not just the outcome.
+
+Verified fresh with a full `clean` rebuild: `mvn test` (domain 412/412,
+CLI 20/20 minus the documented pre-existing flake),
+`mvn test -Pcharacterization-tests` (12/12), and
+`acceptance/run-acceptance.sh` (901/901). All green.
+
+This closes out the war-profits-tax feature's full arc, including the
+gap the user had independently already noticed. No further specifier
+action pending; awaiting the user's next direction.
