@@ -116,3 +116,15 @@ Feature: CLI packaged jar
     Examples:
       | raw arguments                                                                                | state   |
       | 3 greedo greedo greedo --optional-development-loans --optional-development-loans-full-draw  | enabled |
+
+  # cli-jar-10
+  Scenario Outline: the packaged jar accepts the war-profits-tax flag alongside explicit strategies
+    Given the CLI module has been packaged
+    When I start the packaged simulator jar with the arguments "<raw arguments>"
+    Then the packaged jar's output confirms that the war profits tax is <state>
+    When I stop the packaged jar
+    Then the packaged jar process ends
+
+    Examples:
+      | raw arguments                                     | state   |
+      | 3 greedo greedo greedo --optional-war-profits-tax | enabled |

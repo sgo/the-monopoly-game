@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -112,6 +113,7 @@ public class World {
   private boolean simulatorAssetRichOpening;
   private boolean simulatorDevelopmentLoans;
   private boolean simulatorFullDrawDevelopmentLoans;
+  private boolean simulatorWarProfitsTax;
   private boolean namedEntityFormed;
   private boolean warProfitsTaxEnabled;
   private final Map<String, Money> pawnLandWorthRent = new HashMap<>();
@@ -255,6 +257,7 @@ public class World {
         simulatorDevelopmentLoans = true;
         simulatorFullDrawDevelopmentLoans = true;
       }
+      case "--optional-war-profits-tax" -> simulatorWarProfitsTax = true;
       default -> throw new AssertionError("Unknown simulator argument: " + argument);
     }
   }
@@ -262,7 +265,7 @@ public class World {
   public void runSimulator() {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
     simulatorResult = Simulator.run(simulatorPlayers, simulatorStrategies, false, false,
-        simulatorDevelopmentLoans, simulatorFullDrawDevelopmentLoans, simulatorMaxYears);
+        simulatorDevelopmentLoans, simulatorFullDrawDevelopmentLoans, simulatorMaxYears, null, simulatorWarProfitsTax);
   }
 
   public Simulator.Result simulatorResult() {
@@ -279,7 +282,8 @@ public class World {
   public void startSimulator() {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
     runningSimulator = Simulator.start(simulatorPlayers, simulatorStrategies, simulatorStalemateTrading,
-        simulatorLegalEntityTrading, simulatorDevelopmentLoans, simulatorFullDrawDevelopmentLoans, simulatorMaxYears);
+        simulatorLegalEntityTrading, simulatorDevelopmentLoans, simulatorFullDrawDevelopmentLoans,
+        simulatorMaxYears, null, simulatorWarProfitsTax);
   }
 
   public void stopSimulator() {
@@ -342,6 +346,7 @@ public class World {
     simulatorAssetRichOpening = arguments.contains("--optional-asset-rich-billionaire");
     simulatorDevelopmentLoans = arguments.contains("--optional-development-loans");
     simulatorFullDrawDevelopmentLoans = arguments.contains("--optional-development-loans-full-draw");
+    simulatorWarProfitsTax = arguments.contains("--optional-war-profits-tax");
     simulatorMaxYears = -1;
     for (String argument : arguments) {
       if (argument.startsWith("--max-years=")) {
@@ -493,11 +498,14 @@ public class World {
         players().stream().anyMatch(player -> strategyOf(player).developmentLoansEnabled()),
         players().stream().anyMatch(player -> strategyOf(player).fullDrawDevelopmentLoans()),
         gameMaxYears,
-        developmentLoanBook()
+        developmentLoanBook(),
+        warProfitsTaxEnabled
     );
     Game.Result result = play.apply(game);
     turnOrder = result.turnOrder();
     journal = result.journal();
+    if (warProfitsTaxEnabled && !governmentBalance.equals(Money.ZERO))
+      record(new Entry.GovernmentBalance(governmentBalance));
     deeds = result.deeds();
   }
 
@@ -1763,6 +1771,19 @@ public class World {
       LockSupport.parkNanos(5_000_000);
     }
     throw new AssertionError("Packaged jar output did not confirm full-draw development loans are " + state
+        + ": " + packagedCliOutputBuffer);
+  }
+
+  public void assertPackagedCliWarProfitsTax(String state) {
+    long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
+    while (System.nanoTime() < deadline) {
+      synchronized (packagedCliOutputBuffer) {
+        if (packagedCliOutputBuffer.toString().contains("War profits tax enabled")
+            == state.equals("enabled")) return;
+      }
+      LockSupport.parkNanos(5_000_000);
+    }
+    throw new AssertionError("Packaged jar output did not confirm war profits tax is " + state
         + ": " + packagedCliOutputBuffer);
   }
 

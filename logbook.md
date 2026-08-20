@@ -40665,6 +40665,72 @@ every test suite green. Only round 3 (payment/enforcement:
 war-profits-tax-8, 9) remains backlogged for this feature. Per role
 rules, no new coder handoff until the user approves one.
 
+## 2026-08-20T12:37:58Z — specifier hands off war-profits-tax-payment (round 3, final)
+
+User approved round 3. Promoted war-profits-tax-8, 9 (multi-player
+government-account accumulation, tax bill forcing a mortgage when cash is
+short) from `backlog/en/rules/war-profits-tax.feature` to the tracked
+file, unchanged and with original stable indices. Spot-checked both
+against real board data before promoting (learned that lesson from
+round 2's scenario 5): scenario 8 uses only the synthetic land-value stub
+(dog/high hat own no real land, so the stub still governs); scenario 9's
+six real hotel-built properties total ~$7,464 (32.7% share, band1, 100%
+rate), and mortgaging Lippenslaan Knokke — the one undeveloped property
+dog holds — raises exactly $90, matching the $90 tax bill precisely. Both
+check out; no redesign needed this round.
+
+All three rounds of the domain feature are now tracked in one file.
+Deleted the now-empty `backlog/en/rules/war-profits-tax.feature` and
+updated the five sibling backlog files' headers (journal/logging/report,
+cli/cli-packaged-jar) to point at the tracked file instead of "also
+backlogged" — those remain the only parked pieces of this feature.
+
+Ran `bb gherkin-parser` + `bb gherkin-ir-dry-checker` against the full
+10-scenario file: 29 findings, all expected — the same two intentional
+double "grows a year older" steps, plus paraphrase/synonym noise scaling
+with the larger file. Nothing to normalize.
+
+Committed as `5094191b43`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: war-profits-tax-payment
+commit: 5094191b43
+```
+
+## 2026-08-20T13:05:35Z — specifier confirms round-3 acceptance mutation survivors
+
+Handoff received (note, priority 00, with scenario-level detail already
+attached this time): "Round-3 soft mutation adds expected survivors
+6000->5992 and 90->84."
+
+- Scenario 8 (`land_value` 6000→5992): both values are 26.3%/26.29% —
+  comfortably inside band1 (25-40%), same rate, same $2000 government
+  total. Same-band interior mutation, matching round 2's pattern exactly.
+- Scenario 9 (`collected` 90→84): tax scales to $84, still less than
+  Lippenslaan Knokke's $90 mortgage value, so the same single property
+  gets mortgaged and dog is still solvent — identical observable outcome.
+  This scenario's own stated purpose ("a tax bill... forces a mortgage,
+  the same as any other unpayable debt") was never about pinning the
+  exact dollar figure, only that a shortfall triggers the mechanism; with
+  dog starting at $0 cash, essentially any positive collected value
+  forces the same one mortgage.
+
+Both confirmed expected; no unresolved ambiguity, nothing to add.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Both expected: same-band interior (8), Knokke still covers a smaller bill (9).
+```
+
 ## 2026-08-20T15:05:00Z — coder implements war-profits-tax payment and enforcement
 
 Merged specifier handoff `5094191b43` for round 3 (`war-profits-tax-8, 9`).
@@ -40712,6 +40778,7 @@ Refactorer verification (all green):
   not forced-refactored (unused accessor outside the active path).
 
 Handing the verified state back to the architect.
+
 ## 2026-08-20T15:20:00Z — coder covers Journalling payment mutation survivors
 
 Processed architect priority-00 note `000339`, which identified survivors in
@@ -40719,6 +40786,7 @@ Processed architect priority-00 note `000339`, which identified survivors in
 the real production tax-assessment path for disabled tax, zero-tax/no mortgage,
 and shortfall traversal past an already mortgaged property. Focused tests pass
 3/3 and the full domain suite passes 410/410.
+
 ## 2026-08-20T15:35:00Z — architect closes payment phase
 
 Processed specifier confirmation `000219` for the two new soft acceptance
@@ -40730,3 +40798,80 @@ pre-existing unrelated branches. Regenerated mutation manifests are included
 in this commit; phase-complete handoff follows to the specifier.
 Sent phase-complete git handoff `50_20260820T130818Z_000341` to the specifier
 at commit `b2e386eecb`.
+
+## 2026-08-20T13:08:18Z — specifier merges the war-profits-tax feature to completion
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: war-profits-tax-payment
+
+Re-read your role and constitution.
+
+merge_and_process architect b2e386eecb
+```
+
+Merged `b2e386e` (architect's closed payment-phase verification, on top
+of a genuine production change this round: `WarProfitsTaxBook.assess`
+gained a `raiseShortfall` callback, `Journalling` wires it to mortgage
+unencumbered owned land in board order — closing the round-1-noted gap
+where `assess()` withdrew without a sufficiency check). `logbook.md`
+conflicted at one clean two-block append point; resolved the usual way,
+including two missing-blank-line formatting fixes. Merge committed as
+`df2958b`.
+
+Verified fresh with a full `clean` rebuild: `mvn test` (domain 410/410,
+CLI 20/20 minus the documented pre-existing flake),
+`mvn test -Pcharacterization-tests` (10/10), and
+`acceptance/run-acceptance.sh` (883/883, `EnRulesWarProfitsTaxAcceptanceTest`
+now 19/19 — all three rounds). All green.
+
+The war-profits-tax domain feature is complete: all 10 scenarios tracked,
+implemented, Java- and acceptance-mutation-clean, every suite green.
+Observability (journal/logging/report) and CLI wiring remain backlogged
+as the only pieces not yet specified for this feature. Per role rules,
+no new coder handoff until the user approves one.
+
+## 2026-08-20T16:10:00Z — coder implements war-profits-tax observability and CLI wiring
+
+Merged specifier handoff `1dbff7417c` for `war-profits-tax-observability`.
+The game now journals the war-profits-tax state explicitly as enabled or
+disabled at startup. Added focused Game and Report tests for the disabled
+state and tax/payment/government-balance rendering. Registered journal, log,
+report, and packaged-CLI acceptance assertions for tax payment, final
+government balance, and enabled/disabled state. Updated the acceptance World
+to pass the real tax flag through simulator construction, preserve synthetic
+pre-game government balance in the captured journal/log, and support the raw
+CLI argument and packaged output checks.
+
+Verification:
+
+- Focused Game/Journalling/Report tests: 87/87 pass.
+- Full domain suite: 411/411 pass.
+- Full acceptance pipeline: 898/898 pass.
+
+## 2026-08-20T13:45:00Z — refactorer processes coder handoff `ad43a16fbd` (round 4: observability)
+
+Merged the war-profits-tax observability completion. Production change is one
+line in `Game.java`: the disable-path now also logs
+`Journal.Entry.WarProfitsTaxEnabled(warProfitsTax)` (previously only the
+enabled case was logged), so the report always shows "war profits tax is
+enabled/disabled". `Report.java:63` already renders both states, so the
+disabled line reads correctly. `ReportTest` covers the enabled render; the
+pre-game government balance and raw-CLI/packaged-output checks are added in
+test/harness and the journal/logging/report specs were promoted from
+`backlog/` to live.
+
+Refactorer verification (all green):
+- Domain 411/411 (+4, incl. new `JournallingTest`) + 28/28 property.
+- Acceptance 898/898 (+15 observability/promotion scenarios; was 883).
+- CLI 19/19 excluding the documented pre-existing
+  `keepsPlayingUntilToldToStop` timing flake; characterization 10/10.
+- Mutation-site scan: Game 105 (was 106 — the simplified log line dropped one;
+  still the documented pre-existing >100 breach), Journalling 24,
+  WarProfitsTax 20, WarProfitsTaxBook 1.
+
+Handing the verified state back to the architect.
