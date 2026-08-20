@@ -239,7 +239,7 @@ public class Game {
     deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
     journalling.developmentLoans(developmentLoans, fullDrawDevelopmentLoans);
-    if (warProfitsTax) journal.log(new Journal.Entry.WarProfitsTaxEnabled(true));
+    journal.log(new Journal.Entry.WarProfitsTaxEnabled(warProfitsTax));
     players.forEach(player -> journalling.strategyNamed(player, strategies.forPlayer(player)));
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));

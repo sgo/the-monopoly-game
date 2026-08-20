@@ -70,6 +70,18 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.FinalAge(idOf(pawnName), age));
   }
 
+  static Claim warProfitsTaxPaid(String pawnName, int amount) {
+    return Claim.of(new Entry.WarProfitsTaxPaid(idOf(pawnName), money(amount)));
+  }
+
+  static Claim governmentBalance(int amount) {
+    return Claim.of(new Entry.GovernmentBalance(money(amount)));
+  }
+
+  static Claim warProfitsTax(String state) {
+    return Claim.of(new Entry.WarProfitsTaxEnabled(state.equals("enabled")));
+  }
+
   static Claim purchaseDeclined(String pawnName, String spaceName, int price,
                                 Strategy.DeclineReason reason, int reserve) {
     if (reason == Strategy.DeclineReason.NO_BUYING_POLICY) {
@@ -352,6 +364,18 @@ final class MonopolyStepHelpers {
 
   static String bankReceivedLine(String pawnName, int amount) {
     return pawnName + " receives $" + amount + " from the bank";
+  }
+
+  static String warProfitsTaxPaidLine(String pawnName, int amount) {
+    return pawnName + " pays a war profits tax of $" + amount;
+  }
+
+  static String governmentBalanceLine(int amount) {
+    return "The government's account holds $" + amount;
+  }
+
+  static String warProfitsTaxLine(String state) {
+    return "war profits tax is " + state;
   }
 
   static String playerPaidLine(String payer, String payee, int amount) {

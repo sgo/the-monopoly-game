@@ -52,6 +52,18 @@ class ReportTest {
   }
 
   @Test
+  void aReportTellsWarProfitsTaxStatePaymentAndGovernmentBalance() {
+    assertThat(report(
+        new Entry.WarProfitsTaxEnabled(true),
+        new Entry.WarProfitsTaxPaid(Pawn.dog.id(), new Money(1000)),
+        new Entry.GovernmentBalance(new Money(1000))))
+        .isEqualTo("""
+            war profits tax is enabled
+            dog pays a war profits tax of $1000
+            The government's account holds $1000""");
+  }
+
+  @Test
   void aReportTellsWhatAPlayerBoughtAndWhatItCostThem() {
     assertThat(report(new Entry.Bought(
         Pawn.dog.id(), Street.Type.DiestsestraatLeuven, new Money(60)

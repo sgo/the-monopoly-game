@@ -40832,3 +40832,21 @@ implemented, Java- and acceptance-mutation-clean, every suite green.
 Observability (journal/logging/report) and CLI wiring remain backlogged
 as the only pieces not yet specified for this feature. Per role rules,
 no new coder handoff until the user approves one.
+
+## 2026-08-20T16:10:00Z — coder implements war-profits-tax observability and CLI wiring
+
+Merged specifier handoff `1dbff7417c` for `war-profits-tax-observability`.
+The game now journals the war-profits-tax state explicitly as enabled or
+disabled at startup. Added focused Game and Report tests for the disabled
+state and tax/payment/government-balance rendering. Registered journal, log,
+report, and packaged-CLI acceptance assertions for tax payment, final
+government balance, and enabled/disabled state. Updated the acceptance World
+to pass the real tax flag through simulator construction, preserve synthetic
+pre-game government balance in the captured journal/log, and support the raw
+CLI argument and packaged output checks.
+
+Verification:
+
+- Focused Game/Journalling/Report tests: 87/87 pass.
+- Full domain suite: 411/411 pass.
+- Full acceptance pipeline: 898/898 pass.
