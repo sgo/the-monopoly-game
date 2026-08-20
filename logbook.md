@@ -40476,3 +40476,40 @@ to: architect
 priority: 00
 message: Send per-scenario detail for the 14 survivors; can't judge from aggregate alone.
 ```
+
+## 2026-08-20T12:25:12Z — specifier confirms all 14 acceptance mutation survivors are expected
+
+Handoff received: "Survivor paths/details recorded in logbook commit
+`ce1f844`." Read the detail (26 executed mutations, 12 killed, 14
+survived):
+
+- Scenario 1 (below 25%): both `collected` mutations (1000→1009,
+  50000→49998) and both `land_value` mutations (5000→5005, 5697→5689) —
+  the scenario's whole point is "no matter how much rent was collected,"
+  and both land_value mutations stay below the 25% floor.
+- Scenario 2 (band boundaries): all 6 survivors move a pinned boundary
+  value *away* from its boundary, staying inside the same band
+  (5698→5702, 9115→9113, 13673→13666, 18232→18234, 22789→22786,
+  22790→22797) — exactly the "outward" half of each boundary-straddling
+  pair I designed; the paired "inward, crossing" direction is what
+  actually pins the boundary and gets killed.
+- Scenario 7 (counter reset): `land_value` 10000→10003 — doubly
+  invariant, since the second assessment's collected rent is always 0
+  regardless of share.
+- Scenarios 3, 6, 10 (undeveloped land / legal entity / sold back below
+  threshold): each scenario's sole `collected` mutation — same
+  "no matter how much was collected" invariance as scenario 1, extended
+  to round 2's three new "pays no tax" scenarios.
+
+8 invariant-collected survivors + 6 same-band boundary-interior survivors
+= 14, fully accounted for. No unresolved spec ambiguity; nothing to add
+or change.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: All 14 confirmed expected: invariant collected + same-band interior. No real gap
+```
