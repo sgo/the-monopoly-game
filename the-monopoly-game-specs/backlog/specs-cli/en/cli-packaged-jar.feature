@@ -1,8 +1,8 @@
 # language: en
 
-# Backlog scenarios for the war-profits-tax feature (see
-# ../../en/rules/war-profits-tax.feature, also backlogged). When this batch
-# is promoted:
+# Backlog scenarios for the war-profits-tax feature (now fully tracked at
+# ../../../the-monopoly-game-specs-core/src/test/resources/en/rules/war-profits-tax.feature).
+# When this batch is promoted:
 #   1. Move cli-jar-10 below into the tracked cli-packaged-jar.feature
 #      unchanged, renumbering to continue that file's own sequence (next
 #      free index at the time this was written was cli-jar-10).

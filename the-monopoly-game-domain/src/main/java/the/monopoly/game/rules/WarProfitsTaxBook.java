@@ -6,6 +6,7 @@ import the.monopoly.game.components.players.Player;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Tracks what the war-profits tax needs between yearly assessments: the rent
@@ -60,11 +61,22 @@ public final class WarProfitsTaxBook {
    * paid (zero when nothing is owed).
    */
   public Money assess(Player player, Money landValue) {
+    return assess(player, landValue, ignored -> {
+    });
+  }
+
+  /**
+   * Assesses tax after giving the caller an opportunity to raise any cash
+   * shortfall, such as by mortgaging the player's spare property.
+   */
+  public Money assess(Player player, Money landValue, Consumer<Money> raiseShortfall) {
     Money owed = taxFor(player, landValue);
     if (owed.equals(Money.ZERO)) {
       collected.put(player.id(), Money.ZERO);
       return Money.ZERO;
     }
+    Money balance = player.account().balance().amount();
+    if (!balance.covers(owed)) raiseShortfall.accept(owed.minus(balance));
     player.account().withdraw(owed);
     bank.accountOf(GOVERNMENT).deposit(owed);
     collected.put(player.id(), Money.ZERO);

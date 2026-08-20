@@ -40309,6 +40309,55 @@ task: war-profits-tax-ownership-share
 commit: b5f607a52b
 ```
 
+## 2026-08-20T11:20:27Z — specifier receives a coder question on war-profits-tax-5
+
+Handoff received:
+
+```
+type: note
+to: specifier
+priority: 50
+
+Tax fixture expects bankruptcy, but rules leave $115 after a $150 mortgage.
+```
+
+Coder's `e30a33e` implemented round 2's real deed-based land valuation:
+`World.currentLandValue` now uses real owned deeds whenever the pawn owns
+any (via `WarProfitsTax.landValue`), falling back to the synthetic
+`pawnLandWorthRent` stub only for pawns with no real land — i.e. only
+round 1's computation-only scenarios still use the stub. war-profits-tax-5
+owns real land (Meir Antwerpen), so its `land_value_before` Given step was
+silently dead: the real Meir Antwerpen vacant rent ($35) governs instead.
+16/17 round-2 acceptance scenarios pass; only war-profits-tax-5 fails,
+and only on the bankruptcy assertion — existing distressed-sale behavior
+mortgages one of high hat's green properties ($150) to cover the $35 rent
+before ever reaching bankruptcy, leaving $115 and a solvent debtor. Not a
+bug in bankruptcy handling; the scenario's debt was simply too small to
+exceed what mortgaging alone could raise.
+
+Recomputed against the real board data (`Street.Type`): high hat's three
+green properties mortgage for $150+$150+$160=$460 total, so the debt has
+to exceed that. Redesigned the scenario: dog now owns and has built
+hotels on the pink and red groups ($2400+$3200=$5600, 24.6% of the
+$22,790 board — just under the 25% floor) and charges rent from a pink
+property (Rue de Diekirch Arlon, $750 hotel rent, comfortably above
+$460), which genuinely bankrupts high hat. The inherited green monopoly's
+bare vacant rent, doubled to $160 once unmortgaged, is what tips dog's
+share over 25% (5600+160=5760, 25.27%), keeping the expected tax at
+$1000 unchanged. Dropped the now-dead `land_value_before` column.
+
+Committed as `e6224758bc`. Handing back to coder.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: war-profits-tax-ownership-share
+commit: e6224758bc
+```
+
 ## 2026-08-20T14:05:00Z — coder completes war-profits-tax round 2
 
 Processed newer specifier handoff `e6224758bc`, which corrected the
@@ -40363,6 +40412,129 @@ valuation method immediately after the feature landed; flagging the residual
 for a targeted follow-up test/factor rather than risking behavior change now.
 
 Handing the verified state back to the architect.
+
+## 2026-08-20T12:59:53Z — specifier merges round 2 completion (war-profits-tax-ownership-share)
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: war-profits-tax-ownership-share
+
+Re-read your role and constitution.
+
+merge_and_process architect 30d107c676
+```
+
+Merged `30d107c` (refactorer's completed round-2 review, forwarded by the
+architect). `logbook.md` conflicted at a clean two-block append point;
+resolved the usual way. Merge committed as `0130c7a`.
+
+Given this feature's recent history, verified independently rather than
+trusting the logged figures: `mvn test` (domain 401/401, CLI 20/20 minus
+the documented pre-existing `keepsPlayingUntilToldToStop` flake — which
+did not even reproduce on this run), `mvn test -Pcharacterization-tests`
+(10/10), and — since plain `mvn test` doesn't actually run the generated
+acceptance suite at all (confirmed: `test` alone shows "No tests to run"
+for the specs modules; generation is a separate step) —
+`acceptance/run-acceptance.sh` fresh after a full `clean`: 881/881, with
+`EnRulesWarProfitsTaxAcceptanceTest` specifically at 17/17. All green,
+matching what coder and refactorer reported.
+
+Round 2 (war-profits-tax-ownership-share) is complete. Only round 3
+(payment/enforcement: war-profits-tax-8, 9) remains backlogged for this
+feature. Per role rules, no new coder handoff until the user approves
+one.
+
+## 2026-08-20T12:04:22Z — specifier receives a supersession note on war-profits-tax-ownership-share
+
+Handoff received (note, priority 00): "Phase handoff 000331 is superseded;
+coder is addressing 3 mutation survivors." No commit to merge — informational.
+The state merged as `0130c7a` (independently verified 881/881 acceptance,
+401/401 domain, 10/10 characterization) stands as correct for what it covers;
+the team found additional mutation-coverage gaps after sending that phase
+handoff and is closing them before re-sending. Logging receipt and waiting for
+the corrected handoff rather than re-verifying prematurely.
+
+## 2026-08-20T12:19:24Z — specifier receives a mutation-status note on war-profits-tax-ownership-share
+
+Handoff received (note, priority 00): "Soft acceptance mutation: 16/30
+killed, 14 survived; review coverage." No commit attached to merge. Checked
+the architect worktree directly: this is a mid-loop status snapshot, already
+superseded by their own further work (`078a16a` sent coder explicit survivor
+details as a separate note; coder has since landed two more coverage
+commits, `57e2b10`/`c910f62`, merged through `9523dd4`/`736c17a`). No
+git_handoff has reached the specifier for this state yet. Logging receipt
+and waiting for the actual corrected phase handoff rather than reviewing an
+already-stale snapshot.
+
+## 2026-08-20T12:24:06Z — specifier corrects course: 000336 needed an actual answer, not a close
+
+User relayed that the architect expected a response to
+`00_20260820T121924Z_000336` ("Soft acceptance mutation: 16/30 killed, 14
+survived; review coverage"). The prior entry closed it as a stale snapshot
+without ever answering the review it asked for — checking the architect
+worktree confirmed `0b8d607` explicitly says "phase remains open pending
+coverage review," i.e. the architect is genuinely blocked on a specifier
+determination, not just broadcasting status.
+
+The note carries no per-mutation detail (unlike the Java-mutation notes to
+coder, which name exact line numbers), so there isn't enough here to give a
+real determination — round 1's precedent (11/23 survivors, all traced to
+scenarios whose asserted outcome is deliberately invariant to one of their
+own parameters) is a plausible shape for these 14 too, given round 2 added
+three more "pays no tax regardless of X" scenarios (3, 6, 10) that would
+survive the same way scenario 1 already does, but that is pattern-matching,
+not verification. Sent a note back asking for the scenario/step-level list
+rather than guessing.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Send per-scenario detail for the 14 survivors; can't judge from aggregate alone.
+```
+
+## 2026-08-20T12:25:12Z — specifier confirms all 14 acceptance mutation survivors are expected
+
+Handoff received: "Survivor paths/details recorded in logbook commit
+`ce1f844`." Read the detail (26 executed mutations, 12 killed, 14
+survived):
+
+- Scenario 1 (below 25%): both `collected` mutations (1000→1009,
+  50000→49998) and both `land_value` mutations (5000→5005, 5697→5689) —
+  the scenario's whole point is "no matter how much rent was collected,"
+  and both land_value mutations stay below the 25% floor.
+- Scenario 2 (band boundaries): all 6 survivors move a pinned boundary
+  value *away* from its boundary, staying inside the same band
+  (5698→5702, 9115→9113, 13673→13666, 18232→18234, 22789→22786,
+  22790→22797) — exactly the "outward" half of each boundary-straddling
+  pair I designed; the paired "inward, crossing" direction is what
+  actually pins the boundary and gets killed.
+- Scenario 7 (counter reset): `land_value` 10000→10003 — doubly
+  invariant, since the second assessment's collected rent is always 0
+  regardless of share.
+- Scenarios 3, 6, 10 (undeveloped land / legal entity / sold back below
+  threshold): each scenario's sole `collected` mutation — same
+  "no matter how much was collected" invariance as scenario 1, extended
+  to round 2's three new "pays no tax" scenarios.
+
+8 invariant-collected survivors + 6 same-band boundary-interior survivors
+= 14, fully accounted for. No unresolved spec ambiguity; nothing to add
+or change.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: All 14 confirmed expected: invariant collected + same-band interior. No real gap
+```
 
 ## 2026-08-20T14:20:00Z — coder closes architect review loop explicitly
 
@@ -40435,3 +40607,84 @@ Processed architect priority-00 note `000335`, which reported the remaining
 mutation survivor at the one-house branch of `WarProfitsTax.java:96`. Added an
 exact one-house rent test. Focused tax tests pass 11/11 and the full domain
 suite passes 405/405. No production code changes were necessary.
+
+## 2026-08-20T12:26:36Z — specifier merges the fully-closed war-profits-tax-ownership-share phase
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: war-profits-tax-ownership-share
+
+Re-read your role and constitution.
+
+merge_and_process architect 5c0e8a33c1
+```
+
+Merged `5c0e8a3` (architect's log of the closed survivor-policy loop, on
+top of the coder's Java one-house fix and 4 new `WarProfitsTaxTest`
+cases). `logbook.md` conflicted at one clean two-block append point;
+resolved the usual way — no interleaving, no duplicates introduced.
+Merge committed as `2b18ff6`.
+
+Verified fresh with a full `clean` rebuild: `mvn test` (domain 405/405,
+CLI 20/20 minus the documented pre-existing `keepsPlayingUntilToldToStop`
+flake), `mvn test -Pcharacterization-tests` (10/10), and
+`acceptance/run-acceptance.sh` (881/881, `EnRulesWarProfitsTaxAcceptanceTest`
+17/17). All green.
+
+Round 2 (war-profits-tax-ownership-share) is genuinely, fully complete —
+Java mutation clean, acceptance mutation survivors all confirmed expected,
+every test suite green. Only round 3 (payment/enforcement:
+war-profits-tax-8, 9) remains backlogged for this feature. Per role
+rules, no new coder handoff until the user approves one.
+
+## 2026-08-20T15:05:00Z — coder implements war-profits-tax payment and enforcement
+
+Merged specifier handoff `5094191b43` for round 3 (`war-profits-tax-8, 9`).
+Added a callback-based shortfall boundary to `WarProfitsTaxBook.assess`, so
+callers can raise cash before the government payment while preserving the
+existing overload. Production `Journalling` now mortgages unencumbered owned
+land in board order when tax exceeds cash; the acceptance World mirrors this
+for direct scenario assertions while preserving synthetic no-deeds scenarios.
+Added focused unit coverage for shortfall funding and accumulated government
+payments.
+
+Verification:
+
+- Focused WarProfitsTaxTest: 13/13 pass.
+- Payment acceptance: 19/19 pass.
+- Domain suite: 407/407 pass.
+- Full acceptance pipeline: 883/883 pass.
+
+## 2026-08-20T13:10:00Z — refactorer processes coder handoff `8f39e2b172` (round 3: payment/enforcement)
+
+Merged the round-3 war-profits-tax payment-enforcement completion. This is
+genuine domain production code this time, not just harness/spec:
+- `WarProfitsTaxBook.assess(player, landValue, raiseShortfall)` — new overload;
+  when the player's balance can't cover the owed tax, it invokes the callback
+  with the shortfall before withdrawing. Old 2-arg `assess` delegates with an
+  empty callback (back-compatible). This closes the round-1 noted gap where
+  `assess()` withdrew without a sufficiency check.
+- `Journalling.assessWarProfitsTax` now supplies `raiseShortfall` →
+  `mortgageWarProfitsTaxCollateral` (mortgages unencumbered owned land in board
+  order until the shortfall is covered).
+- `WarProfitsTaxTest` +6 focused cases; live `war-profits-tax.feature` +52
+  round-3 scenarios; `World` harness mirrors the mortgage path.
+
+Refactorer verification (all green):
+- Domain 407/407 (+6 payment tests) + 28/28 property.
+- Acceptance 883/883 (+2 round-3 scenarios; was 881).
+- CLI 19/19 excluding the documented pre-existing
+  `keepsPlayingUntilToldToStop` timing flake; characterization 10/10.
+- Mutation-site scan: WarProfitsTaxBook 1, Journalling 24, WarProfitsTax 20,
+  Game 106 (documented pre-existing breach) — all under threshold except
+  Game's known breach.
+- CRAP: `WarProfitsTaxBook.assess` (new) 3.0 at 82.4% cov (fine);
+  `setGovernmentBalance` is CRAP 12.0 at 0% coverage — a PRE-EXISTING public
+  setter with no production call sites, not introduced by round 3. Recorded,
+  not forced-refactored (unused accessor outside the active path).
+
+Handing the verified state back to the architect.
