@@ -1,0 +1,9 @@
+{
+  "outcomes": {"ordinary_win": 37, "stalemate": 13},
+  "winners": {"ship": 4, "dog": 5, "iron box": 9, "thimble": 5, "high hat": 3, "shoe": 5, "racecar": 4, "wheelbarrow": 2},
+  "ageAtEnd": {"min": 0, "max": 454, "mean": 81.62, "median": 17},
+  "core": {"bankruptcies": {"dog": 183, "ship": 9, "the bank": 64, "thimble": 11, "iron box": 16, "racecar": 17, "high hat": 11, "shoe": 9, "wheelbarrow": 11}, "auctions": 148, "directPurchases": 1212, "mortgages": 755, "income": {"salary": 1881600, "rent": 1910428, "bankPayments": 224990}},
+  "entities": {"formed": 23, "dissolved": 3},
+  "trades": {"peerTrades": 1},
+  "warProfitsTax": {"payments": 52, "totalDollars": 275456, "payers": {"dog": 48, "racecar": 2, "iron box": 2}, "governmentBalance": {"min": 3002, "max": 7499, "mean": 5226.0, "median": 5333}}
+}

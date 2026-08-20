@@ -56,6 +56,9 @@ final class PomStepHandlers {
         then("^the packaged jar's output confirms that full-draw development loans is " + NAME + "$",
             (world, arguments) -> world.assertPackagedCliFullDrawDevelopmentLoans(arguments.text(1))),
 
+        then("^the packaged jar's output confirms that the war profits tax is " + NAME + "$",
+            (world, arguments) -> world.assertPackagedCliWarProfitsTax(arguments.text(1))),
+
         step("^I stop the packaged jar$", (world, arguments) -> world.stopPackagedCli()),
 
         then("^the packaged jar process ends$",

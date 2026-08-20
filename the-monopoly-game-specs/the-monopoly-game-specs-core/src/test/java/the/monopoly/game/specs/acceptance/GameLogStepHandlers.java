@@ -52,6 +52,8 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeR
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.initiativeWon;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalBalance;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalAge;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.governmentBalance;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.governmentBalanceLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEnteredLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailCardUsed;
@@ -91,6 +93,10 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.splitMonopo
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.soldAHouse;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStarted;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStartedAtAge;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTax;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTaxLine;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTaxPaid;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTaxPaidLine;
 import static the.monopoly.game.specs.acceptance.StepHandler.step;
 import static the.monopoly.game.specs.acceptance.StepHandler.then;
 
@@ -815,6 +821,15 @@ final class GameLogStepHandlers {
                 moved(arguments.text(1), arguments.number(2), arguments.text(3), arguments.number(4), arguments.text(5)),
                 salaryCollected(arguments.text(6), arguments.number(7)))),
 
+        then("^the game log records that pawn \"" + NAME + "\" pays the government a war profits tax of \\$" + MONEY + "$",
+            (world, arguments) -> logRecords(world, warProfitsTaxPaid(arguments.text(1), Integer.parseInt(arguments.text(2))))),
+
+        then("^the game log records that the government's final account balance is \\$" + MONEY + "$",
+            (world, arguments) -> logRecords(world, governmentBalance(Integer.parseInt(arguments.text(1))))),
+
+        then("^the game log records that the war profits tax is " + NAME + "$",
+            (world, arguments) -> logRecords(world, warProfitsTax(arguments.text(1)))), 
+
         then("^the game log records that pawn \"" + NAME
                 + "\" starts its turn before pawn \"" + NAME + "\"$",
             (world, arguments) -> logRecordsInOrder(world,
@@ -1011,6 +1026,15 @@ final class GameLogStepHandlers {
                 + "\" for \\$" + VALUE + "$",
             (world, arguments) -> says(world, builtAHouse(
                 arguments.text(1), arguments.text(2), arguments.number(3)))),
+
+        then("^the game report says that pawn \"" + NAME + "\" pays the government a war profits tax of \\$" + MONEY + "$",
+            (world, arguments) -> says(world, warProfitsTaxPaidLine(arguments.text(1), Integer.parseInt(arguments.text(2))))),
+
+        then("^the game report says that the government's final account balance is \\$" + MONEY + "$",
+            (world, arguments) -> says(world, governmentBalanceLine(Integer.parseInt(arguments.text(1))))),
+
+        then("^the game report says that the war profits tax is " + NAME + "$",
+            (world, arguments) -> says(world, warProfitsTaxLine(arguments.text(1)))),
 
         then("^the game report says that pawn \"" + NAME + "\" sells a house on \"" + NAME
                 + "\" for \\$" + VALUE + "$",

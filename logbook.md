@@ -39232,6 +39232,31 @@ would silently re-pair config↔fixture), and `formatMean` uses `Double.toString
 trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
+## 2026-08-20T16:45:00Z — architect closes characterization phase
+
+Processed refactorer handoff `000184` at `e9645b76b5` and merged it. Independent
+verification passes: characterization profile 12/12 (including config 10's
+war-profits-tax baseline), full domain suite 411/411, and DRY reports no
+duplicate candidates in the new `GameBreakdown`/`CharacterizationConfig`
+paths. The phase is complete and is handed to the specifier.
+Architect sent policy follow-up `00_20260820T134946Z_000342` to the specifier
+for the surviving case-mutation assertion in the new CLI war-profits-tax
+scenario. Awaiting policy before any coder follow-up or phase-complete handoff.
+Specifier confirmation `000221` reports direct `cli-14/15` checks reject
+`eNabled`. Recheck confirmed the strict `state.equals("enabled")` assertion;
+the earlier survivor came only from packaged `cli-jar-10`, while the isolated
+CLI rerun selected unrelated argument mutations. Sent clarification back to
+the specifier; no behavior or acceptance-policy change is warranted. Sent
+clarification as `00_20260820T135640Z_000343`; the inbound batch is closed.
+## 2026-08-20T15:50:00Z — architect verifies war-profits-tax observability
+
+Processed refactorer handoff `000182` at `d3d97c484d` and merged it as
+`4ca5b42`. Independent checks: acceptance 898/898; serial Maven domain 411/411
+and CLI 20/20; changed `Game.java` mutation sites 2/2 killed. DRY reported
+only the two existing duplicated Game blocks. Soft acceptance mutation found
+one new CLI survivor: changing expected war-profits-tax state `enabled` to
+`eNabled` still passes. Sent that policy/assertion question to the specifier;
+phase cannot advance until it is resolved.
 
 ## 2026-08-20T15:10:00Z — architect payment/enforcement verification
 
@@ -40796,6 +40821,8 @@ acceptance 883/883, WarProfitsTaxBook mutation 1/1 killed, and all changed
 Journalling payment branches killed. Remaining Journalling survivors are
 pre-existing unrelated branches. Regenerated mutation manifests are included
 in this commit; phase-complete handoff follows to the specifier.
+Sent phase-complete git handoff `50_20260820T130818Z_000341` to the specifier
+at commit `b2e386eecb`.
 
 ## 2026-08-20T13:08:18Z — specifier merges the war-profits-tax feature to completion
 
@@ -40832,6 +40859,65 @@ implemented, Java- and acceptance-mutation-clean, every suite green.
 Observability (journal/logging/report) and CLI wiring remain backlogged
 as the only pieces not yet specified for this feature. Per role rules,
 no new coder handoff until the user approves one.
+
+## 2026-08-20T16:10:00Z — coder implements war-profits-tax observability and CLI wiring
+
+Merged specifier handoff `1dbff7417c` for `war-profits-tax-observability`.
+The game now journals the war-profits-tax state explicitly as enabled or
+disabled at startup. Added focused Game and Report tests for the disabled
+state and tax/payment/government-balance rendering. Registered journal, log,
+report, and packaged-CLI acceptance assertions for tax payment, final
+government balance, and enabled/disabled state. Updated the acceptance World
+to pass the real tax flag through simulator construction, preserve synthetic
+pre-game government balance in the captured journal/log, and support the raw
+CLI argument and packaged output checks.
+
+Verification:
+
+- Focused Game/Journalling/Report tests: 87/87 pass.
+- Full domain suite: 411/411 pass.
+- Full acceptance pipeline: 898/898 pass.
+## 2026-08-20T13:45:00Z — refactorer processes coder handoff `ad43a16fbd` (round 4: observability)
+
+Merged the war-profits-tax observability completion. Production change is one
+line in `Game.java`: the disable-path now also logs
+`Journal.Entry.WarProfitsTaxEnabled(warProfitsTax)` (previously only the
+enabled case was logged), so the report always shows "war profits tax is
+enabled/disabled". `Report.java:63` already renders both states, so the
+disabled line reads correctly. `ReportTest` covers the enabled render; the
+pre-game government balance and raw-CLI/packaged-output checks are added in
+test/harness and the journal/logging/report specs were promoted from
+`backlog/` to live.
+
+Refactorer verification (all green):
+- Domain 411/411 (+4, incl. new `JournallingTest`) + 28/28 property.
+- Acceptance 898/898 (+15 observability/promotion scenarios; was 883).
+- CLI 19/19 excluding the documented pre-existing
+  `keepsPlayingUntilToldToStop` timing flake; characterization 10/10.
+- Mutation-site scan: Game 105 (was 106 — the simplified log line dropped one;
+  still the documented pre-existing >100 breach), Journalling 24,
+  WarProfitsTax 20, WarProfitsTaxBook 1.
+
+CRAP audit on `Game.java` (post round-4): the round-4 change touched only the
+single `WarProfitsTaxEnabled` log line (line 242) and introduces no CRAP issue.
+Pre-existing breaches in this already-red-flagged file, all unchanged by the
+war-profits rounds:
+- `journalOperation` CRAP 56.0 (CC 7, 0% cov) — a switch over the sealed
+  `LegalEntity.Operation`, exhaustive by compilation with straight-line cases;
+  qualifies for the documented sealed-type exemption, left in place, CRAP
+  recorded.
+- `serviceEntityDevelopmentLoan` CRAP 12.0 (CC 3, 0%), `operateEntity` CRAP
+  6.0 (CC 2, 0%), `mortgageEntitySpareProperty` CRAP 2.0 (CC 1, 0%) — the
+  pre-existing legal-entity development-loan machinery, a separate feature
+  outside the war-profits scope; 0% coverage flagged as a pre-existing gap
+  within the `Game.java` structural breach.
+- `playTurns`/`playTurn`/`operateEntity` at CRAP 6.0 (threshold boundary).
+
+CRAP on `WarProfitsTaxBook.assess` (new, round 3) was 3.0/82.4% cov (fine);
+the pre-existing `setGovernmentBalance` CRAP 12.0/0% (unused setter) is
+documented in the round-3 entry. No war-profits-introduced CRAP breach exists.
+
+Handing the verified state back to the architect.
 
 ## 2026-08-20T13:18:54Z — specifier hands off war-profits-tax-observability (final piece)
 
@@ -40954,3 +41040,57 @@ priority: 50
 task: characterization-war-profits-tax
 commit: 4d90b5a13c
 ```
+
+## 2026-08-20T17:30:00Z — coder processes characterization-war-profits-tax handoff
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+merge_and_process specifier 4d90b5a13c
+```
+
+Merged the characterization specification and resolved the logbook merge
+conflict by preserving both the specifier's observability history and the
+coder's implementation history. Added characterization config 10 for the
+asset-rich Billionaire plus Greedo with `--optional-war-profits-tax`.
+Extended `GameBreakdown` with optional war-profits-tax payment count/total,
+payer counts, and final government-balance Stats aggregated across every
+seed, including zero-balance seeds. Added focused parsing, aggregation, and
+JSON round-trip coverage. Updated README sync validation and README's
+Summary/Detailed Breakdown data for all ten configs. Generated the config-10
+50-seed baseline.
+
+Verification:
+
+- Characterization profile: 12/12 pass (10 configs, README sync, focused tax breakdown test).
+- Full domain suite: 411/411 pass.
+- The existing unseeded `SimulatorTest.keepsPlayingUntilToldToStop` timing
+  assertion failed in the CLI module and on an isolated rerun; no simulator
+  production code was changed for this unrelated flake.
+
+## 2026-08-20T14:45:00Z — refactorer processes coder handoff `436bd72e11` (characterization-war-profits-tax)
+
+Merged the war-profits-tax characterization baseline. This is test-side
+harness work: `CharacterizationConfig` gains config 10 (asset-rich Billionaire
++ Greedo with `--optional-war-profits-tax`); `GameBreakdown.WarProfitsTaxExtras`
+records payment count/total-dollars, per-payer counts, and final
+government-balance Stats aggregated across every seed (incl. zero-balance
+seeds), serialised to a fixture; `CharacterizationTest` adds focused
+parsing/aggregation/JSON round-trip coverage; new 50-seed fixture
+`eight_billionaire_greedo_asset_rich_war_profits_tax.json`; README sync
+validation + Summary/Detailed Breakdown updated for all ten configs.
+
+(Logbook merge conflict during this merge: my round-4/CRAP-audit notes
+coexisted with the coder's specifier-observability + characterization history;
+resolved by preserving both chronologically.)
+
+Refactorer verification (all green):
+- Characterization 12/12 (10 configs + README sync + focused tax-breakdown
+  test) — includes the new config-10 50-seed baseline.
+- Full domain suite 411/411.
+- CLI 19/19 excluding the documented pre-existing
+  `SimulatorTest.keepsPlayingUntilToldToStop` timing flake (recurred; no
+  simulator production code changed here).
+
+Handing the verified state back to the architect.

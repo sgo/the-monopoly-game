@@ -26,7 +26,10 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.idOf;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.jailEntered;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalBalance;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalAge;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.governmentBalance;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.money;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTax;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTaxPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moved;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesFromPosition;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rolled;
@@ -751,6 +754,15 @@ final class JournalStepHandlers {
 
         then("^pawn \"" + NAME + "\" pays no war profits tax$",
             (world, arguments) -> assertThat(world.paysNoWarProfitsTax(arguments.text(1))).isTrue()),
+
+        then("^the game journal records that pawn \"" + NAME + "\" pays the government a war profits tax of \\$" + MONEY + "$",
+            (world, arguments) -> records(world, warProfitsTaxPaid(arguments.text(1), Integer.parseInt(arguments.text(2))))),
+
+        then("^the game journal records that the government's final account balance is \\$" + MONEY + "$",
+            (world, arguments) -> records(world, governmentBalance(Integer.parseInt(arguments.text(1))))),
+
+        then("^the game journal records that the war profits tax is " + NAME + "$",
+            (world, arguments) -> records(world, warProfitsTax(arguments.text(1)))), 
 
         then("^the government's account holds \\$" + MONEY + "$",
             (world, arguments) -> assertThat(world.governmentAccountBalance())
