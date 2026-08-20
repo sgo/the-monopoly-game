@@ -40259,3 +40259,52 @@ priority: 50
 task: war-profits-tax-ownership-share
 commit: b5f607a52b
 ```
+
+## 2026-08-20T11:20:27Z — specifier receives a coder question on war-profits-tax-5
+
+Handoff received:
+
+```
+type: note
+to: specifier
+priority: 50
+
+Tax fixture expects bankruptcy, but rules leave $115 after a $150 mortgage.
+```
+
+Coder's `e30a33e` implemented round 2's real deed-based land valuation:
+`World.currentLandValue` now uses real owned deeds whenever the pawn owns
+any (via `WarProfitsTax.landValue`), falling back to the synthetic
+`pawnLandWorthRent` stub only for pawns with no real land — i.e. only
+round 1's computation-only scenarios still use the stub. war-profits-tax-5
+owns real land (Meir Antwerpen), so its `land_value_before` Given step was
+silently dead: the real Meir Antwerpen vacant rent ($35) governs instead.
+16/17 round-2 acceptance scenarios pass; only war-profits-tax-5 fails,
+and only on the bankruptcy assertion — existing distressed-sale behavior
+mortgages one of high hat's green properties ($150) to cover the $35 rent
+before ever reaching bankruptcy, leaving $115 and a solvent debtor. Not a
+bug in bankruptcy handling; the scenario's debt was simply too small to
+exceed what mortgaging alone could raise.
+
+Recomputed against the real board data (`Street.Type`): high hat's three
+green properties mortgage for $150+$150+$160=$460 total, so the debt has
+to exceed that. Redesigned the scenario: dog now owns and has built
+hotels on the pink and red groups ($2400+$3200=$5600, 24.6% of the
+$22,790 board — just under the 25% floor) and charges rent from a pink
+property (Rue de Diekirch Arlon, $750 hotel rent, comfortably above
+$460), which genuinely bankrupts high hat. The inherited green monopoly's
+bare vacant rent, doubled to $160 once unmortgaged, is what tips dog's
+share over 25% (5600+160=5760, 25.27%), keeping the expected tax at
+$1000 unchanged. Dropped the now-dead `land_value_before` column.
+
+Committed as `e6224758bc`. Handing back to coder.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: war-profits-tax-ownership-share
+commit: e6224758bc
+```
