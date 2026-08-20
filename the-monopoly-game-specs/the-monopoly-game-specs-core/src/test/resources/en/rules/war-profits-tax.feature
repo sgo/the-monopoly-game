@@ -138,21 +138,39 @@ Feature: war profits tax
   # bankruptcy.feature), so inherited land always arrives bare and
   # mortgaged, not with whatever houses it had. It only starts counting
   # once the new owner lifts that mortgage (an existing Greedo behaviour
-  # whenever it can afford to).
+  # whenever it can afford to). For that mortgage-then-transfer step to
+  # still leave high hat bankrupt, the rent owed has to exceed everything
+  # mortgaging the green group alone could raise ($150 + $150 + $160 =
+  # $460) — dog's pink+red hotels put the rent charged (from Rue de
+  # Diekirch Arlon, $750) well above that, and dog's own pre-existing
+  # land value (pink $2400 + red $3200 = $5600, 24.6% of the $22,790
+  # board) sits just under the 25% floor, so it's specifically the
+  # inherited green monopoly's bare vacant rent ($26+$26+$28, doubled to
+  # $160 once unmortgaged) that tips dog over it.
   Scenario Outline: land inherited through another player's bankruptcy counts toward ownership share the same as land that was bought
     Given we select 3 players
     And pawn "dog" will roll 10 for initiative
     And pawn "high hat" will roll 6 for initiative
     And pawn "iron box" will roll 2 for initiative
-    And pawn "dog"'s land is currently worth $<land_value_before> in rent
-    And pawn "dog" owns "Meir Antwerpen"
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And pawn "dog" owns "Bruul Mechelen"
+    And pawn "dog" owns "Place Verte Verviers"
+    And pawn "dog" owns "Rue St-Léonard Liège"
+    And pawn "dog" owns "Lange Steenstraat Kortrijk"
+    And pawn "dog" owns "Grand Place Mons"
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
+    And the street "Rue St-Léonard Liège" has a hotel built
+    And the street "Lange Steenstraat Kortrijk" has a hotel built
+    And the street "Grand Place Mons" has a hotel built
     And pawn "high hat" owns "Boulevard Tirou Charleroi"
     And pawn "high hat" owns "Veldstraat Gent"
     And pawn "high hat" owns "Boulevard d'Avroy Liège"
     And pawn "high hat" has $0 to spend
-    And pawn "dog" will claim rent for "Meir Antwerpen"
+    And pawn "dog" will claim rent for "Rue de Diekirch Arlon"
     And pawn "dog" has collected $<collected> in rent since their last war profits tax assessment
-    When pawn "high hat" lands on "Meir Antwerpen"
+    When pawn "high hat" lands on "Rue de Diekirch Arlon"
     Then pawn "high hat" is bankrupt
     And pawn "dog" owns "Boulevard Tirou Charleroi"
     And pawn "dog" owns "Veldstraat Gent"
@@ -161,8 +179,8 @@ Feature: war profits tax
     Then pawn "dog" pays the government a war profits tax of $<tax>
 
     Examples:
-      | land_value_before | collected | tax  |
-      | 5620               | 1000      | 1000 |
+      | collected | tax  |
+      | 1000      | 1000 |
 
   # war-profits-tax-6
   Scenario Outline: a legal entity's ownership share never taxes the entity, and its land does not count toward any shareholder's own share
