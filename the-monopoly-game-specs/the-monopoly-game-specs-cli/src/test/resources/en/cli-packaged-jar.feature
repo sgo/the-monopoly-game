@@ -65,6 +65,7 @@ Feature: CLI packaged jar
     And the README usage report includes the optional flag "--optional-asset-rich-billionaire"
     And the README usage report includes the optional flag "--optional-development-loans"
     And the README usage report includes the optional flag "--optional-development-loans-full-draw"
+    And the README usage report includes the optional flag "--optional-war-profits-tax"
 
   # cli-jar-6
   Scenario Outline: the packaged jar confirms the configured year limit at the start of the game
