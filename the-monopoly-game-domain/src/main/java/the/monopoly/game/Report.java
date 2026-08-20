@@ -60,6 +60,8 @@ public final class Report {
       case Entry.StalemateTrading it -> "stalemate trading is " + (it.enabled() ? "enabled" : "disabled");
       case Entry.DevelopmentLoans it -> "development loans are " + (it.enabled() ? "enabled" : "disabled")
           + (it.fullDraw() ? " with full draw" : "");
+      case Entry.WarProfitsTaxEnabled it -> "war profits tax is " + (it.enabled() ? "enabled" : "disabled");
+      case Entry.WarProfitsTaxPaid it -> name(it.payer()) + " pays a war profits tax of $" + it.amount().amount();
       case Entry.DevelopmentLoanRaised it -> name(it.borrower()) + " raises a development loan of $"
           + it.amount().amount() + " from the bank, secured by " + boardSpaceName(it.collateral())
           + fundedBy(it.bondholder());
@@ -149,6 +151,7 @@ public final class Report {
           + (it.creditor() == null ? "the bank" : name(it.creditor()));
       case Entry.Stalemate it -> "The game ends in a stalemate";
       case Entry.YearLimitReached it -> "The year limit was reached";
+      case Entry.GovernmentBalance it -> "The government's account holds $" + it.amount().amount();
       case Entry.FinalBalance it -> name(it.player()) + "'s final balance is $" + it.balance().amount();
       case Entry.FinalAge it -> name(it.player()) + "'s final age is " + it.age() + " years";
       case Entry.LegalEntityFormed it -> it.name() + " is formed, held in equal thirds by "
