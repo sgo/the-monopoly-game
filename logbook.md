@@ -40637,3 +40637,21 @@ Java mutation clean, acceptance mutation survivors all confirmed expected,
 every test suite green. Only round 3 (payment/enforcement:
 war-profits-tax-8, 9) remains backlogged for this feature. Per role
 rules, no new coder handoff until the user approves one.
+
+## 2026-08-20T15:05:00Z — coder implements war-profits-tax payment and enforcement
+
+Merged specifier handoff `5094191b43` for round 3 (`war-profits-tax-8, 9`).
+Added a callback-based shortfall boundary to `WarProfitsTaxBook.assess`, so
+callers can raise cash before the government payment while preserving the
+existing overload. Production `Journalling` now mortgages unencumbered owned
+land in board order when tax exceeds cash; the acceptance World mirrors this
+for direct scenario assertions while preserving synthetic no-deeds scenarios.
+Added focused unit coverage for shortfall funding and accumulated government
+payments.
+
+Verification:
+
+- Focused WarProfitsTaxTest: 13/13 pass.
+- Payment acceptance: 19/19 pass.
+- Domain suite: 407/407 pass.
+- Full acceptance pipeline: 883/883 pass.

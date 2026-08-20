@@ -62,8 +62,21 @@ record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds,
   private void assessWarProfitsTax(Player player) {
     if (!warProfitsTax) return;
     Money owed = warProfitsTaxBook.assess(player,
-        the.monopoly.game.rules.WarProfitsTax.landValue(rules, deeds, player));
+        the.monopoly.game.rules.WarProfitsTax.landValue(rules, deeds, player),
+        shortfall -> mortgageWarProfitsTaxCollateral(player, shortfall));
     if (!owed.equals(Money.ZERO)) journal.log(new Journal.Entry.WarProfitsTaxPaid(player.id(), owed));
+  }
+
+  private void mortgageWarProfitsTaxCollateral(Player player, Money shortfall) {
+    for (Street.Type type : rules.gameboard().layout()) {
+      if (deeds.landOwnedBy(player).contains(type)) {
+        Ownable land = (Ownable) rules.create(type);
+        if (!deeds.isMortgaged(land)) {
+          deeds.mortgage(land, player);
+          if (player.account().balance().amount().covers(shortfall)) return;
+        }
+      }
+    }
   }
 
   private void serviceDevelopmentLoan(the.monopoly.game.rules.DevelopmentLoanBook.Position position) {
