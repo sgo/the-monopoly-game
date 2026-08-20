@@ -40850,3 +40850,26 @@ Verification:
 - Focused Game/Journalling/Report tests: 87/87 pass.
 - Full domain suite: 411/411 pass.
 - Full acceptance pipeline: 898/898 pass.
+
+## 2026-08-20T13:45:00Z — refactorer processes coder handoff `ad43a16fbd` (round 4: observability)
+
+Merged the war-profits-tax observability completion. Production change is one
+line in `Game.java`: the disable-path now also logs
+`Journal.Entry.WarProfitsTaxEnabled(warProfitsTax)` (previously only the
+enabled case was logged), so the report always shows "war profits tax is
+enabled/disabled". `Report.java:63` already renders both states, so the
+disabled line reads correctly. `ReportTest` covers the enabled render; the
+pre-game government balance and raw-CLI/packaged-output checks are added in
+test/harness and the journal/logging/report specs were promoted from
+`backlog/` to live.
+
+Refactorer verification (all green):
+- Domain 411/411 (+4, incl. new `JournallingTest`) + 28/28 property.
+- Acceptance 898/898 (+15 observability/promotion scenarios; was 883).
+- CLI 19/19 excluding the documented pre-existing
+  `keepsPlayingUntilToldToStop` timing flake; characterization 10/10.
+- Mutation-site scan: Game 105 (was 106 — the simplified log line dropped one;
+  still the documented pre-existing >100 breach), Journalling 24,
+  WarProfitsTax 20, WarProfitsTaxBook 1.
+
+Handing the verified state back to the architect.
