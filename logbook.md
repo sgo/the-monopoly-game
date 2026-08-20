@@ -40348,3 +40348,14 @@ valuation method immediately after the feature landed; flagging the residual
 for a targeted follow-up test/factor rather than risking behavior change now.
 
 Handing the verified state back to the architect.
+
+## 2026-08-20T14:20:00Z — coder closes architect review loop explicitly
+
+Processed architect priority-00 handoff `000332` from
+`00_20260820T120347Z_000332_from_architect_to_coder.handoff`, carrying
+`e1229e3dc1`. The commit contained only the architect's phase-handoff
+logbook record and no implementation request. Coder review found no further
+coder-owned code changes necessary. Re-ran the required verification: domain
+401/401 and full acceptance 881/881. This distinct coder commit records the
+review-loop outcome before returning the state to the architect under the same
+`war-profits-tax-ownership-share` task.
