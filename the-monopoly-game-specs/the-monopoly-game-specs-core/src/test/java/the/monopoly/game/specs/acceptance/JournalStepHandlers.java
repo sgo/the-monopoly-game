@@ -1017,10 +1017,10 @@ final class JournalStepHandlers {
                 .as("pawn \"%s\" owns \"%s\"", arguments.text(1), arguments.text(2))
                 .isTrue()),
 
-        then("^pawn \"" + NAME + "\" no longer owns \"" + NAME + "\"$",
-            (world, arguments) -> assertThat(world.pawnOwns(arguments.text(1), SpaceNames.of(arguments.text(2))))
+        step("^pawn \"" + NAME + "\" no longer owns \"" + NAME + "\"$",
+            (world, arguments) -> assertThat(world.pawnNoLongerOwns(arguments.text(1), SpaceNames.of(arguments.text(2))))
                 .as("pawn \"%s\" owns \"%s\"", arguments.text(1), arguments.text(2))
-                .isFalse()),
+                .isTrue()),
 
         then("^pawn \"" + NAME + "\" does not own \"" + NAME + "\"$",
             (world, arguments) -> assertThat(world.pawnOwns(arguments.text(1), SpaceNames.of(arguments.text(2))))

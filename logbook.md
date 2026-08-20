@@ -40232,6 +40232,33 @@ arrived right behind the priority-00 note just closed above. `91e8bfd547`
 is already an ancestor of `HEAD` (merged as `b04533b` in the entry above).
 No new content to process; marking complete without reprocessing.
 
+## 2026-08-20T13:10:00Z — coder implements war-profits-tax round 2 ownership valuation
+
+Merged specifier handoff `b5f607a52b` (ownership-share valuation). The
+production `WarProfitsTax.landValue(...)` path was already present from round
+1; the acceptance harness now uses it whenever a pawn has direct owned land,
+while retaining synthetic land values for round-1 computation-only scenarios.
+Added current ownership behavior for the acceptance action `pawn ... no longer
+owns ...`, including `And` keyword matching and deed removal before the next
+assessment.
+
+Added focused `WarProfitsTaxTest` coverage for undeveloped monopoly vacant rent,
+current hotel rent, and exclusion of mortgaged/legal-entity land.
+
+Verification:
+
+- Focused tax tests: 7/7 pass.
+- Domain suite: 401/401 pass.
+- Round-2 acceptance: 16/17 pass; all ownership valuation scenarios pass.
+- Full acceptance: 881 tests, 1 failure, only the bankruptcy-inheritance
+  fixture. High hat has three properties and $0, but existing bankruptcy
+  servicing mortgages `Boulevard Tirou Charleroi` for $150 to pay the $35 rent,
+  leaving $115; the scenario expects bankruptcy and conflicts with current
+  bankruptcy behavior. No bankruptcy production logic was changed.
+
+Valid tax/acceptance changes remain ready for commit; the fixture discrepancy
+is routed to the specifier for clarification before altering unrelated
+bankruptcy rules.
 ## 2026-08-20T10:57:20Z — specifier hands off war-profits-tax-ownership-share
 
 User approved round 2. Promoted war-profits-tax-3, 4, 5, 6, 10 (undeveloped
@@ -40308,3 +40335,58 @@ priority: 50
 task: war-profits-tax-ownership-share
 commit: e6224758bc
 ```
+
+## 2026-08-20T14:05:00Z — coder completes war-profits-tax round 2
+
+Processed newer specifier handoff `e6224758bc`, which corrected the
+bankruptcy-inheritance fixture: the rent trigger now exceeds all mortgageable
+collateral and Dog's pre-existing ownership is represented by real developed
+land. The acceptance harness preserves the existing strategy behavior outside
+war-profits-tax scenarios while retaining `Greedo` metadata in tax scenarios so
+existing inherited-mortgage settlement lifts the transferred mortgages.
+Updated packaged CLI acceptance paths from the stale `0.5.0` artifact name to
+the current `0.6.0` artifact name.
+
+Verification:
+
+- Focused WarProfitsTaxTest: 7/7 pass.
+- Domain suite: 401/401 pass.
+- Round-2 war-profits-tax acceptance: 17/17 pass.
+- Full acceptance pipeline: 881/881 pass.
+- One isolated CLI year-limit acceptance failure was intermittent; the focused
+  class passed on rerun and the final full acceptance run passed.
+
+The corrected ownership-share slice is complete and ready for refactorer review.
+
+## 2026-08-20T12:05:00Z — refactorer processes coder handoff `acb53b011b` (round 2: ownership-share)
+
+Merged the round-2 war-profits-tax ownership-share completion. This brings in
+the acceptance spec (`war-profits-tax.feature` +127, plus a version/header
+bump across the other rules features), the acceptance-harness change in
+`World.pawnWillClaimRent` (force `claims()` to true for a war-profits-tax Greedo
+so ownership-share rent claims are exercised), and domain unit tests for
+`WarProfitsTax.landValue` (using vacant-rent-for-monopoly / hotel-rent paths).
+No domain production code (`WarProfitsTax`/`WarProfitsTaxBook`/`Game`/
+`Journalling`) changed with this merge — the valuation logic was already in
+place; this merge adds the scenarios that exercise it.
+
+Refactorer verification (all green):
+- Acceptance 881/881 (was 876; +5 round-2 ownership-share scenarios live).
+- Domain 401/401 normal (+2 landValue tests) + 28/28 property.
+- CLI 19/19 excluding the documented pre-existing
+  `keepsPlayingUntilToldToStop` timing flake; characterization 10/10.
+- Mutation-site scan unchanged: WarProfitsTax 20, WarProfitsTaxBook 0, Game
+  106 (documented pre-existing breach), Journalling 23, Report 5, Simulator
+  91, SimulatorFlags 9.
+- CRAP on `WarProfitsTax` improved markedly with round-2 coverage:
+  `landValue` 90.0 → 9.5 (CC 9, 82.3% cov), `rate` 6.0 (100% cov, at
+  threshold), `colourStreetValue` 5.0, `stationValue` 2.0 (0% cov,
+  station/utility edge path), `boardValue`/`tax` 1.0.
+
+`landValue` remains marginally over the <=6 CRAP target (9.5), driven by
+~18% uncovered edge paths (short/mortgaged/station-utility combinations, and
+station ownership at 0% coverage). Not forcing a behavioral refactor of this
+valuation method immediately after the feature landed; flagging the residual
+for a targeted follow-up test/factor rather than risking behavior change now.
+
+Handing the verified state back to the architect.
