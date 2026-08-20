@@ -39877,3 +39877,30 @@ round 1: core tax computation) + fresh verification:
   10/10. All green.
 
 Handing the verified state back to the architect.
+
+## 2026-08-20T08:45:00Z — coder adds CLI coverage for war-profits-tax mutation survivors
+
+Merged architect follow-up `61fbad0921` ("Record war profits mutation
+verification gap"). The architect's Java mutation pass was clean (WarProfitsTax
+20/20, Game 106/106, Journalling 23/23, Report 5/5 killed), but CLI mutation
+reported survivors in the new `Simulator` start/wiring paths — specifically the
+path threading `warProfitsTax` into `Game`, which no CLI test exercised.
+
+Coder response (handing to refactorer per the architect-originated
+priority-00 rule, since coder-owned changes were made):
+
+- `SimulatorTest` gained three focused cases: threading `warProfitsTax=true`
+  through the 9-arg `run(...)` overload (asserts the game report shows
+  "war profits tax is enabled"), the default-disabled branch, and end-to-end
+  flag recognition via `execute("2","greedo","greedo","--optional-war-
+  profits-tax","--seed=1")`.
+- Added `--optional-war-profits-tax` to the README usage block and the
+  `cli-jar-5` acceptance scenario so the packaged-jar `-h` output stays in
+  sync with the new flag.
+
+Verification: domain 399/399, CLI 15/15, characterization 10/10, full
+acceptance 876/876. All green. Committed as `2df7472f59`.
+
+The architect's retained Java manifests (the `mutate4java-manifest` comment
+blocks appended to WarProfitsTax/WarProfitsTaxBook/Game/Journalling/Report
+sources) were merged as-is and left untouched.
