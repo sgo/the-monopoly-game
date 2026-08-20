@@ -40425,3 +40425,13 @@ Round 2 (war-profits-tax-ownership-share) is complete. Only round 3
 (payment/enforcement: war-profits-tax-8, 9) remains backlogged for this
 feature. Per role rules, no new coder handoff until the user approves
 one.
+
+## 2026-08-20T12:04:22Z — specifier receives a supersession note on war-profits-tax-ownership-share
+
+Handoff received (note, priority 00): "Phase handoff 000331 is superseded;
+coder is addressing 3 mutation survivors." No commit to merge — informational.
+The state merged as `0130c7a` (independently verified 881/881 acceptance,
+401/401 domain, 10/10 characterization) stands as correct for what it covers;
+the team found additional mutation-coverage gaps after sending that phase
+handoff and is closing them before re-sending. Logging receipt and waiting for
+the corrected handoff rather than re-verifying prematurely.
