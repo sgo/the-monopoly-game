@@ -45,8 +45,8 @@ seed is explicitly supplied, which characterization runs always do.
 
 Each config below runs across a handful of different fixed seeds (not just
 one), so the suite still exercises more than one dice/card path per setup
-without losing reproducibility. Five seeds per config is a reasonable
-starting point.
+without losing reproducibility. 50 seeds per config is what the suite
+actually runs today.
 
 ## Execution
 
@@ -55,7 +55,7 @@ starting point.
   internals directly — so this suite exercises the same code path a user
   actually experiences.
 - Games run in parallel (multiple processes or threads — implementation's
-  choice) to keep wall-clock time reasonable; 8 configs × 5 seeds is 40
+  choice) to keep wall-clock time reasonable; 10 configs × 50 seeds is 500
   full games.
 - Each game's complete log is written to a dedicated directory under the
   owning module's `target/`, grouped by config, e.g.
@@ -66,7 +66,7 @@ starting point.
 
 ## Game setups
 
-Nine configs, each additionally run with `--max-years=2500` as a safety
+Ten configs, each additionally run with `--max-years=2500` as a safety
 cap against a run that never naturally terminates:
 
 | # | Players | Strategies | Optional flags |
@@ -80,6 +80,7 @@ cap against a run that never naturally terminates:
 | 7 | 8 | 1 Billionaire (cash-rich, default) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` |
 | 8 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-asset-rich-billionaire` |
 | 9 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-asset-rich-billionaire` `--optional-development-loans` |
+| 10 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-asset-rich-billionaire` `--optional-war-profits-tax` |
 
 Configs 7 and 8 are identical except for the one flag that matters
 (`--optional-asset-rich-billionaire`), so a comparison between their two
@@ -93,6 +94,15 @@ the billionaire's opening mode. Renaming both to drop the now-inaccurate
 `_loans` (they no longer have loans on) is expected as part of this
 change; config 9 reuses the identifier the asset-rich config previously
 had, since it now holds what that config used to represent.
+
+Config 10 is likewise config 8 plus only `--optional-war-profits-tax`,
+isolating that flag's effect the same way — orthogonal to config 9's
+development-loans axis, both branching from config 8 rather than from
+each other. It exists because an ad-hoc 50-seed run of this exact setup
+found a large effect worth permanently tracking: the asset-rich
+billionaire's win rate collapsed from 50/50 to 5/50, ordinary wins fell
+from 100% to 74% (the rest stalemating), and mean age at end rose from
+~4 to ~82 years.
 
 ## The breakdown
 
@@ -133,14 +143,21 @@ always-empty fields:
 - `--optional-greedo-legal-entity`: entities formed count, entities
   dissolved count.
 - `--optional-greedo-stalemate-trading`: peer trades executed count.
+- `--optional-war-profits-tax`: tax payments (count, total $), payer
+  breakdown by pawn — plus final government-account balance as a
+  min/max/mean/median `Stats` block, the same shape `ageAtEnd` already
+  uses, computed across *all* the config's seeds including the ones
+  where the tax was never triggered (balance $0). A flat total across
+  seeds would bury how concentrated collection is in the handful of
+  seeds where a player actually crosses 25% ownership; the distribution
+  is the interesting part.
 
-This schema is expected to grow (new extras for new flags, e.g. the
-backlogged war-profits-tax feature once it ships) without invalidating
-existing baseline fixtures for configs that don't use the new flag — adding
-a field must not require touching every other config's fixture. Adding a
-*generic core* field is different: since it applies to every config, all 8
-baselines need regenerating together when one is added or changed — as they
-will the first time these new core fields ship.
+This schema is expected to grow (new extras for new flags) without
+invalidating existing baseline fixtures for configs that don't use the new
+flag — adding a field must not require touching every other config's
+fixture. Adding a *generic core* field is different: since it applies to
+every config, all baselines need regenerating together when one is added
+or changed.
 
 ## Baseline comparison
 
@@ -171,9 +188,9 @@ every data point shown for a config matches that config's fixture:
   min/median/mean/max.
 - Detailed Breakdown block: everything the Summary row has, plus winners,
   bankruptcies, auction count and its percentage of total land
-  acquisitions, mortgage count, income composition, and — for the two
-  configs that have them — loan origination/servicing, entity, and
-  peer-trade figures.
+  acquisitions, mortgage count, income composition, and — for whichever
+  configs have them — loan origination/servicing, entity, peer-trade, and
+  war-profits-tax figures.
 
 Only the factual data points are checked, not the hand-written analytical
 asides (e.g. the `eight_greedo` income-scale comment, the "350 total =
