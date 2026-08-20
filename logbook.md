@@ -40231,3 +40231,31 @@ A second priority-50 `git_handoff` for the same commit (`91e8bfd547`)
 arrived right behind the priority-00 note just closed above. `91e8bfd547`
 is already an ancestor of `HEAD` (merged as `b04533b` in the entry above).
 No new content to process; marking complete without reprocessing.
+
+## 2026-08-20T10:57:20Z — specifier hands off war-profits-tax-ownership-share
+
+User approved round 2. Promoted war-profits-tax-3, 4, 5, 6, 10 (undeveloped
+vs. developed land, bankruptcy-inherited land, legal-entity exemption,
+selling back below threshold) from `backlog/en/rules/war-profits-tax.feature`
+to the tracked file, unchanged and with original stable indices. Backlog now
+holds only round 3 (war-profits-tax-8, 9: government-account accumulation,
+forced mortgage on shortfall).
+
+Ran `bb gherkin-parser` + `bb gherkin-ir-dry-checker` against the full
+8-scenario tracked file: 18 findings, all expected — the two intentional
+double "grows a year older" steps (rounds 1's reset scenario, round 2's
+sell-back scenario), and `land_value` vs `land_value_before` flagged as a
+placeholder variant (deliberate: scenario 5 names it differently to
+distinguish the pre-bankruptcy value). Nothing to normalize.
+
+Committed as `b5f607a52b`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: war-profits-tax-ownership-share
+commit: b5f607a52b
+```
