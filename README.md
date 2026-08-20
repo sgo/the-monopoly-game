@@ -186,7 +186,7 @@ Full breakdown for any config lives in
 - Peer trades: 1
 - War-profits tax: 52 payments, \$275,456 total
 - Tax payers: dog 48, racecar 2, iron box 2
-- Government balance: min 3002, median 5333, mean 5226.0, max 7499
+- Government balance: min 0, median 5335, mean 5509.12, max 10956
 
 </details>
 

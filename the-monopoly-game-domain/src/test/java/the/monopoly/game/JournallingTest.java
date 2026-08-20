@@ -36,6 +36,22 @@ class JournallingTest {
     assertThat(dog.account().balance().amount()).isEqualTo(before);
     assertThat(book.collected(dog)).isEqualTo(new Money(1000));
     assertThat(journal.entries()).noneMatch(Entry.WarProfitsTaxPaid.class::isInstance);
+    assertThat(journal.entries()).noneMatch(Entry.GovernmentBalance.class::isInstance);
+  }
+
+  @Test
+  void enabledWarProfitsTaxLogsTheGovernmentBalanceAfterAnOrdinaryWin() {
+    Deeds deeds = developedLand();
+    Game.Journal journal = new Game.Journal();
+    WarProfitsTaxBook book = taxBook();
+    book.setGovernmentBalance(new Money(1000));
+
+    journalling(journal, deeds, book, true).won(dog);
+
+    assertThat(journal.entries()).containsSubsequence(
+        new Entry.Won(dog.id()),
+        new Entry.FinalAge(dog.id(), 0),
+        new Entry.GovernmentBalance(new Money(1000)));
   }
 
   @Test

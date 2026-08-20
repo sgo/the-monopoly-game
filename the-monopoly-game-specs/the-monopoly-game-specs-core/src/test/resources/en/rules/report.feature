@@ -1256,6 +1256,21 @@ Feature: game report
       | land_value | collected | balance |
       | 6000       | 1000      | 1000    |
 
+  # report-89
+  Scenario Outline: the report narrates the government's final account balance once an ordinary win ends the game too
+    Given the war profits tax is enabled
+    And pawn "dog"'s land is currently worth $<land_value> in rent
+    And pawn "dog" has collected $<collected> in rent since their last war profits tax assessment
+    And pawn "dog" grows a year older
+    And pawn "high hat" has $<high hat balance> to spend
+    When pawn "high hat" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    Then the game report says that pawn "dog" wins the game
+    And the game report says that the government's final account balance is $<balance>
+
+    Examples:
+      | land_value | collected | high hat balance | balance |
+      | 6000       | 1000      | 5                 | 1000    |
+
   # report-87
   Scenario Outline: the report narrates that the war profits tax is enabled, near the start of the game
     Given the war profits tax is enabled
