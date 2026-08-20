@@ -1,3 +1,7 @@
+# acceptance-mutation-manifest-begin
+# {"version":1,"tested_at":"2026-08-20T10:22:05.563964Z","feature_name":"auctions for declined land","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/auctions.feature","background_hash":"f9cad8a167d25a58781606f42a70845a9afe8a18f1f63bed35985499ab19f099","implementation_hash":"unknown","scenarios":[{"index":2,"name":"neither player has any strategic interest in a middling-priority property, so it remains with the bank","scenario_hash":"044952dadeb1229716422293df317e25dbda0830ee5245f0fd8a88bb03888648","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:05.563964Z"},{"index":3,"name":"a sole bidder denying a highest-priority monopoly wins at the land's mortgage value, never at its own bidding cap","scenario_hash":"2ae7d02826b301c66c84bd315d2b41c1b3c7a57c17f79b1bf97c0c599a6a5774","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:05.563964Z"}]}
+# acceptance-mutation-manifest-end
+
 # language: en
 
 Feature: auctions for declined land

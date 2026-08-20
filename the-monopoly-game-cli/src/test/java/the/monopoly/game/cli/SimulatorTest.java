@@ -151,4 +151,31 @@ class SimulatorTest {
     assertThat(running.isPlaying()).isFalse();
   }
 
+  @Test
+  void recognizesTheWarProfitsTaxFlagAndThreadsItIntoTheGame() {
+    Simulator.Result result = Simulator.execute("2", "greedo", "greedo",
+        "--optional-war-profits-tax", "--seed=1");
+
+    assertThat(result.succeeded()).isTrue();
+    assertThat(result.output()).contains("war profits tax is enabled");
+  }
+
+  @Test
+  void threadsTheWarProfitsTaxFlagIntoTheGame() {
+    Simulator.Result result = Simulator.run(2, Simulator.strategiesFor(2, List.of()),
+        false, false, false, false, -1, 1L, true);
+
+    assertThat(result.succeeded()).isTrue();
+    assertThat(result.output()).contains("war profits tax is enabled");
+  }
+
+  @Test
+  void leavesWarProfitsTaxDisabledByDefault() {
+    Simulator.Result result = Simulator.run(2, Simulator.strategiesFor(2, List.of()),
+        false, false, false, false, -1, 1L, false);
+
+    assertThat(result.succeeded()).isTrue();
+    assertThat(result.output()).doesNotContain("war profits tax is enabled");
+  }
+
 }

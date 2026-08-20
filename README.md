@@ -191,6 +191,7 @@ Optional flags:
   --optional-asset-rich-billionaire
   --optional-development-loans
   --optional-development-loans-full-draw
+  --optional-war-profits-tax
   --max-years=N
 Report file: $TMPDIR/the-monopoly-game.report
 ```
