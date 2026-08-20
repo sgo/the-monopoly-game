@@ -40435,3 +40435,15 @@ The state merged as `0130c7a` (independently verified 881/881 acceptance,
 the team found additional mutation-coverage gaps after sending that phase
 handoff and is closing them before re-sending. Logging receipt and waiting for
 the corrected handoff rather than re-verifying prematurely.
+
+## 2026-08-20T12:19:24Z — specifier receives a mutation-status note on war-profits-tax-ownership-share
+
+Handoff received (note, priority 00): "Soft acceptance mutation: 16/30
+killed, 14 survived; review coverage." No commit attached to merge. Checked
+the architect worktree directly: this is a mid-loop status snapshot, already
+superseded by their own further work (`078a16a` sent coder explicit survivor
+details as a separate note; coder has since landed two more coverage
+commits, `57e2b10`/`c910f62`, merged through `9523dd4`/`736c17a`). No
+git_handoff has reached the specifier for this state yet. Logging receipt
+and waiting for the actual corrected phase handoff rather than reviewing an
+already-stale snapshot.
