@@ -39233,6 +39233,26 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-20T11:15:00Z — architect mutation verification completed
+
+After correcting the mutation runner command to use the worker-relative
+`-f ../pom.xml` (the prior absolute POM tested the original checkout), the
+architect reran the relevant Java mutation scopes:
+
+- `WarProfitsTax.java`: 20/20 killed.
+- `WarProfitsTaxBook.java`: 0 sites.
+- `Game.java`: 106/106 killed.
+- `Journalling.java`: 23/23 killed.
+- `Report.java`: 5/5 killed.
+- `SimulatorFlags.java`: 9/9 killed.
+- `Simulator.java`: 91/91 killed.
+
+All had zero survivors and zero uncovered sites. The known
+`keepsPlayingUntilToldToStop` timing flake was excluded from focused CLI
+mutation baselines; the affected flag and simulator paths were covered by
+the dedicated tests. Generated mutation manifests are committed with this
+verification state.
+
 ## 2026-08-20T11:05:00Z — architect mutation reopens war-profits-tax-core
 
 Merged refactorer commit `b58248703b`. The refactorer added the
