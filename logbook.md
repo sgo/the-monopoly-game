@@ -40914,3 +40914,43 @@ tests depend on a rebuilt jar; a stale artifact would make the runner
 observe behavior unrelated to the mutated feature file). No policy
 question is being routed to the specifier here — informational, closing
 without further action.
+
+## 2026-08-20T14:25:08Z — specifier hands off characterization-war-profits-tax
+
+User asked to analyze the new war-profits-tax feature's effect on the
+asset-rich billionaire's dominance. Ran a throwaway 50-seed analysis
+(same seeds/setup as `eight_billionaire_greedo_asset_rich`, plus
+`--optional-war-profits-tax`, via a scratch JUnit test never committed —
+deleted after use) using `Simulator.execute()` directly and `GameBreakdown`
+for the generic figures, with the war-profits-tax-specific lines
+(`Report.java`'s "pays a war profits tax of $" / "The government's account
+holds $") parsed by hand since `GameBreakdown` doesn't model them yet.
+
+Result: dog's win rate collapsed from 50/50 to 5/50; ordinary wins fell
+from 100% to 74% (26% now stalemate); mean age at end rose from ~4 to
+~82 years; 92% of all tax payments (99% of dollars) were dog's — the tax
+is landing almost exclusively on the strategy it was aimed at. User asked
+for this made permanent in the characterization suite.
+
+Added config 10 (`CHARACTERIZATION-TESTS.md`): config 8 + only
+`--optional-war-profits-tax`, isolating the flag the same way 7/8 and
+8/9 already isolate theirs. Specified the new extras: payment count/total
+$, payer breakdown by pawn, and final government balance as a
+min/max/mean/median `Stats` block (mirroring `ageAtEnd`) computed across
+*all* seeds including untaxed ones at $0 — a flat total would bury how
+concentrated collection is in the few seeds where someone actually
+crosses 25%. Also fixed pre-existing staleness noticed while editing
+("8 configs × 5 seeds", "Nine configs" — both predate the earlier
+50-seed/9-config bumps).
+
+Committed as `4d90b5a13c`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: characterization-war-profits-tax
+commit: 4d90b5a13c
+```
