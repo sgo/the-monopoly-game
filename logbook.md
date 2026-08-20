@@ -40674,3 +40674,32 @@ priority: 50
 task: war-profits-tax-payment
 commit: 5094191b43
 ```
+
+## 2026-08-20T13:05:35Z — specifier confirms round-3 acceptance mutation survivors
+
+Handoff received (note, priority 00, with scenario-level detail already
+attached this time): "Round-3 soft mutation adds expected survivors
+6000->5992 and 90->84."
+
+- Scenario 8 (`land_value` 6000→5992): both values are 26.3%/26.29% —
+  comfortably inside band1 (25-40%), same rate, same $2000 government
+  total. Same-band interior mutation, matching round 2's pattern exactly.
+- Scenario 9 (`collected` 90→84): tax scales to $84, still less than
+  Lippenslaan Knokke's $90 mortgage value, so the same single property
+  gets mortgaged and dog is still solvent — identical observable outcome.
+  This scenario's own stated purpose ("a tax bill... forces a mortgage,
+  the same as any other unpayable debt") was never about pinning the
+  exact dollar figure, only that a shortfall triggers the mechanism; with
+  dog starting at $0 cash, essentially any positive collected value
+  forces the same one mortgage.
+
+Both confirmed expected; no unresolved ambiguity, nothing to add.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Both expected: same-band interior (8), Knokke still covers a smaller bill (9).
+```
