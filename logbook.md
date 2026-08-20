@@ -39233,6 +39233,28 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-20T12:00:00Z — architect processes refactorer ownership-share handoff
+
+Merged refactorer commit `30d107c676` for `war-profits-tax-ownership-share` and
+closed inbound batch `20260820T115920Z_000001`. Refactorer reports acceptance
+881/881, domain 401/401, property 28/28, CLI 19/19, and characterization
+10/10. Sent phase-complete handoff `50_20260820T115953Z_000331` to specifier.
+
+## 2026-08-20T12:04:00Z — architect catches mutation survivors in ownership-share handoff
+
+Independent architect verification found 3 survivors in a forced 20-site
+`WarProfitsTax.java` mutation run (17 killed, 3 survived): `rate` line 52
+(`<` to `<=` at the 25% boundary), `colourStreetValue` line 96 (`>` to `>=`
+for zero houses), and line 101 (`&&` to `||` for full-colour ownership and
+mortgage status). Property and characterization profiles passed; full
+acceptance passed 881/881, including 17 round-2 war-profits scenarios.
+
+Routed the missing coverage to coder priority 00 as handoff
+`00_20260820T120347Z_000332` on commit `e1229e3dc1`. The prior phase-complete
+handoff `000331` is superseded pending the coder/refactorer loop.
+
+Sent supersession note `00_20260820T120422Z_000333` to specifier.
+
 ## 2026-08-20T12:45:00Z — architect final verification and corrected handoff preparation
 
 Completed the constitution-required final verification for `war-profits-tax-core`:
@@ -40513,3 +40535,72 @@ to: architect
 priority: 00
 message: All 14 confirmed expected: invariant collected + same-band interior. No real gap
 ```
+
+## 2026-08-20T14:20:00Z — coder closes architect review loop explicitly
+
+Processed architect priority-00 handoff `000332` from
+`00_20260820T120347Z_000332_from_architect_to_coder.handoff`, carrying
+`e1229e3dc1`. The commit contained only the architect's phase-handoff
+logbook record and no implementation request. Coder review found no further
+coder-owned code changes necessary. Re-ran the required verification: domain
+401/401 and full acceptance 881/881. This distinct coder commit records the
+review-loop outcome before returning the state to the architect under the same
+`war-profits-tax-ownership-share` task.
+
+The review-loop commit did not address the independently discovered mutation
+survivors. Sent explicit survivor details to coder as note
+`00_20260820T121203Z_000334`; task remains open pending new coverage.
+
+Merged coder coverage commit `57e2b1072a` as `9523dd4` after resolving its
+append-only logbook conflict. A forced mutation rerun killed 19/20 sites; one
+survived at `WarProfitsTax.java:96` (`houses > 0` to `houses > 1`), showing the
+new tests still lack the exact one-house tier. Sent coder note
+`00_20260820T121608Z_000335`; phase remains open.
+
+## 2026-08-20T14:35:00Z — coder kills three WarProfitsTax mutation survivors
+
+Processed architect priority-00 note `000334`, which identified survivors at
+WarProfitsTax lines 52, 96, and 101. Added focused tests for exact cent-based
+25% threshold behavior, intermediate house-tier rent, and the absence of
+monopoly doubling when a colour group is incomplete or partly mortgaged.
+Focused tax tests pass 10/10; full domain suite passes 404/404. No production
+code changes were necessary.
+
+Merged coder one-house coverage commit `c910f62ce6` and closed inbound batch
+`20260820T121745Z_000001`. Independent verification killed all 20/20 Java
+mutations, found no DRY duplicates, and passed focused domain and property
+tests. Soft mutation of the expanded acceptance feature had 30 total, 16
+killed, 14 survived, and 0 runner errors. Sent specifier review note
+`00_20260820T121924Z_000336`; phase remains open pending coverage review.
+
+## 2026-08-20T14:50:00Z — architect details soft acceptance survivors
+
+Re-ran `war-profits-tax.feature` with JSON mutation reporting. Summary: 26
+executed mutations (2 scenarios skipped, 4 mutations skipped), 12 killed, 14
+survived, 0 errors. The 14 survivors are:
+
+- scenario 1 (`below 25%`): `collected` 1000→1009, `land_value` 5000→5005;
+  `collected` 50000→49998, `land_value` 5697→5689.
+- scenario 2 (band boundaries): `land_value` 5698→5702; 9115→9113;
+  13673→13666; 18232→18234; 22789→22786; 22790→22797.
+- scenario 7 (counter reset): `land_value` 10000→10003.
+- scenario 3 (undeveloped land): `collected` 500→499.
+- scenario 6 (legal-entity exemption): `collected` 500→506.
+- scenario 10 (selling back below threshold): `collected` 1000→992.
+
+These are data mutations that remain within the same asserted policy outcome;
+the exact paths are now recorded for specifier policy review.
+
+Processed specifier request `00_20260820T122406Z_000216`, closed its batch, and
+sent the detailed survivor report as note `00_20260820T122512Z_000337`.
+
+Processed specifier confirmation `00_20260820T122603Z_000217` and closed its
+batch `20260820T122610Z_000001`. Specifier confirmed all 14 soft survivors are
+expected invariant/same-band interior mutations; no specification gap remains.
+
+## 2026-08-20T14:45:00Z — coder covers one-house rent mutation survivor
+
+Processed architect priority-00 note `000335`, which reported the remaining
+mutation survivor at the one-house branch of `WarProfitsTax.java:96`. Added an
+exact one-house rent test. Focused tax tests pass 11/11 and the full domain
+suite passes 405/405. No production code changes were necessary.
