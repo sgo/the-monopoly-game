@@ -41282,3 +41282,29 @@ CLI 20/20 minus the documented pre-existing flake),
 This closes out the war-profits-tax feature's full arc, including the
 gap the user had independently already noticed. No further specifier
 action pending; awaiting the user's next direction.
+
+## 2026-08-20T20:25:00Z — coder processes characterization-survivors-at-first-tax
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+merge_and_process specifier b1def7ce90
+```
+
+Added the optional `survivorsAtFirstTax` Stats block to the war-profits-tax
+characterization extras. The parser identifies the `Billionaire` pawn from
+the strategy lines, replays startup players and bankruptcy debtors in report
+order, and captures the number of solvent players at that pawn's first tax
+payment. Games without a billionaire or without a billionaire tax event omit
+the field. Added focused tests for both the metric and omission behavior,
+README synchronization, and regenerated config 10's baseline.
+
+Config-10 survivor Stats: min 2, median 4, mean
+3.9583333333333335, max 7 (48 of 50 seeds included).
+
+Verification:
+
+- Characterization profile: 12/12 pass.
+- Full domain suite: 412/412 pass.
+- Acceptance pipeline: 901/901 pass.
