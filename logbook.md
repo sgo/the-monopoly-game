@@ -39233,6 +39233,17 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-20T15:10:00Z — architect payment/enforcement verification
+
+Merged refactorer payment handoff `8c17b3d522` and closed inbound batch
+`20260820T125405Z_000001`. Independent acceptance passed 883/883; the
+`WarProfitsTaxBook` mutation run killed 1/1. Forced `Journalling` mutation
+found 15/24 survivors, mostly pre-existing journal branches. Three survivors
+are on the changed payment path: line 63 (disabled tax guard), line 67
+(zero-owed journal entry), and line 74 (already-mortgaged collateral skip).
+Routed those focused gaps to coder as `00_20260820T125659Z_000339`; no phase
+handoff is sent until they are addressed or explicitly classified.
+
 ## 2026-08-20T12:00:00Z — architect processes refactorer ownership-share handoff
 
 Merged refactorer commit `30d107c676` for `war-profits-tax-ownership-share` and
