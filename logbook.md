@@ -41144,3 +41144,40 @@ particular baseline). Raising this to the user rather than quietly
 correcting the doc, since the underlying question — should an ordinary
 win also report a final government balance? — is a product decision,
 not just a docs fix.
+
+## 2026-08-20T17:36:20Z — specifier hands off war-profits-tax-ordinary-win-balance
+
+User confirmed: yes, ordinary wins should log the final government
+balance too (had already noticed this and was planning to ask for it
+independently). Added journal-89/logging-89/report-89, each pinning the
+same setup: dog pays war-profits tax, then high hat (given only $5)
+lands on a tax space it can't cover and goes bankrupt to the bank,
+leaving dog the winner in a 2-player game — reusing the existing
+journal-22-style "force an ordinary win" pattern. The journal/log/report
+must still show the government's final balance even though the game
+ended via `Won`, not `Stalemate`/`YearLimitReached`.
+
+This is a production fix (`Journalling.won()` needs to log
+`GovernmentBalance` too, mirroring `Game.logGameEnd`), not just spec/
+harness wiring — flagged that explicitly in the commit message, along
+with the follow-on consequence: once it lands, config 10's
+characterization baseline needs regenerating, since `governmentBalance`
+will then genuinely cover all 50 seeds instead of only the 13 that
+happened to end in stalemate.
+
+Ran `bb gherkin-parser` + `bb gherkin-ir-dry-checker` against all three
+modified files: no new `duplicate-in-scenario` or `placeholder-variant`
+findings tied to the new scenarios, only the same near-duplicate
+token-overlap noise every large file in this pair produces.
+
+Committed as `5eca564519`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: war-profits-tax-ordinary-win-balance
+commit: 5eca564519
+```
