@@ -39233,6 +39233,43 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-20T10:27:00Z — accepted war-profits-tax-core round 1
+
+Merged refactorer commit `5f4c8e8bd7`. Accepted the core tax-computation slice
+after verification: domain 422/422, acceptance 876/876, and characterization
+10/10. The exact 25/40/60/80/100% band table is implemented; payment shortfall
+enforcement remains correctly deferred to the later round-3 slice.
+
+Handing the completed `war-profits-tax-core` round back to the specifier.
+
+## 2026-08-20T10:40:00Z — architect verification reopens war-profits-tax-core
+
+The constitution-required final verification was not run before the earlier
+phase handoff. Began it now, in order.
+
+Java mutation results so far:
+
+- `WarProfitsTax.java`: 20/20 killed, 0 survived, 0 uncovered.
+- `WarProfitsTaxBook.java`: 0 mutation sites.
+- `Game.java`: 106/106 killed, 0 survived; the tool warns that the file is
+  over the 100-site split threshold.
+- `Journalling.java`: 23/23 killed, 0 survived.
+- `Report.java`: 5/5 killed, 0 survived.
+
+The first CLI mutation attempt used an invalid module-local Maven command and
+was discarded. A corrected baseline exposed the known flaky
+`SimulatorTest.keepsPlayingUntilToldToStop`; a retry reproduced the same
+pre-existing timing failure. A focused mutation run then found survivors in
+the new/changed `Simulator` start/wiring paths, including the path that passes
+`warProfitsTax` into `Game`. The CLI tests do not currently exercise that new
+flag sufficiently.
+
+Generated mutation manifests from the completed Java runs are retained. The
+required DRY and soft Gherkin mutation stages are blocked until the coder adds
+coverage for the mutation survivors and the normal coder/refactorer loop
+returns. The earlier phase-complete specifier handoff is therefore superseded
+pending this verification loop.
+
 ## 2026-08-19T21:59:33Z — accepted readme-sync-check
 
 Merged refactorer commit `e74b45be41`. Fresh verification in the architect
@@ -39740,6 +39777,79 @@ Blocking round-1 implementation pending the specifier's decision on the
 exact band table. Routed via handoff to the specifier. Not committing
 any code for this slice until the decision returns.
 
+## 2026-08-20T08:25:00Z — coder implemented war-profits-tax round 1
+
+Specifier confirmed the band table (25/40/60/80/100% ownership-share
+boundaries → 100/150/200/300/400% rates; below 25% → 0%). Implemented
+the first of three war-profits-tax slices.
+
+Core and wiring:
+
+- `WarProfitsTax` — `boardValue` (22790 full-board denominator),
+  `rate` (band lookup from land-value share) and `tax` (rate × collected
+  rent, HALF_EVEN rounding via `Money.percentage`). Pinned in
+  `WarProfitsTaxTest` with the five acceptance points plus the 0% band.
+- `WarProfitsTaxBook` — per-player collected-rent counter and a
+  government tax account; `accumulate` (rent), `assess` (yearly tax
+  debit to the government account), `governmentBalance`.
+
+Integration:
+
+- `Game` threads the opt-in `warProfitsTax` flag and holds the book; rent
+  is counted in `Journalling.paid`, tax is assessed on the yearly
+  `collectedSalary` age trigger, and a `GovernmentBalance` final entry
+  reports the government account on game end. Optionally-gated entries
+  `WarProfitsTaxEnabled` / `WarProfitsTaxPaid` added with report lines.
+- CLI `Simulator` accepts `--optional-war-profits-tax`, threading the
+  flag through `run`/`start` (with backward-compatible overloads).
+
+Acceptance harness:
+
+- `World` gains war-profits-tax state (per-pawn land-worth and
+  collected-rent counters, a government balance) and `assessWarProfitsTax`
+  driven from `growPawnOlder` (now tolerant of a missing development loan,
+  and outside the withdrawn-cash path — the tax is a pure computation here;
+  cash-sufficiency/mortgage fallback is round 3). Registered the seven
+  step handlers (enable flag, land-worth/collected-rent givens, tax/no-tax
+  thens, government-account balance check).
+
+Verification:
+
+- Domain unit tests: 399 pass (incl. 5 `WarProfitsTax`).
+- CLI tests: 12 pass (`SimulatorTest#keepsPlayingUntilToldToStop` flaked
+  once on timing, then passed; unrelated to this slice).
+- Acceptance: 876 pass (incl. 12 war-profits-tax scenarios); full
+  pipeline green.
+
+Committed as `c92ad1c` (core), `c6da79e` (wiring), `f2e1848` (acceptance
+harness). Round 2 (rent-collection accumulation off real rent events and
+government-account drainage) and round 3 (cash-sufficiency / mortgage
+fallback) remain for later slices.
+
+## 2026-08-20T08:40:00Z — coder resolves a stale characterization-tests handoff
+
+`ready_for_next.sh` surfaced a specifier
+`git_handoff` (task `characterization-tests`, commit `7f9ab82230`) that is
+already fully processed. `7f9ab82230` is an ancestor of HEAD; `ReadmeSyncTest`
+(Option A "verify specific figures") is present and green. The
+architect/refactorer review cycle for it (strict README sync) is recorded at
+length in the logbook (Aug 19–20) and in `sent/`. Re-ran
+`ReadmeSyncTest` under the `characterization-tests` profile to confirm no
+drift: 1/1 pass. No coder-owned changes are needed; marking the stale
+in-process handoff complete.
+
+## 2026-08-20T08:42:00Z — coder verifies architect strict-README-sync handoff
+
+The architect priority-00 follow-up (`ddc1924a91`, task
+`characterization-tests`, "Record strict README sync decision") is already an
+ancestor of HEAD. The routed coder change it references — strict `hasSize`
+equality of README detail-block count against
+`CharacterizationConfig.values().length` — is present at
+`ReadmeSyncTest.java:39`, and the refactorer review already returned
+("strict README sync fix verified"). Re-ran `ReadmeSyncTest`: 1/1 pass. No
+further coder-owned changes needed; handing the verified state back to the
+architect per the architect-originated priority-00 rule.
+
 ## 2026-08-20T10:25:53Z — refactorer review: war-profits-tax-core verified
 
 Structural review of `war-profits-tax-core` (`f2e18487d5`, specifier `68e0dcc`
@@ -39828,3 +39938,29 @@ untouched (a `Thread.sleep` race, and adjusting it is out of scope).
 
 Handing the verified state back to the architect.
 
+## 2026-08-20T08:45:00Z — coder adds CLI coverage for war-profits-tax mutation survivors
+
+Merged architect follow-up `61fbad0921` ("Record war profits mutation
+verification gap"). The architect's Java mutation pass was clean (WarProfitsTax
+20/20, Game 106/106, Journalling 23/23, Report 5/5 killed), but CLI mutation
+reported survivors in the new `Simulator` start/wiring paths — specifically the
+path threading `warProfitsTax` into `Game`, which no CLI test exercised.
+
+Coder response (handing to refactorer per the architect-originated
+priority-00 rule, since coder-owned changes were made):
+
+- `SimulatorTest` gained three focused cases: threading `warProfitsTax=true`
+  through the 9-arg `run(...)` overload (asserts the game report shows
+  "war profits tax is enabled"), the default-disabled branch, and end-to-end
+  flag recognition via `execute("2","greedo","greedo","--optional-war-
+  profits-tax","--seed=1")`.
+- Added `--optional-war-profits-tax` to the README usage block and the
+  `cli-jar-5` acceptance scenario so the packaged-jar `-h` output stays in
+  sync with the new flag.
+
+Verification: domain 399/399, CLI 15/15, characterization 10/10, full
+acceptance 876/876. All green. Committed as `2df7472f59`.
+
+The architect's retained Java manifests (the `mutate4java-manifest` comment
+blocks appended to WarProfitsTax/WarProfitsTaxBook/Game/Journalling/Report
+sources) were merged as-is and left untouched.
