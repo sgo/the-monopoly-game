@@ -41144,3 +41144,31 @@ particular baseline). Raising this to the user rather than quietly
 correcting the doc, since the underlying question — should an ordinary
 win also report a final government balance? — is a product decision,
 not just a docs fix.
+
+## 2026-08-20T19:50:00Z — coder processes war-profits-tax-ordinary-win-balance
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+merge_and_process specifier 5eca564519
+```
+
+The approved scenarios require the final government balance to be
+observable after an ordinary win, not only after a stalemate or year
+limit. Added the minimal production change in `Journalling.won`: when
+war-profits-tax is enabled, the existing `WarProfitsTaxBook` balance is
+logged after the winner and final age entries. Added focused enabled and
+disabled unit coverage in `JournallingTest`.
+
+Regenerated config 10's characterization baseline so its government
+balance Stats now cover all 50 final balances: min 0, max 10956, mean
+5509.12, median 5335. Updated the matching README detail line.
+
+Verification:
+
+- Focused Game/Journalling/Report tests: 88/88 pass.
+- Acceptance pipeline: 901/901 pass, including journal/logging/report
+  ordinary-win scenarios.
+- Characterization profile: 12/12 pass.
+- Full domain suite: 412/412 pass.

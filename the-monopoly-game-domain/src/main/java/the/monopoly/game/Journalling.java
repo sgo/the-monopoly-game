@@ -372,6 +372,7 @@ record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds,
   public void won(Player player) {
     journal.log(new Journal.Entry.Won(player.id()));
     journal.log(new Journal.Entry.FinalAge(player.id(), age(player)));
+    if (warProfitsTax) journal.log(new Journal.Entry.GovernmentBalance(warProfitsTaxBook.governmentBalance()));
   }
 }
 
