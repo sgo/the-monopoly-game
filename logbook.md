@@ -40218,3 +40218,10 @@ no unresolved spec ambiguity. Closing the note.
 
 Round 1 (war-profits-tax-core) is now genuinely complete and verified.
 Rounds 2/3 remain backlogged pending user approval of the next handoff.
+
+## 2026-08-20T10:41:30Z — specifier closes a stale duplicate war-profits-tax-core handoff
+
+A second priority-50 `git_handoff` for the same commit (`91e8bfd547`)
+arrived right behind the priority-00 note just closed above. `91e8bfd547`
+is already an ancestor of `HEAD` (merged as `b04533b` in the entry above).
+No new content to process; marking complete without reprocessing.
