@@ -39726,3 +39726,52 @@ while the actual spec intent could differ.
 Blocking round-1 implementation pending the specifier's decision on the
 exact band table. Routed via handoff to the specifier. Not committing
 any code for this slice until the decision returns.
+
+## 2026-08-20T08:25:00Z — coder implemented war-profits-tax round 1
+
+Specifier confirmed the band table (25/40/60/80/100% ownership-share
+boundaries → 100/150/200/300/400% rates; below 25% → 0%). Implemented
+the first of three war-profits-tax slices.
+
+Core and wiring:
+
+- `WarProfitsTax` — `boardValue` (22790 full-board denominator),
+  `rate` (band lookup from land-value share) and `tax` (rate × collected
+  rent, HALF_EVEN rounding via `Money.percentage`). Pinned in
+  `WarProfitsTaxTest` with the five acceptance points plus the 0% band.
+- `WarProfitsTaxBook` — per-player collected-rent counter and a
+  government tax account; `accumulate` (rent), `assess` (yearly tax
+  debit to the government account), `governmentBalance`.
+
+Integration:
+
+- `Game` threads the opt-in `warProfitsTax` flag and holds the book; rent
+  is counted in `Journalling.paid`, tax is assessed on the yearly
+  `collectedSalary` age trigger, and a `GovernmentBalance` final entry
+  reports the government account on game end. Optionally-gated entries
+  `WarProfitsTaxEnabled` / `WarProfitsTaxPaid` added with report lines.
+- CLI `Simulator` accepts `--optional-war-profits-tax`, threading the
+  flag through `run`/`start` (with backward-compatible overloads).
+
+Acceptance harness:
+
+- `World` gains war-profits-tax state (per-pawn land-worth and
+  collected-rent counters, a government balance) and `assessWarProfitsTax`
+  driven from `growPawnOlder` (now tolerant of a missing development loan,
+  and outside the withdrawn-cash path — the tax is a pure computation here;
+  cash-sufficiency/mortgage fallback is round 3). Registered the seven
+  step handlers (enable flag, land-worth/collected-rent givens, tax/no-tax
+  thens, government-account balance check).
+
+Verification:
+
+- Domain unit tests: 399 pass (incl. 5 `WarProfitsTax`).
+- CLI tests: 12 pass (`SimulatorTest#keepsPlayingUntilToldToStop` flaked
+  once on timing, then passed; unrelated to this slice).
+- Acceptance: 876 pass (incl. 12 war-profits-tax scenarios); full
+  pipeline green.
+
+Committed as `c92ad1c` (core), `c6da79e` (wiring), `f2e1848` (acceptance
+harness). Round 2 (rent-collection accumulation off real rent events and
+government-account drainage) and round 3 (cash-sufficiency / mortgage
+fallback) remain for later slices.
