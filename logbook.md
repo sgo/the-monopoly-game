@@ -39240,6 +39240,19 @@ closed inbound batch `20260820T115920Z_000001`. Refactorer reports acceptance
 881/881, domain 401/401, property 28/28, CLI 19/19, and characterization
 10/10. Sent phase-complete handoff `50_20260820T115953Z_000331` to specifier.
 
+## 2026-08-20T12:04:00Z — architect catches mutation survivors in ownership-share handoff
+
+Independent architect verification found 3 survivors in a forced 20-site
+`WarProfitsTax.java` mutation run (17 killed, 3 survived): `rate` line 52
+(`<` to `<=` at the 25% boundary), `colourStreetValue` line 96 (`>` to `>=`
+for zero houses), and line 101 (`&&` to `||` for full-colour ownership and
+mortgage status). Property and characterization profiles passed; full
+acceptance passed 881/881, including 17 round-2 war-profits scenarios.
+
+Routed the missing coverage to coder priority 00 as handoff
+`00_20260820T120347Z_000332` on commit `e1229e3dc1`. The prior phase-complete
+handoff `000331` is superseded pending the coder/refactorer loop.
+
 ## 2026-08-20T12:45:00Z — architect final verification and corrected handoff preparation
 
 Completed the constitution-required final verification for `war-profits-tax-core`:
