@@ -151,6 +151,29 @@ always-empty fields:
   seeds would bury how concentrated collection is in the handful of
   seeds where a player actually crosses 25% ownership; the distribution
   is the interesting part.
+  Also survivors at first tax: the number of players still solvent
+  (never yet the debtor in a "goes bankrupt to" line) at the moment the
+  billionaire pawn's *first* war-profits tax payment is reported — the
+  point where the billionaire, previously untouchable, becomes taxable
+  like anyone else — as a min/max/mean/median `Stats` block. Seeds where
+  the billionaire is never taxed at all have no such moment and are
+  excluded from this Stats block (not zero-filled — the event didn't
+  happen, unlike a balance that's meaningfully $0). This needs no new
+  production entry: replay the existing "goes bankrupt to" and "pays a
+  war profits tax of $" lines in order, stopping at the billionaire's
+  first tax line. An ad-hoc 50-seed analysis of config 10 found the
+  billionaire is taxed at least once in 48/50 seeds, with a mean of
+  3.96 players (out of 8) still standing at that moment — i.e. the tax
+  typically catches up with the billionaire only after roughly half the
+  table is already gone, not early.
+  Only meaningful for a config with a billionaire pawn; today that's
+  config 10 alone (the only config combining a billionaire with
+  war-profits-tax), but the field is defined generically as "the
+  billionaire pawn's first tax payment" so it still makes sense if a
+  future config pairs war-profits-tax with the cash-rich billionaire
+  instead. A war-profits-tax config with no billionaire at all (e.g. an
+  all-Greedo variant) would have no billionaire pawn to anchor this on
+  and should omit the field entirely, not error.
 
 This schema is expected to grow (new extras for new flags) without
 invalidating existing baseline fixtures for configs that don't use the new
