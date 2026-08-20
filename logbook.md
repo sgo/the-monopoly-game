@@ -40308,3 +40308,36 @@ Verification:
   class passed on rerun and the final full acceptance run passed.
 
 The corrected ownership-share slice is complete and ready for refactorer review.
+
+## 2026-08-20T12:05:00Z — refactorer processes coder handoff `acb53b011b` (round 2: ownership-share)
+
+Merged the round-2 war-profits-tax ownership-share completion. This brings in
+the acceptance spec (`war-profits-tax.feature` +127, plus a version/header
+bump across the other rules features), the acceptance-harness change in
+`World.pawnWillClaimRent` (force `claims()` to true for a war-profits-tax Greedo
+so ownership-share rent claims are exercised), and domain unit tests for
+`WarProfitsTax.landValue` (using vacant-rent-for-monopoly / hotel-rent paths).
+No domain production code (`WarProfitsTax`/`WarProfitsTaxBook`/`Game`/
+`Journalling`) changed with this merge — the valuation logic was already in
+place; this merge adds the scenarios that exercise it.
+
+Refactorer verification (all green):
+- Acceptance 881/881 (was 876; +5 round-2 ownership-share scenarios live).
+- Domain 401/401 normal (+2 landValue tests) + 28/28 property.
+- CLI 19/19 excluding the documented pre-existing
+  `keepsPlayingUntilToldToStop` timing flake; characterization 10/10.
+- Mutation-site scan unchanged: WarProfitsTax 20, WarProfitsTaxBook 0, Game
+  106 (documented pre-existing breach), Journalling 23, Report 5, Simulator
+  91, SimulatorFlags 9.
+- CRAP on `WarProfitsTax` improved markedly with round-2 coverage:
+  `landValue` 90.0 → 9.5 (CC 9, 82.3% cov), `rate` 6.0 (100% cov, at
+  threshold), `colourStreetValue` 5.0, `stationValue` 2.0 (0% cov,
+  station/utility edge path), `boardValue`/`tax` 1.0.
+
+`landValue` remains marginally over the <=6 CRAP target (9.5), driven by
+~18% uncovered edge paths (short/mortgaged/station-utility combinations, and
+station ownership at 0% coverage). Not forcing a behavioral refactor of this
+valuation method immediately after the feature landed; flagging the residual
+for a targeted follow-up test/factor rather than risking behavior change now.
+
+Handing the verified state back to the architect.
