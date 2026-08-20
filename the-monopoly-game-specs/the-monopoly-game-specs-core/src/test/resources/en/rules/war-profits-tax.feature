@@ -21,10 +21,21 @@ Feature: war profits tax
   year — the same "grows a year older" trigger development loan payments
   already use — that accumulated rent is taxed at a rate set by the
   player's *current* ownership share at that moment, then the counter
-  resets to zero for the next year. Below 25% ownership, the rate is 0%.
-  At and above 25% it climbs in bands, reaching 400% at full board
-  ownership — a rate above 100% means the player owes more than they
-  collected that year, out of pocket.
+  resets to zero for the next year. The rate is set by fixed bands, each
+  band's lower bound inclusive (a share exactly at a boundary belongs to
+  the higher band):
+
+  | Ownership share | Rate |
+  |------------------|------|
+  | below 25%        | 0%   |
+  | 25% – 40%         | 100% |
+  | 40% – 60%         | 150% |
+  | 60% – 80%         | 200% |
+  | 80% – 100%        | 300% |
+  | 100%              | 400% |
+
+  A rate above 100% means the player owes more than they collected that
+  year, out of pocket.
 
   All tax collected is paid into a new government account.
 
@@ -47,8 +58,18 @@ Feature: war profits tax
     Examples:
       | land_value | collected |
       | 5000       | 1000      |
+      | 5697       | 50000     |
 
   # war-profits-tax-2
+  # Board value is $22,790 (colour $21,850 + stations $800 + utilities $140,
+  # the same figure Stalemate.threshold uses). Each pair below straddles a
+  # band boundary — the top of one band ($1 short of the next threshold)
+  # and the bottom of the next (exactly at it) — so the boundary itself,
+  # not just a comfortably-interior point, is pinned: 5698/9115 pin band
+  # 25%-40%, 9116/13673 pin 40%-60%, 13674/18231 pin 60%-80%, 18232/22789
+  # pin 80%-100%, and 22790 is the single top point at exactly 100%. The
+  # $5697 counterpart just below the 25% threshold is covered by
+  # war-profits-tax-1, which asserts no tax rather than a $0 tax.
   Scenario Outline: the tax rate climbs in bands as ownership share crosses 25%, applied to the rent collected that year
     Given pawn "dog"'s land is currently worth $<land_value> in rent
     And pawn "dog" has collected $1000 in rent since their last war profits tax assessment
@@ -57,10 +78,14 @@ Feature: war profits tax
 
     Examples:
       | land_value | tax  |
-      | 6000       | 1000 |
-      | 10000      | 1500 |
-      | 14000      | 2000 |
-      | 19000      | 3000 |
+      | 5698       | 1000 |
+      | 9115       | 1000 |
+      | 9116       | 1500 |
+      | 13673      | 1500 |
+      | 13674      | 2000 |
+      | 18231      | 2000 |
+      | 18232      | 3000 |
+      | 22789      | 3000 |
       | 22790      | 4000 |
 
   # war-profits-tax-7

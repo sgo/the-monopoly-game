@@ -31,9 +31,20 @@ Feature: war profits tax
   the same "grows a year older" trigger development loan payments already
   use — that accumulated rent is taxed at a rate set by the player's
   *current* ownership share at that moment, then the counter resets to
-  zero for the next year. Below 25% ownership, the rate is 0%. At and
-  above 25% it climbs in bands, reaching 400% at full board ownership — a
-  rate above 100% means the player owes more than they collected that
+  zero for the next year. The rate is set by fixed bands, each band's
+  lower bound inclusive (a share exactly at a boundary belongs to the
+  higher band):
+
+  | Ownership share | Rate |
+  |------------------|------|
+  | below 25%        | 0%   |
+  | 25% – 40%         | 100% |
+  | 40% – 60%         | 150% |
+  | 60% – 80%         | 200% |
+  | 80% – 100%        | 300% |
+  | 100%              | 400% |
+
+  A rate above 100% means the player owes more than they collected that
   year, out of pocket.
 
   A shortfall is handled exactly like any other unpayable debt already is
