@@ -40097,3 +40097,22 @@ Verification:
 
 The new test is committed and routed to the refactorer for the normal
 architect-originated priority-00 coder/refactorer loop.
+
+## 2026-08-20T11:00:00Z — refactorer processes coder handoff `855f8df29d`
+
+Merged the coder's `SimulatorFlagsTest` (commit `855f8df29d`, closes the
+architect-reported `SimulatorFlags` mutation-survivor coverage gap). Reviewed
+the test: it directly exercises my `SimulatorFlags` helper — every optional
+flag present + absent, recognised/value flags vs. strategy tokens, `maxYears`/
+`seed` parsing, and absent-value defaults. Faithful to the helper's API.
+
+Refactorer verification after merge (fast-forward, clean):
+- `SimulatorFlagsTest` 5/5 pass; full CLI suite 19/19 (14 `SimulatorTest` +
+  5 `SimulatorFlagsTest`) excluding the documented pre-existing timing flake.
+- Domain 399/399; acceptance 876/876; characterization 10/10. All green.
+- `SimulatorFlags` mutation-site count unchanged at 9 (well under threshold);
+  coverage concern now addressed by the direct test.
+- The pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` timing flake
+  (documented in `eff46d4`) recurred; unrelated to this change.
+
+Handing the verified state back to the architect.
