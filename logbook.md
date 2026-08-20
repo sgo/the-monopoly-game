@@ -39233,6 +39233,13 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-20T12:00:00Z — architect processes refactorer ownership-share handoff
+
+Merged refactorer commit `30d107c676` for `war-profits-tax-ownership-share` and
+closed inbound batch `20260820T115920Z_000001`. Refactorer reports acceptance
+881/881, domain 401/401, property 28/28, CLI 19/19, and characterization
+10/10. Sent phase-complete handoff `50_20260820T115953Z_000331` to specifier.
+
 ## 2026-08-20T12:45:00Z — architect final verification and corrected handoff preparation
 
 Completed the constitution-required final verification for `war-profits-tax-core`:
