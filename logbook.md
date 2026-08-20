@@ -40870,3 +40870,35 @@ priority: 50
 task: war-profits-tax-observability
 commit: 1dbff7417c
 ```
+
+## 2026-08-20T13:49:46Z — specifier investigates a reported CLI survivor and can't reproduce it
+
+Handoff received: "New CLI survivor: war tax expected enabled->eNabled
+still passes; decide policy." Before ruling on policy, checked whether
+this is real, given `state.equals("enabled")` (the actual comparison,
+found at `MonopolyStepHelpers.warProfitsTax`) is case-sensitive — a
+mutated "eNabled" should build a `WarProfitsTaxEnabled(false)` claim,
+which should fail against a journal that actually records
+`WarProfitsTaxEnabled(true)`, not survive.
+
+Verified directly rather than trust the report: in the coder worktree,
+temporarily changed cli-14's Examples `state` from `enabled` to
+`eNabled` and ran `acceptance/run-acceptance.sh`. It failed exactly as
+predicted — `AssertionError: The game journal records no
+WarProfitsTaxEnabled[enabled=false]; it records: ... WarProfitsTaxEnabled
+[enabled=true] ...`. Repeated for cli-15 (billionaire/greedo variant):
+same result, failed as expected. Reverted both edits afterward
+(`git checkout --`); worktree left clean.
+
+Cannot confirm this survivor exists as reported. Sent a note back to the
+architect describing the discrepancy rather than either accepting the
+claim or inventing a policy determination for something unverified.
+
+Handoff message sent:
+
+```
+type: note
+to: architect
+priority: 00
+message: Can't reproduce: eNabled fails cli-14/15 in my direct test. Recheck your run?
+```
