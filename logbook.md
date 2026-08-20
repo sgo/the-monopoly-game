@@ -39233,6 +39233,23 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-20T11:05:00Z — architect mutation reopens war-profits-tax-core
+
+Merged refactorer commit `b58248703b`. The refactorer added the
+behavior-preserving `SimulatorFlags` extraction, property coverage for the
+pure tax rule, and the CLI tests for war-profits-tax wiring. Their structural
+and verification audit is accepted provisionally.
+
+Architect mutation of the new `SimulatorFlags.java` found only 1/9 killed and
+8 survivors. The remaining survivors are in the flag-recognition chain and
+`--max-years`/`--seed` constants, where the current CLI assertions do not pin
+the parsed values or each recognition branch tightly enough.
+
+The constitution-required DRY and soft Gherkin stages remain blocked until
+this mutation gap is covered. Routed the test-coverage correction back to
+coder at priority 00; the earlier phase-complete specifier handoff remains
+superseded.
+
 ## 2026-08-20T10:27:00Z — accepted war-profits-tax-core round 1
 
 Merged refactorer commit `5f4c8e8bd7`. Accepted the core tax-computation slice
