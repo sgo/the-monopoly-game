@@ -8486,6 +8486,8 @@ three-doubles jail path, together with its acceptance-pipeline registration
 and regression hardening. Coder must validate and return this priority-`00`
 architect review loop to architect before Phase 12 can be synced to
 specifier.
+Sent phase-complete handoff `50_20260820T174621Z_000345` at commit
+`e96211d154`.
 
 2026-08-05T21:40:00Z — sent specifier handoff:
 type: git_handoff
@@ -39232,6 +39234,13 @@ would silently re-pair config↔fixture), and `formatMean` uses `Double.toString
 trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
+## 2026-08-20T20:50:00Z — architect closes first-tax survivor phase
+
+Processed refactorer handoff `000186` at `8d8fe20c42` and merged it. Independent
+verification passes: characterization profile 13/13, full Maven reactor green
+(domain 412/412 and CLI characterization 13/13), and DRY reports no duplicate
+candidates in `GameBreakdown`. This is characterization-only; no production
+source changed. Phase is complete for the specifier.
 ## 2026-08-20T19:50:00Z — architect closes ordinary-win balance phase
 
 Processed refactorer handoff `000185` at `96df989718` and merged it. Independent
@@ -41316,3 +41325,51 @@ priority: 50
 task: characterization-survivors-at-first-tax
 commit: b1def7ce90
 ```
+
+## 2026-08-20T20:25:00Z — coder processes characterization-survivors-at-first-tax
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+merge_and_process specifier b1def7ce90
+```
+
+Added the optional `survivorsAtFirstTax` Stats block to the war-profits-tax
+characterization extras. The parser identifies the `Billionaire` pawn from
+the strategy lines, replays startup players and bankruptcy debtors in report
+order, and captures the number of solvent players at that pawn's first tax
+payment. Games without a billionaire or without a billionaire tax event omit
+the field. Added focused tests for both the metric and omission behavior,
+README synchronization, and regenerated config 10's baseline.
+
+Config-10 survivor Stats: min 2, median 4, mean
+3.9583333333333335, max 7 (48 of 50 seeds included).
+
+Verification:
+
+- Characterization profile: 12/12 pass.
+- Full domain suite: 412/412 pass.
+- Acceptance pipeline: 901/901 pass.
+
+## 2026-08-20T15:10:00Z — refactorer processes coder handoff `a63f146689` (survivors at first tax)
+
+Merged the war-profits-tax survivor-tracking characterization baseline. This
+is test-side harness only (no production source changed):
+`GameBreakdown.WarProfitsTaxExtras` now also tracks the number of solvent
+players at the moment the Billionaire pays their first war tax, aggregated
+into `survivorsAtFirstTax` Stats across seeds; `CharacterizationTest` verifies
+the counting (only at the Billionaire's first tax, empty when no Billionaire);
+`CharacterizationConfig`/README sync updated; config-10 50-seed fixture gains
+`survivorsAtFirstTax` {min 2, median 4, mean 3.96, max 7} (48 of 50 seeds).
+
+The merge's large `Journalling.java` diff was pure `mutate4java-manifest`
+reflow (module/scope hashes recomputed); no code change there.
+
+Refactorer verification (all green):
+- Characterization 13/13 (+1 survivor-tracking test).
+- Domain 412/412; CLI 19/19 excluding the documented pre-existing
+  `keepsPlayingUntilToldToStop` timing flake; acceptance 901/901.
+- No production source changed → no new mutation sites or CRAP breach.
+
+Handing the verified state back to the architect.

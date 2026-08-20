@@ -187,6 +187,7 @@ Full breakdown for any config lives in
 - War-profits tax: 52 payments, \$275,456 total
 - Tax payers: dog 48, racecar 2, iron box 2
 - Government balance: min 0, median 5335, mean 5509.12, max 10956
+- Survivors at first tax: min 2, median 4, mean 3.9583333333333335, max 7
 
 </details>
 

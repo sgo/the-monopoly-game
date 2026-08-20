@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -354,32 +355,40 @@ record GameBreakdown(
   }
 
   record WarProfitsTaxExtras(int payments, long totalDollars, Map<String, Integer> payers,
-                             Stats governmentBalance, List<Integer> governmentBalances) {
+                             Stats governmentBalance, List<Integer> governmentBalances,
+                             Optional<Stats> survivorsAtFirstTax, List<Integer> survivorCounts) {
 
     WarProfitsTaxExtras merge(WarProfitsTaxExtras other) {
       List<Integer> balances = new java.util.ArrayList<>(governmentBalances);
       balances.addAll(other.governmentBalances);
+      List<Integer> survivors = new java.util.ArrayList<>(survivorCounts);
+      survivors.addAll(other.survivorCounts);
       return new WarProfitsTaxExtras(
           payments + other.payments,
           totalDollars + other.totalDollars,
           mergeMaps(payers, other.payers),
-          Stats.of(balances), balances);
+          Stats.of(balances), balances,
+          survivors.isEmpty() ? Optional.empty() : Optional.of(Stats.of(survivors)), survivors);
     }
 
     String toJson() {
-      return "{\"payments\": " + payments + ", \"totalDollars\": " + totalDollars
-          + ", \"payers\": " + mapToJson(payers)
-          + ", \"governmentBalance\": " + governmentBalance.toJson() + "}";
+      StringBuilder json = new StringBuilder("{\"payments\": ").append(payments)
+          .append(", \"totalDollars\": ").append(totalDollars)
+          .append(", \"payers\": ").append(mapToJson(payers))
+          .append(", \"governmentBalance\": ").append(governmentBalance.toJson());
+      survivorsAtFirstTax.ifPresent(stats -> json.append(", \"survivorsAtFirstTax\": ").append(stats.toJson()));
+      return json.append("}").toString();
     }
 
     static WarProfitsTaxExtras fromJson(String json) {
       Map<String, String> fields = parseObject(json);
+      Optional<Stats> survivors = Optional.ofNullable(fields.get("survivorsAtFirstTax")).map(Stats::fromJson);
       return new WarProfitsTaxExtras(
           Integer.parseInt(fields.get("payments")),
           parseLong(fields.get("totalDollars")),
           parseStringIntMap(fields.get("payers")),
           Stats.fromJson(fields.get("governmentBalance")),
-          List.of());
+          List.of(), survivors, List.of());
     }
   }
 
@@ -476,6 +485,10 @@ record GameBreakdown(
       long taxDollars = 0;
       Map<String, Integer> taxPayers = new LinkedHashMap<>();
       List<Integer> governmentBalances = new java.util.ArrayList<>();
+      Set<String> survivingPlayers = new java.util.LinkedHashSet<>();
+      String billionaire = null;
+      boolean survivorsCaptured = false;
+      List<Integer> survivorCounts = new java.util.ArrayList<>();
 
       for (String line : lines) {
         // Loan handling only counts when the config enables development loans,
@@ -520,6 +533,14 @@ record GameBreakdown(
           if (line.contains(" trades ") && line.contains(" to ") && line.contains(" for ")) peerTrades++;
         }
         if (warProfitsTax) {
+          if (line.startsWith("The game starts with ")) {
+            String names = line.substring("The game starts with ".length());
+            survivingPlayers.addAll(List.of(names.split(", ")));
+          }
+          int billionaireAt = line.indexOf(" uses Billionaire (");
+          if (billionaireAt >= 0) billionaire = line.substring(0, billionaireAt);
+          int bankruptAt = line.indexOf(" goes bankrupt to ");
+          if (bankruptAt >= 0) survivingPlayers.remove(line.substring(0, bankruptAt));
           int taxAt = line.indexOf(" pays a war profits tax of $");
           if (taxAt >= 0) {
             String payer = line.substring(0, taxAt);
@@ -527,6 +548,10 @@ record GameBreakdown(
             taxPayments++;
             taxDollars += amount;
             taxPayers.merge(payer, 1, Integer::sum);
+            if (!survivorsCaptured && payer.equals(billionaire)) {
+              survivorCounts.add(survivingPlayers.size());
+              survivorsCaptured = true;
+            }
           }
           if (line.contains("The government's account holds $"))
             governmentBalances.add((int) dollarsAfter(line, "The government's account holds $"));
@@ -563,7 +588,8 @@ record GameBreakdown(
           : Optional.empty();
       this.warProfitsTax = warProfitsTax
           ? Optional.of(new WarProfitsTaxExtras(taxPayments, taxDollars, taxPayers,
-              Stats.of(governmentBalances), governmentBalances))
+              Stats.of(governmentBalances), governmentBalances,
+              survivorCounts.isEmpty() ? Optional.empty() : Optional.of(Stats.of(survivorCounts)), survivorCounts))
           : Optional.empty();
     }
 

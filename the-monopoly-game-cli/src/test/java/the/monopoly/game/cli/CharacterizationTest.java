@@ -63,6 +63,32 @@ class CharacterizationTest {
     assertThat(roundTripped.governmentBalance()).isEqualTo(tax.governmentBalance());
   }
 
+  @Test
+  void countsSolventPlayersAtBillionairesFirstTaxOnlyWhenThatEventOccurs() {
+    GameBreakdown.GameResult result = new GameBreakdown.GameResult(
+        "The game starts with dog, high hat, iron box\n"
+            + "dog uses Billionaire (legal-entity trading is enabled, stalemate trading is enabled)\n"
+            + "high hat goes bankrupt to dog\n"
+            + "dog pays a war profits tax of $100\n"
+            + "The government's account holds $100\n",
+        false, false, false, true);
+
+    GameBreakdown.WarProfitsTaxExtras tax = result.warProfitsTax().orElseThrow();
+    assertThat(tax.survivorsAtFirstTax()).hasValueSatisfying(stats -> {
+      assertThat(stats.min().orElseThrow()).isEqualTo(2);
+      assertThat(stats.max().orElseThrow()).isEqualTo(2);
+      assertThat(stats.mean().orElseThrow()).isEqualTo(2.0);
+      assertThat(stats.median().orElseThrow()).isEqualTo(2);
+    });
+
+    GameBreakdown.GameResult noBillionaire = new GameBreakdown.GameResult(
+        "The game starts with dog, high hat\n"
+            + "dog uses Greedo (legal-entity trading is enabled, stalemate trading is enabled)\n"
+            + "dog pays a war profits tax of $100\n",
+        false, false, false, true);
+    assertThat(noBillionaire.warProfitsTax().orElseThrow().survivorsAtFirstTax()).isEmpty();
+  }
+
   @ParameterizedTest
   @EnumSource(CharacterizationConfig.class)
   void characterization(CharacterizationConfig config) throws IOException {
