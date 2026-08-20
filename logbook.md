@@ -40719,3 +40719,12 @@ Processed architect priority-00 note `000339`, which identified survivors in
 the real production tax-assessment path for disabled tax, zero-tax/no mortgage,
 and shortfall traversal past an already mortgaged property. Focused tests pass
 3/3 and the full domain suite passes 410/410.
+## 2026-08-20T15:35:00Z — architect closes payment phase
+
+Processed specifier confirmation `000219` for the two new soft acceptance
+mutation survivors: both are expected policy outcomes (same-band interior and
+the smaller Knokke bill). The payment path is independently verified: full
+acceptance 883/883, WarProfitsTaxBook mutation 1/1 killed, and all changed
+Journalling payment branches killed. Remaining Journalling survivors are
+pre-existing unrelated branches. Regenerated mutation manifests are included
+in this commit; phase-complete handoff follows to the specifier.
