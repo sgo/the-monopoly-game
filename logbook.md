@@ -40872,4 +40872,23 @@ Refactorer verification (all green):
   still the documented pre-existing >100 breach), Journalling 24,
   WarProfitsTax 20, WarProfitsTaxBook 1.
 
+CRAP audit on `Game.java` (post round-4): the round-4 change touched only the
+single `WarProfitsTaxEnabled` log line (line 242) and introduces no CRAP issue.
+Pre-existing breaches in this already-red-flagged file, all unchanged by the
+war-profits rounds:
+- `journalOperation` CRAP 56.0 (CC 7, 0% cov) — a switch over the sealed
+  `LegalEntity.Operation`, exhaustive by compilation with straight-line cases;
+  qualifies for the documented sealed-type exemption, left in place, CRAP
+  recorded.
+- `serviceEntityDevelopmentLoan` CRAP 12.0 (CC 3, 0%), `operateEntity` CRAP
+  6.0 (CC 2, 0%), `mortgageEntitySpareProperty` CRAP 2.0 (CC 1, 0%) — the
+  pre-existing legal-entity development-loan machinery, a separate feature
+  outside the war-profits scope; 0% coverage flagged as a pre-existing gap
+  within the `Game.java` structural breach.
+- `playTurns`/`playTurn`/`operateEntity` at CRAP 6.0 (threshold boundary).
+
+CRAP on `WarProfitsTaxBook.assess` (new, round 3) was 3.0/82.4% cov (fine);
+the pre-existing `setGovernmentBalance` CRAP 12.0/0% (unused setter) is
+documented in the round-3 entry. No war-profits-introduced CRAP breach exists.
+
 Handing the verified state back to the architect.
