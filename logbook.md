@@ -41896,3 +41896,10 @@ regex-based selected-player-count handler already in
 parsed and all acceptance entry points generated, but execution was blocked
 before tests started because no Java runtime is installed (`JAVA_HOME` is
 unset; `Unable to locate a Java Runtime`). No Gherkin content changed.
+
+## 2026-08-21T08:48:00Z — architect rejects unresolved setup selection follow-up
+
+The handler exists but asserts `World.selectedPlayers()`, which contains all
+eight initialized pawns. The full acceptance run fails both setup rows:
+expected 2 selected players, actual 8. Coder follow-up required to expose the
+actual selected subset or count; no feature change is needed.
