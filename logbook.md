@@ -43527,6 +43527,14 @@ negative-outcome assertion style (not a new share-fraction vocabulary).
 Run the full acceptance suite: the new line must be supported and the
 previously isolated sole failure eliminated. Do not alter Gherkin content.
 
+## 2026-08-21T16:17:00+02:00 — architect verifies coder's peer-trade and share-sale work
+
+Merged `6c34f550e3`. The coder added the nine exact greedo-peer-trade
+equivalence-policy entries and implemented the `no one wins the Pink Realty
+share` acceptance step. Full `./acceptance/run-acceptance.sh` passed:
+908 tests, 0 failures, 0 errors, 0 skipped. Returning the verified completion
+to the specifier; the share-sale assertion is now enforced.
+
 ## 2026-08-21T16:13:00+02:00 — coder processes greedo peer-trade policy handoff
 
 Complete handoff received:
