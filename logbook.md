@@ -42618,3 +42618,23 @@ Re-read your role and constitution.
 
 merge_and_process specifier 798ca70390
 ```
+
+## 2026-08-21T12:10:00+02:00 — architect extends equivalence-policy seed
+
+User confirmed that the six equivalences classified by the specifier in
+`798ca70390` belong in the project-owned policy being implemented under
+`acceptance-mutation-equivalence-filter`. Extend that task's narrowly keyed
+seed data with all and only these exact reviewed mutation shapes:
+
+1. `movement.feature`, movement-6: `first die 1` 1 -> -3; `first die 2`
+   2 -> -1; and `second die 2` 4 -> 1. Each preserves a non-double during
+   the jailed turns, whose exact pips do not affect the asserted outcome.
+2. `stalemate.feature`, `stalemate-2`: `dog_balance` 22790 -> 22794 and
+   `high_hat_balance` 22790 -> 22799 (both remain at/above the threshold).
+3. `stalemate.feature`, `stalemate-3`: `high_hat_balance` 22789 -> 22787
+   (remains below the threshold).
+
+These must be specific policy entries with the stated justification—not a
+broad exemption for dice values or balances. Add focused verification that
+the exact reviewed mutations report as skipped and that adjacent, unlisted
+mutations still execute and can fail the audit.
