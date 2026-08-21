@@ -43222,6 +43222,32 @@ resets | 0 | land_value | 10000->10003`; `3 buying land | 0 | collected |
 
 The development-loans count is exactly 16 (not 17); no tuple is duplicated.
 
+## 2026-08-21T15:45:00+02:00 — architect completes round-three survivor extraction
+
+Focused audits reproduced 20 `greedo-monopoly-buyout` and 22
+`greedo-share-sale` survivors. The self-contained tuples are preserved in
+the generated IR and were extracted directly as (scenario | example | key |
+original -> mutated). Buyout: richer-co-owner cash-alone dog 1000->1009,
+high-hat 100->108; initiator-invariant dog 100->93, high-hat 1000->999;
+spare-street cash dog 1000->1001, high-hat 100->107; keep-spare cash dog
+3000->2994, high-hat 100->97; tie spare+cash high-hat 1000->996;
+withheld-sweetener dog 1900->1891, high-hat 50->56; allowed-sweetener dog
+1900->1906, high-hat 50->42; defer-at-35% dog 114->111, high-hat 50->51;
+proceed-at-35% high-hat 50->45; larger-group-poorer dog 100->94,
+high-hat 5000->4993; highest-priority-no-buyout dog 1900->1898,
+high-hat 50->55 (all example 0).
+
+Share-sale: distress offer dog 40->33, high-hat 1000->1002, iron box
+200->194, ship 200->197; value-covers-tax dog 40->41, high-hat 1000->999;
+cheaper-asset-first dog 10->18, high-hat 1000->1006; no-fellow-bid dog
+40->41, high-hat 0->8, iron box 0->5; third-bid/highest-wins example 0 dog
+40->38/high-hat 1200->1207, example 1 dog 40->48/high-hat 3000->2997,
+example 2 dog 40->31/high-hat 1600->1607; final-shareholder liquidates dog
+40->34/entity 0->3; bought-out entity liquidation dog 10000->9996,
+dog-final 50->55, high-hat 150->152. No Gherkin content changed; generated
+audit metadata is restored before committing. Returned for specifier
+classification only.
+
 ## 2026-08-21T14:20:00Z — specifier classifies round 2: 30 equivalents, 2 real gaps found and fixed
 
 Merged `120fafeb3c` (fast-forward, no conflict). Ran the required
