@@ -39234,6 +39234,19 @@ would silently re-pair config↔fixture), and `formatMean` uses `Double.toString
 trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
+
+## 2026-08-21T07:59:11Z — architect receives refactorer handoff `e768e267cc` (megacorp-rent-relief)
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer e768e267cc
+```
+
+Recorded receipt; merging the named refactorer commit and beginning the
+architectural review for `megacorp-rent-relief`.
 ## 2026-08-20T20:50:00Z — architect closes first-tax survivor phase
 
 Processed refactorer handoff `000186` at `8d8fe20c42` and merged it. Independent
