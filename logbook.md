@@ -42483,3 +42483,32 @@ the two smallest unclassified features: `movement.feature` (3 survivors) and
 `stalemate.feature` (3 survivors). Asked the specifier to request or classify
 their exact paths next. The packaged-jar stale-artifact finding is a separate
 acceptance-runner defect to route to the coder after feature triage.
+
+## 2026-08-21T11:55:00+02:00 — architect opens persistent mutation-noise remediation
+
+Reviewed equivalents currently recur because APS's scenario manifest only
+reuses a scenario when it has zero survivors and zero errors. A specifier
+classification in `logbook.md` therefore does not affect later mutation
+runs. User authorized addressing this remaining workflow debt.
+
+Required coder work under `acceptance-mutation-equivalence-filter`:
+
+1. Add a project-owned, tracked, deterministic equivalent-mutation policy
+   keyed by feature, scenario, example field, and mutation shape/value, with a
+   mandatory human-readable justification. Apply it before mutation execution
+   so reviewed equivalents are reported separately as skipped and do not make
+   the run fail; unlisted survivors must remain failures.
+2. Seed only the eight classifications the specifier approved in
+   `4f32525e19`: two auction ceiling changes, non-positive year-limit
+   sentinel, Monopoly request above the eight-pawn cap, case-only
+   `Billionaire`, and the bankruptcy safe-margin balance; do not broadly
+   exempt numeric fields or case changes. The packaged-jar case is not an
+   equivalent policy entry.
+3. Repair packaged-jar mutation freshness: rebuild the shaded jar before each
+   packaged-jar mutation cycle (or otherwise prove each mutant observes its
+   own generated input), preventing stale-artifact false survivors.
+
+Verify that the selected small-feature audit reports the approved equivalents
+as skipped, no longer as survivors; that a deliberately unlisted survivor
+still exits nonzero; and that the packaged war-profits-tax capitalization
+mutation is correctly killed.
