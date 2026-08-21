@@ -41823,3 +41823,31 @@ exactly two uses of the repaired step.
 
 The implementation state is ready for architect review. The state being handed
 back is based on implementation commit `2f4cb5b`.
+
+## 2026-08-21T10:45:00+02:00 — coder processed duplicate setup-mutation-fix handoff
+
+Received the complete duplicate handoff message:
+
+```
+id: 20260821T083224Z_000349_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 7107d4debf
+created_at: 2026-08-21T08:32:24.932392Z
+enqueued_at: 2026-08-21T08:32:24.952290Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T08:33:58.573185Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 7107d4debf
+```
+
+This handoff was already merged, implemented, verified as far as the
+Java-less environment allowed, and returned to the architect in `9acf7b3`.
+No implementation work was repeated. The duplicate queue message is removed
+after this log entry is committed.
