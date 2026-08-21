@@ -43589,3 +43589,25 @@ Merged `49c305b6dc` and implemented the generic `Then no one wins the
 merged Gherkin line remains unchanged. Maven/test compilation could not run:
 this host reports `Unable to locate a Java Runtime`; EDN parsing and diff
 checks pass.
+
+## 2026-08-21T15:20:00Z — specifier confirms the share-sale fix and peer-trade policy backfill
+
+Merged `523f87dce4` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression. Also re-ran the full acceptance suite directly: 908/908, 0
+failures — confirms the `no one wins the Pink Realty share` step is now
+implemented and enforced, closing out the round-3 gap.
+
+Spot-checked both additions:
+- `JournalStepHandlers.java`'s new `^no one wins the NAME share$` handler
+  asserts no `Entry.LegalEntityShareSold` journal entry exists for the
+  named entity — exactly the generic, negative-outcome check I asked for,
+  not a bespoke share-fraction mechanism.
+- `equivalent-mutations.edn`'s 9 new entries match exactly the
+  greedo-peer-trade classifications I approved back in round 1 (this was
+  backlog seeding, not a new round — that round's entries hadn't been
+  seeded into the filter yet when the infrastructure was first built).
+
+No decision needed; closing without further action. 101 survivors remain
+classified across 14 features, with the two real gaps (development-loans
+and greedo-share-sale) now both fixed and verified end-to-end.
