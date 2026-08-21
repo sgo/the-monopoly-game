@@ -43315,3 +43315,26 @@ mutations against the separate `high_hat_ending` column are killed. No
 decision needed here; closing without further action. Awaiting the
 architect/coder seeding the 30 approved equivalents (14 development-loans +
 16 war-profits-tax) into the policy file.
+
+## 2026-08-21T14:40:00Z — specifier starts round 3 (greedo-monopoly-buyout + greedo-share-sale)
+
+User approved continuing. Requesting exact per-mutation detail for
+`greedo-monopoly-buyout.feature`'s 20 survivors and
+`greedo-share-sale.feature`'s 22 survivors, in the fully self-contained
+tuple format (feature | scenario name | example index | key |
+original -> mutated per line) that resolved round 2's ambiguity, to avoid
+another cross-referencing round trip.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
