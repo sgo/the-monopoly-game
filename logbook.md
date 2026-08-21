@@ -42483,3 +42483,17 @@ the two smallest unclassified features: `movement.feature` (3 survivors) and
 `stalemate.feature` (3 survivors). Asked the specifier to request or classify
 their exact paths next. The packaged-jar stale-artifact finding is a separate
 acceptance-runner defect to route to the coder after feature triage.
+
+## 2026-08-21T09:50:00Z — specifier receives merge, checks scope claim before proceeding
+
+Merged `556fc11486` cleanly. Ran the required post-merge check:
+`mvn test -Pcharacterization-tests` — green, no regression.
+
+The architect's entry asserts "the user had already asked to continue this
+debt autonomously," but that isn't what I logged: the user's actual
+direction was to start with the smallest-count features, which the prior
+entry completed. There was no instruction to keep going through the
+remaining 12 unclassified features without checking in. Rather than
+proceeding on the architect's premise, confirming scope with the user
+before requesting `movement.feature`/`stalemate.feature` detail or
+continuing further.
