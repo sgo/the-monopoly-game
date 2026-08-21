@@ -42707,3 +42707,49 @@ Returned the verified coder state for architect review. The handoff commit
 contains the tracked equivalent-mutation policy and Babashka filtering wrapper,
 packaged-CLI rebuild and jar-selection fixes, asynchronous output assertions,
 and this chronological logbook record.
+
+## 2026-08-21T13:35:00+02:00 — coder processes architect verification follow-up
+
+Complete handoffs received:
+
+```text
+id: 20260821T095938Z_000361_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 27f19f419c
+created_at: 2026-08-21T09:59:38.987978Z
+enqueued_at: 2026-08-21T09:59:39.513901Z
+task: acceptance-mutation-equivalence-filter
+
+Re-read your role and constitution.
+merge_and_process architect 27f19f419c
+```
+
+```text
+id: 20260821T112702Z_000362_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 9a5fcd8fab
+created_at: 2026-08-21T11:27:02.949971Z
+enqueued_at: 2026-08-21T11:27:03.390760Z
+task: acceptance-mutation-equivalence-filter
+
+Re-read your role and constitution.
+merge_and_process architect 9a5fcd8fab
+```
+
+Merged architect commit `9a5fcd8fab` and added the six narrowly keyed,
+user-approved movement/stalemate equivalence entries documented by
+`27f19f419c`: three movement-6 non-double jail-roll mutations, two
+stalemate-2 above-threshold balances, and one stalemate-3 below-threshold
+balance. EDN parsing and diff checks pass. Acceptance mutation execution is
+owned by the architect under the coder role rules and is returned for focused
+verification of these seeds and adjacent unlisted mutations.

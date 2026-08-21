@@ -39,4 +39,46 @@
   :key "starting balance"
   :original "10"
   :mutated "12"
-  :justification "Both balances remain below the scripted rent demand, so the same bankruptcy and zero final balance are asserted."}]
+  :justification "Both balances remain below the scripted rent demand, so the same bankruptcy and zero final balance are asserted."}
+ {:feature "en/rules/movement.feature"
+  :scenario "failing to roll doubles for three turns in jail forces the fine before moving"
+  :example 0
+  :key "first die 1"
+  :original "1"
+  :mutated "-3"
+  :justification "Both values keep the first jailed roll non-doubles, so the same fine-before-movement outcome is asserted."}
+ {:feature "en/rules/movement.feature"
+  :scenario "failing to roll doubles for three turns in jail forces the fine before moving"
+  :example 0
+  :key "first die 2"
+  :original "2"
+  :mutated "-1"
+  :justification "Both values keep the first jailed roll non-doubles, so the same fine-before-movement outcome is asserted."}
+ {:feature "en/rules/movement.feature"
+  :scenario "failing to roll doubles for three turns in jail forces the fine before moving"
+  :example 0
+  :key "second die 2"
+  :original "4"
+  :mutated "1"
+  :justification "The second jailed roll remains non-doubles, so the same fine-before-movement outcome is asserted."}
+ {:feature "en/rules/stalemate.feature"
+  :scenario "the game ends in a stalemate once every remaining player's balance clears the threshold"
+  :example 0
+  :key "dog_balance"
+  :original "22790"
+  :mutated "22794"
+  :justification "Both balances remain at or above the documented stalemate threshold, so the same stalemate outcome is asserted."}
+ {:feature "en/rules/stalemate.feature"
+  :scenario "the game ends in a stalemate once every remaining player's balance clears the threshold"
+  :example 0
+  :key "high_hat_balance"
+  :original "22790"
+  :mutated "22799"
+  :justification "Both balances remain at or above the documented stalemate threshold, so the same stalemate outcome is asserted."}
+ {:feature "en/rules/stalemate.feature"
+  :scenario "the game does not end in a stalemate while any remaining player is still below the threshold"
+  :example 0
+  :key "high_hat_balance"
+  :original "22789"
+  :mutated "22787"
+  :justification "Both balances remain below the documented stalemate threshold, so the same non-stalemate outcome is asserted."}]
