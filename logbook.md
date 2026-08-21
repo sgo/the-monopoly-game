@@ -41752,6 +41752,69 @@ Ran the required post-merge check: `mvn test -Pcharacterization-tests` —
 
 No further specifier action pending; awaiting the user's next feature.
 
+## 2026-08-21T08:25:00Z — specifier decides architect's setup.feature mutation finding
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: acceptance-mutation-debt
+
+Re-read your role and constitution.
+
+merge_and_process architect 1f6ef529ab
+```
+
+Merged `1f6ef529ab`. `logbook.md` conflicted in two interleaved hunks this
+time (my own entry landed between the refactorer's original processing note
+and its later correction commit rather than cleanly after both); resolved
+by reconstructing each side's complete message and reordering them
+chronologically. The architect's new finding entry landed at a different
+point in the file and merged cleanly on its own.
+
+Reviewed the finding: `setup.feature`'s two scenarios select `<players>`
+players but only assert universal properties (starting state, bank
+completeness) that hold no matter what the count is, so mutating the
+`players` column (2->11, 2->-4) survives. Accepted as a real gap — but only
+the "never assert the selected count" half. The "valid player-count range"
+half is already the CLI's job (`cli.feature`'s "the CLI rejects a player
+count outside the official range", backed by `Player.Pool` having no range
+validation of its own — range checking is deliberately a CLI-boundary
+concern, not `setup.feature`'s).
+
+Fix: added a new `expected players` column and a `Then exactly <expected
+players> players are selected` assertion to both scenarios, decoupled from
+the `players` column that arranges the scenario — reading the same column
+back would have been tautological (rule: give an assertion its own column
+instead of reading back the one that arranged the scenario). Committed as
+`a1a1229`.
+
+Verification: `setup.feature` parses cleanly via `gherkin-parser` and shows
+no genuine drift via `gherkin-ir-dry-checker` (only expected pre-existing
+false positives). Did not run the acceptance suite — the new `Then` step has
+no handler yet, so it isn't runnable until implemented; that's expected for
+a specifier-only Gherkin change.
+
+New stable task name for this remediation: `setup-mutation-fix`. Handing
+back to the architect for routing (a new step handler implementation, then
+re-verification, is needed before this can close).
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+commit: a1a1229287
+
+Re-read your role and constitution.
+
+merge_and_process specifier a1a1229287
+```
+
 ## 2026-08-21T10:00:00+02:00 — coder processed duplicate megacorp-rent-relief handoff
 
 Received the complete duplicate handoff message:
@@ -42079,6 +42142,38 @@ Required coder correction: retain the single generalized capturing handler in
 Run the full acceptance pipeline; expected result is all 908 generated tests
 passing.
 
+## 2026-08-21T11:19:23+02:00 — architect verifies setup-mutation-fix complete
+
+Merged coder commit `33da6ceca2`: selection now has one generalized,
+capturing handler in `MonopolyStepHandlers`; the obsolete
+`JournalStepHandlers` duplicate is removed. The targeted generated setup
+suite passes 2/2 and the full acceptance pipeline passes 908/908.
+
+Targeted soft Gherkin acceptance mutation of `en/rules/setup.feature` passes
+6/6: both player-count mutations (`2 -> 11`, `2 -> -4`), both expected-count
+mutations, the starting balance mutation, and the starting position mutation
+are all killed. The runner refreshed the feature's tracked mutation manifest
+and stamp with this evidence.
+
+## 2026-08-21T11:30:00+02:00 — architect refreshes broader acceptance-mutation debt
+
+A fresh full soft mutation audit completed with exit 1 because existing
+features still have many survivors. The previously fixed `setup.feature` is
+clean (6/6 killed), so this is broader legacy specification debt. Verified
+feature-level survivor counts include: movement 3, bankruptcy 2,
+distressed-sale 44, stalemate 3, buying-land 58, greedo-peer-trade 9,
+greedo-monopoly-buyout 20, greedo-share-sale 22, auctions 2, journal 76,
+report 77, logging 80, development-loans 16, war-profits-tax 16,
+rent-relief 2, year-limit 1, monopoly 1, CLI 1, and packaged CLI 1.
+
+The paths are dominated by case-only strategy values and fixture inputs that
+do not change the scenario's asserted outcome, but this audit deliberately
+does not classify policy. The specifier must determine which survivors are
+intentional equivalents and select the first genuine acceptance-criteria gap
+for a bounded remediation task. The runner's generated mutation stamps were
+reverted after extracting this evidence, keeping the worktree clean; only
+the already-committed setup manifest remains refreshed.
+
 ## 2026-08-21T11:35:00+02:00 — coder processes architect setup outline diagnosis
 
 Received the complete handoff message:
@@ -42182,6 +42277,95 @@ merge_and_process coder c39bbd0281
 The duplicate `JournalStepHandlers` selection entry is removed and the state
 is returned to the architect for Java-enabled full acceptance verification.
 
+## 2026-08-21T09:22:00Z — specifier merges architect's phase-complete setup-mutation-fix handoff
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: setup-mutation-fix
+
+Re-read your role and constitution.
+
+merge_and_process architect 4010541da2
+```
+
+Merged `4010541da2`. `logbook.md` conflicted in two hunks, both caused by the
+same identical-boilerplate anchor problem: my "Handoff sent" block shares
+its opening lines (`type: git_handoff`/`to: architect`/`priority: 00`/
+`task: setup-mutation-fix`) verbatim with the coder's own handoffs to the
+architect under the same task, so git treated that shared text as a common
+merge point and split the surrounding content into two separate conflicts
+instead of one clean append. Resolved by transcribing each side's complete
+entries in full and concatenating my entry first, then the entire
+coder/architect resolution chain in its existing order. While reconstructing
+my own entry I also corrected a real inaccuracy: my logged "Handoff sent"
+text had dropped the `commit:` header line that the tool-generated payload
+actually included.
+
+The resolution chain this closes out was a real back-and-forth, not routine:
+the coder's environment had no Java runtime the entire time
+(`JAVA_HOME` unset), so every coder-side "verification" could only confirm
+parsing/generation, never actual test execution. That mattered — the
+architect (which does have a working Java runtime) caught two real defects
+the coder couldn't have seen: the new handler asserted against
+`World.selectedPlayers()` returning all 8 initialized pawns instead of the
+requested 2 (hardcoded pool max), and later a duplicate step-handler
+registration (`JournalStepHandlers` vs `MonopolyStepHandlers`) created an
+ambiguous match that broke 5 unrelated legal-entity scenarios. Both were
+corrected; the architect's final entry confirms the full acceptance pipeline
+at 908/908 and targeted `setup.feature` mutation at 6/6 killed, including
+both previously-surviving player-count mutations (`2->11`, `2->-4`).
+
+Ran the required post-merge check: `mvn test -Pcharacterization-tests` —
+green, no regression.
+
+Worth flagging to the user separately: the coder's environment lacking a
+Java runtime throughout this whole loop is a real environment gap (similar
+in kind to the handoff daemon being down earlier), not something I can fix
+as specifier.
+
+No further specifier action pending; awaiting the user's next feature.
+
+## 2026-08-21T09:37:00Z — specifier receives broader acceptance-mutation debt finding
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: acceptance-mutation-debt
+
+Re-read your role and constitution.
+
+merge_and_process architect 04172cfa95
+```
+
+Merged `04172cfa95` cleanly, no conflicts. Ran the required post-merge check:
+`mvn test -Pcharacterization-tests` — green, no regression.
+
+The architect's fresh full soft-mutation audit found survivors across 18
+features (auctions 2 through logging 80; full per-feature counts in the
+merged entry), noting the paths look dominated by case-only/fixture-input
+mutations that likely don't change the asserted outcome, but deliberately
+not classifying policy — leaving that determination and the choice of a
+first bounded remediation task to me. Given the scope, reporting to the user
+before selecting where to start rather than deciding unilaterally; no
+decision recorded yet, task not yet handed back to the architect.
+
+User directed starting with the smallest-count features first: auctions (2),
+year-limit (1), monopoly (1), CLI (1), packaged CLI (1), bankruptcy (2) — 6
+features, 8 survivors total. The architect's audit reported only aggregate
+per-feature counts, not per-mutation detail, so I can't yet tell which of
+these 8 are real acceptance-criteria gaps versus intentional equivalents
+(as with rent-relief's own two already-explained survivors). Requesting the
+concrete per-mutation detail (scenario, mutated value, and what changed)
+for just these 6 features before making any determination, rather than
+guessing from aggregate counts alone.
+
 Handoff sent:
 
 ```
@@ -42195,3 +42379,150 @@ Re-read your role and constitution.
 
 merge_and_process coder 33da6ceca2
 ```
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: dabe903e9f
+
+Re-read your role and constitution.
+
+merge_and_process specifier dabe903e9f
+```
+
+## 2026-08-21T11:40:00+02:00 — architect supplies exact small-feature mutation paths
+
+Replayed the six selected features, then ran every candidate mutation through
+the runner individually to distinguish the survivors from kills. Exact results:
+
+- `auctions.feature`: survivor `high_hat_bid 120 -> 119` in the first
+  winner/final-balance example, and survivor `dog_bid 140 -> 145` in the
+  second. Both bid changes leave the stated winner and final balance unchanged.
+- `year-limit.feature`: survivor `year limit 2 -> -6` in the “does not stop
+  while below the limit” scenario. Its only assertion is that the year limit
+  did not end the game.
+- `monopoly.feature`: survivor `players 8 -> 17`; the scenario only asserts
+  eventual monopoly after ten games, and selection is capped by the official
+  eight-pawn pool.
+- `cli.feature`: clean on replay, 3/3 killed; the earlier aggregate 1 was not
+  reproduced.
+- `cli-packaged-jar.feature`: survivor `state enabled -> eNabled` for the
+  war-profits-tax flag confirmation; the output assertion is case-insensitive.
+- `bankruptcy.feature`: survivors `strategy Billionaire -> billionaire` in
+  the inherited-mortgage scenario (case-insensitive strategy parsing), and
+  `starting balance 10 -> 12` in the phantom-extra-move scenario, which still
+  bankrupts the player and leaves the asserted final balance at zero.
+
+All other candidates in these features fail their generated tests. The
+replays' generated feature stamps were reverted after capture, so this is
+evidence only and leaves no unrelated feature-file modification. The
+specifier must classify the listed equivalents or identify the first one that
+should become a new acceptance criterion.
+
+## 2026-08-21T09:47:00Z — specifier classifies the six-smallest-feature survivors
+
+Merged `391d872134` cleanly. Investigated each of the 8 survivors against the
+real code, not just the architect's characterization:
+
+- `auctions.feature` (`high_hat_bid 120->119`, `dog_bid 140->145`): equivalent.
+  The feature's own header comment documents the mechanic — an ascending $5
+  auction where "will bid $X" only fixes a ceiling, and the price paid is
+  "often below any bidder's own ceiling." In both scenarios the settling
+  price is set entirely by the *losing* bidder's ceiling (90 and 120
+  respectively); the winner's ceiling only needs to clear that price by one
+  $5 step, so any value comfortably above it is interchangeable by design.
+- `year-limit.feature` (`year limit 2->-6`): equivalent. Confirmed in
+  `Game.java:317` (`yearLimitJustReached`): `maxYears <= 0` is an explicit,
+  documented "unlimited" sentinel, and `year-limit-3` already has a
+  dedicated scenario for exactly that default-unlimited behavior. `-6` isn't
+  an under-tested boundary, it's the same disabled state as `0` or any other
+  non-positive value, by design.
+- `monopoly.feature` (`players 8->17`): equivalent. Confirmed in
+  `Player.Pool.select`/`stream()`: the official pawn pool is hard-capped at
+  `max` (8) regardless of what's requested, so 8 and 17 select the identical
+  real player set. This isn't the same gap `setup.feature` had (nothing
+  asserted the resulting count at all, for any value including valid ones);
+  here the requested value is already at the pool's ceiling, so no count
+  assertion could distinguish 8 from 17 in the first place.
+- `cli.feature`: no action — not reproduced, 3/3 killed on replay.
+- `cli-packaged-jar.feature` (`enabled->eNabled`, cli-jar-10): not a new
+  finding. This is the identical war-profits-tax packaged-jar survivor from
+  2026-08-20, already jointly diagnosed with the architect as a
+  mutation-runner/stale-jar tooling artifact (`assertPackagedCliWarProfitsTax`
+  uses a plain, case-sensitive `state.equals("enabled")`, confirmed just now
+  by rereading `World.java:1809` — the assertion logic itself is fine).
+  Recommending the architect's mutation runner rebuild the packaged jar
+  before each packaged-jar mutation cycle, or exclude that suite from soft
+  audits until it does, so this doesn't keep resurfacing as apparent debt.
+- `bankruptcy.feature` (`strategy Billionaire->billionaire`): equivalent.
+  Confirmed in `Vocabulary.java:35`: `case "billionaire", "Billionaire" ->
+  new Billionaire()` is a deliberate dual-case match in the test-fixture
+  vocabulary parser, not scenario-level behavior needing a tighter assertion.
+- `bankruptcy.feature` (`starting balance 10->12`, phantom-extra-move
+  scenario): equivalent. The scenario's subject is the phantom-extra-move
+  rule, not a precise bankruptcy threshold; both values are comfortably
+  below what the scripted rent charges demand, so both still bankrupt dog
+  and land the same $0 final balance.
+
+Verdict: all 8 survivors across these 6 features are legitimate equivalents
+or a known tooling artifact — none warrant a Gherkin change. Declining to
+open a remediation task for any of them. The other 12 larger-count features
+from the original audit (movement through logging/report, rent-relief's own
+2, etc.) remain unclassified and are not in scope for this decision; the
+user will direct whether/when to pick those up next.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
+
+## 2026-08-21T11:50:00+02:00 — architect advances acceptance-mutation debt triage
+
+Merged the specifier's small-feature classification. The user had already
+asked to continue this debt autonomously, so the next bounded triage group is
+the two smallest unclassified features: `movement.feature` (3 survivors) and
+`stalemate.feature` (3 survivors). Asked the specifier to request or classify
+their exact paths next. The packaged-jar stale-artifact finding is a separate
+acceptance-runner defect to route to the coder after feature triage.
+
+## 2026-08-21T11:55:00+02:00 — architect opens persistent mutation-noise remediation
+
+Reviewed equivalents currently recur because APS's scenario manifest only
+reuses a scenario when it has zero survivors and zero errors. A specifier
+classification in `logbook.md` therefore does not affect later mutation
+runs. User authorized addressing this remaining workflow debt.
+
+Required coder work under `acceptance-mutation-equivalence-filter`:
+
+1. Add a project-owned, tracked, deterministic equivalent-mutation policy
+   keyed by feature, scenario, example field, and mutation shape/value, with a
+   mandatory human-readable justification. Apply it before mutation execution
+   so reviewed equivalents are reported separately as skipped and do not make
+   the run fail; unlisted survivors must remain failures.
+2. Seed only the eight classifications the specifier approved in
+   `4f32525e19`: two auction ceiling changes, non-positive year-limit
+   sentinel, Monopoly request above the eight-pawn cap, case-only
+   `Billionaire`, and the bankruptcy safe-margin balance; do not broadly
+   exempt numeric fields or case changes. The packaged-jar case is not an
+   equivalent policy entry.
+3. Repair packaged-jar mutation freshness: rebuild the shaded jar before each
+   packaged-jar mutation cycle (or otherwise prove each mutant observes its
+   own generated input), preventing stale-artifact false survivors.
+
+Verify that the selected small-feature audit reports the approved equivalents
+as skipped, no longer as survivors; that a deliberately unlisted survivor
+still exits nonzero; and that the packaged war-profits-tax capitalization
+mutation is correctly killed.
