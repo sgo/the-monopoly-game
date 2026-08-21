@@ -43753,3 +43753,15 @@ Re-read your role and constitution.
 
 merge_and_process specifier 7ab2b80744
 ```
+
+## 2026-08-21T17:00:00+02:00 — architect dispatches round-four policy seeds
+
+Specifier approved 100 round-four equivalences in `7ab2b80744`; two
+distressed-sale dead strategy-column rows were pruned and are not policy
+entries. Dispatch `acceptance-mutation-equivalence-filter` to coder: seed
+every tuple in the tracked `acceptance/round-four-survivors.md` report except
+the two now-pruned distressed-sale-1 strategy tuples. Preserve exact feature,
+scenario, example, key, old/new value, and a mechanism-specific justification
+(auction ceiling, reserve/threshold bucket, strategy vocabulary) rather than
+any broad numeric/case exemption. Verify approved entries skip and unlisted
+mutations still execute; do not alter Gherkin content.
