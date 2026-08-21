@@ -42833,3 +42833,16 @@ Re-read your role and constitution.
 
 merge_and_process specifier 0db44ac2e0
 ```
+
+## 2026-08-21T14:10:00+02:00 — architect returns rent-relief survivor detail
+
+Ran the requested focused soft audit of `rent-relief.feature`: 2 total, 0
+killed, 2 survived, no errors. The generated mutants are both in
+`rent-relief-1`, “rent at or under $200 is paid by the tenant in full,
+regardless of what the government's account holds,” and both mutate the
+first scenario outline's `government_start` column: example 0 -> 6, and
+example 5000 -> 5006. No other scenario fields mutated in this audit.
+
+Both values are returned to the specifier for requirement-level
+classification; no Gherkin content was changed. Generated audit metadata was
+restored before committing.
