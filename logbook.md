@@ -43044,3 +43044,26 @@ Re-read your role and constitution.
 
 merge_and_process specifier e1e326bb75
 ```
+
+## 2026-08-21T14:45:00+02:00 — architect extends policy with greedo-peer-trade equivalents
+
+The specifier approved all nine greedo-peer-trade survivors in `e1e326bb75`.
+Add exact, pre-execution policy entries under
+`acceptance-mutation-equivalence-filter`:
+
+1. `greedo-trade-1`, example 3, `strategy`, `Billionaire` -> `billionaire`.
+2. `greedo-trade-2`, example 0, `decision`, `declines` -> `dEclines`;
+   example 1, `declines` -> `deClines`.
+3. `greedo-trade-3`, example 0, `decision`, `declines` -> `Declines`;
+   example 1, `declines` -> `declineS`.
+4. `greedo-trade-4`, example 0, `decision`, `declines` -> `declineS`;
+   example 1, `declines` -> `Declines`.
+5. `greedo-trade-5`, example 0, `decision`, `declines` -> `declinEs`;
+   example 1, `declines` -> `decliNes`.
+
+The `Billionaire` entry is justified by intentionally dual-case strategy
+parsing. Each decision entry is justified by the current assertion's binary
+semantics: only exactly `accepts` means acceptance, so these specific
+non-accepts variants assert the same decline. Do not broadly exclude the
+decision field or arbitrary non-accepts values; verify those nine entries
+skip while unlisted greedo-peer-trade mutations still execute.
