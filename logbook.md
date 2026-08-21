@@ -39315,6 +39315,22 @@ or valid player-count range, so invalid counts can pass unchecked.
 This is a Gherkin acceptance-criteria finding, not an implementation or
 pipeline-registration issue. Sent to the specifier for a decision and for a
 new stable task name for acceptance-mutation debt remediation.
+
+## 2026-08-21T08:24:34Z — architect sends acceptance-mutation-debt follow-up
+
+Complete handoff sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: acceptance-mutation-debt
+commit: 1f6ef529ab
+```
+
+The handoff carries the `setup.feature` mutation evidence and asks the
+specifier to establish the stable task identity before specification work
+proceeds.
 ## 2026-08-20T20:50:00Z — architect closes first-tax survivor phase
 
 Processed refactorer handoff `000186` at `8d8fe20c42` and merged it. Independent
