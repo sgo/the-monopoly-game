@@ -741,6 +741,21 @@ final class JournalStepHandlers {
         given("^the war profits tax is enabled$",
             (world, arguments) -> world.enableWarProfitsTax()),
 
+        given("^rent relief is enabled$",
+            (world, arguments) -> world.enableRentRelief()),
+
+        given("^the government's account already holds \\$" + MONEY + "$",
+            (world, arguments) -> world.setGovernmentAccountBalance(money(arguments.text(1)))),
+
+        step("^pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
+            (world, arguments) -> world.collectSalary(arguments.text(1), money(arguments.number(2)))),
+
+        then("^MegaCorp pays the government an individual income tax of \\$" + MONEY + "$",
+            (world, arguments) -> assertThat(world.paysMegacorpTax(money(arguments.text(1)))).isTrue()),
+
+        step("^pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + " rent$",
+            (world, arguments) -> world.payRent(arguments.text(1), arguments.text(2), money(arguments.number(3)))),
+
         given("^pawn \"" + NAME + "\"'s land is currently worth \\$" + MONEY + " in rent$",
             (world, arguments) -> world.setLandWorthRent(arguments.text(1), money(arguments.text(2)))),
 

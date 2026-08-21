@@ -39234,6 +39234,47 @@ would silently re-pair config↔fixture), and `formatMean` uses `Double.toString
 trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
+
+## 2026-08-21T07:59:11Z — architect receives refactorer handoff `e768e267cc` (megacorp-rent-relief)
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer e768e267cc
+```
+
+Recorded receipt; merging the named refactorer commit and beginning the
+architectural review for `megacorp-rent-relief`.
+
+## 2026-08-21T08:14:06Z — architect completes megacorp-rent-relief review
+
+Reviewed `e768e267cc` for UI/core separation, dependency direction,
+encapsulation, and local quality. The new `GovernmentAccount` is an
+appropriate domain boundary: salary tax, rent relief, and war-profits tax
+share one bank-owned account without exposing its representation to the
+acceptance adapter. No architectural change was warranted.
+
+Verification:
+
+- Domain unit suite: 419/419 pass.
+- Domain property suite (separate profile): 28/28 pass.
+- Differential mutation, one file at a time: RentRelief 2/2 killed;
+  WarProfitsTaxBook 1/1 killed; GovernmentAccount and MegacorpSalaryTax have
+  no supported sites. No uncovered sites.
+- DRY: no duplicate candidates across the changed production rules.
+- Scoped soft Gherkin mutation: megacorp-salary-tax 7/7 killed; rent-relief's
+  six over-cap/boundary mutations 6/6 killed. Its two surviving cap-scenario
+  `government_start` mutations are intentionally equivalent: the scenario
+  states that a $200 rent never spends government money regardless of that
+  balance.
+- Full acceptance pipeline: 908/908 pass.
+
+The attempted whole-pipeline soft mutation run was stopped after confirming
+it was spending several minutes in pre-existing unrelated scenarios with
+known survivors; its unrelated partial manifests were discarded. Only the
+task's approved mutation manifests are retained.
 ## 2026-08-20T20:50:00Z — architect closes first-tax survivor phase
 
 Processed refactorer handoff `000186` at `8d8fe20c42` and merged it. Independent
@@ -39241,6 +39282,8 @@ verification passes: characterization profile 13/13, full Maven reactor green
 (domain 412/412 and CLI characterization 13/13), and DRY reports no duplicate
 candidates in `GameBreakdown`. This is characterization-only; no production
 source changed. Phase is complete for the specifier.
+Sent phase-complete handoff `50_20260820T185132Z_000346` at commit
+`a5f349cfa6`.
 ## 2026-08-20T19:50:00Z — architect closes ordinary-win balance phase
 
 Processed refactorer handoff `000185` at `96df989718` and merged it. Independent
@@ -41462,3 +41505,83 @@ Re-read your role and constitution.
 
 merge_and_process specifier 63d5142b16
 ```
+
+## 2026-08-21T07:30:00Z — coder received megacorp-rent-relief from specifier
+
+Received the complete handoff message:
+
+```
+Re-read your role and constitution.
+merge_and_process specifier 63d5142b16
+```
+
+Merged commit `63d5142b16`. Implementing the round-1 isolated MegaCorp salary-tax and rent-relief computations; live-game observability, CLI, journal, logging, report, and legal-entity scenarios remain backlogged by the specification.
+
+## 2026-08-21T09:53:00+02:00 — coder sent megacorp-rent-relief handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: megacorp-rent-relief
+commit: pending final logbook commit
+
+Re-read your role and constitution.
+merge_and_process coder <final logbook commit>
+```
+
+Summary: implemented the shared government account, 43% MegaCorp salary tax, and all-or-nothing $200 rent relief with focused unit coverage and isolated acceptance steps. Full Maven verification passed with 419 tests and the acceptance pipeline passed with 908 generated tests, all green.
+
+## 2026-08-21T08:05:00Z — refactorer processes coder handoff `1f396a176e` (megacorp-rent-relief)
+
+Handoff message received:
+
+```
+id: 20260821T075615Z_000221_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 1f396a176e
+created_at: 2026-08-21T07:56:15.261558Z
+enqueued_at: 2026-08-21T07:56:15.280094Z
+task: megacorp-rent-relief
+
+Re-read your role and constitution.
+
+merge_and_process coder 1f396a176e
+```
+
+Merged the inaugural megacorp-rent-relief handoff (commit `1f396a176e`, whose
+parent `8a3c6cb` holds the implementation). This is round-1 of a new feature,
+isolated by the specifier: the computations are standalone, not yet wired into
+live game observability.
+
+What it delivers:
+- `GovernmentAccount` — extracts the government account from `WarProfitsTaxBook`
+  into a shared, named owner (behavior-preserving; `WarProfitsTaxBook` now
+  delegates `balance()`/`setBalance()` to it).
+- `MegacorpSalaryTax.collect` — deposits salary to the player, collects a flat
+  43% income tax into government.
+- `RentRelief.pay` — caps a tenant's rent at $200, government funds the
+  difference only when its balance covers it (all-or-nothing relief).
+- Unit tests for both rules; isolated acceptance steps; backlog feature files
+  (journal/logging/report/tax/cli) for the later live-game rounds.
+
+Refactorer verification (all green):
+- Domain 419/419 (+7: MegacorpSalaryTaxTest, RentReliefTest) + 28/28 property;
+  existing WarProfitsTax/Book tests still pass (extraction is behavior-preserving).
+- Acceptance 908/908 (+7 isolated megacorp scenarios); CLI 19/19 excluding the
+  documented pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` timing
+  flake; characterization 13/13.
+- Mutation sites: GovernmentAccount 0, MegacorpSalaryTax 0, RentRelief 2,
+  WarProfitsTaxBook 1 — all far under threshold, no split needed.
+- CRAP: GovernmentAccount max 3.5 (setBalance 60.9%), MegacorpSalaryTax all 1.0
+  (100%), RentRelief all ≤3.0 (100%) — all within the <=6 target. Isolated,
+  well-tested modules, no refactor concerns.
+
+Handing the verified state back to the architect.
