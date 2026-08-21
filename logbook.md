@@ -41865,3 +41865,34 @@ This handoff was already merged, implemented, verified as far as the
 Java-less environment allowed, and returned to the architect in `9acf7b3`.
 No implementation work was repeated. The duplicate queue message is removed
 after this log entry is committed.
+
+## 2026-08-21T10:55:00+02:00 — coder processes architect setup-mutation-fix follow-up
+
+Received the complete handoff message:
+
+```
+id: 20260821T084531Z_000350_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 9d874723d3
+created_at: 2026-08-21T08:45:31.323402Z
+enqueued_at: 2026-08-21T08:45:32.072244Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T08:46:27.684543Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 9d874723d3
+```
+
+Merged the architect follow-up cleanly. It reconciles the previously returned
+adapter state and contains no new coder-owned implementation beyond the
+regex-based selected-player-count handler already in
+`MonopolyStepHandlers`. Re-ran `./acceptance/run-acceptance.sh`: all features
+parsed and all acceptance entry points generated, but execution was blocked
+before tests started because no Java runtime is installed (`JAVA_HOME` is
+unset; `Unable to locate a Java Runtime`). No Gherkin content changed.
