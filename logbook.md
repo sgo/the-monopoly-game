@@ -41700,3 +41700,65 @@ Ran the required post-merge check: `mvn test -Pcharacterization-tests` —
 12/12 green, no regression.
 
 No further specifier action pending; awaiting the user's next feature.
+
+## 2026-08-21T08:25:00Z — specifier decides architect's setup.feature mutation finding
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: acceptance-mutation-debt
+
+Re-read your role and constitution.
+
+merge_and_process architect 1f6ef529ab
+```
+
+Merged `1f6ef529ab`. `logbook.md` conflicted in two interleaved hunks this
+time (my own entry landed between the refactorer's original processing note
+and its later correction commit rather than cleanly after both); resolved
+by reconstructing each side's complete message and reordering them
+chronologically. The architect's new finding entry landed at a different
+point in the file and merged cleanly on its own.
+
+Reviewed the finding: `setup.feature`'s two scenarios select `<players>`
+players but only assert universal properties (starting state, bank
+completeness) that hold no matter what the count is, so mutating the
+`players` column (2->11, 2->-4) survives. Accepted as a real gap — but only
+the "never assert the selected count" half. The "valid player-count range"
+half is already the CLI's job (`cli.feature`'s "the CLI rejects a player
+count outside the official range", backed by `Player.Pool` having no range
+validation of its own — range checking is deliberately a CLI-boundary
+concern, not `setup.feature`'s).
+
+Fix: added a new `expected players` column and a `Then exactly <expected
+players> players are selected` assertion to both scenarios, decoupled from
+the `players` column that arranges the scenario — reading the same column
+back would have been tautological (rule: give an assertion its own column
+instead of reading back the one that arranged the scenario). Committed as
+`a1a1229`.
+
+Verification: `setup.feature` parses cleanly via `gherkin-parser` and shows
+no genuine drift via `gherkin-ir-dry-checker` (only expected pre-existing
+false positives). Did not run the acceptance suite — the new `Then` step has
+no handler yet, so it isn't runnable until implemented; that's expected for
+a specifier-only Gherkin change.
+
+New stable task name for this remediation: `setup-mutation-fix`. Handing
+back to the architect for routing (a new step handler implementation, then
+re-verification, is needed before this can close).
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+
+Re-read your role and constitution.
+
+merge_and_process specifier a1a1229
+```
