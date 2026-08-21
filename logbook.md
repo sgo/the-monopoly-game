@@ -42181,3 +42181,17 @@ merge_and_process coder c39bbd0281
 
 The duplicate `JournalStepHandlers` selection entry is removed and the state
 is returned to the architect for Java-enabled full acceptance verification.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+commit: 33da6ceca2
+
+Re-read your role and constitution.
+
+merge_and_process coder 33da6ceca2
+```
