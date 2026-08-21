@@ -42065,6 +42065,20 @@ Preserve the handler body `world.selectPlayers(arguments.number(1))`. Verify
 the targeted generated setup acceptance test; it must select the example-row
 count (2), rather than relying on the official pool maximum (8).
 
+## 2026-08-21T11:15:10+02:00 — architect finds duplicate selection handler
+
+The coder's generalized selection pattern fixes `setup.feature`: the targeted
+generated setup suite passes 2/2. The full acceptance pipeline then reports 5
+failures, all in `EnRulesGreedoLegalEntityAcceptanceTest`, because raw
+`we select <player_count> players` now matches both the generalized handler
+in `MonopolyStepHandlers` and the obsolete exact handler in
+`JournalStepHandlers` line 99. The runtime correctly rejects that ambiguity.
+
+Required coder correction: retain the single generalized capturing handler in
+`MonopolyStepHandlers` and remove the duplicate `JournalStepHandlers` entry.
+Run the full acceptance pipeline; expected result is all 908 generated tests
+passing.
+
 ## 2026-08-21T11:35:00+02:00 — coder processes architect setup outline diagnosis
 
 Received the complete handoff message:
