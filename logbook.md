@@ -39275,6 +39275,46 @@ The attempted whole-pipeline soft mutation run was stopped after confirming
 it was spending several minutes in pre-existing unrelated scenarios with
 known survivors; its unrelated partial manifests were discarded. Only the
 task's approved mutation manifests are retained.
+
+## 2026-08-21T08:14:06Z — architect sends phase-complete sync for megacorp-rent-relief
+
+Complete handoff sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: megacorp-rent-relief
+commit: f47a06b493
+```
+
+Phase-complete architect state, including the review and task-scoped mutation
+manifests, is available to the specifier.
+
+## 2026-08-21T08:15:18Z — architect receives refactorer handoff `19d8105e29` (megacorp-rent-relief)
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 19d8105e29
+```
+
+Recorded receipt; merging the named refactorer commit for the next
+architectural review loop.
+
+## 2026-08-21T08:23:55Z — architect reports acceptance-mutation specification gap
+
+Soft Gherkin mutation of `en/rules/setup.feature` found four mutations: the
+starting balance and position mutations are killed, while the `players`
+example mutations `2 -> 11` and `2 -> -4` survive. The scenarios assert
+universal properties of selected players but never assert the selected count
+or valid player-count range, so invalid counts can pass unchecked.
+
+This is a Gherkin acceptance-criteria finding, not an implementation or
+pipeline-registration issue. Sent to the specifier for a decision and for a
+new stable task name for acceptance-mutation debt remediation.
 ## 2026-08-20T20:50:00Z — architect closes first-tax survivor phase
 
 Processed refactorer handoff `000186` at `8d8fe20c42` and merged it. Independent
@@ -41522,14 +41562,18 @@ Merged commit `63d5142b16`. Implementing the round-1 isolated MegaCorp salary-ta
 Handoff message sent:
 
 ```
-type: git_handoff
+id: 20260821T075615Z_000221_from_coder
+from: coder
 to: refactorer
 priority: 50
+type: git_handoff
+role: coder
 task: megacorp-rent-relief
-commit: pending final logbook commit
+commit: 1f396a176e
+created_at: 2026-08-21T07:56:15.261558Z
 
 Re-read your role and constitution.
-merge_and_process coder <final logbook commit>
+merge_and_process coder 1f396a176e
 ```
 
 Summary: implemented the shared government account, 43% MegaCorp salary tax, and all-or-nothing $200 rent relief with focused unit coverage and isolated acceptance steps. Full Maven verification passed with 419 tests and the acceptance pipeline passed with 908 generated tests, all green.
@@ -41583,6 +41627,44 @@ Refactorer verification (all green):
 - CRAP: GovernmentAccount max 3.5 (setBalance 60.9%), MegacorpSalaryTax all 1.0
   (100%), RentRelief all ≤3.0 (100%) — all within the <=6 target. Isolated,
   well-tested modules, no refactor concerns.
+
+Handing the verified state back to the architect.
+
+## 2026-08-21T08:10:00Z — refactorer processes coder handoff `8d516d4f54` (megacorp-rent-relief, correction)
+
+Handoff message received:
+
+```
+id: 20260821T075806Z_000222_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 8d516d4f54
+created_at: 2026-08-21T07:58:06.948599Z
+enqueued_at: 2026-08-21T07:58:07.936856Z
+task: megacorp-rent-relief
+
+Re-read your role and constitution.
+
+merge_and_process coder 8d516d4f54
+```
+
+Merged the correction commit `8d516d4f54` to the megacorp-rent-relief
+handoff record. Logbook-only housekeeping: the coder's earlier entry had
+placeholder values (`commit: pending final logbook commit`,
+`merge_and_process coder <final logbook commit>`); this commit substitutes the
+actual values (`commit: 1f396a176e`, `merge_and_process coder 1f396a176e`) and
+adds the `id:`/`from:`/`role:`/`created_at:` header lines. No production or
+test code changed; the megacorp implementation and my first processing note
+are untouched and both logbook records now agree.
+
+Verification: clean ort merge, no conflict markers; the corrected coder record
+and my prior processing note both present. No test re-run needed (logbook-only
+change); the previously-verified suites (domain 419, acceptance 908,
+characterization 13, CLI 19) remain valid.
 
 Handing the verified state back to the architect.
 
