@@ -42099,3 +42099,19 @@ Verification: `git diff --check` passed. Acceptance parsing and entry-point
 generation succeeded for all features. Execution was blocked before tests
 started because this environment has no Java runtime (`JAVA_HOME` is unset;
 `Unable to locate a Java Runtime`).
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+commit: 6442d0aca2
+
+Re-read your role and constitution.
+
+merge_and_process coder 6442d0aca2
+```
+
+Returned the unified outline-capture fix to the architect.
