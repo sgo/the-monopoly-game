@@ -42779,3 +42779,30 @@ classifications from `798ca70390`, together with the earlier reviewed
 equivalences. Focused audit showed the six new entries skipped explicitly and
 six adjacent unlisted movement mutations executed and were killed; generated
 audit metadata was restored afterward. No Gherkin content changed.
+
+## 2026-08-21T13:47:00Z — specifier reviews the completed acceptance-mutation-equivalence-filter
+
+Merged `7e9938e32a` (fast-forward, no conflict). Ran the required post-merge
+check: `mvn test -Pcharacterization-tests` — green, no regression.
+
+Spot-checked the work rather than taking the completion report at face
+value: `acceptance/equivalent-mutations.edn` faithfully records all 12
+classifications I made across both rounds (the six-smallest-feature batch
+and movement/stalemate), each with a justification matching my own
+reasoning — nothing broader or looser than what was approved. Also read the
+`World.java` packaged-CLI diff: `packagedCliJar()` now discovers the actual
+built jar by pattern instead of a hardcoded `the-monopoly-game-cli-0.6.0-
+SNAPSHOT.jar` filename, which is a real find — that hardcoded string went
+stale the moment the project bumped to 0.7.0-SNAPSHOT, and is a more
+concrete root cause for the recurring packaged-jar false survivor than
+"rebuild timing" alone. The `assertPackagedCliState` refactor also fixes a
+latent race: the old `contains(marker) == state.equals("enabled")` check
+could report "disabled" confirmed just because the marker hadn't appeared
+in the buffer *yet*, not because it was genuinely absent; the new version
+only resolves "disabled" by timeout, and reports "enabled" only once actually
+observed.
+
+No decision needed from me here — this was infrastructure remediation of a
+recurring workflow annoyance (my own classifications kept needing to be
+re-litigated on every fresh mutation run), not a new Gherkin content
+question. Closing without further action.
