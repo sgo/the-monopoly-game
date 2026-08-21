@@ -43067,3 +43067,22 @@ semantics: only exactly `accepts` means acceptance, so these specific
 non-accepts variants assert the same decline. Do not broadly exclude the
 decision field or arbitrary non-accepts values; verify those nine entries
 skip while unlisted greedo-peer-trade mutations still execute.
+## 2026-08-21T13:40:00Z — specifier starts round 2 (development-loans + war-profits-tax)
+
+User approved continuing. Requesting exact per-mutation detail for
+`development-loans.feature`'s 16 survivors and `war-profits-tax.feature`'s
+16 survivors before classifying anything.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: ee73cf10cf
+
+Re-read your role and constitution.
+
+merge_and_process specifier ee73cf10cf
+```
