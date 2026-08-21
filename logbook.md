@@ -42497,3 +42497,21 @@ remaining 12 unclassified features without checking in. Rather than
 proceeding on the architect's premise, confirming scope with the user
 before requesting `movement.feature`/`stalemate.feature` detail or
 continuing further.
+
+User confirmed continuing with `movement.feature` and `stalemate.feature`
+(3 survivors each). Requesting the same per-mutation detail as the previous
+six features before classifying anything.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
