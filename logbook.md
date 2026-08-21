@@ -42806,3 +42806,30 @@ No decision needed from me here — this was infrastructure remediation of a
 recurring workflow annoyance (my own classifications kept needing to be
 re-litigated on every fresh mutation run), not a new Gherkin content
 question. Closing without further action.
+
+## 2026-08-21T14:00:00Z — specifier requests rent-relief's exact survivor detail
+
+User directed closing out rent-relief's 2 survivors next, then deciding on
+the remaining 10 unclassified features. `rent-relief.feature`'s own tracked
+mutation manifest already shows `rent-relief-2` at 6/6 killed, so the 2
+survivors must be in `rent-relief-1` ("rent at or under $200 is paid by the
+tenant in full, regardless of what the government's account holds"),
+almost certainly its `government_start` column (0 and 5000) — mutating it
+shouldn't matter since the cap never engages at exactly $200, which is the
+scenario's own stated point. Requesting the exact mutated values from the
+architect before writing an equivalence-policy entry, rather than assuming
+from memory.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
