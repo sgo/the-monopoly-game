@@ -39352,6 +39352,20 @@ selected`. `MonopolyStepHandlers` has no matching handler. This is an
 acceptance-adapter implementation gap; no Gherkin content change is needed.
 
 Full acceptance result: 906 passing, 2 failing unsupported-step rows.
+
+## 2026-08-21T08:32:24Z — architect sends setup-mutation-fix follow-up to coder
+
+Complete handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: setup-mutation-fix
+commit: 7107d4debf
+```
+
+The coder owns the required acceptance-step handler implementation.
 ## 2026-08-20T20:50:00Z — architect closes first-tax survivor phase
 
 Processed refactorer handoff `000186` at `8d8fe20c42` and merged it. Independent
