@@ -41405,3 +41405,60 @@ CLI 20/20 minus the documented pre-existing flake),
 No production source changed for this task, as expected — pure
 characterization/test-side work. No further specifier action pending;
 awaiting the user's next direction.
+
+## 2026-08-21T07:11:38Z — specifier hands off megacorp-rent-relief to coder
+
+Committed `63d5142` (round 1 of two new features, decided with the user
+across an extended analytical discussion of the war-profits-tax's effect
+on the asset-rich billionaire's dominance):
+
+- `megacorp-salary-tax.feature`: an opt-in `--optional-rent-relief` flag
+  has MegaCorp pay the government an individual income tax of 43% of
+  every salary collected, on top of what the player keeps. Round 1 is an
+  isolated computation (new `collects a salary of $<salary>` trigger),
+  parameterized so the same scenario covers both the ordinary $200 salary
+  and the $400 double-salary-on-landing case's proportional math.
+- `rent-relief.feature`: the same flag caps what a tenant pays in rent at
+  $200 (chosen from the real characterization-baseline rent distribution:
+  only 3.5% of payments exceed it, but that tail carries ~30% of all rent
+  dollars) whenever the government's account can cover the landlord's
+  remainder in full; otherwise the tenant pays the full rent as today.
+  Also an isolated computation, boundary-pinned at $550/$549.
+- `acceptance/pipeline-features.txt`: registered both new tracked files.
+
+Backlogged (not in this handoff, all still Gherkin-complete under
+`the-monopoly-game-specs/backlog/`): journal/logging/report observability
+for both features (90–93 each); CLI wiring for `--optional-rent-relief`
+(cli-16/17, cli-jar-11); rent relief for a legal-entity landlord; a real
+double-salary-rule interaction proof; redirecting the existing Income Tax
+and Luxury Tax board spaces into the government account under the same
+flag (tax-3/4, explicitly requested by the user, scoped to the two tax
+spaces only — the street-repairs Chance/Community-Chest cards were
+considered and declined). Every backlogged live-game scenario shares one
+real prerequisite this round doesn't need: today a live played game's
+actual government account is never exposed anywhere afterward — even
+war-profits-tax's own "final account balance" journal/log/report
+assertions only ever echo back the isolated fixture value "grows a year
+older" writes, never something a real play produced. Exposing it through
+`Game.Result`, the way `deeds` and the journal already are, is a
+prerequisite shared by every backlogged live-game scenario, not something
+new to this feature.
+
+Verification: every new/changed feature file (tracked and backlog) parses
+cleanly via `gherkin-parser` and shows no genuine drift via
+`gherkin-ir-dry-checker` (findings are all expected same-step/
+different-placeholder-name false positives, matching precedent elsewhere
+in the suite).
+
+Handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: megacorp-rent-relief
+
+Re-read your role and constitution.
+
+merge_and_process specifier 63d5142b16
+```
