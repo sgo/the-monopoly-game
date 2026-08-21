@@ -41493,14 +41493,18 @@ Merged commit `63d5142b16`. Implementing the round-1 isolated MegaCorp salary-ta
 Handoff message sent:
 
 ```
-type: git_handoff
+id: 20260821T075615Z_000221_from_coder
+from: coder
 to: refactorer
 priority: 50
+type: git_handoff
+role: coder
 task: megacorp-rent-relief
-commit: pending final logbook commit
+commit: 1f396a176e
+created_at: 2026-08-21T07:56:15.261558Z
 
 Re-read your role and constitution.
-merge_and_process coder <final logbook commit>
+merge_and_process coder 1f396a176e
 ```
 
 Summary: implemented the shared government account, 43% MegaCorp salary tax, and all-or-nothing $200 rent relief with focused unit coverage and isolated acceptance steps. Full Maven verification passed with 419 tests and the acceptance pipeline passed with 908 generated tests, all green.
@@ -41554,5 +41558,43 @@ Refactorer verification (all green):
 - CRAP: GovernmentAccount max 3.5 (setBalance 60.9%), MegacorpSalaryTax all 1.0
   (100%), RentRelief all ≤3.0 (100%) — all within the <=6 target. Isolated,
   well-tested modules, no refactor concerns.
+
+Handing the verified state back to the architect.
+
+## 2026-08-21T08:10:00Z — refactorer processes coder handoff `8d516d4f54` (megacorp-rent-relief, correction)
+
+Handoff message received:
+
+```
+id: 20260821T075806Z_000222_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 8d516d4f54
+created_at: 2026-08-21T07:58:06.948599Z
+enqueued_at: 2026-08-21T07:58:07.936856Z
+task: megacorp-rent-relief
+
+Re-read your role and constitution.
+
+merge_and_process coder 8d516d4f54
+```
+
+Merged the correction commit `8d516d4f54` to the megacorp-rent-relief
+handoff record. Logbook-only housekeeping: the coder's earlier entry had
+placeholder values (`commit: pending final logbook commit`,
+`merge_and_process coder <final logbook commit>`); this commit substitutes the
+actual values (`commit: 1f396a176e`, `merge_and_process coder 1f396a176e`) and
+adds the `id:`/`from:`/`role:`/`created_at:` header lines. No production or
+test code changed; the megacorp implementation and my first processing note
+are untouched and both logbook records now agree.
+
+Verification: clean ort merge, no conflict markers; the corrected coder record
+and my prior processing note both present. No test re-run needed (logbook-only
+change); the previously-verified suites (domain 419, acceptance 908,
+characterization 13, CLI 19) remain valid.
 
 Handing the verified state back to the architect.
