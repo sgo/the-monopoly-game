@@ -42948,3 +42948,34 @@ features total, all equivalents or tooling artifacts. Awaiting the user's
 direction on the remaining 10 unclassified features (greedo-peer-trade,
 development-loans, war-profits-tax, greedo-monopoly-buyout,
 greedo-share-sale, distressed-sale, buying-land, journal, report, logging).
+
+## 2026-08-21T13:25:00Z — specifier proposes and starts a plan for the remaining 10 features
+
+Proposed an ordering to the user, prioritizing leverage over raw size: (1)
+greedo-peer-trade (9) alone; (2) development-loans + war-profits-tax (16
+each); (3) greedo-monopoly-buyout + greedo-share-sale (20/22, same Greedo
+trading domain); (4) distressed-sale + buying-land (44/58, no shortcut,
+saved for individual attention); (5) journal + report + logging (76/77/80)
+saved for last on purpose — these three narrate the same underlying
+scenarios in three styles ("the game journal records that"/"the game log
+records that"/"the game report says that"), so classifying journal's 76
+first should let most of report's and logging's survivors inherit the
+identical classification rather than requiring three independent reviews.
+User approved; starting round 1 (greedo-peer-trade).
+
+Requesting exact per-mutation detail for `greedo-peer-trade.feature`'s 9
+survivors before classifying anything.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
