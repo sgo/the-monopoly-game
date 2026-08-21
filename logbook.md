@@ -43156,3 +43156,35 @@ scenario 2/0 `land_value`; scenario 3/0 `collected`; scenario 6/0
 `collected`; scenario 7/0 `collected`; scenario 8/0 `land_value`; scenario
 9/0 `collected`. Exact old/new values are in `2e2db6cee7`; this resolves the
 specifier's ambiguity for classification. No Gherkin content changed.
+
+## 2026-08-21T14:05:00Z — specifier requests one unambiguous combined list
+
+Merged `e1d68a4b60` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression.
+
+Tried to zip this scenario/example/key mapping against the earlier
+value-delta list (matched by field name and order) to reconstruct each
+survivor's full tuple myself. For development-loans the two lists don't
+reconcile: the location list implies 17 individual survivor slots (2/0,
+3/0, 3/1, 4/0, 5/0, 6/0, 8/0, two at 9/0, 10/0, 12/0, two at 13/0, 14/0, two
+at 16/0) against a reported total of 16. Rather than guess which one of
+these two independently-worded reports has the miscount, or misassign a
+value to the wrong scenario, requesting one final combined list: each of
+the 32 survivors as a single self-contained line (feature, scenario name,
+example index, key, original value, mutated value) rather than two lists
+to cross-reference.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
