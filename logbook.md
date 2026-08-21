@@ -43140,3 +43140,19 @@ Re-read your role and constitution.
 
 merge_and_process specifier d86025b535
 ```
+
+## 2026-08-21T15:10:00+02:00 — architect supplies exact round-two mapping
+
+Exact generated-IR mapping is now recorded in the committed audit output.
+Development-loans survivors are scenario indices/examples: 2/0
+`high_hat_cash`; 3/0 and 3/1 `cash`; 4/0 `high_hat_cash`; 5/0 `cash`; 6/0
+`cash`; 8/0 `bid`; 9/0 `bond_cash` and `cash`; 10/0 `bond_cash`; 12/0
+`cash`; 13/0 `bond_cash` and `cash`; 14/0 `bond_cash`; and 16/0
+`fresh_bond_cash` and `recycled`, with exact deltas in `2e2db6cee7`.
+
+War-profits-tax: scenario 0 examples 0/1 have `collected` and `land_value`
+survivors respectively; scenario 1 examples 0,1,3,6,7,8 have `land_value`;
+scenario 2/0 `land_value`; scenario 3/0 `collected`; scenario 6/0
+`collected`; scenario 7/0 `collected`; scenario 8/0 `land_value`; scenario
+9/0 `collected`. Exact old/new values are in `2e2db6cee7`; this resolves the
+specifier's ambiguity for classification. No Gherkin content changed.
