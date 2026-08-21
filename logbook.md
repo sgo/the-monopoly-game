@@ -43526,3 +43526,58 @@ against the existing legal-entity/share model, following the established
 negative-outcome assertion style (not a new share-fraction vocabulary).
 Run the full acceptance suite: the new line must be supported and the
 previously isolated sole failure eliminated. Do not alter Gherkin content.
+
+## 2026-08-21T16:13:00+02:00 — coder processes greedo peer-trade policy handoff
+
+Complete handoff received:
+
+```text
+id: 20260821T123206Z_000368_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 53f49aa3bc
+created_at: 2026-08-21T12:32:06.683567Z
+enqueued_at: 2026-08-21T12:32:07.048211Z
+task: acceptance-mutation-equivalence-filter
+
+Re-read your role and constitution.
+merge_and_process architect 53f49aa3bc
+```
+
+Merged `53f49aa3bc` as `0244a71`, preserving the append-only logbook
+history. Added the nine exact greedo-peer-trade equivalence entries covering
+one strategy case mutation and eight decision case mutations. EDN parsing
+reports 23 total entries and exactly 9 peer-trade entries; Java acceptance
+verification is pending because this host has no Java runtime.
+
+## 2026-08-21T16:14:00+02:00 — coder processes greedo share-sale no-winner handoff
+
+Complete handoff received:
+
+```text
+id: 20260821T135838Z_000374_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 49c305b6dc
+created_at: 2026-08-21T13:58:38.305712Z
+enqueued_at: 2026-08-21T13:58:38.548935Z
+task: greedo-share-sale-no-winner-step
+
+Re-read your role and constitution.
+merge_and_process architect 49c305b6dc
+```
+
+Merged `49c305b6dc` and implemented the generic `Then no one wins the
+<entity> share` handler in `JournalStepHandlers.java`, asserting that no
+`Entry.LegalEntityShareSold` journal entry exists for the named entity. The
+merged Gherkin line remains unchanged. Maven/test compilation could not run:
+this host reports `Unable to locate a Java Runtime`; EDN parsing and diff
+checks pass.

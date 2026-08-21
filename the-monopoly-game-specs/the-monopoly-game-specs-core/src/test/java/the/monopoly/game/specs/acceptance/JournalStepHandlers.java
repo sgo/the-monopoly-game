@@ -650,6 +650,11 @@ final class JournalStepHandlers {
                 .anyMatch(entry -> entry.name().equals(arguments.text(2))
                     && entry.buyer().value().equals(arguments.text(1))
                     && entry.price().amount() == arguments.number(3))).isTrue()),
+        then("^no one wins the " + NAME + " share$",
+            (world, arguments) -> assertThat(world.gameLog().stream()
+                .filter(Entry.LegalEntityShareSold.class::isInstance)
+                .map(Entry.LegalEntityShareSold.class::cast)
+                .noneMatch(entry -> entry.name().equals(arguments.text(1)))).isTrue()),
         then("^pawn \"" + NAME + "\" paid the lowest possible price within a third of bank balance$",
             (world, arguments) -> assertThat(world.gameLog().stream()
                 .filter(Entry.LegalEntityShareSold.class::isInstance)

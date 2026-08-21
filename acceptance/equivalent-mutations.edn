@@ -95,4 +95,67 @@
   :key "government_start"
   :original "5000"
   :mutated "5006"
-  :justification "At rent $200 the relief cap never engages, so the government's starting balance is irrelevant to this scenario."}]
+  :justification "At rent $200 the relief cap never engages, so the government's starting balance is irrelevant to this scenario."}
+ {:feature "en/rules/greedo-peer-trade.feature"
+  :scenario "Greedo trades a spare street to complete a monopoly, but never gives up a highest-priority street"
+  :example 3
+  :key "strategy"
+  :original "Billionaire"
+  :mutated "billionaire"
+  :justification "Strategy parsing intentionally accepts Billionaire case-insensitively, so both values select the same strategy."}
+ {:feature "en/rules/greedo-peer-trade.feature"
+  :scenario "Greedo declines a trade that would not complete a monopoly"
+  :example 0
+  :key "decision"
+  :original "declines"
+  :mutated "dEclines"
+  :justification "The assertion treats only exactly accepts as acceptance; this case variant remains the same decline."}
+ {:feature "en/rules/greedo-peer-trade.feature"
+  :scenario "Greedo declines a trade that would not complete a monopoly"
+  :example 1
+  :key "decision"
+  :original "declines"
+  :mutated "deClines"
+  :justification "The assertion treats only exactly accepts as acceptance; this case variant remains the same decline."}
+ {:feature "en/rules/greedo-peer-trade.feature"
+  :scenario "Greedo declines a trade with a partner who already owns a complete highest-priority monopoly"
+  :example 0
+  :key "decision"
+  :original "declines"
+  :mutated "Declines"
+  :justification "The assertion treats only exactly accepts as acceptance; this case variant remains the same decline."}
+ {:feature "en/rules/greedo-peer-trade.feature"
+  :scenario "Greedo declines a trade with a partner who already owns a complete highest-priority monopoly"
+  :example 1
+  :key "decision"
+  :original "declines"
+  :mutated "declineS"
+  :justification "The assertion treats only exactly accepts as acceptance; this case variant remains the same decline."}
+ {:feature "en/rules/greedo-peer-trade.feature"
+  :scenario "Greedo declines a trade that would give up a highest-priority street"
+  :example 0
+  :key "decision"
+  :original "declines"
+  :mutated "declineS"
+  :justification "The assertion treats only exactly accepts as acceptance; this case variant remains the same decline."}
+ {:feature "en/rules/greedo-peer-trade.feature"
+  :scenario "Greedo declines a trade that would give up a highest-priority street"
+  :example 1
+  :key "decision"
+  :original "declines"
+  :mutated "Declines"
+  :justification "The assertion treats only exactly accepts as acceptance; this case variant remains the same decline."}
+ {:feature "en/rules/greedo-peer-trade.feature"
+  :scenario "Greedo declines a trade where the offered and wanted streets belong to the same colour group"
+  :example 0
+  :key "decision"
+  :original "declines"
+  :mutated "declinEs"
+  :justification "The assertion treats only exactly accepts as acceptance; this case variant remains the same decline."}
+ {:feature "en/rules/greedo-peer-trade.feature"
+  :scenario "Greedo declines a trade where the offered and wanted streets belong to the same colour group"
+  :example 1
+  :key "decision"
+  :original "declines"
+  :mutated "decliNes"
+  :justification "The assertion treats only exactly accepts as acceptance; this case variant remains the same decline."}]
