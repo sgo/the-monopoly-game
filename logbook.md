@@ -43679,3 +43679,77 @@ Re-read your role and constitution.
 
 merge_and_process specifier 302e5d8b7f
 ```
+
+## 2026-08-21T16:00:00Z — specifier classifies round 4: 100 equivalents, 2 a dead-column cleanup, none real behavioral gaps
+
+Merged `0fb4ae066c` (fast-forward, no conflict). This time `acceptance/
+round-four-survivors.md` gave the full self-contained tuple list (44
+distressed-sale + 58 buying-land = 102, matching exactly). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression, before and after the fix below. Also ran the full acceptance
+suite directly (908/908) both before and after.
+
+Read both feature files in full and the domain code behind them
+(`DistressedSale.java`, `Greedo.bidForDistressed`/`bidFor`,
+`Strategy.priorityOf`, and `Street.java`'s board data) rather than guess
+from the Gherkin alone, since 102 survivors is too many to spot-check
+individually without a grounded mechanism to reason from:
+
+- Both features' auctions ascend from the land's mortgage value in $5
+  steps, same as `auctions.feature`; a sole bidder (the overwhelmingly
+  common case here, 2-player scenarios) wins at the *minimum* ask
+  regardless of their own ceiling, as long as the ceiling clears it. This
+  is the same "ceiling, not paid price" equivalence from round 1, and
+  covers the large majority of `high_hat_bid`/`high_hat_starting_balance`/
+  `iron_box_starting_balance` mutations in both files.
+- `DistressedSale`'s `bidForDistressed`: a bidder offers $0 if they'd
+  rather let the debtor go bankrupt (richer than the debtor's total
+  property value plus debt), the property's *full* available balance if
+  it completes the bidder's own colour group, or 35% of available balance
+  if it's merely a highest-priority denial play, else $0. Verified this
+  explains the boundary-flavored scenarios precisely: distressed-sale-17's
+  "one dollar below the mortgage value" is really a computed 35%-of-239≈83
+  ceiling against a $90 minimum ask (not literally $89) — both reported
+  mutations (231, 243) keep the computed ceiling comfortably below 90, so
+  the "declined" outcome is unaffected.
+- `Greedo.bidFor`'s reserve check (`available - reserve`) and the
+  near-monopoly "reserve the missing street's price instead" behavior
+  explain every `reserve` mutation in `buying-land.feature`; spot-computed
+  several (buying-land-4/5) against the Gherkin's own arithmetic
+  (`dog_starting_balance - price = expected_final`) and confirmed each
+  mutated reserve stays on the same side of the buy/decline threshold.
+- All `strategy Billionaire->billionaire` mutations (lowercase) are the
+  established `Vocabulary.java` dual-case equivalence.
+
+**One finding wasn't an equivalence at all.** distressed-sale-1's two
+survivors (`strategy Greedo->greedo`, `Billionaire->BillionaiRe`) don't
+survive because of case-insensitive parsing — "BillionaiRe" doesn't match
+either of `Vocabulary.strategy()`'s two literal cases and would throw if it
+were ever parsed. It never is: unlike every other scenario in this file,
+distressed-sale-1 declares a `strategy` column but never wires it via a
+"follows the `<strategy>` strategy" step. Pruned the column; the two rows
+were otherwise identical (`20 | 10` both), so they collapsed to one row.
+Committed as `2e3e70f`.
+
+Verdict: 100 survivors are legitimate equivalents (all grounded in verified
+domain mechanisms, not just pattern-matching against prior rounds), 2 were
+dead Gherkin content now pruned — no real behavioral gap found this round.
+201 survivors classified in total across 16 features; the two real gaps
+found so far (development-loans, greedo-share-sale) remain the only ones
+requiring implementation work. Remaining: journal (76), report (77),
+logging (80) — the observability trio, saved for last since classifying
+journal's should let most of report/logging's inherit for free.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
