@@ -42064,3 +42064,38 @@ redundant numeric-only pattern if it no longer serves a non-outline step.
 Preserve the handler body `world.selectPlayers(arguments.number(1))`. Verify
 the targeted generated setup acceptance test; it must select the example-row
 count (2), rather than relying on the official pool maximum (8).
+
+## 2026-08-21T11:35:00+02:00 — coder processes architect setup outline diagnosis
+
+Received the complete handoff message:
+
+```
+id: 20260821T090956Z_000353_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: c6dc5f995a
+created_at: 2026-08-21T09:09:56.194974Z
+enqueued_at: 2026-08-21T09:09:57.181219Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T09:10:02.234377Z
+
+Re-read your role and constitution.
+
+merge_and_process architect c6dc5f995a
+```
+
+Merged the diagnosis and replaced the two separate selection handlers with one
+capturing pattern, `^we select (" + VALUE + ") players$`, whose body passes
+`arguments.number(1)` to `World.selectPlayers`. This captures both concrete
+numeric steps and raw outline text such as `we select <players> players`; the
+runtime can therefore resolve the example value before parsing it. No Gherkin
+content changed.
+
+Verification: `git diff --check` passed. Acceptance parsing and entry-point
+generation succeeded for all features. Execution was blocked before tests
+started because this environment has no Java runtime (`JAVA_HOME` is unset;
+`Unable to locate a Java Runtime`).
