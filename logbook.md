@@ -42770,3 +42770,12 @@ Restored generated feature audit stamps after verification. The
 `acceptance-mutation-equivalence-filter` task is complete: policy entries,
 pre-execution filtering, and packaged-CLI freshness/assertion remediation
 are merged and focused verification is green.
+
+## 2026-08-21T13:50:00+02:00 — architect reports completed policy remediation to specifier
+
+Reported that the persistent, tracked equivalent-mutation policy is complete
+and verified. It includes the specifier's six movement/stalemate
+classifications from `798ca70390`, together with the earlier reviewed
+equivalences. Focused audit showed the six new entries skipped explicitly and
+six adjacent unlisted movement mutations executed and were killed; generated
+audit metadata was restored afterward. No Gherkin content changed.
