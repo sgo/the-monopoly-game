@@ -43000,3 +43000,47 @@ The first survivor is in a scenario with six examples, zero-indexed example
 3; each other scenario has Greedo example 0 and Billionaire example 1. No
 Gherkin content was changed. Generated audit metadata was restored before
 committing; awaiting the specifier's requirements-level classification.
+
+## 2026-08-21T13:35:00Z — specifier classifies all nine greedo-peer-trade survivors
+
+Merged `0cdb11c51a` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression.
+
+Survivor 1 (`strategy Billionaire->billionaire`, greedo-trade-1 example 3):
+equivalent, same known cause as bankruptcy.feature's identical finding —
+`Vocabulary.java:35`'s deliberate `case "billionaire", "Billionaire" ->`
+dual-case strategy parsing.
+
+Survivors 2-9 (the eight `decision declines -> <case-mutated>` mutations
+across greedo-trade-2 through -5): all equivalent, for a sharper reason than
+plain case-insensitivity. Confirmed in `World.java:1314`
+(`assertTradeDecision`): `boolean expected = decision.equals("accepts")` is
+a coarse binary check against one literal string. Every one of these eight
+scenario rows expects `declines`, and `"declines".equalsIgnoreCase` is never
+even invoked — any string that isn't exactly `"accepts"` (any case
+variant of "declines", or literally anything else) makes `expected = false`
+identically. These mutations aren't surviving because the parser is
+case-insensitive; they survive because the assertion never distinguishes
+between different kinds of "not accepts" at all. Real domain behavior here
+is a genuine decline in every scenario, so this isn't masking anything.
+
+Verdict: all 9 survivors are legitimate equivalents. Declining to open a
+remediation task. All 25 survivors classified so far (across 10 features)
+remain equivalents or tooling artifacts — none have required a Gherkin
+change. Round 1 of the remaining-features plan is done; moving to round 2
+(development-loans + war-profits-tax) next.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
