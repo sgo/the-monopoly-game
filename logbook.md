@@ -42092,6 +42092,25 @@ mutations, the starting balance mutation, and the starting position mutation
 are all killed. The runner refreshed the feature's tracked mutation manifest
 and stamp with this evidence.
 
+## 2026-08-21T11:30:00+02:00 — architect refreshes broader acceptance-mutation debt
+
+A fresh full soft mutation audit completed with exit 1 because existing
+features still have many survivors. The previously fixed `setup.feature` is
+clean (6/6 killed), so this is broader legacy specification debt. Verified
+feature-level survivor counts include: movement 3, bankruptcy 2,
+distressed-sale 44, stalemate 3, buying-land 58, greedo-peer-trade 9,
+greedo-monopoly-buyout 20, greedo-share-sale 22, auctions 2, journal 76,
+report 77, logging 80, development-loans 16, war-profits-tax 16,
+rent-relief 2, year-limit 1, monopoly 1, CLI 1, and packaged CLI 1.
+
+The paths are dominated by case-only strategy values and fixture inputs that
+do not change the scenario's asserted outcome, but this audit deliberately
+does not classify policy. The specifier must determine which survivors are
+intentional equivalents and select the first genuine acceptance-criteria gap
+for a bounded remediation task. The runner's generated mutation stamps were
+reverted after extracting this evidence, keeping the worktree clean; only
+the already-committed setup manifest remains refreshed.
+
 ## 2026-08-21T11:35:00+02:00 — coder processes architect setup outline diagnosis
 
 Received the complete handoff message:
