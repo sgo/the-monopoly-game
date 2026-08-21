@@ -41896,3 +41896,20 @@ regex-based selected-player-count handler already in
 parsed and all acceptance entry points generated, but execution was blocked
 before tests started because no Java runtime is installed (`JAVA_HOME` is
 unset; `Unable to locate a Java Runtime`). No Gherkin content changed.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+commit: 05b7a200d5
+
+Re-read your role and constitution.
+
+merge_and_process coder 05b7a200d5
+```
+
+Returned the priority-00 follow-up review state to the architect. No further
+coder-owned implementation changes were required.
