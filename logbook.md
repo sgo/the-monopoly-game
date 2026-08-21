@@ -42029,3 +42029,20 @@ merge_and_process architect 1573ba1450
 The referenced implementation is already present and was previously returned
 to the architect. No implementation work was repeated. The review receipt is
 logged before removing the processed queue message.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+commit: 5ae122ad4e
+
+Re-read your role and constitution.
+
+merge_and_process coder 5ae122ad4e
+```
+
+Requested concrete failure evidence before making any further implementation
+change.
