@@ -141,7 +141,9 @@ E.g:
 
 - Claude Sonnet 5
 - GPT 5.6-luna
-- DeepSeek V4 Flash (guidance is baked in by the test discipline and verification workflow but can be slow to give up when too complicated)
+- DeepSeek V4 Pro (Flash appears to struggle too much in spite of guidance baked into the test harness)
+- Mistral
+- Kimi-k2.7
 
 ### Refactorer
 
@@ -169,7 +171,7 @@ AI models intended for day-to-day tasks appear enough for this role.
 E.g:
 
 - Caude Opus 5
-- GPT 5.6-terra
+- GPT 5.6-luna
 
 ## AI Slop
 

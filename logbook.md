@@ -41307,6 +41307,40 @@ This closes out the war-profits-tax feature's full arc, including the
 gap the user had independently already noticed. No further specifier
 action pending; awaiting the user's next direction.
 
+## 2026-08-20T18:40:18Z — specifier hands off characterization-survivors-at-first-tax
+
+User asked several ad-hoc analytical questions about config 10's data
+(stalemate vs. year-limit, board development state at stalemate,
+opponents destroyed before the tax breaks the billionaire's dominance —
+each answered by parsing `target/characterization-logs/.../seed-*.log`
+directly, no code changes), then asked to make one of them permanent:
+"survivors saved by the war profits tax." First draft mis-scoped it as
+survivors at *game end*; user corrected — it should snapshot survivors
+at the moment the billionaire's *first* tax payment lands ("by that
+time the war is over... whoever is left is a survivor living in a world
+where our billionaire has become a regular Greedo or bankrupted").
+
+Added `survivorsAtFirstTax` to the war-profits-tax extras in
+`CHARACTERIZATION-TESTS.md`: a Stats block over players still solvent
+at the billionaire pawn's first tax payment, seeds where the billionaire
+is never taxed excluded (not zero-filled — no such moment exists there).
+No production change needed, pure replay of already-reported lines.
+Validated against the real config-10 logs before writing the spec
+(matching how I verify ad-hoc findings elsewhere this session): taxed
+in 48/50 seeds, mean 3.96 players still standing at that moment.
+
+Committed as `b1def7ce90`.
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: characterization-survivors-at-first-tax
+commit: b1def7ce90
+```
+
 ## 2026-08-20T20:25:00Z — coder processes characterization-survivors-at-first-tax
 
 Complete handoff received:
@@ -41352,5 +41386,117 @@ Refactorer verification (all green):
 - Domain 412/412; CLI 19/19 excluding the documented pre-existing
   `keepsPlayingUntilToldToStop` timing flake; acceptance 901/901.
 - No production source changed → no new mutation sites or CRAP breach.
+
+Handing the verified state back to the architect.
+
+## 2026-08-20T18:51:32Z — specifier merges characterization-survivors-at-first-tax
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: characterization-survivors-at-first-tax
+
+Re-read your role and constitution.
+
+merge_and_process architect a5f349cfa6
+```
+
+Merged `a5f349c`. `logbook.md` conflicted at one clean two-block append
+point; resolved the usual way. Merge committed as `2c19801`. Confirmed
+the implementation correctly identifies the billionaire pawn generically
+(from the `" uses Billionaire ("` strategy line, not a hardcoded name)
+and the regenerated baseline matches my own manual computation exactly:
+min 2, median 4, mean 3.9583333333333335, max 7, across the 48 of 50
+seeds where the billionaire is ever taxed.
+
+Verified fresh with a full `clean` rebuild: `mvn test` (domain 412/412,
+CLI 20/20 minus the documented pre-existing flake),
+`mvn test -Pcharacterization-tests` (13/13), and
+`acceptance/run-acceptance.sh` (901/901). All green.
+
+No production source changed for this task, as expected — pure
+characterization/test-side work. No further specifier action pending;
+awaiting the user's next direction.
+
+## 2026-08-21T07:30:00Z — coder received megacorp-rent-relief from specifier
+
+Received the complete handoff message:
+
+```
+Re-read your role and constitution.
+merge_and_process specifier 63d5142b16
+```
+
+Merged commit `63d5142b16`. Implementing the round-1 isolated MegaCorp salary-tax and rent-relief computations; live-game observability, CLI, journal, logging, report, and legal-entity scenarios remain backlogged by the specification.
+
+## 2026-08-21T09:53:00+02:00 — coder sent megacorp-rent-relief handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: megacorp-rent-relief
+commit: pending final logbook commit
+
+Re-read your role and constitution.
+merge_and_process coder <final logbook commit>
+```
+
+Summary: implemented the shared government account, 43% MegaCorp salary tax, and all-or-nothing $200 rent relief with focused unit coverage and isolated acceptance steps. Full Maven verification passed with 419 tests and the acceptance pipeline passed with 908 generated tests, all green.
+
+## 2026-08-21T08:05:00Z — refactorer processes coder handoff `1f396a176e` (megacorp-rent-relief)
+
+Handoff message received:
+
+```
+id: 20260821T075615Z_000221_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 1f396a176e
+created_at: 2026-08-21T07:56:15.261558Z
+enqueued_at: 2026-08-21T07:56:15.280094Z
+task: megacorp-rent-relief
+
+Re-read your role and constitution.
+
+merge_and_process coder 1f396a176e
+```
+
+Merged the inaugural megacorp-rent-relief handoff (commit `1f396a176e`, whose
+parent `8a3c6cb` holds the implementation). This is round-1 of a new feature,
+isolated by the specifier: the computations are standalone, not yet wired into
+live game observability.
+
+What it delivers:
+- `GovernmentAccount` — extracts the government account from `WarProfitsTaxBook`
+  into a shared, named owner (behavior-preserving; `WarProfitsTaxBook` now
+  delegates `balance()`/`setBalance()` to it).
+- `MegacorpSalaryTax.collect` — deposits salary to the player, collects a flat
+  43% income tax into government.
+- `RentRelief.pay` — caps a tenant's rent at $200, government funds the
+  difference only when its balance covers it (all-or-nothing relief).
+- Unit tests for both rules; isolated acceptance steps; backlog feature files
+  (journal/logging/report/tax/cli) for the later live-game rounds.
+
+Refactorer verification (all green):
+- Domain 419/419 (+7: MegacorpSalaryTaxTest, RentReliefTest) + 28/28 property;
+  existing WarProfitsTax/Book tests still pass (extraction is behavior-preserving).
+- Acceptance 908/908 (+7 isolated megacorp scenarios); CLI 19/19 excluding the
+  documented pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` timing
+  flake; characterization 13/13.
+- Mutation sites: GovernmentAccount 0, MegacorpSalaryTax 0, RentRelief 2,
+  WarProfitsTaxBook 1 — all far under threshold, no split needed.
+- CRAP: GovernmentAccount max 3.5 (setBalance 60.9%), MegacorpSalaryTax all 1.0
+  (100%), RentRelief all ≤3.0 (100%) — all within the <=6 target. Isolated,
+  well-tested modules, no refactor concerns.
 
 Handing the verified state back to the architect.

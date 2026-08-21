@@ -15,26 +15,21 @@ import java.util.function.Consumer;
  * {@link WarProfitsTax} computation; this book only remembers state.
  */
 public final class WarProfitsTaxBook {
-  private static final Bank.Account.Owner GOVERNMENT = new Bank.Account.Owner("government");
-
-  private final Bank bank;
+  private final GovernmentAccount government;
   private final Money boardValue;
   private final Map<Player.ID, Money> collected = new HashMap<>();
 
   public WarProfitsTaxBook(Bank bank, Money boardValue) {
-    this.bank = bank;
+    government = new GovernmentAccount(bank);
     this.boardValue = boardValue;
-    bank.createAccountFor(GOVERNMENT);
   }
 
   public Money governmentBalance() {
-    return bank.accountOf(GOVERNMENT).balance().amount();
+    return government.balance();
   }
 
   public void setGovernmentBalance(Money amount) {
-    Money current = governmentBalance();
-    if (amount.exceeds(current)) bank.accountOf(GOVERNMENT).deposit(amount.minus(current));
-    else if (current.exceeds(amount)) bank.accountOf(GOVERNMENT).withdraw(current.minus(amount));
+    government.setBalance(amount);
   }
 
   /** The rent a player has collected since their last war-profits-tax assessment. */
@@ -78,7 +73,7 @@ public final class WarProfitsTaxBook {
     Money balance = player.account().balance().amount();
     if (!balance.covers(owed)) raiseShortfall.accept(owed.minus(balance));
     player.account().withdraw(owed);
-    bank.accountOf(GOVERNMENT).deposit(owed);
+    government.deposit(owed);
     collected.put(player.id(), Money.ZERO);
     return owed;
   }
