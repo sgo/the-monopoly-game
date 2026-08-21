@@ -41433,3 +41433,55 @@ merge_and_process coder <final logbook commit>
 ```
 
 Summary: implemented the shared government account, 43% MegaCorp salary tax, and all-or-nothing $200 rent relief with focused unit coverage and isolated acceptance steps. Full Maven verification passed with 419 tests and the acceptance pipeline passed with 908 generated tests, all green.
+
+## 2026-08-21T08:05:00Z — refactorer processes coder handoff `1f396a176e` (megacorp-rent-relief)
+
+Handoff message received:
+
+```
+id: 20260821T075615Z_000221_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 1f396a176e
+created_at: 2026-08-21T07:56:15.261558Z
+enqueued_at: 2026-08-21T07:56:15.280094Z
+task: megacorp-rent-relief
+
+Re-read your role and constitution.
+
+merge_and_process coder 1f396a176e
+```
+
+Merged the inaugural megacorp-rent-relief handoff (commit `1f396a176e`, whose
+parent `8a3c6cb` holds the implementation). This is round-1 of a new feature,
+isolated by the specifier: the computations are standalone, not yet wired into
+live game observability.
+
+What it delivers:
+- `GovernmentAccount` — extracts the government account from `WarProfitsTaxBook`
+  into a shared, named owner (behavior-preserving; `WarProfitsTaxBook` now
+  delegates `balance()`/`setBalance()` to it).
+- `MegacorpSalaryTax.collect` — deposits salary to the player, collects a flat
+  43% income tax into government.
+- `RentRelief.pay` — caps a tenant's rent at $200, government funds the
+  difference only when its balance covers it (all-or-nothing relief).
+- Unit tests for both rules; isolated acceptance steps; backlog feature files
+  (journal/logging/report/tax/cli) for the later live-game rounds.
+
+Refactorer verification (all green):
+- Domain 419/419 (+7: MegacorpSalaryTaxTest, RentReliefTest) + 28/28 property;
+  existing WarProfitsTax/Book tests still pass (extraction is behavior-preserving).
+- Acceptance 908/908 (+7 isolated megacorp scenarios); CLI 19/19 excluding the
+  documented pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` timing
+  flake; characterization 13/13.
+- Mutation sites: GovernmentAccount 0, MegacorpSalaryTax 0, RentRelief 2,
+  WarProfitsTaxBook 1 — all far under threshold, no split needed.
+- CRAP: GovernmentAccount max 3.5 (setBalance 60.9%), MegacorpSalaryTax all 1.0
+  (100%), RentRelief all ≤3.0 (100%) — all within the <=6 target. Isolated,
+  well-tested modules, no refactor concerns.
+
+Handing the verified state back to the architect.
