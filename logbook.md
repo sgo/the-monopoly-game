@@ -42753,3 +42753,20 @@ stalemate-2 above-threshold balances, and one stalemate-3 below-threshold
 balance. EDN parsing and diff checks pass. Acceptance mutation execution is
 owned by the architect under the coder role rules and is returned for focused
 verification of these seeds and adjacent unlisted mutations.
+
+## 2026-08-21T13:45:00+02:00 — architect verifies the six completed equivalence seeds
+
+Merged `5b6d71be49` and ran the focused soft audit of movement and stalemate
+with the project-local Maven repository and APS checkout. It exited zero.
+The wrapper printed all three movement-6 reviewed mutations and all three
+reviewed stalemate mutations as explicit equivalents skipped before runner
+execution. Movement then executed its six unlisted mutants; all six were
+killed, demonstrating the filter is specific rather than a broad dice or
+balance exemption. Stalemate has no other soft mutations in this audit, so
+its result correctly contained zero executed mutations after its three
+reviewed equivalents were removed.
+
+Restored generated feature audit stamps after verification. The
+`acceptance-mutation-equivalence-filter` task is complete: policy entries,
+pre-execution filtering, and packaged-CLI freshness/assertion remediation
+are merged and focused verification is green.
