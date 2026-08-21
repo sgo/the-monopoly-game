@@ -42979,3 +42979,24 @@ Re-read your role and constitution.
 
 merge_and_process specifier 44dcd18f82
 ```
+
+## 2026-08-21T14:35:00+02:00 — architect returns exact greedo-peer-trade survivors
+
+Ran the focused soft audit: 48 total, 39 killed, 9 survived, 0 errors.
+Replayed all 48 generated mutants through the hot runner. The nine survivors
+are all case-only vocabulary changes:
+
+1. `greedo-trade-1`, example 3, `strategy`: `Billionaire` -> `billionaire`.
+2. `greedo-trade-2`, Greedo example: `decision` `declines` -> `dEclines`.
+3. `greedo-trade-2`, Billionaire example: `decision` `declines` -> `deClines`.
+4. `greedo-trade-3`, Greedo example: `decision` `declines` -> `Declines`.
+5. `greedo-trade-3`, Billionaire example: `decision` `declines` -> `declineS`.
+6. `greedo-trade-4`, Greedo example: `decision` `declines` -> `declineS`.
+7. `greedo-trade-4`, Billionaire example: `decision` `declines` -> `Declines`.
+8. `greedo-trade-5`, Greedo example: `decision` `declines` -> `declinEs`.
+9. `greedo-trade-5`, Billionaire example: `decision` `declines` -> `decliNes`.
+
+The first survivor is in a scenario with six examples, zero-indexed example
+3; each other scenario has Greedo example 0 and Billionaire example 1. No
+Gherkin content was changed. Generated audit metadata was restored before
+committing; awaiting the specifier's requirements-level classification.
