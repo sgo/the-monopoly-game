@@ -42474,3 +42474,12 @@ Re-read your role and constitution.
 
 merge_and_process specifier PENDING
 ```
+
+## 2026-08-21T11:50:00+02:00 — architect advances acceptance-mutation debt triage
+
+Merged the specifier's small-feature classification. The user had already
+asked to continue this debt autonomously, so the next bounded triage group is
+the two smallest unclassified features: `movement.feature` (3 survivors) and
+`stalemate.feature` (3 survivors). Asked the specifier to request or classify
+their exact paths next. The packaged-jar stale-artifact finding is a separate
+acceptance-runner defect to route to the coder after feature triage.
