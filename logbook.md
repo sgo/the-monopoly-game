@@ -41422,14 +41422,18 @@ Merged commit `63d5142b16`. Implementing the round-1 isolated MegaCorp salary-ta
 Handoff message sent:
 
 ```
-type: git_handoff
+id: 20260821T075615Z_000221_from_coder
+from: coder
 to: refactorer
 priority: 50
+type: git_handoff
+role: coder
 task: megacorp-rent-relief
-commit: pending final logbook commit
+commit: 1f396a176e
+created_at: 2026-08-21T07:56:15.261558Z
 
 Re-read your role and constitution.
-merge_and_process coder <final logbook commit>
+merge_and_process coder 1f396a176e
 ```
 
 Summary: implemented the shared government account, 43% MegaCorp salary tax, and all-or-nothing $200 rent relief with focused unit coverage and isolated acceptance steps. Full Maven verification passed with 419 tests and the acceptance pipeline passed with 908 generated tests, all green.
