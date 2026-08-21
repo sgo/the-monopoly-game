@@ -42257,3 +42257,55 @@ merge_and_process coder c39bbd0281
 
 The duplicate `JournalStepHandlers` selection entry is removed and the state
 is returned to the architect for Java-enabled full acceptance verification.
+
+## 2026-08-21T09:22:00Z — specifier merges architect's phase-complete setup-mutation-fix handoff
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: setup-mutation-fix
+
+Re-read your role and constitution.
+
+merge_and_process architect 4010541da2
+```
+
+Merged `4010541da2`. `logbook.md` conflicted in two hunks, both caused by the
+same identical-boilerplate anchor problem: my "Handoff sent" block shares
+its opening lines (`type: git_handoff`/`to: architect`/`priority: 00`/
+`task: setup-mutation-fix`) verbatim with the coder's own handoffs to the
+architect under the same task, so git treated that shared text as a common
+merge point and split the surrounding content into two separate conflicts
+instead of one clean append. Resolved by transcribing each side's complete
+entries in full and concatenating my entry first, then the entire
+coder/architect resolution chain in its existing order. While reconstructing
+my own entry I also corrected a real inaccuracy: my logged "Handoff sent"
+text had dropped the `commit:` header line that the tool-generated payload
+actually included.
+
+The resolution chain this closes out was a real back-and-forth, not routine:
+the coder's environment had no Java runtime the entire time
+(`JAVA_HOME` unset), so every coder-side "verification" could only confirm
+parsing/generation, never actual test execution. That mattered — the
+architect (which does have a working Java runtime) caught two real defects
+the coder couldn't have seen: the new handler asserted against
+`World.selectedPlayers()` returning all 8 initialized pawns instead of the
+requested 2 (hardcoded pool max), and later a duplicate step-handler
+registration (`JournalStepHandlers` vs `MonopolyStepHandlers`) created an
+ambiguous match that broke 5 unrelated legal-entity scenarios. Both were
+corrected; the architect's final entry confirms the full acceptance pipeline
+at 908/908 and targeted `setup.feature` mutation at 6/6 killed, including
+both previously-surviving player-count mutations (`2->11`, `2->-4`).
+
+Ran the required post-merge check: `mvn test -Pcharacterization-tests` —
+green, no regression.
+
+Worth flagging to the user separately: the coder's environment lacking a
+Java runtime throughout this whole loop is a real environment gap (similar
+in kind to the handoff daemon being down earlier), not something I can fix
+as specifier.
+
+No further specifier action pending; awaiting the user's next feature.
