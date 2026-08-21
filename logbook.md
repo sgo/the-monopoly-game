@@ -39303,6 +39303,18 @@ merge_and_process refactorer 19d8105e29
 
 Recorded receipt; merging the named refactorer commit for the next
 architectural review loop.
+
+## 2026-08-21T08:23:55Z — architect reports acceptance-mutation specification gap
+
+Soft Gherkin mutation of `en/rules/setup.feature` found four mutations: the
+starting balance and position mutations are killed, while the `players`
+example mutations `2 -> 11` and `2 -> -4` survive. The scenarios assert
+universal properties of selected players but never assert the selected count
+or valid player-count range, so invalid counts can pass unchecked.
+
+This is a Gherkin acceptance-criteria finding, not an implementation or
+pipeline-registration issue. Sent to the specifier for a decision and for a
+new stable task name for acceptance-mutation debt remediation.
 ## 2026-08-20T20:50:00Z — architect closes first-tax survivor phase
 
 Processed refactorer handoff `000186` at `8d8fe20c42` and merged it. Independent
