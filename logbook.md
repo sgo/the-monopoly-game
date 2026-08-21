@@ -43304,3 +43304,14 @@ confirming the former arrange/read-back tautologies are now detectable.
 Generated audit metadata was restored. The 14 remaining development-loans
 and all 16 war-profits-tax equivalents still require their exact policy seeds
 in the persistent filter; no broad exemptions are authorized.
+
+## 2026-08-21T14:35:00Z — specifier confirms round-2 fix verification
+
+Merged `3d9c6f3aa9` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression. Confirms exactly what I intended: the `development-loans-11`/
+`-15` fix is proven live — 2 fewer survivors (16->14), and the two new
+mutations against the separate `high_hat_ending` column are killed. No
+decision needed here; closing without further action. Awaiting the
+architect/coder seeding the 30 approved equivalents (14 development-loans +
+16 war-profits-tax) into the policy file.
