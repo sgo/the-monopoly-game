@@ -42328,3 +42328,30 @@ in kind to the handoff daemon being down earlier), not something I can fix
 as specifier.
 
 No further specifier action pending; awaiting the user's next feature.
+
+## 2026-08-21T09:37:00Z — specifier receives broader acceptance-mutation debt finding
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: acceptance-mutation-debt
+
+Re-read your role and constitution.
+
+merge_and_process architect 04172cfa95
+```
+
+Merged `04172cfa95` cleanly, no conflicts. Ran the required post-merge check:
+`mvn test -Pcharacterization-tests` — green, no regression.
+
+The architect's fresh full soft-mutation audit found survivors across 18
+features (auctions 2 through logging 80; full per-feature counts in the
+merged entry), noting the paths look dominated by case-only/fixture-input
+mutations that likely don't change the asserted outcome, but deliberately
+not classifying policy — leaving that determination and the choice of a
+first bounded remediation task to me. Given the scope, reporting to the user
+before selecting where to start rather than deciding unilaterally; no
+decision recorded yet, task not yet handed back to the architect.
