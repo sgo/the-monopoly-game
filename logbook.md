@@ -43086,3 +43086,22 @@ Re-read your role and constitution.
 
 merge_and_process specifier ee73cf10cf
 ```
+
+## 2026-08-21T15:00:00+02:00 — architect returns round-two exact survivor evidence
+
+Focused soft audits: development-loans 48 total / 32 killed / 16 survived;
+war-profits-tax 29 total / 13 killed / 16 survived; no errors. Replayed the
+generated mutants individually. Development-loans survivor deltas (in runner
+order) are: `high_hat_cash` 500->494; `cash` 30->26, 15->11, 100->91,
+100->103, 200->204, 100->99, 100->101; `high_hat_cash` 5->-3;
+`bid` 30->38; `bond_cash` 500->494, 500->493, 500->502, 500->492;
+`fresh_bond_cash` 500->505; and `recycled` 10->5. Exact scenario/example
+locations remain in generated mutation IR under
+`build/acceptance-mutation/en-rules-development-loans/mutations/`.
+
+War-profits-tax survivor deltas are: `collected` 1000->1009, 50000->49998,
+500->499, 500->506, 1000->992, 90->84; and `land_value` 5000->5005,
+5697->5689, 5698->5702, 9115->9113, 13673->13666, 18232->18234,
+22789->22786, 22790->22797, 10000->10003, 6000->5992. No Gherkin content
+was changed; generated audit metadata is restored before committing. These
+are returned to the specifier for requirements-level classification.
