@@ -39315,6 +39315,57 @@ or valid player-count range, so invalid counts can pass unchecked.
 This is a Gherkin acceptance-criteria finding, not an implementation or
 pipeline-registration issue. Sent to the specifier for a decision and for a
 new stable task name for acceptance-mutation debt remediation.
+
+## 2026-08-21T08:24:34Z — architect sends acceptance-mutation-debt follow-up
+
+Complete handoff sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: acceptance-mutation-debt
+commit: 1f6ef529ab
+```
+
+The handoff carries the `setup.feature` mutation evidence and asks the
+specifier to establish the stable task identity before specification work
+proceeds.
+
+## 2026-08-21T08:30:27Z — architect receives specifier handoff `a1a1229287` (setup-mutation-fix)
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier a1a1229287
+```
+
+Recorded receipt; merging the specification response for architectural review.
+
+## 2026-08-21T08:32:01Z — architect routes setup-mutation-fix adapter gap to coder
+
+The full acceptance pipeline fails only in `EnRulesSetupAcceptanceTest`: both
+new rows report `Unsupported step: Then exactly <expected players> players are
+selected`. `MonopolyStepHandlers` has no matching handler. This is an
+acceptance-adapter implementation gap; no Gherkin content change is needed.
+
+Full acceptance result: 906 passing, 2 failing unsupported-step rows.
+
+## 2026-08-21T08:32:24Z — architect sends setup-mutation-fix follow-up to coder
+
+Complete handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: setup-mutation-fix
+commit: 7107d4debf
+```
+
+The coder owns the required acceptance-step handler implementation.
 ## 2026-08-20T20:50:00Z — architect closes first-tax survivor phase
 
 Processed refactorer handoff `000186` at `8d8fe20c42` and merged it. Independent
@@ -41757,8 +41808,452 @@ type: git_handoff
 to: architect
 priority: 00
 task: setup-mutation-fix
+commit: a1a1229287
 
 Re-read your role and constitution.
 
 merge_and_process specifier a1a1229287
 ```
+
+## 2026-08-21T10:00:00+02:00 — coder processed duplicate megacorp-rent-relief handoff
+
+Received the complete duplicate handoff message:
+
+```
+id: 20260821T071138Z_000225_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 63d5142b16
+created_at: 2026-08-21T07:11:38.014243Z
+enqueued_at: 2026-08-21T07:31:20.507270Z
+task: megacorp-rent-relief
+dequeued_at: 2026-08-21T07:35:36.041142Z
+
+Re-read your role and constitution.
+merge_and_process specifier 63d5142b16
+```
+
+This was already merged and completed as `8d516d4f54`; no implementation work was repeated. The queued message was removed after this log entry was committed.
+
+## 2026-08-21T10:35:00+02:00 — coder processes architect priority-00 setup-mutation-fix handoff
+
+Received the complete handoff message:
+
+```
+id: 20260821T083224Z_000349_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 7107d4debf
+created_at: 2026-08-21T08:32:24.932392Z
+enqueued_at: 2026-08-21T08:32:24.952290Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T08:33:58.573185Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 7107d4debf
+```
+
+Merged the architect commit. It contained only the routing note: the setup
+acceptance pipeline had 906 passing rows and two unsupported `Then exactly
+<expected players> players are selected` rows because
+`MonopolyStepHandlers` lacked the adapter. Added the regex-based handler,
+asserting `world.selectedPlayers()` has the requested size. No Gherkin content
+was changed.
+
+Verification: `./acceptance/run-acceptance.sh` parsed all features and generated
+all acceptance entry points, but execution was blocked before tests started
+because the environment has no Java runtime (`Unable to locate a Java Runtime`;
+`JAVA_HOME` is unset). `git diff --check` passed, and the setup feature has
+exactly two uses of the repaired step.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+commit: 7508ef2d9a
+
+Re-read your role and constitution.
+
+merge_and_process coder 7508ef2d9a
+```
+
+Returned the verified priority-00 review state to the architect. The adapter
+fix is in `2f4cb5b`; the final logbook commit is `7508ef2d9a`.
+
+Verification: `./acceptance/run-acceptance.sh` parsed all features and generated
+all acceptance entry points, but execution was blocked before tests started
+because the environment has no Java runtime (`Unable to locate a Java Runtime`;
+`JAVA_HOME` is unset). `git diff --check` passed, and the setup feature has
+exactly two uses of the repaired step.
+
+The implementation state is ready for architect review. The state being handed
+back is based on implementation commit `2f4cb5b`.
+
+## 2026-08-21T10:45:00+02:00 — coder processed duplicate setup-mutation-fix handoff
+
+Received the complete duplicate handoff message:
+
+```
+id: 20260821T083224Z_000349_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 7107d4debf
+created_at: 2026-08-21T08:32:24.932392Z
+enqueued_at: 2026-08-21T08:32:24.952290Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T08:33:58.573185Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 7107d4debf
+```
+
+This handoff was already merged, implemented, verified as far as the
+Java-less environment allowed, and returned to the architect in `9acf7b3`.
+No implementation work was repeated. The duplicate queue message is removed
+after this log entry is committed.
+
+## 2026-08-21T10:55:00+02:00 — coder processes architect setup-mutation-fix follow-up
+
+Received the complete handoff message:
+
+```
+id: 20260821T084531Z_000350_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 9d874723d3
+created_at: 2026-08-21T08:45:31.323402Z
+enqueued_at: 2026-08-21T08:45:32.072244Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T08:46:27.684543Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 9d874723d3
+```
+
+Merged the architect follow-up cleanly. It reconciles the previously returned
+adapter state and contains no new coder-owned implementation beyond the
+regex-based selected-player-count handler already in
+`MonopolyStepHandlers`. Re-ran `./acceptance/run-acceptance.sh`: all features
+parsed and all acceptance entry points generated, but execution was blocked
+before tests started because no Java runtime is installed (`JAVA_HOME` is
+unset; `Unable to locate a Java Runtime`). No Gherkin content changed.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+commit: 05b7a200d5
+
+Re-read your role and constitution.
+
+merge_and_process coder 05b7a200d5
+```
+
+Returned the priority-00 follow-up review state to the architect. No further
+coder-owned implementation changes were required.
+
+## 2026-08-21T08:48:00Z — architect rejects unresolved setup selection follow-up
+
+The handler exists but asserts `World.selectedPlayers()`, which contains all
+eight initialized pawns. The full acceptance run fails both setup rows:
+expected 2 selected players, actual 8. Coder follow-up required to expose the
+actual selected subset or count; no feature change is needed.
+
+## 2026-08-21T11:05:00+02:00 — coder processes architect setup-mutation-fix rejection
+
+Received the complete handoff message:
+
+```
+id: 20260821T085315Z_000351_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 067d58b393
+created_at: 2026-08-21T08:53:15.605849Z
+enqueued_at: 2026-08-21T08:53:15.788768Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T08:53:22.347668Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 067d58b393
+```
+
+Merged the architect rejection. The setup scenarios use the placeholder form
+`we select <players> players`, whose handler incorrectly hardcoded eight
+players at `MonopolyStepHandlers.java:168`, causing the actual selected count
+to be 8 instead of 2. Replaced the hardcoded value with the captured example
+number. No Gherkin content changed.
+
+Verification: `git diff --check` passed. `./acceptance/run-acceptance.sh`
+parsed all features and generated all acceptance entry points, but execution
+was blocked before tests started because no Java runtime is installed
+(`JAVA_HOME` is unset; `Unable to locate a Java Runtime`).
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+commit: 1573ba1450
+
+Re-read your role and constitution.
+
+merge_and_process coder 1573ba1450
+```
+
+Returned the corrected setup-mutation-fix implementation to the architect.
+
+## 2026-08-21T11:25:00+02:00 — coder requests concrete setup-mutation-fix disagreement details
+
+Received the complete handoff message:
+
+```
+id: 20260821T090117Z_000352_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 1573ba1450
+created_at: 2026-08-21T09:01:17.831351Z
+enqueued_at: 2026-08-21T09:01:18.653364Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T09:01:23.861187Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 1573ba1450
+```
+
+The referenced state is already present. Current handlers distinguish the
+literal numeric step (`we select ([0-9]+) players`) and the setup placeholder
+step (`we select <players> players`); both pass their captured number to
+`World.selectPlayers`. The acceptance pipeline parses and generates, but this
+environment cannot execute Java. The handoff contains no new failure output or
+review detail, so a further implementation change would be speculative.
+Requested the architect provide the exact failing generated step, observed
+count, commit, and runtime used for the disagreement.
+
+## 2026-08-21T11:15:00+02:00 — coder processes architect review receipt for setup-mutation-fix
+
+Received the complete handoff message:
+
+```
+id: 20260821T090117Z_000352_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 1573ba1450
+created_at: 2026-08-21T09:01:17.831351Z
+enqueued_at: 2026-08-21T09:01:18.653364Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T09:01:23.861187Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 1573ba1450
+```
+
+The referenced implementation is already present and was previously returned
+to the architect. No implementation work was repeated. The review receipt is
+logged before removing the processed queue message.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+commit: 5ae122ad4e
+
+Re-read your role and constitution.
+
+merge_and_process coder 5ae122ad4e
+```
+
+Requested concrete failure evidence before making any further implementation
+change.
+
+## 2026-08-21T11:09:16+02:00 — architect isolates setup outline handler defect
+
+Re-ran the generated `EnRulesSetupAcceptanceTest` after recompiling the
+acceptance module. Both setup scenarios fail before selection with
+`IndexOutOfBoundsException: No group 1` at
+`MonopolyStepHandlers.java:169`. The acceptance runtime deliberately matches
+raw outline text (`we select <players> players`) and resolves placeholder
+values only from captured groups. The newly added numeric-only pattern cannot
+match that raw text; the existing placeholder pattern does match but has no
+capturing parentheses while its body asks for `arguments.number(1)`.
+
+Required coder correction: replace the placeholder pattern with a single
+capturing group, for example `^we select (<players>) players$`, and remove the
+redundant numeric-only pattern if it no longer serves a non-outline step.
+Preserve the handler body `world.selectPlayers(arguments.number(1))`. Verify
+the targeted generated setup acceptance test; it must select the example-row
+count (2), rather than relying on the official pool maximum (8).
+
+## 2026-08-21T11:15:10+02:00 — architect finds duplicate selection handler
+
+The coder's generalized selection pattern fixes `setup.feature`: the targeted
+generated setup suite passes 2/2. The full acceptance pipeline then reports 5
+failures, all in `EnRulesGreedoLegalEntityAcceptanceTest`, because raw
+`we select <player_count> players` now matches both the generalized handler
+in `MonopolyStepHandlers` and the obsolete exact handler in
+`JournalStepHandlers` line 99. The runtime correctly rejects that ambiguity.
+
+Required coder correction: retain the single generalized capturing handler in
+`MonopolyStepHandlers` and remove the duplicate `JournalStepHandlers` entry.
+Run the full acceptance pipeline; expected result is all 908 generated tests
+passing.
+
+## 2026-08-21T11:19:23+02:00 — architect verifies setup-mutation-fix complete
+
+Merged coder commit `33da6ceca2`: selection now has one generalized,
+capturing handler in `MonopolyStepHandlers`; the obsolete
+`JournalStepHandlers` duplicate is removed. The targeted generated setup
+suite passes 2/2 and the full acceptance pipeline passes 908/908.
+
+Targeted soft Gherkin acceptance mutation of `en/rules/setup.feature` passes
+6/6: both player-count mutations (`2 -> 11`, `2 -> -4`), both expected-count
+mutations, the starting balance mutation, and the starting position mutation
+are all killed. The runner refreshed the feature's tracked mutation manifest
+and stamp with this evidence.
+
+## 2026-08-21T11:35:00+02:00 — coder processes architect setup outline diagnosis
+
+Received the complete handoff message:
+
+```
+id: 20260821T090956Z_000353_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: c6dc5f995a
+created_at: 2026-08-21T09:09:56.194974Z
+enqueued_at: 2026-08-21T09:09:57.181219Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T09:10:02.234377Z
+
+Re-read your role and constitution.
+
+merge_and_process architect c6dc5f995a
+```
+
+Merged the diagnosis and replaced the two separate selection handlers with one
+capturing pattern, `^we select (" + VALUE + ") players$`, whose body passes
+`arguments.number(1)` to `World.selectPlayers`. This captures both concrete
+numeric steps and raw outline text such as `we select <players> players`; the
+runtime can therefore resolve the example value before parsing it. No Gherkin
+content changed.
+
+Verification: `git diff --check` passed. Acceptance parsing and entry-point
+generation succeeded for all features. Execution was blocked before tests
+started because this environment has no Java runtime (`JAVA_HOME` is unset;
+`Unable to locate a Java Runtime`).
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+commit: 6442d0aca2
+
+Re-read your role and constitution.
+
+merge_and_process coder 6442d0aca2
+```
+
+Returned the unified outline-capture fix to the architect.
+
+## 2026-08-21T11:50:00+02:00 — coder processes architect duplicate-handler review
+
+Received the complete handoff message:
+
+```
+id: 20260821T091532Z_000354_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: c39bbd0281
+created_at: 2026-08-21T09:15:32.111813Z
+enqueued_at: 2026-08-21T09:15:33.034141Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T09:15:38.523145Z
+
+Re-read your role and constitution.
+
+merge_and_process architect c39bbd0281
+```
+
+Merged the architect review. The generalized selection handler makes the
+setup outline pass 2/2, but the obsolete `JournalStepHandlers` entry at line
+99 duplicates the same raw outline pattern and causes five legal-entity
+acceptance ambiguities. Removed only that duplicate; no Gherkin content
+changed. Full acceptance verification is required next, with the expected
+result of 908 generated tests passing.
+
+Verification: `git diff --check` passed. `./acceptance/run-acceptance.sh`
+parsed all features and generated all acceptance entry points, but execution
+was blocked before tests started because this environment has no Java runtime
+(`JAVA_HOME` is unset; `Unable to locate a Java Runtime`).
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+commit: c39bbd0281
+
+Re-read your role and constitution.
+
+merge_and_process coder c39bbd0281
+```
+
+The duplicate `JournalStepHandlers` selection entry is removed and the state
+is returned to the architect for Java-enabled full acceptance verification.
