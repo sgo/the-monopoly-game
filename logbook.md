@@ -39331,6 +39331,18 @@ commit: 1f6ef529ab
 The handoff carries the `setup.feature` mutation evidence and asks the
 specifier to establish the stable task identity before specification work
 proceeds.
+
+## 2026-08-21T08:30:27Z — architect receives specifier handoff `a1a1229287` (setup-mutation-fix)
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier a1a1229287
+```
+
+Recorded receipt; merging the specification response for architectural review.
 ## 2026-08-20T20:50:00Z — architect closes first-tax survivor phase
 
 Processed refactorer handoff `000186` at `8d8fe20c42` and merged it. Independent
