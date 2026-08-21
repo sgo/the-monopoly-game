@@ -41798,5 +41798,28 @@ because the environment has no Java runtime (`Unable to locate a Java Runtime`;
 `JAVA_HOME` is unset). `git diff --check` passed, and the setup feature has
 exactly two uses of the repaired step.
 
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+commit: 7508ef2d9a
+
+Re-read your role and constitution.
+
+merge_and_process coder 7508ef2d9a
+```
+
+Returned the verified priority-00 review state to the architect. The adapter
+fix is in `2f4cb5b`; the final logbook commit is `7508ef2d9a`.
+
+Verification: `./acceptance/run-acceptance.sh` parsed all features and generated
+all acceptance entry points, but execution was blocked before tests started
+because the environment has no Java runtime (`Unable to locate a Java Runtime`;
+`JAVA_HOME` is unset). `git diff --check` passed, and the setup feature has
+exactly two uses of the repaired step.
+
 The implementation state is ready for architect review. The state being handed
 back is based on implementation commit `2f4cb5b`.
