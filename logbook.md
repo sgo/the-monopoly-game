@@ -39234,6 +39234,124 @@ would silently re-pair config↔fixture), and `formatMean` uses `Double.toString
 trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
+
+## 2026-08-21T07:59:11Z — architect receives refactorer handoff `e768e267cc` (megacorp-rent-relief)
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer e768e267cc
+```
+
+Recorded receipt; merging the named refactorer commit and beginning the
+architectural review for `megacorp-rent-relief`.
+
+## 2026-08-21T08:14:06Z — architect completes megacorp-rent-relief review
+
+Reviewed `e768e267cc` for UI/core separation, dependency direction,
+encapsulation, and local quality. The new `GovernmentAccount` is an
+appropriate domain boundary: salary tax, rent relief, and war-profits tax
+share one bank-owned account without exposing its representation to the
+acceptance adapter. No architectural change was warranted.
+
+Verification:
+
+- Domain unit suite: 419/419 pass.
+- Domain property suite (separate profile): 28/28 pass.
+- Differential mutation, one file at a time: RentRelief 2/2 killed;
+  WarProfitsTaxBook 1/1 killed; GovernmentAccount and MegacorpSalaryTax have
+  no supported sites. No uncovered sites.
+- DRY: no duplicate candidates across the changed production rules.
+- Scoped soft Gherkin mutation: megacorp-salary-tax 7/7 killed; rent-relief's
+  six over-cap/boundary mutations 6/6 killed. Its two surviving cap-scenario
+  `government_start` mutations are intentionally equivalent: the scenario
+  states that a $200 rent never spends government money regardless of that
+  balance.
+- Full acceptance pipeline: 908/908 pass.
+
+The attempted whole-pipeline soft mutation run was stopped after confirming
+it was spending several minutes in pre-existing unrelated scenarios with
+known survivors; its unrelated partial manifests were discarded. Only the
+task's approved mutation manifests are retained.
+
+## 2026-08-21T08:14:06Z — architect sends phase-complete sync for megacorp-rent-relief
+
+Complete handoff sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: megacorp-rent-relief
+commit: f47a06b493
+```
+
+Phase-complete architect state, including the review and task-scoped mutation
+manifests, is available to the specifier.
+
+## 2026-08-21T08:15:18Z — architect receives refactorer handoff `19d8105e29` (megacorp-rent-relief)
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process refactorer 19d8105e29
+```
+
+Recorded receipt; merging the named refactorer commit for the next
+architectural review loop.
+
+## 2026-08-21T08:23:55Z — architect reports acceptance-mutation specification gap
+
+Soft Gherkin mutation of `en/rules/setup.feature` found four mutations: the
+starting balance and position mutations are killed, while the `players`
+example mutations `2 -> 11` and `2 -> -4` survive. The scenarios assert
+universal properties of selected players but never assert the selected count
+or valid player-count range, so invalid counts can pass unchecked.
+
+This is a Gherkin acceptance-criteria finding, not an implementation or
+pipeline-registration issue. Sent to the specifier for a decision and for a
+new stable task name for acceptance-mutation debt remediation.
+
+## 2026-08-21T08:24:34Z — architect sends acceptance-mutation-debt follow-up
+
+Complete handoff sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 00
+task: acceptance-mutation-debt
+commit: 1f6ef529ab
+```
+
+The handoff carries the `setup.feature` mutation evidence and asks the
+specifier to establish the stable task identity before specification work
+proceeds.
+
+## 2026-08-21T08:30:27Z — architect receives specifier handoff `a1a1229287` (setup-mutation-fix)
+
+Complete handoff received:
+
+```
+Re-read your role and constitution.
+
+merge_and_process specifier a1a1229287
+```
+
+Recorded receipt; merging the specification response for architectural review.
+
+## 2026-08-21T08:32:01Z — architect routes setup-mutation-fix adapter gap to coder
+
+The full acceptance pipeline fails only in `EnRulesSetupAcceptanceTest`: both
+new rows report `Unsupported step: Then exactly <expected players> players are
+selected`. `MonopolyStepHandlers` has no matching handler. This is an
+acceptance-adapter implementation gap; no Gherkin content change is needed.
+
+Full acceptance result: 906 passing, 2 failing unsupported-step rows.
 ## 2026-08-20T20:50:00Z — architect closes first-tax survivor phase
 
 Processed refactorer handoff `000186` at `8d8fe20c42` and merged it. Independent
@@ -39241,6 +39359,8 @@ verification passes: characterization profile 13/13, full Maven reactor green
 (domain 412/412 and CLI characterization 13/13), and DRY reports no duplicate
 candidates in `GameBreakdown`. This is characterization-only; no production
 source changed. Phase is complete for the specifier.
+Sent phase-complete handoff `50_20260820T185132Z_000346` at commit
+`a5f349cfa6`.
 ## 2026-08-20T19:50:00Z — architect closes ordinary-win balance phase
 
 Processed refactorer handoff `000185` at `96df989718` and merged it. Independent
@@ -41406,6 +41526,63 @@ No production source changed for this task, as expected — pure
 characterization/test-side work. No further specifier action pending;
 awaiting the user's next direction.
 
+## 2026-08-21T07:11:38Z — specifier hands off megacorp-rent-relief to coder
+
+Committed `63d5142` (round 1 of two new features, decided with the user
+across an extended analytical discussion of the war-profits-tax's effect
+on the asset-rich billionaire's dominance):
+
+- `megacorp-salary-tax.feature`: an opt-in `--optional-rent-relief` flag
+  has MegaCorp pay the government an individual income tax of 43% of
+  every salary collected, on top of what the player keeps. Round 1 is an
+  isolated computation (new `collects a salary of $<salary>` trigger),
+  parameterized so the same scenario covers both the ordinary $200 salary
+  and the $400 double-salary-on-landing case's proportional math.
+- `rent-relief.feature`: the same flag caps what a tenant pays in rent at
+  $200 (chosen from the real characterization-baseline rent distribution:
+  only 3.5% of payments exceed it, but that tail carries ~30% of all rent
+  dollars) whenever the government's account can cover the landlord's
+  remainder in full; otherwise the tenant pays the full rent as today.
+  Also an isolated computation, boundary-pinned at $550/$549.
+- `acceptance/pipeline-features.txt`: registered both new tracked files.
+
+Backlogged (not in this handoff, all still Gherkin-complete under
+`the-monopoly-game-specs/backlog/`): journal/logging/report observability
+for both features (90–93 each); CLI wiring for `--optional-rent-relief`
+(cli-16/17, cli-jar-11); rent relief for a legal-entity landlord; a real
+double-salary-rule interaction proof; redirecting the existing Income Tax
+and Luxury Tax board spaces into the government account under the same
+flag (tax-3/4, explicitly requested by the user, scoped to the two tax
+spaces only — the street-repairs Chance/Community-Chest cards were
+considered and declined). Every backlogged live-game scenario shares one
+real prerequisite this round doesn't need: today a live played game's
+actual government account is never exposed anywhere afterward — even
+war-profits-tax's own "final account balance" journal/log/report
+assertions only ever echo back the isolated fixture value "grows a year
+older" writes, never something a real play produced. Exposing it through
+`Game.Result`, the way `deeds` and the journal already are, is a
+prerequisite shared by every backlogged live-game scenario, not something
+new to this feature.
+
+Verification: every new/changed feature file (tracked and backlog) parses
+cleanly via `gherkin-parser` and shows no genuine drift via
+`gherkin-ir-dry-checker` (findings are all expected same-step/
+different-placeholder-name false positives, matching precedent elsewhere
+in the suite).
+
+Handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: megacorp-rent-relief
+
+Re-read your role and constitution.
+
+merge_and_process specifier 63d5142b16
+```
+
 ## 2026-08-21T07:30:00Z — coder received megacorp-rent-relief from specifier
 
 Received the complete handoff message:
@@ -41437,6 +41614,129 @@ merge_and_process coder 1f396a176e
 ```
 
 Summary: implemented the shared government account, 43% MegaCorp salary tax, and all-or-nothing $200 rent relief with focused unit coverage and isolated acceptance steps. Full Maven verification passed with 419 tests and the acceptance pipeline passed with 908 generated tests, all green.
+
+## 2026-08-21T08:05:00Z — refactorer processes coder handoff `1f396a176e` (megacorp-rent-relief)
+
+Handoff message received:
+
+```
+id: 20260821T075615Z_000221_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 1f396a176e
+created_at: 2026-08-21T07:56:15.261558Z
+enqueued_at: 2026-08-21T07:56:15.280094Z
+task: megacorp-rent-relief
+
+Re-read your role and constitution.
+
+merge_and_process coder 1f396a176e
+```
+
+Merged the inaugural megacorp-rent-relief handoff (commit `1f396a176e`, whose
+parent `8a3c6cb` holds the implementation). This is round-1 of a new feature,
+isolated by the specifier: the computations are standalone, not yet wired into
+live game observability.
+
+What it delivers:
+- `GovernmentAccount` — extracts the government account from `WarProfitsTaxBook`
+  into a shared, named owner (behavior-preserving; `WarProfitsTaxBook` now
+  delegates `balance()`/`setBalance()` to it).
+- `MegacorpSalaryTax.collect` — deposits salary to the player, collects a flat
+  43% income tax into government.
+- `RentRelief.pay` — caps a tenant's rent at $200, government funds the
+  difference only when its balance covers it (all-or-nothing relief).
+- Unit tests for both rules; isolated acceptance steps; backlog feature files
+  (journal/logging/report/tax/cli) for the later live-game rounds.
+
+Refactorer verification (all green):
+- Domain 419/419 (+7: MegacorpSalaryTaxTest, RentReliefTest) + 28/28 property;
+  existing WarProfitsTax/Book tests still pass (extraction is behavior-preserving).
+- Acceptance 908/908 (+7 isolated megacorp scenarios); CLI 19/19 excluding the
+  documented pre-existing `SimulatorTest.keepsPlayingUntilToldToStop` timing
+  flake; characterization 13/13.
+- Mutation sites: GovernmentAccount 0, MegacorpSalaryTax 0, RentRelief 2,
+  WarProfitsTaxBook 1 — all far under threshold, no split needed.
+- CRAP: GovernmentAccount max 3.5 (setBalance 60.9%), MegacorpSalaryTax all 1.0
+  (100%), RentRelief all ≤3.0 (100%) — all within the <=6 target. Isolated,
+  well-tested modules, no refactor concerns.
+
+Handing the verified state back to the architect.
+
+## 2026-08-21T08:10:00Z — refactorer processes coder handoff `8d516d4f54` (megacorp-rent-relief, correction)
+
+Handoff message received:
+
+```
+id: 20260821T075806Z_000222_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 8d516d4f54
+created_at: 2026-08-21T07:58:06.948599Z
+enqueued_at: 2026-08-21T07:58:07.936856Z
+task: megacorp-rent-relief
+
+Re-read your role and constitution.
+
+merge_and_process coder 8d516d4f54
+```
+
+Merged the correction commit `8d516d4f54` to the megacorp-rent-relief
+handoff record. Logbook-only housekeeping: the coder's earlier entry had
+placeholder values (`commit: pending final logbook commit`,
+`merge_and_process coder <final logbook commit>`); this commit substitutes the
+actual values (`commit: 1f396a176e`, `merge_and_process coder 1f396a176e`) and
+adds the `id:`/`from:`/`role:`/`created_at:` header lines. No production or
+test code changed; the megacorp implementation and my first processing note
+are untouched and both logbook records now agree.
+
+Verification: clean ort merge, no conflict markers; the corrected coder record
+and my prior processing note both present. No test re-run needed (logbook-only
+change); the previously-verified suites (domain 419, acceptance 908,
+characterization 13, CLI 19) remain valid.
+
+Handing the verified state back to the architect.
+
+## 2026-08-21T08:15:02Z — specifier merges architect's phase-complete megacorp-rent-relief handoff
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: megacorp-rent-relief
+
+Re-read your role and constitution.
+
+merge_and_process architect f47a06b493
+```
+
+Merged `f47a06b493`. Its `logbook.md` conflicted at one clean append point
+(my own handoff entry vs. the coder/refactorer entries appended after it);
+resolved by keeping both in chronological order. The architect's own review
+entry landed at a different point in the file and merged cleanly on its own.
+
+Round 1 is now real: `GovernmentAccount` (extracted from `WarProfitsTaxBook`,
+shared by war-profits-tax, salary tax, and rent relief), `MegacorpSalaryTax`
+(43% flat), and `RentRelief` (all-or-nothing $200 cap). Architect's noted
+equivalent survivors (rent-relief's two `government_start` mutations on the
+$200-exactly scenario) match the spec's own stated intent — a $200 rent
+never touches the government account regardless of its balance — so no
+action needed there.
+
+Ran the required post-merge check: `mvn test -Pcharacterization-tests` —
+12/12 green, no regression.
+
+No further specifier action pending; awaiting the user's next feature.
 
 ## 2026-08-21T10:00:00+02:00 — coder processed duplicate megacorp-rent-relief handoff
 
