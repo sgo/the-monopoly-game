@@ -42846,3 +42846,39 @@ example 5000 -> 5006. No other scenario fields mutated in this audit.
 Both values are returned to the specifier for requirement-level
 classification; no Gherkin content was changed. Generated audit metadata was
 restored before committing.
+
+## 2026-08-21T13:14:00Z — specifier classifies rent-relief's two survivors
+
+Merged `7b07ffd8d7` (fast-forward, no conflict). Ran the required post-merge
+check: `mvn test -Pcharacterization-tests` — green, no regression.
+
+Confirmed as predicted: both `rent-relief-1` survivors
+(`government_start` 0->6, 5000->5006) are equivalent. The scenario's own
+title states the point directly — rent at or under $200 is paid in full
+"regardless of what the government's account holds" — so no value of
+`government_start` can ever change the outcome for a $200 rent; the cap
+mechanism only ever engages above $200, which this scenario deliberately
+never tests. Same reasoning class as the stalemate/year-limit/monopoly
+threshold equivalents already in the policy: any value comfortably on the
+same side (here, "any value at all," since the column is irrelevant here)
+produces the identical outcome.
+
+Verdict: both survivors are legitimate equivalents. Declining to open a
+remediation task. This closes out rent-relief; all 16 survivors classified
+across 9 features so far (14 from movement/bankruptcy/auctions/year-limit/
+monopoly/CLI/packaged-CLI/stalemate, now +2 from rent-relief) are
+equivalents or tooling artifacts — none have required a Gherkin change.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
