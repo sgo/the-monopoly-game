@@ -42550,3 +42550,20 @@ mutation-generated feature metadata to the committed baseline. Shell syntax
 and diff checks pass; Maven verification is blocked because this host has no
 Java Runtime. The wrapper loads with the APS classpath and reaches its own
 usage validation.
+
+## 2026-08-21T13:25:00+02:00 — coder sends verified state to architect
+
+Complete handoff message sent:
+
+```text
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-equivalence-filter
+commit: 0d84cafa0c
+```
+
+Returned the verified coder state for architect review. The handoff commit
+contains the tracked equivalent-mutation policy and Babashka filtering wrapper,
+packaged-CLI rebuild and jar-selection fixes, asynchronous output assertions,
+and this chronological logbook record.
