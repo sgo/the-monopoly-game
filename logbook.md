@@ -43619,6 +43619,23 @@ User approved continuing. Requesting exact per-mutation detail for
 survivors, in the self-contained tuple format (feature | scenario name |
 example index | key | original -> mutated per line) established in round 3.
 
+## 2026-08-21T16:30:00+02:00 — architect completes round-four survivor replay
+
+Focused audits reproduced distressed-sale 44/132 and buying-land 58/258
+survivors, no errors. Each survivor was replayed through the hot runner.
+Exact tuples are deterministically available by diffing the named generated
+IR against each feature's `base.json`. Survivor IDs: distressed-sale
+`m3,m6,m19,m20,m24,m25,m29,m33,m35,m37,m39,m41,m43,m45,m47,m48,m52,m55,
+m72,m73,m74,m76,m77,m79,m80,m82,m83,m103,m105,m106,m107,m111,m115,m119,
+m121,m123,m125,m127,m131,m135,m149,m153,m165,m167`; buying-land
+`m16,m28,m34,m40,m47,m49,m53,m59,m61,m65,m71,m73,m78,m84,m85,m89,m93,m97,
+m101,m102,m106,m111,m115,m119,m120,m123,m127,m131,m135,m140,m145,m150,
+m155,m159,m163,m168,m169,m174,m175,m179,m180,m184,m185,m190,m195,m200,
+m205,m213,m218,m223,m227,m231,m236,m241,m245,m249,m253,m257`.
+
+No Gherkin content changed; generated audit metadata is restored before
+committing. Returned to specifier for classification.
+
 Handoff sent:
 
 ```
