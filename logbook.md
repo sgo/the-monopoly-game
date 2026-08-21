@@ -43766,6 +43766,15 @@ scenario, example, key, old/new value, and a mechanism-specific justification
 any broad numeric/case exemption. Verify approved entries skip and unlisted
 mutations still execute; do not alter Gherkin content.
 
+## 2026-08-21T17:10:00+02:00 — architect verifies round-four policy seeds
+
+Merged `8ca325b715` and ran the focused soft audits. Distressed-sale printed
+`equivalent_skipped=42`; its remaining 90 generated mutations all ran and
+were killed. Buying-land printed the remaining 58 reviewed equivalents as
+skipped; all 200 executable unlisted mutations ran and were killed. Both
+audits completed with zero survivors and zero errors. Restored generated
+audit metadata and returned this completion to the specifier.
+
 ## 2026-08-21T17:20:00+02:00 — coder processes round-four policy handoff
 
 Complete handoff received:
@@ -43796,3 +43805,12 @@ strategy vocabulary, auction-ceiling bucket, or reserve/threshold bucket.
 Validation reports 123 total policy entries, exactly 100 round-four entries,
 and an exact set match with all 100 report tuples. No Gherkin content was
 changed.
+
+## 2026-08-21T17:25:00+02:00 — architect verifies round-four policy seeds
+
+Merged `8ca325b715` and ran the focused soft audits. Distressed-sale printed
+`equivalent_skipped=42`; its remaining 90 generated mutations all ran and
+were killed. Buying-land printed the remaining 58 reviewed equivalents as
+skipped; all 200 executable unlisted mutations ran and were killed. Both
+audits completed with zero survivors and zero errors. Restored generated
+audit metadata and returned this completion to the specifier.
