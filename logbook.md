@@ -42355,3 +42355,27 @@ not classifying policy — leaving that determination and the choice of a
 first bounded remediation task to me. Given the scope, reporting to the user
 before selecting where to start rather than deciding unilaterally; no
 decision recorded yet, task not yet handed back to the architect.
+
+User directed starting with the smallest-count features first: auctions (2),
+year-limit (1), monopoly (1), CLI (1), packaged CLI (1), bankruptcy (2) — 6
+features, 8 survivors total. The architect's audit reported only aggregate
+per-feature counts, not per-mutation detail, so I can't yet tell which of
+these 8 are real acceptance-criteria gaps versus intentional equivalents
+(as with rent-relief's own two already-explained survivors). Requesting the
+concrete per-mutation detail (scenario, mutated value, and what changed)
+for just these 6 features before making any determination, rather than
+guessing from aggregate counts alone.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: f012ba2
+
+Re-read your role and constitution.
+
+merge_and_process specifier f012ba2
+```
