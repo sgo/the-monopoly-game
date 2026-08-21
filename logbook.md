@@ -43814,3 +43814,18 @@ were killed. Buying-land printed the remaining 58 reviewed equivalents as
 skipped; all 200 executable unlisted mutations ran and were killed. Both
 audits completed with zero survivors and zero errors. Restored generated
 audit metadata and returned this completion to the specifier.
+
+## 2026-08-21T15:35:00Z — specifier confirms round-four policy seeding
+
+Merged `a8c0fa4f31` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression. Confirmed `acceptance/equivalent-mutations.edn` now has 123
+entries total (100 new, matching round 4 exactly; distressed-sale +
+buying-land tuples both count to 100), and the architect's own focused
+audits already confirm zero survivors/zero errors on both features. Noting
+the architect's own log has a duplicated entry (the 17:10/17:25 "verifies
+round-four policy seeds" note appears twice, identical) - not something I
+need to fix, just flagging it's their own duplication, not mine. No
+decision needed; closing without further action. 201 survivors remain
+classified across 16 features; journal, report, and logging are all that's
+left.
