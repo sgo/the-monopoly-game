@@ -1,0 +1,42 @@
+[{:feature "en/rules/auctions.feature"
+  :scenario "the highest auction ceiling buys land after the landing player declines, at the price it took to outlast the loser"
+  :example 0
+  :key "high_hat_bid"
+  :original "120"
+  :mutated "119"
+  :justification "The winner's ceiling remains above the losing ceiling, so the same ascending-auction price and outcome are preserved. It is a ceiling, not the paid price."}
+ {:feature "en/rules/auctions.feature"
+  :scenario "the player who declined the offer may win the auction"
+  :example 0
+  :key "dog_bid"
+  :original "140"
+  :mutated "145"
+  :justification "The winner's ceiling remains above the losing ceiling, so the same ascending-auction price and outcome are preserved. It is a ceiling, not the paid price."}
+ {:feature "en/rules/year-limit.feature"
+  :scenario "the game does not stop while every remaining player is still below the year limit"
+  :example 0
+  :key "year limit"
+  :original "2"
+  :mutated "-6"
+  :justification "Every non-positive maximum-year value is the documented unlimited sentinel, so -6 has the same behavior as the configured scenario's disabled limit."}
+ {:feature "en/monopoly.feature"
+  :scenario "the game always ends in a monopoly"
+  :example 0
+  :key "players"
+  :original "8"
+  :mutated "17"
+  :justification "The official player pool is capped at eight pawns, so requesting 17 selects the same eight players as requesting 8."}
+ {:feature "en/rules/bankruptcy.feature"
+  :scenario "\"<strategy>\" keeps an inherited mortgage when it cannot afford to pay it off, paying only the mandatory interest"
+  :example 1
+  :key "strategy"
+  :original "Billionaire"
+  :mutated "billionaire"
+  :justification "The acceptance vocabulary deliberately recognizes Billionaire case-insensitively, so this spelling change selects the same strategy."}
+ {:feature "en/rules/bankruptcy.feature"
+  :scenario "a doubles roll that causes bankruptcy does not grant a phantom extra move afterward"
+  :example 0
+  :key "starting balance"
+  :original "10"
+  :mutated "12"
+  :justification "Both balances remain below the scripted rent demand, so the same bankruptcy and zero final balance are asserted."}]

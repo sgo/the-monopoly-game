@@ -42372,6 +42372,20 @@ Handoff sent:
 type: git_handoff
 to: architect
 priority: 00
+task: setup-mutation-fix
+commit: 33da6ceca2
+
+Re-read your role and constitution.
+
+merge_and_process coder 33da6ceca2
+```
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
 task: acceptance-mutation-debt
 commit: dabe903e9f
 
@@ -42638,3 +42652,43 @@ These must be specific policy entries with the stated justification—not a
 broad exemption for dice values or balances. Add focused verification that
 the exact reviewed mutations report as skipped and that adjacent, unlisted
 mutations still execute and can fail the audit.
+## 2026-08-21T13:24:01+02:00 — coder processes architect priority-00 follow-up
+
+Complete handoff received:
+
+```text
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/in_process/00_20260821T095100Z_000359_from_architect_to_coder.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: acceptance-mutation-equivalence-filter
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect f59364d032
+```
+
+Processed the architect follow-up under coder ownership. Reviewed the
+tracked equivalence policy, Babashka wrapper, packaged-jar rebuild and jar
+selection changes, and asynchronous packaged-CLI assertions. Restored all
+mutation-generated feature metadata to the committed baseline. Shell syntax
+and diff checks pass; Maven verification is blocked because this host has no
+Java Runtime. The wrapper loads with the APS classpath and reaches its own
+usage validation.
+
+## 2026-08-21T13:25:00+02:00 — coder sends verified state to architect
+
+Complete handoff message sent:
+
+```text
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-equivalence-filter
+commit: 0d84cafa0c
+```
+
+Returned the verified coder state for architect review. The handoff commit
+contains the tracked equivalent-mutation policy and Babashka filtering wrapper,
+packaged-CLI rebuild and jar-selection fixes, asynchronous output assertions,
+and this chronological logbook record.
