@@ -43188,3 +43188,36 @@ Re-read your role and constitution.
 
 merge_and_process specifier 6fd9b4b286
 ```
+
+## 2026-08-21T15:20:00+02:00 — architect returns self-contained round-two survivor tuples
+
+Source of truth is the generated JSON IR, diffed per mutant. Each line is
+feature | scenario index/name | example | key | original -> mutated.
+
+Development-loans (16):
+`2 cap blocks development | 0 | high_hat_cash | 500->494`; `3 full-draw |
+0 | cash | 30->26`; `3 full-draw | 1 | cash | 15->11`; `4 no bondholder |
+0 | high_hat_cash | 5->-3`; `5 first annual payment | 0 | cash | 100->91`;
+`6 loan fully repaid | 0 | cash | 100->103`; `8 default foreclosure | 0 |
+bid | 30->38`; `9 bondholder annual payout | 0 | bond_cash | 500->494`;
+`9 bondholder annual payout | 0 | cash | 200->204`; `10 default
+re-collateralized | 0 | bond_cash | 500->493`; `12 later annual payment | 0
+| cash | 100->99`; `13 bank spread | 0 | bond_cash | 500->502`; `13 bank
+spread | 0 | cash | 100->101`; `14 foreclosure shortfall | 0 | bond_cash |
+500->492`; `16 recycled capital partly covers new loan | 0 |
+fresh_bond_cash | 500->505`; `16 recycled capital partly covers new loan |
+0 | recycled | 10->5`.
+
+War-profits-tax (16): `0 below 25% | 0 | collected | 1000->1009`; `0 below
+25% | 0 | land_value | 5000->5005`; `0 below 25% | 1 | collected |
+50000->49998`; `0 below 25% | 1 | land_value | 5697->5689`; `1 rate bands
+| 0 | land_value | 5698->5702`; `1 rate bands | 1 | land_value |
+9115->9113`; `1 rate bands | 3 | land_value | 13673->13666`; `1 rate bands
+| 6 | land_value | 18232->18234`; `1 rate bands | 7 | land_value |
+22789->22786`; `1 rate bands | 8 | land_value | 22790->22797`; `2 counter
+resets | 0 | land_value | 10000->10003`; `3 buying land | 0 | collected |
+500->499`; `6 legal entity | 0 | collected | 500->506`; `7 selling below
+25% | 0 | collected | 1000->992`; `8 multiple players | 0 | land_value |
+6000->5992`; `9 mortgage tax bill | 0 | collected | 90->84`.
+
+The development-loans count is exactly 16 (not 17); no tuple is duplicated.
