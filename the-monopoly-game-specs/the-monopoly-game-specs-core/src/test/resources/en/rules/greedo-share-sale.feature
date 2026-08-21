@@ -72,6 +72,7 @@ Feature: selling legal-entity shares to avoid bankruptcy
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
     Then pawn "dog" is bankrupt
     And pawn "dog" holds no shares of any legal entity
+    And no one wins the Pink Realty share
 
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance |
