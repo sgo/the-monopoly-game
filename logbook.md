@@ -43765,3 +43765,34 @@ scenario, example, key, old/new value, and a mechanism-specific justification
 (auction ceiling, reserve/threshold bucket, strategy vocabulary) rather than
 any broad numeric/case exemption. Verify approved entries skip and unlisted
 mutations still execute; do not alter Gherkin content.
+
+## 2026-08-21T17:20:00+02:00 — coder processes round-four policy handoff
+
+Complete handoff received:
+
+```text
+id: 20260821T145227Z_000378_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: ed6b16ffdf
+created_at: 2026-08-21T14:52:27.875462Z
+enqueued_at: 2026-08-21T14:52:28.756297Z
+task: acceptance-mutation-equivalence-filter
+dequeued_at: 2026-08-21T14:52:33.790414Z
+
+Re-read your role and constitution.
+merge_and_process architect ed6b16ffdf
+```
+
+Merged `ed6b16ffdf` and used the authoritative
+`acceptance/round-four-survivors.md` report. Added all 100 approved tuples to
+`acceptance/equivalent-mutations.edn`, excluding the two pruned
+`distressed-sale-1` strategy rows. Justifications are mechanism-specific:
+strategy vocabulary, auction-ceiling bucket, or reserve/threshold bucket.
+Validation reports 123 total policy entries, exactly 100 round-four entries,
+and an exact set match with all 100 report tuples. No Gherkin content was
+changed.
