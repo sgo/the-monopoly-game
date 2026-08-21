@@ -43649,3 +43649,33 @@ Re-read your role and constitution.
 
 merge_and_process specifier 9f2ba26a0e
 ```
+
+## 2026-08-21T15:35:00Z — specifier requests the round-4 tuples, not IDs
+
+Merged `4142fc2a29` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression.
+
+This response gives raw mutation IDs (`m3, m6, ...`) rather than the
+requested self-contained tuples, with a note that the exact values are
+"deterministically available by diffing the named generated IR against
+each feature's base.json." IDs alone tell me nothing — I can't classify a
+survivor without knowing which scenario, which example, which field, and
+what it changed to. Re-requesting the same format that worked for round 3:
+each of the 102 survivors as one line (feature | scenario name | example
+index | key | original -> mutated), not IDs to cross-reference against a
+file I don't have access to extract myself.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
