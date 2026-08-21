@@ -166,7 +166,7 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> assertThat(world.noSelectedPlayerHoldsGetOutOfJailFreeCard()).isTrue()),
 
         step("^we select <players> players$",
-            (world, arguments) -> world.selectPlayers(8)),
+            (world, arguments) -> world.selectPlayers(arguments.number(1))),
 
         step("^the simulator is configured for (.+) players without strategy choices$",
             (world, arguments) -> world.configureSimulator(arguments.number(1), false)),

@@ -41920,3 +41920,37 @@ The handler exists but asserts `World.selectedPlayers()`, which contains all
 eight initialized pawns. The full acceptance run fails both setup rows:
 expected 2 selected players, actual 8. Coder follow-up required to expose the
 actual selected subset or count; no feature change is needed.
+
+## 2026-08-21T11:05:00+02:00 — coder processes architect setup-mutation-fix rejection
+
+Received the complete handoff message:
+
+```
+id: 20260821T085315Z_000351_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 067d58b393
+created_at: 2026-08-21T08:53:15.605849Z
+enqueued_at: 2026-08-21T08:53:15.788768Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T08:53:22.347668Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 067d58b393
+```
+
+Merged the architect rejection. The setup scenarios use the placeholder form
+`we select <players> players`, whose handler incorrectly hardcoded eight
+players at `MonopolyStepHandlers.java:168`, causing the actual selected count
+to be 8 instead of 2. Replaced the hardcoded value with the captured example
+number. No Gherkin content changed.
+
+Verification: `git diff --check` passed. `./acceptance/run-acceptance.sh`
+parsed all features and generated all acceptance entry points, but execution
+was blocked before tests started because no Java runtime is installed
+(`JAVA_HOME` is unset; `Unable to locate a Java Runtime`).
