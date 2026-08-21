@@ -42129,3 +42129,55 @@ merge_and_process coder 6442d0aca2
 ```
 
 Returned the unified outline-capture fix to the architect.
+
+## 2026-08-21T11:50:00+02:00 — coder processes architect duplicate-handler review
+
+Received the complete handoff message:
+
+```
+id: 20260821T091532Z_000354_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: c39bbd0281
+created_at: 2026-08-21T09:15:32.111813Z
+enqueued_at: 2026-08-21T09:15:33.034141Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T09:15:38.523145Z
+
+Re-read your role and constitution.
+
+merge_and_process architect c39bbd0281
+```
+
+Merged the architect review. The generalized selection handler makes the
+setup outline pass 2/2, but the obsolete `JournalStepHandlers` entry at line
+99 duplicates the same raw outline pattern and causes five legal-entity
+acceptance ambiguities. Removed only that duplicate; no Gherkin content
+changed. Full acceptance verification is required next, with the expected
+result of 908 generated tests passing.
+
+Verification: `git diff --check` passed. `./acceptance/run-acceptance.sh`
+parsed all features and generated all acceptance entry points, but execution
+was blocked before tests started because this environment has no Java runtime
+(`JAVA_HOME` is unset; `Unable to locate a Java Runtime`).
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: setup-mutation-fix
+commit: c39bbd0281
+
+Re-read your role and constitution.
+
+merge_and_process coder c39bbd0281
+```
+
+The duplicate `JournalStepHandlers` selection entry is removed and the state
+is returned to the architect for Java-enabled full acceptance verification.
