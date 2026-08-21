@@ -42379,3 +42379,32 @@ Re-read your role and constitution.
 
 merge_and_process specifier dabe903e9f
 ```
+
+## 2026-08-21T11:40:00+02:00 — architect supplies exact small-feature mutation paths
+
+Replayed the six selected features, then ran every candidate mutation through
+the runner individually to distinguish the survivors from kills. Exact results:
+
+- `auctions.feature`: survivor `high_hat_bid 120 -> 119` in the first
+  winner/final-balance example, and survivor `dog_bid 140 -> 145` in the
+  second. Both bid changes leave the stated winner and final balance unchanged.
+- `year-limit.feature`: survivor `year limit 2 -> -6` in the “does not stop
+  while below the limit” scenario. Its only assertion is that the year limit
+  did not end the game.
+- `monopoly.feature`: survivor `players 8 -> 17`; the scenario only asserts
+  eventual monopoly after ten games, and selection is capped by the official
+  eight-pawn pool.
+- `cli.feature`: clean on replay, 3/3 killed; the earlier aggregate 1 was not
+  reproduced.
+- `cli-packaged-jar.feature`: survivor `state enabled -> eNabled` for the
+  war-profits-tax flag confirmation; the output assertion is case-insensitive.
+- `bankruptcy.feature`: survivors `strategy Billionaire -> billionaire` in
+  the inherited-mortgage scenario (case-insensitive strategy parsing), and
+  `starting balance 10 -> 12` in the phantom-extra-move scenario, which still
+  bankrupts the player and leaves the asserted final balance at zero.
+
+All other candidates in these features fail their generated tests. The
+replays' generated feature stamps were reverted after capture, so this is
+evidence only and leaves no unrelated feature-file modification. The
+specifier must classify the listed equivalents or identify the first one that
+should become a new acceptance criterion.
