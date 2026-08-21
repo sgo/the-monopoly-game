@@ -92,7 +92,9 @@ for feature in "${FEATURE_FILES[@]}"; do
   if [[ "$feature" == "specs-cli:en/cli-packaged-jar.feature" ]]; then
     workers=1
   fi
-  (cd "$APS" && bb gherkin-mutator \
+  (cd "$APS" && bb "$ROOT/acceptance/equivalent-mutation-mutator.bb" \
+    --project-root "$ROOT" \
+    --feature-id "$feature" \
     --feature "$feature_file" \
     --work-dir "$work_dir" \
     --generated-dir "$generated" \

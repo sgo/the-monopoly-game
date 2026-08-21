@@ -1696,13 +1696,11 @@ public class World {
   public void packageCli() {
     Path root = PomInspector.repoRoot("the-monopoly-game-cli");
     runProcess(root, "mvn", "-B", "-Dmaven.repo.local=tmp/m2", "-pl", "the-monopoly-game-cli",
-        "-am", "package", "-DskipTests");
+        "-am", "clean", "package", "-DskipTests");
   }
 
   public void runPackagedCli(String flag) {
-    Path root = PomInspector.repoRoot("the-monopoly-game-cli");
-    Path jar = root.resolve("the-monopoly-game-cli").resolve("target")
-        .resolve("the-monopoly-game-cli-0.6.0-SNAPSHOT.jar");
+    Path jar = packagedCliJar();
     ProcessBuilder builder = new ProcessBuilder("java", "-jar", jar.toString(), flag);
     try {
       packagedCliProcess = builder.redirectErrorStream(true).start();
@@ -1715,9 +1713,7 @@ public class World {
   }
 
   public void startPackagedCli(String rawArguments) {
-    Path root = PomInspector.repoRoot("the-monopoly-game-cli");
-    Path jar = root.resolve("the-monopoly-game-cli").resolve("target")
-        .resolve("the-monopoly-game-cli-0.6.0-SNAPSHOT.jar");
+    Path jar = packagedCliJar();
     try {
       packagedCliOutputBuffer = new StringBuilder();
       packagedCliProcess = new ProcessBuilder(
@@ -1742,30 +1738,28 @@ public class World {
     }
   }
 
-  public void assertPackagedCliStalemateTrading(String state) {
+  private void assertPackagedCliState(String marker, String description, String state) {
     long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
     while (System.nanoTime() < deadline) {
       synchronized (packagedCliOutputBuffer) {
-        if (packagedCliOutputBuffer.toString().contains("Stalemate trading enabled")
-            == state.equals("enabled")) return;
+        String output = packagedCliOutputBuffer.toString();
+        if (output.contains(marker)) {
+          if (state.equals("enabled")) return;
+          throw new AssertionError("Packaged jar output confirmed " + description + " enabled, expected " + state + ".");
+        }
       }
       LockSupport.parkNanos(5_000_000);
     }
-    throw new AssertionError("Packaged jar output did not confirm stalemate trading is " + state
+    throw new AssertionError("Packaged jar output did not confirm " + description + " is " + state
         + ": " + packagedCliOutputBuffer);
   }
 
+  public void assertPackagedCliStalemateTrading(String state) {
+    assertPackagedCliState("Stalemate trading enabled", "stalemate trading", state);
+  }
+
   public void assertPackagedCliLegalEntity(String state) {
-    long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
-    while (System.nanoTime() < deadline) {
-      synchronized (packagedCliOutputBuffer) {
-        if (packagedCliOutputBuffer.toString().contains("Legal entity trading enabled")
-            == state.equals("enabled")) return;
-      }
-      LockSupport.parkNanos(5_000_000);
-    }
-    throw new AssertionError("Packaged jar output did not confirm legal entity trading is " + state
-        + ": " + packagedCliOutputBuffer);
+    assertPackagedCliState("Legal entity trading enabled", "legal entity trading", state);
   }
 
   public void assertPackagedCliYearLimit(int yearLimit) {
@@ -1781,37 +1775,22 @@ public class World {
   }
 
   public void assertPackagedCliDevelopmentLoans(String state) {
-    long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
-    while (System.nanoTime() < deadline) {
-      synchronized (packagedCliOutputBuffer) {
-        if (packagedCliOutputBuffer.toString().contains("Development loans enabled")
-            == state.equals("enabled")) return;
-      }
-      LockSupport.parkNanos(5_000_000);
-    }
-    throw new AssertionError("Packaged jar output did not confirm development loans are " + state
-        + ": " + packagedCliOutputBuffer);
+    assertPackagedCliState("Development loans enabled", "development loans", state);
   }
 
   public void assertPackagedCliFullDrawDevelopmentLoans(String state) {
-    long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
-    while (System.nanoTime() < deadline) {
-      synchronized (packagedCliOutputBuffer) {
-        if (packagedCliOutputBuffer.toString().contains("Full-draw development loans enabled")
-            == state.equals("enabled")) return;
-      }
-      LockSupport.parkNanos(5_000_000);
-    }
-    throw new AssertionError("Packaged jar output did not confirm full-draw development loans are " + state
-        + ": " + packagedCliOutputBuffer);
+    assertPackagedCliState("Full-draw development loans enabled", "full-draw development loans", state);
   }
 
   public void assertPackagedCliWarProfitsTax(String state) {
     long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
     while (System.nanoTime() < deadline) {
       synchronized (packagedCliOutputBuffer) {
-        if (packagedCliOutputBuffer.toString().contains("War profits tax enabled")
-            == state.equals("enabled")) return;
+        String output = packagedCliOutputBuffer.toString();
+        if (output.contains("War profits tax enabled")) {
+          if (state.equals("enabled")) return;
+          throw new AssertionError("Packaged jar output confirmed war profits tax enabled, expected " + state + ".");
+        }
       }
       LockSupport.parkNanos(5_000_000);
     }
@@ -1820,16 +1799,7 @@ public class World {
   }
 
   public void assertPackagedCliAssetRichOpening(String state) {
-    long deadline = System.nanoTime() + Duration.ofSeconds(5).toNanos();
-    while (System.nanoTime() < deadline) {
-      synchronized (packagedCliOutputBuffer) {
-        if (packagedCliOutputBuffer.toString().contains("Asset-rich opening enabled")
-            == state.equals("enabled")) return;
-      }
-      LockSupport.parkNanos(5_000_000);
-    }
-    throw new AssertionError("Packaged jar output did not confirm asset-rich opening is " + state
-        + ": " + packagedCliOutputBuffer);
+    assertPackagedCliState("Asset-rich opening enabled", "asset-rich opening", state);
   }
 
   public void stopPackagedCli() {
@@ -1855,6 +1825,19 @@ public class World {
   public void assertPackagedCliUsage() {
     if (packagedCliOutput == null || !packagedCliOutput.contains("Usage: simulator"))
       throw new AssertionError("Packaged jar did not print simulator usage: " + packagedCliOutput);
+  }
+
+  private static Path packagedCliJar() {
+    Path target = PomInspector.repoRoot("the-monopoly-game-cli")
+        .resolve("the-monopoly-game-cli").resolve("target");
+    try (Stream<Path> files = Files.list(target)) {
+      return files.filter(path -> path.getFileName().toString().matches("the-monopoly-game-cli-[^/]+\\.jar"))
+          .filter(path -> !path.getFileName().toString().matches(".*-(original|tests|sources|javadoc)\\.jar"))
+          .findFirst()
+          .orElseThrow(() -> new AssertionError("No packaged simulator jar found in " + target));
+    } catch (IOException cause) {
+      throw new AssertionError("Could not inspect packaged simulator jars in " + target, cause);
+    }
   }
 
   public void assertReadmeUsageFlag(String flag) {

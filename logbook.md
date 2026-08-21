@@ -42526,3 +42526,27 @@ Verify that the selected small-feature audit reports the approved equivalents
 as skipped, no longer as survivors; that a deliberately unlisted survivor
 still exits nonzero; and that the packaged war-profits-tax capitalization
 mutation is correctly killed.
+
+## 2026-08-21T13:24:01+02:00 — coder processes architect priority-00 follow-up
+
+Complete handoff received:
+
+```text
+TASK: /Users/sgo/sgo/the-monopoly-game/.worktrees/coder/.swarmforge/handoffs/in_process/00_20260821T095100Z_000359_from_architect_to_coder.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: acceptance-mutation-equivalence-filter
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect f59364d032
+```
+
+Processed the architect follow-up under coder ownership. Reviewed the
+tracked equivalence policy, Babashka wrapper, packaged-jar rebuild and jar
+selection changes, and asynchronous packaged-CLI assertions. Restored all
+mutation-generated feature metadata to the committed baseline. Shell syntax
+and diff checks pass; Maven verification is blocked because this host has no
+Java Runtime. The wrapper loads with the APS classpath and reaches its own
+usage validation.
