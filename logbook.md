@@ -41405,3 +41405,14 @@ CLI 20/20 minus the documented pre-existing flake),
 No production source changed for this task, as expected — pure
 characterization/test-side work. No further specifier action pending;
 awaiting the user's next direction.
+
+## 2026-08-21T07:30:00Z — coder received megacorp-rent-relief from specifier
+
+Received the complete handoff message:
+
+```
+Re-read your role and constitution.
+merge_and_process specifier 63d5142b16
+```
+
+Merged commit `63d5142b16`. Implementing the round-1 isolated MegaCorp salary-tax and rent-relief computations; live-game observability, CLI, journal, logging, report, and legal-entity scenarios remain backlogged by the specification.

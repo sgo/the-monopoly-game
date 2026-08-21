@@ -20,7 +20,9 @@ import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
 import the.monopoly.game.rules.LegalEntity;
+import the.monopoly.game.rules.MegacorpSalaryTax;
 import the.monopoly.game.rules.MonopolyBuyout;
+import the.monopoly.game.rules.RentRelief;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Stalemate;
 import the.monopoly.game.rules.Turn;
@@ -119,7 +121,10 @@ public class World {
   private final Map<String, Money> pawnLandWorthRent = new HashMap<>();
   private final Map<String, Money> pawnCollectedRent = new HashMap<>();
   private final Map<String, Money> lastWarProfitsTaxPaid = new HashMap<>();
+  private final Map<String, Money> lastMegacorpTaxPaid = new HashMap<>();
   private Money governmentBalance = Money.ZERO;
+  private RentRelief rentRelief;
+  private MegacorpSalaryTax megacorpSalaryTax;
   private int gameMaxYears = -1;
   private int simulatorMaxYears = -1;
   private Entry selectedEvent;
@@ -137,6 +142,8 @@ public class World {
   public void selectRuleSet(Rule.Set.Type type) {
     ruleSet = type.create();
     developmentLoanBook = null;
+    rentRelief = null;
+    megacorpSalaryTax = null;
     jail = new Jail(ruleSet);
   }
 
@@ -829,8 +836,33 @@ public class World {
     pawnCollectedRent.put(pawnName, value);
   }
 
+  public void enableRentRelief() {
+    rentRelief = new RentRelief(ruleSet.bank());
+    megacorpSalaryTax = new MegacorpSalaryTax(ruleSet.bank());
+  }
+
+  public void setGovernmentAccountBalance(Money amount) {
+    if (rentRelief == null) enableRentRelief();
+    rentRelief.setGovernmentBalance(amount);
+  }
+
+  public void collectSalary(String pawnName, Money salary) {
+    if (megacorpSalaryTax == null) enableRentRelief();
+    Money tax = megacorpSalaryTax.collect(pawn(pawnName), salary);
+    lastMegacorpTaxPaid.put(pawnName, tax);
+  }
+
+  public boolean paysMegacorpTax(Money amount) {
+    return lastMegacorpTaxPaid.values().stream().anyMatch(amount::equals);
+  }
+
+  public void payRent(String tenantName, String landlordName, Money rent) {
+    if (rentRelief == null) enableRentRelief();
+    rentRelief.pay(pawn(tenantName), pawn(landlordName), rent);
+  }
+
   public Money governmentAccountBalance() {
-    return governmentBalance;
+    return rentRelief == null ? governmentBalance : rentRelief.governmentBalance();
   }
 
   public boolean paysWarProfitsTax(String pawnName, Money amount) {
