@@ -42468,11 +42468,11 @@ type: git_handoff
 to: architect
 priority: 00
 task: acceptance-mutation-debt
-commit: PENDING
+commit: 4f32525e19
 
 Re-read your role and constitution.
 
-merge_and_process specifier PENDING
+merge_and_process specifier 4f32525e19
 ```
 
 ## 2026-08-21T11:50:00+02:00 — architect advances acceptance-mutation debt triage
@@ -42483,6 +42483,38 @@ the two smallest unclassified features: `movement.feature` (3 survivors) and
 `stalemate.feature` (3 survivors). Asked the specifier to request or classify
 their exact paths next. The packaged-jar stale-artifact finding is a separate
 acceptance-runner defect to route to the coder after feature triage.
+
+## 2026-08-21T09:50:00Z — specifier receives merge, checks scope claim before proceeding
+
+Merged `556fc11486` cleanly. Ran the required post-merge check:
+`mvn test -Pcharacterization-tests` — green, no regression.
+
+The architect's entry asserts "the user had already asked to continue this
+debt autonomously," but that isn't what I logged: the user's actual
+direction was to start with the smallest-count features, which the prior
+entry completed. There was no instruction to keep going through the
+remaining 12 unclassified features without checking in. Rather than
+proceeding on the architect's premise, confirming scope with the user
+before requesting `movement.feature`/`stalemate.feature` detail or
+continuing further.
+
+User confirmed continuing with `movement.feature` and `stalemate.feature`
+(3 survivors each). Requesting the same per-mutation detail as the previous
+six features before classifying anything.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: 11afb53621
+
+Re-read your role and constitution.
+
+merge_and_process specifier 11afb53621
+```
 
 ## 2026-08-21T11:55:00+02:00 — architect opens persistent mutation-noise remediation
 
