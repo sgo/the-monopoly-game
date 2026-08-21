@@ -39247,6 +39247,34 @@ merge_and_process refactorer e768e267cc
 
 Recorded receipt; merging the named refactorer commit and beginning the
 architectural review for `megacorp-rent-relief`.
+
+## 2026-08-21T08:14:06Z — architect completes megacorp-rent-relief review
+
+Reviewed `e768e267cc` for UI/core separation, dependency direction,
+encapsulation, and local quality. The new `GovernmentAccount` is an
+appropriate domain boundary: salary tax, rent relief, and war-profits tax
+share one bank-owned account without exposing its representation to the
+acceptance adapter. No architectural change was warranted.
+
+Verification:
+
+- Domain unit suite: 419/419 pass.
+- Domain property suite (separate profile): 28/28 pass.
+- Differential mutation, one file at a time: RentRelief 2/2 killed;
+  WarProfitsTaxBook 1/1 killed; GovernmentAccount and MegacorpSalaryTax have
+  no supported sites. No uncovered sites.
+- DRY: no duplicate candidates across the changed production rules.
+- Scoped soft Gherkin mutation: megacorp-salary-tax 7/7 killed; rent-relief's
+  six over-cap/boundary mutations 6/6 killed. Its two surviving cap-scenario
+  `government_start` mutations are intentionally equivalent: the scenario
+  states that a $200 rent never spends government money regardless of that
+  balance.
+- Full acceptance pipeline: 908/908 pass.
+
+The attempted whole-pipeline soft mutation run was stopped after confirming
+it was spending several minutes in pre-existing unrelated scenarios with
+known survivors; its unrelated partial manifests were discarded. Only the
+task's approved mutation manifests are retained.
 ## 2026-08-20T20:50:00Z — architect closes first-tax survivor phase
 
 Processed refactorer handoff `000186` at `8d8fe20c42` and merged it. Independent
