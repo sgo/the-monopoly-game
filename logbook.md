@@ -42079,6 +42079,19 @@ Required coder correction: retain the single generalized capturing handler in
 Run the full acceptance pipeline; expected result is all 908 generated tests
 passing.
 
+## 2026-08-21T11:19:23+02:00 — architect verifies setup-mutation-fix complete
+
+Merged coder commit `33da6ceca2`: selection now has one generalized,
+capturing handler in `MonopolyStepHandlers`; the obsolete
+`JournalStepHandlers` duplicate is removed. The targeted generated setup
+suite passes 2/2 and the full acceptance pipeline passes 908/908.
+
+Targeted soft Gherkin acceptance mutation of `en/rules/setup.feature` passes
+6/6: both player-count mutations (`2 -> 11`, `2 -> -4`), both expected-count
+mutations, the starting balance mutation, and the starting position mutation
+are all killed. The runner refreshed the feature's tracked mutation manifest
+and stamp with this evidence.
+
 ## 2026-08-21T11:35:00+02:00 — coder processes architect setup outline diagnosis
 
 Received the complete handoff message:
