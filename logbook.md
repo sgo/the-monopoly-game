@@ -42926,3 +42926,82 @@ Merged `374a527eaf` and added its two exact rent-relief policy entries:
 scenario. Both entries use the approved rationale that the relief cap never
 engages at $200. EDN parsing and diff checks pass; acceptance mutation remains
 architect-owned and is returned for focused verification.
+
+## 2026-08-21T16:06:00+02:00 — coder closes superseded architect queue items
+
+The following complete handoff messages were already integrated and were
+closed without duplicate merges:
+
+```text
+id: 20260821T095100Z_000359_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: f59364d032
+created_at: 2026-08-21T09:51:00.132910Z
+enqueued_at: 2026-08-21T09:51:00.368683Z
+task: acceptance-mutation-equivalence-filter
+dequeued_at: 2026-08-21T09:51:06.510424Z
+
+Re-read your role and constitution.
+merge_and_process architect f59364d032
+```
+
+```text
+id: 20260821T095938Z_000361_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 27f19f419c
+created_at: 2026-08-21T09:59:38.987978Z
+enqueued_at: 2026-08-21T09:59:39.513901Z
+task: acceptance-mutation-equivalence-filter
+
+Re-read your role and constitution.
+merge_and_process architect 27f19f419c
+```
+
+```text
+id: 20260821T112702Z_000362_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 9a5fcd8fab
+created_at: 2026-08-21T11:27:02.949971Z
+enqueued_at: 2026-08-21T11:27:03.390760Z
+task: acceptance-mutation-equivalence-filter
+
+Re-read your role and constitution.
+merge_and_process architect 9a5fcd8fab
+```
+
+```text
+id: 20260821T120554Z_000365_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 374a527eaf
+created_at: 2026-08-21T12:05:54.746527Z
+enqueued_at: 2026-08-21T12:05:55.223552Z
+task: acceptance-mutation-equivalence-filter
+
+Re-read your role and constitution.
+merge_and_process architect 374a527eaf
+```
+
+All four commits are ancestors of the current coder `HEAD`; the corresponding
+queue files are superseded duplicates and are safe to close. The newer
+`53f49aa3bc` and `49c305b6dc` handoffs remain open because their commits are
+not integrated and require separate coder processing.
