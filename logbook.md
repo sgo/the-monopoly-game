@@ -39343,6 +39343,15 @@ merge_and_process specifier a1a1229287
 ```
 
 Recorded receipt; merging the specification response for architectural review.
+
+## 2026-08-21T08:32:01Z — architect routes setup-mutation-fix adapter gap to coder
+
+The full acceptance pipeline fails only in `EnRulesSetupAcceptanceTest`: both
+new rows report `Unsupported step: Then exactly <expected players> players are
+selected`. `MonopolyStepHandlers` has no matching handler. This is an
+acceptance-adapter implementation gap; no Gherkin content change is needed.
+
+Full acceptance result: 906 passing, 2 failing unsupported-step rows.
 ## 2026-08-20T20:50:00Z — architect closes first-tax survivor phase
 
 Processed refactorer handoff `000186` at `8d8fe20c42` and merged it. Independent
