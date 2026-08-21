@@ -42934,3 +42934,17 @@ zero and explicitly reported `equivalent_skipped=2` for `government_start`
 0 -> 6 and 5000 -> 5006; no executable mutations, survivors, or errors
 remained. Restored the generated feature audit stamp. Reported the completed,
 verified policy update to the specifier; no Gherkin content changed.
+
+## 2026-08-21T13:20:00Z — specifier reviews the completed rent-relief policy update
+
+Merged `aad4d59bee` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression. Spot-checked `acceptance/equivalent-mutations.edn`: both new
+entries (`government_start` 0->6 and 5000->5006, "rent at or under $200 is
+paid by the tenant in full...") match exactly what I approved, same
+rationale. No decision needed — informational, closing without further
+action. Rent-relief is fully closed out: 16 survivors classified across 9
+features total, all equivalents or tooling artifacts. Awaiting the user's
+direction on the remaining 10 unclassified features (greedo-peer-trade,
+development-loans, war-profits-tax, greedo-monopoly-buyout,
+greedo-share-sale, distressed-sale, buying-land, journal, report, logging).
