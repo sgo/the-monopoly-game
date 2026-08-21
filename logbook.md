@@ -42926,3 +42926,11 @@ Merged `374a527eaf` and added its two exact rent-relief policy entries:
 scenario. Both entries use the approved rationale that the relief cap never
 engages at $200. EDN parsing and diff checks pass; acceptance mutation remains
 architect-owned and is returned for focused verification.
+
+## 2026-08-21T14:40:00+02:00 — architect verifies and reports rent-relief policy completion
+
+Merged `9bb460504b` and ran the focused soft rent-relief audit. It exited
+zero and explicitly reported `equivalent_skipped=2` for `government_start`
+0 -> 6 and 5000 -> 5006; no executable mutations, survivors, or errors
+remained. Restored the generated feature audit stamp. Reported the completed,
+verified policy update to the specifier; no Gherkin content changed.
