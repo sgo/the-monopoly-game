@@ -43044,3 +43044,23 @@ Re-read your role and constitution.
 
 merge_and_process specifier e1e326bb75
 ```
+
+## 2026-08-21T13:40:00Z — specifier starts round 2 (development-loans + war-profits-tax)
+
+User approved continuing. Requesting exact per-mutation detail for
+`development-loans.feature`'s 16 survivors and `war-profits-tax.feature`'s
+16 survivors before classifying anything.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
