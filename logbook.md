@@ -42408,3 +42408,69 @@ replays' generated feature stamps were reverted after capture, so this is
 evidence only and leaves no unrelated feature-file modification. The
 specifier must classify the listed equivalents or identify the first one that
 should become a new acceptance criterion.
+
+## 2026-08-21T09:47:00Z — specifier classifies the six-smallest-feature survivors
+
+Merged `391d872134` cleanly. Investigated each of the 8 survivors against the
+real code, not just the architect's characterization:
+
+- `auctions.feature` (`high_hat_bid 120->119`, `dog_bid 140->145`): equivalent.
+  The feature's own header comment documents the mechanic — an ascending $5
+  auction where "will bid $X" only fixes a ceiling, and the price paid is
+  "often below any bidder's own ceiling." In both scenarios the settling
+  price is set entirely by the *losing* bidder's ceiling (90 and 120
+  respectively); the winner's ceiling only needs to clear that price by one
+  $5 step, so any value comfortably above it is interchangeable by design.
+- `year-limit.feature` (`year limit 2->-6`): equivalent. Confirmed in
+  `Game.java:317` (`yearLimitJustReached`): `maxYears <= 0` is an explicit,
+  documented "unlimited" sentinel, and `year-limit-3` already has a
+  dedicated scenario for exactly that default-unlimited behavior. `-6` isn't
+  an under-tested boundary, it's the same disabled state as `0` or any other
+  non-positive value, by design.
+- `monopoly.feature` (`players 8->17`): equivalent. Confirmed in
+  `Player.Pool.select`/`stream()`: the official pawn pool is hard-capped at
+  `max` (8) regardless of what's requested, so 8 and 17 select the identical
+  real player set. This isn't the same gap `setup.feature` had (nothing
+  asserted the resulting count at all, for any value including valid ones);
+  here the requested value is already at the pool's ceiling, so no count
+  assertion could distinguish 8 from 17 in the first place.
+- `cli.feature`: no action — not reproduced, 3/3 killed on replay.
+- `cli-packaged-jar.feature` (`enabled->eNabled`, cli-jar-10): not a new
+  finding. This is the identical war-profits-tax packaged-jar survivor from
+  2026-08-20, already jointly diagnosed with the architect as a
+  mutation-runner/stale-jar tooling artifact (`assertPackagedCliWarProfitsTax`
+  uses a plain, case-sensitive `state.equals("enabled")`, confirmed just now
+  by rereading `World.java:1809` — the assertion logic itself is fine).
+  Recommending the architect's mutation runner rebuild the packaged jar
+  before each packaged-jar mutation cycle, or exclude that suite from soft
+  audits until it does, so this doesn't keep resurfacing as apparent debt.
+- `bankruptcy.feature` (`strategy Billionaire->billionaire`): equivalent.
+  Confirmed in `Vocabulary.java:35`: `case "billionaire", "Billionaire" ->
+  new Billionaire()` is a deliberate dual-case match in the test-fixture
+  vocabulary parser, not scenario-level behavior needing a tighter assertion.
+- `bankruptcy.feature` (`starting balance 10->12`, phantom-extra-move
+  scenario): equivalent. The scenario's subject is the phantom-extra-move
+  rule, not a precise bankruptcy threshold; both values are comfortably
+  below what the scripted rent charges demand, so both still bankrupt dog
+  and land the same $0 final balance.
+
+Verdict: all 8 survivors across these 6 features are legitimate equivalents
+or a known tooling artifact — none warrant a Gherkin change. Declining to
+open a remediation task for any of them. The other 12 larger-count features
+from the original audit (movement through logging/report, rent-relief's own
+2, etc.) remain unclassified and are not in scope for this decision; the
+user will direct whether/when to pick those up next.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
