@@ -43221,3 +43221,75 @@ resets | 0 | land_value | 10000->10003`; `3 buying land | 0 | collected |
 6000->5992`; `9 mortgage tax bill | 0 | collected | 90->84`.
 
 The development-loans count is exactly 16 (not 17); no tuple is duplicated.
+
+## 2026-08-21T14:20:00Z — specifier classifies round 2: 30 equivalents, 2 real gaps found and fixed
+
+Merged `120fafeb3c` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression, before and after the fix below.
+
+**War-profits-tax, all 16 equivalent**, every one a "same bucket" case
+already established for this feature: below-25% scenarios (0, 3, 6, 7)
+where `collected` or a below-threshold `land_value` never matters because
+tax is $0 regardless ("no matter how much rent was collected" is the
+literal point of scenario 0); band-interior `land_value` perturbations in
+scenario 1 (examples 0,1,3,6,7,8) and scenario 8 that stay within the same
+band's bounds, so the same rate and tax apply; scenario 2's `land_value`
+staying "high" without crossing a band, irrelevant to its actual point
+(the collected-resets-to-zero rule); and scenario 9's `collected`, where
+the assertion is only "mortgaged, not bankrupt," not an exact dollar
+figure, so a nearby tax bill forces the identical qualitative outcome. One
+(`22790->22797`) pushes land_value past the real board maximum, but the
+domain's `>=` check for the top 100% band still selects the same band and
+rate for a share past the real max.
+
+**Development-loans, 14 of 16 equivalent** — mostly the same two patterns
+already seen elsewhere: comfortable-cash-margin values not testing an
+affordability boundary (scenarios 5,6,9,13,14's `cash`/`bond_cash`
+mutations, none of which are asserted back or close to what's actually
+owed), the full-draw scenario's `cash` (3, both examples — the scenario's
+own point is that the exact shortfall doesn't matter), a background
+"insufficient funds" flag where negative is the same as small-and-positive
+(`4`'s `high_hat_cash 5->-3`), the 80%-cap-blocks-development scenario
+where a bondholder's exact cash headroom is moot once the cap itself
+blocks the loan (`2`), and scenario 16's `recycled` staying in the same
+"partially covers the loan" bucket. Scenario `8`'s `bid 30->38` is the
+sole-bidder ascending-auction-ceiling equivalence already established in
+round 1's `auctions.feature` work — high hat is the only bidder, so they
+win at the land's mortgage value regardless of their stated ceiling.
+
+**The other 2 are a real gap, not equivalents**: scenarios 11 and 15 both
+asserted `Then pawn "high hat"'s account balance is $<bond_cash>` — the
+exact same column that arranged high hat's starting cash
+(`pawn "high hat" has $<bond_cash> to spend`). Confirmed by direct
+inspection (`development-loans.feature:237,244` and `:312,319`): reading
+back the arranging column is tautological — the assertion could never fail
+regardless of what the implementation does, the exact anti-pattern the
+specifier's own Gherkin rules warn against. Neither is an equivalent to
+accept into the policy; it's an acceptance-criteria gap. Fixed directly
+(within specifier authority, pure Gherkin content): added a separate
+`high_hat_ending` column to both scenarios, same value (500) in each
+single-row table, decoupled from `bond_cash`. Committed as `2ff8972`.
+Verified via `gherkin-parser`/`gherkin-ir-dry-checker` (clean; only the
+expected same-step/different-column-name false positives) and re-ran
+`mvn test -Pcharacterization-tests` after the fix — still green.
+
+Verdict: 30 survivors classified as equivalent, 2 were a genuine gap and
+are now fixed. 61 survivors classified in total across 12 features so far.
+Handing back with the fix commit for re-verification (the two corrected
+scenarios need the architect's mutation tooling to confirm they now catch
+a real regression, the same follow-up shape as `setup-mutation-fix`).
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
