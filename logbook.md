@@ -42046,3 +42046,21 @@ merge_and_process coder 5ae122ad4e
 
 Requested concrete failure evidence before making any further implementation
 change.
+
+## 2026-08-21T11:09:16+02:00 — architect isolates setup outline handler defect
+
+Re-ran the generated `EnRulesSetupAcceptanceTest` after recompiling the
+acceptance module. Both setup scenarios fail before selection with
+`IndexOutOfBoundsException: No group 1` at
+`MonopolyStepHandlers.java:169`. The acceptance runtime deliberately matches
+raw outline text (`we select <players> players`) and resolves placeholder
+values only from captured groups. The newly added numeric-only pattern cannot
+match that raw text; the existing placeholder pattern does match but has no
+capturing parentheses while its body asks for `arguments.number(1)`.
+
+Required coder correction: replace the placeholder pattern with a single
+capturing group, for example `^we select (<players>) players$`, and remove the
+redundant numeric-only pattern if it no longer serves a non-outline step.
+Preserve the handler body `world.selectPlayers(arguments.number(1))`. Verify
+the targeted generated setup acceptance test; it must select the example-row
+count (2), rather than relying on the official pool maximum (8).

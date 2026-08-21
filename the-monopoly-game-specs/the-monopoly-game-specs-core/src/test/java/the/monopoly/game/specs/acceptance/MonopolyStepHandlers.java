@@ -131,7 +131,7 @@ public final class MonopolyStepHandlers {
               assertThat(colourGroupOf(space)).isEqualTo(Vocabulary.colour(arguments.text(4)));
             }),
 
-        step("^we select ([0-9]+) players$",
+        step("^we select (" + VALUE + ") players$",
             (world, arguments) -> world.selectPlayers(arguments.number(1))),
 
         step("^the standard game setup$", (world, arguments) -> world.selectStandardGameSetup()),
@@ -164,9 +164,6 @@ public final class MonopolyStepHandlers {
             (world, arguments) -> assertThat(world.cardDecksAreComplete()).isTrue()),
         then("^no selected player holds a Get Out of Jail Free card$",
             (world, arguments) -> assertThat(world.noSelectedPlayerHoldsGetOutOfJailFreeCard()).isTrue()),
-
-        step("^we select <players> players$",
-            (world, arguments) -> world.selectPlayers(arguments.number(1))),
 
         step("^the simulator is configured for (.+) players without strategy choices$",
             (world, arguments) -> world.configureSimulator(arguments.number(1), false)),
