@@ -28,9 +28,8 @@ Feature: selling property to avoid bankruptcy
     And pawn "dog"'s account balance is $<expected_dog_final_balance>
 
     Examples:
-      | strategy | dog_starting_balance | expected_dog_final_balance |
-      | Greedo | 20 | 10 |
-      | Billionaire | 20 | 10 |
+      | dog_starting_balance | expected_dog_final_balance |
+      | 20                    | 10                          |
 
   # distressed-sale-2
   Scenario Outline: a debtor sells a spare property to a peer who offers more than the bank would lend against it
