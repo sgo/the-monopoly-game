@@ -41416,3 +41416,20 @@ merge_and_process specifier 63d5142b16
 ```
 
 Merged commit `63d5142b16`. Implementing the round-1 isolated MegaCorp salary-tax and rent-relief computations; live-game observability, CLI, journal, logging, report, and legal-entity scenarios remain backlogged by the specification.
+
+## 2026-08-21T09:53:00+02:00 — coder sent megacorp-rent-relief handoff to refactorer
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: megacorp-rent-relief
+commit: pending final logbook commit
+
+Re-read your role and constitution.
+merge_and_process coder <final logbook commit>
+```
+
+Summary: implemented the shared government account, 43% MegaCorp salary tax, and all-or-nothing $200 rent relief with focused unit coverage and isolated acceptance steps. Full Maven verification passed with 419 tests and the acceptance pipeline passed with 908 generated tests, all green.
