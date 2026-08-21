@@ -43611,3 +43611,24 @@ Spot-checked both additions:
 No decision needed; closing without further action. 101 survivors remain
 classified across 14 features, with the two real gaps (development-loans
 and greedo-share-sale) now both fixed and verified end-to-end.
+
+## 2026-08-21T15:25:00Z — specifier starts round 4 (distressed-sale + buying-land)
+
+User approved continuing. Requesting exact per-mutation detail for
+`distressed-sale.feature`'s 44 survivors and `buying-land.feature`'s 58
+survivors, in the self-contained tuple format (feature | scenario name |
+example index | key | original -> mutated per line) established in round 3.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
