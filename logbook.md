@@ -42652,6 +42652,21 @@ These must be specific policy entries with the stated justification—not a
 broad exemption for dice values or balances. Add focused verification that
 the exact reviewed mutations report as skipped and that adjacent, unlisted
 mutations still execute and can fail the audit.
+
+## 2026-08-21T12:30:00+02:00 — architect validates delivered filter and reiterates pending seeds
+
+Merged the coder's base implementation as `3b2e4a2`. Contrary to the coder's
+host note, Java 25 is available in this worktree. Ran the focused soft audit:
+`MAVEN_REPO_LOCAL=tmp/m2 APS_HOME=tmp/aps ./acceptance/run-acceptance-mutation.sh
+--level soft en/rules/auctions.feature`. It passed: both approved auction
+entries were explicitly printed as `equivalent_skipped=2`; all six unlisted
+auction mutations executed and were killed (no survivors/errors). This
+validates that the filter is pre-execution and remains narrow.
+
+The delivered policy is based on the first architect handoff and lacks the
+six movement/stalemate entries requested in `27f19f419c`. That later commit
+is now part of this branch. Returned it to the coder under the same task;
+completion still requires those exact seeds and their focused verification.
 ## 2026-08-21T13:24:01+02:00 — coder processes architect priority-00 follow-up
 
 Complete handoff received:
