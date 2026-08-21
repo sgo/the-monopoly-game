@@ -43105,3 +43105,38 @@ War-profits-tax survivor deltas are: `collected` 1000->1009, 50000->49998,
 22789->22786, 22790->22797, 10000->10003, 6000->5992. No Gherkin content
 was changed; generated audit metadata is restored before committing. These
 are returned to the specifier for requirements-level classification.
+
+## 2026-08-21T13:52:00Z — specifier requests exact scenario/example mapping for round 2
+
+Merged `2e2db6cee7` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression.
+
+Unlike the previous rounds, this evidence gives value deltas only, not
+which scenario/example each belongs to. That ambiguity is real here:
+`war-profits-tax.feature` has at least three different scenarios with a
+literal `collected: $1000` (war-profits-tax-2, -4, -5), each at a
+different ownership-share band, so the same delta shape doesn't imply the
+same reasoning everywhere — a `collected` mutation is trivially irrelevant
+in a below-25%-band scenario (tax is $0 regardless) but would NOT be
+equivalent in a 100%-rate-band scenario, where the asserted tax is
+`collected`'s own column and a real implementation should track the
+mutated value (a discrepancy there would mean the mutation should have been
+killed, not that it's an equivalent to accept). I won't guess the mapping
+from value-matching alone with this many candidates. Requesting the
+scenario name and example index for each of the 16+16 deltas before
+classifying anything.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
