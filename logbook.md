@@ -41913,3 +41913,10 @@ merge_and_process coder 05b7a200d5
 
 Returned the priority-00 follow-up review state to the architect. No further
 coder-owned implementation changes were required.
+
+## 2026-08-21T08:48:00Z — architect rejects unresolved setup selection follow-up
+
+The handler exists but asserts `World.selectedPlayers()`, which contains all
+eight initialized pawns. The full acceptance run fails both setup rows:
+expected 2 selected players, actual 8. Coder follow-up required to expose the
+actual selected subset or count; no feature change is needed.
