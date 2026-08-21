@@ -1,0 +1,106 @@
+# Round-four soft mutation survivors
+
+Format: feature | scenario name | example index | key | original | mutated.
+
+- distressed-sale | a debtor mortgages a spare property rather than sell houses off a developed monopoly | 0 | strategy | Greedo | greedo
+- distressed-sale | a debtor mortgages a spare property rather than sell houses off a developed monopoly | 1 | strategy | Billionaire | BillionaiRe
+- distressed-sale | a debtor mortgages to the bank instead when a peer's offer does not beat the mortgage value | 0 | high_hat_reserve | 85 | 89
+- distressed-sale | a debtor mortgages to the bank instead when a peer's offer does not beat the mortgage value | 0 | high_hat_starting_balance | 95 | 104
+- distressed-sale | a debtor mortgages to the bank instead when a peer's offer does not beat the mortgage value | 1 | high_hat_reserve | 85 | 81
+- distressed-sale | a debtor mortgages to the bank instead when a peer's offer does not beat the mortgage value | 1 | high_hat_starting_balance | 95 | 89
+- distressed-sale | a debtor sells houses rather than sell a peer the property that would complete their monopoly | 0 | high_hat_starting_balance | 200 | 199
+- distressed-sale | a debtor sells houses rather than sell a peer the property that would complete their monopoly | 1 | high_hat_starting_balance | 200 | 207
+- distressed-sale | a debtor sells to the monopoly-completing opponent anyway when nothing else avoids bankruptcy | 0 | dog_starting_balance | 0 | 3
+- distressed-sale | a debtor sells to the monopoly-completing opponent anyway when nothing else avoids bankruptcy | 0 | high_hat_starting_balance | 200 | 202
+- distressed-sale | a debtor sells to the monopoly-completing opponent anyway when nothing else avoids bankruptcy | 1 | dog_starting_balance | 0 | -2
+- distressed-sale | a debtor sells to the monopoly-completing opponent anyway when nothing else avoids bankruptcy | 1 | high_hat_starting_balance | 200 | 194
+- distressed-sale | a debtor's priority table sells the lowest-priority spare property first, regardless of price | 0 | dog_starting_balance | 40 | 36
+- distressed-sale | a debtor's priority table sells the lowest-priority spare property first, regardless of price | 1 | dog_starting_balance | 40 | 41
+- distressed-sale | a lone buyer's offer for a debtor's only spare property must cover the whole shortfall, not just beat its mortgage value | 0 | dog_starting_balance | 5 | 0
+- distressed-sale | a lone buyer's offer for a debtor's only spare property must cover the whole shortfall, not just beat its mortgage value | 0 | high_hat_starting_balance | 92 | 87
+- distressed-sale | a lone buyer's offer for a debtor's only spare property must cover the whole shortfall, not just beat its mortgage value | 1 | strategy | Billionaire | billionaire
+- distressed-sale | a buyer only needs to beat the mortgage value when the debtor has another property to cover the rest | 0 | high_hat_starting_balance | 92 | 100
+- distressed-sale | an ascending auction's winning bid does not need to cover the whole debt alone; the rest is mortgaged separately | 1 | strategy | Billionaire | billionaire
+- distressed-sale | a buyer declines an affordable offer for a property that holds no value for them | 0 | dog_starting_balance | 0 | -9
+- distressed-sale | a buyer declines an affordable offer for a property that holds no value for them | 0 | high_hat_starting_balance | 1000 | 1007
+- distressed-sale | a buyer declines an affordable offer for a property that holds no value for them | 1 | dog_starting_balance | 0 | 8
+- distressed-sale | a buyer declines an affordable offer for a property that holds no value for them | 1 | high_hat_starting_balance | 1000 | 991
+- distressed-sale | a buyer who would win the game by the debtor's bankruptcy declines regardless of the property's value | 0 | dog_starting_balance | 0 | -2
+- distressed-sale | a buyer who would win the game by the debtor's bankruptcy declines regardless of the property's value | 0 | high_hat_starting_balance | 1000 | 1002
+- distressed-sale | a buyer who would win the game by the debtor's bankruptcy declines regardless of the property's value | 1 | dog_starting_balance | 0 | 7
+- distressed-sale | a buyer who would win the game by the debtor's bankruptcy declines regardless of the property's value | 1 | high_hat_starting_balance | 1000 | 991
+- distressed-sale | a bid that completes the bidder's own monopoly is not capped at 35% and can spend the bidder's whole balance when that much is genuinely needed | 1 | high_hat_starting_balance | 100 | 99
+- distressed-sale | the debtor breaks a tied offer by selling to whichever competing buyer has the lower net worth | 0 | dog_starting_balance | 0 | 1
+- distressed-sale | the debtor breaks a tied offer by selling to whichever competing buyer has the lower net worth | 0 | high_hat_starting_balance | 600 | 606
+- distressed-sale | the debtor breaks a tied offer by selling to whichever competing buyer has the lower net worth | 0 | iron_box_starting_balance | 600 | 602
+- distressed-sale | the debtor breaks a tied offer by selling to whichever competing buyer has the lower net worth | 1 | iron_box_starting_balance | 600 | 594
+- distressed-sale | mortgaging the debtor's other spare properties does not re-attempt a property already sold to a peer | 0 | high_hat_starting_balance | 200 | 199
+- distressed-sale | mortgaging the debtor's other spare properties does not re-attempt a property already sold to a peer | 1 | high_hat_starting_balance | 200 | 206
+- distressed-sale | a debtor sells a spare property to a peer despite holding an unrelated developed monopoly, when the sale does not complete the buyer's group | 0 | dog_starting_balance | 0 | 5
+- distressed-sale | a debtor sells a spare property to a peer despite holding an unrelated developed monopoly, when the sale does not complete the buyer's group | 0 | high_hat_starting_balance | 300 | 298
+- distressed-sale | a debtor sells a spare property to a peer despite holding an unrelated developed monopoly, when the sale does not complete the buyer's group | 1 | dog_starting_balance | 0 | -2
+- distressed-sale | a debtor sells a spare property to a peer despite holding an unrelated developed monopoly, when the sale does not complete the buyer's group | 1 | high_hat_starting_balance | 300 | 305
+- distressed-sale | a peer's offer one dollar below the land's mortgage value is declined in favor of mortgaging to the bank | 0 | high_hat_starting_balance | 239 | 231
+- distressed-sale | a peer's offer one dollar below the land's mortgage value is declined in favor of mortgaging to the bank | 1 | high_hat_starting_balance | 239 | 243
+- distressed-sale | a monopoly-completing offer below the land's mortgage value is still declined in favor of mortgaging to the bank | 0 | high_hat_starting_balance | 9 | 17
+- distressed-sale | a monopoly-completing offer below the land's mortgage value is still declined in favor of mortgaging to the bank | 1 | high_hat_starting_balance | 9 | 2
+- distressed-sale | settling a partial-coverage sale actually mortgages the debtor's other collateral instead of crediting its value for free | 0 | dog_starting_balance | 0 | 6
+- distressed-sale | settling a partial-coverage sale actually mortgages the debtor's other collateral instead of crediting its value for free | 0 | high_hat_starting_balance | 286 | 288
+- buying-land | an agreeable player buys affordable unowned land at its listed price | 3 | strategy | Billionaire | billionaire
+- buying-land | an agreeable player declines unowned land they cannot afford | 0 | high_hat_bid | 60 | 53
+- buying-land | an agreeable player declines unowned land they cannot afford | 1 | high_hat_bid | 60 | 69
+- buying-land | an agreeable player keeping a reserve declines land that would dip below it | 0 | high_hat_bid | 60 | 63
+- buying-land | an agreeable player keeping a reserve declines land that would dip below it | 1 | high_hat_bid | 60 | 51
+- buying-land | an agreeable player keeping a reserve declines land that would dip below it | 1 | reserve | 96 | 99
+- buying-land | an agreeable player keeping a reserve buys land that would leave at least the reserve behind | 0 | high_hat_bid | 110 | 102
+- buying-land | an agreeable player keeping a reserve buys land that would leave at least the reserve behind | 1 | high_hat_bid | 110 | 118
+- buying-land | an agreeable player keeping a reserve buys land that would leave at least the reserve behind | 1 | reserve | 100 | 92
+- buying-land | an agreeable player keeping a reserve buys land that would leave at least the reserve behind | 2 | high_hat_bid | 110 | 101
+- buying-land | an agreeable player keeping a reserve buys land that would leave at least the reserve behind | 3 | high_hat_bid | 110 | 116
+- buying-land | an agreeable player keeping a reserve buys land that would leave at least the reserve behind | 3 | reserve | 100 | 91
+- buying-land | an agreeable player keeping a reserve still respects it for a utility nobody owns yet | 0 | high_hat_bid | 150 | 157
+- buying-land | an agreeable player keeping a reserve still respects it for a utility nobody owns yet | 1 | high_hat_bid | 150 | 144
+- buying-land | an agreeable player keeping a reserve still respects it for a utility nobody owns yet | 1 | reserve | 56 | 62
+- buying-land | an agreeable player keeping a reserve buys a utility anyway to deny another player a monopoly on them | 0 | reserve | 100 | 109
+- buying-land | an agreeable player keeping a reserve buys a utility anyway to deny another player a monopoly on them | 1 | reserve | 100 | 98
+- buying-land | an agreeable player keeping a reserve buys a utility anyway to complete their own monopoly on them | 0 | reserve | 100 | 99
+- buying-land | an agreeable player keeping a reserve buys a utility anyway to complete their own monopoly on them | 1 | reserve | 100 | 101
+- buying-land | an agreeable player keeping a reserve buys a utility anyway to complete their own monopoly on them | 1 | strategy | Billionaire | billionaire
+- buying-land | an agreeable player one street away from a colour monopoly reserves that street's price | 0 | high_hat_bid | 100 | 106
+- buying-land | an agreeable player one street away from a colour monopoly reserves that street's price | 1 | high_hat_bid | 100 | 96
+- buying-land | an agreeable player one street away from a colour monopoly still buys land that would leave at least that street's price behind | 0 | high_hat_bid | 200 | 202
+- buying-land | an agreeable player one street away from a colour monopoly still buys land that would leave at least that street's price behind | 1 | high_hat_bid | 200 | 199
+- buying-land | an agreeable player one street away from a colour monopoly still buys land that would leave at least that street's price behind | 1 | strategy | Billionaire | billionaire
+- buying-land | an agreeable player one street away from a colour monopoly still buys land that would leave at least that street's price behind | 2 | high_hat_bid | 200 | 203
+- buying-land | an agreeable player one street away from a colour monopoly still buys land that would leave at least that street's price behind | 3 | high_hat_bid | 200 | 195
+- buying-land | an agreeable player one street away from completing two colour groups reserves only the pricier missing street | 0 | high_hat_bid | 330 | 327
+- buying-land | an agreeable player one street away from completing two colour groups reserves only the pricier missing street | 1 | high_hat_bid | 330 | 333
+- buying-land | an agreeable player one street away from completing two colour groups still declines land that would dip below the pricier missing street | 0 | high_hat_bid | 100 | 101
+- buying-land | an agreeable player one street away from completing two colour groups still declines land that would dip below the pricier missing street | 1 | high_hat_bid | 100 | 98
+- buying-land | an agreeable player falls back to a cheaper reachable missing street within the same priority tier when the pricier one is unaffordable | 0 | high_hat_bid | 60 | 62
+- buying-land | an agreeable player falls back to a cheaper reachable missing street within the same priority tier when the pricier one is unaffordable | 1 | high_hat_bid | 60 | 59
+- buying-land | an agreeable player is not blocked by an unaffordable missing street once a cheaper reachable street in the same priority tier sets the reserve instead | 0 | high_hat_bid | 250 | 255
+- buying-land | an agreeable player is not blocked by an unaffordable missing street once a cheaper reachable street in the same priority tier sets the reserve instead | 1 | high_hat_bid | 250 | 246
+- buying-land | an agreeable player with no reachable near-complete monopoly still respects their configured reserve | 0 | high_hat_bid | 100 | 96
+- buying-land | an agreeable player with no reachable near-complete monopoly still respects their configured reserve | 0 | reserve | 30 | 26
+- buying-land | an agreeable player with no reachable near-complete monopoly still respects their configured reserve | 1 | high_hat_bid | 100 | 106
+- buying-land | an agreeable player with no reachable near-complete monopoly still respects their configured reserve | 1 | reserve | 30 | 31
+- buying-land | an agreeable player with no reachable near-complete monopoly is not blocked by an unaffordable missing street once the configured reserve is small enough | 0 | high_hat_bid | 200 | 197
+- buying-land | an agreeable player with no reachable near-complete monopoly is not blocked by an unaffordable missing street once the configured reserve is small enough | 0 | reserve | 30 | 35
+- buying-land | an agreeable player with no reachable near-complete monopoly is not blocked by an unaffordable missing street once the configured reserve is small enough | 1 | high_hat_bid | 200 | 202
+- buying-land | an agreeable player with no reachable near-complete monopoly is not blocked by an unaffordable missing street once the configured reserve is small enough | 1 | reserve | 30 | 23
+- buying-land | an agreeable player one station away from completing the set reserves that station's price | 0 | high_hat_bid | 100 | 94
+- buying-land | an agreeable player one station away from completing the set reserves that station's price | 1 | high_hat_bid | 100 | 101
+- buying-land | an agreeable player reserves a middle-priority colour group's missing street over a pricier missing station in the lowest tier | 0 | high_hat_bid | 100 | 107
+- buying-land | an agreeable player reserves a middle-priority colour group's missing street over a pricier missing station in the lowest tier | 1 | high_hat_bid | 100 | 95
+- buying-land | an agreeable player still buys into a colour group another player already blocks, provided the reserve is maintained | 1 | reserve | 40 | 37
+- buying-land | an agreeable player does not buy into a colour group another player already blocks if doing so would dip below the reserve, and a lone-owning bystander has no auction interest in a second piece either | 0 | reserve | 40 | 32
+- buying-land | an agreeable player does not buy into a colour group another player already blocks if doing so would dip below the reserve, and a lone-owning bystander has no auction interest in a second piece either | 1 | reserve | 40 | 46
+- buying-land | an agreeable player is not limited to a pricier missing station's reserve when a middle-priority colour group's cheaper missing street applies instead | 0 | high_hat_bid | 250 | 241
+- buying-land | an agreeable player is not limited to a pricier missing station's reserve when a middle-priority colour group's cheaper missing street applies instead | 1 | high_hat_bid | 250 | 253
+- buying-land | an agreeable player reserves a highest-priority colour group's missing street over a pricier missing street in a middle-priority group | 0 | high_hat_bid | 75 | 84
+- buying-land | an agreeable player reserves a highest-priority colour group's missing street over a pricier missing street in a middle-priority group | 1 | high_hat_bid | 75 | 71
+- buying-land | an agreeable player is not limited to a pricier middle-priority group's reserve when a highest-priority group's cheaper missing street applies instead | 0 | high_hat_bid | 320 | 321
+- buying-land | an agreeable player is not limited to a pricier middle-priority group's reserve when a highest-priority group's cheaper missing street applies instead | 1 | high_hat_bid | 320 | 311
+- buying-land | an agreeable player reserves a highest-priority colour group's missing street over a pricier missing street in the lowest tier | 0 | high_hat_bid | 320 | 318
+- buying-land | an agreeable player reserves a highest-priority colour group's missing street over a pricier missing street in the lowest tier | 1 | high_hat_bid | 320 | 327
