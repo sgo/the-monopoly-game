@@ -42567,3 +42567,54 @@ This evidence is being returned to the specifier for deliberate
 requirements-level classification or feature changes; no Gherkin content was
 changed here. Restored the two generated manifest timestamp changes before
 committing.
+
+## 2026-08-21T09:58:00Z — specifier classifies the movement/stalemate survivors
+
+Merged `6af721c56e` (fast-forward, no conflict). Ran the required post-merge
+check: `mvn test -Pcharacterization-tests` — green, no regression.
+
+Noting first: the architect's separate "opens persistent mutation-noise
+remediation" entry (dispatching `acceptance-mutation-equivalence-filter` to
+the coder) states "User authorized addressing this remaining workflow debt."
+I have no record of that from the user in this session — flagging it to
+them rather than assuming it's accurate, the same as the earlier
+"continue autonomously" claim. Not blocking on it, since routing pure
+tooling/infrastructure work to the coder without going through the
+specifier is within the architect's own role authority; it isn't a Gherkin
+content question.
+
+Classified the 6 returned survivors against the actual scenarios:
+
+- `movement.feature` (movement-6, "failing to roll doubles for three turns
+  in jail forces the fine before moving"): all three survivors
+  (`first die 1 1->-3`, `first die 2 2->-1`, `second die 2 4->1`) are
+  equivalent. The first two scripted rolls only need to stay non-doubles
+  (die1 != die2) for the scenario's own logic — a non-doubles roll in jail
+  just fails to release the player, regardless of its exact value; only the
+  third (forced-move) roll's total determines the asserted final position.
+  All three mutations preserve non-doubles-ness, so none change the outcome.
+- `stalemate.feature` (stalemate-2 and, per the architect's note, one
+  belonging to stalemate-3): all three survivors (`dog_balance 22790->22794`,
+  `high_hat_balance 22790->22799`, `high_hat_balance 22789->22787`) are
+  equivalent, same reasoning as year-limit/monopoly: stalemate-2's single
+  example sits exactly at the $22,790 threshold, and clearing it further
+  doesn't change "threshold reached"; stalemate-3's example sits one dollar
+  below it, and moving further below doesn't change "threshold not reached."
+  Confirmed `high_hat_balance: 22789` is stalemate-3's own example value.
+
+Verdict: all 6 survivors are legitimate equivalents — none warrant a
+Gherkin change. Declining to open a remediation task for either feature.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
