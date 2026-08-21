@@ -241,13 +241,13 @@ Feature: development loans
     And pawn "iron box" will bid $<bid> for "Rue Grande Dinant" at auction
     And development loans are enabled for the "Greedo" strategy
     When pawn "dog" grows a year older
-    Then pawn "high hat"'s account balance is $<bond_cash>
+    Then pawn "high hat"'s account balance is $<high_hat_ending>
     And the bank's account holds $<bank_account>
     And pawn "dog"'s account balance is $<dog_ending>
 
     Examples:
-      | principal | bond_cash | bid | bank_account | dog_ending |
-      | 20        | 500       | 30  | 21           | 34         |
+      | principal | bond_cash | bid | bank_account | dog_ending | high_hat_ending |
+      | 20        | 500       | 30  | 21           | 34          | 500              |
 
   # development-loans-12
   Scenario Outline: the loan mechanism is not tied to who won initiative; a player other than the Background's usual borrower can raise one too
@@ -316,13 +316,13 @@ Feature: development loans
     And pawn "iron box" will bid $<bid> for "Rue Grande Dinant" at auction
     And development loans are enabled for the "Greedo" strategy
     When pawn "dog" grows a year older
-    Then pawn "high hat"'s account balance is $<bond_cash>
+    Then pawn "high hat"'s account balance is $<high_hat_ending>
     And the bank's account holds $<bank_remaining>
     And pawn "dog"'s account balance is $0
 
     Examples:
-      | principal | bond_cash | bid | bank_starting | bank_remaining |
-      | 40        | 500       | 5   | 50            | 38             |
+      | principal | bond_cash | bid | bank_starting | bank_remaining | high_hat_ending |
+      | 40        | 500       | 5   | 50            | 38              | 500              |
 
   # development-loans-16
   Scenario Outline: a new loan is funded from recycled capital left over from an earlier foreclosure, without needing a fresh bond
