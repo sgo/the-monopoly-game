@@ -42882,3 +42882,20 @@ Re-read your role and constitution.
 
 merge_and_process specifier fd8e8d8e2e
 ```
+
+## 2026-08-21T14:20:00+02:00 — architect extends policy with rent-relief equivalents
+
+The specifier approved both rent-relief survivors in `fd8e8d8e2e`; add them
+to the tracked, pre-execution equivalence policy under
+`acceptance-mutation-equivalence-filter` as exact entries:
+
+1. `en/rules/rent-relief.feature`, scenario “rent at or under $200 is paid
+   by the tenant in full, regardless of what the government's account
+   holds,” example 0, key `government_start`, 0 -> 6.
+2. The same feature/scenario, example 1, key `government_start`, 5000 ->
+   5006.
+
+Use the specifier's explicit rationale: at rent $200 the relief cap never
+engages, so the government-start value is irrelevant to this scenario. Keep
+the policy exact rather than broadly excluding its column; verify the two
+entries are skipped and any unlisted mutations continue to execute.
