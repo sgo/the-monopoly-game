@@ -42899,3 +42899,30 @@ Use the specifier's explicit rationale: at rent $200 the relief cap never
 engages, so the government-start value is irrelevant to this scenario. Keep
 the policy exact rather than broadly excluding its column; verify the two
 entries are skipped and any unlisted mutations continue to execute.
+
+## 2026-08-21T14:30:00+02:00 — coder processes architect rent-relief follow-up
+
+Complete handoff received:
+
+```text
+id: 20260821T120554Z_000365_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 374a527eaf
+created_at: 2026-08-21T12:05:54.746527Z
+enqueued_at: 2026-08-21T12:05:55.223552Z
+task: acceptance-mutation-equivalence-filter
+
+Re-read your role and constitution.
+merge_and_process architect 374a527eaf
+```
+
+Merged `374a527eaf` and added its two exact rent-relief policy entries:
+`government_start` 0 -> 6 and 5000 -> 5006 for the rent-at-or-under-$200
+scenario. Both entries use the approved rationale that the relief cap never
+engages at $200. EDN parsing and diff checks pass; acceptance mutation remains
+architect-owned and is returned for focused verification.

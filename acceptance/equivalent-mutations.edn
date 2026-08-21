@@ -81,4 +81,18 @@
   :key "high_hat_balance"
   :original "22789"
   :mutated "22787"
-  :justification "Both balances remain below the documented stalemate threshold, so the same non-stalemate outcome is asserted."}]
+  :justification "Both balances remain below the documented stalemate threshold, so the same non-stalemate outcome is asserted."}
+ {:feature "en/rules/rent-relief.feature"
+  :scenario "rent at or under $200 is paid by the tenant in full, regardless of what the government's account holds"
+  :example 0
+  :key "government_start"
+  :original "0"
+  :mutated "6"
+  :justification "At rent $200 the relief cap never engages, so the government's starting balance is irrelevant to this scenario."}
+ {:feature "en/rules/rent-relief.feature"
+  :scenario "rent at or under $200 is paid by the tenant in full, regardless of what the government's account holds"
+  :example 1
+  :key "government_start"
+  :original "5000"
+  :mutated "5006"
+  :justification "At rent $200 the relief cap never engages, so the government's starting balance is irrelevant to this scenario."}]
