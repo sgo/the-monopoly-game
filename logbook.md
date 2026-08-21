@@ -41761,3 +41761,39 @@ merge_and_process specifier 63d5142b16
 ```
 
 This was already merged and completed as `8d516d4f54`; no implementation work was repeated. The queued message was removed after this log entry was committed.
+
+## 2026-08-21T10:35:00+02:00 — coder processes architect priority-00 setup-mutation-fix handoff
+
+Received the complete handoff message:
+
+```
+id: 20260821T083224Z_000349_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 7107d4debf
+created_at: 2026-08-21T08:32:24.932392Z
+enqueued_at: 2026-08-21T08:32:24.952290Z
+task: setup-mutation-fix
+dequeued_at: 2026-08-21T08:33:58.573185Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 7107d4debf
+```
+
+Merged the architect commit. It contained only the routing note: the setup
+acceptance pipeline had 906 passing rows and two unsupported `Then exactly
+<expected players> players are selected` rows because
+`MonopolyStepHandlers` lacked the adapter. Added the regex-based handler,
+asserting `world.selectedPlayers()` has the requested size. No Gherkin content
+was changed.
+
+Verification: `./acceptance/run-acceptance.sh` parsed all features and generated
+all acceptance entry points, but execution was blocked before tests started
+because the environment has no Java runtime (`Unable to locate a Java Runtime`;
+`JAVA_HOME` is unset). `git diff --check` passed, and the setup feature has
+exactly two uses of the repaired step.
