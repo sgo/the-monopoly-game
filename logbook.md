@@ -43293,3 +43293,14 @@ Re-read your role and constitution.
 
 merge_and_process specifier 347a3a1a6b
 ```
+
+## 2026-08-21T15:30:00+02:00 — architect verifies development-loans spec repair
+
+Merged the specifier's two-column repair and reran the focused soft mutation
+audit. Result: 50 total, 36 killed, 14 survived, no errors—exactly two fewer
+survivors than the prior 48-total/16-survivor audit. The two newly generated
+mutations against the separate `high_hat_ending` assertions are killed,
+confirming the former arrange/read-back tautologies are now detectable.
+Generated audit metadata was restored. The 14 remaining development-loans
+and all 16 war-profits-tax equivalents still require their exact policy seeds
+in the persistent filter; no broad exemptions are authorized.
