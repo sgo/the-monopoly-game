@@ -42544,3 +42544,26 @@ Verify that the selected small-feature audit reports the approved equivalents
 as skipped, no longer as survivors; that a deliberately unlisted survivor
 still exits nonzero; and that the packaged war-profits-tax capitalization
 mutation is correctly killed.
+
+## 2026-08-21T12:05:00+02:00 — architect returns movement/stalemate survivor evidence to specifier
+
+Ran a targeted soft mutation audit of `movement.feature` and
+`stalemate.feature`: movement was 6 killed / 3 survived; stalemate was 0
+killed / 3 survived. Replayed every generated mutant individually through
+the hot runner to identify exact outcomes.
+
+Movement survivors are all fields of the one-example jail-release scenario
+(`movement-6`, “failing to roll doubles for three turns in jail forces the
+fine before moving”): `first die 1` 1 -> -3, `first die 2` 2 -> -1, and
+`second die 2` 4 -> 1. Its other six generated changes were killed.
+
+All three generated stalemate mutants survived in `stalemate-2`, “the game
+ends in a stalemate once every remaining player's balance clears the
+threshold”: `dog_balance` 22790 -> 22794, `high_hat_balance` 22790 ->
+22799, and `high_hat_balance` 22789 -> 22787. The final mutation is against
+the adjacent below-threshold example despite the runner's scenario grouping.
+
+This evidence is being returned to the specifier for deliberate
+requirements-level classification or feature changes; no Gherkin content was
+changed here. Restored the two generated manifest timestamp changes before
+committing.
