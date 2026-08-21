@@ -43438,3 +43438,13 @@ Re-read your role and constitution.
 
 merge_and_process specifier 82d1fe7992
 ```
+
+## 2026-08-21T16:05:00+02:00 — architect dispatches share-sale assertion handler
+
+Specifier's `fe9c778` Gherkin repair adds `Then no one wins the Pink Realty
+share` to share-sale-4. Dispatch coder work under
+`greedo-share-sale-no-winner-step`: implement the exact acceptance step
+against the existing legal-entity/share model, following the established
+negative-outcome assertion style (not a new share-fraction vocabulary).
+Run the full acceptance suite: the new line must be supported and the
+previously isolated sole failure eliminated. Do not alter Gherkin content.
