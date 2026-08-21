@@ -41585,3 +41585,36 @@ Refactorer verification (all green):
   well-tested modules, no refactor concerns.
 
 Handing the verified state back to the architect.
+
+## 2026-08-21T08:15:02Z — specifier merges architect's phase-complete megacorp-rent-relief handoff
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: megacorp-rent-relief
+
+Re-read your role and constitution.
+
+merge_and_process architect f47a06b493
+```
+
+Merged `f47a06b493`. Its `logbook.md` conflicted at one clean append point
+(my own handoff entry vs. the coder/refactorer entries appended after it);
+resolved by keeping both in chronological order. The architect's own review
+entry landed at a different point in the file and merged cleanly on its own.
+
+Round 1 is now real: `GovernmentAccount` (extracted from `WarProfitsTaxBook`,
+shared by war-profits-tax, salary tax, and rent relief), `MegacorpSalaryTax`
+(43% flat), and `RentRelief` (all-or-nothing $200 cap). Architect's noted
+equivalent survivors (rent-relief's two `government_start` mutations on the
+$200-exactly scenario) match the spec's own stated intent — a $200 rent
+never touches the government account regardless of its balance — so no
+action needed there.
+
+Ran the required post-merge check: `mvn test -Pcharacterization-tests` —
+12/12 green, no regression.
+
+No further specifier action pending; awaiting the user's next feature.
