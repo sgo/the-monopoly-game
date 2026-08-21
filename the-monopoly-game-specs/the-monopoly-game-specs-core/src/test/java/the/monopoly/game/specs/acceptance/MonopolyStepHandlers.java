@@ -136,6 +136,9 @@ public final class MonopolyStepHandlers {
 
         step("^the standard game setup$", (world, arguments) -> world.selectStandardGameSetup()),
 
+        then("^exactly " + VALUE + " players are selected$",
+            (world, arguments) -> assertThat(world.selectedPlayers()).hasSize(arguments.number(1))),
+
         then("^every selected player starts at position " + VALUE + "$",
             (world, arguments) -> assertThat(world.selectedPlayers())
                 .extracting(player -> player.position().index()).containsOnly(arguments.number(1))),
