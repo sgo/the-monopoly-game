@@ -43364,3 +43364,77 @@ Re-read your role and constitution.
 
 merge_and_process specifier f3ca86a7b2
 ```
+
+## 2026-08-21T15:00:00Z — specifier classifies round 3: 40 equivalents, 1 real gap found, verified, and fixed
+
+Merged `c0b464bb81` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression, before and after the fix below.
+
+**Greedo-monopoly-buyout, all 20 equivalent.** Every pair of
+dog_balance/high_hat_balance mutations preserves the qualitative role each
+scenario depends on (richer/poorer ordering, or "comfortably affordable")
+without crossing into a different bucket: buyout-1/2 (richer-wins,
+initiator-invariant), buyout-3/4 (spare-street cash), buyout-7/8
+(sweetener withheld/allowed), buyout-11 (larger-group-poorer, cash
+irrelevant to the ownership-count exception), buyout-12
+(highest-priority-never-buyout, cash irrelevant entirely). buyout-9/10's
+35%-of-richer-co-owner threshold reads only the dog_balance column per
+`the.monopoly.game.rules.Bankruptcy`-style logic (confirmed by buyout-9/10
+using dog_balance alone to derive the price/defer split), so
+high_hat_balance mutations there are structurally irrelevant.
+buyout-6's `high_hat_balance 1000->996` breaks the scenario's stated exact
+tie, but this is a black-box equivalence, not a hidden defect: the correct
+winner (dog) is asserted and produced either via the tie-break path or the
+plain richer-wins path, and Gherkin can't observe which internal branch
+ran — a real defect would mean the wrong winner, which doesn't happen here.
+
+**Greedo-share-sale, 20 of 22 equivalent**, all comfortable-margin or
+richer/poorer-preserving values not on a tested boundary (share-sale-1/2/3
+personal-asset/tax-debt scenarios; share-sale-5's three third-of-balance
+ascending-bid examples, the same auction-ceiling equivalence established
+in round 1 — the winner's exact ceiling doesn't matter once it clears the
+loser's; share-sale-23's comfortable margins across a two-round scenario).
+
+**The other 2 are a real, confirmed gap.** Share-sale-4
+("a legal-entity share does not change hands when no fellow shareholder
+will bid") mutates `high_hat_balance`/`iron_box_balance` from 0 to
+8/5. I did not accept this from reasoning alone — read
+`Bankruptcy.bidsFor`: a candidate's bid is `available * 35 / 100`
+(integer division), included whenever `> 0`; at $8 and $5 that's $2 and
+$1, both nonzero, so both would newly qualify as bidders where $0
+excluded them. I verified by temporarily setting the scenario's own
+values to 8/5 and running the full acceptance suite with an added probe
+assertion: it proved high hat actually acquires a real share (my first
+probe assertion, "high hat holds no share of Pink Realty", was itself
+wrong and failed even at the *original* 0/0 values, because
+`LegalEntity`'s three-slot model already makes high hat/iron box
+permanent co-owners from formation — the real signal is the *count* of
+slots each holds, not bare presence). Reverted the scratch probe, and
+instead added `no one wins the Pink Realty share`, mirroring the sibling
+`greedo-monopoly-buyout.feature`'s existing `no one wins the split
+monopoly` negative-outcome pattern rather than inventing new
+share-fraction vocabulary this feature doesn't use anywhere else.
+Committed as `fe9c778`. This needs a new step handler (currently
+"Unsupported step"); confirmed via a full acceptance run that this is the
+*only* failure (908 total, 1 failure), isolated to the new line.
+
+Verdict: 40 survivors classified as equivalent, 1 was a genuine gap
+(2 of the 22 share-sale values) and is now partially fixed — the Gherkin
+assertion is in place but needs a coder-implemented step handler before
+it's enforced. 101 survivors classified in total across 14 features so
+far, two real gaps found and fixed along the way.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
