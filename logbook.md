@@ -44092,3 +44092,41 @@ journal equivalents to `acceptance/equivalent-mutations.edn`, excluding all
 strategy/state, later-step override, and irrelevant-background mechanisms.
 Validation reports 184 total policy entries, 76 report tuples, 61 approved
 journal tuples, an exact set match, and clean diff checks.
+
+## 2026-08-22T07:55:00Z — specifier classifies the journal-33 follow-up survivor from the tautology fix
+
+Merged `19263bf055` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression. Confirmed `equivalent-mutations.edn` now has 184 entries
+(123 + 61), matching the coder's own count exactly.
+
+The architect's follow-up audit of the newly-fixed journal-33 found one
+new survivor introduced by my own `expected_balance`/`expected_reserve`
+split: example 0's arrangement-only `reserve` column mutates 0→-5 and
+still passes, since `expected_reserve` stays fixed at 0 and isn't touched.
+This is not a regression in the fix — it's a genuine domain-level
+equivalence I verified directly in `Greedo.java:118-135`
+(`cashReserve(player, rules, deeds)`): the method starts from the
+configured reserve, applies near-monopoly/station bumps via `Math.max`,
+and its *final* step is `Math.max(reserveAmount, stationReserve(...))`
+where `stationReserve` returns exactly `0` when no station bump applies
+(confirmed by its own doc comment: "or 0 if not applicable"). Any
+negative configured reserve is therefore clamped up to 0 by construction
+in every scenario where no near-monopoly/station bonus is in play — the
+same clamp that makes `0` and `-5` behave identically here would make any
+other negative value behave the same way too. Accepted as equivalent; no
+further Gherkin change needed.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
