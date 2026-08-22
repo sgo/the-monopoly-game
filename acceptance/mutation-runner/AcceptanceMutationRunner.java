@@ -151,6 +151,7 @@ public final class AcceptanceMutationRunner {
     }
 
     private static List<Ir.Step> steps(Object value) {
+      if (value == null) return List.of();
       return list(value).stream().map(Json::step).toList();
     }
 
