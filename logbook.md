@@ -45649,3 +45649,37 @@ Starting classification, smallest feature first, same methodology as the
 2026-08-21 acceptance-mutation-debt sweep: ground every verdict in the actual
 domain mechanism, verify decoupling fixes empirically, and only record a true
 semantic equivalence in `acceptance/equivalent-mutations.edn` with rationale.
+
+## 2026-08-22T21:40:18Z — specifier classifies the four smallest-survivor features
+
+Investigated all 6 survivors across `journal.feature`, `logging.feature`,
+`greedo-priority.feature`, and `specs-cli:cli-packaged-jar.feature` against
+the real code, not just the reported tuples:
+
+- `journal-93`/`logging-93` (`state disabled -> disAbled`/`disablEd`):
+  equivalent. Confirmed in `MonopolyStepHelpers.rentRelief`:
+  `state.equals("enabled")` — any spelling that isn't the literal string
+  "enabled" produces the same `false`, exactly the same class already
+  recorded for war-profits-tax/development-loans' own disabled-state
+  scenarios.
+- `greedo-priority.feature` (`strategy Billionaire -> billionaire`, examples
+  3/11/49, all the same scenario): equivalent. Same case-insensitive strategy
+  vocabulary already established (`distressed-sale`, `buying-land`,
+  `journal`, `report`, `logging` all carry this identical class).
+- `specs-cli:cli-packaged-jar.feature` (`raw arguments`, one strategy token
+  mangled into `greedoxgreedo`): equivalent. Confirmed in
+  `Simulator.main` (lines 48-49): the "Rent relief enabled" line prints
+  unconditionally before `execute(arguments)` is even called, so a malformed
+  strategy token downstream can't suppress it. `World.stopPackagedCli()`/
+  `packagedCliProcessEnded()` only check process liveness via `destroy()`/
+  `isAlive()`, never the exit code, so the scenario's remaining steps pass
+  whether or not the mismatched strategy count later causes `execute()` to
+  return its own error result.
+
+Recorded all 6 as new entries in `acceptance/equivalent-mutations.edn` (314 ->
+320), each with the concrete code-grounded rationale above. No Gherkin edits
+needed; these are 6 genuine equivalences, not gaps.
+
+135 survivors remain: `development-loans.feature` (14), `war-profits-tax.feature`
+(16), `greedo-monopoly-buyout.feature` (20), `greedo-share-sale.feature` (20),
+`greedo-legal-entity.feature` (65).
