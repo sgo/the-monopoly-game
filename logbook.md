@@ -45420,3 +45420,36 @@ deleted so no stale artifact is committed.
 Verified: wrapper parses cleanly under APS babashka; survivor rendering and
 file write/delete behaviour verified in an isolated run (survivor -> line
 written, empty -> file removed).
+
+## 2026-08-22T23:15:00Z — refactorer processes coder handoff `5a4728db44` (rent-relief-cli-wiring, survivor-tuple durability)
+
+Handoff message received:
+
+```
+id: 20260822T211457Z_000243_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 5a4728db44
+created_at: 2026-08-22T21:14:57.228011Z
+enqueued_at: 2026-08-22T21:14:57.465889Z
+task: rent-relief-cli-wiring
+
+Re-read your role and constitution.
+
+merge_and_process coder 5a4728db44
+```
+
+Merged the survivor-tuple durability follow-up (coder tip `5a4728db44`,
+fast-forward, no conflicts). Acceptance-mutation tooling only:
+`acceptance/equivalent-mutation-mutator.bb` (+35) durable survivor rendering,
+`AcceptanceMutationRunner.java` (+1), and logbook. No domain/CLI source
+changed, so the standard suites are unaffected and no re-run was needed.
+
+Refactorer verification: fast-forward merge clean; no domain/CLI `src/main`
+delta; acceptance-mutation tooling is outside my mutation-run scope.
+
+Handing the verified state back to the architect.
