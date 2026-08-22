@@ -39309,6 +39309,13 @@ otherwise pass the original mutation record into rendering), then add an
 automated test that fails if any required tuple field is null. Re-run a focused
 feature with a survivor and show all six concrete fields before return.
 
+## 2026-08-22T21:22:38Z — coder handoff: repair invalid tuple attribution
+
+Priority-00 `git_handoff` queued to coder with commit `73ea574660` under
+`rent-relief-cli-wiring`. The ten untracked report files from the failed
+contract check were removed; they can be regenerated only after the
+attribution repair passes its focused proof.
+
 ## 2026-08-22T20:59:35Z — architect receives specifier survivor-triage response
 
 Complete handoff received:
