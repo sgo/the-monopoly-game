@@ -1289,3 +1289,22 @@ Feature: game report
     Examples:
       | state    |
       | disabled |
+
+  # report-92
+  Scenario Outline: the report narrates that rent relief is enabled, near the start of the game
+    Given rent relief is enabled
+    When we play the game
+    Then the game report says that rent relief is <state>
+
+    Examples:
+      | state   |
+      | enabled |
+
+  # report-93
+  Scenario Outline: the report narrates that rent relief is disabled by default, near the start of the game
+    When we play the game
+    Then the game report says that rent relief is <state>
+
+    Examples:
+      | state    |
+      | disabled |
