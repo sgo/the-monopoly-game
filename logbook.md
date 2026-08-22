@@ -39277,6 +39277,47 @@ Continued independent final-gate work while that repair is outstanding:
   small, type-distinct calls would add an indirection without removing a
   duplicated algorithm. This is accepted as reasonable non-actionable DRY
   noise. No rent-relief behavior duplicated code.
+## 2026-08-22T21:58:15Z — coder repairs deterministic simulator baseline
+
+Replaced the one-second natural-duration assumption in
+`SimulatorTest#keepsPlayingUntilToldToStop` with worker-thread-only latch
+coordination. Setup strategy calls remain non-blocking; the simulator worker is
+held at strategy resolution while the test verifies `Running.isPlaying()`, then
+released and stopped cooperatively.
+
+Verification:
+
+- Focused `SimulatorTest#keepsPlayingUntilToldToStop`: 5 consecutive passes.
+- Full `SimulatorTest`: 18/18 passed, 0 failures, 0 errors, 0 skipped.
+
+Handing the deterministic baseline back to the architect for the remaining
+mutation and DRY gates.
+
+## 2026-08-22T19:59:43Z — architect receives coder final-gate repair
+
+Complete handoff received:
+
+```text
+id: 20260822T195851Z_000240_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: ce16188f77
+created_at: 2026-08-22T19:58:51.039500Z
+enqueued_at: 2026-08-22T19:58:51.311906Z
+task: rent-relief-cli-wiring
+dequeued_at: 2026-08-22T19:59:17.217567Z
+
+Re-read your role and constitution.
+
+merge_and_process coder ce16188f77
+```
+
+Merged the deterministic test repair and resumed the required final
+verification sequence at the previously blocked `Simulator.java` mutation.
 
 ## 2026-08-22T19:43:13Z — architect receives rent-relief observability review
 
