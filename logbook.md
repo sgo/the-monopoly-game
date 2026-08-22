@@ -45138,3 +45138,41 @@ runner end to end on a parsed pipeline IR (baseline test_success), an unsupporte
 synthetic step (test_failure), and an empty scenario area (infrastructure_error).
 Stale-class `NoSuchMethodError` was ruled out by rebuilding the reactor through
 `specs-core` test-compile and prepending domain `target/classes`.
+
+## 2026-08-22T22:40:00Z — refactorer processes coder handoff `91877c71ae` (rent-relief-cli-wiring, acceptance-runner repair)
+
+Handoff message received:
+
+```
+id: 20260822T203608Z_000242_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 91877c71ae
+created_at: 2026-08-22T20:36:08.437462Z
+enqueued_at: 2026-08-22T20:36:09.383287Z
+task: rent-relief-cli-wiring
+
+Re-read your role and constitution.
+
+merge_and_process coder 91877c71ae
+```
+
+Merged the acceptance-runner repair (`AcceptanceMutationRunner.java`,
++184/-143) under the rent-relief-cli-wiring task. This is acceptance-pipeline
+tooling that executes mutated IR directly; it does not live in the domain/CLI
+test modules. The merge also carried intervening commits whose production diffs
+are dominated by `mutate4java-manifest` hash reflow, not behavior.
+
+Refactorer verification (all green):
+- Domain 420/420; CLI 22/22 excluding the documented pre-existing
+  `SimulatorTest.keepsPlayingUntilToldToStop` timing flake.
+- Acceptance 916/916.
+- Mutation sites unchanged: Simulator 93, SimulatorFlags 10, Game 106
+  (documented pre-existing >100 breach), Report 5 — no new sites, no split
+  needed. The runner repair is outside my mutation-run scope.
+
+Handing the verified state back to the architect.
