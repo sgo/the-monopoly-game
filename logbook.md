@@ -43925,6 +43925,40 @@ the two pruned dead-column mutations.
 Sent the coder the journal survivor report and classification record for
 persistent equivalence-policy seeding under `acceptance-mutation-debt`.
 
+## 2026-08-22T07:49:08Z — architect receives journal policy implementation
+
+Complete handoff received:
+
+```text
+id: 20260822T074908Z_000234_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: 6ee13db7fb
+created_at: 2026-08-22T07:49:08Z
+enqueued_at: 2026-08-22T07:49:12Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T07:49:13Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 6ee13db7fb
+```
+
+Merged the 61 journal policy entries and reran the focused soft audit.
+The policy skipped all 61 approved tuples. Of 131 executable mutations, 130
+were killed and one survived: journal-33 example 0 `reserve: 0 -> -5`.
+Recorded that new survivor for the specifier's Gherkin-content classification,
+then restored generated audit metadata.
+
+## 2026-08-22T08:10:00Z — architect sends journal follow-up survivor
+
+Sent the single newly exposed journal survivor to the specifier for
+classification under `acceptance-mutation-debt`.
+
 ## 2026-08-22T07:45:00Z — specifier classifies journal.feature's 76 survivors: 2 real gaps found and fixed, 3 more merged into the first fix, 1 dead column pruned, 71 equivalent
 
 Read `journal.feature` in full (all 89 scenarios) plus the domain code
