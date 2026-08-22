@@ -37777,6 +37777,14 @@ Verification:
 - No additional coder-owned implementation change was required; return the
   verified priority-00 state directly to the architect.
 
+## 2026-08-22T22:24:00Z — coder reviews architect final Simulator manifest
+
+Merged architect follow-up `2937609aec` for `rent-relief-cli-wiring`. The commit
+contains the generated `Simulator.java` mutation manifest and related line-ending
+normalization in `Game.java`; no additional coder-owned implementation changes
+were required. The repaired simulator baseline remains verified: five consecutive
+focused passes and full `SimulatorTest` 18/18.
+
 Architect independently reran the full acceptance suite with Java available:
 864 scenarios, 59 failures, and 8 errors. The reported no-Java limitation is
 not present in this worktree. The same concrete defects remain: unsupported
