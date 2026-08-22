@@ -39304,6 +39304,22 @@ the value-level data, but its report omits scenario/example context and the
 standard full-run wrapper emits only aggregates. Architect will extract the
 current tuples and send a coder follow-up to make tuple reporting durable.
 
+### Coder follow-up — durable survivor-tuple reporting
+
+Implement a supported report mode for the repository's Gherkin mutation
+command (not a one-off shell scrape). On a full or focused
+`acceptance/run-acceptance-mutation.sh --level soft` run with survivors, it
+must emit one machine-readable and human-readable tuple per survivor:
+
+`feature, scenario name, zero-based example index, key, original value,
+mutated value`.
+
+Keep the existing normal summary/status behavior and equivalence skipping
+unchanged. The report must identify only executed survivors (not policy-skipped
+mutations) and be usable by the specifier without parsing generated JSON or
+re-running individual mutations. Add focused automated coverage for scenario
+and example attribution, then return the implementation and command evidence.
+
 ## 2026-08-22T20:55:56Z — full soft Gherkin-mutation gate: specifier follow-up required
 
 After the acceptance runner repair, the required complete command
