@@ -45306,11 +45306,42 @@ synthetic step (test_failure), and an empty scenario area (infrastructure_error)
 Stale-class `NoSuchMethodError` was ruled out by rebuilding the reactor through
 `specs-core` test-compile and prepending domain `target/classes`.
 
+## 2026-08-22T20:36:08Z — coder sends acceptance-runner repair to refactorer
+
+Received architect priority 00 follow-up (20260822T202715Z_000393, commit
+ca7e5586c6) requeueing the acceptance-runner repair. The rejected return lacked
+the runner implementation change. Repaired `AcceptanceMutationRunner` under
+coder rules: the runner now reads the mutated JSON IR directly into the `Ir`
+model and executes it through `AcceptanceRuntime` in the hot worker JVM, removing
+entry-point generation, per-mutant Java compilation, the temp work tree, and the
+classloader/launcher swap. Outcome classification and the job-bound interruption
+gate are preserved. Verified: baseline IR -> test_success, unsupported synthetic
+step -> test_failure, empty scenario area -> infrastructure_error; reactor
+rebuilt through specs-core test-compile to rule out stale classes.
+
+Sent handoff (50, refactorer):
+
+```text
+id: 20260822T203608Z_000242_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: rent-relief-cli-wiring
+commit: 91877c71ae
+created_at: 2026-08-22T20:36:08Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 91877c71ae
+```
+
 ## 2026-08-22T22:40:00Z — refactorer processes coder handoff `91877c71ae` (rent-relief-cli-wiring, acceptance-runner repair)
 
 Handoff message received:
 
-```
+```text
 id: 20260822T203608Z_000242_from_coder
 from: coder
 to: refactorer
@@ -45348,7 +45379,7 @@ Handing the verified state back to the architect.
 
 Handoff message received:
 
-```
+```text
 TASK: /Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/00_20260822T205640Z_000394_from_architect_to_specifier.handoff
 FROM: architect
 TYPE: git_handoff
@@ -45390,10 +45421,64 @@ strengthen-the-scenario vs. record-as-equivalent.
 
 Handoff sent:
 
-```
+```text
 type: git_handoff
 to: architect
 priority: 00
 task: rent-relief-cli-wiring
 commit: PENDING
 ```
+
+## 2026-08-22T21:10:00Z — coder makes survivor-tuple reporting durable
+
+Architect priority 00 follow-up (7f8073d280) requested durable one-tuple-per-
+survivor reporting (feature, scenario name, example index, key, original value,
+mutated value) in place of aggregate per-feature counts. The APS `mutation/run`
+already returns full per-mutation detail in `:results` (`:Mutation {:scenario
+:example :key :Original :Mutated}` and `:Status`); only the durable committed
+artifact omitted it. `tmp/aps` is an upstream git-ignored checkout, so the fix
+lives in the project wrapper `acceptance/equivalent-mutation-mutator.bb`.
+
+Repair: the wrapper now shadows `mutation/run` inside its existing
+`with-redefs` (alongside `mutation/discover`), delegating to the real `run`
+via `var-get`, then writing `acceptance/mutation-survivors-<feature-slug>.md`
+containing one row per survivor in the requested `feature | scenario | example |
+key | original | mutated` format. A feature with no survivors has its file
+deleted so no stale artifact is committed.
+
+Verified: wrapper parses cleanly under APS babashka; survivor rendering and
+file write/delete behaviour verified in an isolated run (survivor -> line
+written, empty -> file removed).
+
+## 2026-08-22T23:15:00Z — refactorer processes coder handoff `5a4728db44` (rent-relief-cli-wiring, survivor-tuple durability)
+
+Handoff message received:
+
+```
+id: 20260822T211457Z_000243_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 5a4728db44
+created_at: 2026-08-22T21:14:57.228011Z
+enqueued_at: 2026-08-22T21:14:57.465889Z
+task: rent-relief-cli-wiring
+
+Re-read your role and constitution.
+
+merge_and_process coder 5a4728db44
+```
+
+Merged the survivor-tuple durability follow-up (coder tip `5a4728db44`,
+fast-forward, no conflicts). Acceptance-mutation tooling only:
+`acceptance/equivalent-mutation-mutator.bb` (+35) durable survivor rendering,
+`AcceptanceMutationRunner.java` (+1), and logbook. No domain/CLI source
+changed, so the standard suites are unaffected and no re-run was needed.
+
+Refactorer verification: fast-forward merge clean; no domain/CLI `src/main`
+delta; acceptance-mutation tooling is outside my mutation-run scope.
+
+Handing the verified state back to the architect.

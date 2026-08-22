@@ -58,6 +58,38 @@
               entry))
           entries)))
 
+(defn- survivors-file [project-root feature-id]
+  (let [slug (-> (str/lower-case feature-id)
+                 (str/replace #"[^a-z0-9]+" "-")
+                 (str/replace #"^-+|-+$" ""))]
+    (str (io/file project-root "acceptance" (str "mutation-survivors-" slug ".md")))))
+
+(defn- survivor-row [feature feature-id mutation]
+  (let [scenario (get-in feature [:scenarios (:scenario mutation)])]
+    (format "%s | %s | %s | %s | %s | %s"
+            feature-id
+            (:name scenario)
+            (:example mutation)
+            (:key mutation)
+            (:Original mutation)
+            (:Mutated mutation))))
+
+(defn- write-survivors! [project-root feature-id feature report]
+  (let [survivors (into []
+                        (comp (filter (fn [r] (= "survived" (:Status r))))
+                              (map (fn [r] (survivor-row feature feature-id (get-in r [:Mutation])))))
+                        (:results report))
+        path (survivors-file project-root feature-id)]
+    (if (seq survivors)
+      (spit path (str "# Mutation survivors\n\n"
+                      "Format: feature | scenario name | example index | key | original | mutated.\n\n"
+                      (str/join "\n" survivors) "\n"))
+      (io/delete-file path true))))
+
+(defn- run-and-report [real-run project-root feature-id feature cfg]
+  (let [report (real-run cfg)]
+    (write-survivors! project-root feature-id feature report)
+    report))
 (let [{:keys [project-root feature-id mutator-args]} (wrapper-args *command-line-args*)
       feature-path (option-value mutator-args "--feature")]
   (when (or (str/blank? project-root) (str/blank? feature-id) (str/blank? feature-path))
@@ -77,7 +109,8 @@
           (println "equivalent_skipped=" (count matches))
           (doseq [{:keys [mutation entry]} matches]
             (println "skipped equivalent" (:Description mutation) "--" (:justification entry)))))
-      (with-redefs [mutation/discover (fn [_] executable)]
+      (with-redefs [mutation/discover (fn [_] executable)
+                    mutation/run (partial run-and-report (var-get #'mutation/run) project-root feature-id feature)]
         (apply mutator/-main mutator-args)))
     (catch Exception cause
       (binding [*out* *err*]
