@@ -39396,6 +39396,13 @@ Do not weaken observable logging assertions. Return focused mutation timing
 and survivor results; coder involvement is only needed if a missing direct
 setup/assertion step blocks the specification split.
 
+## 2026-08-22T21:43:45Z — handoff to specifier: logging mutation performance
+
+Queued priority-00 `git_handoff` to specifier for task `rent-relief-cli-wiring`,
+commit `8a108c972f`. The handoff contains the evidence that full-game scenario
+execution—not log capture—is the bottleneck, and the required specification
+split while preserving the integration cases.
+
 ## 2026-08-22T21:22:38Z — coder handoff: repair invalid tuple attribution
 
 Priority-00 `git_handoff` queued to coder with commit `73ea574660` under
