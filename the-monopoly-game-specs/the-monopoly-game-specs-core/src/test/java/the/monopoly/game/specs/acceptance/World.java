@@ -116,6 +116,7 @@ public class World {
   private boolean simulatorDevelopmentLoans;
   private boolean simulatorFullDrawDevelopmentLoans;
   private boolean simulatorWarProfitsTax;
+  private boolean simulatorRentRelief;
   private boolean namedEntityFormed;
   private boolean warProfitsTaxEnabled;
   private final Map<String, Money> pawnLandWorthRent = new HashMap<>();
@@ -265,6 +266,7 @@ public class World {
         simulatorFullDrawDevelopmentLoans = true;
       }
       case "--optional-war-profits-tax" -> simulatorWarProfitsTax = true;
+      case "--optional-rent-relief" -> simulatorRentRelief = true;
       default -> throw new AssertionError("Unknown simulator argument: " + argument);
     }
   }
@@ -272,7 +274,8 @@ public class World {
   public void runSimulator() {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
     simulatorResult = Simulator.run(simulatorPlayers, simulatorStrategies, false, false,
-        simulatorDevelopmentLoans, simulatorFullDrawDevelopmentLoans, simulatorMaxYears, null, simulatorWarProfitsTax);
+        simulatorDevelopmentLoans, simulatorFullDrawDevelopmentLoans, simulatorMaxYears, null, simulatorWarProfitsTax,
+        simulatorRentRelief);
   }
 
   public Simulator.Result simulatorResult() {
@@ -290,7 +293,7 @@ public class World {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
     runningSimulator = Simulator.start(simulatorPlayers, simulatorStrategies, simulatorStalemateTrading,
         simulatorLegalEntityTrading, simulatorDevelopmentLoans, simulatorFullDrawDevelopmentLoans,
-        simulatorMaxYears, null, simulatorWarProfitsTax);
+        simulatorMaxYears, null, simulatorWarProfitsTax, simulatorRentRelief);
   }
 
   public void stopSimulator() {
@@ -354,6 +357,7 @@ public class World {
     simulatorDevelopmentLoans = arguments.contains("--optional-development-loans");
     simulatorFullDrawDevelopmentLoans = arguments.contains("--optional-development-loans-full-draw");
     simulatorWarProfitsTax = arguments.contains("--optional-war-profits-tax");
+    simulatorRentRelief = arguments.contains("--optional-rent-relief");
     simulatorMaxYears = -1;
     for (String argument : arguments) {
       if (argument.startsWith("--max-years=")) {
@@ -1796,6 +1800,10 @@ public class World {
     }
     throw new AssertionError("Packaged jar output did not confirm war profits tax is " + state
         + ": " + packagedCliOutputBuffer);
+  }
+
+  public void assertPackagedCliRentRelief(String state) {
+    assertPackagedCliState("Rent relief enabled", "rent relief", state);
   }
 
   public void assertPackagedCliAssetRichOpening(String state) {

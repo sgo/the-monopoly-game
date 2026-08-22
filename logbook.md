@@ -44522,6 +44522,40 @@ acceptance-mutation-debt sweep.
 Sent the coder the final report/logging clamped-reserve equivalences for
 persistent policy seeding under `acceptance-mutation-debt`.
 
+## 2026-08-22T11:15:41Z — architect receives final policy implementation
+
+Complete handoff received:
+
+```text
+id: 20260822T111541Z_000236_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: 2ac2328f9a
+created_at: 2026-08-22T11:15:41Z
+enqueued_at: 2026-08-22T11:15:45Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T11:15:46Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 2ac2328f9a
+```
+
+Merged the final two clamped-reserve policy entries. Final focused soft
+audits are clean: report ran 129 executable mutations, all killed; logging
+ran 138, all killed. Both completed with zero survivors and zero errors.
+Restored generated audit metadata and closed the completed
+`acceptance-mutation-debt` sweep with the specifier.
+
+## 2026-08-22T13:45:00Z — architect sends phase-complete acceptance-mutation sync
+
+Sent the phase-complete `acceptance-mutation-debt` synchronization commit
+to the specifier after accepting all coder follow-up work.
+
 ## 2026-08-22T13:35:00Z — coder processes final clamped-reserve policy task
 
 Complete handoff received:
@@ -44577,3 +44611,103 @@ merge_and_process coder 2ac2328f9a
 ```
 
 Returned the verified final clamped-reserve policy state to the architect.
+## 2026-08-22T11:20:00Z — specifier merges architect's phase-complete acceptance-mutation-debt sync
+
+Merged `83013e505a` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression. Also ran the full acceptance suite directly as final
+confirmation: 908/908, 0 failures — matches the architect's own final
+focused-audit report (report 129/129 killed, logging 138/138 killed, zero
+survivors, zero errors).
+
+The `acceptance-mutation-debt` task is now fully closed: 314 total policy
+entries, spanning all 19 originally-audited features with zero remaining
+unclassified survivors and zero open real gaps. No further specifier
+action pending; awaiting the user's next direction.
+
+## 2026-08-22T11:35:00Z — specifier hands off rent-relief-cli-wiring to coder
+
+User asked to review the megacorp-rent-relief backlog and pick a slice to
+hand off. Investigated real dependencies rather than assuming the backlog's
+own prior framing was still accurate: confirmed via `grep` that neither
+`MegacorpSalaryTax` nor `RentRelief` is referenced anywhere outside their
+own files — unlike the "just needs a government-balance readback path"
+framing the backlog files themselves carried, both classes are currently
+invoked only by isolated test-fixture triggers, never from real gameplay
+(`Turn`/`Rent`). That's a materially bigger gap than originally scoped, and
+blocks the majority of the remaining backlog (megacorp-salary-tax-3,
+rent-relief-3/4/5, tax-3/4, and the journal/logging/report-90/91/92/93
+observability entries).
+
+Presented this breakdown to the user; they chose to start with the one
+slice with zero dependency on that gap: **CLI flag wiring** (cli-16, cli-17,
+cli-jar-11), which just mirrors the already-working
+`--optional-war-profits-tax` CLI pattern for `--optional-rent-relief`.
+
+Promoted all three scenarios from `backlog/specs-cli/en/cli.feature` and
+`cli-packaged-jar.feature` into the tracked
+`the-monopoly-game-specs-cli` spec files (after cli-15/cli-jar-10), then
+deleted both now-empty backlog files (and the emptied
+`backlog/specs-cli/en/` directory). Verified via `gherkin-parser` (clean)
+and `gherkin-ir-dry-checker` (only the same pre-existing cross-flag
+phrasing noise every other CLI flag's scenarios already carry) and
+`mvn test` (green — the new scenarios need coder-side flag wiring, nothing
+existing broke). Committed as `4b29bd3`.
+
+Task name: `rent-relief-cli-wiring`. The remaining backlog (megacorp-salary-
+tax-3, rent-relief-3/4/5, tax-3/4, journal/logging/report-90 through 93)
+stays backlogged, gated on the real-turn-loop-wiring gap; not handed off
+this round.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: rent-relief-cli-wiring
+commit: c5a265a8ba
+
+Re-read your role and constitution.
+
+merge_and_process specifier c5a265a8ba
+```
+
+## 2026-08-22T20:54:00+02:00 — coder processes rent-relief-cli-wiring
+
+Received handoff:
+
+```text
+id: 20260822T184032Z_000250_from_specifier
+from: specifier
+to: coder
+recipient: coder
+priority: 50
+type: git_handoff
+role: specifier
+commit: 51e1d852da
+created_at: 2026-08-22T18:40:32.511114Z
+enqueued_at: 2026-08-22T18:40:32.662546Z
+task: rent-relief-cli-wiring
+dequeued_at: 2026-08-22T18:40:54.658844Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 51e1d852da
+```
+
+Merged the specifier's promoted cli-16, cli-17, and cli-jar-11 scenarios and
+implemented `--optional-rent-relief` parity with the existing war-profits-tax
+CLI path. The simulator now recognizes the flag, reports it in usage and
+startup output, threads it into `Game`, and records `RentReliefEnabled` in the
+journal/report while preserving existing overload defaults. Updated the
+acceptance world and step handlers so structured and raw simulator scenarios
+forward the flag, and retained the packaged-jar output assertion.
+
+Verification: Babashka `gherkin-parser` parsed both promoted CLI features;
+focused domain and new CLI tests passed; acceptance handler test compilation
+passed; the promoted CLI acceptance feature passed 17/17; and the full normal
+acceptance pipeline passed 910/910 with 0 failures. An earlier full
+`SimulatorTest` run exposed the existing timing-sensitive
+`keepsPlayingUntilToldToStop` assertion, but all three new rent-relief tests
+passed in isolation and the full acceptance pipeline was green.

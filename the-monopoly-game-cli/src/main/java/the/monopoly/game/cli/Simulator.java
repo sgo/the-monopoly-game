@@ -45,6 +45,8 @@ public final class Simulator {
       System.out.println("Full-draw development loans enabled");
     if (List.of(arguments).contains("--optional-war-profits-tax"))
       System.out.println("War profits tax enabled");
+    if (List.of(arguments).contains("--optional-rent-relief"))
+      System.out.println("Rent relief enabled");
     for (String argument : arguments) {
       if (argument.startsWith(SimulatorFlags.MAX_YEARS_FLAG)) {
         System.out.println("Year limit is " + argument.substring(SimulatorFlags.MAX_YEARS_FLAG.length()) + " years");
@@ -84,6 +86,7 @@ public final class Simulator {
     boolean developmentLoans = SimulatorFlags.developmentLoans(arguments);
     boolean fullDrawDevelopmentLoans = SimulatorFlags.fullDrawDevelopmentLoans(arguments);
     boolean warProfitsTax = SimulatorFlags.warProfitsTax(arguments);
+    boolean rentRelief = SimulatorFlags.rentRelief(arguments);
     int maxYears = SimulatorFlags.maxYears(arguments);
     Long seed = SimulatorFlags.seed(arguments);
     List<String> strategyNames = List.of(arguments).subList(Math.min(1, arguments.length), arguments.length).stream()
@@ -93,7 +96,7 @@ public final class Simulator {
     return run(playerCount, strategiesFor(playerCount, strategyNames, stalemateTrading, legalEntityTrading,
             assetRichOpening, developmentLoans, fullDrawDevelopmentLoans),
         stalemateTrading, legalEntityTrading, developmentLoans, fullDrawDevelopmentLoans, maxYears, seed,
-        warProfitsTax);
+        warProfitsTax, rentRelief);
   }
 
   static Strategy.OfPlayers strategiesFor(int playerCount, List<String> strategyNames) {
@@ -143,6 +146,7 @@ public final class Simulator {
         + System.lineSeparator() + "  --optional-development-loans"
         + System.lineSeparator() + "  --optional-development-loans-full-draw"
         + System.lineSeparator() + "  --optional-war-profits-tax"
+        + System.lineSeparator() + "  --optional-rent-relief"
         + System.lineSeparator() + "  --max-years=N"
         + System.lineSeparator() + "  --seed=N"
         + System.lineSeparator() + "Report file: " + reportPath();
@@ -187,8 +191,16 @@ public final class Simulator {
   public static Result run(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading,
                            boolean legalEntityTrading, boolean developmentLoans,
                            boolean fullDrawDevelopmentLoans, int maxYears, Long seed, boolean warProfitsTax) {
+    return run(playerCount, strategies, stalemateTrading, legalEntityTrading,
+        developmentLoans, fullDrawDevelopmentLoans, maxYears, seed, warProfitsTax, false);
+  }
+
+  public static Result run(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading,
+                           boolean legalEntityTrading, boolean developmentLoans,
+                           boolean fullDrawDevelopmentLoans, int maxYears, Long seed,
+                           boolean warProfitsTax, boolean rentRelief) {
     return start(playerCount, strategies, stalemateTrading, legalEntityTrading,
-        developmentLoans, fullDrawDevelopmentLoans, maxYears, seed, warProfitsTax).awaitEnd();
+        developmentLoans, fullDrawDevelopmentLoans, maxYears, seed, warProfitsTax, rentRelief).awaitEnd();
   }
 
   /**
@@ -233,6 +245,14 @@ public final class Simulator {
   public static Running start(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading,
                               boolean legalEntityTrading, boolean developmentLoans,
                               boolean fullDrawDevelopmentLoans, int maxYears, Long seed, boolean warProfitsTax) {
+    return start(playerCount, strategies, stalemateTrading, legalEntityTrading,
+        developmentLoans, fullDrawDevelopmentLoans, maxYears, seed, warProfitsTax, false);
+  }
+
+  public static Running start(int playerCount, Strategy.OfPlayers strategies, boolean stalemateTrading,
+                              boolean legalEntityTrading, boolean developmentLoans,
+                              boolean fullDrawDevelopmentLoans, int maxYears, Long seed,
+                              boolean warProfitsTax, boolean rentRelief) {
     Result rejected = rejectOutOfRange(playerCount);
     if (rejected == null) rejected = rejectInvalidYearLimit(maxYears);
     if (rejected != null) return new Running(rejected);
@@ -246,11 +266,11 @@ public final class Simulator {
           player -> Cup.of(rules.dice().map(die -> die.withRandom(random)).toList()),
           strategies, deeds,
           Cards.Decks.official(deeds, random), new Jail(rules), stalemateTrading, legalEntityTrading,
-          developmentLoans, fullDrawDevelopmentLoans, maxYears, null, warProfitsTax));
+          developmentLoans, fullDrawDevelopmentLoans, maxYears, null, warProfitsTax, rentRelief));
     }
     return new Running(new Game(rules, players, player -> Cup.of(rules.dice().toList()), strategies, deeds,
         Cards.Decks.official(deeds), new Jail(rules), stalemateTrading, legalEntityTrading,
-        developmentLoans, fullDrawDevelopmentLoans, maxYears, null, warProfitsTax));
+        developmentLoans, fullDrawDevelopmentLoans, maxYears, null, warProfitsTax, rentRelief));
   }
 
   private static Result rejectOutOfRange(int playerCount) {

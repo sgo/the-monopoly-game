@@ -82,6 +82,10 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.WarProfitsTaxEnabled(state.equals("enabled")));
   }
 
+  static Claim rentRelief(String state) {
+    return Claim.of(new Entry.RentReliefEnabled(state.equals("enabled")));
+  }
+
   static Claim purchaseDeclined(String pawnName, String spaceName, int price,
                                 Strategy.DeclineReason reason, int reserve) {
     if (reason == Strategy.DeclineReason.NO_BUYING_POLICY) {

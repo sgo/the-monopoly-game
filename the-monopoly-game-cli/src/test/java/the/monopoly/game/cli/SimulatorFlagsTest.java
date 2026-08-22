@@ -13,6 +13,7 @@ class SimulatorFlagsTest {
     assertThat(SimulatorFlags.developmentLoans("--optional-development-loans")).isTrue();
     assertThat(SimulatorFlags.fullDrawDevelopmentLoans("--optional-development-loans-full-draw")).isTrue();
     assertThat(SimulatorFlags.warProfitsTax("--optional-war-profits-tax")).isTrue();
+    assertThat(SimulatorFlags.rentRelief("--optional-rent-relief")).isTrue();
   }
 
   @Test
@@ -23,6 +24,7 @@ class SimulatorFlagsTest {
     assertThat(SimulatorFlags.developmentLoans()).isFalse();
     assertThat(SimulatorFlags.fullDrawDevelopmentLoans()).isFalse();
     assertThat(SimulatorFlags.warProfitsTax()).isFalse();
+    assertThat(SimulatorFlags.rentRelief()).isFalse();
   }
 
   @Test
@@ -33,6 +35,7 @@ class SimulatorFlagsTest {
     assertThat(SimulatorFlags.recognized("--optional-development-loans")).isTrue();
     assertThat(SimulatorFlags.recognized("--optional-development-loans-full-draw")).isTrue();
     assertThat(SimulatorFlags.recognized("--optional-war-profits-tax")).isTrue();
+    assertThat(SimulatorFlags.recognized("--optional-rent-relief")).isTrue();
     assertThat(SimulatorFlags.recognized("--max-years=12")).isTrue();
     assertThat(SimulatorFlags.recognized("--seed=42")).isTrue();
     assertThat(SimulatorFlags.recognized("greedo")).isFalse();

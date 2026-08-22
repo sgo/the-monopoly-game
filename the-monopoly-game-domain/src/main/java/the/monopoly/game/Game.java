@@ -65,6 +65,7 @@ public class Game {
   private final boolean fullDrawDevelopmentLoans;
   private final DevelopmentLoanBook developmentLoanBook;
   private final boolean warProfitsTax;
+  private final boolean rentRelief;
   private final WarProfitsTaxBook warProfitsTaxBook;
   private final int maxYears;
   private boolean automaticMarketDeadlock = true;
@@ -139,6 +140,16 @@ public class Game {
       boolean developmentLoans, boolean fullDrawDevelopmentLoans, int maxYears,
       DevelopmentLoanBook developmentLoanBook, boolean warProfitsTax
   ) {
+    this(rules, players, cups, strategies, deeds, decks, jail, stalemateTrading, legalEntityTrading,
+        developmentLoans, fullDrawDevelopmentLoans, maxYears, developmentLoanBook, warProfitsTax, false);
+  }
+
+  public Game(
+      Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
+      Cards.Decks decks, Jail jail, boolean stalemateTrading, boolean legalEntityTrading,
+      boolean developmentLoans, boolean fullDrawDevelopmentLoans, int maxYears,
+      DevelopmentLoanBook developmentLoanBook, boolean warProfitsTax, boolean rentRelief
+  ) {
     this.rules = rules;
     this.players = players;
     this.cups = cups;
@@ -152,6 +163,7 @@ public class Game {
     this.fullDrawDevelopmentLoans = fullDrawDevelopmentLoans;
     this.developmentLoanBook = developmentLoanBook == null ? new DevelopmentLoanBook(rules.bank()) : developmentLoanBook;
     this.warProfitsTax = warProfitsTax;
+    this.rentRelief = rentRelief;
     this.warProfitsTaxBook = new WarProfitsTaxBook(rules.bank(), WarProfitsTax.boardValue(rules));
     this.maxYears = maxYears;
     applyOpeningCapital();
@@ -240,6 +252,7 @@ public class Game {
     journalling.stalemateTrading(stalemateTrading);
     journalling.developmentLoans(developmentLoans, fullDrawDevelopmentLoans);
     journal.log(new Journal.Entry.WarProfitsTaxEnabled(warProfitsTax));
+    journal.log(new Journal.Entry.RentReliefEnabled(rentRelief));
     players.forEach(player -> journalling.strategyNamed(player, strategies.forPlayer(player)));
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
@@ -798,6 +811,9 @@ public class Game {
       }
 
       record WarProfitsTaxEnabled(boolean enabled) implements Entry {
+      }
+
+      record RentReliefEnabled(boolean enabled) implements Entry {
       }
 
       record WarProfitsTaxPaid(Player.ID payer, Money amount) implements Entry {

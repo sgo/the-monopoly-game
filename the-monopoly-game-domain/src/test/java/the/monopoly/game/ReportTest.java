@@ -64,6 +64,12 @@ class ReportTest {
   }
 
   @Test
+  void aReportTellsRentReliefState() {
+    assertThat(report(new Entry.RentReliefEnabled(true)))
+        .isEqualTo("rent relief is enabled");
+  }
+
+  @Test
   void aReportTellsWhatAPlayerBoughtAndWhatItCostThem() {
     assertThat(report(new Entry.Bought(
         Pawn.dog.id(), Street.Type.DiestsestraatLeuven, new Money(60)

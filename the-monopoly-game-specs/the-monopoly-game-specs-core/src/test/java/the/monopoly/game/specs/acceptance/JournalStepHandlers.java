@@ -28,6 +28,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalBalanc
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.finalAge;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.governmentBalance;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.money;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentRelief;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTax;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTaxPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moved;
@@ -779,7 +780,10 @@ final class JournalStepHandlers {
             (world, arguments) -> records(world, governmentBalance(Integer.parseInt(arguments.text(1))))),
 
         then("^the game journal records that the war profits tax is " + NAME + "$",
-            (world, arguments) -> records(world, warProfitsTax(arguments.text(1)))), 
+            (world, arguments) -> records(world, warProfitsTax(arguments.text(1)))),
+
+        then("^the game journal records that rent relief is " + NAME + "$",
+            (world, arguments) -> records(world, rentRelief(arguments.text(1)))),
 
         then("^the government's account holds \\$" + MONEY + "$",
             (world, arguments) -> assertThat(world.governmentAccountBalance())

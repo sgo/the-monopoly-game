@@ -40,6 +40,10 @@ final class SimulatorFlags {
     return present(arguments, "--optional-war-profits-tax");
   }
 
+  static boolean rentRelief(String... arguments) {
+    return present(arguments, "--optional-rent-relief");
+  }
+
   /** Whether {@code token} is a recognised flag rather than a strategy name. */
   static boolean recognized(String argument) {
     return argument.equals("--optional-greedo-stalemate-trading")
@@ -48,6 +52,7 @@ final class SimulatorFlags {
         || argument.equals("--optional-development-loans")
         || argument.equals("--optional-development-loans-full-draw")
         || argument.equals("--optional-war-profits-tax")
+        || argument.equals("--optional-rent-relief")
         || argument.startsWith(MAX_YEARS_FLAG)
         || argument.startsWith(SEED_FLAG);
   }

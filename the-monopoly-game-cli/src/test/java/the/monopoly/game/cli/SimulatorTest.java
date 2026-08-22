@@ -178,4 +178,31 @@ class SimulatorTest {
     assertThat(result.output()).doesNotContain("war profits tax is enabled");
   }
 
+  @Test
+  void recognizesTheRentReliefFlagAndThreadsItIntoTheGame() {
+    Simulator.Result result = Simulator.execute("2", "greedo", "greedo",
+        "--optional-rent-relief", "--seed=1");
+
+    assertThat(result.succeeded()).isTrue();
+    assertThat(result.output()).contains("rent relief is enabled");
+  }
+
+  @Test
+  void threadsTheRentReliefFlagIntoTheGame() {
+    Simulator.Result result = Simulator.run(2, Simulator.strategiesFor(2, List.of()),
+        false, false, false, false, -1, 1L, false, true);
+
+    assertThat(result.succeeded()).isTrue();
+    assertThat(result.output()).contains("rent relief is enabled");
+  }
+
+  @Test
+  void leavesRentReliefDisabledByDefault() {
+    Simulator.Result result = Simulator.run(2, Simulator.strategiesFor(2, List.of()),
+        false, false, false, false, -1, 1L, false, false);
+
+    assertThat(result.succeeded()).isTrue();
+    assertThat(result.output()).doesNotContain("rent relief is enabled");
+  }
+
 }

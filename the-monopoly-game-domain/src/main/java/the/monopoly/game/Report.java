@@ -61,6 +61,7 @@ public final class Report {
       case Entry.DevelopmentLoans it -> "development loans are " + (it.enabled() ? "enabled" : "disabled")
           + (it.fullDraw() ? " with full draw" : "");
       case Entry.WarProfitsTaxEnabled it -> "war profits tax is " + (it.enabled() ? "enabled" : "disabled");
+      case Entry.RentReliefEnabled it -> "rent relief is " + (it.enabled() ? "enabled" : "disabled");
       case Entry.WarProfitsTaxPaid it -> name(it.payer()) + " pays a war profits tax of $" + it.amount().amount();
       case Entry.DevelopmentLoanRaised it -> name(it.borrower()) + " raises a development loan of $"
           + it.amount().amount() + " from the bank, secured by " + boardSpaceName(it.collateral())
