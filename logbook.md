@@ -39422,6 +39422,13 @@ report was removed. The new CLI survivor report is retained and returned to
 the specifier for a grounded equivalence-versus-assertion decision. Generated
 feature manifests were restored.
 
+## 2026-08-22T21:54:01Z — handoff to specifier: post-split CLI survivor
+
+Queued priority-00 `git_handoff` to specifier for task `rent-relief-cli-wiring`,
+commit `f4e9a961f1`. It contains the 4.4x packaged-JAR timing reduction and
+the sole newly surfaced, self-contained fast-CLI survivor tuple for
+classification.
+
 ## 2026-08-22T21:22:38Z — coder handoff: repair invalid tuple attribution
 
 Priority-00 `git_handoff` queued to coder with commit `73ea574660` under
