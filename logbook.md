@@ -39302,6 +39302,28 @@ observable, or add only true semantic equivalences to
 `acceptance/equivalent-mutations.edn` with the required rationale.  Do not
 silence the survivors by recording an unverified manifest.
 
+## 2026-08-22T20:56:40Z — handoff to specifier
+
+```
+id: 20260822T205640Z_000394_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: rent-relief-cli-wiring
+commit: 6320a6ef81
+created_at: 2026-08-22T20:56:40.846838Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 6320a6ef81
+```
+
+Sent priority-00 specifier ownership of the failed soft-Gherkin gate. The
+referenced commit contains the survivor evidence, explicit classification
+criteria, and the requirement to re-run before recording any manifest.
+
 ## 2026-08-22T20:40:00Z — architect receives acceptance-runner repair
 
 Complete handoff received:
