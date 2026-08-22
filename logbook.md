@@ -45545,3 +45545,23 @@ concrete per row (no nulls) — e.g. `en/rules/journal.feature | the journal
 records a bankruptcy to the bank | 0 | starting balance | 5 | 1`. The per-run
 artifact and the APS manifest stamp were reverted before commit; the code
 change and this record are committed.
+
+## 2026-08-22T21:27:27Z — coder sends survivor-tuple defect fix to refactorer
+
+Sent handoff (50, refactorer):
+
+```text
+id: 20260822T212727Z_000244_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: rent-relief-cli-wiring
+commit: 2b8a2a811b
+created_at: 2026-08-22T21:27:27.103545Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 2b8a2a811b
+```
