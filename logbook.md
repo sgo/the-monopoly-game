@@ -44874,3 +44874,29 @@ priority: 50
 task: rent-relief-observability
 commit: PENDING
 ```
+
+## 2026-08-22T21:36:22Z — coder completes rent-relief observability
+
+Implemented the report and logging acceptance support for the six promoted
+rent-relief observability scenarios. Added `rentReliefLine` plus matching
+`GameLogStepHandlers` bindings, and forwarded the acceptance fixture's enabled
+state from `World.playAndCapture()` into the full `Game` constructor.
+
+Verification:
+
+- Parsed journal, report, and logging features with the APS Babashka
+  `gherkin-parser`.
+- Generated the three acceptance entrypoints.
+- Ran `mvn -B -Pacceptance -pl the-monopoly-game-specs/the-monopoly-game-specs-core -am
+  -Dtest='*RentObservabilityJournalAcceptanceTest,*RentObservabilityReportAcceptanceTest,*RentObservabilityLoggingAcceptanceTest' test`.
+- Result: 349/349 tests passed, 0 failures, 0 errors, 0 skipped.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: rent-relief-observability
+commit: PENDING
+```

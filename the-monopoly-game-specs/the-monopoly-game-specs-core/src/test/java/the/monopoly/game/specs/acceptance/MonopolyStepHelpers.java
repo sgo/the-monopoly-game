@@ -382,6 +382,10 @@ final class MonopolyStepHelpers {
     return "war profits tax is " + state;
   }
 
+  static String rentReliefLine(String state) {
+    return "rent relief is " + state;
+  }
+
   static String playerPaidLine(String payer, String payee, int amount) {
     return payer + " pays " + payee + " $" + amount;
   }
