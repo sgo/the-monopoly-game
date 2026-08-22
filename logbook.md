@@ -44364,6 +44364,39 @@ Routed those persistent policy entries to the coder.
 Sent the coder the report/logging survivor reports and classification record
 for persistent equivalence-policy seeding under `acceptance-mutation-debt`.
 
+## 2026-08-22T11:03:15Z — architect receives observability policy implementation
+
+Complete handoff received:
+
+```text
+id: 20260822T110315Z_000235_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: 8126a03f6b
+created_at: 2026-08-22T11:03:15Z
+enqueued_at: 2026-08-22T11:03:20Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T11:03:21Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 8126a03f6b
+```
+
+Merged 127 policy entries. Focused audits skipped 62 report and 65 logging
+equivalents; each then killed all but one executable mutation, with zero
+errors. Recorded the two newly exposed clamped-reserve survivors for the
+specifier and restored generated audit metadata.
+
+## 2026-08-22T13:20:00Z — architect sends observability follow-up survivors
+
+Sent the two post-policy clamped-reserve survivors to the specifier for
+classification under `acceptance-mutation-debt`.
+
 ## 2026-08-22T13:10:00Z — coder processes round-six report/logging policy task
 
 Complete handoff received:
@@ -44419,3 +44452,108 @@ merge_and_process coder 8126a03f6b
 ```
 
 Returned the verified round-six policy state to the architect.
+## 2026-08-22T11:15:00Z — specifier classifies the report/logging follow-up survivors
+
+Merged `f829eca826` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression. Confirmed `equivalent-mutations.edn` now has 312 entries
+(185 + 62 + 65), matching the coder's own count exactly.
+
+Both new survivors — `report-33` example 0's `reserve` (0→-5) and
+`logging-33` example 1's `reserve` (0→-1) — are the identical mechanism
+already confirmed for `journal-33`'s own follow-up: `Greedo.cashReserve`'s
+final `Math.max(reserveAmount, stationReserve(...))` clamps any negative
+configured reserve up to 0 whenever no near-monopoly/station bonus
+applies, so 0 and any negative value produce the same recorded reserve.
+No new investigation needed; accepted as equivalent.
+
+Verdict: this closes out the acceptance-mutation-debt sweep in full — all
+416 survivors across 19 features (journal 76, report 77, logging 80, plus
+183 from rounds 1-4) are now classified, with 5 real gaps found and fixed
+along the way (development-loans-11/-15's tautology, greedo-share-sale-4's
+missing assertion, and the journal/report/logging-33/41/44 tautology + dead
+`interest` column, the latter fixed identically across all three
+observability narration styles).
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: da7110ce76
+
+Re-read your role and constitution.
+
+merge_and_process specifier da7110ce76
+```
+
+## 2026-08-22T11:12:12Z — architect accepts final observability classifications
+
+Complete handoff received:
+
+```text
+id: 20260822T111212Z_000249_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 5720a7e99a
+created_at: 2026-08-22T11:12:12Z
+enqueued_at: 2026-08-22T11:12:17Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T11:12:18Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 5720a7e99a
+```
+
+Accepted both report/logging follow-up reserve mutations as the same
+already-established clamped-reserve equivalence. Routed the final two policy
+entries to the coder, after which focused audits can close the completed
+acceptance-mutation-debt sweep.
+
+## 2026-08-22T13:30:00Z — architect sends final clamped-reserve policy task
+
+Sent the coder the final report/logging clamped-reserve equivalences for
+persistent policy seeding under `acceptance-mutation-debt`.
+
+## 2026-08-22T13:35:00Z — coder processes final clamped-reserve policy task
+
+Complete handoff received:
+
+```text
+id: 20260822T111245Z_000387_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 8a4f0603ae
+created_at: 2026-08-22T11:12:45.707377Z
+enqueued_at: 2026-08-22T11:12:46.283716Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T11:13:04.920885Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 8a4f0603ae
+```
+
+Merged the architect commit and resolved its logbook-only conflict while
+preserving the prior round-six handoff records. Reviewed
+`acceptance/round-six-followup-survivors.md` and added exactly two approved
+clamped-reserve equivalents to `acceptance/equivalent-mutations.edn`:
+report scenario 33 example 0 (`reserve: 0 -> -5`) and logging scenario 33
+example 1 (`reserve: 0 -> -1`). Both use the established rule that negative
+configured reserves clamp to zero when no near-monopoly or station reserve
+applies.
+
+Verification: Babashka EDN parsing succeeded with 314 total entries, including
+63 report entries and 66 logging entries; all three clamped-reserve tuples are
+present, and `git diff --check` passed.
