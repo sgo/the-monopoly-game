@@ -423,14 +423,14 @@ Feature: game logging
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "dog" will roll 2 and 3 for their turn
     When we play the game
-    Then the game log records that pawn "dog" starts a turn with $<dog_starting_balance> and a $<reserve> reserve
+    Then the game log records that pawn "dog" starts a turn with $<expected_balance> and a $<expected_reserve> reserve
 
     Examples:
-      | strategy | dog_starting_balance | reserve |
-      | Greedo | 1500 | 0 |
-      | Billionaire | 1500 | 0 |
-      | Greedo | 1500 | 100 |
-      | Billionaire | 1500 | 100 |
+      | strategy | dog_starting_balance | reserve | expected_balance | expected_reserve |
+      | Greedo | 1500 | 0 | 1500 | 0 |
+      | Billionaire | 1500 | 0 | 1500 | 0 |
+      | Greedo | 1500 | 100 | 1500 | 100 |
+      | Billionaire | 1500 | 100 | 1500 | 100 |
 
   # logging-34
   Scenario Outline: the log records why a player declines to buy a card-driven property they cannot afford
@@ -532,12 +532,12 @@ Feature: game logging
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "dog" will roll 2 and 3 for their turn
     When we play the game
-    Then the game log records that pawn "dog" starts a turn with $<dog_starting_balance> and a $<reserve> reserve
+    Then the game log records that pawn "dog" starts a turn with $<expected_balance> and a $<reserve> reserve
 
     Examples:
-      | strategy | dog_starting_balance | reserve |
-      | Greedo | 1500 | 60 |
-      | Billionaire | 1500 | 60 |
+      | strategy | dog_starting_balance | reserve | expected_balance |
+      | Greedo | 1500 | 60 | 1500 |
+      | Billionaire | 1500 | 60 | 1500 |
 
   # logging-42
   Scenario Outline: the log records a debtor putting a property up for sale and the sole buyer's winning offer
@@ -595,14 +595,14 @@ Feature: game logging
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "dog" will roll 2 and 3 for their turn
     When we play the game
-    Then the game log records that pawn "dog" starts a turn with $<dog_starting_balance> and a $<reserve> reserve
+    Then the game log records that pawn "dog" starts a turn with $<expected_balance> and a $<reserve> reserve
 
     Examples:
-      | strategy | dog_starting_balance | reserve |
-      | Greedo | 200 | 160 |
-      | Billionaire | 200 | 160 |
-      | Greedo | 100 | 0 |
-      | Billionaire | 100 | 0 |
+      | strategy | dog_starting_balance | reserve | expected_balance |
+      | Greedo | 200 | 160 | 200 |
+      | Billionaire | 200 | 160 | 200 |
+      | Greedo | 100 | 0 | 100 |
+      | Billionaire | 100 | 0 | 100 |
 
   # logging-45
   Scenario Outline: the log records a card drawn before the bank pays the player directly
@@ -1130,8 +1130,8 @@ Feature: game logging
     Then the game log records that pawn "dog" defaults on the development loan secured by "Rue Grande Dinant"; the bank forecloses
 
     Examples:
-      | principal | bid | interest |
-      | 20        | 30  | 0.60     |
+      | principal | bid |
+      | 20        | 30   |
 
   # logging-78
   Scenario Outline: the log records a legal entity defaulting on a development loan and the bank foreclosing
@@ -1151,8 +1151,8 @@ Feature: game logging
     Then the game log records that Pink Realty defaults on the development loan secured by "Rue de Diekirch Arlon"; the bank forecloses
 
     Examples:
-      | principal | bid | interest |
-      | 40        | 25  | 1.20     |
+      | principal | bid |
+      | 40        | 25   |
   # logging-79
   Scenario Outline: the log records a bondholder's annual payout on a player's development loan
     Given the official rule set

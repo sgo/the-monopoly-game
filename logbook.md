@@ -44165,6 +44165,34 @@ Sent the coder the accepted journal-33 clamped-reserve equivalence for
 persistent policy seeding under `acceptance-mutation-debt`.
 
 ## 2026-08-22T08:25:00Z — coder processes clamped-reserve policy task
+## 2026-08-22T08:00:00Z — specifier starts round 6 (report + logging)
+
+User approved continuing. Requesting exact per-mutation detail for
+`report.feature`'s 77 survivors and `logging.feature`'s 80 survivors
+together, in the same self-contained tuple format used for journal. Since
+both narrate the same underlying scenarios as `journal.feature` in
+different styles ("the game report says that X" / "the game log records
+that X" vs. "the game journal records that X"), expecting most of these to
+map directly onto journal's already-completed classification once matched
+by scenario name, example index, and key — only genuinely new
+scenario/key combinations (if any exist in report/logging but not journal)
+will need fresh investigation.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: ede14a9020
+
+Re-read your role and constitution.
+
+merge_and_process specifier ede14a9020
+```
+
+## 2026-08-22T08:27:45Z — architect receives round-six observability audit request
 
 Complete handoff received:
 
@@ -44197,3 +44225,177 @@ station reserve applies.
 
 Verification: Babashka EDN parsing succeeded with 185 total entries and exactly
 one matching clamped-reserve tuple; `git diff --check` passed.
+id: 20260822T082745Z_000247_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: ebda63bd60
+created_at: 2026-08-22T08:27:45Z
+enqueued_at: 2026-08-22T08:27:50Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T08:27:51Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier ebda63bd60
+```
+
+Resolved a logbook-only merge conflict by preserving both the prior
+clamped-reserve handoff record and the round-six request. Ran the required
+soft audits sequentially and recorded their complete survivor sets:
+`report.feature` has 77 survivors (101 killed, zero errors) and
+`logging.feature` has 80 survivors (111 killed, zero errors). Restored
+generated audit metadata and sent both self-contained tuple reports to the
+specifier for classification.
+
+## 2026-08-22T10:55:00Z — architect sends round-six survivor reports
+
+Sent `acceptance/round-six-report-survivors.md` and
+`acceptance/round-six-logging-survivors.md` to the specifier under
+`acceptance-mutation-debt`.
+
+## 2026-08-22T10:30:00Z — specifier classifies report.feature (77) and logging.feature (80): applied journal's fixes directly, all remaining survivors inherited as equivalents
+
+Merged `1a00588d05` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression, both before and after the fixes below.
+
+Confirmed the expected structural parity: `report.feature` and
+`logging.feature` mirror `journal.feature` scenario-for-scenario
+(report-N/logging-N narrate the identical underlying setup as journal-N in
+a different style — same Background, same Given/When steps, same
+Examples tables), so the same two defects existed in both, at the same
+scenario numbers:
+
+- **report-33/41/44 and logging-33/41/44** carried the identical
+  arrange/assert tautology as journal-33/41/44 ("starts a turn with
+  $<dog_starting_balance> and a $<reserve> reserve"). Applied the same
+  fix: decoupled `expected_balance`/`expected_reserve` columns.
+- **report-77/78 and logging-77/78** carried the identical dead `interest`
+  column as journal-77/78. Pruned it the same way.
+
+Committed both fixes together as `fc8c9c7` (both files, one commit, since
+it's the same mechanical fix applied twice). Verified via
+`gherkin-parser`, the required characterization check, and a full
+acceptance suite run (908/908) — all green.
+
+**All remaining survivors — 62 in report (77-15), 65 in logging (80-15) —
+map onto journal's already-verified equivalence buckets** by matching
+scenario + key, confirming the same auction-ceiling, reserve/threshold,
+case-insensitive strategy/state, and irrelevant-background patterns
+already established. Two new key names appeared that weren't in journal's
+list (different survivor sets per mutation run, not a structural
+difference), both individually confirmed rather than assumed:
+
+- **logging-68's `treasury`** (100→103, "<entity_name> builds a house...
+  when its treasury can pay for it"): confirmed via direct read — the
+  assertion is a fixed `$100` house cost, a separate figure from
+  `treasury`; the entity's treasury just needs to comfortably cover it,
+  same comfortable-margin bucket as everywhere else.
+- **logging-59's `dog_die_1`/`dog_die_2`/`dog_start_position`** (age
+  increasing after passing Start): confirmed via direct read — the
+  scenario's actual assertion is a fixed `$200` salary and age increment,
+  not the exact position/dice values; any combination that results in
+  *passing* Start produces the identical qualitative event, so the precise
+  numbers are interchangeable. Same reserve/threshold-style bucket, just a
+  movement-based trigger instead of a cash-based one.
+
+Also reused report/logging's own `Billionaire`→`billionaire` and
+`disabled`→`Disabled`/`dIsabled` survivors as the same established
+case-insensitive-parsing equivalence (case bucket C).
+
+Verdict: 0 new real gaps in either file — both defects found in journal
+were the *only* ones, and they were structural (shared across all three
+narration styles), not narration-specific. 414 survivors classified in
+total across 19 features (journal's 76 + report's 77 + logging's 80, plus
+the 261 from rounds 1-4). This closes the observability trio and the
+acceptance-mutation-debt sweep started at the user's direction several
+rounds ago — every originally-audited feature has now been classified.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: 866cea47ed
+
+Re-read your role and constitution.
+
+merge_and_process specifier 866cea47ed
+```
+
+## 2026-08-22T10:54:30Z — architect receives round-six classifications
+
+Complete handoff received:
+
+```text
+id: 20260822T105430Z_000248_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: cb72b00c28
+created_at: 2026-08-22T10:54:30Z
+enqueued_at: 2026-08-22T10:54:37Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T10:54:38Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier cb72b00c28
+```
+
+Accepted the report/logging parity fixes: each decouples the journal-style
+expected values in scenarios 33/41/44 and removes the dead `interest`
+column in scenarios 77/78. The other 127 tuples (62 report, 65 logging)
+are approved equivalents inherited from the journal mechanisms, including
+the individually confirmed logging treasury and pass-Start movement cases.
+Routed those persistent policy entries to the coder.
+
+## 2026-08-22T13:00:00Z — architect sends report/logging policy task
+
+Sent the coder the report/logging survivor reports and classification record
+for persistent equivalence-policy seeding under `acceptance-mutation-debt`.
+
+## 2026-08-22T13:10:00Z — coder processes round-six report/logging policy task
+
+Complete handoff received:
+
+```text
+id: 20260822T105509Z_000385_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: b04298e0e8
+created_at: 2026-08-22T10:55:09.280109Z
+enqueued_at: 2026-08-22T10:55:09.569817Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T10:55:36.556126Z
+
+Re-read your role and constitution.
+
+merge_and_process architect b04298e0e8
+```
+
+Merged the architect commit and resolved its logbook-only conflict while
+preserving both prior and round-six handoff records. Added the architect's
+approved 127 inherited equivalents to `acceptance/equivalent-mutations.edn`:
+62 for `report.feature` and 65 for `logging.feature`. The entries cover the
+survivor reports after excluding the 15 obsolete structural survivors in each
+feature (decoupled expected values in scenarios 33/41/44 and pruned dead
+`interest` columns in scenarios 77/78). Special evidence-backed entries cover
+logging treasury affordability and pass-Start movement inputs.
+
+Verification: Babashka EDN parsing succeeded with 312 total entries, including
+185 existing entries, 62 report entries, and 65 logging entries; no duplicate
+maps were found, and `git diff --check` passed.
