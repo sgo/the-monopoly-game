@@ -39235,6 +39235,27 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-22T20:30:00Z — architect final verification: rent-relief CLI wiring and observability
+
+Started the mandatory final sequence after `a39b60d98c` and `33418fa0ee`:
+
+- `mutate4java` with eight workers and focused reactor test commands killed all
+  5/5 mutation sites in `Report.java` and all 8/8 in `SimulatorFlags.java`.
+  The tool updated their embedded mutation manifests; those tool-generated
+  changes are retained in this handoff commit.
+- `Simulator.java` cannot yet enter mutation execution: its baseline runs
+  `SimulatorTest#keepsPlayingUntilToldToStop`, whose hard-coded one-second
+  sleep is demonstrably nondeterministic. One isolated run passed, the next
+  failed at line 146 (`assertThat(running.isPlaying()).isTrue()`). The full
+  focused `SimulatorTest` baseline likewise failed at that assertion.
+
+The final language mutation, language DRY, and full soft Gherkin mutation
+remain deliberately incomplete until the baseline is deterministic. Handing
+the test reliability repair to the coder, who must make the test prove the
+simulator's continued execution without depending on natural game duration,
+then run the focused test repeatedly and hand the result back for the remaining
+final gates.
+
 ## 2026-08-22T19:43:13Z — architect receives rent-relief observability review
 
 Complete handoff received:
