@@ -45136,7 +45136,7 @@ type: git_handoff
 to: coder
 priority: 50
 task: rent-relief-observability
-commit: PENDING
+commit: 2762d8c54b
 ```
 
 ## 2026-08-22T21:36:22Z — coder completes rent-relief observability
@@ -45200,6 +45200,33 @@ Refactorer verification (all green):
 
 Handing the verified state back to the architect.
 
+## 2026-08-22T19:44:50Z — specifier merges architect phase-complete sync (rent-relief-observability)
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/50_20260822T194347Z_000390_from_architect_to_specifier.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: rent-relief-observability
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect 33418fa0ee
+```
+
+Merged `33418fa0ee` into `main` (real merge, auto-merged `logbook.md`; no
+conflicts). Brings in the coder's acceptance-harness wiring for
+`journal-92/93`, `report-92/93`, `logging-92/93` (`MonopolyStepHelpers`,
+`World`, `GameLogStepHandlers`) plus the refactorer's verification (domain
+420/420, acceptance 916/916, no production source touched so no mutation/CRAP
+delta) and the architect's own review commit.
+
+Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS; `CharacterizationTest`
+12/12, domain 420/420, CLI module 13/13. No further action needed; task
+`rent-relief-observability` is closed on my side.
+
 ## 2026-08-22T22:40:00Z — coder repairs acceptance mutation runner
 
 Architect requeued the runner repair (ca7e558): `AcceptanceMutationRunner`
@@ -45256,3 +45283,57 @@ Refactorer verification (all green):
   needed. The runner repair is outside my mutation-run scope.
 
 Handing the verified state back to the architect.
+
+## 2026-08-22T20:59:06Z — specifier receives soft-mutation survivor triage request, requests self-contained tuples
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/00_20260822T205640Z_000394_from_architect_to_specifier.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: rent-relief-cli-wiring
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect 6320a6ef81
+```
+
+Merged `6320a6ef81` into `main` (real merge; resolved a `logbook.md` conflict
+by keeping both sides' entries in timestamp order — no other files
+conflicted). Brings in: the simulator determinism fix, the acceptance-runner
+rewrite to execute mutated IR directly instead of compiling generated Java
+per mutant, an empty-background IR fix, and — the actual finding for this
+task — a completed full soft Gherkin-mutation run surfacing survivors across
+eight features that were previously unreachable because the runner couldn't
+finish:
+
+- `greedo-monopoly-buyout.feature`: 20/28 survived
+- `greedo-legal-entity.feature`: 65/172 survived
+- `greedo-share-sale.feature`: 20/30 survived
+- `journal.feature`: 1/132 survived
+- `logging.feature`: 1/140 survived
+- `development-loans.feature`: 14/50 survived
+- `war-profits-tax.feature`: 16/29 survived
+- `specs-cli:cli-packaged-jar.feature`: 1/4 survived
+
+Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS.
+
+Only aggregate per-feature counts were logged, not the individual mutations.
+Following the same rule established during the round-one acceptance-mutation-
+debt sweep ([[acceptance-mutation-debt]] round two, 2026-08-21): refusing to
+classify from counts alone. Requesting one self-contained tuple per survivor
+(feature, scenario name, example index, key, original value, mutated value)
+so each can be grounded in the actual domain mechanism before deciding
+strengthen-the-scenario vs. record-as-equivalent.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: rent-relief-cli-wiring
+commit: PENDING
+```
