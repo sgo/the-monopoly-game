@@ -43857,3 +43857,31 @@ Re-read your role and constitution.
 
 merge_and_process specifier e56f92a35d
 ```
+
+## 2026-08-22T07:24:56Z — architect receives round-five journal audit request
+
+Complete handoff received:
+
+```text
+id: 20260822T071921Z_000244_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 2d79c4c70a
+created_at: 2026-08-22T07:19:21Z
+enqueued_at: 2026-08-22T07:19:45Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T07:19:46Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 2d79c4c70a
+```
+
+Reproduced the journal soft audit: 180 executable mutations, 104 killed, 76
+survived, and zero errors. Recorded the 76 self-contained survivor tuples in
+`acceptance/round-five-journal-survivors.md` for the specifier's review, and
+restored generated audit metadata.

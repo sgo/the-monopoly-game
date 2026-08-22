@@ -1,0 +1,80 @@
+# Round-five journal soft mutation survivors
+
+Format: feature | scenario name | example index | key | original | mutated.
+
+- journal | the journal records why a player declines to buy land they cannot afford | 1 | high_hat_bid | 60 | 69
+- journal | the journal records why a player keeping a reserve declines a purchase that would dip below it | 1 | reserve | 96 | 105
+- journal | the journal records a player's reserve alongside their balance at the start of a turn | 2 | dog_starting_balance | 1500 | 1493
+- journal | the journal records a player's reserve alongside their balance at the start of a turn | 3 | reserve | 100 | 98
+- journal | the journal records why a player keeping a reserve declines a card-driven purchase that would dip below it | 0 | dog_starting_balance | 200 | 191
+- journal | the journal records why a player keeping a reserve declines a card-driven purchase that would dip below it | 1 | reserve | 65 | 62
+- journal | the journal records the reserve dynamically sized for a near-complete colour monopoly at the start of a turn | 0 | dog_starting_balance | 1500 | 1501
+- journal | the journal records a debtor putting a property up for sale and the sole buyer's winning offer | 0 | high_hat_starting_balance | 200 | 199
+- journal | the journal records a debtor putting a property up for sale and the sole buyer's winning offer | 1 | high_hat_starting_balance | 200 | 205
+- journal | the journal records every $5 raise in a bidding war before the winning offer | 0 | iron_box_starting_balance | 320 | 316
+- journal | the journal records every $5 raise in a bidding war before the winning offer | 1 | iron_box_starting_balance | 320 | 322
+- journal | the journal records a near-complete colour group's reserve only while its missing street remains affordable | 2 | dog_starting_balance | 100 | 109
+- journal | the journal records that no one bids before it records the resulting mortgage | 0 | high_hat_starting_balance | 95 | 96
+- journal | the journal records that no one bids before it records the resulting mortgage | 1 | high_hat_reserve | 85 | 79
+- journal | peer trading never touches a colour group that is a genuine two-owner split, even while the buyout cannot yet afford it | 0 | dog_balance | 114 | 107
+- journal | the journal records the winner's final age once the game ends in an ordinary win | 0 | starting_balance | 5 | 4
+- journal | the journal records that pawn "<renter>" pays rent to <entity_name> for an entity-owned street | 0 | renter_position | 3 | -5
+- journal | the journal records a player defaulting on a development loan and the bank foreclosing | 0 | interest | 0.60 | -5.08
+- journal | the journal records a legal entity defaulting on a development loan and the bank foreclosing | 0 | principal | 40 | 47
+- journal | the journal records a player's war profits tax payment | 0 | land_value | 6000 | 5994
+- journal | the journal records the government's final account balance once the game ends | 0 | land_value | 6000 | 6003
+- journal | the journal records the government's final account balance once an ordinary win ends the game too | 0 | high hat balance | 5 | 11
+- journal | the journal records why a player keeping a reserve declines a purchase that would dip below it | 0 | high_hat_bid | 60 | 61
+- journal | the journal records why a player keeping a reserve declines a purchase that would dip below it | 1 | dog_starting_balance | 150 | 142
+- journal | the journal records why a player keeping a reserve declines a purchase that would dip below it | 1 | strategy | Billionaire | billionaire
+- journal | the journal records a player's reserve alongside their balance at the start of a turn | 1 | dog_starting_balance | 1500 | 1502
+- journal | the journal records a player's reserve alongside their balance at the start of a turn | 2 | reserve | 100 | 109
+- journal | the journal records why a player declines to buy a card-driven property they cannot afford | 1 | dog_starting_balance | 100 | 104
+- journal | the journal records why a player keeping a reserve declines a card-driven purchase that would dip below it | 0 | reserve | 65 | 73
+- journal | the journal records a creditor paying interest to keep an inherited mortgage in place | 0 | owner_starting_balance | 0 | -6
+- journal | the journal records a creditor immediately lifting an inherited mortgage | 0 | starting_balance | 10 | 4
+- journal | the journal records a creditor immediately lifting an inherited mortgage | 1 | starting_balance | 10 | 18
+- journal | the journal records a near-complete colour group's reserve only while its missing street remains affordable | 1 | dog_starting_balance | 200 | 205
+- journal | the journal records that no one bids before it records the resulting mortgage | 1 | high_hat_starting_balance | 95 | 94
+- journal | peer trading never touches a colour group that is a genuine two-owner split, even while the buyout cannot yet afford it | 0 | high_hat_balance | 50 | 54
+- journal | the journal records a legal entity's development loan being fully repaid | 0 | bank_funds | 100 | 108
+- journal | the journal records a player defaulting on a development loan and the bank foreclosing | 0 | principal | 20 | 12
+- journal | the journal records a bondholder's annual payout on a player's development loan | 0 | bond_cash | 500 | 493
+- journal | the journal records the government's final account balance once an ordinary win ends the game too | 0 | land_value | 6000 | 5993
+- journal | the journal records rent paid for a utility as a multiple of the dice roll that landed there | 1 | strategy | Billionaire | billionaire
+- journal | the journal records why a player keeping a reserve declines a purchase that would dip below it | 1 | high_hat_bid | 60 | 53
+- journal | the journal records a player's reserve alongside their balance at the start of a turn | 0 | dog_starting_balance | 1500 | 1495
+- journal | the journal records a player's reserve alongside their balance at the start of a turn | 1 | reserve | 0 | 8
+- journal | the journal records why a player declines to buy a card-driven property they cannot afford | 0 | dog_starting_balance | 100 | 93
+- journal | the journal records a bank-forced auction win during another player's bankruptcy | 0 | bid | 35 | 34
+- journal | the journal records a creditor paying interest to keep an inherited mortgage in place | 0 | starting_balance | 2 | -4
+- journal | the journal records every $5 raise in a bidding war before the winning offer | 0 | dog_starting_balance | 0 | 5
+- journal | the journal records every $5 raise in a bidding war before the winning offer | 1 | dog_starting_balance | 0 | -9
+- journal | the journal records a near-complete colour group's reserve only while its missing street remains affordable | 0 | dog_starting_balance | 200 | 193
+- journal | the journal records that no one bids before it records the resulting mortgage | 0 | dog_starting_balance | 10 | 1
+- journal | the majority owner within a split colour group wins the buyout during real play, even when poorer | 0 | dog_balance | 100 | 94
+- journal | the journal records that <entity_name> raises a loan and builds a house on a street when its treasury cannot pay for it | 0 | commitment | 25 | 27
+- journal | the journal records a legal entity defaulting on a development loan and the bank foreclosing | 0 | bid | 25 | 33
+- journal | the journal records a bondholder's annual payout on a player's development loan | 0 | cash | 200 | 205
+- journal | the journal records a bondholder's annual payout on a legal entity's development loan | 0 | bank_funds | 200 | 198
+- journal | the journal records the bank recovering a player's foreclosure proceeds into its own account, rather than paying the bondholder out | 0 | bid | 30 | 31
+- journal | the journal records the bank recovering a legal entity's foreclosure proceeds into its own account, rather than paying the bondholder out | 0 | bid | 25 | 20
+- journal | the journal records that development loans are disabled by default, near the start of the game | 0 | state | disabled | disableD
+- journal | the journal records why a player declines to buy land they cannot afford | 0 | dog_starting_balance | 59 | 56
+- journal | the journal records why a player keeping a reserve declines a purchase that would dip below it | 0 | reserve | 96 | 94
+- journal | the journal records a player's reserve alongside their balance at the start of a turn | 3 | dog_starting_balance | 1500 | 1501
+- journal | the journal records why a player keeping a reserve declines a card-driven purchase that would dip below it | 1 | dog_starting_balance | 200 | 202
+- journal | the journal records the reserve dynamically sized for a near-complete colour monopoly at the start of a turn | 1 | dog_starting_balance | 1500 | 1495
+- journal | the journal records a near-complete colour group's reserve only while its missing street remains affordable | 3 | dog_starting_balance | 100 | 91
+- journal | the journal records that no one bids before it records the resulting mortgage | 0 | high_hat_reserve | 85 | 94
+- journal | the journal records that no one bids before it records the resulting mortgage | 1 | dog_starting_balance | 10 | 11
+- journal | the journal records a player's annual development-loan payment split into interest and principal | 0 | cash | 100 | 93
+- journal | the journal records a legal entity's annual development-loan payment split into interest and principal | 0 | bank_funds | 100 | 101
+- journal | the journal records a player's development loan being fully repaid | 0 | cash | 100 | 91
+- journal | the journal records a player defaulting on a development loan and the bank foreclosing | 0 | bid | 30 | 22
+- journal | the journal records a legal entity defaulting on a development loan and the bank foreclosing | 0 | interest | 1.20 | -8.24
+- journal | the journal records the bank recovering a player's foreclosure proceeds into its own account, rather than paying the bondholder out | 0 | bond_cash | 500 | 507
+- journal | the journal records the bank recovering a legal entity's foreclosure proceeds into its own account, rather than paying the bondholder out | 0 | bond_cash | 500 | 499
+- journal | the journal records that the war profits tax is disabled by default, near the start of the game | 0 | state | disabled | disaBled
+- journal | the journal records the winner and price of an auction after the landing movement | 0 | high_hat_bid | 120 | 119
+- journal | the journal records why a player declines to buy land they cannot afford | 0 | high_hat_bid | 60 | 52
