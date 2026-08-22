@@ -39367,6 +39367,35 @@ entrypoint/dependencies, and accepts a representative invocation. This is a
 specification change; preserve required observable behaviour and return it
 through the normal loop with focused mutation timing/results.
 
+## 2026-08-22T21:41:41Z — handoff to specifier: CLI packaging boundary
+
+Queued priority-00 `git_handoff` to specifier for task `rent-relief-cli-wiring`,
+commit `2873c190b1`. The commit contains the measured bottleneck and requested
+split between semantic CLI acceptance coverage and minimal packaged-JAR smoke
+coverage.
+
+## 2026-08-22T21:43:00Z — logging-mutation performance analysis
+
+The 158.5-second `logging.feature` mutation batch is not caused by SLF4J or
+the in-memory Logback appender. `GameLog` merely appends event objects to a
+synchronized list and assertions scan that list.
+
+The actual cost is scenario execution: the feature contains 49 `we play the
+game` or `we play up to N rounds` actions. Each mutated example constructs a
+new `Game` in `World.playAndCapture` and invokes `Game.play()` or
+`Game.playUpToRounds()`, including card/deed setup and turn-loop processing,
+before asserting the log. With 140 executed mutations this repeatedly executes
+end-to-end game flow; the four hot runner workers cannot make those simulated
+games inexpensive.
+
+Specifier follow-up: preserve a small set of end-to-end log-order/integration
+scenarios, but move event-rendering and individual journal-event assertions to
+direct event/journal setup steps (the feature already has an `event is logged
+to the Journal` pattern) or narrowly bounded `playUpToRounds` scenarios.
+Do not weaken observable logging assertions. Return focused mutation timing
+and survivor results; coder involvement is only needed if a missing direct
+setup/assertion step blocks the specification split.
+
 ## 2026-08-22T21:22:38Z — coder handoff: repair invalid tuple attribution
 
 Priority-00 `git_handoff` queued to coder with commit `73ea574660` under
