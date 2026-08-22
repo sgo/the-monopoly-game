@@ -39273,6 +39273,35 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-22T20:55:56Z — full soft Gherkin-mutation gate: specifier follow-up required
+
+After the acceptance runner repair, the required complete command
+`./acceptance/run-acceptance-mutation.sh --level soft` completed without
+infrastructure errors but exited 1 for surviving mutations.  This is
+acceptance-specification debt, not the earlier runner-performance failure:
+the hot JVM completed the ordinary feature batches in seconds (for example,
+the full 28-mutant Greedo buyout feature completed in 1.395 seconds when
+rechecked), while the survivors leave changed Gherkin values undetected.
+
+Feature-level outcomes requiring triage by the specifier:
+
+- `en/rules/greedo-monopoly-buyout.feature`: 20 survived / 28 total.
+- `en/rules/greedo-legal-entity.feature`: 65 survived / 172 total.
+- `en/rules/greedo-share-sale.feature`: 20 survived / 30 total.
+- `en/rules/journal.feature`: 1 survived / 132 total.
+- `en/rules/logging.feature`: 1 survived / 140 total.
+- `en/rules/development-loans.feature`: 14 survived / 50 total.
+- `en/rules/war-profits-tax.feature`: 16 survived / 29 total.
+- `specs-cli:en/cli-packaged-jar.feature`: 1 survived / 4 total.
+
+The runner reports zero errors for these batches.  The prior run's generated
+feature manifests were deliberately restored rather than committed, because a
+failing gate cannot certify them.  The specifier must classify each survivor:
+strengthen the scenario/assertions where the changed value is behaviorally
+observable, or add only true semantic equivalences to
+`acceptance/equivalent-mutations.edn` with the required rationale.  Do not
+silence the survivors by recording an unverified manifest.
+
 ## 2026-08-22T20:40:00Z — architect receives acceptance-runner repair
 
 Complete handoff received:
