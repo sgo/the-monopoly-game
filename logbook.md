@@ -44163,3 +44163,37 @@ the coder.
 
 Sent the coder the accepted journal-33 clamped-reserve equivalence for
 persistent policy seeding under `acceptance-mutation-debt`.
+
+## 2026-08-22T08:25:00Z — coder processes clamped-reserve policy task
+
+Complete handoff received:
+
+```text
+id: 20260822T075309Z_000383_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: a0366ef4e4
+created_at: 2026-08-22T07:53:09.821377Z
+enqueued_at: 2026-08-22T07:53:10.477844Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T07:53:17.373628Z
+
+Re-read your role and constitution.
+
+merge_and_process architect a0366ef4e4
+```
+
+Merged architect commit `a0366ef4e4` and reviewed
+`acceptance/round-five-journal-followup-survivors.md`. Added the single
+approved journal-33 policy tuple to `acceptance/equivalent-mutations.edn`:
+`reserve: 0 -> -5`, example 0, for the scenario recording a player's reserve
+alongside their balance at the start of a turn. The justification records that
+a negative configured reserve is clamped to zero when no near-monopoly or
+station reserve applies.
+
+Verification: Babashka EDN parsing succeeded with 185 total entries and exactly
+one matching clamped-reserve tuple; `git diff --check` passed.
