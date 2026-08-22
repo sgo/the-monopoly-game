@@ -44605,3 +44605,51 @@ The `acceptance-mutation-debt` task is now fully closed: 314 total policy
 entries, spanning all 19 originally-audited features with zero remaining
 unclassified survivors and zero open real gaps. No further specifier
 action pending; awaiting the user's next direction.
+
+## 2026-08-22T11:35:00Z — specifier hands off rent-relief-cli-wiring to coder
+
+User asked to review the megacorp-rent-relief backlog and pick a slice to
+hand off. Investigated real dependencies rather than assuming the backlog's
+own prior framing was still accurate: confirmed via `grep` that neither
+`MegacorpSalaryTax` nor `RentRelief` is referenced anywhere outside their
+own files — unlike the "just needs a government-balance readback path"
+framing the backlog files themselves carried, both classes are currently
+invoked only by isolated test-fixture triggers, never from real gameplay
+(`Turn`/`Rent`). That's a materially bigger gap than originally scoped, and
+blocks the majority of the remaining backlog (megacorp-salary-tax-3,
+rent-relief-3/4/5, tax-3/4, and the journal/logging/report-90/91/92/93
+observability entries).
+
+Presented this breakdown to the user; they chose to start with the one
+slice with zero dependency on that gap: **CLI flag wiring** (cli-16, cli-17,
+cli-jar-11), which just mirrors the already-working
+`--optional-war-profits-tax` CLI pattern for `--optional-rent-relief`.
+
+Promoted all three scenarios from `backlog/specs-cli/en/cli.feature` and
+`cli-packaged-jar.feature` into the tracked
+`the-monopoly-game-specs-cli` spec files (after cli-15/cli-jar-10), then
+deleted both now-empty backlog files (and the emptied
+`backlog/specs-cli/en/` directory). Verified via `gherkin-parser` (clean)
+and `gherkin-ir-dry-checker` (only the same pre-existing cross-flag
+phrasing noise every other CLI flag's scenarios already carry) and
+`mvn test` (green — the new scenarios need coder-side flag wiring, nothing
+existing broke). Committed as `4b29bd3`.
+
+Task name: `rent-relief-cli-wiring`. The remaining backlog (megacorp-salary-
+tax-3, rent-relief-3/4/5, tax-3/4, journal/logging/report-90 through 93)
+stays backlogged, gated on the real-turn-loop-wiring gap; not handed off
+this round.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: rent-relief-cli-wiring
+commit: 4b29bd3245
+
+Re-read your role and constitution.
+
+merge_and_process specifier 4b29bd3245
+```
