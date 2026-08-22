@@ -43891,6 +43891,40 @@ restored generated audit metadata.
 Sent the tracked journal survivor report to the specifier for classification
 under `acceptance-mutation-debt`.
 
+## 2026-08-22T07:42:56Z — architect receives journal classifications
+
+Complete handoff received:
+
+```text
+id: 20260822T074256Z_000245_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: eecd914d0a
+created_at: 2026-08-22T07:42:56Z
+enqueued_at: 2026-08-22T07:43:02Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T07:43:03Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier eecd914d0a
+```
+
+Accepted the two journal Gherkin fixes: decoupled expected journal values in
+journal-33/41/44, and removed the dead `interest` columns in journal-77/78.
+The specifier classified the other 61 survivors as equivalents. Routed their
+policy entries to the coder, excluding the 13 resolved tautology mutations and
+the two pruned dead-column mutations.
+
+## 2026-08-22T07:45:00Z — architect sends journal policy task
+
+Sent the coder the journal survivor report and classification record for
+persistent equivalence-policy seeding under `acceptance-mutation-debt`.
+
 ## 2026-08-22T07:45:00Z — specifier classifies journal.feature's 76 survivors: 2 real gaps found and fixed, 3 more merged into the first fix, 1 dead column pruned, 71 equivalent
 
 Read `journal.feature` in full (all 89 scenarios) plus the domain code
