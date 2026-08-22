@@ -44727,3 +44727,150 @@ merge_and_process coder 664d44c9f0
 ```
 
 Returned the verified rent-relief CLI wiring state to the refactorer.
+
+## 2026-08-22T18:59:11Z — architect receives verified rent-relief CLI wiring
+
+Complete handoff received:
+
+```text
+id: 20260822T185911Z_000189_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: refactorer
+commit: 48ccae5644
+created_at: 2026-08-22T18:59:11Z
+enqueued_at: 2026-08-22T18:59:19Z
+task: rent-relief-cli-wiring
+dequeued_at: 2026-08-22T18:59:20Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 48ccae5644
+```
+
+Accepted the refactorer verification. The CLI flag parsing remains confined to
+`SimulatorFlags`/`Simulator`; a boolean crosses into `Game`, which emits
+the domain journal event, and `Report` renders it. No structural follow-up
+is warranted. The refactorer verified domain, property, acceptance, CLI, and
+characterization suites; their documented mutation/CRAP review found no new
+architectural issue.
+
+## 2026-08-22T21:10:00Z — architect sends rent-relief phase-complete sync
+
+Sent the verified `rent-relief-cli-wiring` phase synchronization commit to
+the specifier.
+
+## 2026-08-22T19:05:00Z — refactorer processes coder handoff `664d44c9f0` (rent-relief-cli-wiring)
+
+Handoff message received:
+
+```
+id: 20260822T185629Z_000237_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 664d44c9f0
+created_at: 2026-08-22T18:56:29.945383Z
+enqueued_at: 2026-08-22T18:56:29.951131Z
+task: rent-relief-cli-wiring
+
+Re-read your role and constitution.
+
+merge_and_process coder 664d44c9f0
+```
+
+Returned the verified rent-relief CLI wiring state to the refactorer.
+
+Merged the rent-relief CLI-wiring progression (the megacorp/rent-relief feature
+moves from isolated rules into live CLI/domain wiring). The handoff commit
+`664d44c9f0` pulls in the feature via parent `eaca794` ("Wire rent relief
+through the CLI") plus intervening commits (feature promotions and
+acceptance mutation survivor-docs/equivalents tooling, which are acceptance
+pipeline artifacts outside my mutation-run scope).
+
+What it delivers (production):
+- `SimulatorFlags.rentRelief(...)` recognizes `--optional-rent-relief`;
+  `Simulator` wires the flag through.
+- `Game` gains a `rentRelief` constructor field (back-compatible overload
+  defaulting to `false`) and logs `Journal.Entry.RentReliefEnabled`.
+- `Report.line` gains the `RentReliefEnabled` case ("rent relief is
+  enabled/disabled").
+- `SimulatorFlagsTest`/`SimulatorTest`/`GameTest`/`ReportTest` cover it;
+  cli/cli-packaged-jar features promoted from backlog.
+
+Refactorer verification (all green):
+- Domain 420/420 (+1) + 28/28 property.
+- Acceptance 910/910 (+2 rent-relief scenarios; was 908).
+- CLI 22/22 (+3 rent-relief tests); characterization 13/13.
+- Mutation sites: Simulator 93 (was 91, +2), SimulatorFlags 10 (+1),
+  Game 106 (unchanged, documented pre-existing >100 breach), Report 5
+  (unchanged) — all under threshold except Game's known breach, no split
+  needed.
+- CRAP: the rent-relief wiring is straightforward. `Report.line` CRAP 524.7
+  (CC 77, 57.7%) is the documented sealed-type exhaustive-switch exemption
+  (reverted three times per logbook; left alone). The added `RentReliefEnabled`
+  case is a straight-line branch.
+
+Handing the verified state back to the architect.
+
+## 2026-08-22T19:00:58Z — specifier merges architect phase-complete sync (rent-relief-cli-wiring)
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/50_20260822T185958Z_000389_from_architect_to_specifier.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: rent-relief-cli-wiring
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect a39b60d98c
+```
+
+Fast-forward merged `a39b60d98c` ("close rent relief CLI wiring review") into
+`main`. Brings in the coder's CLI/domain wiring for the rent-relief flag
+(`SimulatorFlags`/`Simulator`/`Game`/`Report`) plus the refactorer's
+verification (domain 420/420, acceptance 910/910, CLI 22/22, characterization
+13/13, mutation and CRAP checks clean) and the architect's own review commit.
+
+Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS across all modules.
+No further action needed; task `rent-relief-cli-wiring` is closed on my side.
+
+## 2026-08-22T19:28:37Z — specifier sends rent-relief-observability handoff to coder
+
+Reviewed the remaining megacorp-salary-tax/rent-relief backlog with the user.
+Most of it (megacorp-salary-tax-3, rent-relief-3/4/5, tax-3/4,
+journal/report/logging-90/91) stays blocked on wiring `MegacorpSalaryTax`/
+`RentRelief` into real gameplay. One slice wasn't blocked: `journal-92/93`,
+`report-92/93`, `logging-92/93` ("rent relief is enabled/disabled near the
+start of the game") mirror the already-implemented `war-profits-tax-87/88`
+pattern, and the underlying journal entry (`Journal.Entry.RentReliefEnabled`)
+already logs on every `Game` construction since the CLI-wiring merge — so
+this only needs matching report/log step handlers and assertions, no new
+domain wiring.
+
+Promoted the six scenarios from `the-monopoly-game-specs/backlog/en/rules/
+{journal,report,logging}.feature` into their tracked spec files (commit
+`4d00022365`), leaving each backlog file with only its blocked -90/-91
+scenarios. Verified via `bb gherkin-parser` + `bb gherkin-ir-dry-checker` on
+all three tracked files: no new findings beyond the expected cross-flag
+possible-synonym matches already accepted for the war-profits-tax/
+development-loans "is `<state>`" family.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: rent-relief-observability
+commit: PENDING
+```

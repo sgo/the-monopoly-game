@@ -6,7 +6,9 @@
 # war-profits-tax-85 through 89 already established for its own
 # observability round. journal-90 reuses journal-3's exact real-turn
 # trigger; journal-91 needs the same real rent-event wiring flagged in
-# ../en/rules/rent-relief.feature's backlog.
+# ../en/rules/rent-relief.feature's backlog. journal-92/93 (the
+# flag-enabled-near-start-of-game pair, mirroring journal-87/88) needed no
+# such wiring and have been promoted to the tracked file.
 
 Feature: game journal
 
@@ -44,22 +46,3 @@ Feature: game journal
     Examples:
       | government_start | relief |
       | 550                | 550     |
-
-  # journal-92
-  Scenario Outline: the journal records that rent relief is enabled, near the start of the game
-    Given rent relief is enabled
-    When we play the game
-    Then the game journal records that rent relief is <state>
-
-    Examples:
-      | state   |
-      | enabled |
-
-  # journal-93
-  Scenario Outline: the journal records that rent relief is disabled by default, near the start of the game
-    When we play the game
-    Then the game journal records that rent relief is <state>
-
-    Examples:
-      | state    |
-      | disabled |

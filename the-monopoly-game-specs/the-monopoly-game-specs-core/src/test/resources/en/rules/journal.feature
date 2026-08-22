@@ -1303,3 +1303,22 @@ Feature: game journal
     Examples:
       | state    |
       | disabled |
+
+  # journal-92
+  Scenario Outline: the journal records that rent relief is enabled, near the start of the game
+    Given rent relief is enabled
+    When we play the game
+    Then the game journal records that rent relief is <state>
+
+    Examples:
+      | state   |
+      | enabled |
+
+  # journal-93
+  Scenario Outline: the journal records that rent relief is disabled by default, near the start of the game
+    When we play the game
+    Then the game journal records that rent relief is <state>
+
+    Examples:
+      | state    |
+      | disabled |

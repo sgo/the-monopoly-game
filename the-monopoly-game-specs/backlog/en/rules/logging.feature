@@ -5,6 +5,8 @@
 # logging.feature, continuing its scenario numbering. Mirrors
 # ../en/rules/journal.feature's backlog scenarios, same numbers, "the game
 # log records that" in place of "the game journal records that".
+# logging-92/93 needed no new wiring and have been promoted to the tracked
+# file, same as journal.feature's backlog.
 
 Feature: game log
 
@@ -42,22 +44,3 @@ Feature: game log
     Examples:
       | government_start | relief |
       | 550                | 550     |
-
-  # logging-92
-  Scenario Outline: the log records that rent relief is enabled, near the start of the game
-    Given rent relief is enabled
-    When we play the game
-    Then the game log records that rent relief is <state>
-
-    Examples:
-      | state   |
-      | enabled |
-
-  # logging-93
-  Scenario Outline: the log records that rent relief is disabled by default, near the start of the game
-    When we play the game
-    Then the game log records that rent relief is <state>
-
-    Examples:
-      | state    |
-      | disabled |

@@ -1314,3 +1314,22 @@ Feature: game logging
     Examples:
       | state    |
       | disabled |
+
+  # logging-92
+  Scenario Outline: the log records that rent relief is enabled, near the start of the game
+    Given rent relief is enabled
+    When we play the game
+    Then the game log records that rent relief is <state>
+
+    Examples:
+      | state   |
+      | enabled |
+
+  # logging-93
+  Scenario Outline: the log records that rent relief is disabled by default, near the start of the game
+    When we play the game
+    Then the game log records that rent relief is <state>
+
+    Examples:
+      | state    |
+      | disabled |
