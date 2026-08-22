@@ -239,3 +239,16 @@ Feature: Monopoly command line interface
     Examples:
       | raw arguments                               | billionaire pawn | greedo pawn | state   |
       | 2 greedo billionaire --optional-rent-relief | high hat         | dog         | enabled |
+
+  # cli-18
+  Scenario Outline: the CLI wires the stalemate-trading flag the Greedo strategies observe
+    Given the simulator is configured with the raw arguments "<raw arguments>"
+    When I start the simulator
+    Then the game journal records that every player uses the "Greedo" strategy
+    And the game journal records that the "Greedo" strategy observes stalemate trading as <stalemate state>
+    When I stop the simulator before the game ends
+    Then the simulator process ends
+
+    Examples:
+      | raw arguments                                               | stalemate state |
+      | 3 greedo greedo greedo --optional-greedo-stalemate-trading | enabled          |

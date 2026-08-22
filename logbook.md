@@ -45563,7 +45563,7 @@ type: git_handoff
 to: architect
 priority: 00
 task: rent-relief-cli-wiring
-commit: PENDING
+commit: 25fe720d25
 ```
 
 ## 2026-08-22T21:10:00Z — coder makes survivor-tuple reporting durable
@@ -45679,3 +45679,149 @@ Refactorer verification: fast-forward merge clean; no domain/CLI `src/main`
 delta; acceptance-mutation tooling is outside my mutation-run scope.
 
 Handing the verified state back to the architect.
+
+## 2026-08-22T21:37:05Z — specifier merges self-contained soft-mutation survivor tuples
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/00_20260822T213524Z_000398_from_architect_to_specifier.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: rent-relief-cli-wiring
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect 3a2ba6be05
+```
+
+Merged `3a2ba6be05` into `main` (real merge, auto-merged `logbook.md`; no
+conflicts). Brings in the full round-trip triggered by my tuple request:
+runner/report-tooling fixes (`acceptance/equivalent-mutation-mutator.bb`, an
+ID-join fix for a null-field defect) and the actual deliverable — nine
+self-contained survivor-tuple reports under `acceptance/mutation-survivors-*.md`,
+one per affected feature, each line `feature | scenario | example | key |
+original -> mutated`:
+
+- `journal.feature`: 1
+- `logging.feature`: 1
+- `specs-cli:cli-packaged-jar.feature`: 1
+- `greedo-priority.feature`: 3 (not in the original aggregate count; the
+  completed run surfaced it)
+- `development-loans.feature`: 14
+- `war-profits-tax.feature`: 16
+- `greedo-monopoly-buyout.feature`: 20
+- `greedo-share-sale.feature`: 20
+- `greedo-legal-entity.feature`: 65
+
+141 survivors total. Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS.
+Starting classification, smallest feature first, same methodology as the
+2026-08-21 acceptance-mutation-debt sweep: ground every verdict in the actual
+domain mechanism, verify decoupling fixes empirically, and only record a true
+semantic equivalence in `acceptance/equivalent-mutations.edn` with rationale.
+
+## 2026-08-22T21:40:18Z — specifier classifies the four smallest-survivor features
+
+Investigated all 6 survivors across `journal.feature`, `logging.feature`,
+`greedo-priority.feature`, and `specs-cli:cli-packaged-jar.feature` against
+the real code, not just the reported tuples:
+
+- `journal-93`/`logging-93` (`state disabled -> disAbled`/`disablEd`):
+  equivalent. Confirmed in `MonopolyStepHelpers.rentRelief`:
+  `state.equals("enabled")` — any spelling that isn't the literal string
+  "enabled" produces the same `false`, exactly the same class already
+  recorded for war-profits-tax/development-loans' own disabled-state
+  scenarios.
+- `greedo-priority.feature` (`strategy Billionaire -> billionaire`, examples
+  3/11/49, all the same scenario): equivalent. Same case-insensitive strategy
+  vocabulary already established (`distressed-sale`, `buying-land`,
+  `journal`, `report`, `logging` all carry this identical class).
+- `specs-cli:cli-packaged-jar.feature` (`raw arguments`, one strategy token
+  mangled into `greedoxgreedo`): equivalent. Confirmed in
+  `Simulator.main` (lines 48-49): the "Rent relief enabled" line prints
+  unconditionally before `execute(arguments)` is even called, so a malformed
+  strategy token downstream can't suppress it. `World.stopPackagedCli()`/
+  `packagedCliProcessEnded()` only check process liveness via `destroy()`/
+  `isAlive()`, never the exit code, so the scenario's remaining steps pass
+  whether or not the mismatched strategy count later causes `execute()` to
+  return its own error result.
+
+Recorded all 6 as new entries in `acceptance/equivalent-mutations.edn` (314 ->
+320), each with the concrete code-grounded rationale above. No Gherkin edits
+needed; these are 6 genuine equivalences, not gaps.
+
+135 survivors remain: `development-loans.feature` (14), `war-profits-tax.feature`
+(16), `greedo-monopoly-buyout.feature` (20), `greedo-share-sale.feature` (20),
+`greedo-legal-entity.feature` (65).
+
+## 2026-08-22T21:42:52Z — specifier receives CLI packaging-boundary follow-up
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/00_20260822T214141Z_000399_from_architect_to_specifier.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: rent-relief-cli-wiring
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect 2873c190b1
+```
+
+Merged `2873c190b1` into `main` (real merge, auto-merged `logbook.md`). Brings
+a second, distinct finding beyond the survivor tuples: full soft mutation is
+dominated by `logging.feature` (158.5s) and the four serial packaged-JAR
+flag scenarios (134.3s), and the packaged-JAR survivor itself is a semantic
+argument-string mutation — evidence the packaged-jar boundary duplicates
+`cli.feature`'s already-fast in-process flag coverage.
+
+Confirmed against the actual tracked files: `cli.feature` (cli-6, cli-10,
+cli-11/12/13, cli-14/15, cli-16/17) already covers legal-entity, asset-rich,
+development-loans (+full-draw), war-profits-tax, and rent-relief exactly the
+way `cli-packaged-jar.feature`'s cli-jar-4/7/8/9/10/11 do, in-process and far
+faster. Only `--optional-greedo-stalemate-trading` (cli-jar-3) has no
+standalone in-process equivalent yet — `cli.feature`'s cli-6 only exercises
+it indirectly (disabled) alongside legal-entity.
+
+Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS. This is a Gherkin
+scope decision spanning two tracked feature files under active review by the
+user; bringing it to them before making any spec changes, per the specifier's
+own handoff-approval rule.
+
+## 2026-08-22T21:50:35Z — specifier resolves CLI packaging-boundary follow-up, hands back to architect
+
+Reviewed the architect's finding with the user (AskUserQuestion: CLI boundary
+first, then the survivor sweep). Confirmed against the tracked files: every
+`cli-packaged-jar.feature` per-flag scenario except stalemate-trading
+(cli-jar-3) already had a faster in-process equivalent in `cli.feature`
+(cli-6 legal-entity, cli-10 asset-rich, cli-11/12/13 development-loans +
+full-draw, cli-14/15 war-profits-tax, cli-16/17 rent-relief).
+
+Added `cli-18` to `cli.feature` (stalemate-trading, reusing cli-6's existing
+"every player uses Greedo"/"observes stalemate trading as" steps verbatim —
+no new step handlers needed). Removed cli-jar-3/4/7/8/9/10/11 from
+`cli-packaged-jar.feature`, keeping cli-jar-1 (pom packaging), cli-jar-2 (`-h`
+usage), cli-jar-5 (README flag documentation), and cli-jar-6 (one
+representative real-argument launch) as the minimal smoke contract.
+
+Verified: `bb gherkin-parser` + `bb gherkin-ir-dry-checker` on both files
+(only expected cross-flag possible-synonym/near-duplicate findings, same
+shape as the rest of the codebase). Full `./acceptance/run-acceptance.sh`:
+910/910 (916 - 7 removed + 1 added). `mvn test -Pcharacterization-tests`:
+BUILD SUCCESS, `CharacterizationTest` 12/12.
+
+Committed as `f30beb2`. Handing back to the architect under the same task
+name per the priority-00 follow-up protocol.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: rent-relief-cli-wiring
+commit: f30beb2
+```
