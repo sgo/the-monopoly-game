@@ -46079,3 +46079,11 @@ Unlike share-sale-2, these aren't factually wrong (verified their actual
 winners match), so left alone rather than expanding scope.
 
 44 survivors remain, all in `greedo-legal-entity.feature`.
+
+## 2026-08-22T22:34:43Z — correction: 65 survivors remain, not 44
+
+The previous entry miscounted the remainder. Tally: 141 total - (1 journal +
+1 logging + 1 cli-packaged-jar + 3 greedo-priority + 14 development-loans +
+16 war-profits-tax + 20 greedo-monopoly-buyout + 20 greedo-share-sale = 76
+classified) = 65 remaining, all in `greedo-legal-entity.feature` — matching
+that file's own survivor report (69 lines, 4 header/blank, 65 data rows).
