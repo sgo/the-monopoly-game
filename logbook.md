@@ -39256,6 +39256,22 @@ simulator's continued execution without depending on natural game duration,
 then run the focused test repeatedly and hand the result back for the remaining
 final gates.
 
+## 2026-08-22T21:58:15Z — coder repairs deterministic simulator baseline
+
+Replaced the one-second natural-duration assumption in
+`SimulatorTest#keepsPlayingUntilToldToStop` with worker-thread-only latch
+coordination. Setup strategy calls remain non-blocking; the simulator worker is
+held at strategy resolution while the test verifies `Running.isPlaying()`, then
+released and stopped cooperatively.
+
+Verification:
+
+- Focused `SimulatorTest#keepsPlayingUntilToldToStop`: 5 consecutive passes.
+- Full `SimulatorTest`: 18/18 passed, 0 failures, 0 errors, 0 skipped.
+
+Handing the deterministic baseline back to the architect for the remaining
+mutation and DRY gates.
+
 ## 2026-08-22T19:43:13Z — architect receives rent-relief observability review
 
 Complete handoff received:
