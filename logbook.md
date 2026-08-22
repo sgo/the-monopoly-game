@@ -44841,3 +44841,34 @@ verification (domain 420/420, acceptance 910/910, CLI 22/22, characterization
 
 Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS across all modules.
 No further action needed; task `rent-relief-cli-wiring` is closed on my side.
+
+## 2026-08-22T19:28:37Z — specifier sends rent-relief-observability handoff to coder
+
+Reviewed the remaining megacorp-salary-tax/rent-relief backlog with the user.
+Most of it (megacorp-salary-tax-3, rent-relief-3/4/5, tax-3/4,
+journal/report/logging-90/91) stays blocked on wiring `MegacorpSalaryTax`/
+`RentRelief` into real gameplay. One slice wasn't blocked: `journal-92/93`,
+`report-92/93`, `logging-92/93` ("rent relief is enabled/disabled near the
+start of the game") mirror the already-implemented `war-profits-tax-87/88`
+pattern, and the underlying journal entry (`Journal.Entry.RentReliefEnabled`)
+already logs on every `Game` construction since the CLI-wiring merge — so
+this only needs matching report/log step handlers and assertions, no new
+domain wiring.
+
+Promoted the six scenarios from `the-monopoly-game-specs/backlog/en/rules/
+{journal,report,logging}.feature` into their tracked spec files (commit
+`4d00022365`), leaving each backlog file with only its blocked -90/-91
+scenarios. Verified via `bb gherkin-parser` + `bb gherkin-ir-dry-checker` on
+all three tracked files: no new findings beyond the expected cross-flag
+possible-synonym matches already accepted for the war-profits-tax/
+development-loans "is `<state>`" family.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: rent-relief-observability
+commit: PENDING
+```
