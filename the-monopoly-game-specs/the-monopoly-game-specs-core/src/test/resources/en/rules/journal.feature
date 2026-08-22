@@ -1118,8 +1118,8 @@ Feature: game journal
     Then the game journal records that pawn "dog" defaults on the development loan secured by "Rue Grande Dinant"; the bank forecloses
 
     Examples:
-      | principal | bid | interest |
-      | 20        | 30  | 0.60     |
+      | principal | bid |
+      | 20        | 30   |
 
   # journal-78
   Scenario Outline: the journal records a legal entity defaulting on a development loan and the bank foreclosing
@@ -1139,8 +1139,8 @@ Feature: game journal
     Then the game journal records that Pink Realty defaults on the development loan secured by "Rue de Diekirch Arlon"; the bank forecloses
 
     Examples:
-      | principal | bid | interest |
-      | 40        | 25  | 1.20     |
+      | principal | bid |
+      | 40        | 25   |
 
   # journal-79
   Scenario Outline: the journal records a bondholder's annual payout on a player's development loan
