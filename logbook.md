@@ -44130,3 +44130,36 @@ Re-read your role and constitution.
 
 merge_and_process specifier 984a524196
 ```
+
+## 2026-08-22T07:52:37Z — architect accepts clamped-reserve classification
+
+Complete handoff received:
+
+```text
+id: 20260822T075237Z_000246_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: e3a44a7aec
+created_at: 2026-08-22T07:52:37Z
+enqueued_at: 2026-08-22T07:52:42Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T07:52:43Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier e3a44a7aec
+```
+
+Accepted the journal-33 `reserve: 0 -> -5` mutation as an equivalent:
+the strategy clamps a negative configured reserve to zero when no
+near-monopoly or station reserve applies. Routed the single policy entry to
+the coder.
+
+## 2026-08-22T08:20:00Z — architect sends clamped-reserve policy task
+
+Sent the coder the accepted journal-33 clamped-reserve equivalence for
+persistent policy seeding under `acceptance-mutation-debt`.
