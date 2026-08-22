@@ -44027,3 +44027,34 @@ Re-read your role and constitution.
 
 merge_and_process specifier 8904937526
 ```
+
+## 2026-08-22T08:15:00Z — coder processes journal equivalence-policy handoff
+
+Complete handoff received:
+
+```text
+id: 20260822T074409Z_000381_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 88bdf7ec14
+created_at: 2026-08-22T07:44:09.696521Z
+enqueued_at: 2026-08-22T07:44:10.630036Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T07:44:17.354782Z
+
+Re-read your role and constitution.
+merge_and_process architect 88bdf7ec14
+```
+
+Merged `88bdf7ec14` and used the authoritative
+`acceptance/round-five-journal-survivors.md` report. Added the 61 classified
+journal equivalents to `acceptance/equivalent-mutations.edn`, excluding all
+13 resolved journal-33/41/44 tautology tuples and the two pruned journal-77/78
+`interest` tuples. The entries use the approved auction, reserve/threshold,
+strategy/state, later-step override, and irrelevant-background mechanisms.
+Validation reports 184 total policy entries, 76 report tuples, 61 approved
+journal tuples, an exact set match, and clean diff checks.
