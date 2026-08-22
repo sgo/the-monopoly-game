@@ -37785,6 +37785,36 @@ normalization in `Game.java`; no additional coder-owned implementation changes
 were required. The repaired simulator baseline remains verified: five consecutive
 focused passes and full `SimulatorTest` 18/18.
 
+## 2026-08-22T20:27:00Z — architect rejects incomplete runner-repair return
+
+Complete handoff received:
+
+```text
+id: 20260822T202535Z_000241_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: 25b2ed275b
+created_at: 2026-08-22T20:25:35.304202Z
+enqueued_at: 2026-08-22T20:25:36.133774Z
+task: rent-relief-cli-wiring
+dequeued_at: 2026-08-22T20:25:40.169732Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 25b2ed275b
+```
+
+The returned commit contains no runner implementation change. The unresolved
+requirement is to remove per-mutant Java compilation from
+`AcceptanceMutationRunner` by executing the mutated JSON IR directly through
+the existing acceptance runtime, while preserving the persistent worker JSON
+protocol and outcome classification. The cancelled full soft Gherkin mutation
+is not evidence of completion. Returning this exact follow-up to the coder.
+
 Architect independently reran the full acceptance suite with Java available:
 864 scenarios, 59 failures, and 8 errors. The reported no-Java limitation is
 not present in this worktree. The same concrete defects remain: unsupported
