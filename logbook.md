@@ -39352,6 +39352,21 @@ The committed reports provide every requested tuple for classification. The
 full soft gate still has survivors and is deliberately not certified until the
 specifier's scenario/equivalence loop returns.
 
+## 2026-08-22T21:36:00Z — packaging-boundary follow-up for specifier
+
+Full soft mutation performance is dominated by `logging.feature` (158.5s) and
+the four serial packaged-JAR mutations (134.3s). The normal CLI feature ran its
+nine semantic mutations in 11.6s. The packaged-JAR survivor itself mutates a
+semantic argument string, confirming the boundary is too broad.
+
+Specifier should move CLI flag parsing, strategy selection, rent-relief
+behaviour, validation, output, and exit-code scenarios from
+`cli-packaged-jar.feature` into the normal `cli.feature`. Retain only a
+minimal packaged-JAR smoke contract: the shaded artifact launches, has its
+entrypoint/dependencies, and accepts a representative invocation. This is a
+specification change; preserve required observable behaviour and return it
+through the normal loop with focused mutation timing/results.
+
 ## 2026-08-22T21:22:38Z — coder handoff: repair invalid tuple attribution
 
 Priority-00 `git_handoff` queued to coder with commit `73ea574660` under
