@@ -45138,3 +45138,34 @@ runner end to end on a parsed pipeline IR (baseline test_success), an unsupporte
 synthetic step (test_failure), and an empty scenario area (infrastructure_error).
 Stale-class `NoSuchMethodError` was ruled out by rebuilding the reactor through
 `specs-core` test-compile and prepending domain `target/classes`.
+
+## 2026-08-22T20:36:08Z — coder sends acceptance-runner repair to refactorer
+
+Received architect priority 00 follow-up (20260822T202715Z_000393, commit
+ca7e5586c6) requeueing the acceptance-runner repair. The rejected return lacked
+the runner implementation change. Repaired `AcceptanceMutationRunner` under
+coder rules: the runner now reads the mutated JSON IR directly into the `Ir`
+model and executes it through `AcceptanceRuntime` in the hot worker JVM, removing
+entry-point generation, per-mutant Java compilation, the temp work tree, and the
+classloader/launcher swap. Outcome classification and the job-bound interruption
+gate are preserved. Verified: baseline IR -> test_success, unsupported synthetic
+step -> test_failure, empty scenario area -> infrastructure_error; reactor
+rebuilt through specs-core test-compile to rule out stale classes.
+
+Sent handoff (50, refactorer):
+
+```text
+id: 20260822T203608Z_000242_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: rent-relief-cli-wiring
+commit: 91877c71ae
+created_at: 2026-08-22T20:36:08Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 91877c71ae
+```
