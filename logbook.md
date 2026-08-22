@@ -45119,3 +45119,22 @@ Refactorer verification (all green):
 - No `src/main` change → no mutation-site or CRAP delta.
 
 Handing the verified state back to the architect.
+
+## 2026-08-22T22:40:00Z — coder repairs acceptance mutation runner
+
+Architect requeued the runner repair (ca7e558): `AcceptanceMutationRunner`
+still compiled generated Java per mutant. Removed that entirely. The runner now
+reads the mutated JSON IR directly into the existing `Ir` model and executes it
+through `AcceptanceRuntime` in the hot worker JVM; no generation, per-mutant
+compilation, temp work tree, or classloader swap remains.
+
+Outcome classification preserved via worker protocol: `test_success` when every
+dynamic test passes, `test_failure` on the first failed/unsupported step, and
+`infrastructure_error` when no tests are discovered. The job timeout and
+interruption gate still bound runaway mutants.
+
+Verification: compiled the adapter against the module test classpath; ran the
+runner end to end on a parsed pipeline IR (baseline test_success), an unsupported
+synthetic step (test_failure), and an empty scenario area (infrastructure_error).
+Stale-class `NoSuchMethodError` was ruled out by rebuilding the reactor through
+`specs-core` test-compile and prepending domain `target/classes`.
