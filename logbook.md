@@ -44227,3 +44227,75 @@ specifier for classification.
 Sent `acceptance/round-six-report-survivors.md` and
 `acceptance/round-six-logging-survivors.md` to the specifier under
 `acceptance-mutation-debt`.
+
+## 2026-08-22T10:30:00Z — specifier classifies report.feature (77) and logging.feature (80): applied journal's fixes directly, all remaining survivors inherited as equivalents
+
+Merged `1a00588d05` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression, both before and after the fixes below.
+
+Confirmed the expected structural parity: `report.feature` and
+`logging.feature` mirror `journal.feature` scenario-for-scenario
+(report-N/logging-N narrate the identical underlying setup as journal-N in
+a different style — same Background, same Given/When steps, same
+Examples tables), so the same two defects existed in both, at the same
+scenario numbers:
+
+- **report-33/41/44 and logging-33/41/44** carried the identical
+  arrange/assert tautology as journal-33/41/44 ("starts a turn with
+  $<dog_starting_balance> and a $<reserve> reserve"). Applied the same
+  fix: decoupled `expected_balance`/`expected_reserve` columns.
+- **report-77/78 and logging-77/78** carried the identical dead `interest`
+  column as journal-77/78. Pruned it the same way.
+
+Committed both fixes together as `fc8c9c7` (both files, one commit, since
+it's the same mechanical fix applied twice). Verified via
+`gherkin-parser`, the required characterization check, and a full
+acceptance suite run (908/908) — all green.
+
+**All remaining survivors — 62 in report (77-15), 65 in logging (80-15) —
+map onto journal's already-verified equivalence buckets** by matching
+scenario + key, confirming the same auction-ceiling, reserve/threshold,
+case-insensitive strategy/state, and irrelevant-background patterns
+already established. Two new key names appeared that weren't in journal's
+list (different survivor sets per mutation run, not a structural
+difference), both individually confirmed rather than assumed:
+
+- **logging-68's `treasury`** (100→103, "<entity_name> builds a house...
+  when its treasury can pay for it"): confirmed via direct read — the
+  assertion is a fixed `$100` house cost, a separate figure from
+  `treasury`; the entity's treasury just needs to comfortably cover it,
+  same comfortable-margin bucket as everywhere else.
+- **logging-59's `dog_die_1`/`dog_die_2`/`dog_start_position`** (age
+  increasing after passing Start): confirmed via direct read — the
+  scenario's actual assertion is a fixed `$200` salary and age increment,
+  not the exact position/dice values; any combination that results in
+  *passing* Start produces the identical qualitative event, so the precise
+  numbers are interchangeable. Same reserve/threshold-style bucket, just a
+  movement-based trigger instead of a cash-based one.
+
+Also reused report/logging's own `Billionaire`→`billionaire` and
+`disabled`→`Disabled`/`dIsabled` survivors as the same established
+case-insensitive-parsing equivalence (case bucket C).
+
+Verdict: 0 new real gaps in either file — both defects found in journal
+were the *only* ones, and they were structural (shared across all three
+narration styles), not narration-specific. 414 survivors classified in
+total across 19 features (journal's 76 + report's 77 + logging's 80, plus
+the 261 from rounds 1-4). This closes the observability trio and the
+acceptance-mutation-debt sweep started at the user's direction several
+rounds ago — every originally-audited feature has now been classified.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
