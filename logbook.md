@@ -45910,3 +45910,39 @@ larger, separate restructuring task than the CLI boundary trim (up to 49
 scenarios to individually assess). Not blocking the in-progress
 survivor-classification sweep the user asked to continue with; parking this
 finding and returning to it after the sweep, or sooner if the user directs.
+
+## 2026-08-22T21:56:44Z — specifier merges CLI boundary verification, classifies its one new survivor
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/00_20260822T215401Z_000401_from_architect_to_specifier.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: rent-relief-cli-wiring
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect f4e9a961f1
+```
+
+Merged `f4e9a961f1` (real merge, auto-merged `logbook.md`). Confirms the CLI
+boundary trim worked: `cli-packaged-jar.feature` dropped from 4
+mutations/134.3s to 2 mutations/30.8s, both killed. Moving the flag
+scenarios in-process surfaced one new survivor in `cli.feature` itself:
+`raw arguments "2 greedo billionaire" -> "2 Greedo billionaire"` in "the CLI
+accepts the billionaire strategy alongside greedo as a mixed per-player
+selection".
+
+Confirmed in `World.configureSimulatorRaw` (line 369-374): the acceptance
+harness assigns `Billionaire` only on an exact-string match of
+`"billionaire"`; every other token — including any case variant of
+"greedo" — falls through to the same `Greedo` default. This bypasses the
+real `Simulator.strategiesFor`'s strict case-sensitive validation entirely;
+the harness's raw-argument step was never asserting strategy-name
+correctness, only end-to-end wiring once names are already resolved.
+Equivalent; recorded in `acceptance/equivalent-mutations.edn` (334 -> 335).
+
+Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS. Continuing the
+survivor sweep: `war-profits-tax.feature` (16) next.
