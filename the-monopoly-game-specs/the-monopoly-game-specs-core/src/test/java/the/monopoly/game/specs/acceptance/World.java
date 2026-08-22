@@ -510,7 +510,8 @@ public class World {
         players().stream().anyMatch(player -> strategyOf(player).fullDrawDevelopmentLoans()),
         gameMaxYears,
         developmentLoanBook(),
-        warProfitsTaxEnabled
+        warProfitsTaxEnabled,
+        rentRelief != null
     );
     Game.Result result = play.apply(game);
     turnOrder = result.turnOrder();

@@ -93,6 +93,8 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.splitMonopo
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.soldAHouse;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStarted;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStartedAtAge;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentRelief;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentReliefLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTax;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTaxLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTaxPaid;
@@ -828,7 +830,10 @@ final class GameLogStepHandlers {
             (world, arguments) -> logRecords(world, governmentBalance(Integer.parseInt(arguments.text(1))))),
 
         then("^the game log records that the war profits tax is " + NAME + "$",
-            (world, arguments) -> logRecords(world, warProfitsTax(arguments.text(1)))), 
+            (world, arguments) -> logRecords(world, warProfitsTax(arguments.text(1)))),
+
+        then("^the game log records that rent relief is " + NAME + "$",
+            (world, arguments) -> logRecords(world, rentRelief(arguments.text(1)))),
 
         then("^the game log records that pawn \"" + NAME
                 + "\" starts its turn before pawn \"" + NAME + "\"$",
@@ -1035,6 +1040,9 @@ final class GameLogStepHandlers {
 
         then("^the game report says that the war profits tax is " + NAME + "$",
             (world, arguments) -> says(world, warProfitsTaxLine(arguments.text(1)))),
+
+        then("^the game report says that rent relief is " + NAME + "$",
+            (world, arguments) -> says(world, rentReliefLine(arguments.text(1)))),
 
         then("^the game report says that pawn \"" + NAME + "\" sells a house on \"" + NAME
                 + "\" for \\$" + VALUE + "$",

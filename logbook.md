@@ -39235,6 +39235,39 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-22T19:43:13Z — architect receives rent-relief observability review
+
+Complete handoff received:
+
+```text
+id: 20260822T194313Z_000190_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: refactorer
+commit: da6d10af65
+created_at: 2026-08-22T19:43:13Z
+enqueued_at: 2026-08-22T19:43:17Z
+task: rent-relief-observability
+dequeued_at: 2026-08-22T19:43:18Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer da6d10af65
+```
+
+Accepted the refactorer verification. The change promotes journal, log, and
+report acceptance scenarios and adds only test-harness helpers; it introduces
+no production dependency, IO, or information-hiding concern. The refactorer
+verified 916 acceptance scenarios and found no structural follow-up.
+
+## 2026-08-22T21:50:00Z — architect sends rent-relief observability phase sync
+
+Sent the verified `rent-relief-observability` phase synchronization commit
+to the specifier.
+
 ## 2026-08-21T07:59:11Z — architect receives refactorer handoff `e768e267cc` (megacorp-rent-relief)
 
 Complete handoff received:
@@ -44719,11 +44752,11 @@ type: git_handoff
 to: refactorer
 priority: 50
 task: rent-relief-cli-wiring
-commit: eaca794eac
+commit: 664d44c9f0
 
 Re-read your role and constitution.
 
-merge_and_process coder eaca794eac
+merge_and_process coder 664d44c9f0
 ```
 
 Returned the verified rent-relief CLI wiring state to the refactorer.
@@ -44784,6 +44817,8 @@ Re-read your role and constitution.
 
 merge_and_process coder 664d44c9f0
 ```
+
+Returned the verified rent-relief CLI wiring state to the refactorer.
 
 Merged the rent-relief CLI-wiring progression (the megacorp/rent-relief feature
 moves from isolated rules into live CLI/domain wiring). The handoff commit
@@ -44872,3 +44907,64 @@ priority: 50
 task: rent-relief-observability
 commit: 2762d8c54b
 ```
+
+## 2026-08-22T21:36:22Z — coder completes rent-relief observability
+
+Implemented the report and logging acceptance support for the six promoted
+rent-relief observability scenarios. Added `rentReliefLine` plus matching
+`GameLogStepHandlers` bindings, and forwarded the acceptance fixture's enabled
+state from `World.playAndCapture()` into the full `Game` constructor.
+
+Verification:
+
+- Parsed journal, report, and logging features with the APS Babashka
+  `gherkin-parser`.
+- Generated the three acceptance entrypoints.
+- Ran `mvn -B -Pacceptance -pl the-monopoly-game-specs/the-monopoly-game-specs-core -am
+  -Dtest='*RentObservabilityJournalAcceptanceTest,*RentObservabilityReportAcceptanceTest,*RentObservabilityLoggingAcceptanceTest' test`.
+- Result: 349/349 tests passed, 0 failures, 0 errors, 0 skipped.
+
+Handoff sent in commit `03ef59b0aef488c6532cc1387bccddd4d8b78c0e`:
+
+```
+type: git_handoff
+to: refactorer
+priority: 50
+task: rent-relief-observability
+commit: 03ef59b0aef488c6532cc1387bccddd4d8b78c0e
+```
+
+## 2026-08-22T20:15:00Z — refactorer processes coder handoff `80801dc896` (rent-relief-observability)
+
+Handoff message received:
+
+```
+id: 20260822T194110Z_000239_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 80801dc896
+created_at: 2026-08-22T19:41:10.531253Z
+enqueued_at: 2026-08-22T19:41:10.808610Z
+task: rent-relief-observability
+
+Re-read your role and constitution.
+
+merge_and_process coder 80801dc896
+```
+
+Merged the rent-relief observability progression (feature in parent `03ef59b`;
+handoff record `80801dc896`). Test/acceptance-harness only: adds rent-relief
+observability acceptance steps (`MonopolyStepHelpers`, `World`) and journal/
+logging/report feature scenarios (+19 each). No production source changed.
+
+Refactorer verification (all green):
+- Domain 420/420; CLI 22/22 excluding the documented pre-existing
+  `SimulatorTest.keepsPlayingUntilToldToStop` timing flake.
+- Acceptance 916/916 (+6 rent-relief observability scenarios; was 910).
+- No `src/main` change → no mutation-site or CRAP delta.
+
+Handing the verified state back to the architect.
