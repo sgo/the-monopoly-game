@@ -39309,6 +39309,29 @@ otherwise pass the original mutation record into rendering), then add an
 automated test that fails if any required tuple field is null. Re-run a focused
 feature with a survivor and show all six concrete fields before return.
 
+## 2026-08-22T21:28:11Z — architect receives corrected tuple-report repair
+
+Complete handoff received from refactorer `60bbf5bf13` for coder repair
+`2b8a2a811b` (task `rent-relief-cli-wiring`, priority 00). The repair joins
+survivor results to their full mutation-discovery records by ID and adds a
+regression self-test for scenario/example/key attribution.
+
+Architect verification:
+
+- `bb acceptance/equivalent-mutation-mutator.bb --self-test` passed.
+- Focused `greedo-priority.feature` run produced concrete scenario, example,
+  key, original, and mutated values for all three survivors.
+- Full `./acceptance/run-acceptance-mutation.sh --level soft` completed with
+  zero runner errors and still correctly failed for survivors.
+- Nine generated `acceptance/mutation-survivors-*.md` reports contain no
+  `| null |` tuple fields; the CLI report was absent because that feature
+  killed all nine mutations on this rerun.
+
+The generated feature manifests were restored after verification. The nine
+survivor reports are the authoritative, self-contained evidence now being
+handed back to the specifier for classification; no equivalence was added by
+the architect.
+
 ## 2026-08-22T21:22:38Z — coder handoff: repair invalid tuple attribution
 
 Priority-00 `git_handoff` queued to coder with commit `73ea574660` under
