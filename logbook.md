@@ -45399,3 +45399,24 @@ priority: 00
 task: rent-relief-cli-wiring
 commit: PENDING
 ```
+
+## 2026-08-22T21:10:00Z — coder makes survivor-tuple reporting durable
+
+Architect priority 00 follow-up (7f8073d280) requested durable one-tuple-per-
+survivor reporting (feature, scenario name, example index, key, original value,
+mutated value) in place of aggregate per-feature counts. The APS `mutation/run`
+already returns full per-mutation detail in `:results` (`:Mutation {:scenario
+:example :key :Original :Mutated}` and `:Status`); only the durable committed
+artifact omitted it. `tmp/aps` is an upstream git-ignored checkout, so the fix
+lives in the project wrapper `acceptance/equivalent-mutation-mutator.bb`.
+
+Repair: the wrapper now shadows `mutation/run` inside its existing
+`with-redefs` (alongside `mutation/discover`), delegating to the real `run`
+via `var-get`, then writing `acceptance/mutation-survivors-<feature-slug>.md`
+containing one row per survivor in the requested `feature | scenario | example |
+key | original | mutated` format. A feature with no survivors has its file
+deleted so no stale artifact is committed.
+
+Verified: wrapper parses cleanly under APS babashka; survivor rendering and
+file write/delete behaviour verified in an isolated run (survivor -> line
+written, empty -> file removed).
