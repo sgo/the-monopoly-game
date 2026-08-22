@@ -45545,3 +45545,36 @@ concrete per row (no nulls) — e.g. `en/rules/journal.feature | the journal
 records a bankruptcy to the bank | 0 | starting balance | 5 | 1`. The per-run
 artifact and the APS manifest stamp were reverted before commit; the code
 change and this record are committed.
+
+## 2026-08-22T23:30:00Z — refactorer processes coder handoff `2b8a2a811b` (rent-relief-cli-wiring, survivor-tuple null-field fix)
+
+Handoff message received:
+
+```
+id: 20260822T212727Z_000244_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 2b8a2a811b
+created_at: 2026-08-22T21:27:27.103545Z
+enqueued_at: 2026-08-22T21:27:27.820213Z
+task: rent-relief-cli-wiring
+
+Re-read your role and constitution.
+
+merge_and_process coder 2b8a2a811b
+```
+
+Merged the survivor-tuple null-field defect fix (fast-forward, no conflicts).
+Acceptance-mutation tooling only: `acceptance/equivalent-mutation-mutator.bb`
+(+75) fixes a null-field report defect via an ID join. Logbook records the
+fix. No domain/CLI source changed, so the standard suites (domain 420, CLI 22,
+acceptance 916) are unaffected and no re-run was needed.
+
+Refactorer verification: fast-forward merge clean; no domain/CLI `src/main`
+delta; acceptance-mutation tooling is outside my mutation-run scope.
+
+Handing the verified state back to the architect.
