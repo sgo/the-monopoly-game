@@ -46014,3 +46014,68 @@ Gherkin edits needed.
 
 85 survivors remain: `greedo-share-sale.feature` (20),
 `greedo-legal-entity.feature` (65).
+
+## 2026-08-22T22:31:53Z — specifier fixes a real bug found while classifying greedo-share-sale.feature's 20 survivors, then classifies all 20
+
+While investigating `share-sale-2`'s survivors, found the tracked scenario's
+own assertion was factually wrong, not just weakly worded: it claims "pawn
+high hat holds the Pink Realty share sold by pawn dog", but that step
+(`pawnHoldsShare`) only checks that high hat holds *some* share — trivially
+true regardless of the auction outcome, since high hat's own pre-existing
+share is never at risk (only dog's departing share is up for sale).
+Empirically verified (via a temporary, reverted debug print in
+`Bankruptcy.sellShareToHighestBidder`, plus a scratch edit run through the
+normal acceptance suite and reverted) that the actual winner today is
+**iron box** — its unset balance defaults to the $1500 starting capital
+(`World.selectPlayers` funds every selected player before any override),
+giving it a $525 ceiling versus high hat's $350. The scenario has been
+silently asserting the wrong winner all along.
+
+Brought this to the user (AskUserQuestion): pin iron box low (matching
+share-sale-1's own $200) so high hat is the legitimate winner, and replace
+the weak assertion with the precise `pawn "high hat" wins the Pink Realty
+share at $<winning_bid>` step already used correctly elsewhere in this
+feature (share-sale-5/8/9). Fixed, verified the actual price is $75, full
+acceptance suite green (unchanged pass count, this was a same-scenario
+in-place fix) and `mvn test -Pcharacterization-tests`: BUILD SUCCESS.
+
+Classified all 20 survivors against `Bankruptcy.java`/`DistressedSale.java`:
+
+- `share-sale-1` (4 survivors, dog/high_hat/iron_box/ship balance):
+  equivalent. Confirmed the real bid computation (high hat $350 ceiling vs.
+  iron box $70) — none of the mutations cross that ranking; ship is never a
+  shareholder regardless of balance.
+- `share-sale-2` (2 survivors, dog/high_hat balance): equivalent, now
+  correctly grounded post-fix — same ranking-preservation reasoning as
+  share-sale-1 with the pinned iron_box_balance=200.
+- `share-sale-3` (2 survivors, dog/high_hat balance): equivalent. This
+  scenario resolves entirely through `DistressedSale`'s ascending auction
+  for a personal asset (Rue Grande Dinant), never reaching the share-sale
+  path at all. `DistressedSale.auction`'s sole-bidder branch pays exactly
+  the minimum qualifying bid, independent of the bidder's own ceiling — the
+  same mechanism already established for `auctions.feature`.
+- `share-sale-4` (1 survivor, dog_balance): equivalent. Both fellow
+  shareholders offer $0 (35% of their own $0 balance), excluded from
+  bidding regardless of dog's own balance.
+- `share-sale-5` (6 survivors, dog/high_hat balance across 3 examples):
+  equivalent. `Bankruptcy.shareSalePrice` caps the winner's price at the
+  *losing* bidder's ceiling plus $5, not the winner's own ceiling; every
+  mutated winner-balance stays comfortably above that cap.
+- `share-sale-7` (2 survivors, dog_balance/entity_balance): equivalent.
+  Both leave a shortfall small enough that selling exactly one transferred
+  street still settles the debt.
+- `share-sale-23` (3 survivors, dog_balance/dog_final_balance/high_hat_balance):
+  equivalent. Dog's $10,000 balance dwarfs any fellow shareholder's ceiling
+  regardless of these small mutations, and dissolution is triggered by
+  share consolidation already achieved in the first round, not the exact
+  cash carried into the second.
+
+All 20 recorded in `acceptance/equivalent-mutations.edn` (371 -> 391).
+
+Noted for later, not acted on now: the dry-checker flags `share-sale-1`'s
+"holds that Pink Realty share" and `share-sale-23`'s "holds no share of
+Pink Realty" as possible synonyms of the new `wins the share at $X` step.
+Unlike share-sale-2, these aren't factually wrong (verified their actual
+winners match), so left alone rather than expanding scope.
+
+44 survivors remain, all in `greedo-legal-entity.feature`.

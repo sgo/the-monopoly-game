@@ -37,13 +37,14 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "dog" owns no mortgaged property
     And pawn "dog" has $<dog_balance> to spend
     And pawn "high hat" has $<high_hat_balance> to spend
+    And pawn "iron box" has $<iron_box_balance> to spend
     When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
     Then pawn "dog" is not bankrupt
-    And pawn "high hat" holds the Pink Realty share sold by pawn "dog"
+    And pawn "high hat" wins the Pink Realty share at $<winning_bid>
 
     Examples:
-      | dog_balance | high_hat_balance |
-      | 40          | 1000             |
+      | dog_balance | high_hat_balance | iron_box_balance | winning_bid |
+      | 40          | 1000             | 200               | 75          |
 
   # share-sale-3
   Scenario Outline: a shareholder sells a cheaper personal asset before offering their legal-entity share
