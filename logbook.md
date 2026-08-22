@@ -39293,6 +39293,25 @@ Verification:
 Handing the deterministic baseline back to the architect for the remaining
 mutation and DRY gates.
 
+## 2026-08-22T20:25:00Z — architect: acceptance-mutation runner performance finding
+
+The required full soft Gherkin mutation was started after all language-mutation
+and DRY gates passed, then stopped at the `greedo-priority` batch because the
+runner was not fast enough to be a reliable full-suite gate.
+
+Measurement of an isolated `greedo-priority` mutant:
+
+- feature-entrypoint generation: 34 ms;
+- normal 58-row priority-table acceptance test: 1.6 s including Maven;
+- `javac` of the generated per-mutant entrypoint: 11.4 s.
+
+The scenario only calls `World.assertPriority` / `Strategy.priority`; it does
+not play a game. The bottleneck is `AcceptanceMutationRunner` generating,
+compiling, and class-loading a Java entrypoint for every mutated IR. A direct
+IR execution path is required so the persistent runner can execute the parsed
+mutation without per-mutant Java compilation. The full soft run remains open
+and must be rerun after this repair.
+
 ## 2026-08-22T19:59:43Z — architect receives coder final-gate repair
 
 Complete handoff received:
