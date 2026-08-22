@@ -46087,3 +46087,61 @@ The previous entry miscounted the remainder. Tally: 141 total - (1 journal +
 16 war-profits-tax + 20 greedo-monopoly-buyout + 20 greedo-share-sale = 76
 classified) = 65 remaining, all in `greedo-legal-entity.feature` — matching
 that file's own survivor report (69 lines, 4 header/blank, 65 data rows).
+
+## 2026-08-22T22:55:03Z — specifier classifies 49 of greedo-legal-entity.feature's 65 survivors
+
+Delegated the initial research pass to a fork (methodology: ground every
+classification in `LegalEntity.java`/`LegalEntityBuilding.java`/
+`LegalEntityFormation.java`, reuse the already-established
+`DevelopmentLoanBook.java` reasoning for the 9 entity-loan mirrors of
+`development-loans.feature`, and flag rather than paper over anything that
+looked like the share-sale-2 weak-assertion pattern). Cross-checked its
+output myself line-by-line against the 65-entry survivor file before
+trusting any of it: 49 equivalences + 16 real gaps, no omissions or
+duplicates, tally confirmed by hand against
+`acceptance/mutation-survivors-en-rules-greedo-legal-entity-feature.md`.
+
+Independently re-verified the one entry the fork itself flagged as
+lower-confidence ("the entity builds a hotel when every Greedo shareholder
+commits to a full build loan", `share 500->495`): its proposed reasoning
+named the wrong function (`solicitCommitmentIfNeeded`, which requires
+`buildCommitmentsEmpty()` and does NOT fire here since the Given step
+already pre-commits). Read `LegalEntityBuilding.financeShortfall` myself and
+found the real mechanism: `commitToBuildIfAllAgree` re-checks each
+shareholder's actual balance/reserve against a freshly computed share and,
+if they agree, overwrites the commitment via `commitSharesToBuild` — so the
+Given-arranged value is inert regardless, just via a different code path
+than first proposed. Corrected the justification text before recording it.
+
+Recorded all 49 confirmed equivalences in `acceptance/equivalent-mutations.edn`
+(391 -> 440). `mvn test -Pcharacterization-tests`: BUILD SUCCESS (no
+production code touched).
+
+16 real gaps remain, not yet acted on — reporting them to the user before
+deciding how to fix each, since several look like they need more than a
+pure Gherkin edit:
+
+- 8 tuples (4 examples of one scenario plus 4 single-example scenarios) use
+  `Then Pink Realty raises a loan of $<loan>` as an assertion, but that step
+  is registered as a bare `step()` whose handler (`entity.raiseLoan`)
+  unconditionally *performs* the raise — it asserts nothing. Confirmed by a
+  temporary, reverted experiment (set one example to $9,999,999; full suite
+  still passed). A correctly-implemented alternative already exists and
+  requires no new code: `then("^the game journal records that NAME raises a
+  loan of \$VALUE from pawn ..., pawn ..., and pawn ...$")`, checking a real
+  `Entry.LegalEntityLoanRaised` journal entry — but it requires naming all
+  three shareholders in the step text, which the affected scenarios don't
+  currently do.
+- 5 tuples across 4 scenarios have a declared Examples column that the step
+  regex never captures into a group, or captures but the handler body never
+  reads (confirmed via each handler's literal source): `enabled_flag`,
+  `formed_outcome`, `entity_name` (two different scenarios), and
+  `repayment` (whose regex is `\\$(<principal>)` — a literal, unsubstituted
+  placeholder token baked into the regex source itself, not the `VALUE`
+  macro). These are prunable dead columns, matching the `distressed-sale.feature`
+  precedent from earlier in this sweep.
+- 3 tuples are read-back tautologies matching the specifier's own named
+  anti-pattern (same column arranges and asserts): `entity-6`'s `principal`,
+  `entity-11`'s `ceiling_share` (wait — the actual case is "cannot build
+  beyond a shareholder's personal affordability ceiling"), and `entity-17`'s
+  `loan` (a raise-then-check-the-same-value round trip).
