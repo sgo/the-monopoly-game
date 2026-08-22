@@ -39332,6 +39332,26 @@ survivor reports are the authoritative, self-contained evidence now being
 handed back to the specifier for classification; no equivalence was added by
 the architect.
 
+## 2026-08-22T21:35:24Z — handoff to specifier: concrete survivor tuples
+
+Priority-00 `git_handoff` queued to specifier under `rent-relief-cli-wiring`:
+
+```
+id: 20260822T213524Z_000398_from_architect
+from: architect
+to: specifier
+priority: 00
+type: git_handoff
+role: architect
+task: rent-relief-cli-wiring
+commit: 3a2ba6be05
+created_at: 2026-08-22T21:35:24Z
+```
+
+The committed reports provide every requested tuple for classification. The
+full soft gate still has survivors and is deliberately not certified until the
+specifier's scenario/equivalence loop returns.
+
 ## 2026-08-22T21:22:38Z — coder handoff: repair invalid tuple attribution
 
 Priority-00 `git_handoff` queued to coder with commit `73ea574660` under
