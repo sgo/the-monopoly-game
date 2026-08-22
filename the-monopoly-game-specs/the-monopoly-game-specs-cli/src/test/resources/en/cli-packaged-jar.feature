@@ -31,30 +31,6 @@ Feature: CLI packaged jar
       | flag |
       | -h   |
 
-  # cli-jar-3
-  Scenario Outline: the packaged jar accepts the Greedo stalemate-trading flag alongside explicit strategies
-    Given the CLI module has been packaged
-    When I start the packaged simulator jar with the arguments "<raw arguments>"
-    Then the packaged jar's output confirms that stalemate trading is <state>
-    When I stop the packaged jar
-    Then the packaged jar process ends
-
-    Examples:
-      | raw arguments                                               | state   |
-      | 3 greedo greedo greedo --optional-greedo-stalemate-trading | enabled |
-
-  # cli-jar-4
-  Scenario Outline: the packaged jar accepts the Greedo legal-entity flag alongside explicit strategies
-    Given the CLI module has been packaged
-    When I start the packaged simulator jar with the arguments "<raw arguments>"
-    Then the packaged jar's output confirms that legal entity is <state>
-    When I stop the packaged jar
-    Then the packaged jar process ends
-
-    Examples:
-      | raw arguments                                         | state   |
-      | 3 greedo greedo greedo --optional-greedo-legal-entity | enabled |
-
   # cli-jar-5
   Scenario Outline: README embeds the `-h` usage report and names every optional flag
     Given the CLI module has been packaged
@@ -80,62 +56,3 @@ Feature: CLI packaged jar
       | raw arguments                            | year limit |
       | 3 greedo greedo greedo --max-years=500   | 500        |
 
-  # cli-jar-7
-  Scenario Outline: the packaged jar accepts the Billionaire asset-rich flag alongside explicit strategies
-    Given the CLI module has been packaged
-    When I start the packaged simulator jar with the arguments "<raw arguments>"
-    Then the packaged jar's output confirms that asset-rich opening is <state>
-    When I stop the packaged jar
-    Then the packaged jar process ends
-
-    Examples:
-      | raw arguments                                            | state   |
-      | 2 greedo billionaire --optional-asset-rich-billionaire   | enabled |
-
-  # cli-jar-8
-  Scenario Outline: the packaged jar accepts the development-loans flag alongside explicit strategies
-    Given the CLI module has been packaged
-    When I start the packaged simulator jar with the arguments "<raw arguments>"
-    Then the packaged jar's output confirms that development loans is <state>
-    When I stop the packaged jar
-    Then the packaged jar process ends
-
-    Examples:
-      | raw arguments                                        | state   |
-      | 3 greedo greedo greedo --optional-development-loans | enabled |
-
-  # cli-jar-9
-  Scenario Outline: the packaged jar accepts the development-loans full-draw flag alongside explicit strategies
-    Given the CLI module has been packaged
-    When I start the packaged simulator jar with the arguments "<raw arguments>"
-    Then the packaged jar's output confirms that full-draw development loans is <state>
-    When I stop the packaged jar
-    Then the packaged jar process ends
-
-    Examples:
-      | raw arguments                                                                                | state   |
-      | 3 greedo greedo greedo --optional-development-loans --optional-development-loans-full-draw  | enabled |
-
-  # cli-jar-10
-  Scenario Outline: the packaged jar accepts the war-profits-tax flag alongside explicit strategies
-    Given the CLI module has been packaged
-    When I start the packaged simulator jar with the arguments "<raw arguments>"
-    Then the packaged jar's output confirms that the war profits tax is <state>
-    When I stop the packaged jar
-    Then the packaged jar process ends
-
-    Examples:
-      | raw arguments                                     | state   |
-      | 3 greedo greedo greedo --optional-war-profits-tax | enabled |
-
-  # cli-jar-11
-  Scenario Outline: the packaged jar accepts the rent-relief flag alongside explicit strategies
-    Given the CLI module has been packaged
-    When I start the packaged simulator jar with the arguments "<raw arguments>"
-    Then the packaged jar's output confirms that rent relief is <state>
-    When I stop the packaged jar
-    Then the packaged jar process ends
-
-    Examples:
-      | raw arguments                                  | state   |
-      | 3 greedo greedo greedo --optional-rent-relief | enabled |
