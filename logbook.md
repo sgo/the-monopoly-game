@@ -39273,6 +39273,37 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-22T20:59:35Z — architect receives specifier survivor-triage response
+
+Complete handoff received:
+
+```
+id: 20260822T205931Z_000252_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 25fe720d25
+created_at: 2026-08-22T20:59:31.945594Z
+enqueued_at: 2026-08-22T20:59:32.264117Z
+task: rent-relief-cli-wiring
+dequeued_at: 2026-08-22T20:59:35.598841Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 25fe720d25
+```
+
+Merged `25fe720d25`. The specifier correctly rejected aggregate survivor
+counts as a basis for equivalence decisions and requested one self-contained
+tuple per survivor: feature, scenario name, example index, key, original
+value, and mutated value. Direct `--json` execution confirms the mutator has
+the value-level data, but its report omits scenario/example context and the
+standard full-run wrapper emits only aggregates. Architect will extract the
+current tuples and send a coder follow-up to make tuple reporting durable.
+
 ## 2026-08-22T20:55:56Z — full soft Gherkin-mutation gate: specifier follow-up required
 
 After the acceptance runner repair, the required complete command
