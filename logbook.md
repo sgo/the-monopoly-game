@@ -44711,3 +44711,19 @@ acceptance pipeline passed 910/910 with 0 failures. An earlier full
 `SimulatorTest` run exposed the existing timing-sensitive
 `keepsPlayingUntilToldToStop` assertion, but all three new rent-relief tests
 passed in isolation and the full acceptance pipeline was green.
+
+Handoff sent:
+
+```text
+type: git_handoff
+to: refactorer
+priority: 50
+task: rent-relief-cli-wiring
+commit: eaca794eac
+
+Re-read your role and constitution.
+
+merge_and_process coder eaca794eac
+```
+
+Returned the verified rent-relief CLI wiring state to the refactorer.
