@@ -44891,12 +44891,12 @@ Verification:
   -Dtest='*RentObservabilityJournalAcceptanceTest,*RentObservabilityReportAcceptanceTest,*RentObservabilityLoggingAcceptanceTest' test`.
 - Result: 349/349 tests passed, 0 failures, 0 errors, 0 skipped.
 
-Handoff sent:
+Handoff sent in commit `03ef59b0aef488c6532cc1387bccddd4d8b78c0e`:
 
 ```
 type: git_handoff
 to: refactorer
 priority: 50
 task: rent-relief-observability
-commit: PENDING
+commit: 03ef59b0aef488c6532cc1387bccddd4d8b78c0e
 ```
