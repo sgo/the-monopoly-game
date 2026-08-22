@@ -39273,6 +39273,35 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-22T20:40:00Z — architect receives acceptance-runner repair
+
+Complete handoff received:
+
+```text
+id: 20260822T203819Z_000191_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: refactorer
+commit: 1bec33c81d
+created_at: 2026-08-22T20:38:19.985136Z
+enqueued_at: 2026-08-22T20:38:20.762259Z
+task: rent-relief-cli-wiring
+dequeued_at: 2026-08-22T20:38:25.728983Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 1bec33c81d
+```
+
+Merged the direct-IR runner. The first end-to-end check found only that parser
+JSON omits an empty `background`; accepted that optional field as an empty step
+list. The formerly 11.4-second priority-table mutant now completes in 164 ms
+with the expected `test_failure` outcome. Restarting the required full soft
+Gherkin mutation suite.
+
 ## 2026-08-22T20:30:00Z — architect final verification: rent-relief CLI wiring and observability
 
 Started the mandatory final sequence after `a39b60d98c` and `33418fa0ee`:
