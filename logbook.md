@@ -45718,3 +45718,39 @@ needed; these are 6 genuine equivalences, not gaps.
 135 survivors remain: `development-loans.feature` (14), `war-profits-tax.feature`
 (16), `greedo-monopoly-buyout.feature` (20), `greedo-share-sale.feature` (20),
 `greedo-legal-entity.feature` (65).
+
+## 2026-08-22T21:42:52Z — specifier receives CLI packaging-boundary follow-up
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/00_20260822T214141Z_000399_from_architect_to_specifier.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: rent-relief-cli-wiring
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect 2873c190b1
+```
+
+Merged `2873c190b1` into `main` (real merge, auto-merged `logbook.md`). Brings
+a second, distinct finding beyond the survivor tuples: full soft mutation is
+dominated by `logging.feature` (158.5s) and the four serial packaged-JAR
+flag scenarios (134.3s), and the packaged-JAR survivor itself is a semantic
+argument-string mutation — evidence the packaged-jar boundary duplicates
+`cli.feature`'s already-fast in-process flag coverage.
+
+Confirmed against the actual tracked files: `cli.feature` (cli-6, cli-10,
+cli-11/12/13, cli-14/15, cli-16/17) already covers legal-entity, asset-rich,
+development-loans (+full-draw), war-profits-tax, and rent-relief exactly the
+way `cli-packaged-jar.feature`'s cli-jar-4/7/8/9/10/11 do, in-process and far
+faster. Only `--optional-greedo-stalemate-trading` (cli-jar-3) has no
+standalone in-process equivalent yet — `cli.feature`'s cli-6 only exercises
+it indirectly (disabled) alongside legal-entity.
+
+Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS. This is a Gherkin
+scope decision spanning two tracked feature files under active review by the
+user; bringing it to them before making any spec changes, per the specifier's
+own handoff-approval rule.
