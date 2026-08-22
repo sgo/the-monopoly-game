@@ -39273,6 +39273,42 @@ trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
 
+## 2026-08-22T21:15:36Z — architect receives tuple-report implementation; contract defect found
+
+Complete handoff received:
+
+```
+id: 20260822T211530Z_000192_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: refactorer
+commit: 35803d0f57
+created_at: 2026-08-22T21:15:30.823280Z
+enqueued_at: 2026-08-22T21:15:31.513550Z
+task: rent-relief-cli-wiring
+dequeued_at: 2026-08-22T21:15:36.334906Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 35803d0f57
+```
+
+Merged the refactorer-processed coder implementation and ran the mandatory
+full soft Gherkin mutation gate. It completed with survivors and zero runner
+errors, but the new report is not valid: it reads scenario/example/key from
+the serialized `:Mutation` view, which contains only ID/path/description/
+original/mutated. The generated reports therefore contain `null | null | null`
+for those required fields (confirmed for Greedo-priority and both CLI reports).
+
+Do not send or commit these invalid report artifacts. Requeue coder: retain
+the full discovery metadata and join it to survivor results by mutation ID (or
+otherwise pass the original mutation record into rendering), then add an
+automated test that fails if any required tuple field is null. Re-run a focused
+feature with a survivor and show all six concrete fields before return.
+
 ## 2026-08-22T20:59:35Z — architect receives specifier survivor-triage response
 
 Complete handoff received:
