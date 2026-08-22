@@ -43890,3 +43890,106 @@ restored generated audit metadata.
 
 Sent the tracked journal survivor report to the specifier for classification
 under `acceptance-mutation-debt`.
+
+## 2026-08-22T07:45:00Z — specifier classifies journal.feature's 76 survivors: 2 real gaps found and fixed, 3 more merged into the first fix, 1 dead column pruned, 71 equivalent
+
+Read `journal.feature` in full (all 89 scenarios) plus the domain code
+behind the unfamiliar mechanisms (`LegalEntityBuilding.canBorrowForBuilding`
+for the build-commitment scenario, `World.landPawnOn`/`placePawn` for the
+position-override question) rather than pattern-match blindly, since 76
+survivors spanning 60+ distinct scenarios is too broad to classify from
+memory of prior rounds alone.
+
+**Two real, confirmed gaps — fixed and empirically verified:**
+
+1. **journal-33/41/44 tautology** (13 of the 76 survivors). All three
+   scenarios asserted `Then the game journal records that pawn "dog" starts
+   a turn with $<dog_starting_balance> and a $<reserve> reserve` — reading
+   back the *exact same columns* used to arrange the setup (`Given pawn
+   "dog" has $<dog_starting_balance> to spend`, and for journal-33 also
+   `keeping a $<reserve> reserve`). Per the specifier's own Gherkin rule
+   ("give an assertion its own column instead of reading back one that
+   arranged the scenario"), no value of these columns could ever
+   demonstrate a defect — mutating them moves the arrangement and the
+   assertion together. Fixed by adding decoupled `expected_balance`/
+   `expected_reserve` columns (journal-41/44 only needed `expected_balance`,
+   since their `reserve` is independently computed from board state, not an
+   input). Verified empirically, not just by inspection: temporarily set
+   `expected_balance` to a deliberately wrong value and reran the full
+   acceptance suite — it correctly failed with a clear mismatch, proving the
+   decoupled assertion now actually catches a discrepancy; then reverted.
+   Committed as `e6c9ec2`.
+
+2. **journal-77/78's dead `interest` column** (2 of the 76). Both
+   scenarios' `Then` step is a fixed narrative string ("defaults... the
+   bank forecloses") with zero numeric assertions; `interest` is declared
+   in the Examples table but never referenced by any Given/When/Then step
+   in either scenario — unlike `principal`/`bid` in the same tables, which
+   do arrange real state (the loan amount, the auction ceiling) even though
+   they aren't read back precisely. Pruned `interest` from both, following
+   the same precedent as round 4's `distressed-sale-1` dead `strategy`
+   column. Committed as `cc3e791`.
+
+Ran `mvn test -Pcharacterization-tests` and the full acceptance suite
+(908/908) after each fix — both green throughout.
+
+**The remaining 61 survivors are legitimate equivalents**, falling into
+patterns already established across prior rounds plus one newly-confirmed
+mechanism:
+
+- **Auction ceiling** (round 1/4 pattern — sole or ascending bidder settles
+  at the minimum ask/mortgage value or a separately-asserted price, not at
+  their own stated ceiling): journal-31/32's `high_hat_bid`, journal-36's
+  `bid` (asserted price is a separate column), journal-42's
+  `high_hat_starting_balance`, journal-43's `iron_box_starting_balance`,
+  journal-81/82's `bid` (the separately-asserted `recovered` amount doesn't
+  read back the ceiling), and journal-89's reused `auctions-1` `high_hat_bid`
+  equivalence.
+- **Reserve/threshold, comfortable margin, or ownership-count-decided
+  outcome** (round 3/4 pattern — value stays on the same side of whatever
+  boundary the scenario actually tests): the bulk of the `reserve`/
+  `dog_starting_balance`/`high_hat_starting_balance`/`owner_starting_balance`
+  mutations across journal-32/34/35/38/39/47/56/57/62/73/74/75/76/78/79/80,
+  and journal-64's `commitment` — confirmed directly against
+  `LegalEntityBuilding.canBorrowForBuilding`: financing only requires each
+  shareholder's commitment to clear their proportional share of the
+  shortfall (~$17 here), so 25 and 27 both comfortably clear it.
+- **Case-insensitive strategy/state parsing** (round 1/2 pattern):
+  `Billionaire`→`billionaire`, `disabled`→`disableD`/`disaBled` (the latter
+  via the same `.equals("enabled")` binary check already found in
+  `megacorp-salary-tax`'s CLI wiring).
+- **Overridden-by-a-later-step** (round 4 pattern, one new instance):
+  journal-67's `renter_position` — confirmed via `World.landPawnOn`, which
+  recalculates the pawn's placement itself, discarding whatever `starts at
+  position` set beforehand. Left unpruned rather than removed outright:
+  the same "starts at position" immediately followed by "lands on" pattern
+  appears in 5 other places across the tracked specs, so this looks like
+  an established (if redundant) documentary convention rather than a
+  defect unique to this scenario — pruning it here alone would be
+  inconsistent without auditing the other 5, which is outside this round's
+  scope.
+- **Genuinely irrelevant background value**: journal-81/82's `bond_cash` —
+  in these two "bank recovers into its own account, not the bondholder"
+  scenarios the bondholder is never paid, so their exact cash figure
+  affects nothing; left as an accepted equivalent rather than pruned, since
+  the underlying step still does necessary scaffolding (funding an account
+  that other scenarios reusing the same step do depend on).
+
+Verdict: 71 equivalents, 2 fixes (13+2 survivors resolved by those fixes).
+277 survivors classified in total across 17 features; report and logging
+remain, expected to inherit most of these classifications directly since
+they narrate the same underlying scenarios in different styles.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
