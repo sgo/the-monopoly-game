@@ -396,14 +396,14 @@ Feature: game report
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "dog" will roll 2 and 3 for their turn
     When we play the game
-    Then the game report says that pawn "dog" starts a turn with $<dog_starting_balance> and a $<reserve> reserve
+    Then the game report says that pawn "dog" starts a turn with $<expected_balance> and a $<expected_reserve> reserve
 
     Examples:
-      | strategy | dog_starting_balance | reserve |
-      | Greedo | 1500 | 0 |
-      | Billionaire | 1500 | 0 |
-      | Greedo | 1500 | 100 |
-      | Billionaire | 1500 | 100 |
+      | strategy | dog_starting_balance | reserve | expected_balance | expected_reserve |
+      | Greedo | 1500 | 0 | 1500 | 0 |
+      | Billionaire | 1500 | 0 | 1500 | 0 |
+      | Greedo | 1500 | 100 | 1500 | 100 |
+      | Billionaire | 1500 | 100 | 1500 | 100 |
 
   # report-34
   Scenario Outline: the report narrates why a player declines to buy a card-driven property they cannot afford
@@ -505,12 +505,12 @@ Feature: game report
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "dog" will roll 2 and 3 for their turn
     When we play the game
-    Then the game report says that pawn "dog" starts a turn with $<dog_starting_balance> and a $<reserve> reserve
+    Then the game report says that pawn "dog" starts a turn with $<expected_balance> and a $<reserve> reserve
 
     Examples:
-      | strategy | dog_starting_balance | reserve |
-      | Greedo | 1500 | 60 |
-      | Billionaire | 1500 | 60 |
+      | strategy | dog_starting_balance | reserve | expected_balance |
+      | Greedo | 1500 | 60 | 1500 |
+      | Billionaire | 1500 | 60 | 1500 |
 
   # report-42
   Scenario Outline: the report narrates a debtor putting a property up for sale and the sole buyer's winning offer
@@ -568,14 +568,14 @@ Feature: game report
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "dog" will roll 2 and 3 for their turn
     When we play the game
-    Then the game report says that pawn "dog" starts a turn with $<dog_starting_balance> and a $<reserve> reserve
+    Then the game report says that pawn "dog" starts a turn with $<expected_balance> and a $<reserve> reserve
 
     Examples:
-      | strategy | dog_starting_balance | reserve |
-      | Greedo | 200 | 160 |
-      | Billionaire | 200 | 160 |
-      | Greedo | 100 | 0 |
-      | Billionaire | 100 | 0 |
+      | strategy | dog_starting_balance | reserve | expected_balance |
+      | Greedo | 200 | 160 | 200 |
+      | Billionaire | 200 | 160 | 200 |
+      | Greedo | 100 | 0 | 100 |
+      | Billionaire | 100 | 0 | 100 |
 
   # report-45
   Scenario Outline: the report narrates a card drawn before the bank pays the player directly
@@ -1105,8 +1105,8 @@ Feature: game report
     Then the game report says that pawn "dog" defaults on the development loan secured by "Rue Grande Dinant"; the bank forecloses
 
     Examples:
-      | principal | bid | interest |
-      | 20        | 30  | 0.60     |
+      | principal | bid |
+      | 20        | 30   |
 
   # report-78
   Scenario Outline: the report narrates a legal entity defaulting on a development loan and the bank foreclosing
@@ -1126,8 +1126,8 @@ Feature: game report
     Then the game report says that Pink Realty defaults on the development loan secured by "Rue de Diekirch Arlon"; the bank forecloses
 
     Examples:
-      | principal | bid | interest |
-      | 40        | 25  | 1.20     |
+      | principal | bid |
+      | 40        | 25   |
   # report-79
   Scenario Outline: the report narrates a bondholder's annual payout on a player's development loan
     Given the official rule set
