@@ -45789,3 +45789,38 @@ priority: 00
 task: rent-relief-cli-wiring
 commit: e01d2ec92b
 ```
+
+## 2026-08-22T21:54:14Z — specifier classifies development-loans.feature's 14 survivors
+
+Investigated all 14 against `DevelopmentLoanBook.java` and `Auction.java`
+directly:
+
+- `high_hat_cash 500->494` (dev-loans-3): equivalent. `fundingFor` rejects
+  for exceeding the 80% LTV cap before ever reaching bondholder eligibility.
+- `cash 30->26`/`15->11` (dev-loans-4, both examples): equivalent. Full-draw
+  sets principal to the fixed cap regardless of the actual shortfall; both
+  values still leave the borrower short of the $50 construction cost.
+- `high_hat_cash 5->-3` (dev-loans-5): equivalent. Both remain far short of
+  the $20 needed; no eligible bondholder either way.
+- `cash 100->91`/`100->103`/`100->99`/`100->101` (dev-loans-6/7/13/14):
+  equivalent. `paymentDue` computes the interest/principal split purely from
+  the loan's own outstanding balance; all mutated values still comfortably
+  cover the small annual payment (~$2-$39).
+- `bid 30->38` (dev-loans-9): equivalent. `Auction.ascend`'s sole-bidder rule
+  pays only the land's mortgage-value opening bid ($30 for Rue Grande
+  Dinant), capped at the bidder's ceiling — both 30 and 38 exceed it, so the
+  real settlement price is unchanged.
+- `bond_cash 500->494`/`500->502` (dev-loans-10/14): equivalent. The
+  bondholder only receives a deposit in these scenarios; their starting cash
+  is never read or asserted.
+- `fresh_bond_cash 500->505` (dev-loans-17): equivalent, same reasoning.
+- `recycled 10->5` (dev-loans-17): equivalent. Both values leave recycled
+  capital short of the $35 principal, so both are fully drawn to $0 and
+  topped up with the same fresh-bond amount.
+
+All 14 recorded in `acceptance/equivalent-mutations.edn` (320 -> 334). No
+Gherkin edits needed.
+
+121 survivors remain: `war-profits-tax.feature` (16),
+`greedo-monopoly-buyout.feature` (20), `greedo-share-sale.feature` (20),
+`greedo-legal-entity.feature` (65).
