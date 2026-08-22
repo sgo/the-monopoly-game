@@ -44432,3 +44432,40 @@ logging treasury affordability and pass-Start movement inputs.
 Verification: Babashka EDN parsing succeeded with 312 total entries, including
 185 existing entries, 62 report entries, and 65 logging entries; no duplicate
 maps were found, and `git diff --check` passed.
+
+## 2026-08-22T11:15:00Z — specifier classifies the report/logging follow-up survivors
+
+Merged `f829eca826` (fast-forward, no conflict). Ran the required
+post-merge check: `mvn test -Pcharacterization-tests` — green, no
+regression. Confirmed `equivalent-mutations.edn` now has 312 entries
+(185 + 62 + 65), matching the coder's own count exactly.
+
+Both new survivors — `report-33` example 0's `reserve` (0→-5) and
+`logging-33` example 1's `reserve` (0→-1) — are the identical mechanism
+already confirmed for `journal-33`'s own follow-up: `Greedo.cashReserve`'s
+final `Math.max(reserveAmount, stationReserve(...))` clamps any negative
+configured reserve up to 0 whenever no near-monopoly/station bonus
+applies, so 0 and any negative value produce the same recorded reserve.
+No new investigation needed; accepted as equivalent.
+
+Verdict: this closes out the acceptance-mutation-debt sweep in full — all
+416 survivors across 19 features (journal 76, report 77, logging 80, plus
+183 from rounds 1-4) are now classified, with 5 real gaps found and fixed
+along the way (development-loans-11/-15's tautology, greedo-share-sale-4's
+missing assertion, and the journal/report/logging-33/41/44 tautology + dead
+`interest` column, the latter fixed identically across all three
+observability narration styles).
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
