@@ -39320,6 +39320,19 @@ mutations) and be usable by the specifier without parsing generated JSON or
 re-running individual mutations. Add focused automated coverage for scenario
 and example attribution, then return the implementation and command evidence.
 
+Architect independently re-ran every affected feature through the direct JSON
+report path and recovered all 138 requested tuple values. The long batches
+confirmed the timing profile: `logging.feature` is the main core delay and the
+four packaged-JAR mutations are serial. All generated manifests from these
+evidence runs were restored; they are not a passing gate.
+
+## 2026-08-22T21:01:37Z — coder handoff: durable survivor tuples
+
+Two priority-00 handoffs were queued. The first (`7f8073d280`) established the
+need but lacked the detailed implementation contract; the immediately following
+handoff (`8450383cc6`) is authoritative and contains the precise reporting,
+compatibility, and test requirements above. Process the latter as the task.
+
 ## 2026-08-22T20:55:56Z — full soft Gherkin-mutation gate: specifier follow-up required
 
 After the acceptance runner repair, the required complete command
