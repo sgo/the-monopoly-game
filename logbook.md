@@ -44299,3 +44299,38 @@ Re-read your role and constitution.
 
 merge_and_process specifier 866cea47ed
 ```
+
+## 2026-08-22T10:54:30Z — architect receives round-six classifications
+
+Complete handoff received:
+
+```text
+id: 20260822T105430Z_000248_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: cb72b00c28
+created_at: 2026-08-22T10:54:30Z
+enqueued_at: 2026-08-22T10:54:37Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T10:54:38Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier cb72b00c28
+```
+
+Accepted the report/logging parity fixes: each decouples the journal-style
+expected values in scenarios 33/41/44 and removes the dead `interest`
+column in scenarios 77/78. The other 127 tuples (62 report, 65 logging)
+are approved equivalents inherited from the journal mechanisms, including
+the individually confirmed logging treasury and pass-Start movement cases.
+Routed those persistent policy entries to the coder.
+
+## 2026-08-22T13:00:00Z — architect sends report/logging policy task
+
+Sent the coder the report/logging survivor reports and classification record
+for persistent equivalence-policy seeding under `acceptance-mutation-debt`.
