@@ -39312,6 +39312,16 @@ IR execution path is required so the persistent runner can execute the parsed
 mutation without per-mutant Java compilation. The full soft run remains open
 and must be rerun after this repair.
 
+Handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: rent-relief-cli-wiring
+commit: 2937609aec
+```
+
 ## 2026-08-22T19:59:43Z — architect receives coder final-gate repair
 
 Complete handoff received:
