@@ -39403,6 +39403,25 @@ commit `8a108c972f`. The handoff contains the evidence that full-game scenario
 execution—not log capture—is the bottleneck, and the required specification
 split while preserving the integration cases.
 
+## 2026-08-22T21:50:58Z — architect verifies CLI packaging-boundary change
+
+Merged specifier handoff `e01d2ec92b` (including feature commit `f30beb2` and
+six grounded equivalences). Focused soft mutation verification:
+
+- `specs-cli:en/cli-packaged-jar.feature`: 2 mutations, 2 killed, 0 survived,
+  0 errors in 30.823s. This replaces the previous 4 mutations / 134.266s
+  serial packaged-JAR batch.
+- `specs-cli:en/cli.feature`: 11 mutations, 10 killed, 1 survived, 0 errors
+  in 6.652s. The moved mixed-strategy scenario exposed a new concrete survivor:
+  `raw arguments: 2 greedo billionaire -> 2 Greedo billionaire` in “the CLI
+  accepts the billionaire strategy alongside greedo as a mixed per-player
+  selection”.
+
+The package feature now passes its focused gate and its obsolete survivor
+report was removed. The new CLI survivor report is retained and returned to
+the specifier for a grounded equivalence-versus-assertion decision. Generated
+feature manifests were restored.
+
 ## 2026-08-22T21:22:38Z — coder handoff: repair invalid tuple attribution
 
 Priority-00 `git_handoff` queued to coder with commit `73ea574660` under
