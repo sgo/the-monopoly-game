@@ -45525,3 +45525,63 @@ Refactorer verification: fast-forward merge clean; no domain/CLI `src/main`
 delta; acceptance-mutation tooling is outside my mutation-run scope.
 
 Handing the verified state back to the architect.
+
+## 2026-08-22T21:30:00Z — coder fixes survivor tuple report null-field contract defect
+
+Merged architect follow-ups 8450383cc6 (specifier contract) and 73ea574660
+(contract defect recording). The defect: `write-survivors!` read the survivor
+tuple fields from the report's `:Mutation` view, which APS strips to
+ID/path/description/original/mutated, so scenario/example/key rendered as null.
+
+Repair in `acceptance/equivalent-mutation-mutator.bb`: survivor rendering now
+joins each survived result back to the full executable discovery records by
+`:ID` (full metadata retains `:scenario`, `:example`, `:key`), and renders
+feature | scenario name | zero-based example index | key | original | mutated
+per the specifier contract (8450383cc6). Normal summary/status and equivalence
+skipping behaviour are unchanged.
+
+Added `--self-test`: reproduces the stripped-`:Mutation` contract, asserts two
+survivor rows render with no null field, and checks scenario/example/key/
+original/mutated attribution. Run: `bb
+acceptance/equivalent-mutation-mutator.bb --self-test` -> "self-test OK".
+
+Focused verification: `run-acceptance-mutation.sh --level soft
+en/rules/journal.feature` completed with 18 survivors, zero runner errors, and
+generated `mutation-survivors-en-rules-journal-feature.md` with all six fields
+concrete per row (no nulls) — e.g. `en/rules/journal.feature | the journal
+records a bankruptcy to the bank | 0 | starting balance | 5 | 1`. The per-run
+artifact and the APS manifest stamp were reverted before commit; the code
+change and this record are committed.
+
+## 2026-08-22T23:30:00Z — refactorer processes coder handoff `2b8a2a811b` (rent-relief-cli-wiring, survivor-tuple null-field fix)
+
+Handoff message received:
+
+```
+id: 20260822T212727Z_000244_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 2b8a2a811b
+created_at: 2026-08-22T21:27:27.103545Z
+enqueued_at: 2026-08-22T21:27:27.820213Z
+task: rent-relief-cli-wiring
+
+Re-read your role and constitution.
+
+merge_and_process coder 2b8a2a811b
+```
+
+Merged the survivor-tuple null-field defect fix (fast-forward, no conflicts).
+Acceptance-mutation tooling only: `acceptance/equivalent-mutation-mutator.bb`
+(+75) fixes a null-field report defect via an ID join. Logbook records the
+fix. No domain/CLI source changed, so the standard suites (domain 420, CLI 22,
+acceptance 916) are unaffected and no re-run was needed.
+
+Refactorer verification: fast-forward merge clean; no domain/CLI `src/main`
+delta; acceptance-mutation tooling is outside my mutation-run scope.
+
+Handing the verified state back to the architect.
