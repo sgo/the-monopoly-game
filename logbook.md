@@ -44190,3 +44190,40 @@ Re-read your role and constitution.
 
 merge_and_process specifier ede14a9020
 ```
+
+## 2026-08-22T08:27:45Z — architect receives round-six observability audit request
+
+Complete handoff received:
+
+```text
+id: 20260822T082745Z_000247_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: ebda63bd60
+created_at: 2026-08-22T08:27:45Z
+enqueued_at: 2026-08-22T08:27:50Z
+task: acceptance-mutation-debt
+dequeued_at: 2026-08-22T08:27:51Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier ebda63bd60
+```
+
+Resolved a logbook-only merge conflict by preserving both the prior
+clamped-reserve handoff record and the round-six request. Ran the required
+soft audits sequentially and recorded their complete survivor sets:
+`report.feature` has 77 survivors (101 killed, zero errors) and
+`logging.feature` has 80 survivors (111 killed, zero errors). Restored
+generated audit metadata and sent both self-contained tuple reports to the
+specifier for classification.
+
+## 2026-08-22T10:55:00Z — architect sends round-six survivor reports
+
+Sent `acceptance/round-six-report-survivors.md` and
+`acceptance/round-six-logging-survivors.md` to the specifier under
+`acceptance-mutation-debt`.

@@ -1,0 +1,84 @@
+# Round-six logging soft mutation survivors
+
+Format: feature | scenario name | example index | key | original | mutated.
+
+- logging | the log records the winner and price of an auction after the landing movement | 0 | dog_bid | 90 | 94
+- logging | the log records the winner and price of an auction after the landing movement | 0 | high_hat_bid | 120 | 125
+- logging | the log records rent paid after the landing movement | 1 | strategy | Billionaire | billionaire
+- logging | the log records a house built during a player's turn | 1 | strategy | Billionaire | billionaire
+- logging | the log records why a player declines to buy land they cannot afford | 0 | high_hat_bid | 60 | 61
+- logging | the log records why a player declines to buy land they cannot afford | 1 | dog_starting_balance | 59 | 53
+- logging | the log records why a player declines to buy land they cannot afford | 1 | high_hat_bid | 60 | 53
+- logging | the log records why a player declines to buy land they cannot afford | 1 | strategy | Billionaire | billionaire
+- logging | the log records why a player keeping a reserve declines a purchase that would dip below it | 0 | dog_starting_balance | 150 | 142
+- logging | the log records why a player keeping a reserve declines a purchase that would dip below it | 0 | high_hat_bid | 60 | 58
+- logging | the log records why a player keeping a reserve declines a purchase that would dip below it | 0 | reserve | 96 | 105
+- logging | the log records why a player keeping a reserve declines a purchase that would dip below it | 1 | dog_starting_balance | 150 | 152
+- logging | the log records why a player keeping a reserve declines a purchase that would dip below it | 1 | high_hat_bid | 60 | 65
+- logging | the log records a player's reserve alongside their balance at the start of a turn | 0 | dog_starting_balance | 1500 | 1504
+- logging | the log records a player's reserve alongside their balance at the start of a turn | 0 | reserve | 0 | 1
+- logging | the log records a player's reserve alongside their balance at the start of a turn | 1 | dog_starting_balance | 1500 | 1498
+- logging | the log records a player's reserve alongside their balance at the start of a turn | 2 | dog_starting_balance | 1500 | 1509
+- logging | the log records a player's reserve alongside their balance at the start of a turn | 2 | reserve | 100 | 96
+- logging | the log records a player's reserve alongside their balance at the start of a turn | 3 | dog_starting_balance | 1500 | 1492
+- logging | the log records a player's reserve alongside their balance at the start of a turn | 3 | reserve | 100 | 109
+- logging | the log records why a player declines to buy a card-driven property they cannot afford | 0 | dog_starting_balance | 100 | 104
+- logging | the log records why a player declines to buy a card-driven property they cannot afford | 1 | dog_starting_balance | 100 | 94
+- logging | the log records why a player keeping a reserve declines a card-driven purchase that would dip below it | 0 | dog_starting_balance | 200 | 204
+- logging | the log records why a player keeping a reserve declines a card-driven purchase that would dip below it | 1 | dog_starting_balance | 200 | 197
+- logging | the log records why a player keeping a reserve declines a card-driven purchase that would dip below it | 1 | reserve | 65 | 68
+- logging | the log records a bank-forced auction win during another player's bankruptcy | 0 | bid | 35 | 41
+- logging | the log records a creditor paying interest to keep an inherited mortgage in place | 1 | owner_starting_balance | 0 | -3
+- logging | the log records a creditor paying interest to keep an inherited mortgage in place | 1 | starting_balance | 2 | -1
+- logging | the log records a creditor immediately lifting an inherited mortgage | 0 | starting_balance | 10 | 11
+- logging | the log records a creditor immediately lifting an inherited mortgage | 1 | starting_balance | 10 | 2
+- logging | the log records the reserve dynamically sized for a near-complete colour monopoly at the start of a turn | 0 | dog_starting_balance | 1500 | 1492
+- logging | the log records the reserve dynamically sized for a near-complete colour monopoly at the start of a turn | 1 | dog_starting_balance | 1500 | 1507
+- logging | the log records a debtor putting a property up for sale and the sole buyer's winning offer | 0 | high_hat_starting_balance | 200 | 207
+- logging | the log records a debtor putting a property up for sale and the sole buyer's winning offer | 1 | high_hat_starting_balance | 200 | 195
+- logging | the log records every $5 raise in a bidding war before the winning offer | 0 | dog_starting_balance | 0 | -6
+- logging | the log records every $5 raise in a bidding war before the winning offer | 0 | iron_box_starting_balance | 320 | 326
+- logging | the log records every $5 raise in a bidding war before the winning offer | 1 | dog_starting_balance | 0 | 4
+- logging | the log records every $5 raise in a bidding war before the winning offer | 1 | iron_box_starting_balance | 320 | 314
+- logging | the log records a near-complete colour group's reserve only while its missing street remains affordable | 0 | dog_starting_balance | 200 | 201
+- logging | the log records a near-complete colour group's reserve only while its missing street remains affordable | 1 | dog_starting_balance | 200 | 193
+- logging | the log records a near-complete colour group's reserve only while its missing street remains affordable | 2 | dog_starting_balance | 100 | 96
+- logging | the log records a near-complete colour group's reserve only while its missing street remains affordable | 3 | dog_starting_balance | 100 | 108
+- logging | the log records that no one bids before it records the resulting mortgage | 0 | dog_starting_balance | 10 | 14
+- logging | the log records that no one bids before it records the resulting mortgage | 0 | high_hat_reserve | 85 | 80
+- logging | the log records that no one bids before it records the resulting mortgage | 0 | high_hat_starting_balance | 95 | 94
+- logging | the log records that no one bids before it records the resulting mortgage | 1 | dog_starting_balance | 10 | 9
+- logging | the log records that no one bids before it records the resulting mortgage | 1 | high_hat_reserve | 85 | 89
+- logging | the log records that no one bids before it records the resulting mortgage | 1 | high_hat_starting_balance | 95 | 99
+- logging | peer trading never touches a colour group that is a genuine two-owner split, even while the buyout cannot yet afford it | 0 | high_hat_balance | 50 | 47
+- logging | the majority owner within a split colour group wins the buyout during real play, even when poorer | 0 | dog_balance | 100 | 103
+- logging | the log records a player's age increasing after passing start | 0 | dog_die_1 | 5 | 13
+- logging | the log records a player's age increasing after passing start | 0 | dog_die_2 | 6 | 15
+- logging | the log records a player's age increasing after passing start | 0 | dog_start_position | 29 | 30
+- logging | the log records the winner's final age once the game ends in an ordinary win | 0 | starting_balance | 5 | 13
+- logging | the log records that <entity_name> raises a loan to fund a build shortfall | 0 | commitment | 25 | 32
+- logging | the log records that pawn "<renter>" pays rent to <entity_name> for an entity-owned street | 0 | renter_position | 3 | 12
+- logging | the log records that <entity_name> builds a house on a street when its treasury can pay for it | 0 | treasury | 100 | 103
+- logging | the log records a player's annual development-loan payment split into interest and principal | 0 | cash | 100 | 104
+- logging | the log records a legal entity's annual development-loan payment split into interest and principal | 0 | bank_funds | 100 | 94
+- logging | the log records a player's development loan being fully repaid | 0 | cash | 100 | 101
+- logging | the log records a legal entity's development loan being fully repaid | 0 | bank_funds | 100 | 91
+- logging | the log records a player defaulting on a development loan and the bank foreclosing | 0 | bid | 30 | 38
+- logging | the log records a player defaulting on a development loan and the bank foreclosing | 0 | interest | 0.60 | 8.79
+- logging | the log records a player defaulting on a development loan and the bank foreclosing | 0 | principal | 20 | 21
+- logging | the log records a legal entity defaulting on a development loan and the bank foreclosing | 0 | bid | 25 | 16
+- logging | the log records a legal entity defaulting on a development loan and the bank foreclosing | 0 | interest | 1.20 | 8.53
+- logging | the log records a legal entity defaulting on a development loan and the bank foreclosing | 0 | principal | 40 | 32
+- logging | the log records a bondholder's annual payout on a player's development loan | 0 | bond_cash | 500 | 505
+- logging | the log records a bondholder's annual payout on a player's development loan | 0 | cash | 200 | 195
+- logging | the log records a bondholder's annual payout on a legal entity's development loan | 0 | bank_funds | 200 | 195
+- logging | the log records the bank recovering a player's foreclosure proceeds into its own account, rather than paying the bondholder out | 0 | bid | 30 | 25
+- logging | the log records the bank recovering a player's foreclosure proceeds into its own account, rather than paying the bondholder out | 0 | bond_cash | 500 | 499
+- logging | the log records the bank recovering a legal entity's foreclosure proceeds into its own account, rather than paying the bondholder out | 0 | bid | 25 | 33
+- logging | the log records the bank recovering a legal entity's foreclosure proceeds into its own account, rather than paying the bondholder out | 0 | bond_cash | 500 | 504
+- logging | the log records that development loans are disabled by default, near the start of the game | 0 | state | disabled | Disabled
+- logging | the log records a player's war profits tax payment | 0 | land_value | 6000 | 6003
+- logging | the log records the government's final account balance once the game ends | 0 | land_value | 6000 | 5993
+- logging | the log records the government's final account balance once an ordinary win ends the game too | 0 | high hat balance | 5 | 3
+- logging | the log records the government's final account balance once an ordinary win ends the game too | 0 | land_value | 6000 | 6001
+- logging | the log records that the war profits tax is disabled by default, near the start of the game | 0 | state | disabled | dIsabled
