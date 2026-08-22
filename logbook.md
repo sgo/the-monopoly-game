@@ -43885,3 +43885,8 @@ Reproduced the journal soft audit: 180 executable mutations, 104 killed, 76
 survived, and zero errors. Recorded the 76 self-contained survivor tuples in
 `acceptance/round-five-journal-survivors.md` for the specifier's review, and
 restored generated audit metadata.
+
+## 2026-08-22T07:30:00Z — architect sends journal survivor report
+
+Sent the tracked journal survivor report to the specifier for classification
+under `acceptance-mutation-debt`.
