@@ -39256,6 +39256,28 @@ simulator's continued execution without depending on natural game duration,
 then run the focused test repeatedly and hand the result back for the remaining
 final gates.
 
+Handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: rent-relief-cli-wiring
+commit: 1d300167fb
+```
+
+Continued independent final-gate work while that repair is outstanding:
+
+- Differential `mutate4java` of `Game.java` used the focused `GameTest`
+  baseline (1.897 seconds) and killed all 106/106 sites with no survivors or
+  uncovered sites. The tool updated the embedded manifest.
+- `dry4java` reported only existing overload-forwarding methods in `Game` and
+  `Simulator`. Each is a public convenience overload that supplies a distinct
+  default argument before delegating to the full signature; extracting their
+  small, type-distinct calls would add an indirection without removing a
+  duplicated algorithm. This is accepted as reasonable non-actionable DRY
+  noise. No rent-relief behavior duplicated code.
+
 ## 2026-08-22T19:43:13Z — architect receives rent-relief observability review
 
 Complete handoff received:
