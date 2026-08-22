@@ -45946,3 +45946,33 @@ Equivalent; recorded in `acceptance/equivalent-mutations.edn` (334 -> 335).
 
 Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS. Continuing the
 survivor sweep: `war-profits-tax.feature` (16) next.
+
+## 2026-08-22T21:58:40Z — specifier classifies war-profits-tax.feature's 16 survivors
+
+Investigated all 16 against `WarProfitsTax.java`'s band table directly
+(board value $22,790):
+
+- Every `collected` mutation (wpt-1 both examples, wpt-3, wpt-6, wpt-10,
+  wpt-9): equivalent. In wpt-1/3/6/10 the player's ownership share sits
+  below the 25% threshold (undeveloped land, entity-owned land, or sold
+  back below it), so `WarProfitsTax.rate` returns 0% regardless of the
+  amount collected — the assertion is "pays no tax," not tied to a specific
+  collected value. In wpt-9 both 90 and 84 exceed the player's $0 cash and
+  are both fully covered by Lippenslaan Knokke's fixed $90 mortgage value,
+  so the same single mortgage and solvent outcome hold.
+- Every `land_value` mutation in wpt-1 and wpt-8: equivalent. Both stay on
+  the same side of the 25% boundary ($5697.50), so the same 0%-band (wpt-1)
+  or 100%-band (wpt-8) tax is asserted.
+- All 6 `land_value` mutations in wpt-2 (the boundary-pinned band table):
+  equivalent. Each mutated value stays inside the same fixed band the
+  original pinned (25-40%, 40-60%, 80-100%, or >=100%), confirmed against
+  `WarProfitsTax.rate`'s band cutoffs; none cross into a neighboring band.
+- `land_value 10000->10003` (wpt-7): equivalent. The asserted zero tax on
+  the second assessment comes from the rent-collected counter resetting to
+  zero, not from the land value; `tax()` multiplies any rate by zero.
+
+All 16 recorded in `acceptance/equivalent-mutations.edn` (335 -> 351). No
+Gherkin edits needed.
+
+105 survivors remain: `greedo-monopoly-buyout.feature` (20),
+`greedo-share-sale.feature` (20), `greedo-legal-entity.feature` (65).
