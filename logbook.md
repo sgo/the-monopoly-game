@@ -43829,3 +43829,31 @@ need to fix, just flagging it's their own duplication, not mine. No
 decision needed; closing without further action. 201 survivors remain
 classified across 16 features; journal, report, and logging are all that's
 left.
+
+## 2026-08-21T16:00:00Z — specifier starts round 5 (journal, report, logging)
+
+User directed starting the observability trio. Requesting exact
+per-mutation detail for `journal.feature`'s 76 survivors first, in the
+self-contained tuple format established in round 4 (feature | scenario
+name | example index | key | original -> mutated per line, written to a
+tracked file rather than inline in the handoff message). Deliberately
+starting with journal alone rather than all three at once: report and
+logging narrate the same underlying scenarios in different styles ("the
+game report says that"/"the game log records that" vs. "the game journal
+records that"), so journal's classifications are expected to transfer
+directly to most of report's and logging's survivors once matched by
+scenario/example/key, avoiding two more redundant 76-80-survivor reviews.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
