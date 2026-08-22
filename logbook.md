@@ -45853,3 +45853,34 @@ Gherkin edits needed.
 121 survivors remain: `war-profits-tax.feature` (16),
 `greedo-monopoly-buyout.feature` (20), `greedo-share-sale.feature` (20),
 `greedo-legal-entity.feature` (65).
+
+## 2026-08-22T21:55:12Z — specifier receives logging.feature mutation-performance finding
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/00_20260822T214345Z_000400_from_architect_to_specifier.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: rent-relief-cli-wiring
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect 8a108c972f
+```
+
+Merged `8a108c972f` (real merge, auto-merged `logbook.md`). Third finding
+from the same soft-mutation performance investigation: `logging.feature`'s
+158.5s mutation cost is real end-to-end game execution (49 `we play the
+game`/`we play up to N rounds` scenarios, each constructing and playing a
+real `Game`), not the logging mechanism itself. Proposed follow-up: move
+scenarios that don't need full-game integration proof to the feature's
+existing direct event/journal setup pattern, keeping a small end-to-end
+subset. Explicitly: do not weaken observable logging assertions.
+
+Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS. This is a
+larger, separate restructuring task than the CLI boundary trim (up to 49
+scenarios to individually assess). Not blocking the in-progress
+survivor-classification sweep the user asked to continue with; parking this
+finding and returning to it after the sweep, or sooner if the user directs.
