@@ -45608,3 +45608,44 @@ Refactorer verification: fast-forward merge clean; no domain/CLI `src/main`
 delta; acceptance-mutation tooling is outside my mutation-run scope.
 
 Handing the verified state back to the architect.
+
+## 2026-08-22T21:37:05Z — specifier merges self-contained soft-mutation survivor tuples
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/00_20260822T213524Z_000398_from_architect_to_specifier.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: rent-relief-cli-wiring
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect 3a2ba6be05
+```
+
+Merged `3a2ba6be05` into `main` (real merge, auto-merged `logbook.md`; no
+conflicts). Brings in the full round-trip triggered by my tuple request:
+runner/report-tooling fixes (`acceptance/equivalent-mutation-mutator.bb`, an
+ID-join fix for a null-field defect) and the actual deliverable — nine
+self-contained survivor-tuple reports under `acceptance/mutation-survivors-*.md`,
+one per affected feature, each line `feature | scenario | example | key |
+original -> mutated`:
+
+- `journal.feature`: 1
+- `logging.feature`: 1
+- `specs-cli:cli-packaged-jar.feature`: 1
+- `greedo-priority.feature`: 3 (not in the original aggregate count; the
+  completed run surfaced it)
+- `development-loans.feature`: 14
+- `war-profits-tax.feature`: 16
+- `greedo-monopoly-buyout.feature`: 20
+- `greedo-share-sale.feature`: 20
+- `greedo-legal-entity.feature`: 65
+
+141 survivors total. Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS.
+Starting classification, smallest feature first, same methodology as the
+2026-08-21 acceptance-mutation-debt sweep: ground every verdict in the actual
+domain mechanism, verify decoupling fixes empirically, and only record a true
+semantic equivalence in `acceptance/equivalent-mutations.edn` with rationale.
