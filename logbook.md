@@ -44130,3 +44130,30 @@ Re-read your role and constitution.
 
 merge_and_process specifier 984a524196
 ```
+
+## 2026-08-22T08:00:00Z — specifier starts round 6 (report + logging)
+
+User approved continuing. Requesting exact per-mutation detail for
+`report.feature`'s 77 survivors and `logging.feature`'s 80 survivors
+together, in the same self-contained tuple format used for journal. Since
+both narrate the same underlying scenarios as `journal.feature` in
+different styles ("the game report says that X" / "the game log records
+that X" vs. "the game journal records that X"), expecting most of these to
+map directly onto journal's already-completed classification once matched
+by scenario name, example index, and key — only genuinely new
+scenario/key combinations (if any exist in report/logging but not journal)
+will need fresh investigation.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: acceptance-mutation-debt
+commit: PENDING
+
+Re-read your role and constitution.
+
+merge_and_process specifier PENDING
+```
