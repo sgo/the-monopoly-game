@@ -45976,3 +45976,41 @@ Gherkin edits needed.
 
 105 survivors remain: `greedo-monopoly-buyout.feature` (20),
 `greedo-share-sale.feature` (20), `greedo-legal-entity.feature` (65).
+
+## 2026-08-22T22:01:14Z — specifier classifies greedo-monopoly-buyout.feature's 20 survivors
+
+Investigated all 20 against `MonopolyBuyout.java` directly:
+
+- Loser-balance mutations (buyout-1/2/3/4/7/8/9/10/11, one column each):
+  equivalent. `MonopolyBuyout.settle`/`price`/`settlementCash` only ever read
+  the *winner's* balance (for the >$1500 price branch and the 35%
+  affordability cap); the loser's balance is never read once the winner is
+  selected, whether selection came from `majorityOwner`, `richer`, or
+  `spareOwner`.
+- Winner-balance mutations that stay on the same side of every threshold
+  the code actually checks ($1500 double-rent branch, the 35%-of-balance
+  affordability cap, the $2000 sweetener-inclusion threshold): equivalent
+  in buyout-1/2/3/4/8/11, confirmed by computing the actual cap for both
+  values and showing neither crosses the price or threshold it's compared
+  against.
+- `high_hat_balance 1000->996` (buyout-6): equivalent. `richer()` now picks
+  dog directly instead of falling through to the tie-break `spareOwner`
+  path, but dog was already the eventual winner either way, and `settle()`
+  computes the same price/spare-transfer purely from the resolved
+  winner/loser pair.
+- `dog_balance 1900->1891`/`1900->1898` (buyout-7/12): equivalent.
+  buyout-7's spare list is already empty (dog's other holdings form a
+  complete group `spareStreetsOf` excludes), and buyout-12's whole group is
+  excluded by `splitGroup`'s highest-priority filter before any balance is
+  ever read.
+- `high_hat_balance 50->55` (buyout-12): equivalent, same
+  highest-priority-group exclusion, independent of either balance.
+- `dog_balance 114->111` (buyout-9): equivalent. Both give a 35%-of-balance
+  ceiling below the $40 no-spare price (39 and 38 by integer floor), so the
+  deal is deferred either way.
+
+All 20 recorded in `acceptance/equivalent-mutations.edn` (351 -> 371). No
+Gherkin edits needed.
+
+85 survivors remain: `greedo-share-sale.feature` (20),
+`greedo-legal-entity.feature` (65).
