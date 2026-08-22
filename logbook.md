@@ -44816,3 +44816,28 @@ Refactorer verification (all green):
   case is a straight-line branch.
 
 Handing the verified state back to the architect.
+
+## 2026-08-22T19:00:58Z — specifier merges architect phase-complete sync (rent-relief-cli-wiring)
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/50_20260822T185958Z_000389_from_architect_to_specifier.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: rent-relief-cli-wiring
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect a39b60d98c
+```
+
+Fast-forward merged `a39b60d98c` ("close rent relief CLI wiring review") into
+`main`. Brings in the coder's CLI/domain wiring for the rent-relief flag
+(`SimulatorFlags`/`Simulator`/`Game`/`Report`) plus the refactorer's
+verification (domain 420/420, acceptance 910/910, CLI 22/22, characterization
+13/13, mutation and CRAP checks clean) and the architect's own review commit.
+
+Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS across all modules.
+No further action needed; task `rent-relief-cli-wiring` is closed on my side.
