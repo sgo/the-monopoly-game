@@ -39367,6 +39367,13 @@ entrypoint/dependencies, and accepts a representative invocation. This is a
 specification change; preserve required observable behaviour and return it
 through the normal loop with focused mutation timing/results.
 
+## 2026-08-22T21:41:41Z — handoff to specifier: CLI packaging boundary
+
+Queued priority-00 `git_handoff` to specifier for task `rent-relief-cli-wiring`,
+commit `2873c190b1`. The commit contains the measured bottleneck and requested
+split between semantic CLI acceptance coverage and minimal packaged-JAR smoke
+coverage.
+
 ## 2026-08-22T21:22:38Z — coder handoff: repair invalid tuple attribution
 
 Priority-00 `git_handoff` queued to coder with commit `73ea574660` under
