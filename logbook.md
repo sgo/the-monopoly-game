@@ -44727,3 +44727,57 @@ merge_and_process coder eaca794eac
 ```
 
 Returned the verified rent-relief CLI wiring state to the refactorer.
+
+## 2026-08-22T19:05:00Z — refactorer processes coder handoff `664d44c9f0` (rent-relief-cli-wiring)
+
+Handoff message received:
+
+```
+id: 20260822T185629Z_000237_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 664d44c9f0
+created_at: 2026-08-22T18:56:29.945383Z
+enqueued_at: 2026-08-22T18:56:29.951131Z
+task: rent-relief-cli-wiring
+
+Re-read your role and constitution.
+
+merge_and_process coder 664d44c9f0
+```
+
+Merged the rent-relief CLI-wiring progression (the megacorp/rent-relief feature
+moves from isolated rules into live CLI/domain wiring). The handoff commit
+`664d44c9f0` pulls in the feature via parent `eaca794` ("Wire rent relief
+through the CLI") plus intervening commits (feature promotions and
+acceptance mutation survivor-docs/equivalents tooling, which are acceptance
+pipeline artifacts outside my mutation-run scope).
+
+What it delivers (production):
+- `SimulatorFlags.rentRelief(...)` recognizes `--optional-rent-relief`;
+  `Simulator` wires the flag through.
+- `Game` gains a `rentRelief` constructor field (back-compatible overload
+  defaulting to `false`) and logs `Journal.Entry.RentReliefEnabled`.
+- `Report.line` gains the `RentReliefEnabled` case ("rent relief is
+  enabled/disabled").
+- `SimulatorFlagsTest`/`SimulatorTest`/`GameTest`/`ReportTest` cover it;
+  cli/cli-packaged-jar features promoted from backlog.
+
+Refactorer verification (all green):
+- Domain 420/420 (+1) + 28/28 property.
+- Acceptance 910/910 (+2 rent-relief scenarios; was 908).
+- CLI 22/22 (+3 rent-relief tests); characterization 13/13.
+- Mutation sites: Simulator 93 (was 91, +2), SimulatorFlags 10 (+1),
+  Game 106 (unchanged, documented pre-existing >100 breach), Report 5
+  (unchanged) — all under threshold except Game's known breach, no split
+  needed.
+- CRAP: the rent-relief wiring is straightforward. `Report.line` CRAP 524.7
+  (CC 77, 57.7%) is the documented sealed-type exhaustive-switch exemption
+  (reverted three times per logbook; left alone). The added `RentReliefEnabled`
+  case is a straight-line branch.
+
+Handing the verified state back to the architect.
