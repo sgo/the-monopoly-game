@@ -44968,3 +44968,30 @@ Refactorer verification (all green):
 - No `src/main` change → no mutation-site or CRAP delta.
 
 Handing the verified state back to the architect.
+
+## 2026-08-22T19:44:50Z — specifier merges architect phase-complete sync (rent-relief-observability)
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/50_20260822T194347Z_000390_from_architect_to_specifier.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 50
+TASK_NAME: rent-relief-observability
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect 33418fa0ee
+```
+
+Merged `33418fa0ee` into `main` (real merge, auto-merged `logbook.md`; no
+conflicts). Brings in the coder's acceptance-harness wiring for
+`journal-92/93`, `report-92/93`, `logging-92/93` (`MonopolyStepHelpers`,
+`World`, `GameLogStepHandlers`) plus the refactorer's verification (domain
+420/420, acceptance 916/916, no production source touched so no mutation/CRAP
+delta) and the architect's own review commit.
+
+Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS; `CharacterizationTest`
+12/12, domain 420/420, CLI module 13/13. No further action needed; task
+`rent-relief-observability` is closed on my side.
