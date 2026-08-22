@@ -44647,9 +44647,9 @@ type: git_handoff
 to: coder
 priority: 50
 task: rent-relief-cli-wiring
-commit: 4b29bd3245
+commit: c5a265a8ba
 
 Re-read your role and constitution.
 
-merge_and_process specifier 4b29bd3245
+merge_and_process specifier c5a265a8ba
 ```
