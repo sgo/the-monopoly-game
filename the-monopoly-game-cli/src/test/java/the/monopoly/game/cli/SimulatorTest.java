@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -131,21 +132,30 @@ class SimulatorTest {
 
   @Test
   void keepsPlayingUntilToldToStop() throws Exception {
-    // Eight players, not two: with real, unseeded dice a two-player game can
-    // legitimately finish inside the sleep below (observed in about 60% of
-    // runs), which would fail this assertion despite the simulator behaving
-    // correctly. Eight players reliably outlasts it (0/30 in the same
-    // sampling) without changing what the assertion proves.
-    Simulator.Running running = Simulator.start(8, Simulator.strategiesFor(8, List.of()));
+    Thread testThread = Thread.currentThread();
+    CountDownLatch strategyEntered = new CountDownLatch(1);
+    CountDownLatch allowStrategy = new CountDownLatch(1);
+    Strategy.OfPlayers strategies = player -> {
+      if (Thread.currentThread() != testThread) {
+        strategyEntered.countDown();
+        try {
+          allowStrategy.await();
+        } catch (InterruptedException cause) {
+          Thread.currentThread().interrupt();
+          throw new AssertionError("Waiting for the test strategy was interrupted.", cause);
+        }
+      }
+      return Strategy.UNDECIDED;
+    };
+    Simulator.Running running = Simulator.start(2, strategies);
 
-    // A single round finishes far faster than this even under coverage
-    // instrumentation; still playing here shows the simulation keeps going on
-    // its own rather than stopping after one round regardless of whether
-    // stop() was ever called.
-    Thread.sleep(1000);
-    assertThat(running.isPlaying()).isTrue();
-
-    running.stop();
+    try {
+      assertThat(strategyEntered.await(5, TimeUnit.SECONDS)).isTrue();
+      assertThat(running.isPlaying()).isTrue();
+    } finally {
+      allowStrategy.countDown();
+      running.stop();
+    }
 
     assertThat(running.awaitEnd().succeeded()).isTrue();
     assertThat(running.isPlaying()).isFalse();

@@ -1,31 +1,20 @@
-import org.junit.platform.launcher.Launcher;
-import org.junit.platform.launcher.LauncherDiscoveryRequest;
-import org.junit.platform.launcher.core.LauncherFactory;
-import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
-import org.junit.platform.launcher.listeners.TestExecutionSummary;
+import org.junit.jupiter.api.DynamicTest;
+import the.monopoly.game.specs.acceptance.AcceptanceRuntime;
+import the.monopoly.game.specs.acceptance.Ir;
+import the.monopoly.game.specs.acceptance.MonopolyStepHandlers;
 
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.StringWriter;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Stream;
-
-import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
-import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.request;
 
 /**
  * Runner adapter for {@code bb gherkin-mutator}, hosted in one long-lived JVM.
@@ -35,33 +24,25 @@ import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.r
  * <p>
  * The previous adapter shelled out to {@code mvn test} for every mutation, which
  * cost about twenty seconds of Maven and JVM startup to run assertions that take
- * milliseconds. This one pays that cost once: the entry point is compiled in
- * process and executed through the JUnit Platform launcher, so a mutation costs
- * roughly the time of the tests themselves.
+ * milliseconds. This one pays that cost once by hosting the worker in one long-
+ * lived JVM.
  * <p>
- * This project's generator embeds the IR in the generated Java source rather
- * than reading it at run time, so a mutated IR still needs the entry point
- * regenerated and recompiled. Hiding that from the mutator is the adapter's job.
+ * Mutated IR is read directly and handed to the existing acceptance runtime;
+ * no generated source or per-mutant Java compilation is needed.
  */
 public final class AcceptanceMutationRunner {
-  private static final String GENERATED_PACKAGE = "the.monopoly.game.specs.acceptance.generated";
 
   /**
-   * Upper bound on one mutation job, from entry-point generation through
-   * compilation and JUnit execution. A mutant that sends a generated test
-   * into an infinite loop must not tie up a worker indefinitely, or four such
-   * mutations could strand every worker and hang the whole run.
+   * Upper bound on one mutation job, from reading the mutated IR through
+   * execution. A mutant that sends a test into an infinite loop must not tie
+   * up a worker indefinitely, or several such mutations could strand every
+   * worker and hang the whole run.
    */
   private static final long JOB_TIMEOUT_MS = 5 * 60 * 1000;
 
-  private final Path root;
-  private final Path generator;
   private final AtomicReference<Thread> interruptionGate = new AtomicReference<>();
-  private final AtomicReference<Process> generatorProcess = new AtomicReference<>();
 
   private AcceptanceMutationRunner(Path root) {
-    this.root = root;
-    this.generator = root.resolve("acceptance/acceptance-entrypoint-generator.bb");
   }
 
   public static void main(String[] args) throws Exception {
@@ -86,15 +67,8 @@ public final class AcceptanceMutationRunner {
     PrintStream protocol = System.out;
     ByteArrayOutputStream output = new ByteArrayOutputStream();
     System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
-    Path work;
-    try {
-      work = Files.createTempDirectory("acceptance-mutation-");
-    } catch (Exception cause) {
-      return response(id, "infrastructure_error", "", "cannot create work directory: " + cause, started);
-    }
-
     AtomicReference<String> reply = new AtomicReference<>();
-    Thread worker = new Thread(() -> reply.set(runJob(job, started, work, output)), "mutation-job-" + id);
+    Thread worker = new Thread(() -> reply.set(runJob(job, started, output)), "mutation-job-" + id);
     interruptionGate.set(worker);
     worker.setDaemon(true);
     worker.start();
@@ -111,108 +85,37 @@ public final class AcceptanceMutationRunner {
       // report a bounded result, and move on to keep the worker responsive.
       Thread active = interruptionGate.getAndSet(null);
       if (active != null) active.interrupt();
-      Process generator = generatorProcess.getAndSet(null);
-      if (generator != null) generator.destroy();
       result = response(id, "infrastructure_error", output.toString(StandardCharsets.UTF_8),
           "mutation job exceeded its " + (JOB_TIMEOUT_MS / 1000) + "s bound; treating as a runner error", started);
     }
     interruptionGate.set(null);
 
     System.setOut(protocol);
-    deleteTree(work);
     return result;
   }
 
   /** Processes a mutation job end to end and returns its JSON response. */
-  private String runJob(Map<String, String> job, long started, Path work, ByteArrayOutputStream output) {
+  private String runJob(Map<String, String> job, long started, ByteArrayOutputStream output) {
     String id = job.getOrDefault("id", "");
     try {
-      Path sources = work.resolve("src");
-      Path classes = Files.createDirectories(work.resolve("classes"));
-
-      generate(job.get("feature_json"), sources);
-      compile(sources, classes);
-      TestExecutionSummary summary = execute(classes, entryPointClass(job.get("feature_json")));
-
-      if (summary.getTestsFoundCount() == 0)
+      List<DynamicTest> tests = new AcceptanceRuntime(MonopolyStepHandlers.handlers())
+          .execute(Json.readIr(Path.of(job.get("feature_json")))).toList();
+      if (tests.isEmpty())
         return response(id, "infrastructure_error", output.toString(StandardCharsets.UTF_8),
             "no tests were discovered", started);
-      return response(id, summary.getTotalFailureCount() > 0 ? "test_failure" : "test_success",
-          output.toString(StandardCharsets.UTF_8), "", started);
+      for (DynamicTest test : tests) {
+        try {
+          test.getExecutable().execute();
+        } catch (Throwable failure) {
+          return response(id, "test_failure", output.toString(StandardCharsets.UTF_8),
+              failure.toString(), started);
+        }
+      }
+      return response(id, "test_success", output.toString(StandardCharsets.UTF_8), "", started);
     } catch (Exception cause) {
       System.err.println("job " + id + " failed: " + cause);
       return response(id, "infrastructure_error", output.toString(StandardCharsets.UTF_8),
           String.valueOf(cause.getMessage()), started);
-    }
-  }
-
-  /** The generator derives the entry point class name from the IR file stem. */
-  private static String entryPointClass(String irPath) {
-    String stem = Path.of(irPath).getFileName().toString().replaceAll("\\.json$", "");
-    StringBuilder name = new StringBuilder();
-    for (String word : stem.split("[^A-Za-z0-9]+")) {
-      if (word.isEmpty()) continue;
-      name.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1).toLowerCase());
-    }
-    return GENERATED_PACKAGE + "." + name + "AcceptanceTest";
-  }
-
-  private void generate(String featureJson, Path into) throws Exception {
-    Process process = new ProcessBuilder("bb", generator.toString(), featureJson, into.toString())
-        .directory(root.toFile())
-        .redirectErrorStream(true)
-        .start();
-    generatorProcess.set(process);
-    String output;
-    try {
-      output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-    } finally {
-      generatorProcess.set(null);
-    }
-    if (process.waitFor() != 0)
-      throw new IllegalStateException("entry point generation failed: " + output);
-  }
-
-  private void compile(Path sources, Path classes) throws Exception {
-    List<String> files = new ArrayList<>();
-    try (Stream<Path> tree = Files.walk(sources)) {
-      tree.filter(it -> it.toString().endsWith(".java")).map(Path::toString).forEach(files::add);
-    }
-    if (files.isEmpty()) throw new IllegalStateException("no generated sources to compile");
-
-    JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-    if (compiler == null) throw new IllegalStateException("no system Java compiler; run on a JDK");
-
-    List<String> arguments = new ArrayList<>(List.of(
-        "-cp", System.getProperty("java.class.path"),
-        "-d", classes.toString(),
-        "-nowarn"
-    ));
-    arguments.addAll(files);
-
-    StringWriter diagnostics = new StringWriter();
-    if (compiler.run(null, null, null, arguments.toArray(String[]::new)) != 0
-        || !Files.exists(classes))
-      throw new IllegalStateException("generated entry point did not compile: " + diagnostics);
-  }
-
-  /**
-   * Loads the freshly compiled entry point in its own class loader so one
-   * mutation never sees the previous mutation's constants.
-   */
-  private TestExecutionSummary execute(Path classes, String className) throws Exception {
-    ClassLoader previous = Thread.currentThread().getContextClassLoader();
-    try (URLClassLoader loader = new URLClassLoader(
-        new URL[]{classes.toUri().toURL()}, AcceptanceMutationRunner.class.getClassLoader())) {
-      Thread.currentThread().setContextClassLoader(loader);
-
-      LauncherDiscoveryRequest discovery = request().selectors(selectClass(loader.loadClass(className))).build();
-      Launcher launcher = LauncherFactory.create();
-      SummaryGeneratingListener listener = new SummaryGeneratingListener();
-      launcher.execute(discovery, listener);
-      return listener.getSummary();
-    } finally {
-      Thread.currentThread().setContextClassLoader(previous);
     }
   }
 
@@ -225,25 +128,10 @@ public final class AcceptanceMutationRunner {
         + "}";
   }
 
-  private static void deleteTree(Path root) {
-    if (root == null) return;
-    try (Stream<Path> tree = Files.walk(root)) {
-      tree.sorted(Comparator.reverseOrder()).forEach(path -> {
-        try {
-          Files.deleteIfExists(path);
-        } catch (Exception ignored) {
-          // A leftover temp file is not worth failing a mutation over.
-        }
-      });
-    } catch (Exception ignored) {
-      // Likewise.
-    }
-  }
-
   /**
-   * Just enough JSON for the worker protocol: a flat object of string and
-   * number values. Keeping it here avoids putting a JSON library on the test
-   * classpath purely for the adapter.
+   * Just enough JSON for the worker protocol and parser-produced acceptance IR.
+   * Keeping it here avoids putting a JSON library on the test classpath purely
+   * for the adapter.
    */
   static final class Json {
     private final String text;
@@ -251,6 +139,59 @@ public final class AcceptanceMutationRunner {
 
     private Json(String text) {
       this.text = text;
+    }
+
+    static Ir readIr(Path path) throws Exception {
+      Object value = new Json(Files.readString(path)).readJsonValue();
+      Map<?, ?> feature = object(value);
+      return new Ir(
+          string(feature, "name"),
+          steps(feature.get("background")),
+          scenarios(feature.get("scenarios")));
+    }
+
+    private static List<Ir.Step> steps(Object value) {
+      if (value == null) return List.of();
+      return list(value).stream().map(Json::step).toList();
+    }
+
+    private static Ir.Step step(Object value) {
+      Map<?, ?> step = object(value);
+      return new Ir.Step(string(step, "keyword"), string(step, "text"));
+    }
+
+    private static List<Ir.Scenario> scenarios(Object value) {
+      return list(value).stream().map(Json::scenario).toList();
+    }
+
+    private static Ir.Scenario scenario(Object value) {
+      Map<?, ?> scenario = object(value);
+      List<Map<String, String>> examples = list(scenario.get("examples")).stream()
+          .map(Json::example).toList();
+      return new Ir.Scenario(string(scenario, "name"), steps(scenario.get("steps")), examples);
+    }
+
+    private static Map<String, String> example(Object value) {
+      Map<?, ?> example = object(value);
+      Map<String, String> result = new HashMap<>();
+      example.forEach((key, item) -> result.put(String.valueOf(key), String.valueOf(item)));
+      return result;
+    }
+
+    private static Map<?, ?> object(Object value) {
+      if (value instanceof Map<?, ?> object) return object;
+      throw new IllegalArgumentException("Expected JSON object but found " + value);
+    }
+
+    private static List<?> list(Object value) {
+      if (value instanceof List<?> list) return list;
+      throw new IllegalArgumentException("Expected JSON array but found " + value);
+    }
+
+    private static String string(Map<?, ?> object, String key) {
+      Object value = object.get(key);
+      if (value instanceof String text) return text;
+      throw new IllegalArgumentException("Expected string field '" + key + "'");
     }
 
     static Map<String, String> readObject(String line) {
@@ -277,11 +218,69 @@ public final class AcceptanceMutationRunner {
       }
     }
 
+    private Object readJsonValue() {
+      skipSpace();
+      return switch (peek()) {
+        case '"' -> readString();
+        case '{' -> readJsonObject();
+        case '[' -> readJsonArray();
+        default -> readToken();
+      };
+    }
+
+    private Map<String, Object> readJsonObject() {
+      expect('{');
+      Map<String, Object> result = new HashMap<>();
+      skipSpace();
+      if (peek() == '}') {
+        at++;
+        return result;
+      }
+      while (true) {
+        skipSpace();
+        String key = readString();
+        skipSpace();
+        expect(':');
+        result.put(key, readJsonValue());
+        skipSpace();
+        if (peek() == ',') {
+          at++;
+          continue;
+        }
+        expect('}');
+        return result;
+      }
+    }
+
+    private List<Object> readJsonArray() {
+      expect('[');
+      List<Object> result = new ArrayList<>();
+      skipSpace();
+      if (peek() == ']') {
+        at++;
+        return result;
+      }
+      while (true) {
+        result.add(readJsonValue());
+        skipSpace();
+        if (peek() == ',') {
+          at++;
+          continue;
+        }
+        expect(']');
+        return result;
+      }
+    }
+
     private String readValue() {
       char next = peek();
       if (next == '"') return readString();
+      return readToken();
+    }
+
+    private String readToken() {
       int start = at;
-      while (at < text.length() && ",}".indexOf(text.charAt(at)) < 0) at++;
+      while (at < text.length() && ",}]".indexOf(text.charAt(at)) < 0) at++;
       return text.substring(start, at).trim();
     }
 

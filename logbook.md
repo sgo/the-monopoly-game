@@ -37777,6 +37777,44 @@ Verification:
 - No additional coder-owned implementation change was required; return the
   verified priority-00 state directly to the architect.
 
+## 2026-08-22T22:24:00Z — coder reviews architect final Simulator manifest
+
+Merged architect follow-up `2937609aec` for `rent-relief-cli-wiring`. The commit
+contains the generated `Simulator.java` mutation manifest and related line-ending
+normalization in `Game.java`; no additional coder-owned implementation changes
+were required. The repaired simulator baseline remains verified: five consecutive
+focused passes and full `SimulatorTest` 18/18.
+
+## 2026-08-22T20:27:00Z — architect rejects incomplete runner-repair return
+
+Complete handoff received:
+
+```text
+id: 20260822T202535Z_000241_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: 25b2ed275b
+created_at: 2026-08-22T20:25:35.304202Z
+enqueued_at: 2026-08-22T20:25:36.133774Z
+task: rent-relief-cli-wiring
+dequeued_at: 2026-08-22T20:25:40.169732Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 25b2ed275b
+```
+
+The returned commit contains no runner implementation change. The unresolved
+requirement is to remove per-mutant Java compilation from
+`AcceptanceMutationRunner` by executing the mutated JSON IR directly through
+the existing acceptance runtime, while preserving the persistent worker JSON
+protocol and outcome classification. The cancelled full soft Gherkin mutation
+is not evidence of completion. Returning this exact follow-up to the coder.
+
 Architect independently reran the full acceptance suite with Java available:
 864 scenarios, 59 failures, and 8 errors. The reported no-Java limitation is
 not present in this worktree. The same concrete defects remain: unsupported
@@ -39234,6 +39272,177 @@ would silently re-pair config↔fixture), and `formatMean` uses `Double.toString
 trade-offs the specifier chose over byte-for-byte regeneration.
 
 Handing the verified state back to the architect.
+
+## 2026-08-22T20:55:56Z — full soft Gherkin-mutation gate: specifier follow-up required
+
+After the acceptance runner repair, the required complete command
+`./acceptance/run-acceptance-mutation.sh --level soft` completed without
+infrastructure errors but exited 1 for surviving mutations.  This is
+acceptance-specification debt, not the earlier runner-performance failure:
+the hot JVM completed the ordinary feature batches in seconds (for example,
+the full 28-mutant Greedo buyout feature completed in 1.395 seconds when
+rechecked), while the survivors leave changed Gherkin values undetected.
+
+Feature-level outcomes requiring triage by the specifier:
+
+- `en/rules/greedo-monopoly-buyout.feature`: 20 survived / 28 total.
+- `en/rules/greedo-legal-entity.feature`: 65 survived / 172 total.
+- `en/rules/greedo-share-sale.feature`: 20 survived / 30 total.
+- `en/rules/journal.feature`: 1 survived / 132 total.
+- `en/rules/logging.feature`: 1 survived / 140 total.
+- `en/rules/development-loans.feature`: 14 survived / 50 total.
+- `en/rules/war-profits-tax.feature`: 16 survived / 29 total.
+- `specs-cli:en/cli-packaged-jar.feature`: 1 survived / 4 total.
+
+The runner reports zero errors for these batches.  The prior run's generated
+feature manifests were deliberately restored rather than committed, because a
+failing gate cannot certify them.  The specifier must classify each survivor:
+strengthen the scenario/assertions where the changed value is behaviorally
+observable, or add only true semantic equivalences to
+`acceptance/equivalent-mutations.edn` with the required rationale.  Do not
+silence the survivors by recording an unverified manifest.
+
+## 2026-08-22T20:40:00Z — architect receives acceptance-runner repair
+
+Complete handoff received:
+
+```text
+id: 20260822T203819Z_000191_from_refactorer
+from: refactorer
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: refactorer
+commit: 1bec33c81d
+created_at: 2026-08-22T20:38:19.985136Z
+enqueued_at: 2026-08-22T20:38:20.762259Z
+task: rent-relief-cli-wiring
+dequeued_at: 2026-08-22T20:38:25.728983Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 1bec33c81d
+```
+
+Merged the direct-IR runner. The first end-to-end check found only that parser
+JSON omits an empty `background`; accepted that optional field as an empty step
+list. The formerly 11.4-second priority-table mutant now completes in 164 ms
+with the expected `test_failure` outcome. Restarting the required full soft
+Gherkin mutation suite.
+
+## 2026-08-22T20:30:00Z — architect final verification: rent-relief CLI wiring and observability
+
+Started the mandatory final sequence after `a39b60d98c` and `33418fa0ee`:
+
+- `mutate4java` with eight workers and focused reactor test commands killed all
+  5/5 mutation sites in `Report.java` and all 8/8 in `SimulatorFlags.java`.
+  The tool updated their embedded mutation manifests; those tool-generated
+  changes are retained in this handoff commit.
+- `Simulator.java` cannot yet enter mutation execution: its baseline runs
+  `SimulatorTest#keepsPlayingUntilToldToStop`, whose hard-coded one-second
+  sleep is demonstrably nondeterministic. One isolated run passed, the next
+  failed at line 146 (`assertThat(running.isPlaying()).isTrue()`). The full
+  focused `SimulatorTest` baseline likewise failed at that assertion.
+
+The final language mutation, language DRY, and full soft Gherkin mutation
+remain deliberately incomplete until the baseline is deterministic. Handing
+the test reliability repair to the coder, who must make the test prove the
+simulator's continued execution without depending on natural game duration,
+then run the focused test repeatedly and hand the result back for the remaining
+final gates.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: rent-relief-cli-wiring
+commit: 1d300167fb
+```
+
+Continued independent final-gate work while that repair is outstanding:
+
+- Differential `mutate4java` of `Game.java` used the focused `GameTest`
+  baseline (1.897 seconds) and killed all 106/106 sites with no survivors or
+  uncovered sites. The tool updated the embedded manifest.
+- `dry4java` reported only existing overload-forwarding methods in `Game` and
+  `Simulator`. Each is a public convenience overload that supplies a distinct
+  default argument before delegating to the full signature; extracting their
+  small, type-distinct calls would add an indirection without removing a
+  duplicated algorithm. This is accepted as reasonable non-actionable DRY
+  noise. No rent-relief behavior duplicated code.
+## 2026-08-22T21:58:15Z — coder repairs deterministic simulator baseline
+
+Replaced the one-second natural-duration assumption in
+`SimulatorTest#keepsPlayingUntilToldToStop` with worker-thread-only latch
+coordination. Setup strategy calls remain non-blocking; the simulator worker is
+held at strategy resolution while the test verifies `Running.isPlaying()`, then
+released and stopped cooperatively.
+
+Verification:
+
+- Focused `SimulatorTest#keepsPlayingUntilToldToStop`: 5 consecutive passes.
+- Full `SimulatorTest`: 18/18 passed, 0 failures, 0 errors, 0 skipped.
+
+Handing the deterministic baseline back to the architect for the remaining
+mutation and DRY gates.
+
+## 2026-08-22T20:25:00Z — architect: acceptance-mutation runner performance finding
+
+The required full soft Gherkin mutation was started after all language-mutation
+and DRY gates passed, then stopped at the `greedo-priority` batch because the
+runner was not fast enough to be a reliable full-suite gate.
+
+Measurement of an isolated `greedo-priority` mutant:
+
+- feature-entrypoint generation: 34 ms;
+- normal 58-row priority-table acceptance test: 1.6 s including Maven;
+- `javac` of the generated per-mutant entrypoint: 11.4 s.
+
+The scenario only calls `World.assertPriority` / `Strategy.priority`; it does
+not play a game. The bottleneck is `AcceptanceMutationRunner` generating,
+compiling, and class-loading a Java entrypoint for every mutated IR. A direct
+IR execution path is required so the persistent runner can execute the parsed
+mutation without per-mutant Java compilation. The full soft run remains open
+and must be rerun after this repair.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: rent-relief-cli-wiring
+commit: 2937609aec
+```
+
+## 2026-08-22T19:59:43Z — architect receives coder final-gate repair
+
+Complete handoff received:
+
+```text
+id: 20260822T195851Z_000240_from_coder
+from: coder
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: coder
+commit: ce16188f77
+created_at: 2026-08-22T19:58:51.039500Z
+enqueued_at: 2026-08-22T19:58:51.311906Z
+task: rent-relief-cli-wiring
+dequeued_at: 2026-08-22T19:59:17.217567Z
+
+Re-read your role and constitution.
+
+merge_and_process coder ce16188f77
+```
+
+Merged the deterministic test repair and resumed the required final
+verification sequence at the previously blocked `Simulator.java` mutation.
 
 ## 2026-08-22T19:43:13Z — architect receives rent-relief observability review
 
@@ -44995,3 +45204,60 @@ delta) and the architect's own review commit.
 Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS; `CharacterizationTest`
 12/12, domain 420/420, CLI module 13/13. No further action needed; task
 `rent-relief-observability` is closed on my side.
+
+## 2026-08-22T22:40:00Z — coder repairs acceptance mutation runner
+
+Architect requeued the runner repair (ca7e558): `AcceptanceMutationRunner`
+still compiled generated Java per mutant. Removed that entirely. The runner now
+reads the mutated JSON IR directly into the existing `Ir` model and executes it
+through `AcceptanceRuntime` in the hot worker JVM; no generation, per-mutant
+compilation, temp work tree, or classloader swap remains.
+
+Outcome classification preserved via worker protocol: `test_success` when every
+dynamic test passes, `test_failure` on the first failed/unsupported step, and
+`infrastructure_error` when no tests are discovered. The job timeout and
+interruption gate still bound runaway mutants.
+
+Verification: compiled the adapter against the module test classpath; ran the
+runner end to end on a parsed pipeline IR (baseline test_success), an unsupported
+synthetic step (test_failure), and an empty scenario area (infrastructure_error).
+Stale-class `NoSuchMethodError` was ruled out by rebuilding the reactor through
+`specs-core` test-compile and prepending domain `target/classes`.
+
+## 2026-08-22T22:40:00Z — refactorer processes coder handoff `91877c71ae` (rent-relief-cli-wiring, acceptance-runner repair)
+
+Handoff message received:
+
+```
+id: 20260822T203608Z_000242_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 91877c71ae
+created_at: 2026-08-22T20:36:08.437462Z
+enqueued_at: 2026-08-22T20:36:09.383287Z
+task: rent-relief-cli-wiring
+
+Re-read your role and constitution.
+
+merge_and_process coder 91877c71ae
+```
+
+Merged the acceptance-runner repair (`AcceptanceMutationRunner.java`,
++184/-143) under the rent-relief-cli-wiring task. This is acceptance-pipeline
+tooling that executes mutated IR directly; it does not live in the domain/CLI
+test modules. The merge also carried intervening commits whose production diffs
+are dominated by `mutate4java-manifest` hash reflow, not behavior.
+
+Refactorer verification (all green):
+- Domain 420/420; CLI 22/22 excluding the documented pre-existing
+  `SimulatorTest.keepsPlayingUntilToldToStop` timing flake.
+- Acceptance 916/916.
+- Mutation sites unchanged: Simulator 93, SimulatorFlags 10, Game 106
+  (documented pre-existing >100 breach), Report 5 — no new sites, no split
+  needed. The runner repair is outside my mutation-run scope.
+
+Handing the verified state back to the architect.
