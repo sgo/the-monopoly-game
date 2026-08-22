@@ -45754,3 +45754,38 @@ Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS. This is a Gherkin
 scope decision spanning two tracked feature files under active review by the
 user; bringing it to them before making any spec changes, per the specifier's
 own handoff-approval rule.
+
+## 2026-08-22T21:50:35Z — specifier resolves CLI packaging-boundary follow-up, hands back to architect
+
+Reviewed the architect's finding with the user (AskUserQuestion: CLI boundary
+first, then the survivor sweep). Confirmed against the tracked files: every
+`cli-packaged-jar.feature` per-flag scenario except stalemate-trading
+(cli-jar-3) already had a faster in-process equivalent in `cli.feature`
+(cli-6 legal-entity, cli-10 asset-rich, cli-11/12/13 development-loans +
+full-draw, cli-14/15 war-profits-tax, cli-16/17 rent-relief).
+
+Added `cli-18` to `cli.feature` (stalemate-trading, reusing cli-6's existing
+"every player uses Greedo"/"observes stalemate trading as" steps verbatim —
+no new step handlers needed). Removed cli-jar-3/4/7/8/9/10/11 from
+`cli-packaged-jar.feature`, keeping cli-jar-1 (pom packaging), cli-jar-2 (`-h`
+usage), cli-jar-5 (README flag documentation), and cli-jar-6 (one
+representative real-argument launch) as the minimal smoke contract.
+
+Verified: `bb gherkin-parser` + `bb gherkin-ir-dry-checker` on both files
+(only expected cross-flag possible-synonym/near-duplicate findings, same
+shape as the rest of the codebase). Full `./acceptance/run-acceptance.sh`:
+910/910 (916 - 7 removed + 1 added). `mvn test -Pcharacterization-tests`:
+BUILD SUCCESS, `CharacterizationTest` 12/12.
+
+Committed as `f30beb2`. Handing back to the architect under the same task
+name per the priority-00 follow-up protocol.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: rent-relief-cli-wiring
+commit: f30beb2
+```
