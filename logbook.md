@@ -46423,3 +46423,11 @@ model or production `Journal.Entry` API. It must accept parameterized values
 for the entry shapes adopted by the specification while rejecting unsupported
 shapes clearly; it must not simulate game rules or claim that direct rendering
 proves emission. No Gherkin content is changed in this architectural step.
+
+## 2026-08-23T12:06:32Z — handoff to coder: direct event fixture
+
+Queued a priority-00 `git_handoff` to coder for task
+`logging-feature-direct-construction`. The handoff requests implementation of
+the test-only, parameterized direct `Journal.Entry` fixture at the acceptance
+adapter boundary; the task deliberately excludes Gherkin scenario edits and
+production-domain changes.
