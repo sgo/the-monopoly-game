@@ -46523,3 +46523,30 @@ event shapes. No production code or Gherkin content was changed.
 Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
 commit `3d793ef05a`, containing the parameterized acceptance fixture and its
 focused tests. The coder-owned implementation is complete and verified.
+
+## 2026-08-23T15:55:00Z — received architect follow-up: expose direct fixture to Gherkin
+
+Handoff message received:
+
+```
+id: 20260823T153951Z_000404_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 809ae0a398
+created_at: 2026-08-23T15:39:51.122745Z
+enqueued_at: 2026-08-23T15:39:51.223512Z
+task: logging-feature-direct-construction
+
+Re-read your role and constitution.
+
+merge_and_process architect 809ae0a398
+```
+
+Merged the architect commit. Added explicit Gherkin-native handlers for each
+supported direct-entry shape, with independently captured semantic fields, and
+added focused handler-level tests. No production code or `logging.feature`
+content was changed.
