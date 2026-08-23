@@ -49,7 +49,7 @@ Feature: Greedo legal entity for a three-way colour-group split
 
   # entity-m3
   Scenario Outline: the entity is not auto-formed while only stalemate trading (not legal-entity trading) is enabled, at the round boundary
-    Given <enabled_flag> trading is enabled for the "Greedo" strategy
+    Given stalemate trading is enabled for the "Greedo" strategy
     And pawn "dog" will roll 10 for initiative
     And pawn "high hat" will roll 4 for initiative
     And pawn "iron box" will roll 2 for initiative
@@ -61,10 +61,6 @@ Feature: Greedo legal entity for a three-way colour-group split
     And the pink split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
     Then the pink colour group is not owned by a legal entity
-
-    Examples:
-      | enabled_flag |
-      | stalemate    |
 
   # entity-m4
   Scenario Outline: the entity never auto-consolidates a highest-priority colour group, at the round boundary
@@ -118,11 +114,11 @@ Feature: Greedo legal entity for a three-way colour-group split
     And the <group> split is an eligible three-owner split
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    Then the <group> colour group is auto-formed into <entity_name>
+    Then the <group> colour group is auto-formed into Pink Realty
 
     Examples:
-      | group | entity_name |
-      | pink  | Pink Realty |
+      | group |
+      | pink  |
 
   # entity-m7
   Scenario Outline: the entity does not form at market deadlock when the round contained an ownership-consolidating action
@@ -181,11 +177,11 @@ Feature: Greedo legal entity for a three-way colour-group split
     And the <group> split is an eligible three-owner split
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     When we play up to 1 round
-    Then the <group> colour group is <formed_outcome> by a legal entity
+    Then the <group> colour group is auto-formed into Pink Realty
 
     Examples:
-      | group | formed_outcome |
-      | pink  | auto-formed     |
+      | group |
+      | pink  |
 
   # entity-m10
   Scenario Outline: the entity is not auto-formed when the eligible split's streets are already fully developed, because there is no real next improvement to fund
@@ -226,11 +222,11 @@ Feature: Greedo legal entity for a three-way colour-group split
     And the <group> split's shareholders can collectively fund the next improvement after their base reserves
     And pawn "racecar" will build a house on "Rue Grande Dinant"
     When we play up to 1 round
-    Then the <group> colour group is auto-formed into <entity_name>
+    Then the <group> colour group is auto-formed into Pink Realty
 
     Examples:
-      | group | entity_name |
-      | pink  | Pink Realty |
+      | group |
+      | pink  |
 
   # entity-6
   Scenario Outline: the entity repays a shareholder loan with five percent interest on top before paying any dividend
@@ -243,7 +239,7 @@ Feature: Greedo legal entity for a three-way colour-group split
     And Pink Realty's bank account holds $<funds>
     And every other ownable space is owned by pawn "racecar"
     When we play up to 1 round
-    Then Pink Realty repays pawn "dog" $<repayment> for the loan
+    Then the game journal records that Pink Realty repays pawn "dog" $<repayment> for the loan
     And Pink Realty's bank account holds $<funds_remaining>
     And pawn "dog" receives no dividend
 
@@ -256,15 +252,15 @@ Feature: Greedo legal entity for a three-way colour-group split
     Given we select 4 players
     And Pink Realty is formed
     And Pink Realty's bank account holds $<rent>
-    And Pink Realty owes pawn "dog" $<principal>
+    And Pink Realty owes pawn "dog" $<loan>
     When we play up to 1 round
     Then the pink colour group is developed up to at least <houses_at_least> houses
     And Pink Realty's bank account holds $<rent_remaining>
     And Pink Realty still owes pawn "dog" $<principal>
 
     Examples:
-      | principal | rent | houses_at_least | rent_remaining |
-      | 200       | 200  | 2               | 0              |
+      | loan | rent | houses_at_least | rent_remaining | principal |
+      | 200  | 200  | 2               | 0               | 200        |
 
   # entity-8
   Scenario Outline: no dividend is paid while any shareholder loan to the entity is still outstanding, even when the entity is fully developed
@@ -307,16 +303,16 @@ Feature: Greedo legal entity for a three-way colour-group split
   Scenario Outline: the entity cannot build beyond a shareholder's personal affordability ceiling
     Given Pink Realty is formed
     And Pink Realty owes pawn "dog" $<loan>
-    And pawn "high hat" has a balance that allows only $<ceiling_share> toward the entity
-    And pawn "iron box" has a balance that allows only $<ceiling_share> toward the entity
+    And pawn "high hat" has a balance that allows only $<share> toward the entity
+    And pawn "iron box" has a balance that allows only $<share> toward the entity
     And pawn "dog" will roll 12 for their turn
     When we play up to 1 round
     Then the pink colour group is developed up to no more than <total_houses> houses
     And no shareholder has paid more than $<ceiling_share> to the entity
 
     Examples:
-      | loan | ceiling_share | total_houses |
-      | 100  | 40            | 1            |
+      | loan | share | total_houses | ceiling_share |
+      | 100  | 40     | 1             | 0              |
 
   # entity-13
   Scenario Outline: rent collected from a tenant is deposited into the entity's bank account
@@ -407,11 +403,11 @@ Feature: Greedo legal entity for a three-way colour-group split
   Scenario Outline: a raised loan is deposited into the entity's bank account
     Given Pink Realty is formed
     When Pink Realty raises a loan of $<loan>
-    Then Pink Realty's bank account holds $<loan>
+    Then Pink Realty's bank account holds $<bank_balance>
 
     Examples:
-      | loan |
-      | 150  |
+      | loan | bank_balance |
+      | 150  | 150           |
 
   # entity-15
   Scenario Outline: the entity uses its rent before raising a loan to build when its shareholders decline the build-loan commitment
@@ -470,7 +466,7 @@ Feature: Greedo legal entity for a three-way colour-group split
     And Pink Realty's bank account is empty
     And each shareholder commits $<share> toward Pink Realty's build
     When we play up to 1 round
-    Then Pink Realty raises a loan of $<loan>
+    Then the game journal records that Pink Realty raises a loan of $<loan> from pawn "dog", pawn "high hat", and pawn "iron box"
     And the street "<street_1>" has <houses_per_street> houses built
     And the street "<street_2>" has <houses_per_street> houses built
     And the street "<street_3>" has <houses_per_street> houses built
@@ -489,7 +485,7 @@ Feature: Greedo legal entity for a three-way colour-group split
     And Pink Realty's bank account is empty
     And each shareholder commits $<share> toward Pink Realty's build
     When we play up to 1 round
-    Then Pink Realty raises a loan of $<loan>
+    Then the game journal records that Pink Realty raises a loan of $<loan> from pawn "dog", pawn "high hat", and pawn "iron box"
     And the street "<street_1>" has a hotel built
     And the street "<street_2>" has a hotel built
     And the street "<street_3>" has a hotel built
@@ -597,7 +593,7 @@ Feature: Greedo legal entity for a three-way colour-group split
     And pawn "high hat" follows the "Greedo" strategy, keeping a $<reserve> reserve
     And pawn "iron box" follows the "Greedo" strategy, keeping a $<reserve> reserve
     When we play up to 1 round
-    Then Pink Realty raises a loan of $<loan>
+    Then the game journal records that Pink Realty raises a loan of $<loan> from pawn "dog", pawn "high hat", and pawn "iron box"
     And the street "<street>" has at least <houses> houses built
 
     Examples:
@@ -643,7 +639,7 @@ Feature: Greedo legal entity for a three-way colour-group split
     And Pink Realty's bank account is empty
     And each shareholder commits $<share> toward Pink Realty's build
     When we play up to 1 round
-    Then Pink Realty raises a loan of $<loan>
+    Then the game journal records that Pink Realty raises a loan of $<loan> from pawn "dog", pawn "high hat", and pawn "iron box"
     And the street "<street>" has a hotel built
 
     Examples:
@@ -662,7 +658,7 @@ Feature: Greedo legal entity for a three-way colour-group split
     And pawn "high hat" follows the "Greedo" strategy, keeping a $<reserve> reserve
     And pawn "iron box" follows the "Greedo" strategy, keeping a $<reserve> reserve
     When we play up to 1 round
-    Then Pink Realty raises a loan of $<loan>
+    Then the game journal records that Pink Realty raises a loan of $<loan> from pawn "dog", pawn "high hat", and pawn "iron box"
     And the pink colour group is developed up to <total_houses> houses
     And pawn "dog" receives no dividend from Pink Realty
 

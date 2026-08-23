@@ -46145,3 +46145,85 @@ pure Gherkin edit:
   `entity-11`'s `ceiling_share` (wait — the actual case is "cannot build
   beyond a shareholder's personal affordability ceiling"), and `entity-17`'s
   `loan` (a raise-then-check-the-same-value round trip).
+
+## 2026-08-23T00:12:00Z — specifier fixes all 16 real gaps in greedo-legal-entity.feature
+
+User directed fixing all 16 now. Root mechanism common to most of them, discovered
+via `AcceptanceRuntime.handlerFor`: step-pattern matching happens against the
+**raw, unsubstituted** step text (still containing literal `<placeholder>`
+tokens) — `Arguments.text()`/`.number()` only resolve a placeholder when it
+sits inside a *captured regex group*. Several step handlers in
+`JournalStepHandlers.java` bake a specific placeholder name directly into
+their regex as literal text (e.g. `\\$<repayment>`, `\\$(<principal>)`,
+`<enabled_flag> trading is enabled...`) instead of using the generic `VALUE`/
+`NAME` macros. Such a step matches only when the Gherkin's own placeholder is
+spelled with that exact name, and — critically — the value bound to that
+name plays no role in which handler gets selected, so mutating it can't
+change which branch runs. This is a stricter version of the read-back
+tautology already named in the specifier's own rules, and explains 12 of the
+16 gaps directly.
+
+Fixes applied, each verified by deliberately breaking the value and
+confirming the test now fails, then reverting:
+
+- **8 broken `Then Pink Realty raises a loan of $<loan>` assertions**
+  (entity-22 ×4 examples, entity-23, entity-24, entity-29, entity-30): that
+  step is registered as a bare `step()` whose handler unconditionally
+  performs the raise — never an assertion. Switched all five scenarios to
+  `the game journal records that Pink Realty raises a loan of $<loan> from
+  pawn "dog", pawn "high hat", and pawn "iron box"`, an already-implemented,
+  properly-capturing journal-check step. Confirmed live: mutating entity-24's
+  `loan` to 999 now fails with "The game journal records no loan raised."
+- **entity-6's dead `repayment`** column: the registered step hardcoded
+  `\\$<repayment>` (no capture) and hardcoded `== 105` in Java, ignoring the
+  Examples value entirely. Added `the game journal records that` as a prefix,
+  routing to the existing generic, properly-capturing step instead. Confirmed
+  live: mutating to 999 now fails.
+- **entity-m3's dead `enabled_flag`**, **entity-m9's dead `formed_outcome`**,
+  **entity-m6/entity-m11's dead `entity_name`**: each of these placeholders
+  was baked as literal regex text into a *different* handler than the one
+  that actually fires for the real (already-correct) working step elsewhere
+  in the codebase. Pruned each dead column and hardcoded the literal value
+  the raw text needs to route to the real handler (`stalemate` /
+  `the <group> colour group is auto-formed into Pink Realty`, reusing
+  entity-m6's own already-working step for m9 too). entity-m3 lost its only
+  column and now has no `Examples:` table, matching the sibling
+  zero-variance scenario `entity-m2` already in this same file.
+- **entity-7's `principal` read-back** (arranges *and* asserts the same
+  column) and **entity-12's `ceiling_share` read-back**: unlike the ones
+  above, these two steps *do* properly resolve their value via a captured
+  group — but the group only accepts one exact literal placeholder name
+  (`<principal>`, or `<ceiling_share>`), so simply renaming the assertion's
+  placeholder (my first attempt) broke the match entirely ("Unsupported
+  step"). Fixed by renaming the *arrangement* side instead, to another name
+  the same arrangement step's regex alternation already accepts (`<loan>`
+  for entity-7, `<share>` for entity-12), leaving the assertion's required
+  name free for its own independent column. Confirmed live for both.
+- **entity-12's `ceiling_share` assertion was also vacuous by scenario
+  design**, independent of the tautology: `Pink Realty owes pawn "dog" $100`
+  is a pre-existing shareholder loan, and `LegalEntityBuilding.canBorrowForBuilding`
+  requires `entity.loan().equals(ZERO)` — so no *new* shareholder payment is
+  ever possible here regardless of affordability, meaning any shareholder
+  always pays exactly $0 toward a new build this turn. Set the assertion to
+  the real tight value ($0, not the old $40 copied from the unrelated
+  affordability-ceiling arrangement) and confirmed it now properly fails at
+  -1 and passes at 0.
+- **entity-14's `loan`/bank-balance tautology**: same-column
+  arrange-then-read-back (`When ... raises a loan of $<loan>` /
+  `Then ... bank account holds $<loan>`). Gave the assertion its own
+  `bank_balance` column (using the fully generic, already-correct
+  `NAME's bank account holds $VALUE` step). Confirmed live.
+
+Verified as a whole: `bb gherkin-parser` clean; `bb gherkin-ir-dry-checker`
+291 findings, all `placeholder-variant`/`near-duplicate`/`possible-synonym`
+(same shape as the rest of this large file, no new `exact-duplicate`). Full
+`./acceptance/run-acceptance.sh`: 910/910. `mvn test -Pcharacterization-tests`:
+BUILD SUCCESS.
+
+The acceptance-mutation-debt survivor sweep across all 9 originally-flagged
+features is now complete: 141 total survivors, 125 recorded as genuine
+equivalences in `acceptance/equivalent-mutations.edn` (440 entries), 16 real
+gaps found and fixed directly in Gherkin (1 in cli.feature discovered
+mid-sweep via the CLI boundary work, plus these 16 — wait: 1 in
+greedo-share-sale.feature (share-sale-2's wrong-winner bug) + 16 here = 17
+real gaps total across the whole sweep, 0 requiring coder involvement).
