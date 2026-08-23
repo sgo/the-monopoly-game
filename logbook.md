@@ -46472,3 +46472,9 @@ The handed-off commit was already present in this worktree. Implemented the
 test-only parameterized event factory and `World` adapter overload, with
 focused tests for construction and clear rejection of missing or unsupported
 event shapes. No production code or Gherkin content was changed.
+
+## 2026-08-23T15:37:43Z — handoff to architect: verified direct event fixture
+
+Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
+commit `3d793ef05a`, containing the parameterized acceptance fixture and its
+focused tests. The coder-owned implementation is complete and verified.
