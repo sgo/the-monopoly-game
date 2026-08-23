@@ -46256,3 +46256,17 @@ priority: 00
 task: rent-relief-cli-wiring
 commit: 4824625a89
 ```
+
+## 2026-08-23T00:16:00Z — architect verification of completed survivor sweep
+
+Merged specifier handoff `38f61b3000`. Full acceptance is green: 910/910.
+The full soft Gherkin mutation gate then killed every executed mutation except
+one, with zero runner errors:
+
+`en/rules/greedo-legal-entity.feature | the entity cannot build beyond a
+shareholder's personal affordability ceiling | example 0 | share | 40 | 36`
+
+The final report is retained for the specifier. All reports for now-clean
+features were removed and the run's generated feature manifests restored.
+The gate must not be certified until this last tuple is either a grounded
+equivalence or a strengthened assertion.
