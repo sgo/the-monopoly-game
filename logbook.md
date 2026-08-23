@@ -46247,5 +46247,5 @@ type: git_handoff
 to: architect
 priority: 00
 task: rent-relief-cli-wiring
-commit: 4824625a89
+commit: 38f61b3000
 ```
