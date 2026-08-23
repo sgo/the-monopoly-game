@@ -46711,6 +46711,33 @@ supported direct-entry shape, with independently captured semantic fields, and
 added focused handler-level tests. No production code or `logging.feature`
 content was changed.
 
+## 2026-08-23T18:15:44Z — received architect follow-up: deduplicate direct fixture tests
+
+Handoff message received:
+
+```
+id: 20260823T161206Z_000408_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 46fe0f9a45
+created_at: 2026-08-23T16:12:06.000000Z
+enqueued_at: 2026-08-23T16:12:06.000000Z
+task: logging-feature-direct-construction
+
+Re-read your role and constitution.
+
+merge_and_process architect 46fe0f9a45
+```
+
+Merged the architect review commit. Deduplicated the repeated invalid-shape
+and required-field assertions through test helpers while preserving distinct
+null, blank, missing, extra-field, and unsupported-event cases. Focused
+verification passes 8/8; no production or Gherkin content changed.
+
 ## 2026-08-23T18:10:50Z — handoff to architect: generic event handler capture
 
 Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
