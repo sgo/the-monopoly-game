@@ -46711,6 +46711,12 @@ supported direct-entry shape, with independently captured semantic fields, and
 added focused handler-level tests. No production code or `logging.feature`
 content was changed.
 
+## 2026-08-23T18:10:50Z — handoff to architect: generic event handler capture
+
+Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
+commit `7b0a2cad8b`, containing the generic event-type handler contract
+assertion. Focused verification passed with 8 tests.
+
 ## 2026-08-23T18:10:32Z — received architect follow-up: kill generic event-type mutant
 
 Handoff message received:
