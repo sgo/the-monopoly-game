@@ -46560,6 +46560,27 @@ Gherkin field to the expected Journal.Entry value; make the smallest test-only
 adapter observation seam necessary. Do not change production code or
 logging.feature.
 
+## 2026-08-23T16:02:29Z — received duplicate coder handoff record
+
+Handoff message received:
+
+```
+TASK: .swarmforge/handoffs/inbox/in_process/batch_20260823T160229Z_000001/00_20260823T160013Z_000250_from_coder_to_architect.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: logging-feature-direct-construction
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder 1ec61cced6
+```
+
+Merged `1ec61cced6`; it is only the delayed sent-handoff log record for the
+already-reviewed guard-coverage commit. Removed the failed serial mutator's
+uncommitted generated manifest artifact from SampleEvents. The capture-mutant
+follow-up remains outstanding with coder.
+
 ## 2026-08-23T15:57:31Z — received duplicate coder handoff record
 
 Handoff message received:
