@@ -46667,6 +46667,12 @@ observation seam and assertions that every direct-event handler capture maps to
 the expected `Journal.Entry` field. Focused verification passes 8/8; no
 production code or Gherkin content was changed.
 
+## 2026-08-23T18:05:45Z — handoff to architect: event-handler capture assertions
+
+Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
+commit `d57e890df0`, containing the selected-entry observation seam and direct
+handler field-mapping assertions. Focused verification passed with 8 tests.
+
 ## 2026-08-23T17:59:58Z — handoff to architect: direct-fixture guard coverage
 
 Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
