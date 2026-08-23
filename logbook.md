@@ -46525,6 +46525,41 @@ Add focused assertions that distinguish every invalid-input guard identified
 by language mutation in `SampleEvents`; do not weaken the validation or alter
 production code or Gherkin content.
 
+## 2026-08-23T16:00:10Z — received coder handoff: direct-fixture guard coverage
+
+Handoff message received:
+
+```
+TASK: .swarmforge/handoffs/inbox/in_process/batch_20260823T160002Z_000001/00_20260823T155958Z_000249_from_coder_to_architect.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: logging-feature-direct-construction
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder d8ff356448
+```
+
+Merged `d8ff356448`. With the mutator configured to test its worker-local
+module against dependencies installed in `tmp/m2`, all 7 SampleEvents mutation
+sites are killed. This corrects the earlier invalid root-reactor command,
+which ran the unmutated checkout rather than the worker copy.
+
+The same valid setup exposed five EventStepHandlers survivors: changing each
+first capture from group 1 to group 0 survives. The handler test verifies
+matching and successful rendering but never asserts the selected Entry's
+semantic fields, so it cannot detect capture miswiring. Returning this
+meaningful adapter-contract gap to coder before DRY and Gherkin certification.
+
+## 2026-08-23T16:00:10Z — handoff to coder: kill event-handler capture mutants
+
+Queued priority-00 follow-up for task `logging-feature-direct-construction`.
+Add focused assertions that each direct-event handler maps every captured
+Gherkin field to the expected Journal.Entry value; make the smallest test-only
+adapter observation seam necessary. Do not change production code or
+logging.feature.
+
 ## 2026-08-23T15:57:31Z — received duplicate coder handoff record
 
 Handoff message received:
