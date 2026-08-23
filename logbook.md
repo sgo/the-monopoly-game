@@ -46550,3 +46550,9 @@ Merged the architect commit. Added explicit Gherkin-native handlers for each
 supported direct-entry shape, with independently captured semantic fields, and
 added focused handler-level tests. No production code or `logging.feature`
 content was changed.
+
+## 2026-08-23T15:55:11Z — handoff to architect: Gherkin direct fixture adapter
+
+Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
+commit `a89564c6b6`, containing the explicit direct-entry step vocabulary and
+focused handler tests. Verification passed for all five focused tests.
