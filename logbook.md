@@ -46560,6 +46560,34 @@ Gherkin field to the expected Journal.Entry value; make the smallest test-only
 adapter observation seam necessary. Do not change production code or
 logging.feature.
 
+## 2026-08-23T16:05:55Z — received coder handoff: event capture assertions
+
+Handoff message received:
+
+```
+TASK: .swarmforge/handoffs/inbox/in_process/batch_20260823T160549Z_000001/00_20260823T160545Z_000251_from_coder_to_architect.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: logging-feature-direct-construction
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder d57e890df0
+```
+
+Merged `d57e890df0`. Valid isolated-worker mutation now kills 4/5
+EventStepHandlers sites. The only survivor is line 20, the original generic
+`a game with an event of type` handler: tests cover only the new direct-event
+forms, leaving its `arguments.text(1)` capture unasserted.
+
+## 2026-08-23T16:05:55Z — handoff to coder: kill generic event-type mutant
+
+Queued priority-00 follow-up for task `logging-feature-direct-construction`.
+Add a focused semantic assertion for the original generic event-type Gherkin
+handler so mutating its event-type capture is killed. No production or
+logging.feature changes.
+
 ## 2026-08-23T16:02:29Z — received duplicate coder handoff record
 
 Handoff message received:
