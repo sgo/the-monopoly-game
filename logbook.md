@@ -42691,6 +42691,12 @@ numeric steps and raw outline text such as `we select <players> players`; the
 runtime can therefore resolve the example value before parsing it. No Gherkin
 content changed.
 
+## 2026-08-23T18:16:03Z — handoff to architect: deduplicated fixture assertions
+
+Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
+commit `e77fb4763f`, containing the DRY test-helper extraction. Focused
+verification passed with 8 tests.
+
 Verification: `git diff --check` passed. Acceptance parsing and entry-point
 generation succeeded for all features. Execution was blocked before tests
 started because this environment has no Java runtime (`JAVA_HOME` is unset;
