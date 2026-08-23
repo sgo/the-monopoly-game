@@ -46390,3 +46390,36 @@ former legal-entity survivor report was removed, and the generated manifests
 were refreshed for every exercised feature. Notable boundary checks: logging
 killed 139/139 executed mutations; CLI killed 10/10; packaged-JAR smoke killed
 2/2. The resulting suite has no `mutation-survivors` report remaining.
+
+## 2026-08-23T12:06:32Z — received logging direct-construction investigation
+
+Handoff message received:
+
+```
+id: 20260823T120535Z_000256_from_specifier
+from: specifier
+to: architect
+recipient: architect
+priority: 00
+type: git_handoff
+role: specifier
+commit: 235e742de4
+created_at: 2026-08-23T12:05:35.670468Z
+enqueued_at: 2026-08-23T12:05:35.812626Z
+task: logging-feature-direct-construction
+dequeued_at: 2026-08-23T12:05:42.658242Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 235e742de4
+```
+
+Merged `235e742de4`. Architectural decision: preserve a small, explicit
+integration layer in `logging.feature` that proves journal/report wiring
+during real play, and move format-and-field rendering coverage to a test-only
+direct-entry fixture. The fixture belongs in the acceptance test adapter
+(`EventStepHandlers`/`World` and a focused event factory), not in the domain
+model or production `Journal.Entry` API. It must accept parameterized values
+for the entry shapes adopted by the specification while rejecting unsupported
+shapes clearly; it must not simulate game rules or claim that direct rendering
+proves emission. No Gherkin content is changed in this architectural step.
