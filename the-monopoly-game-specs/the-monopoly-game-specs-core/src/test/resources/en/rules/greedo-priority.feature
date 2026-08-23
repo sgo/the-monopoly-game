@@ -1,5 +1,6 @@
+# mutation-stamp: sha256=dbd005eac1967f47d6dacdb96c8fdc1e1f910cef4efc662fda547deabc25a617
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-20T10:21:28.699220Z","feature_name":"Greedo strategy priority table","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/greedo-priority.feature","background_hash":"74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b","implementation_hash":"unknown","scenarios":[]}
+# {"version":1,"tested_at":"2026-08-23T00:22:32.727771Z","feature_name":"Greedo strategy priority table","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/greedo-priority.feature","background_hash":"74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b","implementation_hash":"unknown","scenarios":[{"index":0,"name":"\"<strategy>\"'s monopoly-building priority for every purchaseable space on the board","scenario_hash":"3b88787a3b32a646d51298ef5d7e0ce10869f0c6d0e3cc44a159221d8a749322","mutation_count":165,"result":{"Total":165,"Killed":165,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:32.727771Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
