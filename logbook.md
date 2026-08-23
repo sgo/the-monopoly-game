@@ -46590,3 +46590,30 @@ content was changed.
 Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
 commit `a89564c6b6`, containing the explicit direct-entry step vocabulary and
 focused handler tests. Verification passed for all five focused tests.
+
+## 2026-08-23T17:59:37Z — received architect follow-up: kill direct-fixture mutants
+
+Handoff message received:
+
+```
+id: 20260823T155731Z_000405_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 93fd7b5f2a
+created_at: 2026-08-23T15:57:31.354099Z
+enqueued_at: 2026-08-23T15:57:31.863206Z
+task: logging-feature-direct-construction
+
+Re-read your role and constitution.
+
+merge_and_process architect 93fd7b5f2a
+```
+
+Merged the architect review commit. Added focused assertions covering null,
+blank, missing, and extra field values in addition to unsupported event types.
+The focused acceptance-adapter tests now pass 8/8; no production or Gherkin
+content was changed.
