@@ -46446,6 +46446,51 @@ the test-only, parameterized direct `Journal.Entry` fixture at the acceptance
 adapter boundary; the task deliberately excludes Gherkin scenario edits and
 production-domain changes.
 
+## 2026-08-23T15:38:28Z — received coder batch: direct event fixture
+
+Handoff messages received, in delivery order:
+
+```
+TASK: .swarmforge/handoffs/inbox/in_process/batch_20260823T153828Z_000001/00_20260823T153743Z_000245_from_coder_to_architect.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: logging-feature-direct-construction
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder 3d793ef05a
+```
+
+```
+TASK: .swarmforge/handoffs/inbox/in_process/batch_20260823T153828Z_000001/00_20260823T153805Z_000246_from_coder_to_architect.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: logging-feature-direct-construction
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder c7ab1acb40
+```
+
+Merged both commits in order. The factory is correctly test-only, rejects bad
+shapes clearly, and `mvn test -pl the-monopoly-game-specs/the-monopoly-game-specs-core
+-am -Dtest=SampleEventsTest -Dsurefire.failIfNoSpecifiedTests=false` passed
+(3 tests). Architectural review found it is not yet callable by a Gherkin
+step: `EventStepHandlers` exposes only the original one-argument event-type
+step, while the new `World` overload accepts a Java-only `Map`. Returning this
+adapter gap to coder before the specifier is asked to restructure scenarios.
+
+## 2026-08-23T15:38:28Z — handoff to coder: expose direct fixture to Gherkin
+
+Queued priority-00 follow-up for task `logging-feature-direct-construction`.
+The coder must add explicit, Gherkin-native `EventStepHandlers` vocabulary for
+each currently supported direct-entry shape, with every semantic field a
+separate captured argument that can be independently supplied by an Examples
+column. It should delegate to the existing map-backed fixture and include a
+focused handler-level test. No production changes or logging.feature edits.
+
 ## 2026-08-23T15:37:30Z — received architect follow-up: direct event fixture
 
 Handoff message received:
