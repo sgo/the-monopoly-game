@@ -46446,3 +46446,29 @@ the test-only, parameterized direct `Journal.Entry` fixture at the acceptance
 adapter boundary; the task deliberately excludes Gherkin scenario edits and
 production-domain changes.
 
+## 2026-08-23T15:37:30Z — received architect follow-up: direct event fixture
+
+Handoff message received:
+
+```
+id: 20260823T120711Z_000403_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 1d2ec2e835
+created_at: 2026-08-23T12:07:11.273428Z
+enqueued_at: 2026-08-23T12:07:11.579971Z
+task: logging-feature-direct-construction
+
+Re-read your role and constitution.
+
+merge_and_process architect 1d2ec2e835
+```
+
+The handed-off commit was already present in this worktree. Implemented the
+test-only parameterized event factory and `World` adapter overload, with
+focused tests for construction and clear rejection of missing or unsupported
+event shapes. No production code or Gherkin content was changed.

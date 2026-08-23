@@ -1654,6 +1654,11 @@ public class World {
     selectedEvent = SampleEvents.of(eventType);
   }
 
+  /** Selects a parameterized event for report/log rendering fixtures. */
+  public void selectEvent(String eventType, Map<String, String> values) {
+    selectedEvent = SampleEvents.of(eventType, values);
+  }
+
   public void renderSelectedEventForReport() {
     renderedEventText = Report.of(List.of(selectedEvent));
   }
