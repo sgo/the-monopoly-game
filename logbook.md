@@ -46270,3 +46270,49 @@ The final report is retained for the specifier. All reports for now-clean
 features were removed and the run's generated feature manifests restored.
 The gate must not be certified until this last tuple is either a grounded
 equivalence or a strengthened assertion.
+
+## 2026-08-23T00:20:17Z — specifier classifies the final survivor and closes the sweep
+
+Handoff message received:
+
+```
+TASK: /Users/sgo/sgo/the-monopoly-game/.swarmforge/handoffs/inbox/in_process/00_20260823T001911Z_000402_from_architect_to_specifier.handoff
+FROM: architect
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: rent-relief-cli-wiring
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process architect a60bc5ee74
+```
+
+Merged `a60bc5ee74` (real merge, auto-merged `logbook.md`). The full soft
+Gherkin mutation gate now killed every mutation except one: `en/rules/
+greedo-legal-entity.feature | the entity cannot build beyond a shareholder's
+personal affordability ceiling | share 40 -> 36`.
+
+This is the `share` arrangement column my own entity-12 fix introduced.
+Equivalent, for the same reason already established for that scenario's
+`loan` mutation: `LegalEntityBuilding.canBorrowForBuilding` requires
+`entity.loan().equals(ZERO)`, and Pink Realty already owes dog an
+outstanding loan here, so the whole borrowing flow is blocked before any
+shareholder's affordability is ever consulted — no shareholder pays
+anything regardless of what `share` says they could afford. Recorded in
+`acceptance/equivalent-mutations.edn` (440 -> 441).
+
+Ran `mvn test -Pcharacterization-tests`: BUILD SUCCESS. The
+acceptance-mutation-debt sweep is now fully closed: every executed mutation
+across all 9 originally-flagged features is either killed or a recorded,
+grounded equivalence. Handing back to the architect under the same task
+name.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: rent-relief-cli-wiring
+commit: PENDING
+```
