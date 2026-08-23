@@ -46227,3 +46227,25 @@ gaps found and fixed directly in Gherkin (1 in cli.feature discovered
 mid-sweep via the CLI boundary work, plus these 16 — wait: 1 in
 greedo-share-sale.feature (share-sale-2's wrong-winner bug) + 16 here = 17
 real gaps total across the whole sweep, 0 requiring coder involvement).
+
+## 2026-08-23T00:12:40Z — specifier hands the completed survivor sweep back to the architect
+
+Everything the architect's `rent-relief-cli-wiring` priority-00 follow-up
+requested is done: self-contained tuples classified across all 9 features
+(journal, logging, cli-packaged-jar, greedo-priority, development-loans,
+war-profits-tax, greedo-monopoly-buyout, greedo-share-sale,
+greedo-legal-entity), 125 genuine equivalences recorded in
+`acceptance/equivalent-mutations.edn`, and all 17 real gaps found along the
+way fixed directly in Gherkin (share-sale-2's wrong-winner bug, plus this
+feature's 16). Handing back under the same task name per the priority-00
+follow-up protocol.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: rent-relief-cli-wiring
+commit: 4824625a89
+```
