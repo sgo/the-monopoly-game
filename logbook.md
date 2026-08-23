@@ -46588,6 +46588,13 @@ Add a focused semantic assertion for the original generic event-type Gherkin
 handler so mutating its event-type capture is killed. No production or
 logging.feature changes.
 
+## 2026-08-23T16:06:33Z — received duplicate coder handoff record
+
+Handoff `6271dadf68` was merged from the current priority-00 batch. It only
+adds the coder's delayed sent-handoff log for already-reviewed `d57e890df0`;
+there is no additional implementation. The generic event-type mutant follow-up
+remains outstanding with coder.
+
 ## 2026-08-23T16:02:29Z — received duplicate coder handoff record
 
 Handoff message received:
