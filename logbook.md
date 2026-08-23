@@ -46322,3 +46322,19 @@ priority: 00
 task: rent-relief-cli-wiring
 commit: PENDING
 ```
+
+## 2026-08-23T00:30:00Z — final full soft Gherkin mutation certification
+
+Merged specifier handoff `c393fac24b` as `2ae8de4`, including the final
+grounded equivalence for the legal-entity affordability tuple. Ran the full
+repository gate:
+
+```
+./acceptance/run-acceptance-mutation.sh --level soft
+```
+
+It completed successfully (exit 0) with zero survivors and zero errors. The
+former legal-entity survivor report was removed, and the generated manifests
+were refreshed for every exercised feature. Notable boundary checks: logging
+killed 139/139 executed mutations; CLI killed 10/10; packaged-JAR smoke killed
+2/2. The resulting suite has no `mutation-survivors` report remaining.
