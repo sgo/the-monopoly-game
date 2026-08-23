@@ -13,6 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EventStepHandlersTest {
   private static final List<Step> DIRECT_STEPS = List.of(
+      new Step("Given", "a game with an event of type \"player_buys_property\"",
+          new Entry.Bought(MonopolyStepHelpers.idOf("dog"), Street.Type.DiestsestraatLeuven,
+              MonopolyStepHelpers.money(60))),
       new Step("Given", "a game with a bought event for pawn \"dog\" on \"Diestsestraat Leuven\" for $60",
           new Entry.Bought(MonopolyStepHelpers.idOf("dog"), Street.Type.DiestsestraatLeuven,
               MonopolyStepHelpers.money(60))),
