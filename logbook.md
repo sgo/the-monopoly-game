@@ -46588,6 +46588,21 @@ Add a focused semantic assertion for the original generic event-type Gherkin
 handler so mutating its event-type capture is killed. No production or
 logging.feature changes.
 
+## 2026-08-23T16:10:56Z — received coder handoff: generic event capture
+
+Merged `7b0a2cad8b` from the current priority-00 coder handoff. Valid
+isolated-worker mutation is clean: SampleEvents 7/7 killed and
+EventStepHandlers 5/5 killed. DRY then found two exact duplicated assertion
+blocks in SampleEventsTest (lines 25-31/33-40 and 54-60/62-68), so final
+Gherkin certification is deferred pending test-only deduplication.
+
+## 2026-08-23T16:10:56Z — handoff to coder: deduplicate direct fixture tests
+
+Queued priority-00 follow-up for task `logging-feature-direct-construction`.
+Remove the two exact SampleEventsTest assertion duplicates reported by
+dry4java while preserving the distinct null, blank, missing, and extra-field
+cases. No production or Gherkin changes.
+
 ## 2026-08-23T16:06:33Z — received duplicate coder handoff record
 
 Handoff `6271dadf68` was merged from the current priority-00 batch. It only
