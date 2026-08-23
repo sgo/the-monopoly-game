@@ -46525,6 +46525,26 @@ Add focused assertions that distinguish every invalid-input guard identified
 by language mutation in `SampleEvents`; do not weaken the validation or alter
 production code or Gherkin content.
 
+## 2026-08-23T15:57:31Z — received duplicate coder handoff record
+
+Handoff message received:
+
+```
+TASK: .swarmforge/handoffs/inbox/in_process/batch_20260823T155731Z_000001/00_20260823T155527Z_000248_from_coder_to_architect.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: logging-feature-direct-construction
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder ca194e4085
+```
+
+Merged `ca194e4085`. It contains only the coder's sent-handoff log record for
+the already-reviewed `a89564c6b6` adapter work, with no new implementation.
+The mutation-survivor follow-up remains outstanding with coder.
+
 ## 2026-08-23T15:37:30Z — received architect follow-up: direct event fixture
 
 Handoff message received:
