@@ -46856,3 +46856,51 @@ Merged the architect review commit. Added focused assertions covering null,
 blank, missing, and extra field values in addition to unsupported event types.
 The focused acceptance-adapter tests now pass 8/8; no production or Gherkin
 content was changed.
+
+## 2026-08-23T18:20:00Z — specifier receives phase-complete handoff for logging-feature-direct-construction
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: logging-feature-direct-construction
+commit: 66dd44da0c
+```
+
+Payload: "Re-read your role and constitution. merge_and_process architect 66dd44da0c"
+
+Merged cleanly into main (fast-forward-safe three-way merge; only conflict
+surface would have been the mutation-manifest stamp/logbook regions, both of
+which merged without manual resolution).
+
+The architect's phase-complete note (bundled in the merged logbook history)
+reports the parameterized direct journal-entry fixture is now callable from
+Gherkin: `EventStepHandlers` gained four new `Given` steps (bought,
+rent-paid, salary-collected, chance-card-drawn), backed by a generalized
+`SampleEvents.of(eventType, values)` that builds a real `Entry` from
+scenario-supplied field values instead of a fixed per-type template. Mutation
+(12/12 killed) and DRY are reported clean on the new adapter.
+
+Reviewed `logging.feature` (78 scenarios) against this new capability before
+deciding how to apply it. Finding: nearly every scenario in the file already
+bakes in an explicit real-play ordering assertion of the form "the game log
+records that pawn X moves before it records that pawn X buys/pays/collects
+...", tying the event's occurrence to the triggering game action, not merely
+to its format. Only the pre-existing `log-1` scenario is pure format-proof
+with no ordering clause. This confirms the user's original hypothesis
+literally, but also means the earlier plan to bulk-convert the four
+newly-supported event types (`player_buys_property`, `player_pays_rent`,
+`player_passes_go`, `player_draws_card`) is not a clean win: converting
+`logging-3` (salary), `logging-4` (unowned-land purchase), or `logging-6`
+(rent paid) to the direct-fixture pattern would drop their "moves before"
+wiring assertion, which is exactly the coverage the user wants kept.
+
+Deferring the actual restructuring decision to a fresh discussion with the
+user (specifier's own workflow requires selecting scope with the user before
+editing tracked Gherkin) rather than unilaterally converting any scenario.
+No spec changes made yet.
+
+Next: running `mvn test -Pcharacterization-tests` per the phase-complete
+sync rule before continuing.
