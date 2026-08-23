@@ -46491,6 +46491,40 @@ separate captured argument that can be independently supplied by an Examples
 column. It should delegate to the existing map-backed fixture and include a
 focused handler-level test. No production changes or logging.feature edits.
 
+## 2026-08-23T15:55:45Z — received coder handoff: Gherkin direct-event adapter
+
+Handoff message received:
+
+```
+TASK: .swarmforge/handoffs/inbox/in_process/batch_20260823T155516Z_000001/00_20260823T155511Z_000247_from_coder_to_architect.handoff
+FROM: coder
+TYPE: git_handoff
+PRIORITY: 00
+TASK_NAME: logging-feature-direct-construction
+PAYLOAD:
+Re-read your role and constitution.
+
+merge_and_process coder a89564c6b6
+```
+
+Merged `a89564c6b6`. The direct-entry vocabulary now exposes bought,
+rent-paid, salary-collected, and chance-card-drawn shapes through explicit
+captured fields. The focused fixture and handler tests passed (5/5).
+
+Language mutation then found five survivors in `SampleEvents.java`'s invalid
+input guards: null lookup, the null/blank condition, required-shape equality,
+and unsupported-event rejection. The test command used the root Maven reactor
+because the tool's default module-local baseline cannot resolve reactor
+dependencies. These survivors are meaningful guard coverage gaps; returning
+them to coder before DRY and soft Gherkin certification.
+
+## 2026-08-23T15:55:45Z — handoff to coder: kill direct-fixture mutants
+
+Queued priority-00 follow-up for task `logging-feature-direct-construction`.
+Add focused assertions that distinguish every invalid-input guard identified
+by language mutation in `SampleEvents`; do not weaken the validation or alter
+production code or Gherkin content.
+
 ## 2026-08-23T15:37:30Z — received architect follow-up: direct event fixture
 
 Handoff message received:
