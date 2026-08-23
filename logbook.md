@@ -46609,6 +46609,15 @@ Remove the two exact SampleEventsTest assertion duplicates reported by
 dry4java while preserving the distinct null, blank, missing, and extra-field
 cases. No production or Gherkin changes.
 
+## 2026-08-23T16:15:00Z — phase complete: direct logging fixture ready
+
+The parameterized direct journal-entry fixture is now callable from Gherkin.
+The test-only adapter and handler mapping are mutation-clean (12/12 killed),
+DRY is clean, and the full soft Gherkin mutation gate passed. Handing the
+phase-complete state to specifier: retain compact real-play event-emission
+coverage in logging.feature and move formatting-only scenarios to the new
+direct-entry steps.
+
 ## 2026-08-23T16:06:33Z — received duplicate coder handoff record
 
 Handoff `6271dadf68` was merged from the current priority-00 batch. It only
