@@ -46320,6 +46320,58 @@ type: git_handoff
 to: architect
 priority: 00
 task: rent-relief-cli-wiring
+commit: c393fac24b
+```
+
+## 2026-08-23T00:30:00Z — specifier investigates the logging.feature performance finding, hands it to architect
+
+Picked the parked `logging.feature` mutation-performance finding back up at the
+user's direction (survivor sweep is closed). Investigated directly, no Gherkin
+changes:
+
+- `logging.feature` has 92 scenarios; 80 invoke a step that constructs a full
+  `Game` — `we play the game`, `we play up to N rounds`, or `pawn "X" lands on
+  "Y"` (which itself calls `World.landPawnOn` -> `playGame()`). Only `log-1`
+  ("logged event text matches report rendering", 4 examples) avoids `Game`
+  entirely, via `EventStepHandlers`/`World.selectEvent` constructing a bare
+  `Journal.Entry` and checking its rendering directly.
+- Corrected one assumption: `Game.play()` (`Game.java:219-221`) is not
+  play-to-completion. `untilComplete=false` means `playTurns`'s do-while exits
+  after exactly one round (`shouldContinuePlaying` requires `untilComplete`).
+  So this is not a runaway-game risk like the Greedo-vs-Greedo stalemate
+  cases — the cost is the fixed overhead of constructing a real `Game`
+  (rules, deeds, cards, strategies, journalling) and playing one honest round,
+  paid on every mutation of every one of those 80 scenarios.
+- `log-1`'s existing direct-construction mechanism (`world.selectEvent`) is a
+  fixed per-type template, not general enough to assert the specific
+  field values (amounts, player names, positions) the other scenarios need —
+  generalizing it would need real step-handler work, out of specifier's
+  Gherkin-only scope.
+
+Discussed with the user. Their read: these scenarios were likely written this
+heavy specifically to prove each event actually reaches the log/report during
+real play, not just to check formatting. Their proposed direction: keep (or
+add) a small set of genuine integration scenarios that prove every event type
+is actually emitted to the journal/report during real gameplay — e.g. one
+comprehensive playthrough asserting the full set of event types appears, or a
+representative scenario per mechanism family — and move the remaining bulk
+(scenarios only asserting a specific event's format/field content, not that it
+gets wired up) onto `log-1`'s direct-construction pattern, generalized to take
+parameterized field values instead of a fixed per-type template.
+
+This is a Gherkin-restructuring decision that depends on new step-handler
+capability (a general parameterized direct-Entry-construction handler), so it
+needs architect/coder scoping before any spec changes. Handing to the
+architect as a new investigation task, separate from the now-closed
+`rent-relief-cli-wiring` line.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: logging-feature-direct-construction
 commit: PENDING
 ```
 
