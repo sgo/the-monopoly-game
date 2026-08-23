@@ -24,19 +24,13 @@ class SampleEventsTest {
 
   @Test
   void reportsMissingFieldsClearly() {
-    AssertionError error = assertThrows(AssertionError.class,
-        () -> SampleEvents.of("player_buys_property", Map.of("player", "dog")));
-
-    assertTrue(error.getMessage().contains("do not match required fields"));
+    assertInvalidShape(() -> SampleEvents.of("player_buys_property", Map.of("player", "dog")));
   }
 
   @Test
   void reportsExtraFieldsClearly() {
-    AssertionError error = assertThrows(AssertionError.class,
-        () -> SampleEvents.of("player_passes_go", Map.of(
-            "player", "dog", "salary", "200", "unexpected", "value")));
-
-    assertTrue(error.getMessage().contains("do not match required fields"));
+    assertInvalidShape(() -> SampleEvents.of("player_passes_go", Map.of(
+        "player", "dog", "salary", "200", "unexpected", "value")));
   }
 
   @Test
@@ -45,18 +39,12 @@ class SampleEventsTest {
     values.put("player", null);
     values.put("salary", "200");
 
-    AssertionError error = assertThrows(AssertionError.class,
-        () -> SampleEvents.of("player_passes_go", values));
-
-    assertEquals("Event field \"player\" is required.", error.getMessage());
+    assertRequiredField(() -> SampleEvents.of("player_passes_go", values));
   }
 
   @Test
   void reportsBlankFieldValuesClearly() {
-    AssertionError error = assertThrows(AssertionError.class,
-        () -> SampleEvents.of("player_passes_go", Map.of("player", " ", "salary", "200")));
-
-    assertEquals("Event field \"player\" is required.", error.getMessage());
+    assertRequiredField(() -> SampleEvents.of("player_passes_go", Map.of("player", " ", "salary", "200")));
   }
 
   @Test
@@ -65,5 +53,15 @@ class SampleEventsTest {
         () -> SampleEvents.of("unknown_event", Map.of()));
 
     assertEquals("No sample event for type \"unknown_event\".", error.getMessage());
+  }
+
+  private static void assertInvalidShape(Runnable action) {
+    AssertionError error = assertThrows(AssertionError.class, action::run);
+    assertTrue(error.getMessage().contains("do not match required fields"));
+  }
+
+  private static void assertRequiredField(Runnable action) {
+    AssertionError error = assertThrows(AssertionError.class, action::run);
+    assertEquals("Event field \"player\" is required.", error.getMessage());
   }
 }
