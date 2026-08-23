@@ -1659,6 +1659,12 @@ public class World {
     selectedEvent = SampleEvents.of(eventType, values);
   }
 
+  /** Test-only observation seam for direct event-handler contract tests. */
+  Entry selectedEventForTesting() {
+    if (selectedEvent == null) throw new AssertionError("No event has been selected yet.");
+    return selectedEvent;
+  }
+
   public void renderSelectedEventForReport() {
     renderedEventText = Report.of(List.of(selectedEvent));
   }

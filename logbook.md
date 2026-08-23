@@ -46661,6 +46661,33 @@ supported direct-entry shape, with independently captured semantic fields, and
 added focused handler-level tests. No production code or `logging.feature`
 content was changed.
 
+## 2026-08-23T18:05:24Z — received architect follow-up: return event-handler capture mutants
+
+Handoff message received:
+
+```
+id: 20260823T160229Z_000406_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: e72573e4f7
+created_at: 2026-08-23T16:02:29.258606Z
+enqueued_at: 2026-08-23T16:02:29.686856Z
+task: logging-feature-direct-construction
+
+Re-read your role and constitution.
+
+merge_and_process architect e72573e4f7
+```
+
+Merged the architect review commit. Added a test-only selected-entry
+observation seam and assertions that every direct-event handler capture maps to
+the expected `Journal.Entry` field. Focused verification passes 8/8; no
+production code or Gherkin content was changed.
+
 ## 2026-08-23T17:59:58Z — handoff to architect: direct-fixture guard coverage
 
 Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
