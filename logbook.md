@@ -46981,7 +46981,7 @@ type: git_handoff
 to: architect
 priority: 00
 task: logging-feature-direct-construction
-commit: PENDING
+commit: e6ac3aabd7
 ```
 
 ## 2026-08-24T17:16:51Z — received architect follow-up: explicit targeted landing step
@@ -47071,3 +47071,78 @@ adapter tests pass, and targeted logging/distressed-sale acceptance passes
 Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
 commit `3404e311d2`, containing the production-backed targeted-turn API and
 its unit test. Targeted acceptance verification passed 160/160.
+
+## 2026-08-24T18:00:00Z — specifier receives phase-complete handoff for targeted-turn optimization
+
+Handoff received:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: logging-feature-direct-construction
+commit: 6f7d82a870
+```
+
+Payload: "Re-read your role and constitution. merge_and_process architect 6f7d82a870"
+
+Merged cleanly into main. This closes the loop opened by the specifier's
+prior finding (commit e6ac3aabd7): the direct render-comparison fixture
+could not substitute for logging.feature's structural journal assertions,
+so the real fix had to be an implementation change to the turn-execution
+path itself, matching the user's own suggestion about `pawn "X" lands on
+"Y"`.
+
+What was built: `Game.playTurnFor(Player.ID)` plays only the named
+player's turn for the current round (still constructing the full `Game`
+object graph, still running that player's real production calculation and
+journalling), instead of every seated player's turn. Exposed to Gherkin as
+a new, separate step `pawn "X" takes a targeted landing on "Y"`
+(`World.landPawnOnTargeted`) alongside the existing `pawn "X" lands on
+"Y"$` step, which is unchanged and still available. `GameTest` (62/62) and
+the new `TargetedLandingStepTest` (1/1) pass; characterization suite run
+next per the phase-complete sync rule.
+
+This is a genuine optimization, not a substitute for the direct fixture:
+it still exercises real production logic for the targeted player's turn
+(dice roll, movement, buy/rent/tax/card resolution, real journal entries),
+so structural journal assertions keep their full wiring-proof value. It
+only skips executing the *other* seated player's turn within that round,
+which `logging.feature`'s scenarios almost never depend on individually.
+
+Next: survey `logging.feature`'s `pawn "X" lands on "Y"` usages and decide,
+scenario by scenario, which ones have no assertion depending on the other
+player's turn happening in the same round, then swap those onto the new
+targeted step.
+
+## 2026-08-24T18:30:00Z — specifier switches logging.feature onto the targeted-turn step
+
+Surveyed all 31 uses of `pawn "X" lands on "Y"` in `logging.feature` against
+the assertions that follow each one, and cross-checked the conclusion
+against `Game.java`'s `playTurn`/`turnEndsTheGame` rather than inferring it
+from Gherkin alone. Every cross-player assertion in the file — auction
+bidding, chance/community-chest effects that pay or collect from every
+other player, bankruptcy inheritance, distressed-sale bidding wars, and
+winner declaration on the other player's bankruptcy — resolves
+synchronously inside the landing player's own `playTurn` call. None of the
+31 scenarios depend on a second seated player executing their own separate
+turn in the same round.
+
+Swapped every `pawn "X" lands on "Y"` to `pawn "X" takes a targeted landing
+on "Y"` (mechanical find-replace of the step phrase only; no assertions,
+Given/Then steps, or Examples values touched). Verified with
+`acceptance/run-acceptance.sh` (the full non-mutation acceptance run, not
+mutation testing, per the specifier's verification rule):
+`EnRulesLoggingAcceptanceTest` 119/119, full suite 910/910, `BUILD
+SUCCESS`.
+
+This closes the practical work opened by the user's `pawn lands on`
+optimization idea: the same real production logic still runs for the
+landing player (dice roll, movement, buy/rent/tax/card resolution, real
+journal entries), so every existing structural journal assertion keeps its
+full wiring-proof value — this only stops paying for the second seated
+player's own turn, which none of these scenarios needed.
+
+`logging.feature`'s mutation-manifest stamp will regenerate on next
+mutation run; not touched here per the verification rule (mutation not
+run this session).
