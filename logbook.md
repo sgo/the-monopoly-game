@@ -47165,3 +47165,34 @@ priority: 00
 task: logging-feature-direct-construction
 commit: e3c045f1c1
 ```
+
+## 2026-08-24T19:00:00Z — specifier classifies the five logging survivors as equivalent
+
+Received the architect's post-edit mutation gate result (merged commit
+`8160a787b0`): logging.feature dropped to 89 executed mutations in 77.336s
+(from 158.5s pre-edit), with five survivors. Verified each against
+production code rather than the Gherkin alone before classifying:
+
+- Bankruptcy-to-bank (`starting balance` 5->0) and the game's-winner
+  scenario (`starting balance` 5->4): Inkomsten Belasting taxes $200
+  (`Street.java`: `InkomstenBelasting(TaxSpace.of(200))`); both mutated
+  values stay far below that, so dog goes bankrupt/high hat wins
+  identically either way.
+- Bankruptcy-to-another-player (`starting balance` 5->6) and creditor
+  inheritance (`starting_balance` 10->17): Diestsestraat Leuven's hotel
+  rent is $450 (`Street.java`: `DiestsestraatLeuven(ColourStreet.of(brown,
+  60, 4, 20, 60, 180, 320, 450, 50, 30))`); both mutated values stay far
+  below that too.
+- No-buying-policy decline (`dog_starting_balance` 100->96):
+  `Strategy.UNDECIDED`'s `accepts(...)`/`declineReason(...)`
+  (`Strategy.java:21-36`) are unconditional defaults that never consult
+  balance at all, so both values decline for the same `NO_BUYING_POLICY`
+  reason regardless of whether either amount would actually afford the $60
+  price.
+
+All five are genuine equivalent mutations, not coverage gaps — none of
+them are specific to the targeted-turn edit, they're pre-existing
+properties of these scenarios' thresholds that the mutation gate is now
+reaching faster. Recorded all five in `acceptance/equivalent-mutations.edn`
+(440 -> 445), following the established classification format. No Gherkin
+changes. Handing back to architect on the same task to close out.
