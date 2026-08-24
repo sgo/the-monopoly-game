@@ -67,7 +67,7 @@ public class Game {
   private final DevelopmentLoanBook developmentLoanBook;
   private final boolean warProfitsTax;
   private final boolean rentRelief;
-  private final the.monopoly.game.rules.RentRelief rentReliefBook;
+  private the.monopoly.game.rules.RentRelief rentReliefBook;
   private final WarProfitsTaxBook warProfitsTaxBook;
   private final int maxYears;
   private boolean automaticMarketDeadlock = true;
@@ -86,6 +86,19 @@ public class Game {
   ) {
     this(rules, players, cups, strategies, deeds,
         decks == null ? Cards.Decks.official(deeds) : decks, new Jail(rules));
+  }
+
+  public Game(
+      Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
+      Cards.Decks decks, Jail jail, boolean stalemateTrading, boolean legalEntityTrading,
+      boolean developmentLoans, boolean fullDrawDevelopmentLoans, int maxYears,
+      DevelopmentLoanBook developmentLoanBook, boolean warProfitsTax,
+      the.monopoly.game.rules.RentRelief rentReliefBook
+  ) {
+    this(rules, players, cups, strategies, deeds, decks, jail, stalemateTrading, legalEntityTrading,
+        developmentLoans, fullDrawDevelopmentLoans, maxYears, developmentLoanBook, warProfitsTax,
+        rentReliefBook != null);
+    this.rentReliefBook = rentReliefBook;
   }
 
   public Game(
