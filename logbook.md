@@ -47466,3 +47466,29 @@ both require new production behavior (a `Game`-level seam for a pre-funded
 or injectable `RentRelief`, and diagnosing the entity-rent discrepancy).
 No production code changed by this handoff. Handing the verified red state
 to the architect for a coder follow-up.
+
+## 2026-08-24T19:30:50Z — refactorer sent rent-relief-megacorp-live-play handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260824T193050Z_000194_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: rent-relief-megacorp-live-play
+commit: 3f25057e8f
+created_at: 2026-08-24T19:30:50.942048Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 3f25057e8f
+```
+
+Reports the verified red acceptance state from commit `83d1e500f0`: analysis
+tools clean on the new/changed code, but `rent-relief-3`/`rent-relief-4`
+still fail, for the two distinct reasons detailed in the prior entry (no
+seam for a pre-funded government account in live play; a $150-vs-$750
+entity-rent discrepancy). Requesting a coder follow-up.
