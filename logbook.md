@@ -47851,6 +47851,16 @@ At the user's direction, sending both changes together as one task,
 `megacorp-salary-tax-cli-wiring`, rather than the two separate handoffs
 suggested earlier.
 
+Handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: megacorp-salary-tax-cli-wiring
+commit: 0f56466a25
+```
+
 ## 2026-08-24T22:01:29Z — refactorer processes coder handoff `b86a94ff02` (megacorp-salary-tax-cli-wiring)
 
 Handoff message received:
@@ -47976,3 +47986,65 @@ has grown across four consecutive refactorer rounds (104 -> 106 -> 112 ->
 124) without ever being split, each time individually justified as
 disproportionate for that round's small diff — worth the architect's
 attention as a standing candidate for a dedicated structural-split task.
+
+## 2026-08-25T00:20:00Z — architect verifies MegaCorp CLI wiring; two casing equivalents remain
+
+Received and fast-forwarded refactorer handoff `000196` (commit
+`736ecc8559`) for `megacorp-salary-tax-cli-wiring`. Independently ran the
+generator-backed full acceptance suite: green. The full soft Gherkin
+mutation run then completed with exactly two survivors, both casing-only
+mutations of the disabled-state example: `disabled -> disableD` in
+`journal.feature` and `disabled -> diSabled` in `logging.feature`. They
+are candidate equivalents because the state vocabulary is intentionally
+case-insensitive, but require specifier records before final certification.
+The same refactorer review flags `Game.java`'s mutation-site count (124)
+as standing architectural debt; this task added only six lines there, so
+it is recorded for separate debt work rather than expanding this completed
+feature.
+
+## 2026-08-25T00:45:00Z — MegaCorp mutation gate certified; Game debt work opened
+
+Merged the specifier's two casing-equivalence records and reran the full
+`./acceptance/run-acceptance-mutation.sh` gate. It completed cleanly with
+no survivors or errors; the tool removed both prior survivor reports.
+`megacorp-salary-tax-cli-wiring` is therefore certified through full
+acceptance and Gherkin mutation.
+
+Per the user's direction, opened a separate `game-java-mutation-site-debt`
+refactorer task. Objective: reduce `Game.java` below the mutation-site split
+threshold by extracting cohesive, behavior-preserving orchestration seams
+from the core engine; preserve the public `Game` API and all observable
+gameplay, and return an evidence-backed refactor rather than another debt
+deferral.
+
+## 2026-08-25T00:30:00Z — specifier classifies the two MegaCorp casing survivors as equivalent
+
+Verified against the actual step implementation rather than assuming the
+architect's "case-insensitive by design" framing:
+
+```java
+then("^the game journal records that MegaCorp salary tax is " + NAME + "$",
+    (world, arguments) -> records(world,
+        Claim.of(new Entry.MegacorpSalaryTaxEnabled(arguments.text(1).equals("enabled")))));
+```
+
+The disabled-state check isn't actually case-insensitive - it's a
+catch-all negative: only an exact, case-sensitive match against the
+literal string `"enabled"` parses true, so `"disableD"`/`"diSabled"` parse
+to `false` exactly the same as `"disabled"` does. This is the identical,
+already-established mechanism behind every other "X is disabled by
+default" equivalent-mutation record in `equivalent-mutations.edn`
+(development-loans, war-profits-tax, rent-relief - `equivalent-mutations.edn`
+lines 308-454), so classified the same way rather than re-deriving new
+reasoning. Recorded both (466 -> 468). No Gherkin changes.
+
+`megacorp-salary-tax-cli-wiring` is otherwise complete per the architect's
+and refactorer's verification: full acceptance green (930/930), formula
+correction and CLI-wiring both confirmed, property test added, CRAP/DRY/
+mutation-site checks clean (the one exemption is the documented
+sealed-switch case in `Report.line`). `Game.java`'s mutation-site growth
+(104->106->112->124 across four rounds) is noted as standing debt for
+separate work, not blocking this task.
+
+Handing back to architect on the same task to certify the mutation gate
+clean.
