@@ -52,6 +52,8 @@ public final class Report {
       case Entry.Moved it -> name(it.player()) + " moves from position " + it.from() + " ("
           + boardSpaceName(it.fromSpace()) + ") to " + it.to() + " (" + boardSpaceName(it.toSpace()) + ")";
       case Entry.SalaryCollected it -> name(it.player()) + " collects a salary of $" + it.salary().amount();
+      case Entry.MegacorpSalaryTaxPaid it -> "MegaCorp pays the government an individual income tax of $"
+          + it.amount().amount();
       case Entry.Bought it -> name(it.player()) + " buys " + spaceName(it.land()) + " for $" + it.price().amount();
       case Entry.AuctionWon it ->
           name(it.player()) + " wins the auction for " + spaceName(it.land()) + " at $" + it.price().amount();
@@ -97,6 +99,8 @@ public final class Report {
       case Entry.PurchaseDeclined it -> declineLine(it);
       case Entry.RentPaid it -> name(it.tenant()) + " pays " + name(it.owner()) + " $"
           + it.rent().amount() + " rent for " + spaceName(it.land());
+      case Entry.RentReliefPaid it -> "The government pays " + name(it.landlord()) + " $"
+          + it.amount().amount() + " in rent relief";
       case Entry.LegalEntityRentPaid it -> name(it.tenant()) + " pays $" + it.rent().amount()
           + " rent to " + it.name() + " for " + spaceName(it.land());
       case Entry.PlayerPaid it -> name(it.payer()) + " pays " + name(it.payee()) + " $" + it.amount().amount();

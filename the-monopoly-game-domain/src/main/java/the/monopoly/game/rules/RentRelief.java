@@ -32,6 +32,10 @@ public final class RentRelief {
     return government.balance();
   }
 
+  public GovernmentAccount government() {
+    return government;
+  }
+
   public Money tenantPayment(Money rent) {
     return rent.minus(reliefFor(rent));
   }

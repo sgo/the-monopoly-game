@@ -87,6 +87,9 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.purchaseDec
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rolled;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.salaryCollected;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.megacorpTaxPaid;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentReliefPaid;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentReliefPaidLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.stalemateTrading;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.splitMonopolyPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.splitMonopolyWon;
@@ -305,6 +308,9 @@ final class GameLogStepHandlers {
             (world, arguments) -> logRecordsInOrder(world,
                 finalAge(arguments.text(1), arguments.number(2)),
                 finalBalance(arguments.text(3), arguments.number(4)))),
+        then("^the game report says that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
+            (world, arguments) -> says(world,
+                arguments.text(1) + " collects a salary of $" + arguments.number(2))),
         then("^the game report says that pawn \"" + NAME + "\" starts a turn aged " + VALUE
                 + " years before it says that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
             (world, arguments) -> saysInOrder(world,
@@ -777,6 +783,13 @@ final class GameLogStepHandlers {
         then("^the game log records that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
             (world, arguments) -> logRecords(world, salaryCollected(arguments.text(1), arguments.number(2)))),
 
+        then("^the game log records that MegaCorp pays the government an individual income tax of \\$" + MONEY + "$",
+            (world, arguments) -> logRecords(world, megacorpTaxPaid("dog", Integer.parseInt(arguments.text(1))))),
+
+        then("^the game log records that the government pays pawn \"" + NAME + "\" \\$" + MONEY
+                + " in rent relief$",
+            (world, arguments) -> logRecords(world, rentReliefPaid(arguments.text(1), Integer.parseInt(arguments.text(2))))),
+
         then("^the game log records game start before it records that pawn \"" + NAME
                 + "\" rolls " + VALUE + " for initiative$",
             (world, arguments) -> logRecordsInOrder(world,
@@ -1003,6 +1016,18 @@ final class GameLogStepHandlers {
                 moves(arguments.text(1)),
                 rentPaid(arguments.text(2), arguments.text(3), arguments.text(5), arguments.number(4)))),
 
+        then("^the game report says that pawn \"" + NAME + "\" pays pawn \"" + NAME
+                + "\" \\$" + VALUE + " rent for \"" + NAME + "\"$",
+            (world, arguments) -> says(world,
+                arguments.text(1) + " pays " + arguments.text(2) + " $" + arguments.number(3)
+                    + " rent for " + arguments.text(4))),
+        then("^the game report says that MegaCorp pays the government an individual income tax of \\$" + MONEY + "$",
+            (world, arguments) -> says(world,
+                "MegaCorp pays the government an individual income tax of $" + arguments.text(1))),
+        then("^the game report says that the government pays pawn \"" + NAME + "\" \\$" + MONEY
+                + " in rent relief$",
+            (world, arguments) -> says(world,
+                rentReliefPaidLine(arguments.text(1), Integer.parseInt(arguments.text(2))))),
         then("^the game report says that pawn \"" + NAME + "\" wins the auction for \""
                 + NAME + "\" at \\$" + VALUE + "$",
             (world, arguments) -> says(world, auctionWonLine(

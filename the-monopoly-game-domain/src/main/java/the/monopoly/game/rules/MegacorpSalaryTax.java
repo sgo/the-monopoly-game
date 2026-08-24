@@ -14,6 +14,10 @@ public final class MegacorpSalaryTax {
     government = new GovernmentAccount(bank);
   }
 
+  public MegacorpSalaryTax(GovernmentAccount government) {
+    this.government = government;
+  }
+
   public Money collect(Player player, Money salary) {
     player.account().deposit(salary);
     Money tax = salary.percentage(RATE);
@@ -23,6 +27,12 @@ public final class MegacorpSalaryTax {
 
   public Money governmentBalance() {
     return government.balance();
+  }
+
+  public Money payTax(Money salary) {
+    Money tax = salary.percentage(RATE);
+    government.deposit(tax);
+    return tax;
   }
 }
 

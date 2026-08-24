@@ -37,6 +37,8 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rolled;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rollsATotalOf;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rollsForInitiative;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.salaryCollected;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.megacorpTaxPaid;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentReliefPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.stalemateTrading;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStarted;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.turnStartedAtAge;
@@ -488,6 +490,10 @@ final class JournalStepHandlers {
         then("^the game journal records that pawn \"" + NAME + "\" collects a salary of \\$" + VALUE + "$",
             (world, arguments) -> records(world, salaryCollected(arguments.text(1), arguments.number(2)))),
 
+
+        then("^the game journal records that MegaCorp pays the government an individual income tax of \\$" + MONEY + "$",
+            (world, arguments) -> records(world, megacorpTaxPaid("dog", Integer.parseInt(arguments.text(1))))),
+
         then("^the game journal records game start before it records that pawn \"" + NAME
                 + "\" rolls " + VALUE + " for initiative$",
             (world, arguments) -> recordsInOrder(world,
@@ -778,6 +784,11 @@ final class JournalStepHandlers {
 
         then("^the game journal records that the government's final account balance is \\$" + MONEY + "$",
             (world, arguments) -> records(world, governmentBalance(Integer.parseInt(arguments.text(1))))),
+
+        then("^the game journal records that the government pays pawn \"" + NAME + "\" \\$" + MONEY
+                + " in rent relief$",
+            (world, arguments) -> records(world,
+                rentReliefPaid(arguments.text(1), Integer.parseInt(arguments.text(2))))),
 
         then("^the game journal records that the war profits tax is " + NAME + "$",
             (world, arguments) -> records(world, warProfitsTax(arguments.text(1)))),

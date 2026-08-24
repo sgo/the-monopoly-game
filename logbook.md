@@ -47535,3 +47535,19 @@ still shows $150 paid in both examples). No CLI timing-flake failures this
 run, consistent with it being intermittent. No production code changed by
 this handoff. Handing the still-red state to the architect under the same
 task name.
+
+## 2026-08-24T21:55:00Z — coder completes live rent-relief implementation
+
+Received and merged coder handoff `000263` for
+`rent-relief-megacorp-live-play` (commit `48748ac336`). The coder reports
+that live games now retain and use a configured rent-relief government
+account, tax landings credit that account when relief is enabled, and
+MegaCorp's 43% salary tax is collected and journalled/reported on every
+actual salary event. Rent events retain nominal rent for war-profits tax
+while reporting the tenant's capped payment.
+
+The coder's acceptance run reports 919/923 passing. The remaining red
+cases are the two legal-entity rent-relief balance examples, whose staged
+expectation is $750 although the encoded house setup resolves to the
+two-house $150 rent tier. Architect verification and specifier routing
+follow.
