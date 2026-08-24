@@ -20,7 +20,7 @@ public final class MegacorpSalaryTax {
 
   public Money collect(Player player, Money salary) {
     player.account().deposit(salary);
-    Money tax = salary.percentage(RATE);
+    Money tax = taxOn(salary);
     government.deposit(tax);
     return tax;
   }
@@ -30,9 +30,16 @@ public final class MegacorpSalaryTax {
   }
 
   public Money payTax(Money salary) {
-    Money tax = salary.percentage(RATE);
+    Money tax = taxOn(salary);
     government.deposit(tax);
     return tax;
+  }
+
+  private Money taxOn(Money netSalary) {
+    return Money.fromCents(java.math.BigDecimal.valueOf(netSalary.cents())
+        .multiply(java.math.BigDecimal.valueOf(RATE))
+        .divide(java.math.BigDecimal.valueOf(100 - RATE), 0, java.math.RoundingMode.HALF_EVEN)
+        .longValueExact());
   }
 }
 

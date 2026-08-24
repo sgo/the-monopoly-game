@@ -492,7 +492,11 @@ final class JournalStepHandlers {
 
 
         then("^the game journal records that MegaCorp pays the government an individual income tax of \\$" + MONEY + "$",
-            (world, arguments) -> records(world, megacorpTaxPaid("dog", Integer.parseInt(arguments.text(1))))),
+            (world, arguments) -> records(world, megacorpTaxPaid("dog", arguments.text(1)))),
+
+        then("^the game journal records that MegaCorp salary tax is " + NAME + "$",
+            (world, arguments) -> records(world,
+                Claim.of(new Entry.MegacorpSalaryTaxEnabled(arguments.text(1).equals("enabled"))))),
 
         then("^the game journal records game start before it records that pawn \"" + NAME
                 + "\" rolls " + VALUE + " for initiative$",
@@ -783,7 +787,7 @@ final class JournalStepHandlers {
             (world, arguments) -> records(world, warProfitsTaxPaid(arguments.text(1), Integer.parseInt(arguments.text(2))))),
 
         then("^the game journal records that the government's final account balance is \\$" + MONEY + "$",
-            (world, arguments) -> records(world, governmentBalance(Integer.parseInt(arguments.text(1))))),
+            (world, arguments) -> records(world, governmentBalance(arguments.text(1)))),
 
         then("^the game journal records that the government pays pawn \"" + NAME + "\" \\$" + MONEY
                 + " in rent relief$",

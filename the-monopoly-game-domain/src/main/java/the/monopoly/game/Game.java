@@ -184,6 +184,8 @@ public class Game {
     this.warProfitsTax = warProfitsTax;
     this.rentRelief = rentRelief;
     this.rentReliefBook = rentRelief ? new the.monopoly.game.rules.RentRelief(rules.bank()) : null;
+    this.megacorpSalaryTax = rentReliefBook == null ? null
+        : new MegacorpSalaryTax(rentReliefBook.government());
     this.warProfitsTaxBook = new WarProfitsTaxBook(rules.bank(), WarProfitsTax.boardValue(rules));
     this.maxYears = maxYears;
     applyOpeningCapital();
@@ -280,6 +282,7 @@ public class Game {
     journalling.developmentLoans(developmentLoans, fullDrawDevelopmentLoans);
     journal.log(new Journal.Entry.WarProfitsTaxEnabled(warProfitsTax));
     journal.log(new Journal.Entry.RentReliefEnabled(rentRelief));
+    journal.log(new Journal.Entry.MegacorpSalaryTaxEnabled(megacorpSalaryTax != null));
     players.forEach(player -> journalling.strategyNamed(player, strategies.forPlayer(player)));
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
@@ -858,6 +861,9 @@ public class Game {
       }
 
       record RentReliefEnabled(boolean enabled) implements Entry {
+      }
+
+      record MegacorpSalaryTaxEnabled(boolean enabled) implements Entry {
       }
 
       record WarProfitsTaxPaid(Player.ID payer, Money amount) implements Entry {

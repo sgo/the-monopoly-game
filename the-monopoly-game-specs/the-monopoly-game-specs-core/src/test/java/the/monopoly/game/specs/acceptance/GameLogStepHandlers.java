@@ -784,7 +784,11 @@ final class GameLogStepHandlers {
             (world, arguments) -> logRecords(world, salaryCollected(arguments.text(1), arguments.number(2)))),
 
         then("^the game log records that MegaCorp pays the government an individual income tax of \\$" + MONEY + "$",
-            (world, arguments) -> logRecords(world, megacorpTaxPaid("dog", Integer.parseInt(arguments.text(1))))),
+            (world, arguments) -> logRecords(world, megacorpTaxPaid("dog", arguments.text(1)))),
+
+        then("^the game log records that MegaCorp salary tax is " + NAME + "$",
+            (world, arguments) -> logRecords(world,
+                Claim.of(new Entry.MegacorpSalaryTaxEnabled(arguments.text(1).equals("enabled"))))),
 
         then("^the game log records that the government pays pawn \"" + NAME + "\" \\$" + MONEY
                 + " in rent relief$",
@@ -840,7 +844,7 @@ final class GameLogStepHandlers {
             (world, arguments) -> logRecords(world, warProfitsTaxPaid(arguments.text(1), Integer.parseInt(arguments.text(2))))),
 
         then("^the game log records that the government's final account balance is \\$" + MONEY + "$",
-            (world, arguments) -> logRecords(world, governmentBalance(Integer.parseInt(arguments.text(1))))),
+            (world, arguments) -> logRecords(world, governmentBalance(arguments.text(1)))),
 
         then("^the game log records that the war profits tax is " + NAME + "$",
             (world, arguments) -> logRecords(world, warProfitsTax(arguments.text(1)))),
@@ -1061,13 +1065,16 @@ final class GameLogStepHandlers {
             (world, arguments) -> says(world, warProfitsTaxPaidLine(arguments.text(1), Integer.parseInt(arguments.text(2))))),
 
         then("^the game report says that the government's final account balance is \\$" + MONEY + "$",
-            (world, arguments) -> says(world, governmentBalanceLine(Integer.parseInt(arguments.text(1))))),
+            (world, arguments) -> says(world, governmentBalanceLine(arguments.text(1)))),
 
         then("^the game report says that the war profits tax is " + NAME + "$",
             (world, arguments) -> says(world, warProfitsTaxLine(arguments.text(1)))),
 
         then("^the game report says that rent relief is " + NAME + "$",
             (world, arguments) -> says(world, rentReliefLine(arguments.text(1)))),
+
+        then("^the game report says that MegaCorp salary tax is " + NAME + "$",
+            (world, arguments) -> says(world, "MegaCorp salary tax is " + arguments.text(1))),
 
         then("^the game report says that pawn \"" + NAME + "\" sells a house on \"" + NAME
                 + "\" for \\$" + VALUE + "$",
