@@ -47203,3 +47203,11 @@ Merged `45b9e8c394` and reran the full soft Gherkin mutation gate: exit 0,
 no survivor report remains. The passing gate refreshed all feature manifests.
 The logging targeted-turn optimization is complete: 89 executed logging
 mutations finished in 77.336 seconds, down from 139 in 158.5 seconds.
+
+## 2026-08-24T19:10:00Z — handoff to specifier: audit journal/report targeted landings
+
+Queued priority-00 follow-up for `logging-feature-direct-construction`.
+Audit the 31 generic landing steps in each of journal.feature and
+report.feature for safe conversion to the targeted landing step. Preserve
+every scenario whose assertion depends on another player's separate turn;
+do not alter `we play` scenarios in this audit.
