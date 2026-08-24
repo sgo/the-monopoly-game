@@ -47143,6 +47143,15 @@ journal entries), so every existing structural journal assertion keeps its
 full wiring-proof value — this only stops paying for the second seated
 player's own turn, which none of these scenarios needed.
 
+## 2026-08-24T17:20:00Z — full soft gate finds five logging survivors
+
+Merged specifier commit `e3c045f1c1` and ran the full soft Gherkin mutation
+gate. Logging improved to 89 executed mutations in 77.336 seconds, but five
+survivors remain: bankruptcy-to-bank starting balance 5->0;
+bankruptcy-to-player 5->6; game-winner 5->4; creditor inheritance
+starting_balance 10->17; no-buying-policy dog_starting_balance 100->96.
+These are Gherkin assertion/equivalence decisions, so routed to specifier.
+
 `logging.feature`'s mutation-manifest stamp will regenerate on next
 mutation run; not touched here per the verification rule (mutation not
 run this session).
