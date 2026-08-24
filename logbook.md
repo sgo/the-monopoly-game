@@ -47850,3 +47850,99 @@ moved.
 At the user's direction, sending both changes together as one task,
 `megacorp-salary-tax-cli-wiring`, rather than the two separate handoffs
 suggested earlier.
+
+## 2026-08-24T22:01:29Z — refactorer processes coder handoff `b86a94ff02` (megacorp-salary-tax-cli-wiring)
+
+Handoff message received:
+
+```
+id: 20260824T215318Z_000267_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: megacorp-salary-tax-cli-wiring
+commit: b86a94ff02
+
+Re-read your role and constitution.
+
+merge_and_process coder b86a94ff02
+```
+
+Fast-forward merge from `08c7074` (my last checkpoint), no conflicts. This
+brings in everything since: the completed and closed `rent-relief-megacorp-
+live-play` task (live rent-relief wiring, the `rent-relief-3` queued-roll
+collision fix, the canonical rent report name fix, and the full soft
+Gherkin mutation gate going clean — all independently reviewed and
+committed by a prior refactorer round before I picked this up, per the
+logbook), then this new task's two changes: the CLI-wiring gap (`Game`'s
+`Simulator`-facing constructor never built `megacorpSalaryTax`, so the real
+CLI path silently dropped the mechanic despite the acceptance suite being
+green through `World.java`) and the salary-tax formula correction (43% of
+*gross* salary, not of the $200/$400 net figure — $150.88/$301.75 instead
+of $86/$172, keeping cent precision via a `Report.money` helper that only
+trims to a whole dollar when the amount is a whole dollar).
+
+Verification: `mvn test` green (domain/CLI/specs-core all passing, no
+failures). `./acceptance/run-acceptance.sh`: 930/930, no failures — both
+of this task's previously-red scenario groups (`journal-94/95`,
+`logging-94/95`, `report-94/95`, `cli-19` for the wiring gap;
+`megacorp-salary-tax-1/2/3`, `journal-90`, `logging-90`, `report-90` for
+the formula) now pass.
+
+Analysis tools (`crap4java`/`dry4java`/`mutate4java --scan` on every file
+changed since my last checkpoint: `Game.java`, `Journalling.java`,
+`Report.java`, `MegacorpSalaryTax.java`, `Rent.java`, `RentRelief.java`,
+`Taxes.java`):
+- CRAP: every new/changed method in this diff is well under the threshold
+  (`MegacorpSalaryTax.taxOn`/`payTax`/`collect` all CRAP <=2.0; `Report`'s
+  new `money` helper 2.1; `Journalling.collectedSalary` 3.1, `paid` 3.7;
+  `Rent`'s two `collect` overloads 3.0/5.0; `Taxes.resolve` 3.2). The one
+  breach, `Report.line` at 609.6, is the documented sealed-switch exemption
+  (2026-07-28 decision) — still a single exhaustive, straight-line switch
+  over `Journal.Entry`, just two cases wider (`MegacorpSalaryTaxEnabled`).
+  The other high-CRAP entries the tool reports on these files
+  (`Journalling.mortgageSpareProperty` 72.0, `Game.journalOperation` 56.0 —
+  itself the same sealed-switch exemption, `Journalling.serviceDevelopmentLoan`
+  42.0, `Game.serviceEntityDevelopmentLoan` 12.0) are pre-existing and
+  untouched by any diff since my last checkpoint, consistent with every
+  prior round's documented precedent.
+- DRY: clean. All flagged pairs are confined to `Journalling.java`/
+  `Game.java`'s established one-liner-per-entry-type event-adapter and
+  constructor-telescoping shapes (documented pre-existing noise across many
+  prior rounds). Neither of this task's two new lines (`Journalling.java:65-66`'s
+  `MegacorpSalaryTaxPaid` log, `Journalling.java:314-315`'s `RentReliefPaid`
+  log) appears in any flagged pair.
+- Mutation-site scan: `MegacorpSalaryTax.java` 2, `Taxes.java` 3,
+  `RentRelief.java` 3, `Rent.java` 14, `Journalling.java` 25, `Report.java` 8
+  — all well under the split threshold, and each file's own diff since my
+  last checkpoint is a handful of lines. `Game.java` is at 124 (was 112 at
+  my last checkpoint, a PRE-EXISTING breach carried in by the rent-relief
+  round before this task started); this task's own diff to `Game.java` is 6
+  lines (a null-check `megacorpSalaryTax` field derivation in one
+  constructor, one `journal.log` call). Per the 2026-08-20T10:36:00Z and
+  2026-08-24T~19:22Z precedents, not splitting the 2941-line core engine for
+  a single-digit-line increment — but the growth trend across four
+  consecutive rounds (104 -> 106 -> 112 -> 124) is worth flagging explicitly
+  to the architect this time, rather than only noting it here, since each
+  round keeps deferring the same standing candidate.
+
+Property testing: added `MegacorpSalaryTaxPropertyTest` (JetCheck,
+`@Tag("property-test")`, mirroring `WarProfitsTaxPropertyTest`'s shape),
+since the example-based `MegacorpSalaryTaxTest` only pins three exact net
+salaries and this round's whole defect was a wrong closed-form tax formula.
+Three properties over a swept range of net salaries (0 to $100,000):
+`taxOn` is always exactly 43% of the resulting gross (net + tax) within
+half-cent rounding — the property that would have caught the original
+net-basis bug directly; tax is non-decreasing as net salary grows; and
+`collect` conserves money exactly (player receives the full net salary,
+government receives exactly the returned tax, no more, no less). Verified
+green standalone (3/3) and as part of the full property-test profile
+(31/31, `mvn test -Pproperty-tests`), and confirmed the default `mvn test`
+profile still excludes it (`excludedGroups=property-test`) and stays green.
+
+No defects found. Committing the property test and this log entry, then
+handing the verified state to the architect under the same task name,
+`megacorp-salary-tax-cli-wiring`, with an explicit note about the `Game.java`
+mutation-site growth trend.
