@@ -47352,6 +47352,11 @@ steps elsewhere. Nothing to prune.
 
 Awaiting the user's approval before committing and handing off to coder.
 
+2026-08-24 coder processed handoff 000262 (specifier d786df9165): merged the
+rent-relief live-play slice and wired enabled rent relief through player and
+legal-entity rent resolution, preserving nominal rent for war-profits tax while
+logging the tenant-paid amount. Implementation commit 83d1e50.
+
 ## 2026-08-24T19:30:02Z — refactorer processes coder handoff `83d1e500f0` (rent-relief-megacorp-live-play)
 
 Handoff message received:
@@ -47474,3 +47479,59 @@ refactorer's two behavior findings: expose a production-valid Game seam for
 a pre-funded/injectable government account so rent relief can be live, and
 diagnose/fix legal-entity landlord rent selecting the two-house rather than
 hotel tier. Both are observable behavior fixes, so routed only to coder.
+
+## 2026-08-24T19:30:50Z — refactorer sent rent-relief-megacorp-live-play handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260824T193050Z_000194_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: rent-relief-megacorp-live-play
+commit: 3f25057e8f
+created_at: 2026-08-24T19:30:50.942048Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 3f25057e8f
+```
+
+Reports the verified red acceptance state from commit `83d1e500f0`: analysis
+tools clean on the new/changed code, but `rent-relief-3`/`rent-relief-4`
+still fail, for the two distinct reasons detailed in the prior entry (no
+seam for a pre-funded government account in live play; a $150-vs-$750
+entity-rent discrepancy). Requesting a coder follow-up.
+
+## 2026-08-24T19:35:00Z — refactorer processes coder follow-up `fb2aab2735` (rent-relief-megacorp-live-play), still red
+
+A second, closely-timed handoff (`000262`, enqueued 2026-08-24T19:19:08Z —
+just under 3 minutes after the one processed above) queued behind the first
+while it was being verified; picked it up via `done_with_current_task.sh`
+immediately after sending the prior handoff.
+
+Merged `fb2aab2735` ("Retain live rent relief account in game"). Resolved
+an append-only `logbook.md` conflict (both parents' final entries kept in
+full, nothing dropped). Diff is `Game.java` only: moves `RentRelief`
+construction from inside `play()` to the constructor, storing it in a new
+`rentReliefBook` field so it survives across multiple `play()`/
+`playUpToRounds()` calls on the same `Game` instance instead of being
+rebuilt (and re-zeroed) on every call. A real fix for a real bug — a
+government balance accumulated across an earlier `play()` call would
+previously vanish on the next one — but it does not add any external seam
+for pre-funding the account, so it does not touch either defect from the
+prior entry.
+
+Verification: `mvn test` still green (domain 421/421, CLI 23/23, specs-core
+9/9). `./acceptance/run-acceptance.sh`: still 12 deterministic failures,
+identical set — `journal-91`/`logging-91`/`report-91`/`tax-3`/`tax-4`/
+`megacorp-salary-tax-3` (expected, out of scope) and `rent-relief-3`/
+`rent-relief-4` (still red, confirmed unchanged: `rent-relief-4` still
+records the tenant paying the full $750 with no relief, `rent-relief-3`
+still shows $150 paid in both examples). No CLI timing-flake failures this
+run, consistent with it being intermittent. No production code changed by
+this handoff. Handing the still-red state to the architect under the same
+task name.
