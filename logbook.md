@@ -48155,3 +48155,31 @@ An evidence-backed structural split rather than another deferral, per the
 architect's brief. Committing `LegalEntities.java` and the `Game.java`
 extraction together, then handing back to the architect on the same task
 name, `game-java-mutation-site-debt`.
+
+## 2026-08-24T22:20:04Z — refactorer sent game-java-mutation-site-debt handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260824T222004Z_000197_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: game-java-mutation-site-debt
+commit: 897be88598
+created_at: 2026-08-24T22:20:04.621318Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 897be88598
+```
+
+Reports the evidence-backed structural split from commit `897be88598`:
+`Game.java` 124 -> 83 mutation sites via the new `LegalEntities` collaborator
+(41 sites), public API and observable gameplay preserved, `mvn test`
+green, acceptance 930/930, property-test profile 31/31, CRAP/DRY clean (no
+new issues; the two carried-over CRAP figures are the same pre-existing
+methods, moved verbatim). Requesting architect review to close out
+`game-java-mutation-site-debt`.
