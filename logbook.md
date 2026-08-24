@@ -48155,3 +48155,17 @@ An evidence-backed structural split rather than another deferral, per the
 architect's brief. Committing `LegalEntities.java` and the `Game.java`
 extraction together, then handing back to the architect on the same task
 name, `game-java-mutation-site-debt`.
+
+## 2026-08-25T01:15:00Z — Game.java mutation-site debt resolved and certified
+
+Merged refactorer handoff `000197` (commit `897be88598`). The cohesive
+`LegalEntities` collaborator removes legal-entity trade/buyout, formation,
+and operation/loan-service orchestration from `Game` while retaining the
+same package-level access to `Journalling`. `Game.java` falls from 124 to
+83 mutation sites; `LegalEntities.java` has 41, so both are below the split
+threshold. The public `Game` API is unchanged.
+
+Independently ran the generator-backed full acceptance suite and the full
+Gherkin mutation suite. Both pass cleanly: no acceptance failures,
+survivors, or mutation errors. This resolves the identified `Game.java`
+architectural debt rather than merely recording it.
