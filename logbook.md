@@ -47601,3 +47601,12 @@ rent-relief scenarios pass and leaves exactly one failure: `report-91`,
 where the report emits `Rue De Diekirch Arlon` instead of the canonical
 `Rue de Diekirch Arlon`. Coder handoff `000417` remains the sole blocker
 before the required full Gherkin mutation gate.
+
+## 2026-08-24T23:05:00Z — coder fixes canonical rent report name
+
+Received coder handoff `000266` (commit `e115ed7ec3`) for the sole
+remaining acceptance blocker. It changes `Report.spaceName()` to consult
+the canonical board-space override before its enum-name fallback and adds
+a focused regression test. This makes rent reports use `Rue de Diekirch
+Arlon` rather than the mechanically capitalized `Rue De Diekirch Arlon`.
+Merged for the final acceptance and mutation sequence.
