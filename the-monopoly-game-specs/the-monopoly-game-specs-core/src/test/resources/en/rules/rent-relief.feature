@@ -75,9 +75,41 @@ Feature: rent relief
       | 549                | 750           | 549                |
 
   # rent-relief-3
+  # Corrected after actually running this (architect finding,
+  # 2026-08-24T22:10:00Z entry, and further tracing):
+  #   - Building a hotel on only "Rue de Diekirch Arlon" left its Pink
+  #     Realty group-mates undeveloped; added hotels on all three, matching
+  #     every other greedo-legal-entity.feature scenario that develops a
+  #     Pink Realty street. Added a third player so all three streets get
+  #     real individual owners before Pink Realty forms, matching every
+  #     entity-forming scenario in greedo-legal-entity.feature (all select
+  #     3+ players); high hat ends up a shareholder as well as the tenant,
+  #     which the tracked "a shareholder pays rent when landing on their
+  #     own legal entity's street" scenario already establishes is valid.
+  #   - The actual cause of the persistent wrong balance, found by
+  #     temporarily asserting the journal's entity-rent entry directly
+  #     instead of the final balance: high hat never landed on Rue de
+  #     Diekirch Arlon at all. `World.formNamedEntity` pre-queues a roll
+  #     for every player "if empty" so its own auto-formation flow has
+  #     something to consume (`World.java:1045-1049`), and it runs before
+  #     `takes a targeted landing on` queues its own roll for the same
+  #     pawn - since queued rolls are FIFO
+  #     (`World.nextQueuedPawnRoll`/`removeFirst`), the pre-queued roll is
+  #     consumed first, moving high hat to the wrong space. Queuing high
+  #     hat's real turn roll before "Pink Realty is formed" pre-empts the
+  #     auto-queue (which only fires when a player's queue is still empty),
+  #     so `takes a targeted landing`'s own roll - appended after, and
+  #     equal to it - is what actually gets consumed. This is a step-timing
+  #     collision, not a rent-relief or entity-rent defect: rent-relief-4
+  #     (individual landlord, no entity formation involved) never hit it.
   Scenario Outline: rent relief applies the same way when the landlord is a legal entity
-    Given Pink Realty is formed
+    Given we select 3 players
+    And pawn "iron box" will roll 6 for initiative
+    And pawn "high hat" will roll 1 and 2 for their turn
+    And Pink Realty is formed
     And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
     And pawn "high hat" has $1500 to spend
     And the government's account already holds $<government_start>
     When pawn "high hat" takes a targeted landing on "Rue de Diekirch Arlon"

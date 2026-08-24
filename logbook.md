@@ -47577,3 +47577,37 @@ existing board-name override for `Rue de Diekirch Arlon`; the rent report
 therefore misses the specified phrase. Route a minimal coder fix. The
 rent-relief, tax, logging, journal, and MegaCorp behavior otherwise passes
 this independent full acceptance run.
+
+## 2026-08-24T22:40:00Z — specifier fixes rent-relief-3's real root cause
+
+Investigated the architect's routed finding directly rather than trusting
+the "2-house tier" surface explanation. First tried the obvious fix
+(hotels on all three Pink Realty streets, matching every other
+greedo-legal-entity.feature scenario) and a second (selecting 3 players so
+all three streets get real owners before formation, matching every
+entity-forming scenario elsewhere) — both legitimate, both applied, but
+the balance mismatch persisted unchanged at $1350 both times, which was
+the tell that neither was the actual cause.
+
+Traced it empirically: temporarily swapped the failing balance assertion
+for a deliberately-wrong journal assertion to force the failure message to
+print the real game log. It showed high hat never landed on Rue de
+Diekirch Arlon at all — it landed on Elektriciteitscentrale instead,
+having rolled a 4 it was never given. Root cause: `World.formNamedEntity`
+pre-queues a roll for every player "if empty" so its own auto-formation
+flow has something to consume (`World.java:1045-1049`); this runs before
+`takes a targeted landing on` queues its own roll for the same pawn, and
+since queued rolls are FIFO (`World.nextQueuedPawnRoll`/`removeFirst`),
+the pre-queued roll fires first, moving high hat to the wrong space
+entirely. A step-timing collision between two independently-reasonable
+step conveniences, not a rent-relief or entity-rent defect -
+`rent-relief-4` (individual landlord, no entity formation) never hit it.
+
+Fixed by queuing high hat's real turn roll (`1 and 2`, matching
+`A_SHORT_HOP`'s actual value) before `Pink Realty is formed`, pre-empting
+the auto-queue since it only fires when a player's queue is still empty.
+Full acceptance run confirms: 923 tests, 1 failure - only `report-91`
+(`Report.spaceName()`'s capitalization bug, already correctly routed to
+coder by the architect, not specifier's to fix).
+
+Handing back to architect on the same task.
