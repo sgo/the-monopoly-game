@@ -47497,3 +47497,33 @@ tools clean on the new/changed code, but `rent-relief-3`/`rent-relief-4`
 still fail, for the two distinct reasons detailed in the prior entry (no
 seam for a pre-funded government account in live play; a $150-vs-$750
 entity-rent discrepancy). Requesting a coder follow-up.
+
+## 2026-08-24T19:35:00Z — refactorer processes coder follow-up `fb2aab2735` (rent-relief-megacorp-live-play), still red
+
+A second, closely-timed handoff (`000262`, enqueued 2026-08-24T19:19:08Z —
+just under 3 minutes after the one processed above) queued behind the first
+while it was being verified; picked it up via `done_with_current_task.sh`
+immediately after sending the prior handoff.
+
+Merged `fb2aab2735` ("Retain live rent relief account in game"). Resolved
+an append-only `logbook.md` conflict (both parents' final entries kept in
+full, nothing dropped). Diff is `Game.java` only: moves `RentRelief`
+construction from inside `play()` to the constructor, storing it in a new
+`rentReliefBook` field so it survives across multiple `play()`/
+`playUpToRounds()` calls on the same `Game` instance instead of being
+rebuilt (and re-zeroed) on every call. A real fix for a real bug — a
+government balance accumulated across an earlier `play()` call would
+previously vanish on the next one — but it does not add any external seam
+for pre-funding the account, so it does not touch either defect from the
+prior entry.
+
+Verification: `mvn test` still green (domain 421/421, CLI 23/23, specs-core
+9/9). `./acceptance/run-acceptance.sh`: still 12 deterministic failures,
+identical set — `journal-91`/`logging-91`/`report-91`/`tax-3`/`tax-4`/
+`megacorp-salary-tax-3` (expected, out of scope) and `rent-relief-3`/
+`rent-relief-4` (still red, confirmed unchanged: `rent-relief-4` still
+records the tenant paying the full $750 with no relief, `rent-relief-3`
+still shows $150 paid in both examples). No CLI timing-flake failures this
+run, consistent with it being intermittent. No production code changed by
+this handoff. Handing the still-red state to the architect under the same
+task name.
