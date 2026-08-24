@@ -47610,3 +47610,17 @@ the canonical board-space override before its enum-name fallback and adds
 a focused regression test. This makes rent reports use `Rue de Diekirch
 Arlon` rather than the mechanically capitalized `Rue De Diekirch Arlon`.
 Merged for the final acceptance and mutation sequence.
+
+## 2026-08-24T23:20:00Z — full soft Gherkin mutation completed; eleven survivors require classification
+
+After the coder fix, the generator-backed full acceptance suite is green.
+Ran `./acceptance/run-acceptance-mutation.sh` to completion. Its generated
+manifests and survivor reports record eleven survivors, all in newly added
+MegaCorp/rent-relief scenarios: two each in journal and report salary
+rolls, two in logging, and five in rent-relief. The mutations are candidate
+equivalences (alternate dice that still cross Start; government balances on
+the same sufficient/insufficient side of the $550 relief boundary; and
+alternate later rolls that retain the same tax timing). They require the
+specifier's explicit classification and equivalent-record updates before
+this gate can certify cleanly. The run's manifest refresh and the four
+survivor reports are retained in this commit for that review.
