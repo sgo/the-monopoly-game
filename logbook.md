@@ -47577,3 +47577,16 @@ each differs from it only by later `logbook.md` entries. No code merge is
 needed and their duplicate completion records must not overwrite the
 architect's verified history. The outstanding coder and specifier follow-up
 handoffs remain `000417` and `000418` respectively.
+
+## 2026-08-24T22:40:00Z — specifier resolves rent-relief-3 setup collision
+
+Received specifier handoff `000263` (commit `656fa0dac3`). Its investigation
+corrected the earlier surface diagnosis: the legal-entity rent was not the
+cause. `Pink Realty is formed` pre-queues a roll for each otherwise-empty
+player queue; that roll was consumed before the later targeted-landing
+step's roll, so high hat actually landed on Elektriciteitscentrale rather
+than Rue de Diekirch Arlon. The feature now queues high hat's intended
+`1 and 2` roll before entity formation, preserving the real targeted
+landing. The specifier independently reports full acceptance at 923 tests
+with only `report-91` remaining, the already-routed canonical-name coder
+defect. Merged for architect verification.
