@@ -47281,3 +47281,13 @@ $200 tax / $450 hotel-rent / Strategy.UNDECIDED reasoning applies directly
 without re-deriving it. All 10 recorded in `acceptance/equivalent-mutations.edn`
 (445 -> 455). No Gherkin changes. Handing back to architect to close out
 the task.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: logging-feature-direct-construction
+commit: 4b5dc341ab
+```
