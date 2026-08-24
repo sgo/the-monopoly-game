@@ -18,6 +18,7 @@ import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
 import the.monopoly.game.rules.LegalEntity;
+import the.monopoly.game.rules.MegacorpSalaryTax;
 import the.monopoly.game.rules.MonopolyBuyout;
 import the.monopoly.game.rules.PeerTrading;
 import the.monopoly.game.rules.Rent;
@@ -68,6 +69,7 @@ public class Game {
   private final boolean warProfitsTax;
   private final boolean rentRelief;
   private the.monopoly.game.rules.RentRelief rentReliefBook;
+  private MegacorpSalaryTax megacorpSalaryTax;
   private final WarProfitsTaxBook warProfitsTaxBook;
   private final int maxYears;
   private boolean automaticMarketDeadlock = true;
@@ -99,6 +101,8 @@ public class Game {
         developmentLoans, fullDrawDevelopmentLoans, maxYears, developmentLoanBook, warProfitsTax,
         rentReliefBook != null);
     this.rentReliefBook = rentReliefBook;
+    this.megacorpSalaryTax = rentReliefBook == null ? null
+        : new MegacorpSalaryTax(rentReliefBook.government());
   }
 
   public Game(
@@ -269,7 +273,7 @@ public class Game {
     Map<Player.ID, Integer> ages = new HashMap<>();
     Journalling journalling = new Journalling(journal, ages, deeds, developmentLoanBook,
         rules, players, strategies, warProfitsTaxBook, warProfitsTax,
-        rentReliefBook);
+        rentReliefBook, megacorpSalaryTax);
     journal.log(new Journal.Entry.Start(ids(players)));
     deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
@@ -287,6 +291,12 @@ public class Game {
     // that never gives the strategy its ordinary development opportunity.
     players.stream().filter(player -> strategies.forPlayer(player).assetRichOpening())
         .forEach(building::develop);
+
+    Money governmentBalance = rentReliefBook == null ? warProfitsTaxBook.governmentBalance()
+        : rentReliefBook.governmentBalance();
+    if (!governmentBalance.equals(Money.ZERO)
+        && journal.entries().stream().noneMatch(entry -> entry instanceof Journal.Entry.GovernmentBalance))
+      journal.log(new Journal.Entry.GovernmentBalance(governmentBalance));
 
     return new Result(turnOrder, journal.entries(), deeds, winner());
   }
@@ -364,7 +374,9 @@ public class Game {
       journal.log(new Journal.Entry.FinalBalance(it.id(), it.account().balance().amount()));
       journal.log(new Journal.Entry.FinalAge(it.id(), journalling.age(it)));
     });
-    if (warProfitsTax) journal.log(new Journal.Entry.GovernmentBalance(warProfitsTaxBook.governmentBalance()));
+    Money governmentBalance = rentReliefBook == null ? warProfitsTaxBook.governmentBalance()
+        : rentReliefBook.governmentBalance();
+    if (!governmentBalance.equals(Money.ZERO)) journal.log(new Journal.Entry.GovernmentBalance(governmentBalance));
   }
 
   private boolean operateLegalEntities(Journalling journalling) {
@@ -566,7 +578,8 @@ public class Game {
     Landings rent = new Rent(deeds, rules, turnOrder, strategies, journalling, journalling.rentRelief());
     Landings landSale = new LandSale(deeds, rules, turnOrder, strategies, journalling);
     Landings cards = new Cards(deeds, rules, turnOrder, strategies, decks, journalling, cups.forPlayer(player), jail);
-    Landings taxes = new Taxes(journalling);
+    Landings taxes = new Taxes(journalling, journalling.rentRelief() == null
+        ? null : journalling.rentRelief().government());
     Bankruptcy bankruptcy = new Bankruptcy(deeds, rules, turnOrder, strategies, journalling);
     return (who, space, roll) -> {
       rent.resolve(who, space, roll);
@@ -659,6 +672,9 @@ public class Game {
       }
 
       record SalaryCollected(Player.ID player, Money salary) implements Entry {
+      }
+
+      record MegacorpSalaryTaxPaid(Player.ID player, Money amount) implements Entry {
       }
 
       /** Land bought from the bank at the price on the board. */
@@ -755,6 +771,9 @@ public class Game {
       }
 
       record RentPaid(Player.ID tenant, Player.ID owner, Street.Type land, Money rent) implements Entry {
+      }
+
+      record RentReliefPaid(Player.ID landlord, Money amount) implements Entry {
       }
 
       record PlayerPaid(Player.ID payer, Player.ID payee, Money amount) implements Entry {

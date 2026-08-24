@@ -11979,6 +11979,26 @@ code.
 Handing the behavior-preserving adapter-test hardening to refactorer for
 review.
 
+2026-08-24T19:54:19Z — sent corrected architect handoff 000264 after the
+implementation commit was amended to include the previous send log. The
+message was:
+
+```
+id: 20260824T195419Z_000264_from_coder
+from: coder
+to: architect
+priority: 00
+type: git_handoff
+role: coder
+task: rent-relief-megacorp-live-play
+commit: a8ff9e106a
+created_at: 2026-08-24T19:54:19.484372Z
+
+Re-read your role and constitution.
+
+merge_and_process coder a8ff9e106a
+```
+
 ## 2026-07-29T14:26:17Z — architect sent Phase 15 CLI adapter-hardening review
 
 Handoff message sent:
@@ -47356,3 +47376,62 @@ Awaiting the user's approval before committing and handing off to coder.
 rent-relief live-play slice and wired enabled rent relief through player and
 legal-entity rent resolution, preserving nominal rent for war-profits tax while
 logging the tenant-paid amount. Implementation commit 83d1e50.
+
+## 2026-08-24T19:40:58Z — coder received architect follow-up 000416
+
+Received complete handoff message:
+
+```
+id: 20260824T193124Z_000416_from_architect_to_coder
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 64f2080a9c
+created_at: 2026-08-24T19:31:24.870824Z
+enqueued_at: 2026-08-24T19:31:24.882715Z
+task: rent-relief-megacorp-live-play
+dequeued_at: 2026-08-24T19:31:28.469350Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 64f2080a9c
+```
+
+Merged the referenced commit; it was already an ancestor of the current coder
+branch. Reviewing and verifying the rent-relief/MegaCorp live-play follow-up.
+
+2026-08-24 coder completed the implementation follow-up: live games now reuse
+the configured rent-relief government account, route enabled tax landings to
+that account, collect MegaCorp's 43% salary payment on every real salary event,
+and record/report MegaCorp tax and government rent-relief payments. Rent event
+amounts are captured before the relief withdrawal so the journal reports the
+tenant's capped payment while war-profits tax continues to use nominal rent.
+Full acceptance is 919/923: all MegaCorp, tax, journal, logging, and report
+scenarios pass. Two rent-relief legal-entity balance examples still resolve
+the model's $150 rent while their staged expectations say $750; this remains a
+scenario/specification discrepancy for architect/specifier review.
+
+2026-08-24T19:53:38Z — coder sent architect follow-up 000263:
+
+```
+id: 20260824T195338Z_000263_from_coder
+from: coder
+to: architect
+priority: 00
+type: git_handoff
+role: coder
+task: rent-relief-megacorp-live-play
+commit: 48748ac336
+created_at: 2026-08-24T19:53:38.834290Z
+
+Re-read your role and constitution.
+
+merge_and_process coder 48748ac336
+```
+
+Handed the verified implementation back to the architect; the two remaining
+legal-entity rent expectation mismatches are called out for architect/specifier
+review.
