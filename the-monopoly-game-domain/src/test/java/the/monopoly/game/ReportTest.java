@@ -52,6 +52,13 @@ class ReportTest {
   }
 
   @Test
+  void aReportUsesThePrintedBoardNameForRent() {
+    assertThat(report(new Entry.RentPaid(Pawn.high_hat.id(), Pawn.dog.id(),
+        Street.Type.RueDeDiekirchArlon, new Money(200))))
+        .isEqualTo("high hat pays dog $200 rent for Rue de Diekirch Arlon");
+  }
+
+  @Test
   void aReportTellsWarProfitsTaxStatePaymentAndGovernmentBalance() {
     assertThat(report(
         new Entry.WarProfitsTaxEnabled(true),
