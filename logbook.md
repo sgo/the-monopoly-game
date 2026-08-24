@@ -48048,3 +48048,110 @@ separate work, not blocking this task.
 
 Handing back to architect on the same task to certify the mutation gate
 clean.
+
+## 2026-08-24T22:19:17Z — refactorer processes architect handoff `b483c013bf` (game-java-mutation-site-debt)
+
+Handoff message received:
+
+```
+id: 20260824T220836Z_000423_from_architect
+from: architect
+to: refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: game-java-mutation-site-debt
+commit: b483c013bf
+
+Re-read your role and constitution.
+
+merge_and_process architect b483c013bf
+```
+
+Non-fast-forward merge (my `megacorp-salary-tax-cli-wiring` handoff and the
+architect/specifier's parallel MegaCorp mutation-gate certification chain
+had diverged from the same base). Resolved an append-only `logbook.md`
+conflict — both parents' final entries kept in full, nothing dropped, order
+preserved by timestamp. No other files conflicted. Re-verified after merge:
+`mvn test` green, acceptance 930/930.
+
+Per the architect's brief: reduce `Game.java` below the mutation-site split
+threshold by extracting a cohesive, behavior-preserving orchestration seam;
+preserve the public `Game` API and all observable gameplay.
+
+Bucketed all 124 of `Game.java`'s current mutation sites by source region
+before picking an extraction: the constructor-telescoping chain (14 sites)
+and the `Journal`/`Entry` sealed-interface data declarations (5 sites) are
+both required public surface or pure data with little to gain; the actual
+turn-loop core (`play`/`playTurns`/`playTurn`/`landingsFor`/etc., 62 sites)
+is Game's own tightly-coupled heart and a poor, high-risk split candidate.
+The remaining 43 sites cluster into one cohesive concern already: how legal
+entities behave in the market — turn-start peer trades and monopoly buyouts
+(21 sites: `resolveSplitOwnershipAtStart`, `tradeAtStart`,
+`resolveBuyoutAtStart`, `resolvableBuyout`, `anySplitExists`,
+`isTiedWithItsPartner`, `applyBuyout`, `completeTrade`,
+`allOwnableSpacesOwned`), entity formation at a quiet round boundary (6
+sites: `resolveMarketDeadlockAtRoundBoundary`, `canFormAtMarketDeadlock`,
+`fundableEntityAtMarketDeadlock`, `formIfFundable`), and an entity servicing
+its own development loans or otherwise operating on its turn (16 sites:
+`operateLegalEntities`, `serviceEntityDevelopmentLoan`,
+`mortgageEntitySpareProperty`, `operateEntity`, `journalOperation`,
+`entityName`).
+
+Extracted all three into a new package-private `LegalEntities` collaborator
+(`the.monopoly.game` package, alongside `Game`/`Journalling`, since several
+of its methods take `Journalling` — itself package-private — as a
+parameter; matching `Building`'s established pattern of a rules-orchestration
+class constructed once and held by `Game` would have required a new
+`Events`-interface indirection for no behavioral gain). Held as a `private
+final` field on `Game`, constructed once in the canonical constructor from
+fields already there (`rules`, `deeds`, `players`, `strategies`,
+`developmentLoanBook`, `stalemateTrading`, `legalEntityTrading`) rather than
+per-`play()`, because the public `resolveMarketDeadlockAtRoundBoundary`
+entry point is callable outside of any `play()` invocation and has no
+per-play() `Journalling` to build it from — the same reason it already
+passed `journalling = null` into its own private 3-arg overload before this
+change.
+
+The one non-mechanical change: `roundHadConsolidatingAction` was a `Game`
+field mutated directly, as a side effect, from inside `applyBuyout` and
+`completeTrade` — no longer possible once those methods live on a separate
+object with no access to `Game`'s private state. Re-threaded as a return
+value instead: `resolveSplitOwnershipAtStart` now returns `boolean`
+("did this consolidate ownership") rather than `void`, true exactly when
+`tradeAtStart` completed a trade or `resolveBuyoutAtStart` applied a
+buyout — the same two conditions that previously wrote the field directly.
+`Game`'s own call site sets its field from that return value. Verified this
+preserves the existing behavior exactly: `resolveBuyoutAtStart`'s return
+value was previously *discarded* by its only caller regardless of whether
+the `anySplitExists` fallback branch ran (a pure, side-effect-free query
+confirmed by reading `MonopolyBuyout.hasSplit`/`splitGroup`), so redefining
+what that branch returns changes nothing observable. `operateLegalEntities`
+and `resolveMarketDeadlockAtRoundBoundary` needed no such rework — neither
+ever touched `roundHadConsolidatingAction`.
+
+Verification: `mvn test` green (no failures). `./acceptance/run-acceptance.sh`:
+930/930, unchanged — the peer-trade, buyout, and legal-entity-formation
+scenarios this touches all still pass. `mvn test -Pproperty-tests`: 31/31.
+
+Analysis tools:
+- Mutation-site scan: `Game.java` 124 -> 83, comfortably under the 100-site
+  threshold. New `LegalEntities.java`: 41 sites, also well under.
+- CRAP: no new breach. The one exceedance, `LegalEntities.journalOperation`
+  at 56.0 (CC 7, 0% coverage), is the exact same pre-existing exhaustive
+  switch over sealed `LegalEntity.Operation` previously reported as
+  `Game.journalOperation` — moved verbatim, same coverage, same shape;
+  documented sealed-switch-exemption reasoning applies unchanged (not the
+  2026-07-28 `Report.line` decision itself, but the same category of
+  exhaustive-by-compilation straight-line dispatch). `serviceEntityDevelopmentLoan`
+  at 12.0 (CC 3, 0%) is likewise the identical pre-existing figure, just
+  reattributed. Every other method in both files is CRAP <=9.1.
+- DRY: clean. No pair in the full report involves `LegalEntities.java`; all
+  flagged pairs remain confined to `Journalling.java`'s and `Game.java`'s
+  own pre-existing, previously-documented event-adapter and
+  constructor-telescoping noise.
+
+An evidence-backed structural split rather than another deferral, per the
+architect's brief. Committing `LegalEntities.java` and the `Game.java`
+extraction together, then handing back to the architect on the same task
+name, `game-java-mutation-site-debt`.
