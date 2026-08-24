@@ -47636,3 +47636,39 @@ alternate later rolls that retain the same tax timing). They require the
 specifier's explicit classification and equivalent-record updates before
 this gate can certify cleanly. The run's manifest refresh and the four
 survivor reports are retained in this commit for that review.
+
+## 2026-08-24T23:35:00Z — specifier classifies all 11 rent-relief/MegaCorp survivors as equivalent
+
+Verified each against production code rather than assuming from the
+architect's summary:
+
+- MegaCorp salary/die mutations (journal/report/logging-90, 3 survivors):
+  `Turn.move` (`Turn.java:92-106`) checks `from + steps >= spaces` using
+  the *raw, unnormalized* starting position - it never wraps `from` to a
+  valid board index first. So both an ordinary die total and an inflated
+  one (or a start position pushed past the board's own length) satisfy
+  the same `>=40` crossing threshold, producing the identical salary/tax
+  outcome.
+- Rent-relief government-balance mutations (logging-91, rent-relief-3 x2):
+  relief paid is capped at the actual $550 gap on a $750 rent, not at
+  whatever the government's account holds - so any value on the same side
+  of that $550 threshold (both >=550, or both <550) yields the identical
+  outcome.
+- rent-relief-5's three survivors: two are the same raw-`from`-threshold
+  reasoning as the MegaCorp mutations, applied to dog's round-2
+  Start-crossing roll. The third (`dog_round2_die_2` 6->2) is more subtle:
+  the mutated roll (2,2) is itself doubles, and since this file's
+  Background arranges `every other player can complete their turn`
+  (`World.othersRollWhatTheyLike=true`), the bonus roll doubles grants is
+  the *deterministic* `UNREMARKABLE=Roll(4,6)` fallback, not a random one
+  - so the guaranteed bonus roll still crosses Start even though the
+  primary mutated roll alone would not have. Confirmed this isn't a
+  flaky/luck-based survival before classifying it. The fourth
+  (`dog_start_position` 25->26) holds because the war-profits-tax amount
+  depends only on landValue and rent collected since the last assessment,
+  neither of which depends on which specific space dog's own round-1 move
+  happens to land on, as long as it still stays under the board size
+  (both 32 and 33 do).
+
+All 11 recorded in `acceptance/equivalent-mutations.edn` (455 -> 466). No
+Gherkin changes needed. Handing back to architect to close out the task.
