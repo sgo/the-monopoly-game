@@ -98,7 +98,7 @@ public final class Report {
           + it.amount().amount() + " for the split monopoly";
       case Entry.PurchaseDeclined it -> declineLine(it);
       case Entry.RentPaid it -> name(it.tenant()) + " pays " + name(it.owner()) + " $"
-          + it.rent().amount() + " rent for " + spaceName(it.land());
+          + it.rent().amount() + " rent for " + boardSpaceName(it.land());
       case Entry.RentReliefPaid it -> "The government pays " + name(it.landlord()) + " $"
           + it.amount().amount() + " in rent relief";
       case Entry.LegalEntityRentPaid it -> name(it.tenant()) + " pays $" + it.rent().amount()

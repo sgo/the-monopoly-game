@@ -47352,16 +47352,6 @@ steps elsewhere. Nothing to prune.
 
 Awaiting the user's approval before committing and handing off to coder.
 
-Handoff sent:
-
-```
-type: git_handoff
-to: coder
-priority: 50
-task: rent-relief-megacorp-live-play
-commit: d786df9165
-```
-
 2026-08-24 coder processed handoff 000262 (specifier d786df9165): merged the
 rent-relief live-play slice and wired enabled rent relief through player and
 legal-entity rent resolution, preserving nominal rent for war-profits tax while
@@ -47578,37 +47568,28 @@ therefore misses the specified phrase. Route a minimal coder fix. The
 rent-relief, tax, logging, journal, and MegaCorp behavior otherwise passes
 this independent full acceptance run.
 
-## 2026-08-24T22:40:00Z — specifier fixes rent-relief-3's real root cause
+## 2026-08-24T22:18:00Z — duplicate coder returns classified without merge
 
-Investigated the architect's routed finding directly rather than trusting
-the "2-house tier" surface explanation. First tried the obvious fix
-(hotels on all three Pink Realty streets, matching every other
-greedo-legal-entity.feature scenario) and a second (selecting 3 players so
-all three streets get real owners before formation, matching every
-entity-forming scenario elsewhere) — both legitimate, both applied, but
-the balance mismatch persisted unchanged at $1350 both times, which was
-the tell that neither was the actual cause.
+Received coder handoffs `000264` (`a8ff9e106a`) and `000265`
+(`23a9607930`) under the same task. Both carry the same production/spec
+change as already-merged `48748ac336`; a direct tree comparison shows that
+each differs from it only by later `logbook.md` entries. No code merge is
+needed and their duplicate completion records must not overwrite the
+architect's verified history. The outstanding coder and specifier follow-up
+handoffs remain `000417` and `000418` respectively.
 
-Traced it empirically: temporarily swapped the failing balance assertion
-for a deliberately-wrong journal assertion to force the failure message to
-print the real game log. It showed high hat never landed on Rue de
-Diekirch Arlon at all — it landed on Elektriciteitscentrale instead,
-having rolled a 4 it was never given. Root cause: `World.formNamedEntity`
-pre-queues a roll for every player "if empty" so its own auto-formation
-flow has something to consume (`World.java:1045-1049`); this runs before
-`takes a targeted landing on` queues its own roll for the same pawn, and
-since queued rolls are FIFO (`World.nextQueuedPawnRoll`/`removeFirst`),
-the pre-queued roll fires first, moving high hat to the wrong space
-entirely. A step-timing collision between two independently-reasonable
-step conveniences, not a rent-relief or entity-rent defect -
-`rent-relief-4` (individual landlord, no entity formation) never hit it.
+## 2026-08-24T22:40:00Z — specifier resolves rent-relief-3 setup collision
 
-Fixed by queuing high hat's real turn roll (`1 and 2`, matching
-`A_SHORT_HOP`'s actual value) before `Pink Realty is formed`, pre-empting
-the auto-queue since it only fires when a player's queue is still empty.
-Full acceptance run confirms: 923 tests, 1 failure - only `report-91`
-(`Report.spaceName()`'s capitalization bug, already correctly routed to
-coder by the architect, not specifier's to fix).
+Received specifier handoff `000263` (commit `656fa0dac3`). Its investigation
+corrected the earlier surface diagnosis: the legal-entity rent was not the
+cause. `Pink Realty is formed` pre-queues a roll for each otherwise-empty
+player queue; that roll was consumed before the later targeted-landing
+step's roll, so high hat actually landed on Elektriciteitscentrale rather
+than Rue de Diekirch Arlon. The feature now queues high hat's intended
+`1 and 2` roll before entity formation, preserving the real targeted
+landing. The specifier independently reports full acceptance at 923 tests
+with only `report-91` remaining, the already-routed canonical-name coder
+defect. Merged for architect verification.
 
 Handing back to architect on the same task.
 
@@ -47621,3 +47602,37 @@ priority: 00
 task: rent-relief-megacorp-live-play
 commit: 656fa0dac3
 ```
+
+## 2026-08-24T22:55:00Z — regenerated acceptance confirms only report-name blocker
+
+The first targeted Maven invocation reused generated acceptance test sources
+and therefore showed stale `rent-relief-3` failures; it is not used as
+verification. The generator-backed `./acceptance/run-acceptance.sh` was
+then run to completion after the specifier merge. It confirms all
+rent-relief scenarios pass and leaves exactly one failure: `report-91`,
+where the report emits `Rue De Diekirch Arlon` instead of the canonical
+`Rue de Diekirch Arlon`. Coder handoff `000417` remains the sole blocker
+before the required full Gherkin mutation gate.
+
+## 2026-08-24T23:05:00Z — coder fixes canonical rent report name
+
+Received coder handoff `000266` (commit `e115ed7ec3`) for the sole
+remaining acceptance blocker. It changes `Report.spaceName()` to consult
+the canonical board-space override before its enum-name fallback and adds
+a focused regression test. This makes rent reports use `Rue de Diekirch
+Arlon` rather than the mechanically capitalized `Rue De Diekirch Arlon`.
+Merged for the final acceptance and mutation sequence.
+
+## 2026-08-24T23:20:00Z — full soft Gherkin mutation completed; eleven survivors require classification
+
+After the coder fix, the generator-backed full acceptance suite is green.
+Ran `./acceptance/run-acceptance-mutation.sh` to completion. Its generated
+manifests and survivor reports record eleven survivors, all in newly added
+MegaCorp/rent-relief scenarios: two each in journal and report salary
+rolls, two in logging, and five in rent-relief. The mutations are candidate
+equivalences (alternate dice that still cross Start; government balances on
+the same sufficient/insufficient side of the $550 relief boundary; and
+alternate later rolls that retain the same tax timing). They require the
+specifier's explicit classification and equivalent-record updates before
+this gate can certify cleanly. The run's manifest refresh and the four
+survivor reports are retained in this commit for that review.
