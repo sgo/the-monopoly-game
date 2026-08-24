@@ -47672,3 +47672,13 @@ architect's summary:
 
 All 11 recorded in `acceptance/equivalent-mutations.edn` (455 -> 466). No
 Gherkin changes needed. Handing back to architect to close out the task.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: rent-relief-megacorp-live-play
+commit: e4bae47b0a
+```
