@@ -253,3 +253,21 @@ Feature: Monopoly command line interface
     Examples:
       | raw arguments                                               | stalemate state |
       | 3 greedo greedo greedo --optional-greedo-stalemate-trading | enabled          |
+
+  # cli-19
+  # Distinct from cli-16's "rent relief is enabled" check: MegaCorp is
+  # gated behind the same --optional-rent-relief flag, but this check is
+  # only meaningful if it reflects whether MegaCorp itself was wired up on
+  # the real simulator path, not merely whether the same input flag was
+  # echoed back. A prior gap let the CLI-driven game path silently omit
+  # MegaCorp entirely while rent relief still logged as enabled here.
+  Scenario Outline: the CLI wires MegaCorp salary tax to the rent-relief flag, game-wide rather than to any one strategy
+    Given the simulator is configured with the raw arguments "<raw arguments>"
+    When I start the simulator
+    Then the game journal records that MegaCorp salary tax is <state>
+    When I stop the simulator before the game ends
+    Then the simulator process ends
+
+    Examples:
+      | raw arguments                          | state   |
+      | 2 greedo greedo --optional-rent-relief | enabled |

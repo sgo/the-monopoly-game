@@ -47703,3 +47703,120 @@ reactor build success, 422/422 domain tests including the new
 `rent-relief-megacorp-live-play` is closed: all 12 originally-backlogged
 scenarios are staged, green, and mutation-clean; `RentRelief` and
 `MegacorpSalaryTax` are now wired into real gameplay end to end.
+
+## 2026-08-25T00:45:00Z — specifier stages a MegaCorp CLI-wiring check after a real production bug surfaces
+
+The user asked for an ad-hoc 50-seed comparison of the final
+characterization config against the same config plus rent relief (run via
+a scratch, non-committed JUnit test reusing the existing `GameBreakdown`
+tooling, since deleted; results were not staged as a permanent
+characterization config). The comparison itself surfaced a real defect:
+8 of 50 variant games paid zero rent relief despite real rent payments
+well over the $200 cap. Investigation first pointed at war-profits-tax
+timing (the government account only had funds after its own single
+late-arriving tax payment in each of those games), but the user correctly
+pushed back - MegaCorp's salary tax should have been an independent,
+continuous funding source too, since it fires on every salary collection,
+not just on crossing the 25% land-value threshold.
+
+Checked and found zero `"MegaCorp pays..."` lines anywhere in the affected
+logs. Root cause: `Game.java` has two constructor overloads for wiring
+rent relief. The one `World.java` (the acceptance-test harness) uses takes
+a pre-built `RentRelief` object and correctly wires `megacorpSalaryTax`
+alongside it (lines 98-105). The one `Simulator.start()` (the real CLI
+path) actually calls takes a plain `boolean rentRelief` and builds
+`rentReliefBook` itself (line 186) but never assigns `megacorpSalaryTax` -
+it stays permanently null on that path. Every Gherkin scenario proving
+MegaCorp works goes through `World.java`, so the acceptance suite is green
+while the actual CLI-facing path silently drops the mechanic. `cli.feature`
+had no MegaCorp coverage at all to catch this, and the existing
+`cli-16`/`cli-17` rent-relief checks (which only assert `RentReliefEnabled`
+gets logged, from the raw input flag) wouldn't have caught it either, even
+if mirrored, since that assertion doesn't depend on whether
+`megacorpSalaryTax` itself got constructed.
+
+Discussed the fix's shape with the user. Their direction: this project's
+established, deliberate pattern for every other optional flag
+(war-profits-tax, rent-relief, development-loans, stalemate-trading,
+legal-entity) is a cheap "is enabled, near the start of the game" check
+(journal/logging/report-92/93 for rent relief) plus a CLI-level wiring
+check (cli-16/17), trusting that if the flag's own presence shows up in
+the log, the feature's real behavior (verified elsewhere, already staged
+and green - journal-90, megacorp-salary-tax-3, etc.) follows. MegaCorp
+should get the same treatment, extended to the CLI level specifically,
+since that's the path with the gap. I raised prescribing that the new
+signal must be derived from `megacorpSalaryTax != null` rather than
+echoing the input flag (since the latter would pass on both the buggy and
+fixed path); the user correctly corrected this as implementation
+overreach - not specifier's call to make. Left it out of the Gherkin
+entirely; only noted the motivating defect as context in scenario
+comments, not as an implementation instruction.
+
+Staged 7 new scenarios: `journal-94`/`95`, `logging-94`/`95`,
+`report-94`/`95` (mirroring `journal-92`/`93`'s exact "enabled, near the
+start"/"disabled by default" shape), and `cli-19` (mirroring `cli-16`,
+run through the real `Simulator` path). Verified red for the right
+reason: all 7 fail as `Unsupported step` (the journal entry and its
+step vocabulary don't exist yet), zero collateral damage to the other
+923 tests (930 total, 7 new failures). Ran `bb gherkin-ir-dry-checker`
+against all four touched files: only expected medium-confidence noise
+against the structurally-similar existing war-profits-tax/salary/MegaCorp
+lines, nothing to prune.
+
+Handing to coder as a new task, `megacorp-salary-tax-cli-wiring`, separate
+from the now-closed `rent-relief-megacorp-live-play`.
+
+## 2026-08-25T01:15:00Z — specifier corrects the MegaCorp tax formula to 43%-of-gross
+
+While reviewing the earlier finding with the user, a second, independent
+issue surfaced: the tax rate itself was misspecified from the start. The
+feature's intent (per the user, its original author) was 43% of the
+*gross* salary, with the $200/$400 figures being the net a player actually
+collects; the implementation instead computes 43% of that $200/$400
+figure directly. Derived and confirmed the correct relationship with the
+user: net = gross * 0.57, so tax = gross - net = net / 0.57 - net.
+For $200: tax = $150.88. For $400: tax = $301.75. Both rounded half-to-even
+to the cent, same convention `Money.percentage()` already uses.
+
+Chose to keep cent-level precision (not round to the nearest whole dollar)
+after confirming with the user this needs real infrastructure work, not
+just new expected values: `Money.amount()` is an intentional "whole-dollar
+view retained for the existing rules and their reports" (its own doc
+comment), `Report.java` renders every entry through it (so the
+report-facing scenario can only ever see a truncated whole dollar), and at
+least one existing MegaCorp step handler
+(`JournalStepHandlers.java:494-495`) parses the matched money text via
+`Integer.parseInt`, which throws outright on a decimal string. Confirmed
+this empirically rather than asserting it: staged the new $150.88/$301.75/
+$301.76 values and ran the full acceptance suite. Result matches
+prediction exactly - a mix of clean assertion mismatches (steps that
+already handle decimals, e.g. the isolated `megacorp-salary-tax-1/2`
+scenarios), `NumberFormatException` crashes (`journal-90`, `logging-90`,
+`megacorp-salary-tax-3`, all going through `Integer.parseInt`-based
+steps), and one clean text-mismatch (`report-90`: "The game report never
+says '...$150.88'" - it's still rendering the old, truncated figure).
+
+Deliberately did not prescribe how the coder should fix the parsing/
+rendering gap (the user corrected an earlier overreach on this same
+point, see the prior entry) - only specified the correct observable
+values and reported the concrete failure modes as context.
+
+Updated: `megacorp-salary-tax-1`'s `government_account` column (86->150.88,
+172->301.75; `final_balance` unchanged, since the player's own take was
+never affected by this formula), `megacorp-salary-tax-2` (172->301.76,
+noting in a comment that this is two independently-rounded $200 events,
+not the $400-combined figure), `megacorp-salary-tax-3` (172->301.75), and
+`journal-90`/`logging-90`/`report-90`'s `megacorp_payment` column
+(86->150.88). Also corrected the feature's own descriptive text, which
+still described the old (net-basis) formula.
+
+Full acceptance run: 930 tests, 14 failures (11 failures + 3 errors) -
+the 7 from the CLI-wiring check above, plus 7 more from this formula
+correction (3 in `megacorp-salary-tax.feature`'s own isolated scenarios,
+2 each in `journal.feature`/`logging.feature`/`report.feature`'s live-play
+scenarios). All are the two changes above; nothing else in the suite
+moved.
+
+At the user's direction, sending both changes together as one task,
+`megacorp-salary-tax-cli-wiring`, rather than the two separate handoffs
+suggested earlier.

@@ -1346,7 +1346,7 @@ Feature: game logging
 
     Examples:
       | dog_start_position | dog_die_1 | dog_die_2 | dog_salary | megacorp_payment |
-      | 37                  | 1          | 2          | 200         | 86                 |
+      | 37                  | 1          | 2          | 200         | 150.88             |
 
   # logging-91
   Scenario Outline: the log records rent relief capping what a tenant pays and the government covering the rest
@@ -1362,3 +1362,26 @@ Feature: game logging
     Examples:
       | government_start | relief |
       | 550                | 550     |
+
+  # logging-94
+  # See journal-94's comment: this check is only meaningful if it reflects
+  # whether MegaCorp itself was wired up, not merely whether the same
+  # --optional-rent-relief flag was passed - a prior gap let the CLI path
+  # silently omit MegaCorp while that flag still logged as enabled.
+  Scenario Outline: the log records that MegaCorp salary tax is enabled, near the start of the game
+    Given rent relief is enabled
+    When we play the game
+    Then the game log records that MegaCorp salary tax is <state>
+
+    Examples:
+      | state   |
+      | enabled |
+
+  # logging-95
+  Scenario Outline: the log records that MegaCorp salary tax is disabled by default, near the start of the game
+    When we play the game
+    Then the game log records that MegaCorp salary tax is <state>
+
+    Examples:
+      | state    |
+      | disabled |

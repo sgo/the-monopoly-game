@@ -1335,7 +1335,7 @@ Feature: game journal
 
     Examples:
       | dog_start_position | dog_die_1 | dog_die_2 | dog_salary | megacorp_payment |
-      | 37                  | 1          | 2          | 200         | 86                 |
+      | 37                  | 1          | 2          | 200         | 150.88             |
 
   # journal-91
   Scenario Outline: the journal records rent relief capping what a tenant pays and the government covering the rest
@@ -1351,3 +1351,30 @@ Feature: game journal
     Examples:
       | government_start | relief |
       | 550                | 550     |
+
+  # journal-94
+  # Distinct from journal-92's "rent relief is enabled" check: MegaCorp is
+  # gated behind the same --optional-rent-relief toggle, but that doesn't
+  # make this check redundant with journal-92 - it is only meaningful if it
+  # reflects whether MegaCorp itself was actually wired up, not merely
+  # whether the same input flag was passed. A prior gap (routed to the
+  # architect 2026-08-25) let the CLI-driven game path silently omit
+  # MegaCorp entirely while the rent-relief flag still logged as enabled;
+  # this scenario exists to make that class of gap observable directly.
+  Scenario Outline: the journal records that MegaCorp salary tax is enabled, near the start of the game
+    Given rent relief is enabled
+    When we play the game
+    Then the game journal records that MegaCorp salary tax is <state>
+
+    Examples:
+      | state   |
+      | enabled |
+
+  # journal-95
+  Scenario Outline: the journal records that MegaCorp salary tax is disabled by default, near the start of the game
+    When we play the game
+    Then the game journal records that MegaCorp salary tax is <state>
+
+    Examples:
+      | state    |
+      | disabled |
