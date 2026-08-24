@@ -46984,6 +46984,16 @@ task: logging-feature-direct-construction
 commit: PENDING
 ```
 
+## 2026-08-24T17:12:00Z — review targeted turn path
+
+Merged coder commits `3404e311d2` and `4af06acc1a`. `Game.playTurnFor` keeps
+real production rule and journal behavior, but no acceptance step invokes it;
+the existing generic `pawn lands on` step still calls full `Game.play()`. To
+make the performance path usable without weakening unrelated scenarios,
+routed a coder follow-up for a separate explicit targeted-landing acceptance
+step and focused adapter test. Existing step wording must remain unchanged;
+specifier will decide later which logging scenarios may opt in.
+
 ## 2026-08-24T17:11:14Z — received architect handoff: targeted real-turn path
 
 Handoff message received:
