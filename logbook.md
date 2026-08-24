@@ -48028,3 +48028,16 @@ priority: 00
 task: megacorp-salary-tax-cli-wiring
 commit: fe0e175fe5
 ```
+
+## 2026-08-25T01:00:00Z — specifier certifies megacorp-salary-tax-cli-wiring complete
+
+Merged the architect's clean full-Gherkin-mutation-gate certification
+(commit `b483c013bf`). Ran `mvn test -Pcharacterization-tests` per the
+phase-complete sync rule: green (`CharacterizationTest` 12/12, full
+reactor build success, 422/422 domain tests). No drift to investigate.
+
+`megacorp-salary-tax-cli-wiring` is closed: the CLI-driven simulator path
+now genuinely wires MegaCorp alongside rent relief, the tax formula
+correctly reflects 43% of gross (not net), and both are verified through
+full acceptance and Gherkin mutation. `game-java-mutation-site-debt` is a
+separate, already-opened refactorer task and needs no specifier action.
