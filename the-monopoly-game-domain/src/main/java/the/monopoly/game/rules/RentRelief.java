@@ -21,8 +21,19 @@ public final class RentRelief {
     if (!relief.equals(Money.ZERO)) government.withdraw(relief);
   }
 
+  public void pay(Player tenant, LegalEntity landlord, Money rent) {
+    Money relief = reliefFor(rent);
+    tenant.account().withdraw(rent.minus(relief));
+    landlord.depositToBank(rent);
+    if (!relief.equals(Money.ZERO)) government.withdraw(relief);
+  }
+
   public Money governmentBalance() {
     return government.balance();
+  }
+
+  public Money tenantPayment(Money rent) {
+    return rent.minus(reliefFor(rent));
   }
 
   public void setGovernmentBalance(Money amount) {

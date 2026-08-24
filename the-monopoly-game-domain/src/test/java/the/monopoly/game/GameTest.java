@@ -80,6 +80,22 @@ class GameTest {
   }
 
   @Test
+  void aTargetedTurnMovesOnlyTheSelectedPlayer() {
+    List<Player> twoPlayers = players.subList(0, 2);
+    Map<Player.ID, Cup> cups = Map.of(
+        Pawn.dog.id(), Cup.of(new Roll(5, 5), new Roll(1, 2)),
+        Pawn.high_hat.id(), Cup.of(new Roll(2, 2), new Roll(5, 5)));
+
+    Game.Result result = new Game(ruleSet, twoPlayers, player -> cups.get(player.id()))
+        .playTurnFor(Pawn.dog.id());
+
+    assertThat(result.journal()).anyMatch(entry -> entry instanceof Entry.Moved moved
+        && moved.player().equals(Pawn.dog.id()));
+    assertThat(result.journal()).noneMatch(entry -> entry instanceof Entry.Moved moved
+        && moved.player().equals(Pawn.high_hat.id()));
+  }
+
+  @Test
   void aLoanEnabledInitiativeWinnerDevelopsAfterTheirTurn() {
     Deeds deeds = new Deeds();
     ColourStreet meir = (ColourStreet) ruleSet.create(Street.Type.MeirAntwerpen);

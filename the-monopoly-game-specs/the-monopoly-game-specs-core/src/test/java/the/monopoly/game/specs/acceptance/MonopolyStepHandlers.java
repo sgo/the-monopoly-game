@@ -58,6 +58,10 @@ public final class MonopolyStepHandlers {
         step("^the (?:street|station|utility|tax space) \"" + NAME + "\"$",
             (world, arguments) -> world.select(SpaceNames.of(arguments.text(1)))),
 
+        step("^pawn \"" + NAME + "\" takes a targeted landing on \"" + NAME + "\"$",
+            (world, arguments) -> world.landPawnOnTargeted(
+                arguments.text(1), SpaceNames.of(arguments.text(2)))),
+
         step("^your salary is \\$" + VALUE + "$",
             (world, arguments) -> assertThat(world.space(StartSpace.class).salary())
                 .isEqualTo(money(arguments.number(1)))),

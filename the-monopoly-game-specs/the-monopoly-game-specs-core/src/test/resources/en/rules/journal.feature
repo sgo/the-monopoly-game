@@ -1,5 +1,5 @@
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-20T13:44:28.839607Z","feature_name":"game journal","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/journal.feature","background_hash":"f9cad8a167d25a58781606f42a70845a9afe8a18f1f63bed35985499ab19f099","implementation_hash":"unknown","scenarios":[{"index":86,"name":"the journal records that the war profits tax is enabled, near the start of the game","scenario_hash":"845946cf46b2c006ad3e0d6ec37e135a74b3b1ac06ad08119318bc1f257ff173","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T13:44:28.839607Z"},{"index":3,"name":"the journal records an unowned-land purchase after the landing movement","scenario_hash":"deaaf97b682d8e419512d95da8e49b07f28834acde4b193547ed23f582614e83","mutation_count":8,"result":{"Total":8,"Killed":8,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":5,"name":"the journal records rent paid after the landing movement","scenario_hash":"43ea6ce63d0c18d68b40669ca258bf1c60be62e5ad95d5a2aea90b8d67d13f8e","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":7,"name":"the journal records a house built during a player's turn","scenario_hash":"e0dd0c3a3abafabaa298657594fb5483f9d8c9a432d79aaa4a3a74f7d8e17445","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":13,"name":"the journal records a build refused because a street in the colour group is mortgaged","scenario_hash":"8925c596b91cf7e35cc0de39db47489d9d747d50152dc0aa879b3c3e9d480acb","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":62,"name":"the journal records that <entity_name> is formed, held in equal thirds by the three co-owners","scenario_hash":"d8e5870fc09375710399d5f228838796b2c5155feca1bc8e336193c1e7b3b341","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":64,"name":"the journal records that <entity_name> repays a shareholder loan","scenario_hash":"627429e8407223f3f7281faf7438dbc527a1812c8ec897a6e6861ceac7090c86","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":65,"name":"the journal records an equal dividend paid by <entity_name> to each shareholder","scenario_hash":"d451cc96443c5cd19011761c021fd69f0a47a00fd6c365b4e19c01a6e4bb3059","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":69,"name":"the journal records each remaining player's final balance and age once the game ends because the year limit was reached","scenario_hash":"798eb5467c3803ca5a5454a943ab2ce411ddf95ddaaad017bdfbc362cc2ed167","mutation_count":7,"result":{"Total":7,"Killed":7,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":70,"name":"the journal records a player raising a development loan","scenario_hash":"507bedca9e59180be8fde239c1dfbeb8c3d18e293250e83a1bd9c491e8ef0c6c","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":71,"name":"the journal records a legal entity raising a development loan","scenario_hash":"e739b62641dac1e9fad7642aa788217ebaccf848345e874f4581ad119c314f1e","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":82,"name":"the journal records that development loans are enabled, near the start of the game","scenario_hash":"e5c2f1766ac975e8549b6f0fa35d4c5277e15dceda6f705063a7e224ec77829e","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":63,"name":"the journal records that <entity_name> raises a loan to fund a build shortfall","scenario_hash":"e9ad49e4d27e265f711d816fec223872e8013539b5aff829547cff1fcd475dfb","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-12T13:46:14.842750Z"},{"index":67,"name":"the journal records that <entity_name> builds a house on a street when its treasury can pay for it","scenario_hash":"22634a8959cebedffc8ad88ae9b5dbdb88f7aea5d55ab007fba8b62aa8f119f1","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-12T13:46:14.842750Z"},{"index":58,"name":"the journal records a player's age increasing after passing start","scenario_hash":"7fbcf17d55d38120e9bde5aac3772e247ab50c4dc2d574872f57dc642ed180f5","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-09T14:48:54.313473Z"},{"index":59,"name":"the journal records a player's age increasing after being sent to jail","scenario_hash":"3b6bde007a02c2116978a5d7afc8d4a9e96f1d149393ca688dd6bc948f1200e8","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-09T14:38:55.200601Z"},{"index":60,"name":"the journal records each remaining player's final age once the game ends in a stalemate","scenario_hash":"e0821c5013abe965b2f8f7c853669be5e2e6bda897dc5d991b36d04f269e79db","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-09T14:38:55.200601Z"},{"index":52,"name":"the journal resolves a split monopoly buyout at the start of a turn, once the whole board is owned","scenario_hash":"8cf2bc8afb9010ca4e2566e3ef2ecb339c5cc54fe2543940c391e0a1004223c0","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T19:52:25.979062Z"},{"index":54,"name":"a split monopoly resolves via buyout even with an uninvolved third player in the game","scenario_hash":"6438ad6ec5d0e04cfebba2f1dc3eca2a8948b9c0f79c941f9c08421e317af45e","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T19:52:25.979062Z"},{"index":47,"name":"the journal records a peer trade completed at the start of a turn, once stalemate trading is enabled for the \"Greedo\" strategy and the whole board is owned","scenario_hash":"786444445f500aae64ebc7926917fec8d81350c96cbd0a9bf980bfd13d23d3c9","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":48,"name":"the journal does not record a peer trade when stalemate trading is not enabled for the \"Greedo\" strategy, even though the whole board is owned","scenario_hash":"3555bb72c91d1e104512857953033a8e2d5115932fc2d521b042a54561bf7e7e","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":49,"name":"the journal does not record a peer trade while the board still has unowned space, even though stalemate trading is enabled for the \"Greedo\" strategy","scenario_hash":"36e852ff876d15dd0afd0e5a1709b1e9a8dec701a14aab830cf644479dd0bd57","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":50,"name":"the journal records that stalemate trading is enabled, near the start of the game","scenario_hash":"adf7698bc6a9e602df589fc01a946da8a9418594ca095470408ea59fdf60f069","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":51,"name":"the journal records that stalemate trading is disabled by default, near the start of the game","scenario_hash":"3776f3cbc4bce31f63b73e2593b843a3098acc56d5c94a250b74b61d909d9fd1","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":53,"name":"the journal does not record a peer trade that would only benefit the trader, not the partner","scenario_hash":"a5945c251319a733d190527a23552b9573f2e173509e5f65a0b5d7462ee64a11","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":57,"name":"peer trading resolves two complementary splits with one cash-free swap, before buyout ever considers either group","scenario_hash":"52e9792fab620ed1ee1b43dbbc61a15fe9e94cdd739b3f35f37fee69905aecf2","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":36,"name":"the journal records land inherited by a creditor when a debtor goes bankrupt to them","scenario_hash":"809e1936c97e070129b4df4f9b5f720a13db4c4aa9d8631afcb18ca44296171b","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-06T19:40:08.169059Z"},{"index":39,"name":"the journal records a decline with no reason when the strategy has no buying policy","scenario_hash":"ee79353e5c4b053544ed44a82a5e3963acf0b2156e25ad2c33acd80cb5584993","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-06T19:40:08.169059Z"},{"index":45,"name":"the journal records that the game ends in a stalemate once every remaining player clears the threshold","scenario_hash":"07b52fab92fcaa397ea3ce028c3742a7ce5dedc3634235ef2220c50c2b34877c","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-06T19:40:08.169059Z"},{"index":44,"name":"the journal records a card drawn before the bank pays the player directly","scenario_hash":"b7f14f3099501a75da09ccd11251fc13efc675b60b0f71f3411d7850ef2c8e26","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-05T05:37:03.391444Z"},{"index":19,"name":"the journal records a bankruptcy to the bank","scenario_hash":"9a4690aaabd97b99707d3aa8c9fdb08f8e7e34508dbdcd89c6f79b04927eb9d5","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:34:19.254756Z"},{"index":20,"name":"the journal records a bankruptcy to another player","scenario_hash":"8aea23c0c5a6b549c7ae9ca6e3fd0b640e801cff614f0acf27f472f075396e3d","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:34:19.254756Z"},{"index":21,"name":"the journal records the game's winner","scenario_hash":"97a5787a82dbd16a8352bd18e631baf96b702d384bb3f6ca3025b46fd02dd109","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:34:19.254756Z"},{"index":25,"name":"the journal records a mortgage forced by an unaffordable debt","scenario_hash":"deb7140946b6b70950be9d8ebb145bf6c60c0e11d809447995f3e7fdcaaaae9e","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:34:19.254756Z"},{"index":26,"name":"the journal records a house sale forced by an unaffordable debt","scenario_hash":"53cce6780f31c6df485b07ff5b545069b3bd139a4e3eaf28f47391ba707f4688","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:34:19.254756Z"},{"index":27,"name":"the journal records a jailed player staying in jail after failing to roll doubles","scenario_hash":"28b43257b22a013b5316612e9a8868b0d855bc7fe3a941e5c75f8c1abd2d85d0","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:34:19.254756Z"},{"index":28,"name":"the journal records a jailed player leaving jail by rolling doubles","scenario_hash":"12e9796f87b2029cc27eaadab39718d22c158bff4ed2fb71e35124724fcff50d","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:34:19.254756Z"},{"index":29,"name":"the journal records a jailed player leaving jail with a Get Out of Jail Free card","scenario_hash":"ec31fa01760e5eaeb54ee9bcb6b683ea744ad9c081f350df919ea1f425b0372d","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:34:19.254756Z"},{"index":24,"name":"the journal records a card drawn before the move it causes","scenario_hash":"d121e12df0db250e665642f7e09430246213f12d4bf7655cdfc00953645bf9c7","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T16:45:15.436363Z"},{"index":0,"name":"the journal records game start and initiative","scenario_hash":"2e7a8628431ead85b28e68eb7a6c1c79223c5d8a7b37315aa3a204b4d770f730","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":1,"name":"the journal records a pawn's turn, roll, and movement","scenario_hash":"2f94b9a5c5f2f6549c407bc028a81adc5c302a11da4f9c949bffb4bcdea0064f","mutation_count":10,"result":{"Total":10,"Killed":10,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":2,"name":"the journal records a salary collected while passing start","scenario_hash":"fade8b7f9787cac8169e2d7a0ec3b625c6b615955c549b0f58f36ff2769586ae","mutation_count":11,"result":{"Total":11,"Killed":11,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":8,"name":"the journal records a house sold back to the bank","scenario_hash":"c08e1685f14b09566c50668ecd475023568227c04af9b0fcb54d4ab6a81935d9","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":9,"name":"the journal records land being mortgaged","scenario_hash":"6f9feeaf37794c9f44050361cebab29cd7e116c809f58e778839d8d8f53d17d9","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":10,"name":"the journal records a mortgage being lifted, including interest paid","scenario_hash":"37fddc6c1e943a6c64d33185599391f2203cfc9f0740ed851abb2acf77b82888","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":11,"name":"the journal records land sold between players","scenario_hash":"f28df5ecbcc6ba68402201dd345b42a67e1251671940ee743a4a12fe77070d19","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":12,"name":"the journal records a sale refused because the colour group has houses built","scenario_hash":"2c400d4c73dcc7bd4a7e93a7b3f3700a03a26e7b072a5fc5dc8e50943cd0ce51","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":14,"name":"the journal records a card drawn before the effect it resolves","scenario_hash":"bc27ca16bdeda5e6a1ad0460af415d5f7af8422423c0764fc670c94daccce8e0","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":15,"name":"the journal records a tax payment after the landing movement","scenario_hash":"74eb521f23ec7091d0208fc0c851c65032779cd0f2e04ea62a16fcede9fce74e","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":16,"name":"the journal records jail entry and its cause","scenario_hash":"6d7b8656f204ec9c0e8fbe67be2fe3262ca7dd522a93715d60d7d5a8e5991b40","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":17,"name":"the journal records jail exit and its method","scenario_hash":"c4394c650e5a39b8b5e45c900c5854598501e038bc52e4c5d84071593f560fa7","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":18,"name":"the journal records landing on Free Parking even though nothing happens","scenario_hash":"dbb3150a6daa7381ec82d4dcc20cfcdd83841154f99d30bf3e010a94a5cf8a55","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":22,"name":"the journal records a card drawn before it pays every other player","scenario_hash":"30f57d39a048adf84c4fdea2c2376990d5515603e4f0bfe427198bc2fc5f6371","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":23,"name":"the journal records a card drawn before it collects from every other player","scenario_hash":"dd40d3685cd2b6b4664621b62225816b50579bec1675e5e756cb10f1a7177209","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"}]}
+# {"version":1,"tested_at":"2026-08-24T18:28:50.740311Z","feature_name":"game journal","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/journal.feature","background_hash":"f9cad8a167d25a58781606f42a70845a9afe8a18f1f63bed35985499ab19f099","implementation_hash":"unknown","scenarios":[{"index":3,"name":"the journal records an unowned-land purchase after the landing movement","scenario_hash":"89ee35fcc25aa01e122cee33987630618c7fd568040de04995026e6106a4568d","mutation_count":8,"result":{"Total":8,"Killed":8,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":4,"name":"the journal records the winner and price of an auction after the landing movement","scenario_hash":"2658e120af41e93d98972c68c9f7ea856634051f82a8e1c41a6746ee27af0e72","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":5,"name":"the journal records rent paid after the landing movement","scenario_hash":"284f3bb15f5008195d61eeace7c317979c160f8e921210b427fbc760fb5fdb02","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":14,"name":"the journal records a card drawn before the effect it resolves","scenario_hash":"d76d2e580ee6194bb8df792a5b9e6a72f9a034f4f382e0dd246a8130211090d6","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":15,"name":"the journal records a tax payment after the landing movement","scenario_hash":"ade25b0e1b93e04ab8736e88fb0dc1b62f0a50ab0f8aa8bc63777100f725fbbf","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":16,"name":"the journal records jail entry and its cause","scenario_hash":"2d1a4dd6256ed6e2a99484690d6186502fe859f8f69d526fda406ed2d50e934a","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":18,"name":"the journal records landing on Free Parking even though nothing happens","scenario_hash":"01e01eec8963a41b05c29629971a4d30d09d826ff19f39c985db5077cd45f2d9","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":22,"name":"the journal records a card drawn before it pays every other player","scenario_hash":"b0a5cbb25c30a593105e09ebf7aaa4653b1eab7f452ed117861d789788bce77d","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":23,"name":"the journal records a card drawn before it collects from every other player","scenario_hash":"d736c319adc38fea5bb0d6299e43f2ada6232a0ccbd9148f2a4366533d76b9da","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":24,"name":"the journal records a card drawn before the move it causes","scenario_hash":"edf47aeb42b20cf2b36b38e9932c530cc133a822c2e346b70252d796d3ad1f5c","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":25,"name":"the journal records a mortgage forced by an unaffordable debt","scenario_hash":"fcd62133c86afcf3d2be43255232fb620e4ebc9b271b0954d5eaeeee3f0b1b32","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":26,"name":"the journal records a house sale forced by an unaffordable debt","scenario_hash":"a34dc5546ce5cdf2e8a76a34ec669dadbc8fda2e0f71eb43ae356099d180c51f","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":30,"name":"the journal records why a player declines to buy land they cannot afford","scenario_hash":"ff1b8db8000a41de939777783a48fc61f874111c53c07b210a868c25f6ea3ae5","mutation_count":7,"result":{"Total":7,"Killed":7,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":31,"name":"the journal records why a player keeping a reserve declines a purchase that would dip below it","scenario_hash":"4ae42a8cbefd1c7f60798adef8816a760c4f0fee61f8182b42628c759829dd94","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":33,"name":"the journal records why a player declines to buy a card-driven property they cannot afford","scenario_hash":"8030792a57a5368f183540b9d483fd030e3caf3f6447f97b6781109d40133953","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":34,"name":"the journal records why a player keeping a reserve declines a card-driven purchase that would dip below it","scenario_hash":"58783eaefd16acc1cab32b932203312d876cde6969d4729a7d3a024e799e0f88","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":35,"name":"the journal records a bank-forced auction win during another player's bankruptcy","scenario_hash":"3b9dd2bbe33d2c45d21809cdde79351a58e3968cdcbcec36a40e6faf2c4552c2","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":37,"name":"the journal records a creditor paying interest to keep an inherited mortgage in place","scenario_hash":"c7f07c64d1fe5da087371d54b0a5ef4c144daafb16582f778b0771b1c809071f","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":38,"name":"the journal records a creditor immediately lifting an inherited mortgage","scenario_hash":"8c7760f7f1297c6da51c692b42cd84a53fdeff561d20773aff15f7e9c4c73680","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":41,"name":"the journal records a debtor putting a property up for sale and the sole buyer's winning offer","scenario_hash":"30089281b7994fd127b54a2e27e455737c3b4a89659e3d3ddb99ab31227f9434","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":42,"name":"the journal records every $5 raise in a bidding war before the winning offer","scenario_hash":"da90a2a281c7404a68d79e80bf0583c0840ab54a530864211caec1cc6128ec11","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":44,"name":"the journal records a card drawn before the bank pays the player directly","scenario_hash":"1f903afc1826bd9cd5cbdc3c3bd7282c9ceb41ec2775f17e32ef8aee4163b31e","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":46,"name":"the journal records that no one bids before it records the resulting mortgage","scenario_hash":"8e5f08c819eece0b62c6170c92bb16e8799fc3f6ec400c5f210439b15b6dadfb","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":61,"name":"the journal records the winner's final age once the game ends in an ordinary win","scenario_hash":"10adfbe8e0ac735f95ffaa89de91eb222dcdc58590bf3a6a73ae37bbcff4dc83","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":66,"name":"the journal records that pawn \"<renter>\" pays rent to <entity_name> for an entity-owned street","scenario_hash":"7048825429fa8045acdbfcba9d9b6c41081315bbd2e0bb04b8fe04cab5d47a3a","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":86,"name":"the journal records the government's final account balance once an ordinary win ends the game too","scenario_hash":"911853eddc86f74a505ecc10203f547de062dbfbe69012d87495006c896d9360","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-24T18:28:50.740311Z"},{"index":6,"name":"the journal records rent paid for a utility as a multiple of the dice roll that landed there","scenario_hash":"11276b38f7e79019d5b0b06f3c907ef8fa6acde19c60bd599e0659cb7f09eb0d","mutation_count":5,"result":{"Total":5,"Killed":5,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":32,"name":"the journal records a player's reserve alongside their balance at the start of a turn","scenario_hash":"43d0d43c078a6662f6b3eea5a3ac4102bf0ebd97b00a3a81c53be9485d85a160","mutation_count":19,"result":{"Total":19,"Killed":19,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":40,"name":"the journal records the reserve dynamically sized for a near-complete colour monopoly at the start of a turn","scenario_hash":"d2535da78fafdf58ef79ac6c915ddb59e42d02eae3b1a155d0137f62b42c4795","mutation_count":8,"result":{"Total":8,"Killed":8,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":43,"name":"the journal records a near-complete colour group's reserve only while its missing street remains affordable","scenario_hash":"5f984bdbf1151fdf55785452c8781edd3b0daf5735f05257a80d77d9a84f1532","mutation_count":16,"result":{"Total":16,"Killed":16,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":68,"name":"the journal records that <entity_name> raises a loan and builds a house on a street when its treasury cannot pay for it","scenario_hash":"4742375a0c2d9d115dac318db99c8e6c1ffa4fd6476a313668046ae1b8eb74ea","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":72,"name":"the journal records a player's annual development-loan payment split into interest and principal","scenario_hash":"01b33e0e0d0151a507e307ba7d26b8a5b45fbec257a0af32f7060033f5266b06","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":73,"name":"the journal records a legal entity's annual development-loan payment split into interest and principal","scenario_hash":"bed8efe9e5c55a4a9f4373f8e92ad927072b780498ebb349cf9eb052b44657f0","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":74,"name":"the journal records a player's development loan being fully repaid","scenario_hash":"6eeed6a4bf7b22a144d9c45d2b6646150692f33b79623b153619a65e0285be72","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":75,"name":"the journal records a legal entity's development loan being fully repaid","scenario_hash":"983ff9c12f0cf74a7f209317e3df6f54b3c68187e129588c6de6b5aea1dc0b78","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":78,"name":"the journal records a bondholder's annual payout on a player's development loan","scenario_hash":"c2a6ea99b1e654218448cac41164a3be0e536cad39413993446e2356a0fe968e","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":79,"name":"the journal records a bondholder's annual payout on a legal entity's development loan","scenario_hash":"217c457e0dd70a8daa954074cb58eb868c1effd52a7b63eee394683045509ed1","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":80,"name":"the journal records the bank recovering a player's foreclosure proceeds into its own account, rather than paying the bondholder out","scenario_hash":"f4fa5c9f95c97b281347491eabd72bb0a55439c979e0888288eebd9affd377b1","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":81,"name":"the journal records the bank recovering a legal entity's foreclosure proceeds into its own account, rather than paying the bondholder out","scenario_hash":"1110aa904013d5a5254ce57087ce9ea8bf5c6823641f99cfe67625180c3ab0a4","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":84,"name":"the journal records a player's war profits tax payment","scenario_hash":"da0fd9951248451c6b7a57c6a6577b8940b091fa3574288f6a71971a74630911","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":85,"name":"the journal records the government's final account balance once the game ends","scenario_hash":"5df2c570dd1ad8d2709c85e43d5adab528ecb531d1b30aca4315822f3959ab58","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":87,"name":"the journal records that the war profits tax is enabled, near the start of the game","scenario_hash":"845946cf46b2c006ad3e0d6ec37e135a74b3b1ac06ad08119318bc1f257ff173","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":89,"name":"the journal records that rent relief is enabled, near the start of the game","scenario_hash":"59d744801678e632835526ed8779f827842dc337c440d6f91f3560b708807191","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:22:48.409464Z"},{"index":7,"name":"the journal records a house built during a player's turn","scenario_hash":"e0dd0c3a3abafabaa298657594fb5483f9d8c9a432d79aaa4a3a74f7d8e17445","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":13,"name":"the journal records a build refused because a street in the colour group is mortgaged","scenario_hash":"8925c596b91cf7e35cc0de39db47489d9d747d50152dc0aa879b3c3e9d480acb","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":62,"name":"the journal records that <entity_name> is formed, held in equal thirds by the three co-owners","scenario_hash":"d8e5870fc09375710399d5f228838796b2c5155feca1bc8e336193c1e7b3b341","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":64,"name":"the journal records that <entity_name> repays a shareholder loan","scenario_hash":"627429e8407223f3f7281faf7438dbc527a1812c8ec897a6e6861ceac7090c86","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":65,"name":"the journal records an equal dividend paid by <entity_name> to each shareholder","scenario_hash":"d451cc96443c5cd19011761c021fd69f0a47a00fd6c365b4e19c01a6e4bb3059","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":69,"name":"the journal records each remaining player's final balance and age once the game ends because the year limit was reached","scenario_hash":"798eb5467c3803ca5a5454a943ab2ce411ddf95ddaaad017bdfbc362cc2ed167","mutation_count":7,"result":{"Total":7,"Killed":7,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":70,"name":"the journal records a player raising a development loan","scenario_hash":"507bedca9e59180be8fde239c1dfbeb8c3d18e293250e83a1bd9c491e8ef0c6c","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":71,"name":"the journal records a legal entity raising a development loan","scenario_hash":"e739b62641dac1e9fad7642aa788217ebaccf848345e874f4581ad119c314f1e","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":82,"name":"the journal records that development loans are enabled, near the start of the game","scenario_hash":"e5c2f1766ac975e8549b6f0fa35d4c5277e15dceda6f705063a7e224ec77829e","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:22:34.625711Z"},{"index":63,"name":"the journal records that <entity_name> raises a loan to fund a build shortfall","scenario_hash":"e9ad49e4d27e265f711d816fec223872e8013539b5aff829547cff1fcd475dfb","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-12T13:46:14.842750Z"},{"index":67,"name":"the journal records that <entity_name> builds a house on a street when its treasury can pay for it","scenario_hash":"22634a8959cebedffc8ad88ae9b5dbdb88f7aea5d55ab007fba8b62aa8f119f1","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-12T13:46:14.842750Z"},{"index":58,"name":"the journal records a player's age increasing after passing start","scenario_hash":"7fbcf17d55d38120e9bde5aac3772e247ab50c4dc2d574872f57dc642ed180f5","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-09T14:48:54.313473Z"},{"index":59,"name":"the journal records a player's age increasing after being sent to jail","scenario_hash":"3b6bde007a02c2116978a5d7afc8d4a9e96f1d149393ca688dd6bc948f1200e8","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-09T14:38:55.200601Z"},{"index":60,"name":"the journal records each remaining player's final age once the game ends in a stalemate","scenario_hash":"e0821c5013abe965b2f8f7c853669be5e2e6bda897dc5d991b36d04f269e79db","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-09T14:38:55.200601Z"},{"index":52,"name":"the journal resolves a split monopoly buyout at the start of a turn, once the whole board is owned","scenario_hash":"8cf2bc8afb9010ca4e2566e3ef2ecb339c5cc54fe2543940c391e0a1004223c0","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T19:52:25.979062Z"},{"index":54,"name":"a split monopoly resolves via buyout even with an uninvolved third player in the game","scenario_hash":"6438ad6ec5d0e04cfebba2f1dc3eca2a8948b9c0f79c941f9c08421e317af45e","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T19:52:25.979062Z"},{"index":47,"name":"the journal records a peer trade completed at the start of a turn, once stalemate trading is enabled for the \"Greedo\" strategy and the whole board is owned","scenario_hash":"786444445f500aae64ebc7926917fec8d81350c96cbd0a9bf980bfd13d23d3c9","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":48,"name":"the journal does not record a peer trade when stalemate trading is not enabled for the \"Greedo\" strategy, even though the whole board is owned","scenario_hash":"3555bb72c91d1e104512857953033a8e2d5115932fc2d521b042a54561bf7e7e","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":49,"name":"the journal does not record a peer trade while the board still has unowned space, even though stalemate trading is enabled for the \"Greedo\" strategy","scenario_hash":"36e852ff876d15dd0afd0e5a1709b1e9a8dec701a14aab830cf644479dd0bd57","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":50,"name":"the journal records that stalemate trading is enabled, near the start of the game","scenario_hash":"adf7698bc6a9e602df589fc01a946da8a9418594ca095470408ea59fdf60f069","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":51,"name":"the journal records that stalemate trading is disabled by default, near the start of the game","scenario_hash":"3776f3cbc4bce31f63b73e2593b843a3098acc56d5c94a250b74b61d909d9fd1","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":53,"name":"the journal does not record a peer trade that would only benefit the trader, not the partner","scenario_hash":"a5945c251319a733d190527a23552b9573f2e173509e5f65a0b5d7462ee64a11","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":57,"name":"peer trading resolves two complementary splits with one cash-free swap, before buyout ever considers either group","scenario_hash":"52e9792fab620ed1ee1b43dbbc61a15fe9e94cdd739b3f35f37fee69905aecf2","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:00:34.116668Z"},{"index":45,"name":"the journal records that the game ends in a stalemate once every remaining player clears the threshold","scenario_hash":"07b52fab92fcaa397ea3ce028c3742a7ce5dedc3634235ef2220c50c2b34877c","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-06T19:40:08.169059Z"},{"index":27,"name":"the journal records a jailed player staying in jail after failing to roll doubles","scenario_hash":"28b43257b22a013b5316612e9a8868b0d855bc7fe3a941e5c75f8c1abd2d85d0","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:34:19.254756Z"},{"index":28,"name":"the journal records a jailed player leaving jail by rolling doubles","scenario_hash":"12e9796f87b2029cc27eaadab39718d22c158bff4ed2fb71e35124724fcff50d","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:34:19.254756Z"},{"index":29,"name":"the journal records a jailed player leaving jail with a Get Out of Jail Free card","scenario_hash":"ec31fa01760e5eaeb54ee9bcb6b683ea744ad9c081f350df919ea1f425b0372d","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:34:19.254756Z"},{"index":0,"name":"the journal records game start and initiative","scenario_hash":"2e7a8628431ead85b28e68eb7a6c1c79223c5d8a7b37315aa3a204b4d770f730","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":1,"name":"the journal records a pawn's turn, roll, and movement","scenario_hash":"2f94b9a5c5f2f6549c407bc028a81adc5c302a11da4f9c949bffb4bcdea0064f","mutation_count":10,"result":{"Total":10,"Killed":10,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":2,"name":"the journal records a salary collected while passing start","scenario_hash":"fade8b7f9787cac8169e2d7a0ec3b625c6b615955c549b0f58f36ff2769586ae","mutation_count":11,"result":{"Total":11,"Killed":11,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":8,"name":"the journal records a house sold back to the bank","scenario_hash":"c08e1685f14b09566c50668ecd475023568227c04af9b0fcb54d4ab6a81935d9","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":9,"name":"the journal records land being mortgaged","scenario_hash":"6f9feeaf37794c9f44050361cebab29cd7e116c809f58e778839d8d8f53d17d9","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":10,"name":"the journal records a mortgage being lifted, including interest paid","scenario_hash":"37fddc6c1e943a6c64d33185599391f2203cfc9f0740ed851abb2acf77b82888","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":11,"name":"the journal records land sold between players","scenario_hash":"f28df5ecbcc6ba68402201dd345b42a67e1251671940ee743a4a12fe77070d19","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":12,"name":"the journal records a sale refused because the colour group has houses built","scenario_hash":"2c400d4c73dcc7bd4a7e93a7b3f3700a03a26e7b072a5fc5dc8e50943cd0ce51","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"},{"index":17,"name":"the journal records jail exit and its method","scenario_hash":"c4394c650e5a39b8b5e45c900c5854598501e038bc52e4c5d84071593f560fa7","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:29:10.059675Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -60,7 +60,7 @@ Feature: game journal
   # journal-4
   Scenario Outline: the journal records an unowned-land purchase after the landing movement
     And pawn "dog" follows the "<strategy>" strategy
-    When pawn "dog" lands on "<property>"
+    When pawn "dog" takes a targeted landing on "<property>"
     Then the game journal records that pawn "dog" buys "<property>" for $<purchase_price>
     And the game journal records that pawn "dog" moves before it records that pawn "dog" buys "<property>" for $<expected_purchase_price>
 
@@ -74,7 +74,7 @@ Feature: game journal
     And pawn "dog" declines the offer for "Diestsestraat Leuven"
     And pawn "dog" will bid $<dog_bid> for "Diestsestraat Leuven" at auction
     And pawn "high hat" will bid $<high_hat_bid> for "Diestsestraat Leuven" at auction
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game journal records that pawn "<auction_winner>" wins the auction for "Diestsestraat Leuven" at $<auction_price>
     And the game journal records that pawn "dog" moves before it records that pawn "<auction_winner>" wins the auction for "Diestsestraat Leuven" at $<expected_auction_price>
 
@@ -86,7 +86,7 @@ Feature: game journal
   Scenario Outline: the journal records rent paid after the landing movement
     And pawn "high hat" owns "Diestsestraat Leuven"
     And pawn "high hat" follows the "<strategy>" strategy
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game journal records that pawn "dog" pays pawn "high hat" $<rent> rent for "Diestsestraat Leuven"
     And the game journal records that pawn "dog" moves before it records that pawn "dog" pays pawn "high hat" $<expected_rent> rent for "Diestsestraat Leuven"
 
@@ -198,7 +198,7 @@ Feature: game journal
   # journal-15
   Scenario Outline: the journal records a card drawn before the effect it resolves
     Given the next chance card will be "Boete voor te snel rijden. Betaal M15."
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game journal records that pawn "dog" draws the chance card "Boete voor te snel rijden. Betaal M15." before it records that pawn "dog" pays the bank $<amount>
 
     Examples:
@@ -207,7 +207,7 @@ Feature: game journal
 
   # journal-16
   Scenario Outline: the journal records a tax payment after the landing movement
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game journal records that pawn "dog" moves before it records that pawn "dog" pays the bank $<amount>
 
     Examples:
@@ -216,7 +216,7 @@ Feature: game journal
 
   # journal-17
   Scenario Outline: the journal records jail entry and its cause
-    When pawn "dog" lands on "<space>"
+    When pawn "dog" takes a targeted landing on "<space>"
     Then the game journal records that pawn "dog" moves before it records that pawn "dog" is sent to jail from landing on "<space>"
 
     Examples:
@@ -237,7 +237,7 @@ Feature: game journal
 
   # journal-19
   Scenario Outline: the journal records landing on Free Parking even though nothing happens
-    When pawn "dog" lands on "Gratis Parkeren / Parc Gratuit"
+    When pawn "dog" takes a targeted landing on "Gratis Parkeren / Parc Gratuit"
     Then the game journal records that pawn "dog" moves from position <start position> (<start space>) to <position> (<space>)
 
     Examples:
@@ -247,7 +247,7 @@ Feature: game journal
   # journal-20
   Scenario Outline: the journal records a bankruptcy to the bank
     Given pawn "dog" has $<starting balance> to spend
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game journal records that pawn "dog" goes bankrupt to the bank
 
     Examples:
@@ -259,7 +259,7 @@ Feature: game journal
     Given pawn "high hat" owns "Diestsestraat Leuven"
     And the street "Diestsestraat Leuven" has a hotel built
     And pawn "dog" has $<starting balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game journal records that pawn "dog" goes bankrupt to pawn "high hat"
 
     Examples:
@@ -269,7 +269,7 @@ Feature: game journal
   # journal-22
   Scenario Outline: the journal records the game's winner
     Given pawn "dog" has $<starting balance> to spend
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game journal records that pawn "high hat" wins the game
 
     Examples:
@@ -282,7 +282,7 @@ Feature: game journal
     And pawn "iron box" will roll 6 for initiative
     And pawn "iron box" has $1500 to spend
     And the next chance card will be "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50."
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game journal records that pawn "dog" draws the chance card "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50." before it records that pawn "dog" pays pawn "high hat" $<amount>
     And the game journal records that pawn "dog" draws the chance card "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50." before it records that pawn "dog" pays pawn "iron box" $<amount>
 
@@ -296,7 +296,7 @@ Feature: game journal
     And pawn "iron box" will roll 6 for initiative
     And pawn "iron box" has $1500 to spend
     And the next community chest card will be "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler."
-    When pawn "dog" lands on "Algemeen Fonds / Caisse de Communauté"
+    When pawn "dog" takes a targeted landing on "Algemeen Fonds / Caisse de Communauté"
     Then the game journal records that pawn "dog" draws the community chest card "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler." before it records that pawn "high hat" pays pawn "dog" $<amount>
     And the game journal records that pawn "dog" draws the community chest card "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler." before it records that pawn "iron box" pays pawn "dog" $<amount>
 
@@ -307,7 +307,7 @@ Feature: game journal
   # journal-25
   Scenario Outline: the journal records a card drawn before the move it causes
     Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game journal records that pawn "dog" draws the chance card "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200." before it records that pawn "dog" moves from position <chance_position> (<chance_space>) to <destination_position> (<destination_space>)
 
     Examples:
@@ -318,7 +318,7 @@ Feature: game journal
   Scenario Outline: the journal records a mortgage forced by an unaffordable debt
     Given pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $70 to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    When pawn "dog" takes a targeted landing on "Extra Belasting / Taxe de Luxe"
     Then the game journal records that pawn "dog" mortgages "Rue Grande Dinant" for $<value>
 
     Examples:
@@ -332,7 +332,7 @@ Feature: game journal
     And the street "Rue Grande Dinant" has 1 house(s) built
     And the street "Diestsestraat Leuven" has 1 house(s) built
     And pawn "dog" has $80 to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    When pawn "dog" takes a targeted landing on "Extra Belasting / Taxe de Luxe"
     Then the game journal records that pawn "dog" sells a house on "Rue Grande Dinant" for $<price>
 
     Examples:
@@ -382,7 +382,7 @@ Feature: game journal
     Given pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
-    When pawn "dog" lands on "<property>"
+    When pawn "dog" takes a targeted landing on "<property>"
     Then the game journal records that pawn "dog" declines to buy "<property>" because it cannot afford the $<price> price
 
     Examples:
@@ -395,7 +395,7 @@ Feature: game journal
     Given pawn "dog" follows the "<strategy>" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
-    When pawn "dog" lands on "<property>"
+    When pawn "dog" takes a targeted landing on "<property>"
     Then the game journal records that pawn "dog" declines to buy "<property>" because it would drop the balance below the $<reserve> reserve
 
     Examples:
@@ -423,7 +423,7 @@ Feature: game journal
     Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
     And pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game journal records that pawn "dog" declines to buy "Rue de Diekirch Arlon" because it cannot afford the $<price> price
 
     Examples:
@@ -436,7 +436,7 @@ Feature: game journal
     Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
     And pawn "dog" follows the "<strategy>" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game journal records that pawn "dog" declines to buy "Rue de Diekirch Arlon" because it would drop the balance below the $<reserve> reserve
 
     Examples:
@@ -449,7 +449,7 @@ Feature: game journal
     Given pawn "dog" owns "Diestsestraat Leuven"
     And pawn "dog" has $5 to spend
     And pawn "high hat" will bid $<bid> for "Diestsestraat Leuven" at auction
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game journal records that pawn "high hat" wins the auction for "Diestsestraat Leuven" at $<price>
 
     Examples:
@@ -463,7 +463,7 @@ Feature: game journal
     And pawn "high hat" will claim rent for "Diestsestraat Leuven"
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting_balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game journal records that pawn "high hat" inherits "Rue Grande Dinant" from pawn "dog"
 
     Examples:
@@ -478,7 +478,7 @@ Feature: game journal
     And pawn "high hat" has $<owner_starting_balance> to spend
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting_balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game journal records that pawn "high hat" pays $<interest> interest to keep the mortgage on "Rue Grande Dinant"
 
     Examples:
@@ -493,7 +493,7 @@ Feature: game journal
     And pawn "high hat" follows the "<strategy>" strategy
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting_balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game journal records that pawn "high hat" lifts the mortgage on "Rue Grande Dinant" for $<total> including $<interest> interest
 
     Examples:
@@ -504,7 +504,7 @@ Feature: game journal
   # journal-40
   Scenario Outline: the journal records a decline with no reason when the strategy has no buying policy
     Given pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game journal records that pawn "dog" declines to buy "Diestsestraat Leuven"
 
     Examples:
@@ -533,7 +533,7 @@ Feature: game journal
     And pawn "high hat" has $<high_hat_starting_balance> to spend
     And pawn "dog" owns "Lippenslaan Knokke"
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    When pawn "dog" takes a targeted landing on "Extra Belasting / Taxe de Luxe"
     Then the game journal records that pawn "dog" puts "Lippenslaan Knokke" up for sale to avoid bankruptcy
     And the game journal records that pawn "high hat" offers $<expected_bid> for "Lippenslaan Knokke"
     And the game journal records that pawn "high hat" wins the distressed sale for "Lippenslaan Knokke" at $<expected_bid>
@@ -557,7 +557,7 @@ Feature: game journal
     And pawn "iron box" follows the "<strategy>" strategy
     And pawn "iron box" has $<iron_box_starting_balance> to spend
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game journal records that pawn "high hat" offers $90 for "Lippenslaan Knokke"
     And the game journal records that pawn "iron box" offers $95 for "Lippenslaan Knokke"
     And the game journal records that pawn "high hat" offers $100 for "Lippenslaan Knokke"
@@ -593,7 +593,7 @@ Feature: game journal
   # journal-45
   Scenario Outline: the journal records a card drawn before the bank pays the player directly
     Given the next chance card will be "De bank betaald je een dividend van M50."
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game journal records that pawn "dog" draws the chance card "De bank betaald je een dividend van M50." before it records that pawn "dog" receives $<amount> from the bank
 
     Examples:
@@ -622,7 +622,7 @@ Feature: game journal
     And pawn "high hat" has $<high_hat_starting_balance> to spend
     And pawn "dog" owns "Lippenslaan Knokke"
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    When pawn "dog" takes a targeted landing on "Extra Belasting / Taxe de Luxe"
     Then the game journal records that pawn "dog" puts Lippenslaan Knokke up for sale to avoid bankruptcy before it records that pawn "dog" finds no bidder for Lippenslaan Knokke
     And the game journal records that pawn "dog" finds no bidder for Lippenslaan Knokke before it records that pawn "dog" mortgages Lippenslaan Knokke for $<mortgage_value>
 
@@ -862,7 +862,7 @@ Feature: game journal
   # journal-62
   Scenario Outline: the journal records the winner's final age once the game ends in an ordinary win
     Given pawn "dog" has $<starting_balance> to spend
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game journal records that pawn "high hat" wins the game before it records that pawn "high hat"'s final age is <high_hat_final_age> years
 
     Examples:
@@ -941,7 +941,7 @@ Feature: game journal
     And the street "Place Verte Verviers" has 4 houses built
     And pawn "<renter>" starts at position <renter_position>
     And pawn "<renter>" will claim rent for "<renter_street>"
-    When pawn "<renter>" lands on "<renter_street>"
+    When pawn "<renter>" takes a targeted landing on "<renter_street>"
     Then the game journal records that pawn "<renter>" pays $<rent> rent to <entity_name> for "<renter_street>"
 
     Examples:
@@ -1277,7 +1277,7 @@ Feature: game journal
     And pawn "dog" has collected $<collected> in rent since their last war profits tax assessment
     And pawn "dog" grows a year older
     And pawn "high hat" has $<high hat balance> to spend
-    When pawn "high hat" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "high hat" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game journal records that pawn "dog" wins the game
     And the game journal records that the government's final account balance is $<balance>
 
@@ -1322,3 +1322,31 @@ Feature: game journal
     Examples:
       | state    |
       | disabled |
+
+  # journal-90
+  Scenario Outline: the journal records MegaCorp's payment alongside a player's salary
+    Given rent relief is enabled
+    And pawn "dog" starts at position <dog_start_position>
+    And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
+    When we play the game
+    Then the game journal records that pawn "dog" collects a salary of $<dog_salary>
+    And the game journal records that MegaCorp pays the government an individual income tax of $<megacorp_payment>
+
+    Examples:
+      | dog_start_position | dog_die_1 | dog_die_2 | dog_salary | megacorp_payment |
+      | 37                  | 1          | 2          | 200         | 86                 |
+
+  # journal-91
+  Scenario Outline: the journal records rent relief capping what a tenant pays and the government covering the rest
+    Given rent relief is enabled
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the government's account already holds $<government_start>
+    And pawn "high hat" has $1500 to spend
+    When pawn "high hat" takes a targeted landing on "Rue de Diekirch Arlon"
+    Then the game journal records that pawn "high hat" pays pawn "dog" $200 rent for "Rue de Diekirch Arlon"
+    And the game journal records that the government pays pawn "dog" $<relief> in rent relief
+
+    Examples:
+      | government_start | relief |
+      | 550                | 550     |

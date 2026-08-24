@@ -680,10 +680,20 @@ public class World {
    * playing rather than by being put there.
    */
   public void landPawnOn(String pawnName, Street.Type space) {
+    stageLanding(pawnName, space);
+    playGame();
+  }
+
+  /** Executes only the named pawn's real turn; intended for targeted performance scenarios. */
+  public void landPawnOnTargeted(String pawnName, Street.Type space) {
+    stageLanding(pawnName, space);
+    playAndCapture(game -> game.playTurnFor(pawn(pawnName).id()));
+  }
+
+  private void stageLanding(String pawnName, Street.Type space) {
     int arrival = ruleSet.gameboard().positionOf(space);
     placePawn(pawnName, arrival - A_SHORT_HOP.total());
     queuePawnRoll(pawnName, A_SHORT_HOP);
-    playGame();
   }
 
   /** Whether the pawn holds the title to that land once the game has been played. */
@@ -1652,6 +1662,17 @@ public class World {
 
   public void selectEvent(String eventType) {
     selectedEvent = SampleEvents.of(eventType);
+  }
+
+  /** Selects a parameterized event for report/log rendering fixtures. */
+  public void selectEvent(String eventType, Map<String, String> values) {
+    selectedEvent = SampleEvents.of(eventType, values);
+  }
+
+  /** Test-only observation seam for direct event-handler contract tests. */
+  Entry selectedEventForTesting() {
+    if (selectedEvent == null) throw new AssertionError("No event has been selected yet.");
+    return selectedEvent;
   }
 
   public void renderSelectedEventForReport() {

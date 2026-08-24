@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
@@ -217,12 +218,18 @@ public class Game {
   }
 
   public Result play() {
-    return play(false, () -> true);
+    return play(false, () -> true, null);
+  }
+
+  /** Plays only the selected player's next turn, retaining real rule and journal behavior. */
+  public Result playTurnFor(Player.ID target) {
+    Objects.requireNonNull(target, "target");
+    return play(false, () -> true, target);
   }
 
   /** Plays successive turns until only one player remains at the table. */
   public Result playToCompletion() {
-    return play(true, () -> true);
+    return play(true, () -> true, null);
   }
 
   /**
@@ -231,7 +238,7 @@ public class Game {
    * it is on and then stops, however long the game would still have gone on.
    */
   public Result playUntilStopped(BooleanSupplier keepPlaying) {
-    return play(true, keepPlaying);
+    return play(true, keepPlaying, null);
   }
 
   /** Plays no more than the requested number of rounds, even if nobody wins. */
@@ -242,11 +249,12 @@ public class Game {
     return playUntilStopped(() -> remaining.getAndDecrement() > 1);
   }
 
-  private Result play(boolean untilComplete, BooleanSupplier keepPlaying) {
+  private Result play(boolean untilComplete, BooleanSupplier keepPlaying, Player.ID target) {
     var journal = new Journal();
     Map<Player.ID, Integer> ages = new HashMap<>();
     Journalling journalling = new Journalling(journal, ages, deeds, developmentLoanBook,
-        rules, players, strategies, warProfitsTaxBook, warProfitsTax);
+        rules, players, strategies, warProfitsTaxBook, warProfitsTax,
+        rentRelief ? new the.monopoly.game.rules.RentRelief(rules.bank()) : null);
     journal.log(new Journal.Entry.Start(ids(players)));
     deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
@@ -259,7 +267,7 @@ public class Game {
 
     jail.observe(journalling);
     Building building = new Building(deeds, rules, strategies, journalling, developmentLoanBook, players);
-    playTurns(turnOrder, journal, journalling, building, untilComplete, keepPlaying);
+    playTurns(turnOrder, journal, journalling, building, untilComplete, keepPlaying, target);
     // Asset-rich openings may be inspected or played with a scripted turn flow
     // that never gives the strategy its ordinary development opportunity.
     players.stream().filter(player -> strategies.forPlayer(player).assetRichOpening())
@@ -270,13 +278,15 @@ public class Game {
 
   private void playTurns(List<Player> turnOrder, Journal journal,
                          Journalling journalling, Building building, boolean untilComplete,
-                         BooleanSupplier keepPlaying) {
+                         BooleanSupplier keepPlaying, Player.ID target) {
     do {
       roundHadConsolidatingAction = false;
       int roundJournalStart = journal.entries().size();
       for (Player player : turnOrder) {
+        if (target != null && !player.id().equals(target)) continue;
         if (turnEndsTheGame(player, turnOrder, journal, journalling, building)) return;
       }
+      if (target != null) return;
       completeRound(journal, roundJournalStart, journalling);
       if (remainingPlayers().size() <= 1) return;
       if (Stalemate.reached(rules, players, deeds)) {
@@ -538,7 +548,7 @@ public class Game {
   }
 
   private Landings landingsFor(Player player, List<Player> turnOrder, Journalling journalling) {
-    Landings rent = new Rent(deeds, rules, turnOrder, strategies, journalling);
+    Landings rent = new Rent(deeds, rules, turnOrder, strategies, journalling, journalling.rentRelief());
     Landings landSale = new LandSale(deeds, rules, turnOrder, strategies, journalling);
     Landings cards = new Cards(deeds, rules, turnOrder, strategies, decks, journalling, cups.forPlayer(player), jail);
     Landings taxes = new Taxes(journalling);

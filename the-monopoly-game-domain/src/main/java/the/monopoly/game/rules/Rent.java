@@ -20,13 +20,20 @@ public class Rent implements Landings {
   private final List<Player> players;
   private final Strategy.OfPlayers strategies;
   private final Events events;
+  private final RentRelief rentRelief;
 
   public Rent(Deeds deeds, Rule.Set rules, List<Player> players, Strategy.OfPlayers strategies, Events events) {
+    this(deeds, rules, players, strategies, events, null);
+  }
+
+  public Rent(Deeds deeds, Rule.Set rules, List<Player> players, Strategy.OfPlayers strategies, Events events,
+              RentRelief rentRelief) {
     this.deeds = deeds;
     this.rules = rules;
     this.players = players;
     this.strategies = strategies;
     this.events = events;
+    this.rentRelief = rentRelief;
   }
 
   @Override
@@ -39,10 +46,12 @@ public class Rent implements Landings {
   private void collect(LegalEntity entity, Player tenant, ColourStreet land) {
     if (deeds.isMortgaged(land)) return;
     Money rent = entityRent(land);
-    tenant.account().withdraw(rent);
-    entity.depositToBank(rent);
+    if (rentRelief == null) {
+      tenant.account().withdraw(rent);
+      entity.depositToBank(rent);
+    } else rentRelief.pay(tenant, entity, rent);
     entity.receiveRent(land);
-    events.paid(tenant, entity, land, rent);
+    events.paid(tenant, entity, land, tenantPayment(rent), rent);
   }
 
   private Money entityRent(ColourStreet street) {
@@ -57,9 +66,15 @@ public class Rent implements Landings {
     if (deeds.isMortgaged(land)) return;
     Money rent = rentFor(owner, land, roll);
     if (!strategies.forPlayer(owner).claims(new Strategy.RentClaim(tenant, land, rent))) return;
-    tenant.account().withdraw(rent);
-    owner.account().deposit(rent);
-    events.paid(tenant, owner, land, rent);
+    if (rentRelief == null) {
+      tenant.account().withdraw(rent);
+      owner.account().deposit(rent);
+    } else rentRelief.pay(tenant, owner, rent);
+    events.paid(tenant, owner, land, tenantPayment(rent), rent);
+  }
+
+  private Money tenantPayment(Money rent) {
+    return rentRelief == null ? rent : rentRelief.tenantPayment(rent);
   }
 
   private Money rentFor(Player owner, Ownable land, Roll roll) {
@@ -96,7 +111,15 @@ public class Rent implements Landings {
   public interface Events {
     void paid(Player tenant, Player owner, Ownable land, Money rent);
 
+    default void paid(Player tenant, Player owner, Ownable land, Money tenantPayment, Money nominalRent) {
+      paid(tenant, owner, land, tenantPayment);
+    }
+
     default void paid(Player tenant, LegalEntity entity, ColourStreet land, Money rent) {
+    }
+
+    default void paid(Player tenant, LegalEntity entity, ColourStreet land, Money tenantPayment, Money nominalRent) {
+      paid(tenant, entity, land, tenantPayment);
     }
   }
 }

@@ -1,5 +1,6 @@
+# mutation-stamp: sha256=d93d836e025f5a54b66fcd5b15bacc2f66f5aa71b7bb9ff2ff442d0254e15d0c
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-20T13:46:52.441541Z","feature_name":"game logging","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/logging.feature","background_hash":"f9cad8a167d25a58781606f42a70845a9afe8a18f1f63bed35985499ab19f099","implementation_hash":"unknown","scenarios":[{"index":87,"name":"the log records that the war profits tax is enabled, near the start of the game","scenario_hash":"e2c126b6e96c34dc82d99f6834af4ee47cc4127e029c6d72b0801026fb6fa3d8","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T13:46:52.441541Z"},{"index":4,"name":"the log records an unowned-land purchase after the landing movement","scenario_hash":"94939681746bed378921588193009b0a18cbae801015aab00ea2c92982a2c7ab","mutation_count":8,"result":{"Total":8,"Killed":8,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":7,"name":"the log records rent paid for a utility as a multiple of the dice roll that landed there","scenario_hash":"8acbd90992981d81f4defbb21f5b8231d6e9fd9693e2083cd8ba5defbc6d0c67","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":14,"name":"the log records a build refused because a street in the colour group is mortgaged","scenario_hash":"ae1b1b9a5945c88198ef27112687d65535836bb6edd3b39fe0346ee38140aaaa","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":63,"name":"the log records that <entity_name> is formed, held in equal thirds by the three co-owners","scenario_hash":"04905991f5aee73419d85b87e96eebfe7f96e31f70d11a9fb49a4c03f82db647","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":65,"name":"the log records that <entity_name> repays a shareholder loan","scenario_hash":"746e853b961a8bb433aedd1880dff3aff0990c50936c520c810075f1c41943a6","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":66,"name":"the log records an equal dividend paid by <entity_name> to each shareholder","scenario_hash":"8d17c09873d67eacd88fbc02d56ea1ce1ff81253e6d2fc546328e3c682a2a282","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":70,"name":"the log records each remaining player's final balance and age once the game ends because the year limit was reached","scenario_hash":"aa7ca13e677e0f7c61984fab8ce0d360129074fdf04b357ea7d36b22f55ff301","mutation_count":7,"result":{"Total":7,"Killed":7,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":71,"name":"the log records a player raising a development loan","scenario_hash":"a4b4e519c73b21f389d46d11a9f678c6e6a1249d000c88ad9d7ab8d745d4fe48","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":72,"name":"the log records a legal entity raising a development loan","scenario_hash":"f43b6496fd7ca02745a650c72af62ac473635b59809c9a054281fc8b3d99ad53","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":83,"name":"the log records that development loans are enabled, near the start of the game","scenario_hash":"79c642f1e6caddfb3fad27a1a76e424de2104a5b2d1fc69bd024b7bd0c25fd8d","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":69,"name":"the log records that <entity_name> raises a loan and builds a house on a street when its treasury cannot pay for it","scenario_hash":"279b3c24bef26377275f7e12c80e413636f59eb89e66835fadcddaeb47e5606f","mutation_count":5,"result":{"Total":5,"Killed":5,"Survived":0,"Errors":0},"tested_at":"2026-08-12T13:46:42.639922Z"},{"index":60,"name":"the log records a player's age increasing after being sent to jail","scenario_hash":"0120589f63eb6d30cf0d557d96e49095f0aa7d8fdb126e24314ffcf7cea0f6c7","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-09T14:39:00.659486Z"},{"index":61,"name":"the log records each remaining player's final age once the game ends in a stalemate","scenario_hash":"33bfbbef88e1d4c8f22ae8b114f36d2866bbb25279a38b4b46cddbd265dab3e4","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-09T14:39:00.659486Z"},{"index":53,"name":"the log resolves a split monopoly buyout at the start of a turn, once the whole board is owned","scenario_hash":"291323795e92ecee1d873e0765ad36d389449604eadf5d99f30bcd1581136e9e","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T19:52:34.319580Z"},{"index":55,"name":"a split monopoly resolves via buyout even with an uninvolved third player in the game","scenario_hash":"18d40d8912255b54eaf67c3ceaa34db69ca1c1a4cdbcfadac25d16e2581fe65d","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T19:52:34.319580Z"},{"index":48,"name":"the log records a peer trade completed at the start of a turn, once stalemate trading is enabled for the \"Greedo\" strategy and the whole board is owned","scenario_hash":"95bae1408faa39b64f3ce405f1a5548d3c311f78a7e228aacb64afe29f42a53a","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":49,"name":"the log does not record a peer trade when stalemate trading is not enabled for the \"Greedo\" strategy, even though the whole board is owned","scenario_hash":"62c0924b3e2c14b6170afb4bb1613c76b90b3f88905714e546e1978f78d97a6c","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":50,"name":"the log does not record a peer trade while the board still has unowned space, even though stalemate trading is enabled for the \"Greedo\" strategy","scenario_hash":"9065331129f1abdd6e02138267b9e7988d02741651ab981c766d05bb439aeebc","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":51,"name":"the log records that stalemate trading is enabled, near the start of the game","scenario_hash":"e467331a9cb949bce3cafc31f9e17df8942eb583c40deec486f01195bc309b23","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":52,"name":"the log records that stalemate trading is disabled by default, near the start of the game","scenario_hash":"b0013af952e92fee7f5312c5449b744f005389e6b2df6f0e2ae75cc31c5857c6","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":54,"name":"the log does not record a peer trade that would only benefit the trader, not the partner","scenario_hash":"40fc8b257c733ece9c6508cc018dee29fc111e90c6b13776fd6dd4d704e7b6e0","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":58,"name":"peer trading resolves two complementary splits with one cash-free swap, before buyout ever considers either group","scenario_hash":"12ba2bdc5cd2f436a7334b5e0085d33e87da362939031e133d09dc77f25db6aa","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":37,"name":"the log records land inherited by a creditor when a debtor goes bankrupt to them","scenario_hash":"811e72cb7a30f4b11fd8d60768b6b71b01ddeb80c624824370b76d4b76a383fd","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-06T19:40:37.687907Z"},{"index":40,"name":"the log records a decline with no reason when the strategy has no buying policy","scenario_hash":"c59022390748f1b39189bcca5f7d1f15be40e19483fbf9ba3935f396715d6962","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-06T19:40:37.687907Z"},{"index":46,"name":"the log records that the game ends in a stalemate once every remaining player clears the threshold","scenario_hash":"97309e6b179967ce1f37619edd750daa5f8528554fccbace68aabef0e7781ebb","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-06T19:40:37.687907Z"},{"index":45,"name":"the log records a card drawn before the bank pays the player directly","scenario_hash":"a82e9b34f1b2259250cb550a25d446a554f75f3796eeaa3da55a3363f4e5e0bb","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-05T05:37:32.928413Z"},{"index":20,"name":"the log records a bankruptcy to the bank","scenario_hash":"949343d307dff987ade9ecea5fe9e7beccc3f61b11aadbb5be3d53b6a47f8b67","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:36:29.743331Z"},{"index":21,"name":"the log records a bankruptcy to another player","scenario_hash":"1f0b70a84eb4a0eafa6654e259ef9e610c3dba96ef2d272e2b956571300e32e0","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:36:29.743331Z"},{"index":22,"name":"the log records the game's winner","scenario_hash":"31b4d7386cdce00ea4777fed5a7f4c727e9b59dcd2246e099dfaed2d8da7a30e","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:36:29.743331Z"},{"index":26,"name":"the log records a mortgage forced by an unaffordable debt","scenario_hash":"0fe392618079f313660792cc3fe42197ce2a699b2f91d5eb94b1e2f4057f64f7","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:36:29.743331Z"},{"index":27,"name":"the log records a house sale forced by an unaffordable debt","scenario_hash":"53438f460e35a8ad4b6f46c6d098bc7d85ae55b34997c864abe3c1543caff34a","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:36:29.743331Z"},{"index":28,"name":"the log records a jailed player staying in jail after failing to roll doubles","scenario_hash":"aad0ee0983e079bc0fda5416c9f814b8cac1d7115d1789c6b181d9021bc9fafb","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:36:29.743331Z"},{"index":29,"name":"the log records a jailed player leaving jail by rolling doubles","scenario_hash":"5bac6901b88f3f177f1232bf1477f2384b7b25276e4c8a18de16f38ad033fff6","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:36:29.743331Z"},{"index":30,"name":"the log records a jailed player leaving jail with a Get Out of Jail Free card","scenario_hash":"d05101ae5bea46da831611829746cd9bd3fbb9448299bce48082c98b630a6e98","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:36:29.743331Z"},{"index":25,"name":"the log records a card drawn before the move it causes","scenario_hash":"9f83ec98c617606f7c73d7ec34c84912b21d512c6c2ee9ca648a556ac6efb13b","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T16:45:28.091115Z"},{"index":2,"name":"the log records a pawn's turn, roll, and movement","scenario_hash":"7ac58d5128703ec1445b01b7a312461c1a878a5f3ca7927d817c3399cce49e01","mutation_count":11,"result":{"Total":11,"Killed":11,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:15.046179Z"},{"index":3,"name":"the log records a salary collected while passing start","scenario_hash":"700e9bab2bb369e062331a4faa912979717ce887d68d7b1933266631f78f289a","mutation_count":11,"result":{"Total":11,"Killed":11,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:15.046179Z"},{"index":19,"name":"the log records landing on Free Parking even though nothing happens","scenario_hash":"152d741a90091b911cac0241773663d237f9678e95d21699e85220180ca32c6e","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:15.046179Z"},{"index":23,"name":"the log records a card drawn before it pays every other player","scenario_hash":"a63499f8e082c4f0e6b488d8e8d3f05a817372c810b0be1945384ca7a9974548","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:15.046179Z"},{"index":24,"name":"the log records a card drawn before it collects from every other player","scenario_hash":"882b25b969fefaa0ce4db56412acd4119bba7ad9dc8d7306c0278c7dc2c05491","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:15.046179Z"},{"index":0,"name":"logged event text matches report rendering","scenario_hash":"f835ddb36be9c4b3df983c8fb0d309b4d4900ccb172e1b73b0ad7f91dee23892","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":1,"name":"the log records game start and initiative","scenario_hash":"a2b92a55e28235ba80668a83c039c56dcf6188c05dea393ffd5cdcf8e9e2b996","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":9,"name":"the log records a house sold back to the bank","scenario_hash":"3cfc0073d188e9170feca30de7767b31a393f3ac1d8193ed39883410a53baaa5","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":10,"name":"the log records land being mortgaged","scenario_hash":"e57add729a6e6abc7a6ecdfef35f6c1ef3d88c5c98b645d5b00414e22fbad84f","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":11,"name":"the log records a mortgage being lifted, including interest paid","scenario_hash":"4c8e414e048527a726da52a655359c92d93534d70fcb451a860f7f25112f3ebf","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":12,"name":"the log records land sold between players","scenario_hash":"10eb426dfd6598520acef844cbdac94b51af1184ea4ba1975c3c1084db923f22","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":13,"name":"the log records a sale refused because the colour group has houses built","scenario_hash":"acec232a2c18797a361f9dda2526ddfbbf2c0b88d275c38c9e0bed00a1c71cea","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":15,"name":"the log records a card drawn before the effect it resolves","scenario_hash":"65627bc06a4c5b7a80a5e349718afd5e916a35de3c8563f87ecd6360fba51ce6","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":16,"name":"the log records a tax payment after the landing movement","scenario_hash":"285b1540daae2d937dfa0eb9f68c84e03bed6c62bd7982a0ebad33af2821c353","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":17,"name":"the log records jail entry and its cause","scenario_hash":"f4cf0a54beff41bb258129e259e3c1b0423ff2317fcebc240dfb46ab78d247c2","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":18,"name":"the log records jail exit and its method","scenario_hash":"67bfb95cd8583adb7f41a95cef2aed5242e117e11d7847e25be50bf215fa597e","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"}]}
+# {"version":1,"tested_at":"2026-08-24T16:49:38.193203Z","feature_name":"game logging","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/logging.feature","background_hash":"f9cad8a167d25a58781606f42a70845a9afe8a18f1f63bed35985499ab19f099","implementation_hash":"unknown","scenarios":[{"index":4,"name":"the log records an unowned-land purchase after the landing movement","scenario_hash":"69c9f9471d52f3c5d48113b1ba12180d13dee737fec511281a4841857bcb9fbc","mutation_count":8,"result":{"Total":8,"Killed":8,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":5,"name":"the log records the winner and price of an auction after the landing movement","scenario_hash":"86801a7261664c1200117eec6d6bcf337d3e79cf2fa990d0a4d0e31943debbc2","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":6,"name":"the log records rent paid after the landing movement","scenario_hash":"dd8fc351689d513f26d151f9b02e957974a820361f720270e2207b2aad02a775","mutation_count":5,"result":{"Total":5,"Killed":5,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":15,"name":"the log records a card drawn before the effect it resolves","scenario_hash":"3f5c69165519e6618d963d0dad88b763b41a5da41fac157b64afb7fbc538a74d","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":16,"name":"the log records a tax payment after the landing movement","scenario_hash":"8e69b4fa6df83b80775dd5c2bcc25ce45724c2ec28b670cc695743ca2c74f1fb","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":17,"name":"the log records jail entry and its cause","scenario_hash":"279e7d209b0c28bcd03021eff3b8096ca9374e63595e28577614ced6256a0e46","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":19,"name":"the log records landing on Free Parking even though nothing happens","scenario_hash":"835c8fab6005d8d5b898dc2bca4f0ef91f4f911c0b9bfa336befa4e56302445c","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":23,"name":"the log records a card drawn before it pays every other player","scenario_hash":"500116463079eecf8a8beb1b045b200ea4d2d0bae1eff8bfb3415b4dbd01f56a","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":24,"name":"the log records a card drawn before it collects from every other player","scenario_hash":"a12312af7c3de31b96ae80124a38c810389b49aa9a425ab3df43745f352e7332","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":25,"name":"the log records a card drawn before the move it causes","scenario_hash":"521b16d5a47a058633f9e735668ea4300ba36286fd6532dfed99f142034a52a4","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":26,"name":"the log records a mortgage forced by an unaffordable debt","scenario_hash":"716459a11af6e68c43383196ef078c92ba5dec99caaeb5557bdd98a772eec2d1","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":27,"name":"the log records a house sale forced by an unaffordable debt","scenario_hash":"daffde75ed5c548a1e16797bf67db645c8ceef37642952df2d2f91e67c6e2640","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":31,"name":"the log records why a player declines to buy land they cannot afford","scenario_hash":"ac26fe3eb7772b316b19cd56ae97813fe4b090ac57a37b2f74da50ca2350a002","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":32,"name":"the log records why a player keeping a reserve declines a purchase that would dip below it","scenario_hash":"ab3d424e51d4c1cad5328435e6693ae166a41fae7423c33092c92d89508f835f","mutation_count":5,"result":{"Total":5,"Killed":5,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":34,"name":"the log records why a player declines to buy a card-driven property they cannot afford","scenario_hash":"bf3eb2a9484b1ca62f345f36abf06ac5fc72edd8fa04331215e120499a285b43","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":35,"name":"the log records why a player keeping a reserve declines a card-driven purchase that would dip below it","scenario_hash":"9006db21327b6f31ad61a7515d8996741baa77bcdfb6096e9a576b2b98358071","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":36,"name":"the log records a bank-forced auction win during another player's bankruptcy","scenario_hash":"89621252e9af8b4d2f418f0605966c0771d13edb964ee8e578856c60898a0eb6","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":38,"name":"the log records a creditor paying interest to keep an inherited mortgage in place","scenario_hash":"bc008955e0acc81a4b3b81f70ba2509797f6478103a5c54c9e26770cadde76d1","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":39,"name":"the log records a creditor immediately lifting an inherited mortgage","scenario_hash":"ecb844cf171b93c2bf486e3dd39a9847aa1b321f446537dd9400eda8f221ff98","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":42,"name":"the log records a debtor putting a property up for sale and the sole buyer's winning offer","scenario_hash":"8eb3e3eaafc0eafa705aa26f65636de5f6b5ab647da87049b17f05cf8d2d9317","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":43,"name":"the log records every $5 raise in a bidding war before the winning offer","scenario_hash":"bcab8fc0107371e831fb4c946f5a0ddabf90ae4b9c4a9cd8be9d811d2f43d292","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":45,"name":"the log records a card drawn before the bank pays the player directly","scenario_hash":"216cfe24a0dce08c43690871ceefec16579fba0339fc9007a6a37bb7809049a3","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":47,"name":"the log records that no one bids before it records the resulting mortgage","scenario_hash":"3589f118c2a36bca9f118e6636766be013eeb897bea927c6e2e85934fbffd591","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":62,"name":"the log records the winner's final age once the game ends in an ordinary win","scenario_hash":"55e717d18e7dcc84bf04056a6e60926557441d74642a805bb26e294dcce637d3","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":67,"name":"the log records that pawn \"<renter>\" pays rent to <entity_name> for an entity-owned street","scenario_hash":"3815c6682ff2ad76bcf8749c416005eb8bf95783b321e7534bf7c25bb7978490","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":87,"name":"the log records the government's final account balance once an ordinary win ends the game too","scenario_hash":"7c912ac210df382198467fb8df28925fd4c3fe3d039e96d7ce9b74f96dcb1f08","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-24T16:43:20.211715Z"},{"index":8,"name":"the log records a house built during a player's turn","scenario_hash":"2f61154c94baa4cac579f6d36a9eeb91de787635cb07b99f222e514762ee98c3","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":33,"name":"the log records a player's reserve alongside their balance at the start of a turn","scenario_hash":"182339dfa330edd992c511c8e50e44e10c3391101596ed207e95d7e973e39d67","mutation_count":19,"result":{"Total":19,"Killed":19,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":41,"name":"the log records the reserve dynamically sized for a near-complete colour monopoly at the start of a turn","scenario_hash":"c04e444d5190729d136c1149c7c83276b8bf16c9ddbb778d66dc2237fdf40c0b","mutation_count":8,"result":{"Total":8,"Killed":8,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":44,"name":"the log records a near-complete colour group's reserve only while its missing street remains affordable","scenario_hash":"2376174a29756730563e2c916be6233bd92c7b23dc7052297a1b4da1da73c785","mutation_count":16,"result":{"Total":16,"Killed":16,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":56,"name":"peer trading never touches a colour group that is a genuine two-owner split, even while the buyout cannot yet afford it","scenario_hash":"d1a031daf1d2c94b72458932dc676b9211c270feabe08ee5c867288c2b36349c","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":59,"name":"the log records a player's age increasing after passing start","scenario_hash":"23b69a0131d8d4311685b312e237758063f0bf7a091f8997980a1a136bd661d4","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":64,"name":"the log records that <entity_name> raises a loan to fund a build shortfall","scenario_hash":"790508f3425d0a98d836a7fe681a0db072b4e5409f75699744a6b156f0cc37ae","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":68,"name":"the log records that <entity_name> builds a house on a street when its treasury can pay for it","scenario_hash":"225e0a154f7f86e8499218c98c51eccf6ee4b64bdcffb907daac9a687bdc6897","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":73,"name":"the log records a player's annual development-loan payment split into interest and principal","scenario_hash":"6a6ad07eed93992ab2ee2c8bacb58957d24fb74e135750fa11ac8d884f7b55ac","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":74,"name":"the log records a legal entity's annual development-loan payment split into interest and principal","scenario_hash":"9c08e5e20df90225e52d7b3e10ed541627a32e7ac7124687cebc0f490bed6a1d","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":75,"name":"the log records a player's development loan being fully repaid","scenario_hash":"7671cf1d575bc0ed91ba765c47b4f77a54eddbe88a23e64ba078f97aa40d6328","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":76,"name":"the log records a legal entity's development loan being fully repaid","scenario_hash":"a6a229e0db881dff38b871af50388915cca256ae0c95daba2f24c93dff4a0100","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":79,"name":"the log records a bondholder's annual payout on a player's development loan","scenario_hash":"40d2f11ed30233379f0e089ca8ddaf0e49edde42676c4ec1bcc410549619935d","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":80,"name":"the log records a bondholder's annual payout on a legal entity's development loan","scenario_hash":"cec88fab5ac57972d4732e56b47e2e34a985cc15b9c02e91d5e78f72fc1c0346","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":81,"name":"the log records the bank recovering a player's foreclosure proceeds into its own account, rather than paying the bondholder out","scenario_hash":"fa31a86bbafa26607464680394c691f89669e0ec86abc938516521f9e091e56e","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":82,"name":"the log records the bank recovering a legal entity's foreclosure proceeds into its own account, rather than paying the bondholder out","scenario_hash":"1371869e0ad9fe8f94ac04473a374dd26e3dc6c99937be123d562822185ef651","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":85,"name":"the log records a player's war profits tax payment","scenario_hash":"b67aee9ef2d98a40033334e0df99671216621eec8e476e464bc100b48b87d34c","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":86,"name":"the log records the government's final account balance once the game ends","scenario_hash":"0bf29041f790db3a1d32e6162145ff8c504422d67ad364c4378b4554e3fce244","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":88,"name":"the log records that the war profits tax is enabled, near the start of the game","scenario_hash":"e2c126b6e96c34dc82d99f6834af4ee47cc4127e029c6d72b0801026fb6fa3d8","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":90,"name":"the log records that rent relief is enabled, near the start of the game","scenario_hash":"328763663207b7580ac9f0529b4a73ae69115d5da35dfd6c9455fc078ecdd1cc","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-23T00:25:30.468927Z"},{"index":7,"name":"the log records rent paid for a utility as a multiple of the dice roll that landed there","scenario_hash":"8acbd90992981d81f4defbb21f5b8231d6e9fd9693e2083cd8ba5defbc6d0c67","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":14,"name":"the log records a build refused because a street in the colour group is mortgaged","scenario_hash":"ae1b1b9a5945c88198ef27112687d65535836bb6edd3b39fe0346ee38140aaaa","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":63,"name":"the log records that <entity_name> is formed, held in equal thirds by the three co-owners","scenario_hash":"04905991f5aee73419d85b87e96eebfe7f96e31f70d11a9fb49a4c03f82db647","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":65,"name":"the log records that <entity_name> repays a shareholder loan","scenario_hash":"746e853b961a8bb433aedd1880dff3aff0990c50936c520c810075f1c41943a6","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":66,"name":"the log records an equal dividend paid by <entity_name> to each shareholder","scenario_hash":"8d17c09873d67eacd88fbc02d56ea1ce1ff81253e6d2fc546328e3c682a2a282","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":70,"name":"the log records each remaining player's final balance and age once the game ends because the year limit was reached","scenario_hash":"aa7ca13e677e0f7c61984fab8ce0d360129074fdf04b357ea7d36b22f55ff301","mutation_count":7,"result":{"Total":7,"Killed":7,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":71,"name":"the log records a player raising a development loan","scenario_hash":"a4b4e519c73b21f389d46d11a9f678c6e6a1249d000c88ad9d7ab8d745d4fe48","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":72,"name":"the log records a legal entity raising a development loan","scenario_hash":"f43b6496fd7ca02745a650c72af62ac473635b59809c9a054281fc8b3d99ad53","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":83,"name":"the log records that development loans are enabled, near the start of the game","scenario_hash":"79c642f1e6caddfb3fad27a1a76e424de2104a5b2d1fc69bd024b7bd0c25fd8d","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-20T10:25:39.689586Z"},{"index":69,"name":"the log records that <entity_name> raises a loan and builds a house on a street when its treasury cannot pay for it","scenario_hash":"279b3c24bef26377275f7e12c80e413636f59eb89e66835fadcddaeb47e5606f","mutation_count":5,"result":{"Total":5,"Killed":5,"Survived":0,"Errors":0},"tested_at":"2026-08-12T13:46:42.639922Z"},{"index":60,"name":"the log records a player's age increasing after being sent to jail","scenario_hash":"0120589f63eb6d30cf0d557d96e49095f0aa7d8fdb126e24314ffcf7cea0f6c7","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-09T14:39:00.659486Z"},{"index":61,"name":"the log records each remaining player's final age once the game ends in a stalemate","scenario_hash":"33bfbbef88e1d4c8f22ae8b114f36d2866bbb25279a38b4b46cddbd265dab3e4","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-09T14:39:00.659486Z"},{"index":53,"name":"the log resolves a split monopoly buyout at the start of a turn, once the whole board is owned","scenario_hash":"291323795e92ecee1d873e0765ad36d389449604eadf5d99f30bcd1581136e9e","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T19:52:34.319580Z"},{"index":55,"name":"a split monopoly resolves via buyout even with an uninvolved third player in the game","scenario_hash":"18d40d8912255b54eaf67c3ceaa34db69ca1c1a4cdbcfadac25d16e2581fe65d","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T19:52:34.319580Z"},{"index":48,"name":"the log records a peer trade completed at the start of a turn, once stalemate trading is enabled for the \"Greedo\" strategy and the whole board is owned","scenario_hash":"95bae1408faa39b64f3ce405f1a5548d3c311f78a7e228aacb64afe29f42a53a","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":49,"name":"the log does not record a peer trade when stalemate trading is not enabled for the \"Greedo\" strategy, even though the whole board is owned","scenario_hash":"62c0924b3e2c14b6170afb4bb1613c76b90b3f88905714e546e1978f78d97a6c","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":50,"name":"the log does not record a peer trade while the board still has unowned space, even though stalemate trading is enabled for the \"Greedo\" strategy","scenario_hash":"9065331129f1abdd6e02138267b9e7988d02741651ab981c766d05bb439aeebc","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":51,"name":"the log records that stalemate trading is enabled, near the start of the game","scenario_hash":"e467331a9cb949bce3cafc31f9e17df8942eb583c40deec486f01195bc309b23","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":52,"name":"the log records that stalemate trading is disabled by default, near the start of the game","scenario_hash":"b0013af952e92fee7f5312c5449b744f005389e6b2df6f0e2ae75cc31c5857c6","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":54,"name":"the log does not record a peer trade that would only benefit the trader, not the partner","scenario_hash":"40fc8b257c733ece9c6508cc018dee29fc111e90c6b13776fd6dd4d704e7b6e0","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":58,"name":"peer trading resolves two complementary splits with one cash-free swap, before buyout ever considers either group","scenario_hash":"12ba2bdc5cd2f436a7334b5e0085d33e87da362939031e133d09dc77f25db6aa","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-08T18:02:03.626782Z"},{"index":46,"name":"the log records that the game ends in a stalemate once every remaining player clears the threshold","scenario_hash":"97309e6b179967ce1f37619edd750daa5f8528554fccbace68aabef0e7781ebb","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-06T19:40:37.687907Z"},{"index":28,"name":"the log records a jailed player staying in jail after failing to roll doubles","scenario_hash":"aad0ee0983e079bc0fda5416c9f814b8cac1d7115d1789c6b181d9021bc9fafb","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:36:29.743331Z"},{"index":29,"name":"the log records a jailed player leaving jail by rolling doubles","scenario_hash":"5bac6901b88f3f177f1232bf1477f2384b7b25276e4c8a18de16f38ad033fff6","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:36:29.743331Z"},{"index":30,"name":"the log records a jailed player leaving jail with a Get Out of Jail Free card","scenario_hash":"d05101ae5bea46da831611829746cd9bd3fbb9448299bce48082c98b630a6e98","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T19:36:29.743331Z"},{"index":2,"name":"the log records a pawn's turn, roll, and movement","scenario_hash":"7ac58d5128703ec1445b01b7a312461c1a878a5f3ca7927d817c3399cce49e01","mutation_count":11,"result":{"Total":11,"Killed":11,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:15.046179Z"},{"index":3,"name":"the log records a salary collected while passing start","scenario_hash":"700e9bab2bb369e062331a4faa912979717ce887d68d7b1933266631f78f289a","mutation_count":11,"result":{"Total":11,"Killed":11,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:15.046179Z"},{"index":0,"name":"logged event text matches report rendering","scenario_hash":"f835ddb36be9c4b3df983c8fb0d309b4d4900ccb172e1b73b0ad7f91dee23892","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":1,"name":"the log records game start and initiative","scenario_hash":"a2b92a55e28235ba80668a83c039c56dcf6188c05dea393ffd5cdcf8e9e2b996","mutation_count":3,"result":{"Total":3,"Killed":3,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":9,"name":"the log records a house sold back to the bank","scenario_hash":"3cfc0073d188e9170feca30de7767b31a393f3ac1d8193ed39883410a53baaa5","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":10,"name":"the log records land being mortgaged","scenario_hash":"e57add729a6e6abc7a6ecdfef35f6c1ef3d88c5c98b645d5b00414e22fbad84f","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":11,"name":"the log records a mortgage being lifted, including interest paid","scenario_hash":"4c8e414e048527a726da52a655359c92d93534d70fcb451a860f7f25112f3ebf","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":12,"name":"the log records land sold between players","scenario_hash":"10eb426dfd6598520acef844cbdac94b51af1184ea4ba1975c3c1084db923f22","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":13,"name":"the log records a sale refused because the colour group has houses built","scenario_hash":"acec232a2c18797a361f9dda2526ddfbbf2c0b88d275c38c9e0bed00a1c71cea","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"},{"index":18,"name":"the log records jail exit and its method","scenario_hash":"67bfb95cd8583adb7f41a95cef2aed5242e117e11d7847e25be50bf215fa597e","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-02T14:30:04.800526Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -74,7 +75,7 @@ Feature: game logging
   # logging-4
   Scenario Outline: the log records an unowned-land purchase after the landing movement
     And pawn "dog" follows the "<strategy>" strategy
-    When pawn "dog" lands on "<property>"
+    When pawn "dog" takes a targeted landing on "<property>"
     Then the game log records that pawn "dog" buys "<property>" for $<purchase_price>
     And the game log records that pawn "dog" moves before it records that pawn "dog" buys "<property>" for $<expected_purchase_price>
 
@@ -88,7 +89,7 @@ Feature: game logging
     And pawn "dog" declines the offer for "Diestsestraat Leuven"
     And pawn "dog" will bid $<dog_bid> for "Diestsestraat Leuven" at auction
     And pawn "high hat" will bid $<high_hat_bid> for "Diestsestraat Leuven" at auction
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game log records that pawn "<auction_winner>" wins the auction for "Diestsestraat Leuven" at $<auction_price>
     And the game log records that pawn "dog" moves before it records that pawn "<auction_winner>" wins the auction for "Diestsestraat Leuven" at $<expected_auction_price>
 
@@ -100,7 +101,7 @@ Feature: game logging
   Scenario Outline: the log records rent paid after the landing movement
     And pawn "high hat" owns "Diestsestraat Leuven"
     And pawn "high hat" follows the "<strategy>" strategy
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game log records that pawn "dog" pays pawn "high hat" $<rent> rent for "Diestsestraat Leuven"
     And the game log records that pawn "dog" moves before it records that pawn "dog" pays pawn "high hat" $<expected_rent> rent for "Diestsestraat Leuven"
 
@@ -212,7 +213,7 @@ Feature: game logging
   # logging-15
   Scenario Outline: the log records a card drawn before the effect it resolves
     Given the next chance card will be "Boete voor te snel rijden. Betaal M15."
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game log records that pawn "dog" draws the chance card "Boete voor te snel rijden. Betaal M15." before it records that pawn "dog" pays the bank $<amount>
 
     Examples:
@@ -221,7 +222,7 @@ Feature: game logging
 
   # logging-16
   Scenario Outline: the log records a tax payment after the landing movement
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game log records that pawn "dog" moves before it records that pawn "dog" pays the bank $<amount>
 
     Examples:
@@ -230,7 +231,7 @@ Feature: game logging
 
   # logging-17
   Scenario Outline: the log records jail entry and its cause
-    When pawn "dog" lands on "<space>"
+    When pawn "dog" takes a targeted landing on "<space>"
     Then the game log records that pawn "dog" moves before it records that pawn "dog" is sent to jail from landing on "<space>"
 
     Examples:
@@ -251,7 +252,7 @@ Feature: game logging
 
   # logging-19
   Scenario Outline: the log records landing on Free Parking even though nothing happens
-    When pawn "dog" lands on "Gratis Parkeren / Parc Gratuit"
+    When pawn "dog" takes a targeted landing on "Gratis Parkeren / Parc Gratuit"
     Then the game log records that pawn "dog" moves from position <start position> (<start space>) to <position> (<space>)
 
     Examples:
@@ -261,7 +262,7 @@ Feature: game logging
   # logging-20
   Scenario Outline: the log records a bankruptcy to the bank
     Given pawn "dog" has $<starting balance> to spend
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game log records that pawn "dog" goes bankrupt to the bank
 
     Examples:
@@ -273,7 +274,7 @@ Feature: game logging
     Given pawn "high hat" owns "Diestsestraat Leuven"
     And the street "Diestsestraat Leuven" has a hotel built
     And pawn "dog" has $<starting balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game log records that pawn "dog" goes bankrupt to pawn "high hat"
 
     Examples:
@@ -283,7 +284,7 @@ Feature: game logging
   # logging-22
   Scenario Outline: the log records the game's winner
     Given pawn "dog" has $<starting balance> to spend
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game log records that pawn "high hat" wins the game
 
     Examples:
@@ -296,7 +297,7 @@ Feature: game logging
     And pawn "iron box" will roll 6 for initiative
     And pawn "iron box" has $1500 to spend
     And the next chance card will be "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50."
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game log records that pawn "dog" draws the chance card "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50." before it records that pawn "dog" pays pawn "high hat" $<amount>
     And the game log records that pawn "dog" draws the chance card "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50." before it records that pawn "dog" pays pawn "iron box" $<amount>
 
@@ -310,7 +311,7 @@ Feature: game logging
     And pawn "iron box" will roll 6 for initiative
     And pawn "iron box" has $1500 to spend
     And the next community chest card will be "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler."
-    When pawn "dog" lands on "Algemeen Fonds / Caisse de Communauté"
+    When pawn "dog" takes a targeted landing on "Algemeen Fonds / Caisse de Communauté"
     Then the game log records that pawn "dog" draws the community chest card "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler." before it records that pawn "high hat" pays pawn "dog" $<amount>
     And the game log records that pawn "dog" draws the community chest card "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler." before it records that pawn "iron box" pays pawn "dog" $<amount>
 
@@ -321,7 +322,7 @@ Feature: game logging
   # logging-25
   Scenario Outline: the log records a card drawn before the move it causes
     Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game log records that pawn "dog" draws the chance card "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200." before it records that pawn "dog" moves from position <chance_position> (<chance_space>) to <destination_position> (<destination_space>)
 
     Examples:
@@ -332,7 +333,7 @@ Feature: game logging
   Scenario Outline: the log records a mortgage forced by an unaffordable debt
     Given pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $70 to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    When pawn "dog" takes a targeted landing on "Extra Belasting / Taxe de Luxe"
     Then the game log records that pawn "dog" mortgages "Rue Grande Dinant" for $<value>
 
     Examples:
@@ -346,7 +347,7 @@ Feature: game logging
     And the street "Rue Grande Dinant" has 1 house(s) built
     And the street "Diestsestraat Leuven" has 1 house(s) built
     And pawn "dog" has $80 to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    When pawn "dog" takes a targeted landing on "Extra Belasting / Taxe de Luxe"
     Then the game log records that pawn "dog" sells a house on "Rue Grande Dinant" for $<price>
 
     Examples:
@@ -396,7 +397,7 @@ Feature: game logging
     Given pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
-    When pawn "dog" lands on "<property>"
+    When pawn "dog" takes a targeted landing on "<property>"
     Then the game log records that pawn "dog" declines to buy "<property>" because it cannot afford the $<price> price
 
     Examples:
@@ -409,7 +410,7 @@ Feature: game logging
     Given pawn "dog" follows the "<strategy>" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
-    When pawn "dog" lands on "<property>"
+    When pawn "dog" takes a targeted landing on "<property>"
     Then the game log records that pawn "dog" declines to buy "<property>" because it would drop the balance below the $<reserve> reserve
 
     Examples:
@@ -437,7 +438,7 @@ Feature: game logging
     Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
     And pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game log records that pawn "dog" declines to buy "Rue de Diekirch Arlon" because it cannot afford the $<price> price
 
     Examples:
@@ -450,7 +451,7 @@ Feature: game logging
     Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
     And pawn "dog" follows the "<strategy>" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game log records that pawn "dog" declines to buy "Rue de Diekirch Arlon" because it would drop the balance below the $<reserve> reserve
 
     Examples:
@@ -463,7 +464,7 @@ Feature: game logging
     Given pawn "dog" owns "Diestsestraat Leuven"
     And pawn "dog" has $5 to spend
     And pawn "high hat" will bid $<bid> for "Diestsestraat Leuven" at auction
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game log records that pawn "high hat" wins the auction for "Diestsestraat Leuven" at $<price>
 
     Examples:
@@ -477,7 +478,7 @@ Feature: game logging
     And pawn "high hat" will claim rent for "Diestsestraat Leuven"
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting_balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game log records that pawn "high hat" inherits "Rue Grande Dinant" from pawn "dog"
 
     Examples:
@@ -492,7 +493,7 @@ Feature: game logging
     And pawn "high hat" has $<owner_starting_balance> to spend
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting_balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game log records that pawn "high hat" pays $<interest> interest to keep the mortgage on "Rue Grande Dinant"
 
     Examples:
@@ -507,7 +508,7 @@ Feature: game logging
     And pawn "high hat" follows the "<strategy>" strategy
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting_balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game log records that pawn "high hat" lifts the mortgage on "Rue Grande Dinant" for $<total> including $<interest> interest
 
     Examples:
@@ -518,7 +519,7 @@ Feature: game logging
   # logging-40
   Scenario Outline: the log records a decline with no reason when the strategy has no buying policy
     Given pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game log records that pawn "dog" declines to buy "Diestsestraat Leuven"
 
     Examples:
@@ -547,7 +548,7 @@ Feature: game logging
     And pawn "high hat" has $<high_hat_starting_balance> to spend
     And pawn "dog" owns "Lippenslaan Knokke"
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    When pawn "dog" takes a targeted landing on "Extra Belasting / Taxe de Luxe"
     Then the game log records that pawn "dog" puts "Lippenslaan Knokke" up for sale to avoid bankruptcy
     And the game log records that pawn "high hat" offers $<expected_bid> for "Lippenslaan Knokke"
     And the game log records that pawn "high hat" wins the distressed sale for "Lippenslaan Knokke" at $<expected_bid>
@@ -571,7 +572,7 @@ Feature: game logging
     And pawn "iron box" follows the "<strategy>" strategy
     And pawn "iron box" has $<iron_box_starting_balance> to spend
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game log records that pawn "high hat" offers $90 for "Lippenslaan Knokke"
     And the game log records that pawn "iron box" offers $95 for "Lippenslaan Knokke"
     And the game log records that pawn "high hat" offers $100 for "Lippenslaan Knokke"
@@ -607,7 +608,7 @@ Feature: game logging
   # logging-45
   Scenario Outline: the log records a card drawn before the bank pays the player directly
     Given the next chance card will be "De bank betaald je een dividend van M50."
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game log records that pawn "dog" draws the chance card "De bank betaald je een dividend van M50." before it records that pawn "dog" receives $<amount> from the bank
 
     Examples:
@@ -636,7 +637,7 @@ Feature: game logging
     And pawn "high hat" has $<high_hat_starting_balance> to spend
     And pawn "dog" owns "Lippenslaan Knokke"
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    When pawn "dog" takes a targeted landing on "Extra Belasting / Taxe de Luxe"
     Then the game log records that pawn "dog" puts Lippenslaan Knokke up for sale to avoid bankruptcy before it records that pawn "dog" finds no bidder for Lippenslaan Knokke
     And the game log records that pawn "dog" finds no bidder for Lippenslaan Knokke before it records that pawn "dog" mortgages Lippenslaan Knokke for $<mortgage_value>
 
@@ -876,7 +877,7 @@ Feature: game logging
   # logging-62
   Scenario Outline: the log records the winner's final age once the game ends in an ordinary win
     Given pawn "dog" has $<starting_balance> to spend
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game log records that pawn "high hat" wins the game before it records that pawn "high hat"'s final age is <high_hat_final_age> years
 
     Examples:
@@ -954,7 +955,7 @@ Feature: game logging
     And the street "Place Verte Verviers" has 4 houses built
     And pawn "<renter>" starts at position <renter_position>
     And pawn "<renter>" will claim rent for "<renter_street>"
-    When pawn "<renter>" lands on "<renter_street>"
+    When pawn "<renter>" takes a targeted landing on "<renter_street>"
     Then the game log records that pawn "<renter>" pays $<rent> rent to <entity_name> for "<renter_street>"
 
     Examples:
@@ -1288,7 +1289,7 @@ Feature: game logging
     And pawn "dog" has collected $<collected> in rent since their last war profits tax assessment
     And pawn "dog" grows a year older
     And pawn "high hat" has $<high hat balance> to spend
-    When pawn "high hat" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "high hat" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game log records that pawn "dog" wins the game
     And the game log records that the government's final account balance is $<balance>
 
@@ -1333,3 +1334,31 @@ Feature: game logging
     Examples:
       | state    |
       | disabled |
+
+  # logging-90
+  Scenario Outline: the log records MegaCorp's payment alongside a player's salary
+    Given rent relief is enabled
+    And pawn "dog" starts at position <dog_start_position>
+    And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
+    When we play the game
+    Then the game log records that pawn "dog" collects a salary of $<dog_salary>
+    And the game log records that MegaCorp pays the government an individual income tax of $<megacorp_payment>
+
+    Examples:
+      | dog_start_position | dog_die_1 | dog_die_2 | dog_salary | megacorp_payment |
+      | 37                  | 1          | 2          | 200         | 86                 |
+
+  # logging-91
+  Scenario Outline: the log records rent relief capping what a tenant pays and the government covering the rest
+    Given rent relief is enabled
+    And pawn "dog" owns "Rue de Diekirch Arlon"
+    And the street "Rue de Diekirch Arlon" has a hotel built
+    And the government's account already holds $<government_start>
+    And pawn "high hat" has $1500 to spend
+    When pawn "high hat" takes a targeted landing on "Rue de Diekirch Arlon"
+    Then the game log records that pawn "high hat" pays pawn "dog" $200 rent for "Rue de Diekirch Arlon"
+    And the game log records that the government pays pawn "dog" $<relief> in rent relief
+
+    Examples:
+      | government_start | relief |
+      | 550                | 550     |

@@ -1,6 +1,6 @@
 # mutation-stamp: sha256=694f43ebbea04354799b37f7f7d62615df43df9b4fc289b7e1323ae7f71c1a30
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-21T08:12:19.232160Z","feature_name":"megacorp salary tax","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/megacorp-salary-tax.feature","background_hash":"8b52bb2a0a6f53558853cb174011d865171e1a4b41c107899c959054c299f158","implementation_hash":"unknown","scenarios":[{"index":0,"name":"collecting a salary also pays MegaCorp's 43% share into the government account, without changing what the player collects","scenario_hash":"1b6a0b24d45b41a4c58c52686c7a7cd3775d398042880389cb5acb1787186790","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-21T08:12:19.232160Z"},{"index":1,"name":"MegaCorp's payments for multiple players accumulate together in the same government account","scenario_hash":"11acbc7780da7356bf51f05252cf5b6fd19342b91d99276ee846ee7217a6d564","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-21T08:12:19.232160Z"}]}
+# {"version":1,"tested_at":"2026-08-24T16:49:42.455775Z","feature_name":"megacorp salary tax","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/megacorp-salary-tax.feature","background_hash":"8b52bb2a0a6f53558853cb174011d865171e1a4b41c107899c959054c299f158","implementation_hash":"unknown","scenarios":[{"index":0,"name":"collecting a salary also pays MegaCorp's 43% share into the government account, without changing what the player collects","scenario_hash":"1b6a0b24d45b41a4c58c52686c7a7cd3775d398042880389cb5acb1787186790","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-21T08:12:19.232160Z"},{"index":1,"name":"MegaCorp's payments for multiple players accumulate together in the same government account","scenario_hash":"11acbc7780da7356bf51f05252cf5b6fd19342b91d99276ee846ee7217a6d564","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-21T08:12:19.232160Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -58,3 +58,16 @@ Feature: megacorp salary tax
     Examples:
       | government_account |
       | 172                  |
+
+  # megacorp-salary-tax-3
+  Scenario Outline: MegaCorp's 43% payment scales with the real double-salary rule when a pawn lands exactly on Start
+    Given with optional double salary when landing on Start rule
+    And pawn "dog" starts at position <dog_start_position>
+    And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
+    When we play the game
+    Then the game journal records that pawn "dog" collects a salary of $<dog_salary>
+    And the game journal records that the government's final account balance is $<government_account>
+
+    Examples:
+      | dog_start_position | dog_die_1 | dog_die_2 | dog_salary | government_account |
+      | 35                   | 2          | 3          | 400         | 172                  |
