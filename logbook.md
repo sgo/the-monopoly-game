@@ -47673,6 +47673,15 @@ architect's summary:
 All 11 recorded in `acceptance/equivalent-mutations.edn` (455 -> 466). No
 Gherkin changes needed. Handing back to architect to close out the task.
 
+## 2026-08-24T23:50:00Z — full soft Gherkin mutation gate clean
+
+Merged the specifier's eleven evidence-backed equivalent-mutation records
+and reran `./acceptance/run-acceptance-mutation.sh` in full. The run
+completed with no survivors and no errors; its automatic cleanup deleted
+all four prior survivor reports. The refreshed manifests are committed with
+this certification. The rent-relief/MegaCorp feature is now through the
+required full acceptance and Gherkin mutation gates.
+
 Handoff sent:
 
 ```
