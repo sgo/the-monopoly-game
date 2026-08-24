@@ -47466,3 +47466,11 @@ both require new production behavior (a `Game`-level seam for a pre-funded
 or injectable `RentRelief`, and diagnosing the entity-rent discrepancy).
 No production code changed by this handoff. Handing the verified red state
 to the architect for a coder follow-up.
+
+## 2026-08-24T21:30:00Z — route live rent-relief defects to coder
+
+Merged refactorer handoff `3f25057e8f`. Architectural review accepts the
+refactorer's two behavior findings: expose a production-valid Game seam for
+a pre-funded/injectable government account so rent relief can be live, and
+diagnose/fix legal-entity landlord rent selecting the two-house rather than
+hotel tier. Both are observable behavior fixes, so routed only to coder.
