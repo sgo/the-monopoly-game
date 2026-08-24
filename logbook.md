@@ -47850,3 +47850,32 @@ moved.
 At the user's direction, sending both changes together as one task,
 `megacorp-salary-tax-cli-wiring`, rather than the two separate handoffs
 suggested earlier.
+
+## 2026-08-24T21:53:18Z — coder completed MegaCorp CLI wiring
+
+Processed specifier handoff `000265` and merged commit `0f56466a25`.
+Implemented the real CLI-path MegaCorp wiring when rent relief is enabled,
+added explicit journal/log/report enabled-state entries, corrected MegaCorp
+tax to 43% of gross from the specified net salary (half-even cent rounding),
+and updated acceptance handlers and report rendering for decimal money.
+
+Verification: domain, CLI, and acceptance support tests pass (422 unit tests);
+the generator-backed full acceptance suite passes all 930 tests.
+
+Sent complete handoff message:
+
+```
+id: 20260824T215318Z_000267_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: megacorp-salary-tax-cli-wiring
+commit: b86a94ff02
+created_at: 2026-08-24T21:53:18.650390Z
+
+Re-read your role and constitution.
+
+merge_and_process coder b86a94ff02
+```
