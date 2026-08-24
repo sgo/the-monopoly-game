@@ -46,12 +46,13 @@ public class Rent implements Landings {
   private void collect(LegalEntity entity, Player tenant, ColourStreet land) {
     if (deeds.isMortgaged(land)) return;
     Money rent = entityRent(land);
+    Money tenantPayment = tenantPayment(rent);
     if (rentRelief == null) {
       tenant.account().withdraw(rent);
       entity.depositToBank(rent);
     } else rentRelief.pay(tenant, entity, rent);
     entity.receiveRent(land);
-    events.paid(tenant, entity, land, tenantPayment(rent), rent);
+    events.paid(tenant, entity, land, tenantPayment, rent);
   }
 
   private Money entityRent(ColourStreet street) {
@@ -66,11 +67,12 @@ public class Rent implements Landings {
     if (deeds.isMortgaged(land)) return;
     Money rent = rentFor(owner, land, roll);
     if (!strategies.forPlayer(owner).claims(new Strategy.RentClaim(tenant, land, rent))) return;
+    Money tenantPayment = tenantPayment(rent);
     if (rentRelief == null) {
       tenant.account().withdraw(rent);
       owner.account().deposit(rent);
     } else rentRelief.pay(tenant, owner, rent);
-    events.paid(tenant, owner, land, tenantPayment(rent), rent);
+    events.paid(tenant, owner, land, tenantPayment, rent);
   }
 
   private Money tenantPayment(Money rent) {

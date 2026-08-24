@@ -511,7 +511,7 @@ public class World {
         gameMaxYears,
         developmentLoanBook(),
         warProfitsTaxEnabled,
-        rentRelief
+        rentRelief == null ? null : rentRelief
     );
     Game.Result result = play.apply(game);
     turnOrder = result.turnOrder();

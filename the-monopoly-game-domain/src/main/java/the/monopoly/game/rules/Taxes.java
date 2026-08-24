@@ -9,9 +9,15 @@ import the.monopoly.game.components.streets.TaxSpace;
 /** Collects the fixed tax charged when a pawn stops on a tax space. */
 public final class Taxes implements Landings {
   private final Events events;
+  private final GovernmentAccount government;
 
   public Taxes(Events events) {
+    this(events, null);
+  }
+
+  public Taxes(Events events, GovernmentAccount government) {
     this.events = events;
+    this.government = government;
   }
 
   @Override
@@ -20,12 +26,20 @@ public final class Taxes implements Landings {
 
     Money amount = tax.tax();
     player.account().withdraw(amount);
-    events.paidBank(player, amount);
+    if (government == null) events.paidBank(player, amount);
+    else {
+      government.deposit(amount);
+      events.paidGovernment(player, amount);
+    }
   }
 
   /** What a tax payment says happened, for whoever keeps the game journal. */
   public interface Events {
     void paidBank(Player player, Money amount);
+
+    default void paidGovernment(Player player, Money amount) {
+      paidBank(player, amount);
+    }
   }
 }
 

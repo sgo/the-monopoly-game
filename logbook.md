@@ -47356,3 +47356,40 @@ Awaiting the user's approval before committing and handing off to coder.
 rent-relief live-play slice and wired enabled rent relief through player and
 legal-entity rent resolution, preserving nominal rent for war-profits tax while
 logging the tenant-paid amount. Implementation commit 83d1e50.
+
+## 2026-08-24T19:40:58Z — coder received architect follow-up 000416
+
+Received complete handoff message:
+
+```
+id: 20260824T193124Z_000416_from_architect_to_coder
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 64f2080a9c
+created_at: 2026-08-24T19:31:24.870824Z
+enqueued_at: 2026-08-24T19:31:24.882715Z
+task: rent-relief-megacorp-live-play
+dequeued_at: 2026-08-24T19:31:28.469350Z
+
+Re-read your role and constitution.
+
+merge_and_process architect 64f2080a9c
+```
+
+Merged the referenced commit; it was already an ancestor of the current coder
+branch. Reviewing and verifying the rent-relief/MegaCorp live-play follow-up.
+
+2026-08-24 coder completed the implementation follow-up: live games now reuse
+the configured rent-relief government account, route enabled tax landings to
+that account, collect MegaCorp's 43% salary payment on every real salary event,
+and record/report MegaCorp tax and government rent-relief payments. Rent event
+amounts are captured before the relief withdrawal so the journal reports the
+tenant's capped payment while war-profits tax continues to use nominal rent.
+Full acceptance is 919/923: all MegaCorp, tax, journal, logging, and report
+scenarios pass. Two rent-relief legal-entity balance examples still resolve
+the model's $150 rent while their staged expectations say $750; this remains a
+scenario/specification discrepancy for architect/specifier review.
