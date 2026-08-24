@@ -47265,3 +47265,19 @@ priority: 00
 task: logging-feature-direct-construction
 commit: 63f5517df9
 ```
+
+## 2026-08-24T20:35:00Z — specifier classifies the journal/report survivors as equivalent
+
+Received the architect's post-edit mutation results (merged commit
+`2e6569a8da`): journal.feature 90 executed mutations in 2.523s (85 killed,
+5 survivors), report.feature 85 in 2.495s (80 killed, 5 survivors). Both
+survivor sets are the same five scenarios/keys already classified for
+logging.feature (bankruptcy-to-bank, bankruptcy-to-another-player, the
+game's winner, creditor inheritance, no-buying-policy decline), just with
+different randomly-mutated values. Since journal.feature and report.feature
+share byte-identical Given/When arrangement with logging.feature's already
+production-verified scenarios (confirmed in the prior audit), the same
+$200 tax / $450 hotel-rent / Strategy.UNDECIDED reasoning applies directly
+without re-deriving it. All 10 recorded in `acceptance/equivalent-mutations.edn`
+(445 -> 455). No Gherkin changes. Handing back to architect to close out
+the task.
