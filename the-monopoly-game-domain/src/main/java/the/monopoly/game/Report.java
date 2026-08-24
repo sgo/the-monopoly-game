@@ -53,7 +53,7 @@ public final class Report {
           + boardSpaceName(it.fromSpace()) + ") to " + it.to() + " (" + boardSpaceName(it.toSpace()) + ")";
       case Entry.SalaryCollected it -> name(it.player()) + " collects a salary of $" + it.salary().amount();
       case Entry.MegacorpSalaryTaxPaid it -> "MegaCorp pays the government an individual income tax of $"
-          + it.amount().amount();
+          + money(it.amount());
       case Entry.Bought it -> name(it.player()) + " buys " + spaceName(it.land()) + " for $" + it.price().amount();
       case Entry.AuctionWon it ->
           name(it.player()) + " wins the auction for " + spaceName(it.land()) + " at $" + it.price().amount();
@@ -64,6 +64,8 @@ public final class Report {
           + (it.fullDraw() ? " with full draw" : "");
       case Entry.WarProfitsTaxEnabled it -> "war profits tax is " + (it.enabled() ? "enabled" : "disabled");
       case Entry.RentReliefEnabled it -> "rent relief is " + (it.enabled() ? "enabled" : "disabled");
+      case Entry.MegacorpSalaryTaxEnabled it -> "MegaCorp salary tax is "
+          + (it.enabled() ? "enabled" : "disabled");
       case Entry.WarProfitsTaxPaid it -> name(it.payer()) + " pays a war profits tax of $" + it.amount().amount();
       case Entry.DevelopmentLoanRaised it -> name(it.borrower()) + " raises a development loan of $"
           + it.amount().amount() + " from the bank, secured by " + boardSpaceName(it.collateral())
@@ -156,7 +158,7 @@ public final class Report {
           + (it.creditor() == null ? "the bank" : name(it.creditor()));
       case Entry.Stalemate it -> "The game ends in a stalemate";
       case Entry.YearLimitReached it -> "The year limit was reached";
-      case Entry.GovernmentBalance it -> "The government's account holds $" + it.amount().amount();
+      case Entry.GovernmentBalance it -> "The government's account holds $" + money(it.amount());
       case Entry.FinalBalance it -> name(it.player()) + "'s final balance is $" + it.balance().amount();
       case Entry.FinalAge it -> name(it.player()) + "'s final age is " + it.age() + " years";
       case Entry.LegalEntityFormed it -> it.name() + " is formed, held in equal thirds by "
@@ -237,6 +239,12 @@ public final class Report {
 
   private static String names(List<Player.ID> players) {
     return players.stream().map(Report::name).collect(joining(", "));
+  }
+
+  private static String money(the.monopoly.game.components.finance.Money amount) {
+    return amount.cents() % 100 == 0
+        ? Integer.toString(amount.amount())
+        : java.math.BigDecimal.valueOf(amount.cents(), 2).stripTrailingZeros().toPlainString();
   }
 
   private static String name(Player.ID player) {

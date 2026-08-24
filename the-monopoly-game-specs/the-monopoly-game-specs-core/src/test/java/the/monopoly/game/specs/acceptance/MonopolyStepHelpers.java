@@ -78,6 +78,10 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.GovernmentBalance(money(amount)));
   }
 
+  static Claim governmentBalance(String amount) {
+    return Claim.of(new Entry.GovernmentBalance(money(amount)));
+  }
+
   static Claim warProfitsTax(String state) {
     return Claim.of(new Entry.WarProfitsTaxEnabled(state.equals("enabled")));
   }
@@ -136,6 +140,10 @@ final class MonopolyStepHelpers {
   }
 
   static Claim megacorpTaxPaid(String pawnName, int amount) {
+    return Claim.of(new Entry.MegacorpSalaryTaxPaid(idOf(pawnName), money(amount)));
+  }
+
+  static Claim megacorpTaxPaid(String pawnName, String amount) {
     return Claim.of(new Entry.MegacorpSalaryTaxPaid(idOf(pawnName), money(amount)));
   }
 
@@ -387,6 +395,10 @@ final class MonopolyStepHelpers {
   }
 
   static String governmentBalanceLine(int amount) {
+    return "The government's account holds $" + amount;
+  }
+
+  static String governmentBalanceLine(String amount) {
     return "The government's account holds $" + amount;
   }
 

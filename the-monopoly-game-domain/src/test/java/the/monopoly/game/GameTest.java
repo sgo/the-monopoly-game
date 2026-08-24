@@ -69,6 +69,7 @@ class GameTest {
         new Entry.DevelopmentLoans(false, false),
         new Entry.WarProfitsTaxEnabled(false),
         new Entry.RentReliefEnabled(false),
+        new Entry.MegacorpSalaryTaxEnabled(false),
         new Entry.StrategyNamed(Pawn.dog.id(), "undecided", false, false),
         new Entry.StrategyNamed(Pawn.high_hat.id(), "undecided", false, false),
         new Entry.StrategyNamed(Pawn.iron_box.id(), "undecided", false, false),

@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MegacorpSalaryTaxTest {
   @Test
-  void salaryIsPaidInFullToThePlayerAndFortyThreePercentGoesToTheGovernment() {
+  void salaryIsPaidInFullToThePlayerAndFortyThreePercentOfGrossGoesToTheGovernment() {
     Bank.Simple bank = new Bank.Simple();
     Player dog = player(bank, "dog", 1500);
     MegacorpSalaryTax tax = new MegacorpSalaryTax(bank);
@@ -17,7 +17,7 @@ class MegacorpSalaryTaxTest {
     tax.collect(dog, new Money(200));
 
     assertThat(dog.account().balance().amount()).isEqualTo(new Money(1700));
-    assertThat(tax.governmentBalance()).isEqualTo(new Money(86));
+    assertThat(tax.governmentBalance()).isEqualTo(Money.fromDollars("150.88"));
   }
 
   @Test
@@ -29,7 +29,7 @@ class MegacorpSalaryTaxTest {
     tax.collect(dog, new Money(400));
 
     assertThat(dog.account().balance().amount()).isEqualTo(new Money(1900));
-    assertThat(tax.governmentBalance()).isEqualTo(new Money(172));
+    assertThat(tax.governmentBalance()).isEqualTo(Money.fromDollars("301.75"));
   }
 
   @Test
@@ -42,7 +42,7 @@ class MegacorpSalaryTaxTest {
     tax.collect(dog, new Money(200));
     tax.collect(highHat, new Money(200));
 
-    assertThat(tax.governmentBalance()).isEqualTo(new Money(172));
+    assertThat(tax.governmentBalance()).isEqualTo(Money.fromDollars("301.76"));
   }
 
   private Player player(Bank bank, String name, int balance) {
