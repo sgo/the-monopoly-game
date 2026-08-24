@@ -86,6 +86,14 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.RentReliefEnabled(state.equals("enabled")));
   }
 
+  static Claim rentReliefPaid(String landlord, int amount) {
+    return Claim.of(new Entry.RentReliefPaid(idOf(landlord), money(amount)));
+  }
+
+  static String rentReliefPaidLine(String landlord, int amount) {
+    return "The government pays " + landlord + " $" + amount + " in rent relief";
+  }
+
   static Claim purchaseDeclined(String pawnName, String spaceName, int price,
                                 Strategy.DeclineReason reason, int reserve) {
     if (reason == Strategy.DeclineReason.NO_BUYING_POLICY) {
@@ -125,6 +133,10 @@ final class MonopolyStepHelpers {
 
   static Claim salaryCollected(String pawnName, int salary) {
     return Claim.of(new Entry.SalaryCollected(idOf(pawnName), money(salary)));
+  }
+
+  static Claim megacorpTaxPaid(String pawnName, int amount) {
+    return Claim.of(new Entry.MegacorpSalaryTaxPaid(idOf(pawnName), money(amount)));
   }
 
   static Claim bought(String pawnName, String spaceName, int price) {
@@ -376,6 +388,10 @@ final class MonopolyStepHelpers {
 
   static String governmentBalanceLine(int amount) {
     return "The government's account holds $" + amount;
+  }
+
+  static String megacorpTaxPaidLine(int amount) {
+    return "MegaCorp pays the government an individual income tax of $" + amount;
   }
 
   static String warProfitsTaxLine(String state) {

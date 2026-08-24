@@ -28,8 +28,17 @@ import java.util.Map;
 record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds,
                    the.monopoly.game.rules.DevelopmentLoanBook developmentLoanBook,
                    Rule.Set rules, List<Player> players, Strategy.OfPlayers strategies,
-                   the.monopoly.game.rules.WarProfitsTaxBook warProfitsTaxBook, boolean warProfitsTax)
-    implements Turn.Events, LandSale.Events, Rent.Events, Building.Events, Cards.Events, Taxes.Events, Jail.Events, Bankruptcy.Events {
+                   the.monopoly.game.rules.WarProfitsTaxBook warProfitsTaxBook, boolean warProfitsTax,
+                   the.monopoly.game.rules.RentRelief rentRelief,
+                   the.monopoly.game.rules.MegacorpSalaryTax megacorpSalaryTax)
+  implements Turn.Events, LandSale.Events, Rent.Events, Building.Events, Cards.Events, Taxes.Events, Jail.Events, Bankruptcy.Events {
+  Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds,
+              the.monopoly.game.rules.DevelopmentLoanBook developmentLoanBook,
+              Rule.Set rules, List<Player> players, Strategy.OfPlayers strategies,
+              the.monopoly.game.rules.WarProfitsTaxBook warProfitsTaxBook, boolean warProfitsTax) {
+    this(journal, ages, deeds, developmentLoanBook, rules, players, strategies,
+        warProfitsTaxBook, warProfitsTax, null, null);
+  }
   int age(Player player) {
     return ages.getOrDefault(player.id(), 0);
   }
@@ -53,6 +62,8 @@ record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds,
     ageAfter(player);
     deeds.legalEntities().forEach(entity -> entity.shareholderGrewOlder(player));
     journal.log(new Journal.Entry.SalaryCollected(player.id(), salary));
+    if (megacorpSalaryTax != null)
+      journal.log(new Journal.Entry.MegacorpSalaryTaxPaid(player.id(), megacorpSalaryTax.payTax(salary)));
     assessWarProfitsTax(player);
     developmentLoanBook.positions().stream()
         .filter(position -> position.borrower() != null && position.borrower().id().equals(player.id()))
@@ -241,6 +252,11 @@ record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds,
   }
 
   @Override
+  public void paid(Player tenant, LegalEntity entity, ColourStreet land, Money tenantPayment, Money nominalRent) {
+    journal.log(new Journal.Entry.LegalEntityRentPaid(entity.name(), tenant.id(), land.type(), tenantPayment));
+  }
+
+  @Override
   public void distressedSaleStarted(Player seller, Ownable land) {
     journal.log(new Journal.Entry.DistressedSaleStarted(seller.id(), land.type()));
   }
@@ -290,6 +306,14 @@ record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds,
   public void paid(Player tenant, Player owner, Ownable land, Money rent) {
     journal.log(new Journal.Entry.RentPaid(tenant.id(), owner.id(), land.type(), rent));
     if (warProfitsTax) warProfitsTaxBook.accumulate(owner, rent);
+  }
+
+  @Override
+  public void paid(Player tenant, Player owner, Ownable land, Money tenantPayment, Money nominalRent) {
+    journal.log(new Journal.Entry.RentPaid(tenant.id(), owner.id(), land.type(), tenantPayment));
+    if (nominalRent.exceeds(tenantPayment))
+      journal.log(new Journal.Entry.RentReliefPaid(owner.id(), nominalRent.minus(tenantPayment)));
+    if (warProfitsTax) warProfitsTaxBook.accumulate(owner, nominalRent);
   }
 
   @Override
