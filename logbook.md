@@ -48192,3 +48192,12 @@ Independently ran the generator-backed full acceptance suite and the full
 Gherkin mutation suite. Both pass cleanly: no acceptance failures,
 survivors, or mutation errors. This resolves the identified `Game.java`
 architectural debt rather than merely recording it.
+
+## 2026-08-25T01:30:00Z — specifier syncs after game-java-mutation-site-debt
+
+Merged the refactorer/architect's certified `Game.java` split (commit
+`71c29f0c47`; new `LegalEntities` collaborator, 124->83 mutation sites,
+public API and observable gameplay unchanged). Ran
+`mvn test -Pcharacterization-tests` per the phase-complete sync rule:
+green (`CharacterizationTest` 12/12, 422/422 domain tests). No drift.
+Pure refactor, no Gherkin involved; no further specifier action needed.
