@@ -47946,3 +47946,18 @@ No defects found. Committing the property test and this log entry, then
 handing the verified state to the architect under the same task name,
 `megacorp-salary-tax-cli-wiring`, with an explicit note about the `Game.java`
 mutation-site growth trend.
+
+## 2026-08-25T00:20:00Z — architect verifies MegaCorp CLI wiring; two casing equivalents remain
+
+Received and fast-forwarded refactorer handoff `000196` (commit
+`736ecc8559`) for `megacorp-salary-tax-cli-wiring`. Independently ran the
+generator-backed full acceptance suite: green. The full soft Gherkin
+mutation run then completed with exactly two survivors, both casing-only
+mutations of the disabled-state example: `disabled -> disableD` in
+`journal.feature` and `disabled -> diSabled` in `logging.feature`. They
+are candidate equivalents because the state vocabulary is intentionally
+case-insensitive, but require specifier records before final certification.
+The same refactorer review flags `Game.java`'s mutation-site count (124)
+as standing architectural debt; this task added only six lines there, so
+it is recorded for separate debt work rather than expanding this completed
+feature.
