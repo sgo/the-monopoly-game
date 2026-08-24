@@ -253,7 +253,8 @@ public class Game {
     var journal = new Journal();
     Map<Player.ID, Integer> ages = new HashMap<>();
     Journalling journalling = new Journalling(journal, ages, deeds, developmentLoanBook,
-        rules, players, strategies, warProfitsTaxBook, warProfitsTax);
+        rules, players, strategies, warProfitsTaxBook, warProfitsTax,
+        rentRelief ? new the.monopoly.game.rules.RentRelief(rules.bank()) : null);
     journal.log(new Journal.Entry.Start(ids(players)));
     deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
@@ -547,7 +548,7 @@ public class Game {
   }
 
   private Landings landingsFor(Player player, List<Player> turnOrder, Journalling journalling) {
-    Landings rent = new Rent(deeds, rules, turnOrder, strategies, journalling);
+    Landings rent = new Rent(deeds, rules, turnOrder, strategies, journalling, journalling.rentRelief());
     Landings landSale = new LandSale(deeds, rules, turnOrder, strategies, journalling);
     Landings cards = new Cards(deeds, rules, turnOrder, strategies, decks, journalling, cups.forPlayer(player), jail);
     Landings taxes = new Taxes(journalling);
