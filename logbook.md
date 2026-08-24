@@ -47237,6 +47237,15 @@ winner-declaration scenario) — all matched logging.feature's Given/When
 exactly, confirming the same Game.java-grounded reasoning applies without
 re-deriving it from scratch.
 
+## 2026-08-24T20:20:00Z — focused journal/report mutation results
+
+Journal completed 90 executed mutations in 2.523 seconds (85 killed, five
+threshold survivors). Report completed 85 in 2.495 seconds (80 killed, five
+analogous threshold survivors). Both survivor sets mirror the already-grounded
+logging thresholds: bankruptcy balances, creditor inheritance balance, and
+the unconditional no-buying-policy balance. Routed both reports to specifier
+for formal equivalence classification.
+
 Applied the identical mechanical swap (`lands on` -> `takes a targeted
 landing on`) to both files: 31 replacements each, no assertions or example
 values touched. Verified with the full acceptance run:
