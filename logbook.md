@@ -47971,3 +47971,35 @@ The same refactorer review flags `Game.java`'s mutation-site count (124)
 as standing architectural debt; this task added only six lines there, so
 it is recorded for separate debt work rather than expanding this completed
 feature.
+
+## 2026-08-25T00:30:00Z — specifier classifies the two MegaCorp casing survivors as equivalent
+
+Verified against the actual step implementation rather than assuming the
+architect's "case-insensitive by design" framing:
+
+```java
+then("^the game journal records that MegaCorp salary tax is " + NAME + "$",
+    (world, arguments) -> records(world,
+        Claim.of(new Entry.MegacorpSalaryTaxEnabled(arguments.text(1).equals("enabled")))));
+```
+
+The disabled-state check isn't actually case-insensitive - it's a
+catch-all negative: only an exact, case-sensitive match against the
+literal string `"enabled"` parses true, so `"disableD"`/`"diSabled"` parse
+to `false` exactly the same as `"disabled"` does. This is the identical,
+already-established mechanism behind every other "X is disabled by
+default" equivalent-mutation record in `equivalent-mutations.edn`
+(development-loans, war-profits-tax, rent-relief - `equivalent-mutations.edn`
+lines 308-454), so classified the same way rather than re-deriving new
+reasoning. Recorded both (466 -> 468). No Gherkin changes.
+
+`megacorp-salary-tax-cli-wiring` is otherwise complete per the architect's
+and refactorer's verification: full acceptance green (930/930), formula
+correction and CLI-wiring both confirmed, property test added, CRAP/DRY/
+mutation-site checks clean (the one exemption is the documented
+sealed-switch case in `Report.line`). `Game.java`'s mutation-site growth
+(104->106->112->124 across four rounds) is noted as standing debt for
+separate work, not blocking this task.
+
+Handing back to architect on the same task to certify the mutation gate
+clean.
