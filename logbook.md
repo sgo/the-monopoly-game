@@ -47352,6 +47352,11 @@ steps elsewhere. Nothing to prune.
 
 Awaiting the user's approval before committing and handing off to coder.
 
+2026-08-24 coder processed handoff 000262 (specifier d786df9165): merged the
+rent-relief live-play slice and wired enabled rent relief through player and
+legal-entity rent resolution, preserving nominal rent for war-profits tax while
+logging the tenant-paid amount. Implementation commit 83d1e50.
+
 ## 2026-08-24T19:30:02Z — refactorer processes coder handoff `83d1e500f0` (rent-relief-megacorp-live-play)
 
 Handoff message received:

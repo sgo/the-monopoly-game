@@ -67,6 +67,7 @@ public class Game {
   private final DevelopmentLoanBook developmentLoanBook;
   private final boolean warProfitsTax;
   private final boolean rentRelief;
+  private final the.monopoly.game.rules.RentRelief rentReliefBook;
   private final WarProfitsTaxBook warProfitsTaxBook;
   private final int maxYears;
   private boolean automaticMarketDeadlock = true;
@@ -165,6 +166,7 @@ public class Game {
     this.developmentLoanBook = developmentLoanBook == null ? new DevelopmentLoanBook(rules.bank()) : developmentLoanBook;
     this.warProfitsTax = warProfitsTax;
     this.rentRelief = rentRelief;
+    this.rentReliefBook = rentRelief ? new the.monopoly.game.rules.RentRelief(rules.bank()) : null;
     this.warProfitsTaxBook = new WarProfitsTaxBook(rules.bank(), WarProfitsTax.boardValue(rules));
     this.maxYears = maxYears;
     applyOpeningCapital();
@@ -254,7 +256,7 @@ public class Game {
     Map<Player.ID, Integer> ages = new HashMap<>();
     Journalling journalling = new Journalling(journal, ages, deeds, developmentLoanBook,
         rules, players, strategies, warProfitsTaxBook, warProfitsTax,
-        rentRelief ? new the.monopoly.game.rules.RentRelief(rules.bank()) : null);
+        rentReliefBook);
     journal.log(new Journal.Entry.Start(ids(players)));
     deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
