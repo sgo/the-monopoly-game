@@ -47820,3 +47820,13 @@ moved.
 At the user's direction, sending both changes together as one task,
 `megacorp-salary-tax-cli-wiring`, rather than the two separate handoffs
 suggested earlier.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: megacorp-salary-tax-cli-wiring
+commit: 0f56466a25
+```
