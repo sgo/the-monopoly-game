@@ -47108,3 +47108,35 @@ Next: survey `logging.feature`'s `pawn "X" lands on "Y"` usages and decide,
 scenario by scenario, which ones have no assertion depending on the other
 player's turn happening in the same round, then swap those onto the new
 targeted step.
+
+## 2026-08-24T18:30:00Z — specifier switches logging.feature onto the targeted-turn step
+
+Surveyed all 31 uses of `pawn "X" lands on "Y"` in `logging.feature` against
+the assertions that follow each one, and cross-checked the conclusion
+against `Game.java`'s `playTurn`/`turnEndsTheGame` rather than inferring it
+from Gherkin alone. Every cross-player assertion in the file — auction
+bidding, chance/community-chest effects that pay or collect from every
+other player, bankruptcy inheritance, distressed-sale bidding wars, and
+winner declaration on the other player's bankruptcy — resolves
+synchronously inside the landing player's own `playTurn` call. None of the
+31 scenarios depend on a second seated player executing their own separate
+turn in the same round.
+
+Swapped every `pawn "X" lands on "Y"` to `pawn "X" takes a targeted landing
+on "Y"` (mechanical find-replace of the step phrase only; no assertions,
+Given/Then steps, or Examples values touched). Verified with
+`acceptance/run-acceptance.sh` (the full non-mutation acceptance run, not
+mutation testing, per the specifier's verification rule):
+`EnRulesLoggingAcceptanceTest` 119/119, full suite 910/910, `BUILD
+SUCCESS`.
+
+This closes the practical work opened by the user's `pawn lands on`
+optimization idea: the same real production logic still runs for the
+landing player (dice roll, movement, buy/rent/tax/card resolution, real
+journal entries), so every existing structural journal assertion keeps its
+full wiring-proof value — this only stops paying for the second seated
+player's own turn, which none of these scenarios needed.
+
+`logging.feature`'s mutation-manifest stamp will regenerate on next
+mutation run; not touched here per the verification rule (mutation not
+run this session).
