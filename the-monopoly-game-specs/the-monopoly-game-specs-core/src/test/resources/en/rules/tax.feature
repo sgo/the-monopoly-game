@@ -32,3 +32,25 @@ Feature: taxes
     Examples:
       | expected_balance |
       | 1400              |
+
+  # tax-3
+  Scenario Outline: landing on Income Tax pays the government's account instead of the bank, once rent relief is enabled
+    Given rent relief is enabled
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
+    Then pawn "dog"'s account balance is $<expected_balance>
+    And the government's account holds $<government_account>
+
+    Examples:
+      | expected_balance | government_account |
+      | 1300               | 200                  |
+
+  # tax-4
+  Scenario Outline: landing on Luxury Tax pays the government's account instead of the bank, once rent relief is enabled
+    Given rent relief is enabled
+    When pawn "dog" takes a targeted landing on "Extra Belasting / Taxe de Luxe"
+    Then pawn "dog"'s account balance is $<expected_balance>
+    And the government's account holds $<government_account>
+
+    Examples:
+      | expected_balance | government_account |
+      | 1400               | 100                  |

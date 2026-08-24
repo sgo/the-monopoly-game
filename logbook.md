@@ -47281,3 +47281,188 @@ $200 tax / $450 hotel-rent / Strategy.UNDECIDED reasoning applies directly
 without re-deriving it. All 10 recorded in `acceptance/equivalent-mutations.edn`
 (445 -> 455). No Gherkin changes. Handing back to architect to close out
 the task.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: logging-feature-direct-construction
+commit: 4b5dc341ab
+```
+
+## 2026-08-24T21:15:00Z — specifier stages all 12 backlogged rent-relief/MegaCorp scenarios, red for the right reason
+
+At the user's direction: rather than pre-emptively asking the architect to
+design wiring before writing any Gherkin, followed plain red-green-refactor.
+Moved all 12 backlogged scenarios into their tracked files as one batch:
+`logging-90/91`, `journal-90/91`, `report-90/91`, `tax-3/4`,
+`rent-relief-3/4/5`, `megacorp-salary-tax-3`. Deleted the 6 now-empty
+backlog files (`the-monopoly-game-specs/backlog/en/rules/{journal,logging,
+report,megacorp-salary-tax,rent-relief,tax}.feature`).
+
+New single-turn landing scenarios (`logging/journal/report-91`, `tax-3/4`,
+`rent-relief-3/4`) use the `takes a targeted landing on` step established
+earlier in this task, consistent with the rest of these files.
+
+Before staging, ran the batch through the full acceptance suite (not
+mutation) to verify each goes red for a real reason, not an authoring bug.
+This caught and fixed two genuine defects in the backlog's own
+`rent-relief-5`, which its own comment had already flagged as unverified:
+
+- `high_hat_start_position` was 37, which is Meir Antwerpen's own board
+  position (confirmed against `Official.java`'s board list) — landing
+  there plus a roll of 3 wrapped to Start, not Meir Antwerpen. Fixed to 34.
+- dog's single queued roll crossed Start in round 1, *before* high hat's
+  round-1 rent payment. `Journalling.collectedSalary` assesses war profits
+  tax synchronously against whatever `WarProfitsTaxBook` has accumulated
+  so far, so the assessment came out $0, not $1500 — a genuine sequencing
+  bug in the scenario itself, not a missing-wiring symptom. Split dog's
+  roll into two queued turns (round 1 lands on Veldstraat Gent, one of
+  dog's own streets, without crossing Start; round 2 crosses Start only
+  after high hat's rent has landed). Re-ran and confirmed this scenario now
+  passes outright — it needed no new wiring at all, just the two fixes.
+
+Final state: 923 acceptance tests, 12 failures, all newly-staged, none
+elsewhere in the suite:
+- `logging-90`/`journal-90` ("MegaCorp pays the government..."): unsupported
+  step — `MegacorpSalaryTax` has zero production callers, confirmed earlier
+  this session.
+- `report-90`'s salary-collection line: unsupported step for a different
+  reason — `report.feature`'s step vocabulary only ever had a compound
+  "X before it says Y" form for salary collection, never a standalone one;
+  this is the first scenario to need it standalone.
+- `logging/journal/report-91`, `rent-relief-3/4`, `tax-3/4`: real
+  assertion failures — rent relief's cap and the tax-to-government
+  redirect never fire during real play (`RentRelief` has zero production
+  callers, confirmed earlier), so full uncapped amounts land on the bank
+  as always.
+- `megacorp-salary-tax-3`'s final-balance line: real assertion failure,
+  same root cause as the MegaCorp scenarios above.
+- `rent-relief-3`'s numeric mismatch ($1350 actual vs $1300/$750 expected)
+  doesn't yet have a confirmed root cause beyond "rent relief isn't
+  applied" — may need a further look once real wiring exists.
+
+Ran `bb gherkin-ir-dry-checker` against all six touched files: no
+high-confidence findings involving the new scenarios beyond expected
+placeholder-variant matches on the shared `takes a targeted landing on`
+step; only generic medium-confidence noise from shared parameterized
+steps elsewhere. Nothing to prune.
+
+Awaiting the user's approval before committing and handing off to coder.
+
+## 2026-08-24T19:30:02Z — refactorer processes coder handoff `83d1e500f0` (rent-relief-megacorp-live-play)
+
+Handoff message received:
+
+```
+id: 20260824T191622Z_000261_from_coder
+from: coder
+to: refactorer
+recipient: refactorer
+priority: 50
+type: git_handoff
+role: coder
+commit: 83d1e500f0
+created_at: 2026-08-24T19:16:22.566805Z
+enqueued_at: 2026-08-24T19:16:22.674726Z
+task: rent-relief-megacorp-live-play
+
+Re-read your role and constitution.
+
+merge_and_process coder 83d1e500f0
+```
+
+(A stale `in_process` daemon file from the already-closed `development-loans`
+task, commit `6ed9577`, was still sitting unarchived from 2026-08-18; that
+commit was already an ancestor of this branch and the task was already
+accepted per the 2026-08-18T14:40:41+02:00 logbook entry. Marked it
+completed via `done_with_current_task.sh` without redoing any work, which
+surfaced this handoff underneath it.)
+
+Merged `83d1e500f0` ("Integrate rent relief into live rent payments") clean,
+no conflicts. Diff: `Game.java`/`Journalling.java`/`Rent.java` wire an
+optional `RentRelief` into the two live rent-collection paths (player and
+legal-entity landlord); `RentRelief` gained a `pay(Player, LegalEntity, Money)`
+overload and a `tenantPayment` query; `Rent.Events.paid` gained a 5-arg
+default (tenant payment + nominal rent) so journal/report/logging can
+distinguish what the tenant paid from what the landlord nominally charged
+without breaking the `Cards.java` card-triggered rent path, which still
+calls the original 4-arg `paid` and is intentionally untouched by rent
+relief (out of scope per the feature file's own background comment).
+
+Analysis tools (constitution-mandated, `crap4java`/`dry4java`/`mutate4java`
+on `Game.java`, `Journalling.java`, `Rent.java`, `RentRelief.java`):
+- CRAP: every new/changed method is ≤6 (`RentRelief.pay(Player,LegalEntity,
+  Money)` is CRAP 6.0 at 0% unit coverage, right at the threshold; everything
+  else lower). The high-CRAP entries the tool reports on these files
+  (`Journalling.mortgageSpareProperty` 72.0, `Game.journalOperation` 56.0 —
+  the documented sealed-switch exemption, `Game.serviceEntityDevelopmentLoan`
+  12.0) are pre-existing, untouched by this diff, already documented in
+  prior rounds.
+- DRY: clean on `Rent.java`/`RentRelief.java` standalone. The new
+  `Journalling.paid` 5-arg overrides only pair with the established
+  one-liner-per-entry-type event-adapter shape (documented pre-existing
+  noise across dozens of prior rounds); nothing new to extract.
+- Mutation-site scan: `Rent.java` 14, `RentRelief.java` 3, `Journalling.java`
+  24 — all well under the split threshold. `Game.java` is at 112 (was 106
+  before this task, a pre-existing >100 breach per the
+  2026-08-20T10:36:00Z entry); this task's diff to `Game.java` is a 3-line
+  ternary plus one accessor call. Consistent with that entry's precedent
+  ("splitting the 2469-line core engine over a +N pre-existing overshoot is
+  disproportionate"), not splitting for this increment; the file remains a
+  documented, standing candidate for a dedicated structural split.
+
+Verification: `mvn test` (`-Dmaven.repo.local=tmp/m2`) all green — domain
+421/421, CLI 23/23, specs-core 9/9. `./acceptance/run-acceptance.sh` is
+red: 923 tests, 15 failures. Of the 12 scenarios the specifier staged as
+expected-red (2026-08-24T21:15:00Z entry), `rent-relief-5` is now green as
+predicted (it needed no wiring, only its own already-fixed authoring bugs).
+`journal-91`/`logging-91`/`report-91`/`tax-3`/`tax-4`/`megacorp-salary-tax-3`
+remain red exactly as expected — `MegacorpSalaryTax` is untouched by this
+commit, correctly out of scope for "integrate rent *relief*". But
+`rent-relief-3` and `rent-relief-4` are still red, for a new reason, not the
+old "zero production callers" one:
+
+- `rent-relief-4` (player-owned landlord, real board landing): expects the
+  journal to show the tenant paying $200 (relief applied; government
+  pre-funded to $550, which fully covers the $550 gap on a $750 rent).
+  Actual: `RentPaid[...,rent=Money[amount=750]]` — full rent, no relief,
+  exactly what a $0 government balance would produce. Root cause: `Game`'s
+  live-play constructor only takes a `boolean rentRelief` and always builds
+  a fresh `new RentRelief(rules.bank())` (`Game.java:257`) with a
+  freshly-zeroed `GovernmentAccount`. There is no way for a live-played
+  game to start with a pre-funded government account, and since
+  `MegacorpSalaryTax` — the government account's only funding source — has
+  zero production callers, the balance can also never grow during play
+  either. As delivered, rent relief in live play is wired but inert: it can
+  never actually grant relief. This is a genuine gap in "integrate rent
+  relief into live rent payments," not a test-rig issue — the scenario
+  explicitly tests that a live game can honor an already-funded government
+  account, which the current `Game` API has no seam for.
+- `rent-relief-3` (legal-entity landlord, two examples): tenant pays exactly
+  $150 in both examples (government-balance-independent), not the expected
+  $1300/$750. $150 is `RueDeDiekirchArlon.rentForHouses(2)` from the street's
+  declared rent table (`Street.java:34`: price 140, vacant 10, 1-house 50,
+  2-house 150, 3-house 450, 4-house 625, hotel 750) — the entity-collect path
+  is charging the 2-house rent tier, not the hotel tier the scenario builds.
+  This is a separate discrepancy from the wiring gap above; root cause not
+  isolated (could be an entity-formation/building-state interaction in the
+  acceptance rig, or a genuine entity-rent computation defect) and left for
+  whoever picks this up to dig into.
+
+The three `SpecsCliEnCliAcceptanceTest` "<flag> is enabled" failures seen on
+the first full run (`development-loans`/`war-profits-tax`/`rent-relief`, all
+in one long randomized packaged-jar scenario) reproduce the already-known,
+previously-documented intermittent CLI timing flake (2026-08-02/03 entries):
+an isolated rerun of that class alone showed only 1 of the 3 failures, not
+reproducing the other two — not a regression from this task.
+
+Per refactorer ownership (structure-preserving cleanup + verification, not
+completing an incomplete implementation — same posture as the
+2026-08-18T08:30:00Z development-loans review), not attempting either fix:
+both require new production behavior (a `Game`-level seam for a pre-funded
+or injectable `RentRelief`, and diagnosing the entity-rent discrepancy).
+No production code changed by this handoff. Handing the verified red state
+to the architect for a coder follow-up.
