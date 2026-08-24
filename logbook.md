@@ -47021,6 +47021,14 @@ routed a coder follow-up for a separate explicit targeted-landing acceptance
 step and focused adapter test. Existing step wording must remain unchanged;
 specifier will decide later which logging scenarios may opt in.
 
+## 2026-08-24T17:17:46Z — phase complete: targeted landing available to specs
+
+Focused verification passed: GameTest 62/62 and TargetedLandingStepTest 1/1.
+The new explicit targeted-landing step preserves real target-turn production
+calculation and journal entries while leaving existing landing wording intact.
+Handing the capability to specifier to select only scenarios for which other
+players' full turns are not semantically required.
+
 ## 2026-08-24T17:11:14Z — received architect handoff: targeted real-turn path
 
 Handoff message received:
