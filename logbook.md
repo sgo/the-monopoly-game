@@ -47672,3 +47672,30 @@ merge_and_process architect 92729c81ba
 Closed the stale processed handoff 000416, merged the architect's follow-up,
 and preserved both branches' append-only logbook entries while resolving the
 merge conflict. Reviewing the newly routed report-format defect.
+
+## 2026-08-24T20:22:00Z — coder returned architect follow-up 000266
+
+Completed the coder-owned `Report` fix so rent reports use the printed board
+name for `RueDeDiekirchArlon`, with a regression unit test. Domain tests pass
+(422 tests). Full acceptance runs 923 tests: 921 pass; the two remaining
+`rent-relief-3` legal-entity examples still expect $1300/$750 while the shared
+board setup resolves $150 two-house rent and produces $1350. This is routed to
+the specifier as specification content.
+
+Sent complete handoff message:
+
+```
+id: 20260824T202200Z_000266_from_coder
+from: coder
+to: architect
+priority: 00
+type: git_handoff
+role: coder
+task: rent-relief-megacorp-live-play
+commit: e115ed7ec3
+created_at: 2026-08-24T20:22:00.599630Z
+
+Re-read your role and constitution.
+
+merge_and_process coder e115ed7ec3
+```
