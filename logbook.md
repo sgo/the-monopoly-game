@@ -47551,3 +47551,19 @@ cases are the two legal-entity rent-relief balance examples, whose staged
 expectation is $750 although the encoded house setup resolves to the
 two-house $150 rent tier. Architect verification and specifier routing
 follow.
+
+## 2026-08-24T22:10:00Z — independent acceptance verification exposes two routes
+
+Ran `./acceptance/run-acceptance.sh` after merging `48748ac336`. It has
+three failures only. `rent-relief-3`'s two examples are specification
+content: the scenario says a hotel exists yet the shared entity setup
+resolves the relevant street at the two-house $150 tier, so the actual
+tenant balance is $1350 rather than the staged $1300/$750 values. Route
+that correction to the specifier.
+
+`report-91` is a separate production defect: `Report.spaceName()` formats
+`RueDeDiekirchArlon` mechanically as `Rue De Diekirch Arlon` despite the
+existing board-name override for `Rue de Diekirch Arlon`; the rent report
+therefore misses the specified phrase. Route a minimal coder fix. The
+rent-relief, tax, logging, journal, and MegaCorp behavior otherwise passes
+this independent full acceptance run.
