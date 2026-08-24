@@ -46904,3 +46904,72 @@ No spec changes made yet.
 
 Next: running `mvn test -Pcharacterization-tests` per the phase-complete
 sync rule before continuing.
+
+## 2026-08-24T09:00:00Z — specifier finds the direct fixture cannot substitute for logging.feature's real-play scenarios
+
+Ran `mvn test -Pcharacterization-tests` after the merge above: green
+(`CharacterizationTest` 12/12, full reactor build success). No drift to
+investigate.
+
+Discussed the actual restructuring with the user in detail before touching
+any Gherkin. Two things surfaced:
+
+1. The user correctly pointed out that `logging.feature`'s "X before Y"
+   assertions are about event ordering *within a single turn*, not across
+   turns — e.g. `logging-6` ("the log records rent paid after the landing
+   movement") already only ever plays one turn. There is no multi-turn cost
+   to trim there. The user separately noted that the `pawn "X" lands on
+   "Y"` step itself still pays full `Game`-construction cost to stage that
+   one turn, and suggested that's an implementation-level optimization the
+   coder could make — separate from anything Gherkin can fix.
+
+2. Tracing the actual step-handler implementations changed the plan
+   entirely. Every `"the game log/journal records that ..."` assertion in
+   `logging.feature` (confirmed by grep: zero exceptions outside `log-1`)
+   resolves to `GameAccount.records`/`recordsInOrder`, which check
+   *structural* `Entry` equality/order in `world.journal()` — never
+   rendered text. `world.journal()` is empty unless a real `Game` was
+   played, or something explicitly appended to it via `World`'s private
+   `record(Entry)` helper. The architect's new fixture
+   (`EventStepHandlers`/`SampleEvents`, from the prior phase) does neither:
+   it builds a throwaway journal purely to compare the Report renderer's
+   text against the Journal renderer's text for the same hand-built entry —
+   a real, legitimate check, but a *rendering-consistency* check, not a
+   *data-wiring* check. It has no assertion path back into `world.journal()`
+   at all.
+
+   Consequence: there is no subset of "format-only" scenarios in
+   `logging.feature` waiting to move onto this fixture. Every scenario
+   outside `log-1` is checking that real gameplay computed the right value
+   and wired it into the journal — not that a value renders correctly.
+   Converting any of them (e.g. `logging-6`) onto the direct fixture would
+   mean hand-constructing the exact entry the scenario expects and then
+   asserting "is this entry present" — tautologically true forever,
+   regardless of whether the real rent/purchase/salary calculation is
+   broken. That would look like a mutation-cost win while silently
+   deleting the coverage that scenario exists for.
+
+Conclusion: the fixture built in the prior phase closes the gap for
+`log-1` (rendering-consistency, its actual purpose) but does not open any
+path to cheapen the other 77 scenarios. The real bottleneck remains what
+the user and I identified independently: no lighter way exists to invoke
+the real rent/purchase/salary/card calculation logic without constructing
+the full `Game` object graph. Closing that gap needs a genuinely lighter
+execution path (still running production logic, just without cards/jail/
+legal-entity/development-loan machinery the scenario doesn't touch) — an
+implementation change, not a Gherkin one.
+
+No `logging.feature` changes made. Handing this back to the architect as
+the next step in the same task, including the user's `pawn lands on`
+optimization idea, rather than attempting a restructuring that would
+weaken assertions.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: logging-feature-direct-construction
+commit: PENDING
+```
