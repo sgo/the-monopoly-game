@@ -47567,3 +47567,13 @@ existing board-name override for `Rue de Diekirch Arlon`; the rent report
 therefore misses the specified phrase. Route a minimal coder fix. The
 rent-relief, tax, logging, journal, and MegaCorp behavior otherwise passes
 this independent full acceptance run.
+
+## 2026-08-24T22:18:00Z — duplicate coder returns classified without merge
+
+Received coder handoffs `000264` (`a8ff9e106a`) and `000265`
+(`23a9607930`) under the same task. Both carry the same production/spec
+change as already-merged `48748ac336`; a direct tree comparison shows that
+each differs from it only by later `logbook.md` entries. No code merge is
+needed and their duplicate completion records must not overwrite the
+architect's verified history. The outstanding coder and specifier follow-up
+handoffs remain `000417` and `000418` respectively.
