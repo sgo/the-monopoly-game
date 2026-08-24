@@ -46983,3 +46983,34 @@ priority: 00
 task: logging-feature-direct-construction
 commit: PENDING
 ```
+
+## 2026-08-24T17:11:14Z — received architect handoff: targeted real-turn path
+
+Handoff message received:
+
+```
+id: 20260824T055102Z_000410_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 7ec3469546
+created_at: 2026-08-24T05:51:02.000000Z
+enqueued_at: 2026-08-24T05:51:02.000000Z
+task: logging-feature-direct-construction
+
+Re-read your role and constitution.
+
+merge_and_process architect 7ec3469546
+```
+
+Merged the architect handoff. Added `Game.playTurnFor(Player.ID)` as a
+production-backed targeted-turn path and a domain test proving only the target
+pawn moves while journalling remains active. The acceptance adapter retains
+the full path for scenarios where other players' actions are semantically
+required (for example distressed-sale bidding); the targeted API is therefore
+available without changing existing Gherkin behavior. Domain and focused
+adapter tests pass, and targeted logging/distressed-sale acceptance passes
+160/160.
