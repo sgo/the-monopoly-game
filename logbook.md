@@ -46964,6 +46964,16 @@ the next step in the same task, including the user's `pawn lands on`
 optimization idea, rather than attempting a restructuring that would
 weaken assertions.
 
+## 2026-08-24T09:05:00Z — route targeted real-turn path investigation to coder
+
+Merged specifier handoff `e6ac3aabd7`. The direct fixture is rendering-only;
+it cannot replace logging.feature's real gameplay journal assertions. The
+current `World.landPawnOn` stages a short hop then calls `Game.play()`, so the
+next performance direction is a lightweight targeted-turn production path
+that preserves real rule calculation and journal emission while excluding
+unrelated setup. Routed architectural investigation and implementation to
+coder; no Gherkin conversion is authorized.
+
 Handoff sent:
 
 ```
@@ -46973,3 +46983,85 @@ priority: 00
 task: logging-feature-direct-construction
 commit: e6ac3aabd7
 ```
+
+## 2026-08-24T17:16:51Z — received architect follow-up: explicit targeted landing step
+
+Handoff message received:
+
+```
+id: 20260824T151431Z_000411_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 23c0db8199
+created_at: 2026-08-24T15:14:31.000000Z
+enqueued_at: 2026-08-24T15:14:31.000000Z
+task: logging-feature-direct-construction
+
+Re-read your role and constitution.
+
+merge_and_process architect 23c0db8199
+```
+
+Merged the architect handoff. Added an explicit targeted-landing step and
+focused adapter test, while preserving the original `pawn lands on` wording
+and full-turn behavior. Targeted adapter and domain verification passes 63/63;
+no feature files were changed.
+
+## 2026-08-24T17:12:00Z — review targeted turn path
+
+Merged coder commits `3404e311d2` and `4af06acc1a`. `Game.playTurnFor` keeps
+real production rule and journal behavior, but no acceptance step invokes it;
+the existing generic `pawn lands on` step still calls full `Game.play()`. To
+make the performance path usable without weakening unrelated scenarios,
+routed a coder follow-up for a separate explicit targeted-landing acceptance
+step and focused adapter test. Existing step wording must remain unchanged;
+specifier will decide later which logging scenarios may opt in.
+
+## 2026-08-24T17:17:46Z — phase complete: targeted landing available to specs
+
+Focused verification passed: GameTest 62/62 and TargetedLandingStepTest 1/1.
+The new explicit targeted-landing step preserves real target-turn production
+calculation and journal entries while leaving existing landing wording intact.
+Handing the capability to specifier to select only scenarios for which other
+players' full turns are not semantically required.
+
+## 2026-08-24T17:11:14Z — received architect handoff: targeted real-turn path
+
+Handoff message received:
+
+```
+id: 20260824T055102Z_000410_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 7ec3469546
+created_at: 2026-08-24T05:51:02.000000Z
+enqueued_at: 2026-08-24T05:51:02.000000Z
+task: logging-feature-direct-construction
+
+Re-read your role and constitution.
+
+merge_and_process architect 7ec3469546
+```
+
+Merged the architect handoff. Added `Game.playTurnFor(Player.ID)` as a
+production-backed targeted-turn path and a domain test proving only the target
+pawn moves while journalling remains active. The acceptance adapter retains
+the full path for scenarios where other players' actions are semantically
+required (for example distressed-sale bidding); the targeted API is therefore
+available without changing existing Gherkin behavior. Domain and focused
+adapter tests pass, and targeted logging/distressed-sale acceptance passes
+160/160.
+
+## 2026-08-24T17:11:50Z — handoff to architect: targeted real-turn path
+
+Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
+commit `3404e311d2`, containing the production-backed targeted-turn API and
+its unit test. Targeted acceptance verification passed 160/160.
