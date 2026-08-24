@@ -46964,6 +46964,16 @@ the next step in the same task, including the user's `pawn lands on`
 optimization idea, rather than attempting a restructuring that would
 weaken assertions.
 
+## 2026-08-24T09:05:00Z — route targeted real-turn path investigation to coder
+
+Merged specifier handoff `e6ac3aabd7`. The direct fixture is rendering-only;
+it cannot replace logging.feature's real gameplay journal assertions. The
+current `World.landPawnOn` stages a short hop then calls `Game.play()`, so the
+next performance direction is a lightweight targeted-turn production path
+that preserves real rule calculation and journal emission while excluding
+unrelated setup. Routed architectural investigation and implementation to
+coder; no Gherkin conversion is authorized.
+
 Handoff sent:
 
 ```
