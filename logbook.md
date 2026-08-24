@@ -47014,3 +47014,9 @@ required (for example distressed-sale bidding); the targeted API is therefore
 available without changing existing Gherkin behavior. Domain and focused
 adapter tests pass, and targeted logging/distressed-sale acceptance passes
 160/160.
+
+## 2026-08-24T17:11:50Z — handoff to architect: targeted real-turn path
+
+Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
+commit `3404e311d2`, containing the production-backed targeted-turn API and
+its unit test. Targeted acceptance verification passed 160/160.
