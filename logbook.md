@@ -11979,26 +11979,6 @@ code.
 Handing the behavior-preserving adapter-test hardening to refactorer for
 review.
 
-2026-08-24T19:54:19Z — sent corrected architect handoff 000264 after the
-implementation commit was amended to include the previous send log. The
-message was:
-
-```
-id: 20260824T195419Z_000264_from_coder
-from: coder
-to: architect
-priority: 00
-type: git_handoff
-role: coder
-task: rent-relief-megacorp-live-play
-commit: a8ff9e106a
-created_at: 2026-08-24T19:54:19.484372Z
-
-Re-read your role and constitution.
-
-merge_and_process coder a8ff9e106a
-```
-
 ## 2026-07-29T14:26:17Z — architect sent Phase 15 CLI adapter-hardening review
 
 Handoff message sent:
@@ -47377,64 +47357,6 @@ rent-relief live-play slice and wired enabled rent relief through player and
 legal-entity rent resolution, preserving nominal rent for war-profits tax while
 logging the tenant-paid amount. Implementation commit 83d1e50.
 
-## 2026-08-24T19:40:58Z — coder received architect follow-up 000416
-
-Received complete handoff message:
-
-```
-id: 20260824T193124Z_000416_from_architect_to_coder
-from: architect
-to: coder
-recipient: coder
-priority: 00
-type: git_handoff
-role: architect
-commit: 64f2080a9c
-created_at: 2026-08-24T19:31:24.870824Z
-enqueued_at: 2026-08-24T19:31:24.882715Z
-task: rent-relief-megacorp-live-play
-dequeued_at: 2026-08-24T19:31:28.469350Z
-
-Re-read your role and constitution.
-
-merge_and_process architect 64f2080a9c
-```
-
-Merged the referenced commit; it was already an ancestor of the current coder
-branch. Reviewing and verifying the rent-relief/MegaCorp live-play follow-up.
-
-2026-08-24 coder completed the implementation follow-up: live games now reuse
-the configured rent-relief government account, route enabled tax landings to
-that account, collect MegaCorp's 43% salary payment on every real salary event,
-and record/report MegaCorp tax and government rent-relief payments. Rent event
-amounts are captured before the relief withdrawal so the journal reports the
-tenant's capped payment while war-profits tax continues to use nominal rent.
-Full acceptance is 919/923: all MegaCorp, tax, journal, logging, and report
-scenarios pass. Two rent-relief legal-entity balance examples still resolve
-the model's $150 rent while their staged expectations say $750; this remains a
-scenario/specification discrepancy for architect/specifier review.
-
-2026-08-24T19:53:38Z — coder sent architect follow-up 000263:
-
-```
-id: 20260824T195338Z_000263_from_coder
-from: coder
-to: architect
-priority: 00
-type: git_handoff
-role: coder
-task: rent-relief-megacorp-live-play
-commit: 48748ac336
-created_at: 2026-08-24T19:53:38.834290Z
-
-Re-read your role and constitution.
-
-merge_and_process coder 48748ac336
-```
-
-Handed the verified implementation back to the architect; the two remaining
-legal-entity rent expectation mismatches are called out for architect/specifier
-review.
 ## 2026-08-24T19:30:02Z — refactorer processes coder handoff `83d1e500f0` (rent-relief-megacorp-live-play)
 
 Handoff message received:
@@ -47646,27 +47568,39 @@ therefore misses the specified phrase. Route a minimal coder fix. The
 rent-relief, tax, logging, journal, and MegaCorp behavior otherwise passes
 this independent full acceptance run.
 
-## 2026-08-24T20:18:27Z — coder received architect follow-up 000417
+## 2026-08-24T22:18:00Z — duplicate coder returns classified without merge
 
-Received complete handoff message:
+Received coder handoffs `000264` (`a8ff9e106a`) and `000265`
+(`23a9607930`) under the same task. Both carry the same production/spec
+change as already-merged `48748ac336`; a direct tree comparison shows that
+each differs from it only by later `logbook.md` entries. No code merge is
+needed and their duplicate completion records must not overwrite the
+architect's verified history. The outstanding coder and specifier follow-up
+handoffs remain `000417` and `000418` respectively.
+
+## 2026-08-24T22:40:00Z — specifier resolves rent-relief-3 setup collision
+
+Received specifier handoff `000263` (commit `656fa0dac3`). Its investigation
+corrected the earlier surface diagnosis: the legal-entity rent was not the
+cause. `Pink Realty is formed` pre-queues a roll for each otherwise-empty
+player queue; that roll was consumed before the later targeted-landing
+step's roll, so high hat actually landed on Elektriciteitscentrale rather
+than Rue de Diekirch Arlon. The feature now queues high hat's intended
+`1 and 2` roll before entity formation, preserving the real targeted
+landing. The specifier independently reports full acceptance at 923 tests
+with only `report-91` remaining, the already-routed canonical-name coder
+defect. Merged for architect verification.
+
+Handing back to architect on the same task.
+
+Handoff sent:
 
 ```
-id: 20260824T195836Z_000417_from_architect_to_coder
-from: architect
-to: coder
-recipient: coder
-priority: 00
 type: git_handoff
-role: architect
-commit: 92729c81ba
-created_at: 2026-08-24T19:58:36.292935Z
-enqueued_at: 2026-08-24T19:58:36.409438Z
+to: architect
+priority: 00
 task: rent-relief-megacorp-live-play
-dequeued_at: 2026-08-24T20:18:27.467445Z
-
-Re-read your role and constitution.
-
-merge_and_process architect 92729c81ba
+commit: 656fa0dac3
 ```
 
 Closed the stale processed handoff 000416, merged the architect's follow-up,
@@ -47699,3 +47633,220 @@ Re-read your role and constitution.
 
 merge_and_process coder e115ed7ec3
 ```
+## 2026-08-24T22:55:00Z — regenerated acceptance confirms only report-name blocker
+
+The first targeted Maven invocation reused generated acceptance test sources
+and therefore showed stale `rent-relief-3` failures; it is not used as
+verification. The generator-backed `./acceptance/run-acceptance.sh` was
+then run to completion after the specifier merge. It confirms all
+rent-relief scenarios pass and leaves exactly one failure: `report-91`,
+where the report emits `Rue De Diekirch Arlon` instead of the canonical
+`Rue de Diekirch Arlon`. Coder handoff `000417` remains the sole blocker
+before the required full Gherkin mutation gate.
+
+## 2026-08-24T23:05:00Z — coder fixes canonical rent report name
+
+Received coder handoff `000266` (commit `e115ed7ec3`) for the sole
+remaining acceptance blocker. It changes `Report.spaceName()` to consult
+the canonical board-space override before its enum-name fallback and adds
+a focused regression test. This makes rent reports use `Rue de Diekirch
+Arlon` rather than the mechanically capitalized `Rue De Diekirch Arlon`.
+Merged for the final acceptance and mutation sequence.
+
+## 2026-08-24T23:20:00Z — full soft Gherkin mutation completed; eleven survivors require classification
+
+After the coder fix, the generator-backed full acceptance suite is green.
+Ran `./acceptance/run-acceptance-mutation.sh` to completion. Its generated
+manifests and survivor reports record eleven survivors, all in newly added
+MegaCorp/rent-relief scenarios: two each in journal and report salary
+rolls, two in logging, and five in rent-relief. The mutations are candidate
+equivalences (alternate dice that still cross Start; government balances on
+the same sufficient/insufficient side of the $550 relief boundary; and
+alternate later rolls that retain the same tax timing). They require the
+specifier's explicit classification and equivalent-record updates before
+this gate can certify cleanly. The run's manifest refresh and the four
+survivor reports are retained in this commit for that review.
+
+## 2026-08-24T23:35:00Z — specifier classifies all 11 rent-relief/MegaCorp survivors as equivalent
+
+Verified each against production code rather than assuming from the
+architect's summary:
+
+- MegaCorp salary/die mutations (journal/report/logging-90, 3 survivors):
+  `Turn.move` (`Turn.java:92-106`) checks `from + steps >= spaces` using
+  the *raw, unnormalized* starting position - it never wraps `from` to a
+  valid board index first. So both an ordinary die total and an inflated
+  one (or a start position pushed past the board's own length) satisfy
+  the same `>=40` crossing threshold, producing the identical salary/tax
+  outcome.
+- Rent-relief government-balance mutations (logging-91, rent-relief-3 x2):
+  relief paid is capped at the actual $550 gap on a $750 rent, not at
+  whatever the government's account holds - so any value on the same side
+  of that $550 threshold (both >=550, or both <550) yields the identical
+  outcome.
+- rent-relief-5's three survivors: two are the same raw-`from`-threshold
+  reasoning as the MegaCorp mutations, applied to dog's round-2
+  Start-crossing roll. The third (`dog_round2_die_2` 6->2) is more subtle:
+  the mutated roll (2,2) is itself doubles, and since this file's
+  Background arranges `every other player can complete their turn`
+  (`World.othersRollWhatTheyLike=true`), the bonus roll doubles grants is
+  the *deterministic* `UNREMARKABLE=Roll(4,6)` fallback, not a random one
+  - so the guaranteed bonus roll still crosses Start even though the
+  primary mutated roll alone would not have. Confirmed this isn't a
+  flaky/luck-based survival before classifying it. The fourth
+  (`dog_start_position` 25->26) holds because the war-profits-tax amount
+  depends only on landValue and rent collected since the last assessment,
+  neither of which depends on which specific space dog's own round-1 move
+  happens to land on, as long as it still stays under the board size
+  (both 32 and 33 do).
+
+All 11 recorded in `acceptance/equivalent-mutations.edn` (455 -> 466). No
+Gherkin changes needed. Handing back to architect to close out the task.
+
+## 2026-08-24T23:50:00Z — full soft Gherkin mutation gate clean
+
+Merged the specifier's eleven evidence-backed equivalent-mutation records
+and reran `./acceptance/run-acceptance-mutation.sh` in full. The run
+completed with no survivors and no errors; its automatic cleanup deleted
+all four prior survivor reports. The refreshed manifests are committed with
+this certification. The rent-relief/MegaCorp feature is now through the
+required full acceptance and Gherkin mutation gates.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: rent-relief-megacorp-live-play
+commit: e4bae47b0a
+```
+
+## 2026-08-25T00:05:00Z — specifier certifies rent-relief-megacorp-live-play complete
+
+Merged the architect's clean full-Gherkin-mutation-gate certification
+(commit `37709547ae`). Ran `mvn test -Pcharacterization-tests` per the
+phase-complete sync rule: green (`CharacterizationTest` 12/12, full
+reactor build success, 422/422 domain tests including the new
+`RentReliefTest`/`MegacorpSalaryTaxTest`). No drift to investigate.
+
+`rent-relief-megacorp-live-play` is closed: all 12 originally-backlogged
+scenarios are staged, green, and mutation-clean; `RentRelief` and
+`MegacorpSalaryTax` are now wired into real gameplay end to end.
+
+## 2026-08-25T00:45:00Z — specifier stages a MegaCorp CLI-wiring check after a real production bug surfaces
+
+The user asked for an ad-hoc 50-seed comparison of the final
+characterization config against the same config plus rent relief (run via
+a scratch, non-committed JUnit test reusing the existing `GameBreakdown`
+tooling, since deleted; results were not staged as a permanent
+characterization config). The comparison itself surfaced a real defect:
+8 of 50 variant games paid zero rent relief despite real rent payments
+well over the $200 cap. Investigation first pointed at war-profits-tax
+timing (the government account only had funds after its own single
+late-arriving tax payment in each of those games), but the user correctly
+pushed back - MegaCorp's salary tax should have been an independent,
+continuous funding source too, since it fires on every salary collection,
+not just on crossing the 25% land-value threshold.
+
+Checked and found zero `"MegaCorp pays..."` lines anywhere in the affected
+logs. Root cause: `Game.java` has two constructor overloads for wiring
+rent relief. The one `World.java` (the acceptance-test harness) uses takes
+a pre-built `RentRelief` object and correctly wires `megacorpSalaryTax`
+alongside it (lines 98-105). The one `Simulator.start()` (the real CLI
+path) actually calls takes a plain `boolean rentRelief` and builds
+`rentReliefBook` itself (line 186) but never assigns `megacorpSalaryTax` -
+it stays permanently null on that path. Every Gherkin scenario proving
+MegaCorp works goes through `World.java`, so the acceptance suite is green
+while the actual CLI-facing path silently drops the mechanic. `cli.feature`
+had no MegaCorp coverage at all to catch this, and the existing
+`cli-16`/`cli-17` rent-relief checks (which only assert `RentReliefEnabled`
+gets logged, from the raw input flag) wouldn't have caught it either, even
+if mirrored, since that assertion doesn't depend on whether
+`megacorpSalaryTax` itself got constructed.
+
+Discussed the fix's shape with the user. Their direction: this project's
+established, deliberate pattern for every other optional flag
+(war-profits-tax, rent-relief, development-loans, stalemate-trading,
+legal-entity) is a cheap "is enabled, near the start of the game" check
+(journal/logging/report-92/93 for rent relief) plus a CLI-level wiring
+check (cli-16/17), trusting that if the flag's own presence shows up in
+the log, the feature's real behavior (verified elsewhere, already staged
+and green - journal-90, megacorp-salary-tax-3, etc.) follows. MegaCorp
+should get the same treatment, extended to the CLI level specifically,
+since that's the path with the gap. I raised prescribing that the new
+signal must be derived from `megacorpSalaryTax != null` rather than
+echoing the input flag (since the latter would pass on both the buggy and
+fixed path); the user correctly corrected this as implementation
+overreach - not specifier's call to make. Left it out of the Gherkin
+entirely; only noted the motivating defect as context in scenario
+comments, not as an implementation instruction.
+
+Staged 7 new scenarios: `journal-94`/`95`, `logging-94`/`95`,
+`report-94`/`95` (mirroring `journal-92`/`93`'s exact "enabled, near the
+start"/"disabled by default" shape), and `cli-19` (mirroring `cli-16`,
+run through the real `Simulator` path). Verified red for the right
+reason: all 7 fail as `Unsupported step` (the journal entry and its
+step vocabulary don't exist yet), zero collateral damage to the other
+923 tests (930 total, 7 new failures). Ran `bb gherkin-ir-dry-checker`
+against all four touched files: only expected medium-confidence noise
+against the structurally-similar existing war-profits-tax/salary/MegaCorp
+lines, nothing to prune.
+
+Handing to coder as a new task, `megacorp-salary-tax-cli-wiring`, separate
+from the now-closed `rent-relief-megacorp-live-play`.
+
+## 2026-08-25T01:15:00Z — specifier corrects the MegaCorp tax formula to 43%-of-gross
+
+While reviewing the earlier finding with the user, a second, independent
+issue surfaced: the tax rate itself was misspecified from the start. The
+feature's intent (per the user, its original author) was 43% of the
+*gross* salary, with the $200/$400 figures being the net a player actually
+collects; the implementation instead computes 43% of that $200/$400
+figure directly. Derived and confirmed the correct relationship with the
+user: net = gross * 0.57, so tax = gross - net = net / 0.57 - net.
+For $200: tax = $150.88. For $400: tax = $301.75. Both rounded half-to-even
+to the cent, same convention `Money.percentage()` already uses.
+
+Chose to keep cent-level precision (not round to the nearest whole dollar)
+after confirming with the user this needs real infrastructure work, not
+just new expected values: `Money.amount()` is an intentional "whole-dollar
+view retained for the existing rules and their reports" (its own doc
+comment), `Report.java` renders every entry through it (so the
+report-facing scenario can only ever see a truncated whole dollar), and at
+least one existing MegaCorp step handler
+(`JournalStepHandlers.java:494-495`) parses the matched money text via
+`Integer.parseInt`, which throws outright on a decimal string. Confirmed
+this empirically rather than asserting it: staged the new $150.88/$301.75/
+$301.76 values and ran the full acceptance suite. Result matches
+prediction exactly - a mix of clean assertion mismatches (steps that
+already handle decimals, e.g. the isolated `megacorp-salary-tax-1/2`
+scenarios), `NumberFormatException` crashes (`journal-90`, `logging-90`,
+`megacorp-salary-tax-3`, all going through `Integer.parseInt`-based
+steps), and one clean text-mismatch (`report-90`: "The game report never
+says '...$150.88'" - it's still rendering the old, truncated figure).
+
+Deliberately did not prescribe how the coder should fix the parsing/
+rendering gap (the user corrected an earlier overreach on this same
+point, see the prior entry) - only specified the correct observable
+values and reported the concrete failure modes as context.
+
+Updated: `megacorp-salary-tax-1`'s `government_account` column (86->150.88,
+172->301.75; `final_balance` unchanged, since the player's own take was
+never affected by this formula), `megacorp-salary-tax-2` (172->301.76,
+noting in a comment that this is two independently-rounded $200 events,
+not the $400-combined figure), `megacorp-salary-tax-3` (172->301.75), and
+`journal-90`/`logging-90`/`report-90`'s `megacorp_payment` column
+(86->150.88). Also corrected the feature's own descriptive text, which
+still described the old (net-basis) formula.
+
+Full acceptance run: 930 tests, 14 failures (11 failures + 3 errors) -
+the 7 from the CLI-wiring check above, plus 7 more from this formula
+correction (3 in `megacorp-salary-tax.feature`'s own isolated scenarios,
+2 each in `journal.feature`/`logging.feature`/`report.feature`'s live-play
+scenarios). All are the two changes above; nothing else in the suite
+moved.
+
+At the user's direction, sending both changes together as one task,
+`megacorp-salary-tax-cli-wiring`, rather than the two separate handoffs
+suggested earlier.

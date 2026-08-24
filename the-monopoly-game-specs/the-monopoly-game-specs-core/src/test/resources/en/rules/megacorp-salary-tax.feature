@@ -1,6 +1,6 @@
-# mutation-stamp: sha256=694f43ebbea04354799b37f7f7d62615df43df9b4fc289b7e1323ae7f71c1a30
+# mutation-stamp: sha256=e6b61aca74000e785e53c84bce6af3d19d0f6408e9fac82a252da922bebae8e8
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-24T18:31:02.149531Z","feature_name":"megacorp salary tax","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/megacorp-salary-tax.feature","background_hash":"8b52bb2a0a6f53558853cb174011d865171e1a4b41c107899c959054c299f158","implementation_hash":"unknown","scenarios":[{"index":0,"name":"collecting a salary also pays MegaCorp's 43% share into the government account, without changing what the player collects","scenario_hash":"1b6a0b24d45b41a4c58c52686c7a7cd3775d398042880389cb5acb1787186790","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-21T08:12:19.232160Z"},{"index":1,"name":"MegaCorp's payments for multiple players accumulate together in the same government account","scenario_hash":"11acbc7780da7356bf51f05252cf5b6fd19342b91d99276ee846ee7217a6d564","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-21T08:12:19.232160Z"}]}
+# {"version":1,"tested_at":"2026-08-24T20:30:37.726090Z","feature_name":"megacorp salary tax","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/megacorp-salary-tax.feature","background_hash":"8b52bb2a0a6f53558853cb174011d865171e1a4b41c107899c959054c299f158","implementation_hash":"unknown","scenarios":[{"index":2,"name":"MegaCorp's 43% payment scales with the real double-salary rule when a pawn lands exactly on Start","scenario_hash":"b1053ec9ed5486ce98a182220b425aa3a2b334f4057bb69d38a89771f2cff024","mutation_count":5,"result":{"Total":5,"Killed":5,"Survived":0,"Errors":0},"tested_at":"2026-08-24T20:24:10.868736Z"},{"index":0,"name":"collecting a salary also pays MegaCorp's 43% share into the government account, without changing what the player collects","scenario_hash":"1b6a0b24d45b41a4c58c52686c7a7cd3775d398042880389cb5acb1787186790","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-21T08:12:19.232160Z"},{"index":1,"name":"MegaCorp's payments for multiple players accumulate together in the same government account","scenario_hash":"11acbc7780da7356bf51f05252cf5b6fd19342b91d99276ee846ee7217a6d564","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-21T08:12:19.232160Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -18,11 +18,14 @@
 
 Feature: megacorp salary tax
   An opt-in flag, `--optional-rent-relief`, has every player's salary paid
-  by a notional employer, MegaCorp, rather than the bank. MegaCorp pays the
-  government an individual income tax of 43% of the salary on top of what
-  the player collects, so the player's own take is unchanged. This grows
-  the same government account that the war profits tax pays into and that
-  rent relief spends from.
+  by a notional employer, MegaCorp, rather than the bank. The salary a
+  player actually collects (the ordinary $200, or the $400 the optional
+  double-salary-on-landing rule pays) is the net amount after a 43%
+  individual income tax on the gross: net is 57% of gross, so MegaCorp
+  pays the government tax = net / 0.57 - net, keeping the player's own
+  take unchanged at the net figure. This grows the same government
+  account that the war profits tax pays into and that rent relief spends
+  from.
 
   The payment is proportional to whatever salary was actually collected, so
   it applies the same way whether a player collected the ordinary $200 for
@@ -38,7 +41,12 @@ Feature: megacorp salary tax
     And rent relief is enabled
 
   # megacorp-salary-tax-1
-  Scenario Outline: collecting a salary also pays MegaCorp's 43% share into the government account, without changing what the player collects
+  # 43% of gross, where the collected salary is the 57% net: tax = salary
+  # / 0.57 - salary. $200 -> $150.88, $400 -> $301.75 (both to the cent,
+  # rounded half-to-even same as Money.percentage()). The player's own
+  # balance is unaffected by this change - MegaCorp still pays the tax on
+  # top, not out of what the player collects.
+  Scenario Outline: collecting a salary also pays MegaCorp's 43%-of-gross share into the government account, without changing what the player collects
     Given pawn "dog" has $1500 to spend
     When pawn "dog" collects a salary of $<salary>
     Then pawn "dog"'s account balance is $<final_balance>
@@ -46,10 +54,14 @@ Feature: megacorp salary tax
 
     Examples:
       | salary | final_balance | government_account |
-      | 200     | 1700           | 86                   |
-      | 400     | 1900           | 172                  |
+      | 200     | 1700           | 150.88               |
+      | 400     | 1900           | 301.75               |
 
   # megacorp-salary-tax-2
+  # Two independent $200 events, each rounded to the cent on its own
+  # (150.88 + 150.88 = 301.76), not the $400-combined figure from
+  # megacorp-salary-tax-1's second row (301.75) - rounding happens
+  # per salary event, not on a pooled total.
   Scenario Outline: MegaCorp's payments for multiple players accumulate together in the same government account
     When pawn "dog" collects a salary of $200
     And pawn "high hat" collects a salary of $200
@@ -57,10 +69,10 @@ Feature: megacorp salary tax
 
     Examples:
       | government_account |
-      | 172                  |
+      | 301.76               |
 
   # megacorp-salary-tax-3
-  Scenario Outline: MegaCorp's 43% payment scales with the real double-salary rule when a pawn lands exactly on Start
+  Scenario Outline: MegaCorp's 43%-of-gross payment scales with the real double-salary rule when a pawn lands exactly on Start
     Given with optional double salary when landing on Start rule
     And pawn "dog" starts at position <dog_start_position>
     And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
@@ -70,4 +82,4 @@ Feature: megacorp salary tax
 
     Examples:
       | dog_start_position | dog_die_1 | dog_die_2 | dog_salary | government_account |
-      | 35                   | 2          | 3          | 400         | 172                  |
+      | 35                   | 2          | 3          | 400         | 301.75                |

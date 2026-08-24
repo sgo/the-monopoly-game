@@ -1,6 +1,6 @@
-# mutation-stamp: sha256=d1d954cb26b3847440fcd61bbb74e46e4dda4cfb36ace240db2eb9259e366e49
+# mutation-stamp: sha256=89224a8a44bcd770cb6963fb358c201bdb32ee8375d5d025c2816a113f379b92
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-24T18:31:02.677046Z","feature_name":"rent relief","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/rent-relief.feature","background_hash":"8b52bb2a0a6f53558853cb174011d865171e1a4b41c107899c959054c299f158","implementation_hash":"unknown","scenarios":[{"index":1,"name":"the tenant's rent is capped at $200 when the government can cover the rest in full, and pays the full rent otherwise","scenario_hash":"14318af1dcc019d9983eda05aef7243b2e67c0bc3781a57834f78107805d3188","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-21T08:12:21.207736Z"}]}
+# {"version":1,"tested_at":"2026-08-24T20:30:39.227141Z","feature_name":"rent relief","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/rules/rent-relief.feature","background_hash":"8b52bb2a0a6f53558853cb174011d865171e1a4b41c107899c959054c299f158","implementation_hash":"unknown","scenarios":[{"index":2,"name":"rent relief applies the same way when the landlord is a legal entity","scenario_hash":"1bea00a251e4d62c047a58c0529dcc0401a62050096adba2f9ba2fb4e224f802","mutation_count":2,"result":{"Total":2,"Killed":2,"Survived":0,"Errors":0},"tested_at":"2026-08-24T20:30:39.227141Z"},{"index":4,"name":"war profits tax still accumulates the full nominal rent a landlord receives, whether or not relief covered part of it","scenario_hash":"ecc748d4c14b143549c9ead3e870768e43e3faee48985159f4130a34b22dc14e","mutation_count":7,"result":{"Total":7,"Killed":7,"Survived":0,"Errors":0},"tested_at":"2026-08-24T20:30:39.227141Z"},{"index":3,"name":"a live played game's rent payment honors an already-funded government account, not just the isolated computation","scenario_hash":"eccc1c6a60ffd2f082cdba988c2dfe81968f016b717eec204b24fabcdb9774fe","mutation_count":1,"result":{"Total":1,"Killed":1,"Survived":0,"Errors":0},"tested_at":"2026-08-24T20:24:12.502920Z"},{"index":1,"name":"the tenant's rent is capped at $200 when the government can cover the rest in full, and pays the full rent otherwise","scenario_hash":"14318af1dcc019d9983eda05aef7243b2e67c0bc3781a57834f78107805d3188","mutation_count":6,"result":{"Total":6,"Killed":6,"Survived":0,"Errors":0},"tested_at":"2026-08-21T08:12:21.207736Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en
@@ -75,9 +75,41 @@ Feature: rent relief
       | 549                | 750           | 549                |
 
   # rent-relief-3
+  # Corrected after actually running this (architect finding,
+  # 2026-08-24T22:10:00Z entry, and further tracing):
+  #   - Building a hotel on only "Rue de Diekirch Arlon" left its Pink
+  #     Realty group-mates undeveloped; added hotels on all three, matching
+  #     every other greedo-legal-entity.feature scenario that develops a
+  #     Pink Realty street. Added a third player so all three streets get
+  #     real individual owners before Pink Realty forms, matching every
+  #     entity-forming scenario in greedo-legal-entity.feature (all select
+  #     3+ players); high hat ends up a shareholder as well as the tenant,
+  #     which the tracked "a shareholder pays rent when landing on their
+  #     own legal entity's street" scenario already establishes is valid.
+  #   - The actual cause of the persistent wrong balance, found by
+  #     temporarily asserting the journal's entity-rent entry directly
+  #     instead of the final balance: high hat never landed on Rue de
+  #     Diekirch Arlon at all. `World.formNamedEntity` pre-queues a roll
+  #     for every player "if empty" so its own auto-formation flow has
+  #     something to consume (`World.java:1045-1049`), and it runs before
+  #     `takes a targeted landing on` queues its own roll for the same
+  #     pawn - since queued rolls are FIFO
+  #     (`World.nextQueuedPawnRoll`/`removeFirst`), the pre-queued roll is
+  #     consumed first, moving high hat to the wrong space. Queuing high
+  #     hat's real turn roll before "Pink Realty is formed" pre-empts the
+  #     auto-queue (which only fires when a player's queue is still empty),
+  #     so `takes a targeted landing`'s own roll - appended after, and
+  #     equal to it - is what actually gets consumed. This is a step-timing
+  #     collision, not a rent-relief or entity-rent defect: rent-relief-4
+  #     (individual landlord, no entity formation involved) never hit it.
   Scenario Outline: rent relief applies the same way when the landlord is a legal entity
-    Given Pink Realty is formed
+    Given we select 3 players
+    And pawn "iron box" will roll 6 for initiative
+    And pawn "high hat" will roll 1 and 2 for their turn
+    And Pink Realty is formed
     And the street "Rue de Diekirch Arlon" has a hotel built
+    And the street "Bruul Mechelen" has a hotel built
+    And the street "Place Verte Verviers" has a hotel built
     And pawn "high hat" has $1500 to spend
     And the government's account already holds $<government_start>
     When pawn "high hat" takes a targeted landing on "Rue de Diekirch Arlon"
