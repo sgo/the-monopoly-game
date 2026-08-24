@@ -47691,3 +47691,15 @@ priority: 00
 task: rent-relief-megacorp-live-play
 commit: e4bae47b0a
 ```
+
+## 2026-08-25T00:05:00Z — specifier certifies rent-relief-megacorp-live-play complete
+
+Merged the architect's clean full-Gherkin-mutation-gate certification
+(commit `37709547ae`). Ran `mvn test -Pcharacterization-tests` per the
+phase-complete sync rule: green (`CharacterizationTest` 12/12, full
+reactor build success, 422/422 domain tests including the new
+`RentReliefTest`/`MegacorpSalaryTaxTest`). No drift to investigate.
+
+`rent-relief-megacorp-live-play` is closed: all 12 originally-backlogged
+scenarios are staged, green, and mutation-clean; `RentRelief` and
+`MegacorpSalaryTax` are now wired into real gameplay end to end.
