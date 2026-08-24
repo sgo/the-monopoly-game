@@ -52,7 +52,7 @@ Feature: game report
   # report-4
   Scenario Outline: the report narrates an unowned-land purchase after the landing movement
     And pawn "dog" follows the "<strategy>" strategy
-    When pawn "dog" lands on "<property>"
+    When pawn "dog" takes a targeted landing on "<property>"
     Then the game report says that pawn "dog" moves before it says that pawn "dog" buys "<property>" for $<purchase_price>
 
     Examples:
@@ -65,7 +65,7 @@ Feature: game report
     And pawn "dog" declines the offer for "Diestsestraat Leuven"
     And pawn "dog" will bid $<dog_bid> for "Diestsestraat Leuven" at auction
     And pawn "high hat" will bid $<high_hat_bid> for "Diestsestraat Leuven" at auction
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game report says that pawn "dog" moves before it says that pawn "<auction_winner>" wins the auction for "Diestsestraat Leuven" at $<auction_price>
 
     Examples:
@@ -76,7 +76,7 @@ Feature: game report
   Scenario Outline: the report narrates rent paid after the landing movement
     And pawn "high hat" owns "Diestsestraat Leuven"
     And pawn "high hat" follows the "<strategy>" strategy
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game report says that pawn "dog" moves before it says that pawn "dog" pays pawn "high hat" $<rent> rent for "Diestsestraat Leuven"
 
     Examples:
@@ -186,7 +186,7 @@ Feature: game report
   # report-15
   Scenario Outline: the report narrates a card drawn before the effect it resolves
     Given the next chance card will be "Boete voor te snel rijden. Betaal M15."
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game report says that pawn "dog" draws the chance card "Boete voor te snel rijden. Betaal M15." before it says that pawn "dog" pays the bank $<amount>
 
     Examples:
@@ -195,7 +195,7 @@ Feature: game report
 
   # report-16
   Scenario Outline: the report narrates a tax payment after the landing movement
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game report says that pawn "dog" moves before it says that pawn "dog" pays the bank $<amount>
 
     Examples:
@@ -204,7 +204,7 @@ Feature: game report
 
   # report-17
   Scenario Outline: the report narrates jail entry and its cause
-    When pawn "dog" lands on "<space>"
+    When pawn "dog" takes a targeted landing on "<space>"
     Then the game report says that pawn "dog" moves before it says that pawn "dog" is sent to jail from landing on "<space>"
 
     Examples:
@@ -225,7 +225,7 @@ Feature: game report
 
   # report-19
   Scenario Outline: the report narrates landing on Free Parking even though nothing happens
-    When pawn "dog" lands on "Gratis Parkeren / Parc Gratuit"
+    When pawn "dog" takes a targeted landing on "Gratis Parkeren / Parc Gratuit"
     Then the game report says that pawn "dog" moves from position <start position> (<start space>) to <position> (<space>)
 
     Examples:
@@ -235,7 +235,7 @@ Feature: game report
   # report-20
   Scenario Outline: the report narrates a bankruptcy to the bank
     Given pawn "dog" has $<starting balance> to spend
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game report says that pawn "dog" goes bankrupt to the bank
 
     Examples:
@@ -247,7 +247,7 @@ Feature: game report
     Given pawn "high hat" owns "Diestsestraat Leuven"
     And the street "Diestsestraat Leuven" has a hotel built
     And pawn "dog" has $<starting balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game report says that pawn "dog" goes bankrupt to pawn "high hat"
 
     Examples:
@@ -257,7 +257,7 @@ Feature: game report
   # report-22
   Scenario Outline: the report narrates the game's winner
     Given pawn "dog" has $<starting balance> to spend
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game report says that pawn "high hat" wins the game
 
     Examples:
@@ -270,7 +270,7 @@ Feature: game report
     And pawn "iron box" will roll 6 for initiative
     And pawn "iron box" has $1500 to spend
     And the next chance card will be "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50."
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game report says that pawn "dog" draws the chance card "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50." before it says that pawn "dog" pays pawn "high hat" $<amount>
     And the game report says that pawn "dog" draws the chance card "Je bent verkozen tot de nieuwe voorzitter. Betaal elke speler M50." before it says that pawn "dog" pays pawn "iron box" $<amount>
 
@@ -284,7 +284,7 @@ Feature: game report
     And pawn "iron box" will roll 6 for initiative
     And pawn "iron box" has $1500 to spend
     And the next community chest card will be "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler."
-    When pawn "dog" lands on "Algemeen Fonds / Caisse de Communauté"
+    When pawn "dog" takes a targeted landing on "Algemeen Fonds / Caisse de Communauté"
     Then the game report says that pawn "dog" draws the community chest card "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler." before it says that pawn "high hat" pays pawn "dog" $<amount>
     And the game report says that pawn "dog" draws the community chest card "je organiseert een buurtfeest zodat de mensen elkaar beter leren kennen. Je ontvangt M10 van elke speler." before it says that pawn "iron box" pays pawn "dog" $<amount>
 
@@ -295,7 +295,7 @@ Feature: game report
   # report-25
   Scenario Outline: the report narrates a card drawn before the move it causes
     Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game report says that pawn "dog" draws the chance card "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200." before it says that pawn "dog" moves from position <chance_position> (<chance_space>) to <destination_position> (<destination_space>)
 
     Examples:
@@ -306,7 +306,7 @@ Feature: game report
   Scenario Outline: the report narrates a mortgage forced by an unaffordable debt
     Given pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $70 to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    When pawn "dog" takes a targeted landing on "Extra Belasting / Taxe de Luxe"
     Then the game report says that pawn "dog" mortgages "Rue Grande Dinant" for $<value>
 
     Examples:
@@ -320,7 +320,7 @@ Feature: game report
     And the street "Rue Grande Dinant" has 1 house(s) built
     And the street "Diestsestraat Leuven" has 1 house(s) built
     And pawn "dog" has $80 to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    When pawn "dog" takes a targeted landing on "Extra Belasting / Taxe de Luxe"
     Then the game report says that pawn "dog" sells a house on "Rue Grande Dinant" for $<price>
 
     Examples:
@@ -370,7 +370,7 @@ Feature: game report
     Given pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
-    When pawn "dog" lands on "<property>"
+    When pawn "dog" takes a targeted landing on "<property>"
     Then the game report says that pawn "dog" declines to buy "<property>" because it cannot afford the $<price> price
 
     Examples:
@@ -383,7 +383,7 @@ Feature: game report
     Given pawn "dog" follows the "<strategy>" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
     And pawn "high hat" will bid $<high_hat_bid> for "<property>" at auction
-    When pawn "dog" lands on "<property>"
+    When pawn "dog" takes a targeted landing on "<property>"
     Then the game report says that pawn "dog" declines to buy "<property>" because it would drop the balance below the $<reserve> reserve
 
     Examples:
@@ -411,7 +411,7 @@ Feature: game report
     Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
     And pawn "dog" follows the "<strategy>" strategy
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game report says that pawn "dog" declines to buy "Rue de Diekirch Arlon" because it cannot afford the $<price> price
 
     Examples:
@@ -424,7 +424,7 @@ Feature: game report
     Given the next chance card will be "Ga door naar Rue de Diekirch (Arlon). Als je langs START komt, ontvang je M200."
     And pawn "dog" follows the "<strategy>" strategy, keeping a $<reserve> reserve
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game report says that pawn "dog" declines to buy "Rue de Diekirch Arlon" because it would drop the balance below the $<reserve> reserve
 
     Examples:
@@ -437,7 +437,7 @@ Feature: game report
     Given pawn "dog" owns "Diestsestraat Leuven"
     And pawn "dog" has $5 to spend
     And pawn "high hat" will bid $<bid> for "Diestsestraat Leuven" at auction
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game report says that pawn "high hat" wins the auction for "Diestsestraat Leuven" at $<price>
 
     Examples:
@@ -451,7 +451,7 @@ Feature: game report
     And pawn "high hat" will claim rent for "Diestsestraat Leuven"
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting_balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game report says that pawn "high hat" inherits "Rue Grande Dinant" from pawn "dog"
 
     Examples:
@@ -466,7 +466,7 @@ Feature: game report
     And pawn "high hat" has $<owner_starting_balance> to spend
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting_balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game report says that pawn "high hat" pays $<interest> interest to keep the mortgage on "Rue Grande Dinant"
 
     Examples:
@@ -481,7 +481,7 @@ Feature: game report
     And pawn "high hat" follows the "<strategy>" strategy
     And pawn "dog" owns "Rue Grande Dinant"
     And pawn "dog" has $<starting_balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game report says that pawn "high hat" lifts the mortgage on "Rue Grande Dinant" for $<total> including $<interest> interest
 
     Examples:
@@ -492,7 +492,7 @@ Feature: game report
   # report-40
   Scenario Outline: the report narrates a decline with no reason when the strategy has no buying policy
     Given pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Diestsestraat Leuven"
+    When pawn "dog" takes a targeted landing on "Diestsestraat Leuven"
     Then the game report says that pawn "dog" declines to buy "Diestsestraat Leuven"
 
     Examples:
@@ -521,7 +521,7 @@ Feature: game report
     And pawn "high hat" has $<high_hat_starting_balance> to spend
     And pawn "dog" owns "Lippenslaan Knokke"
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    When pawn "dog" takes a targeted landing on "Extra Belasting / Taxe de Luxe"
     Then the game report says that pawn "dog" puts "Lippenslaan Knokke" up for sale to avoid bankruptcy
     And the game report says that pawn "high hat" offers $<expected_bid> for "Lippenslaan Knokke"
     And the game report says that pawn "high hat" wins the distressed sale for "Lippenslaan Knokke" at $<expected_bid>
@@ -545,7 +545,7 @@ Feature: game report
     And pawn "iron box" follows the "<strategy>" strategy
     And pawn "iron box" has $<iron_box_starting_balance> to spend
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game report says that pawn "high hat" offers $90 for "Lippenslaan Knokke"
     And the game report says that pawn "iron box" offers $95 for "Lippenslaan Knokke"
     And the game report says that pawn "high hat" offers $100 for "Lippenslaan Knokke"
@@ -581,7 +581,7 @@ Feature: game report
   # report-45
   Scenario Outline: the report narrates a card drawn before the bank pays the player directly
     Given the next chance card will be "De bank betaald je een dividend van M50."
-    When pawn "dog" lands on "Kans / Chance"
+    When pawn "dog" takes a targeted landing on "Kans / Chance"
     Then the game report says that pawn "dog" draws the chance card "De bank betaald je een dividend van M50." before it says that pawn "dog" receives $<amount> from the bank
 
     Examples:
@@ -610,7 +610,7 @@ Feature: game report
     And pawn "high hat" has $<high_hat_starting_balance> to spend
     And pawn "dog" owns "Lippenslaan Knokke"
     And pawn "dog" has $<dog_starting_balance> to spend
-    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    When pawn "dog" takes a targeted landing on "Extra Belasting / Taxe de Luxe"
     Then the game report says that pawn "dog" puts Lippenslaan Knokke up for sale to avoid bankruptcy before it says that pawn "dog" finds no bidder for Lippenslaan Knokke
     And the game report says that pawn "dog" finds no bidder for Lippenslaan Knokke before it says that pawn "dog" mortgages Lippenslaan Knokke for $<mortgage_value>
 
@@ -850,7 +850,7 @@ Feature: game report
   # report-62
   Scenario Outline: the report narrates the winner's final age once the game ends in an ordinary win
     Given pawn "dog" has $<starting_balance> to spend
-    When pawn "dog" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "dog" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game report says that pawn "high hat" wins the game before it says that pawn "high hat"'s final age is <high_hat_final_age> years
 
     Examples:
@@ -929,7 +929,7 @@ Feature: game report
     And the street "Place Verte Verviers" has 4 houses built
     And pawn "<renter>" starts at position <renter_position>
     And pawn "<renter>" will claim rent for "<renter_street>"
-    When pawn "<renter>" lands on "<renter_street>"
+    When pawn "<renter>" takes a targeted landing on "<renter_street>"
     Then the game report says that pawn "<renter>" pays $<rent> rent to <entity_name> for "<renter_street>"
 
     Examples:
@@ -1264,7 +1264,7 @@ Feature: game report
     And pawn "dog" has collected $<collected> in rent since their last war profits tax assessment
     And pawn "dog" grows a year older
     And pawn "high hat" has $<high hat balance> to spend
-    When pawn "high hat" lands on "Inkomsten Belasting / Impôts sur le revenu"
+    When pawn "high hat" takes a targeted landing on "Inkomsten Belasting / Impôts sur le revenu"
     Then the game report says that pawn "dog" wins the game
     And the game report says that the government's final account balance is $<balance>
 

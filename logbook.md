@@ -47221,3 +47221,28 @@ Audit the 31 generic landing steps in each of journal.feature and
 report.feature for safe conversion to the targeted landing step. Preserve
 every scenario whose assertion depends on another player's separate turn;
 do not alter `we play` scenarios in this audit.
+
+## 2026-08-24T20:15:00Z — specifier extends the targeted-turn swap to journal.feature and report.feature
+
+Audited both against the architect's request. Both are structural mirrors
+of logging.feature: 91 scenarios each (92 in logging.feature, which alone
+carries the extra `log-1` direct-fixture scenario), same 31 `lands on`
+occurrences, same scenario order and titles (only the surface vocabulary
+differs: "the log records"/"the game journal records"/"the game report
+says"). Confirmed byte-identical Given/When arrangement on a full title
+diff plus targeted spot-checks of the trickiest cases already reasoned
+through for logging.feature (the 3-player card-pays-every-player scenario,
+the 4-player entity-rent scenario, and the other-player's-bankruptcy
+winner-declaration scenario) — all matched logging.feature's Given/When
+exactly, confirming the same Game.java-grounded reasoning applies without
+re-deriving it from scratch.
+
+Applied the identical mechanical swap (`lands on` -> `takes a targeted
+landing on`) to both files: 31 replacements each, no assertions or example
+values touched. Verified with the full acceptance run:
+`EnRulesJournalAcceptanceTest` 115/115, `EnRulesReportAcceptanceTest`
+115/115, whole suite 910/910, `BUILD SUCCESS`.
+
+Handing back to architect on the same task to measure the mutation-cost
+improvement and mutation-run the two files, same as logging.feature's
+round.
