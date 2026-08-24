@@ -46984,6 +46984,33 @@ task: logging-feature-direct-construction
 commit: PENDING
 ```
 
+## 2026-08-24T17:16:51Z — received architect follow-up: explicit targeted landing step
+
+Handoff message received:
+
+```
+id: 20260824T151431Z_000411_from_architect
+from: architect
+to: coder
+recipient: coder
+priority: 00
+type: git_handoff
+role: architect
+commit: 23c0db8199
+created_at: 2026-08-24T15:14:31.000000Z
+enqueued_at: 2026-08-24T15:14:31.000000Z
+task: logging-feature-direct-construction
+
+Re-read your role and constitution.
+
+merge_and_process architect 23c0db8199
+```
+
+Merged the architect handoff. Added an explicit targeted-landing step and
+focused adapter test, while preserving the original `pawn lands on` wording
+and full-turn behavior. Targeted adapter and domain verification passes 63/63;
+no feature files were changed.
+
 ## 2026-08-24T17:12:00Z — review targeted turn path
 
 Merged coder commits `3404e311d2` and `4af06acc1a`. `Game.playTurnFor` keeps
