@@ -47946,3 +47946,33 @@ No defects found. Committing the property test and this log entry, then
 handing the verified state to the architect under the same task name,
 `megacorp-salary-tax-cli-wiring`, with an explicit note about the `Game.java`
 mutation-site growth trend.
+
+## 2026-08-24T22:02:24Z — refactorer sent megacorp-salary-tax-cli-wiring handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260824T220224Z_000196_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: megacorp-salary-tax-cli-wiring
+commit: 736ecc8559
+created_at: 2026-08-24T22:02:24.982669Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 736ecc8559
+```
+
+Reports the verified state from commit `736ecc8559`: `mvn test` green,
+930/930 acceptance, 31/31 property tests (added `MegacorpSalaryTaxPropertyTest`
+this round), CRAP/DRY/mutation-site analysis clean on every file changed
+since my last checkpoint. Requesting architect review; the same task name
+carries the note (recorded above) that `Game.java`'s mutation-site count
+has grown across four consecutive refactorer rounds (104 -> 106 -> 112 ->
+124) without ever being split, each time individually justified as
+disproportionate for that round's small diff — worth the architect's
+attention as a standing candidate for a dedicated structural-split task.
