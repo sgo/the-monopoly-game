@@ -47590,3 +47590,14 @@ than Rue de Diekirch Arlon. The feature now queues high hat's intended
 landing. The specifier independently reports full acceptance at 923 tests
 with only `report-91` remaining, the already-routed canonical-name coder
 defect. Merged for architect verification.
+
+## 2026-08-24T22:55:00Z — regenerated acceptance confirms only report-name blocker
+
+The first targeted Maven invocation reused generated acceptance test sources
+and therefore showed stale `rent-relief-3` failures; it is not used as
+verification. The generator-backed `./acceptance/run-acceptance.sh` was
+then run to completion after the specifier merge. It confirms all
+rent-relief scenarios pass and leaves exactly one failure: `report-91`,
+where the report emits `Rue De Diekirch Arlon` instead of the canonical
+`Rue de Diekirch Arlon`. Coder handoff `000417` remains the sole blocker
+before the required full Gherkin mutation gate.
