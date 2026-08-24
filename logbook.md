@@ -47972,6 +47972,21 @@ as standing architectural debt; this task added only six lines there, so
 it is recorded for separate debt work rather than expanding this completed
 feature.
 
+## 2026-08-25T00:45:00Z — MegaCorp mutation gate certified; Game debt work opened
+
+Merged the specifier's two casing-equivalence records and reran the full
+`./acceptance/run-acceptance-mutation.sh` gate. It completed cleanly with
+no survivors or errors; the tool removed both prior survivor reports.
+`megacorp-salary-tax-cli-wiring` is therefore certified through full
+acceptance and Gherkin mutation.
+
+Per the user's direction, opened a separate `game-java-mutation-site-debt`
+refactorer task. Objective: reduce `Game.java` below the mutation-site split
+threshold by extracting cohesive, behavior-preserving orchestration seams
+from the core engine; preserve the public `Game` API and all observable
+gameplay, and return an evidence-backed refactor rather than another debt
+deferral.
+
 ## 2026-08-25T00:30:00Z — specifier classifies the two MegaCorp casing survivors as equivalent
 
 Verified against the actual step implementation rather than assuming the
