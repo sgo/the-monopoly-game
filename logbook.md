@@ -47011,6 +47011,12 @@ focused adapter test, while preserving the original `pawn lands on` wording
 and full-turn behavior. Targeted adapter and domain verification passes 63/63;
 no feature files were changed.
 
+## 2026-08-24T17:17:23Z — handoff to architect: targeted landing step
+
+Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
+commit `6838678c16`, containing the explicit targeted-landing vocabulary and
+focused adapter test. Domain and adapter verification passed with 63 tests.
+
 ## 2026-08-24T17:12:00Z — review targeted turn path
 
 Merged coder commits `3404e311d2` and `4af06acc1a`. `Game.playTurnFor` keeps
@@ -47136,6 +47142,15 @@ landing player (dice roll, movement, buy/rent/tax/card resolution, real
 journal entries), so every existing structural journal assertion keeps its
 full wiring-proof value — this only stops paying for the second seated
 player's own turn, which none of these scenarios needed.
+
+## 2026-08-24T17:20:00Z — full soft gate finds five logging survivors
+
+Merged specifier commit `e3c045f1c1` and ran the full soft Gherkin mutation
+gate. Logging improved to 89 executed mutations in 77.336 seconds, but five
+survivors remain: bankruptcy-to-bank starting balance 5->0;
+bankruptcy-to-player 5->6; game-winner 5->4; creditor inheritance
+starting_balance 10->17; no-buying-policy dog_starting_balance 100->96.
+These are Gherkin assertion/equivalence decisions, so routed to specifier.
 
 `logging.feature`'s mutation-manifest stamp will regenerate on next
 mutation run; not touched here per the verification rule (mutation not
