@@ -47291,3 +47291,63 @@ priority: 00
 task: logging-feature-direct-construction
 commit: 4b5dc341ab
 ```
+
+## 2026-08-24T21:15:00Z — specifier stages all 12 backlogged rent-relief/MegaCorp scenarios, red for the right reason
+
+At the user's direction: rather than pre-emptively asking the architect to
+design wiring before writing any Gherkin, followed plain red-green-refactor.
+Moved all 12 backlogged scenarios into their tracked files as one batch:
+`logging-90/91`, `journal-90/91`, `report-90/91`, `tax-3/4`,
+`rent-relief-3/4/5`, `megacorp-salary-tax-3`. Deleted the 6 now-empty
+backlog files (`the-monopoly-game-specs/backlog/en/rules/{journal,logging,
+report,megacorp-salary-tax,rent-relief,tax}.feature`).
+
+New single-turn landing scenarios (`logging/journal/report-91`, `tax-3/4`,
+`rent-relief-3/4`) use the `takes a targeted landing on` step established
+earlier in this task, consistent with the rest of these files.
+
+Before staging, ran the batch through the full acceptance suite (not
+mutation) to verify each goes red for a real reason, not an authoring bug.
+This caught and fixed two genuine defects in the backlog's own
+`rent-relief-5`, which its own comment had already flagged as unverified:
+
+- `high_hat_start_position` was 37, which is Meir Antwerpen's own board
+  position (confirmed against `Official.java`'s board list) — landing
+  there plus a roll of 3 wrapped to Start, not Meir Antwerpen. Fixed to 34.
+- dog's single queued roll crossed Start in round 1, *before* high hat's
+  round-1 rent payment. `Journalling.collectedSalary` assesses war profits
+  tax synchronously against whatever `WarProfitsTaxBook` has accumulated
+  so far, so the assessment came out $0, not $1500 — a genuine sequencing
+  bug in the scenario itself, not a missing-wiring symptom. Split dog's
+  roll into two queued turns (round 1 lands on Veldstraat Gent, one of
+  dog's own streets, without crossing Start; round 2 crosses Start only
+  after high hat's rent has landed). Re-ran and confirmed this scenario now
+  passes outright — it needed no new wiring at all, just the two fixes.
+
+Final state: 923 acceptance tests, 12 failures, all newly-staged, none
+elsewhere in the suite:
+- `logging-90`/`journal-90` ("MegaCorp pays the government..."): unsupported
+  step — `MegacorpSalaryTax` has zero production callers, confirmed earlier
+  this session.
+- `report-90`'s salary-collection line: unsupported step for a different
+  reason — `report.feature`'s step vocabulary only ever had a compound
+  "X before it says Y" form for salary collection, never a standalone one;
+  this is the first scenario to need it standalone.
+- `logging/journal/report-91`, `rent-relief-3/4`, `tax-3/4`: real
+  assertion failures — rent relief's cap and the tax-to-government
+  redirect never fire during real play (`RentRelief` has zero production
+  callers, confirmed earlier), so full uncapped amounts land on the bank
+  as always.
+- `megacorp-salary-tax-3`'s final-balance line: real assertion failure,
+  same root cause as the MegaCorp scenarios above.
+- `rent-relief-3`'s numeric mismatch ($1350 actual vs $1300/$750 expected)
+  doesn't yet have a confirmed root cause beyond "rent relief isn't
+  applied" — may need a further look once real wiring exists.
+
+Ran `bb gherkin-ir-dry-checker` against all six touched files: no
+high-confidence findings involving the new scenarios beyond expected
+placeholder-variant matches on the shared `takes a targeted landing on`
+step; only generic medium-confidence noise from shared parameterized
+steps elsewhere. Nothing to prune.
+
+Awaiting the user's approval before committing and handing off to coder.

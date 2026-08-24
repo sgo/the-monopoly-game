@@ -58,3 +58,16 @@ Feature: megacorp salary tax
     Examples:
       | government_account |
       | 172                  |
+
+  # megacorp-salary-tax-3
+  Scenario Outline: MegaCorp's 43% payment scales with the real double-salary rule when a pawn lands exactly on Start
+    Given with optional double salary when landing on Start rule
+    And pawn "dog" starts at position <dog_start_position>
+    And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
+    When we play the game
+    Then the game journal records that pawn "dog" collects a salary of $<dog_salary>
+    And the game journal records that the government's final account balance is $<government_account>
+
+    Examples:
+      | dog_start_position | dog_die_1 | dog_die_2 | dog_salary | government_account |
+      | 35                   | 2          | 3          | 400         | 172                  |
