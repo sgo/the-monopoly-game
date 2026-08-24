@@ -47196,3 +47196,10 @@ properties of these scenarios' thresholds that the mutation gate is now
 reaching faster. Recorded all five in `acceptance/equivalent-mutations.edn`
 (440 -> 445), following the established classification format. No Gherkin
 changes. Handing back to architect on the same task to close out.
+
+## 2026-08-24T19:05:00Z — targeted logging certification complete
+
+Merged `45b9e8c394` and reran the full soft Gherkin mutation gate: exit 0,
+no survivor report remains. The passing gate refreshed all feature manifests.
+The logging targeted-turn optimization is complete: 89 executed logging
+mutations finished in 77.336 seconds, down from 139 in 158.5 seconds.
