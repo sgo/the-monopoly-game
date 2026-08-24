@@ -47011,6 +47011,12 @@ focused adapter test, while preserving the original `pawn lands on` wording
 and full-turn behavior. Targeted adapter and domain verification passes 63/63;
 no feature files were changed.
 
+## 2026-08-24T17:17:23Z — handoff to architect: targeted landing step
+
+Sent priority-00 `git_handoff` for task `logging-feature-direct-construction`,
+commit `6838678c16`, containing the explicit targeted-landing vocabulary and
+focused adapter test. Domain and adapter verification passed with 63 tests.
+
 ## 2026-08-24T17:12:00Z — review targeted turn path
 
 Merged coder commits `3404e311d2` and `4af06acc1a`. `Game.playTurnFor` keeps
