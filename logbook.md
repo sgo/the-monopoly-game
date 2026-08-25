@@ -49938,3 +49938,21 @@ game's course), not just reporting a single "when does this happen"
 number in isolation. Updated the README sync check's bullet list.
 Committing and handing off to coder under a new task name,
 `relief-event-age-stats`.
+
+Sent handoff to coder:
+
+```
+id: 20260825T130053Z_000276_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: relief-event-age-stats
+commit: 584fb3e33f
+created_at: 2026-08-25T13:00:53.768730Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 584fb3e33f
+```
