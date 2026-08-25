@@ -49596,3 +49596,42 @@ this doc's prose cites specific figures from a run taken before a task's
 verification loop is fully closed out. Committing directly; no handoff
 needed, no code or spec content changed, nothing for another role to
 process.
+
+## 2026-08-25T13:20:00Z — specified effective tax burden per player, routed to coder
+
+User asked why effective tax burden per player wasn't listed anywhere in
+the characterization output, and confirmed they want it as a permanent
+tracked figure (README.md + baseline fixtures), not a one-off report.
+Extended `CHARACTERIZATION-TESTS.md`'s breakdown schema:
+- Generic core gains a new field, income by player (salary collected and
+  rent collected as landlord, broken down by pawn), alongside the
+  existing aggregate totals - tracked unconditionally rather than gated
+  behind a tax flag, since it's the income side the burden figure needs
+  regardless of which tax extra ends up active.
+- The `--optional-rent-relief` extra gains MegaCorp tax paid broken down
+  by pawn (mirroring war profits tax's existing payer breakdown).
+- A new, not-its-own-extra section: effective tax burden by pawn, a
+  README-only *derived* figure (no new JSON field, same pattern the
+  outcome percentages already use) - `(MegaCorp tax + war profits tax) /
+  (gross salary + rent collected) × 100`, pooled across every seed in the
+  config. Applies to any config with at least one tax extra active -
+  configs 10 through 13 today, not just the new ones, since config 10
+  already has war-profits-tax.
+
+Caught and fixed my own first draft before committing: I'd initially
+specified the denominator as "salary collected" (the generic core's
+*net* figure, after MegaCorp's tax is already withheld), which the user
+correctly flagged as wrong - dividing tax by an already-taxed figure
+overstates the rate and caps the salary-only ratio at 75.4% (43/57)
+instead of the intuitive 0-43% range that makes "effective tax rate" a
+meaningful concept. Net and gross differ only by the tax itself, so no
+new field or division is needed to recover gross: `gross salary = salary
+collected + MegaCorp tax paid`, both already-tracked figures. Rent needs
+no such adjustment - it's never taxed at the point of collection (only
+later, in aggregate, by a war-profits-tax assessment), so "rent
+collected" is already the gross figure.
+
+Updated the README sync check's Detailed Breakdown bullet list and
+derivation note to include both the per-player income breakdown and the
+new derived burden figure. Committing and handing off to coder under a
+new task name, `effective-tax-burden-per-player`.
