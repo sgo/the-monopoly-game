@@ -113,6 +113,22 @@ class CharacterizationTest {
         .isEqualTo(breakdown.warProfitsTax().orElseThrow().payerDollars());
   }
 
+  @Test
+  void attributesReliefToTheTenantAndTracksStarvedBills() {
+    GameBreakdown.GameResult result = new GameBreakdown.GameResult("""
+        cat pays dog $250 rent for Rue de Diekirch Arlon
+        The government pays dog $50 in rent relief
+        dog pays cat $300 rent for Rue de Diekirch Arlon
+        dog starts a turn aged 1 years with $100 and a $0 reserve
+        """, false, false, false, false, true);
+
+    GameBreakdown.RentReliefExtras relief = result.rentRelief().orElseThrow();
+    assertThat(relief.reliefByPlayer()).containsExactly(Map.entry("cat", 50L));
+    assertThat(relief.starvedPayments()).isEqualTo(1);
+    assertThat(relief.starvedDollars()).isEqualTo(100);
+    assertThat(relief.starvedByPlayer()).containsExactly(Map.entry("dog", 100L));
+  }
+
   @ParameterizedTest
   @EnumSource(CharacterizationConfig.class)
   void characterization(CharacterizationConfig config) throws IOException {
