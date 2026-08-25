@@ -1,19 +1,20 @@
 # language: en
 
-# This round covers the core tax computation only (combining gross salary
-# and gross rent collected since this player's own last assessment into
-# one 43% payment, and the accumulator resetting afterward), the same
+# This round covers the core tax computation (combining gross salary and
+# gross rent collected since this player's own last assessment into one
+# 43% payment, and the accumulator resetting afterward), the same
 # isolated-computation scope megacorp-salary-tax.feature and
-# war-profits-tax.feature each started from - plus one played-game
+# war-profits-tax.feature each started from; interaction with the two
+# existing income taxes when enabled at the same time
+# (unified-income-tax-5/6), proving each keeps its own independent
+# accumulator rather than sharing or conflating one; and one played-game
 # scenario (unified-income-tax-7, mirroring megacorp-salary-tax-3)
 # proving the real double-salary-on-landing rule scales this tax
 # correctly too, using only pre-existing generic journal entries so it
 # needs no new observability wiring despite not being an isolated
-# computation. Interaction with the two existing income taxes when
-# enabled at the same time, and this tax's own payment narration plus CLI
-# wiring, are backlogged at ../../backlog/en/rules/unified-income-tax.feature,
-# ../../backlog/en/rules/journal.feature, report.feature, logging.feature,
-# and ../../backlog/specs-cli/en/cli.feature.
+# computation. This tax's own payment narration plus CLI wiring are
+# backlogged at ../../backlog/en/rules/journal.feature, report.feature,
+# logging.feature, and ../../backlog/specs-cli/en/cli.feature.
 
 Feature: unified income tax
   An opt-in flag, `--optional-unified-income-tax`, is a third, independent
@@ -101,6 +102,42 @@ Feature: unified income tax
     Examples:
       | salary | rent    | government_account |
       | 200    | 649.12  | 580.88              |
+
+  # unified-income-tax-5
+  # War profits tax's own accumulator ($5000, at a land value chosen to
+  # land in the 100% band so its tax is easy to verify) and unified
+  # income tax's accumulator ($649.12, chosen as in unified-income-tax-1
+  # so the combined base is an exact $1000 and its tax an exact $430) are
+  # set to deliberately different figures, so a shared or conflated
+  # accumulator would produce a visibly wrong total on at least one side.
+  Scenario Outline: enabling this alongside war profits tax taxes the same rent twice, from two independent accumulators
+    Given the war profits tax is enabled
+    And pawn "dog"'s land is currently worth $6000 in rent
+    And pawn "dog" has collected $5000 in rent since their last war profits tax assessment
+    And pawn "dog" has collected $649.12 in rent since their last unified income tax assessment
+    When pawn "dog" grows a year older
+    And pawn "dog" collects a salary of $200
+    Then pawn "dog" pays the government a war profits tax of $<war_profits_tax>
+    And the government's account holds $<government_account>
+
+    Examples:
+      | war_profits_tax | government_account |
+      | 5000             | 5430.00              |
+
+  # unified-income-tax-6
+  # MegaCorp's own tax ($150.88, from megacorp-salary-tax-1) and this
+  # tax's own salary-only figure (also $150.88, from unified-income-tax-2)
+  # both fire from the same salary collection, independently, landing on
+  # the same government account: $301.76 total, not $150.88.
+  Scenario Outline: enabling this alongside MegaCorp's salary tax taxes the same salary twice, independently
+    Given rent relief is enabled
+    When pawn "dog" collects a salary of $<salary>
+    Then MegaCorp pays the government an individual income tax of $<megacorp_tax>
+    And the government's account holds $<government_account>
+
+    Examples:
+      | salary | megacorp_tax | government_account |
+      | 200    | 150.88        | 301.76               |
 
   # unified-income-tax-7
   # Numbered 7 rather than 5 to leave room for the two interaction

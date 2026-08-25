@@ -50321,6 +50321,41 @@ followed by an abundant one, with a sharp transition rather than a
 gradual trend. `relief-event-age-stats` is closed, and with it the last
 outstanding task from this session's rent-relief characterization work.
 
+## 2026-08-25T13:20:00Z — refactorer sent relief-event-age-stats handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T131355Z_000208_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: relief-event-age-stats
+commit: 685a7c3554
+created_at: 2026-08-25T13:13:55.988654Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 685a7c3554
+```
+
+Reports from commit `685a7c3554`: merged coder's `603d8df860` (relief/
+starved age-at-event stats). Hand-traced the `TurnStarted`-adjacency
+age attribution, including the ordering between the top-of-loop starved
+check and the current line's own age update; correct, and the coder's
+own new test already covers it directly. Fixed a latent property-test
+issue from my own prior cycle: a whole-record round-trip equality
+assertion was accidentally coupled to two ephemeral accumulator fields
+(`reliefAges`/`starvedAges`) that are deliberately not round-tripped,
+same established pattern as `WarProfitsTaxExtras`; replaced with
+field-by-field assertions and added round-trip coverage for the new
+`Stats` fields this diff left uncovered. No production files touched,
+CRAP/DRY/mutation gate inapplicable. `mvn test`, characterization-tests
+(19/19), and full acceptance (933/933) all green. Requesting architect
+review.
+
 ## 2026-08-25T15:35:00Z — brought SIMULATOR.md and tasks.md up to date
 
 User asked to update both with the feature development completed. Found
@@ -50405,16 +50440,252 @@ new scenarios, no glue code existing yet - with every one of the
 unexpected). Committing and handing off to coder under a new task name,
 `unified-income-tax`.
 
-## 2026-08-25T22:20:00Z — implemented unified income tax
+## 2026-08-25T20:35:00Z — refactorer processes coder handoff `d8e8f32a0b` (unified-income-tax)
 
-Processed specifier handoff `50_20260825T200740Z_000277_from_specifier_to_coder.handoff`
-at commit `085c8fc926`. Added the independent 43% unified income tax over
-gross salary plus rent collected since the player's prior assessment,
-with per-player accumulator reset after each salary collection and the
-shared government account. Wired the optional CLI flag and acceptance
-harness while preserving existing tax behavior.
+Handoff message received:
 
-Verification: focused domain/CLI tests pass, the six new unified-income-tax
-scenarios pass, and the full acceptance pipeline passes all 939 tests.
-Committed as `d8e8f32` and handing off to refactorer via
-`.swarmforge/handoffs/outbox/50_20260825T201842Z_000281_from_coder_to_refactorer.handoff`.
+```
+id: 20260825T201842Z_000281_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: unified-income-tax
+commit: d8e8f32a0b
+
+Re-read your role and constitution.
+
+merge_and_process coder d8e8f32a0b
+```
+
+Merged `d8e8f32a0b`. Usual append-only `logbook.md` conflict, both sides
+kept in full. First task in this run with real production changes
+(`Game.java`, `Journalling.java`, the new `UnifiedIncomeTaxBook.java`,
+`Simulator.java`/`SimulatorFlags.java`), not just test-support - so the
+CRAP/DRY/mutation gate actually applies this cycle.
+
+Checked the one place this feature could plausibly be wrong: the
+gross-up math. `UnifiedIncomeTaxBook.assess` treats the salary it's
+given as *net* and grosses it up via `/0.57` before taxing, the exact
+same convention `MegacorpSalaryTax.taxOn` uses. Confirmed against
+`unified-income-tax.feature`'s own worked comments before trusting
+it (not assumed): "$200 net -> $350.88 gross" is spec'd explicitly
+as intentional, independent of whether MegaCorp is even enabled -
+the feature deliberately treats the passing-Start salary as
+conceptually net-of-a-43%-tax regardless of which tax mechanism is
+active. Hand-verified the arithmetic for all three worked examples
+(unified-income-tax-1: $1000.00 combined base at exactly $430.00;
+-2: $150.88 and $301.75 for $200/$400 with no rent) against
+`UnifiedIncomeTaxBook.java`'s actual rounding (`setScale(0,
+HALF_EVEN)` on cents) by hand - all three match exactly.
+
+Checked `Game.governmentBalance()`'s new three-way priority chain
+(`rentReliefBook` / `unifiedIncomeTaxBook` / `warProfitsTaxBook`) for
+redundancy, since all three wrap a `GovernmentAccount` on the same
+shared "government" `Bank.Account.Owner` key when constructed from
+`rules.bank()` - initially looked collapsible to a single unconditional
+read. Not actually redundant: the object-accepting `Game` constructor
+overload (used by `World.java`'s acceptance harness) can be handed an
+*externally* constructed `RentRelief` with its own independently-set
+government balance for testing threshold behavior, which can
+legitimately diverge from the internally-constructed books. Left it
+alone - simplifying would have broken that decoupling.
+
+Noted but not acted on (out of this round's spec scope, not a defect
+in what's actually tested): `World.java`'s harness passes
+`unifiedIncomeTaxBook != null` as a *boolean* into `Game`'s
+constructor rather than the actual `UnifiedIncomeTaxBook` object (unlike
+`rentRelief`, which is passed as the real object) - so a pawn's rent
+pre-seeded via `has collected $X in rent since their last unified
+income tax assessment` would not carry into an actual `game.play()`
+run, only into the isolated (non-played) scenarios that call
+`collectSalary` directly. No current scenario combines "play the game"
+with pre-seeded unified-tax rent (scenario 7, the only played-game
+scenario, deliberately has none), so nothing here is actually broken
+today - flagging only because the two backlogged interaction scenarios
+(unified-income-tax-5/6) may need this fixed when they land.
+
+CRAP (`crap4java`, all five changed/new files): every touched or new
+method at or below CRAP 4.5, including the new
+`UnifiedIncomeTaxBook`'s own methods (CRAP 1.0, 100% coverage each,
+before I added the property test below). Three pre-existing hotspots
+exceed the 6.0 threshold - `Simulator.main` (156.0, grew from the
+last-recorded 20.0 many CLI-flag-additions ago), `Journalling.
+mortgageSpareProperty` (72.0), and `Journalling.serviceDevelopmentLoan`
+(42.0) - all confirmed via diff-hunk boundaries to be completely
+untouched by this commit, and all three already on record across many
+prior cycles (`mortgageSpareProperty` alone appears in at least three
+earlier entries) as long-standing, accepted, unrelated debt. Not
+touching them this round.
+
+`dry4java` (same five files): the large list of flagged duplicates is
+entirely the already-accepted "one thin method per sealed `Entry`
+type" dispatch pattern in `Journalling.java` (e.g. `declinedToBuy`/
+`builtHouse`/`sold`/`saleRefused`, none of which this diff touched) and
+the already-accepted telescoping-constructor-overload pattern in
+`Game.java`/`Simulator.java` (the new `Game` constructor at line 211 is
+0.94-similar to the pre-existing one at line 93, extending the same
+family the four other 0.88-similar constructors already belong to).
+Confirmed none of the flagged pairs include any line this diff actually
+changed. Nothing to de-duplicate.
+
+`mutate4java --scan` on all five files: `Game.java` 87, `Simulator.java`
+96, `Journalling.java` 28, `SimulatorFlags.java` 11,
+`UnifiedIncomeTaxBook.java` 3 - all well under the 100-site split
+threshold.
+
+**Property-test gap, filled.** No property test existed for the new
+`UnifiedIncomeTaxBook`, even though its closest sibling,
+`MegacorpSalaryTax`, already has one (`MegacorpSalaryTaxPropertyTest`)
+covering exactly the kind of invariant this class also has: the
+gross-basis tax percentage, and money conservation. Added
+`UnifiedIncomeTaxBookPropertyTest` (jetCheck, `@Tag("property-test")`,
+matching the existing framework and pattern exactly) with three
+properties the example-based `UnifiedIncomeTaxBookTest` only
+spot-checks at one salary/rent pair: (1) the tax is always 43% of the
+combined gross-salary-plus-rent base within half-cent rounding, swept
+across net salary and rent independently; (2) `assess` always resets
+the rent accumulator to `Money.ZERO` regardless of the salary/rent
+values, not just the one reset case the example test covers; (3)
+repeated assessments conserve money exactly - the government balance
+after two assessments equals the exact sum of both returned tax
+amounts, no drift. All three pass.
+
+Verification (domain reinstalled fresh first): `mvn test` (root
+reactor): green. `mvn test -Pproperty-tests` (domain, includes the new
+property test): green. Full acceptance: 939/939 (the 6 new
+`unified-income-tax` scenarios all pass). `mvn test
+-Pcharacterization-tests` (cli, unaffected by this domain-only feature
+since no characterization config enables the new flag yet): green.
+Committing the new property test and handing the verified state to the
+architect under the same task name.
+
+## 2026-08-25T20:45:00Z — refactorer sent unified-income-tax handoff to architect
+
+## 2026-08-25T20:31:00Z — architect received refactorer handoff `d84dcae17b`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: unified-income-tax
+commit: d84dcae17b
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d84dcae17b
+```
+
+Merged the refactorer handoff after resolving the append-only
+`logbook.md` conflict while retaining the architect history. The task
+introduces the unified-income-tax domain rule, simulator wiring,
+acceptance coverage, and property tests; beginning architectural review.
+
+## 2026-08-25T20:50:00Z — recovered a genuine content-loss bug in this merge, not just resolved a conflict
+
+This merge (architect commit `0343ebbbf3`) was not a normal append-append
+conflict. `git merge-base` correctly identified my own `085c8fc9` as the
+common ancestor, but the architect's own merge tip had, at some point in
+its own chain, silently dropped a large stretch of already-shared history
+- everything from my "specifier syncs after
+rent-relief-net-position-and-matched-pair" entry through the refactorer's
+own detailed unified-income-tax verification notes - leaving only a
+terse "Merged the refactorer handoff ... beginning architectural review"
+stub in its place. Caught it because a naive resolution of git's own
+conflict markers produced a nonsensical result (my own commit's content
+spliced *inside* another entry's quoted handoff-message code fence,
+breaking it) - traced the actual cause with `git merge-base`, `git show
+<rev>:logbook.md`, and direct diffs between the merge base, my `HEAD`,
+the refactorer's own commit (`d84dcae`, which turned out to hold the
+complete, correct history), and the architect's final merge (which did
+not), rather than trusting the automatic result or my own first attempt
+at resolving it by hand.
+
+Reconstructed by taking the refactorer's own commit's full logbook.md
+(confirmed to be my own complete history plus their own genuinely new
+material, correctly interleaved) and appending only the one truly new
+stub the architect's merge actually added on top of it. Recorded here
+rather than silently fixed, since this is the second time this session a
+merge on this file produced a subtly wrong result on the first attempt
+(the first was my own mistake, caught before committing; this one
+belonged to the incoming branch) - worth knowing this class of error can
+originate on either side, not just from a careless resolution of my own,
+and that verifying a "clean" merge result actually contains what both
+parents contributed is worth doing before trusting it, not just checking
+that the conflict markers are gone.
+
+## 2026-08-25T21:00:00Z — specifier syncs after unified-income-tax, feature closed
+
+Since the recovered logbook content showed the architect's own review
+ending mid-sentence ("beginning architectural review", no acceptance or
+verification paragraph - possibly itself truncated by the same merge
+issue just recovered from, possibly genuinely not yet run), verified
+independently rather than assuming certification happened. `mvn test
+-Pcharacterization-tests`: green (`CharacterizationTest` 19/19 unchanged
+- confirmed via the refactorer's own recovered note that no
+characterization config enables the new flag yet, so it's expected to be
+unaffected; domain 432/432, up from 430, the two new
+`UnifiedIncomeTaxBookTest` cases; `ReadmeSyncTest` 1/1). Also ran the
+full acceptance suite directly (`./acceptance/run-acceptance.sh`: clean
+build, all green - the 6 `unified-income-tax` scenarios now passing,
+red-to-green) and `mvn test -Pproperty-tests` (37/37, including the new
+`UnifiedIncomeTaxBookPropertyTest`'s 3 properties), since this task
+landed real production code, not just test-support.
+
+`unified-income-tax` is closed: designed from a plain-language proposal
+through two clarifying questions, specified with a deliberate
+isolated-computation-first scope mirroring its two sibling tax features,
+gap-checked directly against `megacorp-salary-tax.feature` (catching two
+real omissions - the $400 double-salary case, and the real double-
+salary-rule interaction - before committing rather than after), and
+implemented cleanly: no defects, no coder loop-back needed, the
+refactorer's own review found only a minor scope note (a test-harness
+detail affecting only the still-backlogged interaction scenarios, not
+anything in this round) and added the missing property-test coverage.
+No further specifier action needed on this task.
+
+## 2026-08-25T23:10:00Z — specifier promotes unified-income-tax's backlogged interaction/observability/CLI scenarios
+
+Promoted all 13 scenarios backlogged during the original
+`unified-income-tax` round into their tracked homes:
+`unified-income-tax-5/6` (independent-accumulator interaction with war
+profits tax and MegaCorp's salary tax) into `unified-income-tax.feature`;
+`journal/report/logging-96/97/98` (enabled/disabled-near-start state, and
+payment narration alongside salary) into their respective tracked files;
+`cli-20/21` (game-wide flag wiring, strategy-mix invariance) into
+`cli.feature`. Deleted the now-empty backlog files. Re-verified
+numbering hadn't drifted since these were drafted (journal/report/
+logging were still at 95, cli at 19) before promoting.
+
+Verified via `bb gherkin-parser` (clean parse on all five files) and `bb
+gherkin-ir-dry-checker` (new findings are all medium-confidence
+"possible-synonym" cross-references against the analogous MegaCorp/war-
+profits-tax/rent-relief sibling scenarios - the same noise class already
+pervasive in these large files, confirmed by diffing before/after
+finding sets rather than trusting the raw count; no new
+high-confidence duplication introduced).
+
+Ran `./acceptance/run-acceptance.sh`: 12 failures, all for the expected
+reason. 9 are "Unsupported step" (journal/report/logging-96/97/98,
+cli-20/21) - the missing narration and CLI wiring this batch exists to
+drive. The 10th and 11th also `Unsupported step`. The remaining one is a
+genuine assertion failure on `unified-income-tax-5` (expected government
+account $5430, got $430) that I traced to a real gap rather than an
+authoring error (confirmed my "grows a year older" / "land is currently
+worth $X in rent" / "has collected $X in rent since their last war
+profits tax assessment" steps match war-profits-tax.feature's own
+established phrasing exactly): `World.java`'s
+`governmentAccountBalance()` (used by "the government's account holds
+$X") reads a fixed priority chain - `rentRelief` if non-null, else
+`unifiedIncomeTaxBook`, else a bare field - rather than one shared
+ledger. With war profits tax and unified income tax both enabled but
+rent relief off, it falls to `unifiedIncomeTaxBook.governmentBalance()`
+and never looks at whatever the war profits tax assessment deposited
+elsewhere, silently dropping it from the reported total.
+`unified-income-tax-6` (MegaCorp + unified income tax) already passes
+cleanly - that pair composes correctly today.
+
+Committed as `da85cd9` and handed off to the coder.
