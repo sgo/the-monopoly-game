@@ -200,7 +200,7 @@ final class LegalEntityBuilding {
         .map(ColourStreet::houseConstructionCost).reduce(Money.ZERO, Money::plus);
   }
 
-  private static List<ColourStreet> ownedStreets(LegalEntity entity, Deeds deeds) {
+  static List<ColourStreet> ownedStreets(LegalEntity entity, Deeds deeds) {
     if (deeds == null) return entity.streets();
     if (!deeds.legalEntities().contains(entity)) return entity.streets();
     return entity.streets().stream()

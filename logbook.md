@@ -48381,6 +48381,37 @@ call, not mine) — handing the verified red state to the architect with
 this diagnosis, under the same task name since it's the same reported
 crash and repro.
 
+## 2026-08-25T07:32:15Z — refactorer sent entity-dev-loan-dissolution-desync handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T073215Z_000198_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: entity-dev-loan-dissolution-desync
+commit: cbd1d2c496
+created_at: 2026-08-25T07:32:15.357834Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer cbd1d2c496
+```
+
+Reports the still-red verification from commit `cbd1d2c496`: the coder's
+`transferEntityLoans` fix is correct for entity dissolution but doesn't
+touch the specifier's actual repro, which never reaches
+`Bankruptcy.liquidateEntity`. Real root cause diagnosed (see prior entry):
+`LegalEntity.operate()` raises a new development loan against a collateral
+street the entity no longer owns after that one street was individually
+foreclosed away while the entity stayed alive — `entity.streets()` is a
+static, formation-time list never updated on partial foreclosure.
+Requesting architect routing; no new production behavior introduced by
+this handoff.
+
 ## 2026-08-25T09:40:00Z — route surviving-entity foreclosure collateral desync to coder
 
 Received refactorer handoff `000198` (commit `cbd1d2c496`). The already
@@ -48411,14 +48442,93 @@ I am routing the exact seed-6 game reproduction back to the refactorer for
 an independent red-to-green confirmation and structural review before
 declaring this repair complete.
 
-## 2026-08-25T10:10:00Z — hand off collateral repro review to refactorer
+## 2026-08-25T07:47:04Z — refactorer processes architect handoff `aadee0fc99` (entity-dev-loan-dissolution-desync): repro confirmed green, but a residual gap found by property testing
 
-Sent handoff `000426` to refactorer for
-`entity-dev-loan-dissolution-desync` at `aadee0fc99`. Requested that the
-refactorer rerun the original direct seed-6 configuration with legal
-entities, development loans, rent relief, stalemate trading, eight Greedos,
-and `--max-years=2500`; confirm the former
-`Deeds.verifyEntityOwner` foreclosure crash is gone; and review the live
-ownership filtering for structural soundness. This is an independent
-acceptance/reproduction check, not a request for speculative production
-changes.
+Handoff message received:
+
+```
+id: 20260825T073922Z_000426_from_architect
+from: architect
+to: refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: entity-dev-loan-dissolution-desync
+commit: aadee0fc99
+
+Re-read your role and constitution.
+
+merge_and_process architect aadee0fc99
+```
+
+Non-fast-forward merge from `efdd37f`. Resolved an append-only `logbook.md`
+conflict (both parents' final entries kept in full, nothing dropped). The
+architect routed my diagnosis to the coder, who fixed it (`ac36bc2c53`,
+"Prevent entity loans on lost streets") and asked me for an independent
+red-to-green confirmation plus structural review before declaring the
+repair complete.
+
+The fix: a new `LegalEntityBuilding.ownedStreets(entity, deeds)` helper
+filters the entity's static formation-time street list down to streets it
+currently owns per live `Deeds` state, falling back to the full list only
+when `deeds` is `null` or the entity isn't currently known to `deeds`
+(unformed unit-test fixtures). Applied consistently everywhere
+`entity.streets()` previously drove building/loan-raising decisions
+(`canFundNextImprovement`, `cannotExtendPlan`, `cheapestBuildableStreet`,
+`standardBuildCost`). Includes a characterization unit test for an entity
+surviving foreclosure of one street.
+
+Independent verification:
+- `mvn test`: green.
+- `./acceptance/run-acceptance.sh`: one flaky run (the documented
+  intermittent CLI-timing flake, not this task), clean 930/930 on rerun.
+- **Re-ran my exact seed-6 repro directly against `Game`** (same setup as
+  my earlier red verification): green, no crash. Swept seeds 0-49 under
+  the same flag combination for confidence beyond the one reported seed:
+  all 50 clean.
+- Analysis tools on the changed file (`crap4java`/`dry4java`/`mutate4java
+  --scan` on `LegalEntityBuilding.java`): CRAP's one exceedance,
+  `buildAsMuchAsAffordable` at 156.0 (CC 12, 0% coverage), is confirmed
+  pre-existing — checked CC against the pre-fix revision, identically 12;
+  the diff only threads a `deeds` parameter through, adds no branching.
+  New `ownedStreets` itself is CRAP 3.0. DRY: no duplicates. Mutation
+  sites: 91 -> 93, comfortably under the split threshold.
+- Property-test assessment (constitution-mandated, before declaring
+  verification complete): the existing `LegalEntityBuildingPropertyTest`
+  only covers `sharesOf`'s fair-split invariant, unrelated to this fix.
+  Relaxed `ownedStreets` from `private` to package-private (behavior-
+  preserving visibility change, purely for testability) and added
+  `ownedStreetsNeverIncludesAStreetLostToIndividualForeclosure`, sweeping
+  every possible subset of a formed 3-street entity individually
+  foreclosed away, asserting `ownedStreets` returns exactly the still-owned
+  subset.
+
+**That property test found a real, distinct residual gap**: falsified at
+`keptMask=0` (the entity loses *every* street). Reproduced directly and
+minimally (not just via the property sweep) to confirm: form a full
+pink-group (3-street) entity, individually `deeds.returnToBank` every one
+of its streets (no full dissolution), then call `ownedStreets(entity,
+deeds)` - it returns the full original 3-street list, not empty. Root
+cause: the fix's own guard,
+`if (!deeds.legalEntities().contains(entity)) return entity.streets();`,
+cannot distinguish "entity never formed" from "entity formed, then lost
+every street to individual foreclosure" - both leave the entity absent
+from `deeds.legalEntities()` (built from `entityOwners.values()`, which
+has zero entries for an entity owning nothing), so the *same* stale-list
+fallback that caused the original crash re-triggers for this narrower
+case. An entity landless-but-still-shareheld (not bankrupt-dissolved) that
+still carries another outstanding development loan position would hit the
+identical `forecloseEntity` crash this task set out to fix. My 50-seed
+sweep didn't happen to hit this exact edge (all streets in one colour
+group individually foreclosed before any position touches the last one) -
+the property test forced it directly instead of waiting on luck.
+
+Not proposing an implementation - new production behavior remains the
+coder's and specifier's call, not mine (Does Not Own: introduce new
+behavior). Committing the testability change and the new (currently red)
+property test as-is, since it correctly gates the "repair complete" claim
+the architect was about to make: `mvn test -Pproperty-tests` is 31/32,
+one genuine failure. Handing back to the architect under the same task
+name with this precise, minimal, independently-confirmed diagnosis - the
+specifier's original seed-6 repro is fixed, but the fix has a distinct,
+narrower gap for the "entity loses every street" case.
