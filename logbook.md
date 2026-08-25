@@ -49011,6 +49011,24 @@ Routing to coder now, before generating the rent-relief report, per user
 direction - inventing task name `loan-foreclosure-null-winner-desync`
 (distinct from the closed dissolution task; unrelated root cause).
 
+Sent handoff to coder:
+
+```
+id: 20260825T090730Z_000270_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: loan-foreclosure-null-winner-desync
+commit: 7756504fb1
+created_at: 2026-08-25T09:07:30.433291Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7756504fb1
+```
+
 ## 2026-08-25T09:22:33Z — refactorer processes coder handoff `a5429d2dae` (loan-foreclosure-null-winner-desync)
 
 Handoff message received:
@@ -49126,3 +49144,130 @@ NPE is confirmed fixed (reproduced directly via `Simulator`, plus a clean
 untested mirror branch and a new `AuctionPropertyTest` covering the class
 where this defect's mechanism actually lives, which previously had no
 dedicated test at all. Requesting architect closure.
+
+## 2026-08-25T11:35:00Z — merge null-winner foreclosure repair for certification
+
+Received refactorer handoff `000202` (commit `e9c91ad40d`). It carries the
+specifier's red `development-loans-18` scenario and the coder's repair for
+the null-winner auction path, with refactorer's direct reproduction sweep,
+mirror-path coverage, and Auction property tests. Merge both audit trails;
+the architect must independently run property, acceptance, and full Gherkin
+mutation gates before closing this new task.
+
+## 2026-08-25T11:45:00Z — route null-winner auction survivor equivalence decision
+
+Architect verification confirms property and acceptance gates green, but the
+full configured Gherkin mutation suite reports two survivors in
+`development-loans-18`, recorded in
+`acceptance/mutation-survivors-en-rules-development-loans-feature.md`.
+They lower `high_hat_bid` from $10 to $4 and `iron_box_bid` from $25 to $24.
+Both original and mutated ceilings remain below Rue Grande Dinant's $30
+mortgage/opening price, so the stated no-winner outcome appears genuinely
+indistinguishable; nevertheless specifier must decide and record precise
+equivalence rationale or add a meaningful observable distinction. Do not
+phase-close until the report is cleared by the mutation tool.
+
+## 2026-08-25T11:05:00Z — classified the two null-winner auction survivors as equivalent
+
+Confirmed the architect's suspicion, not just accepted it. Neither mutated
+bid ever changes any asserted outcome: no code path uses a *losing*
+bidder's exact ceiling for anything beyond deciding whether they can raise
+that round (`Auction.ascendMany`/`raiseRound`), and a losing bid is never
+journaled - grepped `Journalling.java` for `bid` and found nothing, so no
+future assertion (report/journal text included) could ever observe the
+difference either. Concretely: `high_hat_bid` $10->$4 and `iron_box_bid`
+$25->$24 both stay positive (still "qualified" under
+`Auction.qualified`'s `floorOpening=false`) and both stay under Rue Grande
+Dinant's $30 mortgage/opening price (`Street.java`:
+`RueGrandeDinant(ColourStreet.of(brown, 60, 2, 10, 30, 90, 160, 250, 50,
+30))`), so `ascendMany`'s first round still offers everyone the $30
+opening, still exceeds both ceilings, still assigns no winner - identical
+null-winner/return-to-bank result, identical $30 `bank_ending`, identical
+everything else in the scenario, no matter which of the two values is
+used.
+
+Registered both in `acceptance/equivalent-mutations.edn` (now 471
+entries) rather than editing the scenario itself; did not hand-edit
+`acceptance/mutation-survivors-en-rules-development-loans-feature.md` per
+the standing rule. No scenario content changed, so no re-verification of
+`development-loans-18` itself was needed beyond confirming the EDN file
+still parses (`bb -e` read it back cleanly). Committing and handing the
+decision back to the architect under the same task name,
+`loan-foreclosure-null-winner-desync`.
+
+Sent handoff to architect:
+
+```
+id: 20260825T093440Z_000271_from_specifier
+from: specifier
+to: architect
+priority: 00
+type: git_handoff
+role: specifier
+task: loan-foreclosure-null-winner-desync
+commit: 9c85ad9704
+created_at: 2026-08-25T09:34:40.775196Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 9c85ad9704
+```
+
+## 2026-08-25T12:00:00Z — certify null-winner foreclosure repair
+
+Architect reran the complete configured Gherkin mutation suite after the
+specifier's two precise equivalence records. No survivor report was
+regenerated. Combined with the previously green 34/34 property profile,
+full acceptance, refactorer's direct seed sweep, and the red-to-green
+`development-loans-18` scenario, this closes
+`loan-foreclosure-null-winner-desync`. Return the completed phase to
+specifier.
+
+## 2026-08-25T12:05:00Z — specifier syncs after loan-foreclosure-null-winner-desync
+
+Merged architect handoff `000433` (commit `e9519bfeed`) after resolving a
+third append-only `logbook.md` conflict (both parents' entries kept in
+full). Ran `mvn test -Pcharacterization-tests` per the phase-complete sync
+rule: green (`CharacterizationTest` 12/12, `ReadmeSyncTest` 1/1, domain
+427/427). No drift. `loan-foreclosure-null-winner-desync` is closed:
+defect found while re-running rent-relief characterization scoping,
+reproduced and root-caused, specified as `development-loans-18` (verified
+red with the exact NPE), coder's null-winner-falls-back-to-returnToBank
+fix merged and independently verified, two resulting mutation survivors
+classified as genuine equivalences and registered, architect's final
+mutation run confirms clean. No further specifier action needed on this
+task.
+
+Both defects blocking the rent-relief characterization scoping (started
+2026-08-25 with `entity-dev-loan-dissolution-desync`) are now closed. Next:
+re-run config13 (asset-rich billionaire + legal-entity + development-loans
++ rent-relief + war-profits-tax) to confirm it's clean now, then update
+`CHARACTERIZATION-TESTS.md` with all three candidate configs together.
+
+## 2026-08-25T12:15:00Z — specified configs 11-13, routed to coder
+
+Re-ran all three candidate configs (`RentReliefConfigsScratch.java`, still
+untracked under `the-monopoly-game-cli/src/test`) now that both blocking
+defects are closed: all 150 seeds (50 each) clean, no crashes.
+
+Updated `CHARACTERIZATION-TESTS.md` with the user's approval: added
+configs 11-13 to the Game setups table (11: all-Greedo + legal-entity +
+stalemate-trading + development-loans + rent-relief; 12: 11 plus
+war-profits-tax; 13: 12 with one Greedo seat replaced by an asset-rich
+Billionaire) and a justification paragraph with real 50-seed headline
+numbers - config 11 resolves in an ordinary win 48/50 times (mean age
+~31yr); adding war-profits-tax in config 12 flips that hard toward
+stalemate (18/50, mean age ~254yr), the same runaway dynamic Greedo-vs-Greedo
+games already exhibit, now at a full 8-player table; swapping in the
+asset-rich Billionaire for config 13 barely moves either number (20/50
+stalemates, ~218yr) - a far milder effect than config 10's win-rate
+collapse, since relief this time is recirculating money back to every
+player rather than letting it concentrate with land ownership. Also added
+a `--optional-rent-relief` Extras bullet to the breakdown schema (relief
+payments plus MegaCorp payments, since the flag binds both mechanisms to
+the same toggle) - the schema had no rent-relief tracking at all before
+this.
+
+Did not touch `CharacterizationConfig.java`, baseline fixtures, or
+README.md sync - that's coder's implementation. Committing the spec
+update and handing off under a new task name, `rent-relief-configs-11-13`.

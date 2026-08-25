@@ -1,0 +1,10 @@
+{
+  "outcomes": {"stalemate": 20, "ordinary_win": 30},
+  "winners": {"thimble": 2, "high hat": 5, "racecar": 8, "ship": 5, "dog": 5, "iron box": 1, "shoe": 4},
+  "ageAtEnd": {"min": 0, "max": 843, "mean": 132.66, "median": 57},
+  "core": {"bankruptcies": {"dog": 141, "the bank": 90, "ship": 15, "wheelbarrow": 6, "racecar": 18, "high hat": 18, "shoe": 13, "thimble": 2, "iron box": 6}, "auctions": 137, "directPurchases": 1263, "mortgages": 610, "income": {"salary": 4035200, "rent": 7644728, "bankPayments": 486435}},
+  "loans": {"loansRaised": 310, "totalDollars": 18243, "borrowers": {"dog": 131, "ship": 21, "racecar": 24, "Yellow Realty": 19, "shoe": 19, "iron box": 9, "Green Realty": 23, "Pink Realty": 19, "thimble": 10, "high hat": 27, "wheelbarrow": 8}, "bondholders": {"high hat": 157, "ship": 6, "wheelbarrow": 1, "dog": 63, "racecar": 2, "iron box": 18, "shoe": 2}, "defaults": 128, "interestPaid": 3401, "principalPaid": 6986, "bondInterestReceived": 1356, "bondPrincipalReceived": 5189},
+  "entities": {"formed": 46, "dissolved": 9},
+  "trades": {"peerTrades": 4},
+  "warProfitsTax": {"payments": 1068, "totalDollars": 2247817, "payers": {"dog": 45, "shoe": 416, "iron box": 64, "thimble": 1, "ship": 236, "racecar": 302, "high hat": 4}, "governmentBalance": {"min": 61, "max": 271144, "mean": 26783.32, "median": 1834}, "survivorsAtFirstTax": {"min": 2, "max": 8, "mean": 5.177777777777778, "median": 5}}
+}
