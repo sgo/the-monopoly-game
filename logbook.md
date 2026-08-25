@@ -50616,3 +50616,33 @@ originate on either side, not just from a careless resolution of my own,
 and that verifying a "clean" merge result actually contains what both
 parents contributed is worth doing before trusting it, not just checking
 that the conflict markers are gone.
+
+## 2026-08-25T21:00:00Z — specifier syncs after unified-income-tax, feature closed
+
+Since the recovered logbook content showed the architect's own review
+ending mid-sentence ("beginning architectural review", no acceptance or
+verification paragraph - possibly itself truncated by the same merge
+issue just recovered from, possibly genuinely not yet run), verified
+independently rather than assuming certification happened. `mvn test
+-Pcharacterization-tests`: green (`CharacterizationTest` 19/19 unchanged
+- confirmed via the refactorer's own recovered note that no
+characterization config enables the new flag yet, so it's expected to be
+unaffected; domain 432/432, up from 430, the two new
+`UnifiedIncomeTaxBookTest` cases; `ReadmeSyncTest` 1/1). Also ran the
+full acceptance suite directly (`./acceptance/run-acceptance.sh`: clean
+build, all green - the 6 `unified-income-tax` scenarios now passing,
+red-to-green) and `mvn test -Pproperty-tests` (37/37, including the new
+`UnifiedIncomeTaxBookPropertyTest`'s 3 properties), since this task
+landed real production code, not just test-support.
+
+`unified-income-tax` is closed: designed from a plain-language proposal
+through two clarifying questions, specified with a deliberate
+isolated-computation-first scope mirroring its two sibling tax features,
+gap-checked directly against `megacorp-salary-tax.feature` (catching two
+real omissions - the $400 double-salary case, and the real double-
+salary-rule interaction - before committing rather than after), and
+implemented cleanly: no defects, no coder loop-back needed, the
+refactorer's own review found only a minor scope note (a test-harness
+detail affecting only the still-backlogged interaction scenarios, not
+anything in this round) and added the missing property-test coverage.
+No further specifier action needed on this task.
