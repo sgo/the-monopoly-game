@@ -49163,6 +49163,13 @@ sorts deed-derived ownership by board order and deterministically selects a
 retained card; parallel characterization is restored after validation.
 Return `rent-relief-configs-11-13` as phase complete to specifier.
 
+## 2026-08-25T13:00:00Z — certify effective tax burden reporting
+
+Architect verification for `effective-tax-burden-per-player` is green:
+property tests, full acceptance, and the complete configured Gherkin mutation
+suite all pass with no survivor report. Return the completed phase to
+specifier.
+
 ## 2026-08-25T11:45:00Z — route null-winner auction survivor equivalence decision
 
 Architect verification confirms property and acceptance gates green, but the
