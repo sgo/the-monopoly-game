@@ -49380,3 +49380,37 @@ the new baseline fixtures, or README.md - those are correct as far as I
 can tell for configs 11 and 13. Handing the still-partially-red state to
 the architect under the same task name, flagging config12's baseline
 specifically.
+
+## 2026-08-25T10:17:21Z — refactorer sent rent-relief-configs-11-13 handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T101721Z_000203_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: rent-relief-configs-11-13
+commit: 2a512b3dc7
+created_at: 2026-08-25T10:17:21.749019Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 2a512b3dc7
+```
+
+Reports from commit `2a512b3dc7`: configs 11 and 13 verified clean.
+Config12's baseline is genuinely unreliable - fails against itself on
+2/2 full characterization-suite runs, with different wrong values each
+time, even fully serial (`workers=1` doesn't fix it; the divergence isn't
+a concurrency issue despite the coder's comment). Isolated to something
+deterministic within one JVM but varying between JVM invocations -
+consistent with identity-hashcode-dependent collection iteration order;
+`LegalEntity` has no `equals`/`hashCode` override and is the element type
+of a `HashSet<LegalEntity>` added in the dissolution work. Did not chase
+the exact code path (real investigation, not a verification pass). `mvn
+test`, acceptance, and property-tests all green - isolated to config12's
+long-running baseline specifically. Requesting architect routing; not
+proposing an implementation.
