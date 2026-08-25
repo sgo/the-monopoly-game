@@ -50329,3 +50329,60 @@ passing unaffected.
 `unified-income-tax-followup` is closed: the interaction, observability,
 and CLI-wiring backlog for `unified-income-tax` is now fully implemented
 and covered. No further specifier action needed on this task.
+
+## 2026-08-26T00:25:00Z — specifier fixes real design mistake: unified income tax must not double-tax labour
+
+After closing `unified-income-tax-followup`, ran an ad-hoc empirical
+study (50 games, seeds 1-50, max-years=2500, 8 all-Greedo +
+stalemate-trading + legal-entity + development-loans + rent-relief -
+mirroring the already-baselined `eight_greedo_stalemate_entity_loans_
+rent_relief_war_profits_tax` characterization config exactly, swapping
+in `--optional-unified-income-tax`) to check whether unified income tax
+finances rent relief as well as war profits tax does. It looked like it
+did (55.7% $ coverage vs war profits tax's 52.0%, vs labour-tax-alone's
+29.5%), reusing `GameBreakdown`'s own parser from a scratch, untracked
+`tmp/study-unified-tax/` program - not committed, just an analysis run.
+
+While reporting that result, the user caught a real problem I'd missed:
+the comparison was confounded, because `unified-income-tax-6` (which I
+wrote and the coder implemented in the original round) had MegaCorp and
+unified income tax both taxing the same gross salary independently -
+$150.88 + $150.88 = $301.76 - whenever rent relief and unified income
+tax were both enabled. That was never the intent. Only the *rent* side
+was meant to double-tax when stacked with war profits tax
+(unified-income-tax-5) - war profits tax computes from ownership share,
+a genuinely separate base, so that overlap is deliberate. MegaCorp and
+unified income tax would be taxing the exact same salary dollar twice,
+which the user confirmed should never happen: labour is taxed once.
+
+Asked the user how they wanted the fix to work (three options: unified
+supersedes MegaCorp entirely; MegaCorp fires as before and unified only
+adds rent's share; or something else). They chose: unified income tax
+supersedes MegaCorp - MegaCorp simply does not fire at all whenever
+unified income tax is active, even when rent relief (which would
+otherwise enable MegaCorp on its own) is also enabled.
+
+Fixed `unified-income-tax-6` in the tracked `unified-income-tax.feature`:
+replaced the old assertion (MegaCorp pays $150.88 AND the account holds
+$301.76) with a new negative step, "MegaCorp pays no individual income
+tax", and the account holding only $150.88. Updated the feature's
+top-level narrative and round-summary comment to state the corrected
+intent precisely (rent double-taxes with war profits tax by design;
+labour never double-taxes with MegaCorp). Verified clean parse, DRY
+findings unchanged in count (9, same as before - no new duplication),
+and confirmed red for exactly the right reason: one failure,
+"Unsupported step: Then MegaCorp pays no individual income tax" - the
+step doesn't exist yet, and neither does the fix (`Journalling.
+collectedSalary` currently fires MegaCorp and unified income tax
+unconditionally and independently whenever each is configured).
+
+Committed as `bee2b66` and handed off to the coder. Also traced the
+actual bug's location precisely: `Journalling.collectedSalary`
+(the-monopoly-game-domain/src/main/java/the/monopoly/game/Journalling.java:
+62-70) fires `megacorpSalaryTax.payTax(salary)` and
+`unifiedIncomeTaxBook.assess(player, salary)` independently, both gated
+only on their own null-checks, with no awareness of each other. Left the
+exact fix approach to the coder (specifier doesn't prescribe
+implementation) but the expected behavior is unambiguous now: MegaCorp
+must not fire at all when unified income tax is active, regardless of
+whether rent relief is also enabled.
