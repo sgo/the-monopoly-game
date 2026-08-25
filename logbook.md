@@ -48874,3 +48874,23 @@ Re-read your role and constitution.
 
 merge_and_process specifier 70bed3d2ed
 ```
+
+## 2026-08-25T11:15:00Z — merge specifier survivor resolution
+
+Received specifier handoff `000269` (commit `70bed3d2ed`). It resolves all
+four share-sale dissolution survivors with real final-balance assertions,
+not equivalence records. The merge retains the earlier architect/refactorer
+audit history alongside the specifier's detailed diagnosis. Final architect
+acceptance and Gherkin mutation verification is now required; the prior
+survivor manifest remains tool-owned and will be refreshed only by that run.
+
+## 2026-08-25T11:25:00Z — certify entity development-loan dissolution repair
+
+Final architect verification after the specifier's assertion additions is
+green: complete acceptance passes, and the complete configured Gherkin
+mutation suite passes with no survivor reports regenerated. The four prior
+share-sale survivors are killed by the final cash-balance assertions. Along
+with the earlier 32/32 property-test run and refactorer's seed 0–99 direct
+reproduction sweep, this closes the original dissolution desynchronization,
+the surviving-entity collateral reuse defect, its all-streets-lost edge case,
+and the acceptance mutation gaps. Return the completed phase to specifier.
