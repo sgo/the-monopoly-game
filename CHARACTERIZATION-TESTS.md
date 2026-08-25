@@ -114,21 +114,23 @@ active, so it stays on rather than being isolated as its own axis here.
 Config 12 is config 11 plus only `--optional-war-profits-tax`, isolating
 that flag's effect on an all-Greedo table the same way config 10 isolates
 it for a billionaire. Config 13 is config 12 with one Greedo seat replaced
-by an asset-rich Billionaire, isolating that swap specifically. An ad-hoc
-50-seed run of each found war-profits-tax has a much larger effect here
+by an asset-rich Billionaire, isolating that swap specifically. The
+checked-in baselines show war-profits-tax has a much larger effect here
 than the billionaire does: config 11 resolves in an ordinary win 48/50
-times (2 stalemates), mean age at end around 31 years; adding
-war-profits-tax in config 12 flips that balance hard toward stalemate
-(18/50) and roughly an order of magnitude longer games (mean age around
-254 years) — the same runaway dynamic Greedo-vs-Greedo games are already
+times (4% stalemate), mean age at end 28.06 years; adding war-profits-tax
+in config 12 flips that balance hard toward stalemate (34%, 17/50) and
+more than a five-fold increase in game length (mean age 152.28 years,
+max 1730) — the same runaway dynamic Greedo-vs-Greedo games are already
 known to exhibit, now showing up with a full 8-player table once
 war-profits-tax and rent relief are both recirculating money. Swapping in
-the asset-rich Billionaire for config 13 barely moves either number (30/50
-wins, 20/50 stalemates, mean age around 218 years) — a far milder effect
-than the billionaire's win-rate collapse in config 10, where rent relief
-is absent; with relief active, the Billionaire's usual advantage from an
-early land-heavy opening appears substantially diluted by money flowing
-back to every player rather than concentrating with land ownership. These
+the asset-rich Billionaire for config 13 moves the outcome split only
+slightly (40% stalemate, 30/50 wins) and actually *shortens* the average
+game (mean age 132.66 years) — a far milder, and differently-shaped,
+effect than the billionaire's win-rate collapse in config 10, where rent
+relief is absent; with relief active, the Billionaire's usual advantage
+from an early land-heavy opening appears substantially diluted by money
+flowing back to every player rather than concentrating with land
+ownership. These
 three configs were also where an entity-dissolution/development-loan
 crash (`entity-dev-loan-dissolution-desync`) and a defaulted-loan-auction
 null-winner crash (`loan-foreclosure-null-winner-desync`) first surfaced

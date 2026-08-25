@@ -49572,3 +49572,27 @@ green (`CharacterizationTest` 15/15 - all configs including 11-13,
 permanent baseline fixtures exist for all three configs - no more need
 for the ad-hoc harness. `rent-relief-configs-11-13` is closed. No further
 specifier action needed on this task.
+
+## 2026-08-25T13:10:00Z — corrected stale figures in CHARACTERIZATION-TESTS.md's own prose
+
+User asked whether `README.md` was actually in sync with the new
+characterization data. It is (`ReadmeSyncTest` enforces this
+automatically, and reading `README.md` directly confirms configs 11-13's
+real rows and Detailed Breakdown blocks). But checking triggered a
+realization: the justification paragraph I wrote for configs 11-13 in
+`CHARACTERIZATION-TESTS.md` itself was not - it cited my own pre-fix
+ad-hoc 50-seed run, taken before the cross-JVM determinism defect this
+same task surfaced was found and fixed, so config 12 and 13's mean-age
+figures were quietly wrong (config 12: I wrote ~254yr, the real
+deterministic baseline is 152.28yr; config 13: I wrote ~218yr, actually
+132.66yr - not just off, but the wrong *direction*: config 13 shortens
+the average game relative to config 12, not lengthens it). Config 11's
+figures and every config's win/stalemate counts already matched.
+Corrected the paragraph to the real, checked-in baseline numbers.
+`CHARACTERIZATION-TESTS.md`'s own prose isn't covered by `ReadmeSyncTest`
+(that only checks `README.md` against the fixtures), so this drift
+wouldn't have been caught automatically - worth remembering next time
+this doc's prose cites specific figures from a run taken before a task's
+verification loop is fully closed out. Committing directly; no handoff
+needed, no code or spec content changed, nothing for another role to
+process.
