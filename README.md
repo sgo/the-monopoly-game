@@ -36,6 +36,7 @@ fixtures by the same test suite (see `README sync check` in
 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich + dev-loans | 100% win (50) | 1 / 4 / 4.0 / 12 |
 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich + war-profits-tax | 74% win (37), 26% stalemate (13) | 0 / 17 / 81.62 / 454 |
 | 8 | Greedo | peer-trading + legal-entity + dev-loans + rent relief | 96% win (48), 4% stalemate (2) | 7 / 14 / 28.06 / 170 |
+| 8 | Greedo | peer-trading + legal-entity + dev-loans | 100% win (50) | 5 / 10 / 11.6 / 32 |
 | 8 | Greedo | peer-trading + legal-entity + dev-loans + rent relief + war-profits-tax | 66% win (33), 34% stalemate (17) | 7 / 68 / 152.28 / 1730 |
 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich + dev-loans + rent relief + war-profits-tax | 60% win (30), 40% stalemate (20) | 0 / 57 / 132.66 / 843 |
 
@@ -78,7 +79,29 @@ Full breakdown for any config lives in
 - Rent relief: 1,274 payments, \$621,670 total, 50 games
 - MegaCorp salary tax: 4,768 payments, \$715,200 total
 - MegaCorp tax payers: wheelbarrow \$81450, dog \$67050, ship \$93150, racecar \$115650, shoe \$83850, high hat \$92700, iron box \$95550, thimble \$85800
+- Relief received: iron box \$90940, racecar \$108515, wheelbarrow \$93245, ship \$70035, shoe \$34135, thimble \$38075, high hat \$116655, dog \$70070
 - Effective tax burden: racecar 12.19%, wheelbarrow 13.78%, iron box 19.42%, ship 17.32%, dog 15.53%, shoe 20.95%, thimble 24.47%, high hat 12.03%
+- Net fiscal position: racecar -0.75%, wheelbarrow 2.00%, iron box -0.94%, ship -4.30%, dog 0.70%, shoe -12.42%, thimble -13.61%, high hat 3.11%
+
+</details>
+
+<details>
+<summary>8 players — Greedo — peer-trading + legal-entity + dev-loans</summary>
+
+- Outcome: 100% win (50)
+- Winners: iron box 4, racecar 8, dog 9, high hat 8, wheelbarrow 9, ship 6, shoe 5, thimble 1
+- Age at end: min 5, median 10, mean 11.6, max 32
+- Bankruptcies: iron box 22, ship 46, racecar 37, the bank 63, thimble 12, dog 40, shoe 40, high hat 46, wheelbarrow 44
+- Auctions: 42 (2.8% of 1,485 land acquisitions)
+- Mortgages: 1,196
+- Income: salary \$485,600, rent \$1,271,793, bank payments \$61,545
+- Income by player: racecar salary \$66,600, rent \$142,841, wheelbarrow salary \$60,800, rent \$154,386, iron box salary \$55,600, rent \$85,786, ship salary \$57,800, rent \$181,041, dog salary \$58,200, rent \$134,030, shoe salary \$64,600, rent \$119,509, thimble salary \$56,000, rent \$55,860, high hat salary \$66,000, rent \$169,834
+- Loans: 520 raised, \$29,700 total, 2 defaults
+  - Borrowers: iron box 47, racecar 62, Green Realty 30, Yellow Realty 40, ship 62, Pink Realty 41, thimble 22, dog 58, shoe 52, high hat 54, wheelbarrow 52
+  - Bondholders: dog 270, high hat 118, ship 8, shoe 13, iron box 32, thimble 23, wheelbarrow 7, racecar 46
+  - Servicing: borrowers paid \$5,359 interest + \$8,457 principal; bondholders received \$2,626 interest + \$8,435 principal
+- Entities: 100 formed, 65 dissolved
+- Peer trades: 4
 
 </details>
 
@@ -105,7 +128,9 @@ Full breakdown for any config lives in
 - Rent relief: 4,242 payments, \$2,737,245 total, 50 games
 - MegaCorp salary tax: 21,331 payments, \$3,199,650 total
 - MegaCorp tax payers: wheelbarrow \$253500, dog \$199500, ship \$653100, racecar \$310050, shoe \$520800, high hat \$385200, iron box \$281100, thimble \$596400
+- Relief received: iron box \$166495, racecar \$126090, wheelbarrow \$120665, ship \$154460, shoe \$209555, thimble \$851770, high hat \$1012380, dog \$95830
 - Effective tax burden: racecar 27.73%, wheelbarrow 31.69%, iron box 23.72%, ship 31.38%, dog 29.70%, shoe 44.89%, thimble 20.91%, high hat 14.13%
+- Net fiscal position: racecar -18.44%, wheelbarrow -20.42%, iron box -10.16%, ship -25.02%, dog -17.49%, shoe -32.88%, thimble 8.76%, high hat 18.79%
 
 </details>
 
@@ -129,7 +154,9 @@ Full breakdown for any config lives in
 - Rent relief: 4,919 payments, \$2,749,045 total, 49 games
 - MegaCorp salary tax: 20,176 payments, \$3,026,400 total
 - MegaCorp tax payers: wheelbarrow \$314700, dog \$507300, ship \$497700, racecar \$322950, shoe \$450900, high hat \$398100, thimble \$239700, iron box \$295050
+- Relief received: dog \$178960, ship \$630290, racecar \$758590, iron box \$252870, thimble \$30165, high hat \$108180, shoe \$706470, wheelbarrow \$83520
 - Effective tax burden: racecar 56.97%, wheelbarrow 34.26%, dog 42.90%, iron box 33.45%, ship 48.37%, shoe 40.78%, thimble 37.37%, high hat 33.88%
+- Net fiscal position: racecar -17.52%, wheelbarrow -25.17%, dog -33.58%, iron box -12.55%, ship -18.89%, shoe -10.54%, thimble -32.71%, high hat -24.88%
 - War-profits tax: 1068 payments, \$2,247,817 total
 - Tax payers: dog 45, shoe 416, iron box 64, thimble 1, ship 236, racecar 302, high hat 4
 - Government balance: min 61, median 1834, mean 26783.32, max 271144

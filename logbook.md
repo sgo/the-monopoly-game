@@ -49163,6 +49163,13 @@ sorts deed-derived ownership by board order and deterministically selects a
 retained card; parallel characterization is restored after validation.
 Return `rent-relief-configs-11-13` as phase complete to specifier.
 
+## 2026-08-25T13:00:00Z — certify effective tax burden reporting
+
+Architect verification for `effective-tax-burden-per-player` is green:
+property tests, full acceptance, and the complete configured Gherkin mutation
+suite all pass with no survivor report. Return the completed phase to
+specifier.
+
 ## 2026-08-25T11:45:00Z — route null-winner auction survivor equivalence decision
 
 Architect verification confirms property and acceptance gates green, but the
@@ -49665,6 +49672,24 @@ derivation note to include both the per-player income breakdown and the
 new derived burden figure. Committing and handing off to coder under a
 new task name, `effective-tax-burden-per-player`.
 
+Sent handoff to coder:
+
+```
+id: 20260825T111021Z_000273_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: effective-tax-burden-per-player
+commit: 0e7a7c1342
+created_at: 2026-08-25T11:10:21.960099Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 0e7a7c1342
+```
+
 ## 2026-08-25T11:38:17Z — refactorer processes coder handoff `ddf7f51981` (effective-tax-burden-per-player)
 
 Handoff message received:
@@ -49791,3 +49816,70 @@ config11-13's baselines is now corrected. `mvn test`, acceptance
 (933/933), and the characterization suite (three separate runs) all
 green. Added explicit JSON round-trip coverage for the new fields.
 Requesting architect closure.
+
+## 2026-08-25T13:35:00Z — specifier syncs after effective-tax-burden-per-player
+
+Merged architect handoff `000436` (commit `b52370f2f4`, "Certify
+effective tax burden reporting") after resolving a fifth append-only
+`logbook.md` conflict (both parents' entries kept in full). Along the way
+the coder's diff fixed a real, previously-uncaught bug as a natural side
+effect: `GameBreakdown`'s rent aggregation matched the bare substring
+`" rent "`, which also matches inside "...in rent relief" lines, silently
+double-counting relief payments as ordinary tenant rent - so configs
+11-13's rent totals (certified just one task ago) were quietly wrong
+until this fix; not a regression, a correction that had to happen for the
+burden figure's denominator to be right.
+
+Ran `mvn test -Pcharacterization-tests` per the phase-complete sync rule:
+green (`CharacterizationTest` 16/16, `ReadmeSyncTest` 1/1, domain
+430/430). No drift. Confirmed directly in `README.md`: real "Effective
+tax burden" lines now published for every applicable config (10-13) -
+config 10's `dog 25.61%` matches, as an independent check, the same
+figure derived by hand from ad-hoc log parsing much earlier this session.
+`effective-tax-burden-per-player` is closed. No further specifier action
+needed on this task.
+
+## 2026-08-25T13:50:00Z — specified relief beneficiary tracking and a real matched-pair config
+
+User asked what the rent-relief data means for beneficiaries, then asked
+to make that precise and permanent (mirroring burden). Traced the actual
+money movement in `RentRelief.pay` before specifying anything: the
+landlord always receives the full nominal rent regardless of relief
+(`landlord.account().deposit(rent)`, the whole amount) - relief only ever
+reduces what the *tenant* pays, so the tenant, not the landlord named in
+the `RentReliefPaid` line, is the real beneficiary. The tenant is
+recoverable from the `RentPaid` line `Journalling.paid` always logs
+immediately before it, the same adjacent-line pattern already used for
+MegaCorp attribution. Specified this as a new per-pawn "relief received"
+field under the `--optional-rent-relief` extra, honestly scoped to
+player-owned landlords only (the legal-entity rent path caps the tenant
+identically but logs no distinguishable relief line at all - a
+pre-existing observability gap, not new). Also specified a derived,
+README-only "net fiscal position by pawn" (`relief % - burden %`, same
+normalized income denominator as burden) so the two are directly
+comparable rather than left as separate $ figures.
+
+Separately, user asked whether survival rate is interesting to compare
+with/without relief. Walked through the real gap first rather than just
+saying yes: none of the 16 existing configs form a clean single-flag
+pair for relief specifically - config 6 is the closest to config 11 but
+is also missing development loans, confounding any comparison. Added
+config 14 (`eight_greedo_stalemate_entity_loans`) as the genuine matched
+pair - config 11 with only `--optional-rent-relief` removed - and ran it
+ad hoc (50 seeds, clean) before specifying, rather than guessing at the
+result: config 14 resolves in an ordinary win all 50 times, exactly 7
+bankruptcies every game (350 total, `7 x 50`), a flat 12.5% survival rate
+(50/400 seats) with no exceptions. Config 11 barely moves that - 348
+bankruptcies, 13.0% survival rate, only 0.5 points higher. Documented
+this as a real, precisely-isolated finding: relief alone does not sustain
+survival or stalemate; the dramatic shift already documented for config
+12 is a war-profits-tax effect (or the interaction of the two), not
+something relief produces by itself.
+
+Both pieces landed in the same `CHARACTERIZATION-TESTS.md` edit session
+in non-overlapping sections (relief/burden derivation vs. the Game
+setups table and its isolation-chain prose), so committing them together
+rather than as two round trips through the pipeline. Deleted the
+`MatchedPairScratch.java` harness and its scratch logs now that the real
+numbers are captured in the doc. Handing off to coder under
+`rent-relief-net-position-and-matched-pair`.

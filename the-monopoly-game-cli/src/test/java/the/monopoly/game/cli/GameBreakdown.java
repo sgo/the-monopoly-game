@@ -397,14 +397,16 @@ record GameBreakdown(
   record RentReliefExtras(int reliefPayments, long reliefDollars, int gamesWithRelief,
                           int megacorpTaxPayments, long megacorpTaxDollars,
                           Map<String, Integer> megacorpTaxPayers,
-                          Map<String, Long> megacorpTaxByPlayer) {
+                          Map<String, Long> megacorpTaxByPlayer,
+                          Map<String, Long> reliefByPlayer) {
     RentReliefExtras merge(RentReliefExtras other) {
       return new RentReliefExtras(reliefPayments + other.reliefPayments,
           reliefDollars + other.reliefDollars, gamesWithRelief + other.gamesWithRelief,
           megacorpTaxPayments + other.megacorpTaxPayments,
           megacorpTaxDollars + other.megacorpTaxDollars,
           mergeMaps(megacorpTaxPayers, other.megacorpTaxPayers),
-          mergeLongMaps(megacorpTaxByPlayer, other.megacorpTaxByPlayer));
+          mergeLongMaps(megacorpTaxByPlayer, other.megacorpTaxByPlayer),
+          mergeLongMaps(reliefByPlayer, other.reliefByPlayer));
     }
 
     String toJson() {
@@ -412,7 +414,8 @@ record GameBreakdown(
           + ", \"gamesWithRelief\": " + gamesWithRelief + ", \"megacorpTaxPayments\": "
           + megacorpTaxPayments + ", \"megacorpTaxDollars\": " + megacorpTaxDollars
           + ", \"megacorpTaxPayers\": " + mapToJson(megacorpTaxPayers)
-          + ", \"megacorpTaxByPlayer\": " + longMapToJson(megacorpTaxByPlayer) + "}";
+          + ", \"megacorpTaxByPlayer\": " + longMapToJson(megacorpTaxByPlayer)
+          + ", \"reliefByPlayer\": " + longMapToJson(reliefByPlayer) + "}";
     }
 
     static RentReliefExtras fromJson(String json) {
@@ -420,7 +423,8 @@ record GameBreakdown(
       return new RentReliefExtras(Integer.parseInt(fields.get("reliefPayments")),
           parseLong(fields.get("reliefDollars")), Integer.parseInt(fields.get("gamesWithRelief")),
           Integer.parseInt(fields.get("megacorpTaxPayments")), parseLong(fields.get("megacorpTaxDollars")),
-          parseStringIntMap(fields.get("megacorpTaxPayers")), parseStringLongMap(fields.get("megacorpTaxByPlayer")));
+          parseStringIntMap(fields.get("megacorpTaxPayers")), parseStringLongMap(fields.get("megacorpTaxByPlayer")),
+          parseStringLongMap(fields.get("reliefByPlayer")));
     }
   }
 
@@ -575,6 +579,7 @@ record GameBreakdown(
       Map<String, Long> taxByPlayer = new LinkedHashMap<>();
       int reliefPayments = 0;
       long reliefDollars = 0;
+      Map<String, Long> reliefByPlayer = new LinkedHashMap<>();
       boolean gameHadRelief = false;
       int megacorpTaxPayments = 0;
       long megacorpTaxDollars = 0;
@@ -705,6 +710,7 @@ record GameBreakdown(
             String landlord = line.substring(nameStart, nameEnd);
             long amount = dollarsAfter(line, " $");
             rent += amount;
+            reliefByPlayer.merge(landlord, amount, Long::sum);
             incomeByPlayer.merge(landlord, new Income.PlayerIncome(0, amount), Income.PlayerIncome::merge);
           }
         }
@@ -731,7 +737,7 @@ record GameBreakdown(
           : Optional.empty();
       this.rentRelief = rentRelief
           ? Optional.of(new RentReliefExtras(reliefPayments, reliefDollars, gameHadRelief ? 1 : 0,
-              megacorpTaxPayments, megacorpTaxDollars, megacorpTaxPayers, megacorpTaxByPlayer))
+              megacorpTaxPayments, megacorpTaxDollars, megacorpTaxPayers, megacorpTaxByPlayer, reliefByPlayer))
           : Optional.empty();
     }
 
