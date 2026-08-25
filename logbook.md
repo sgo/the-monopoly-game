@@ -49664,3 +49664,99 @@ Updated the README sync check's Detailed Breakdown bullet list and
 derivation note to include both the per-player income breakdown and the
 new derived burden figure. Committing and handing off to coder under a
 new task name, `effective-tax-burden-per-player`.
+
+## 2026-08-25T11:38:17Z — refactorer processes coder handoff `ddf7f51981` (effective-tax-burden-per-player)
+
+Handoff message received:
+
+```
+id: 20260825T112916Z_000276_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: effective-tax-burden-per-player
+commit: ddf7f51981
+
+Re-read your role and constitution.
+
+merge_and_process coder ddf7f51981
+```
+
+Non-fast-forward merge from `43fa2ca`. Resolved an append-only `logbook.md`
+conflict (both parents' entries kept in full). The specifier extended the
+characterization breakdown schema (per-player income unconditionally,
+MegaCorp-tax-by-player under the rent-relief extra, and a derived
+"effective tax burden by pawn" percentage for any config with a tax extra
+active), catching and correcting their own draft before committing (gross
+salary, not net, belongs in the denominator). This commit implements it.
+
+The one domain-level (`src/main`) change stood out for scrutiny:
+`Report.line`'s `MegacorpSalaryTaxPaid` case now appends the payer's name
+in parentheses - the only MegaCorp-tax report line that never named a
+payer (unlike `WarProfitsTaxPaid`, which already leads with the payer's
+name), needed so `GameBreakdown` can attribute per-player MegaCorp tax
+from report text at all. Verified this doesn't break any of the many
+existing Gherkin scenarios asserting this exact line (`journal-90`,
+`report-90`, etc.): the acceptance step-matching helper (`GameAccount.
+says`) does `report.indexOf(phrase)`, not exact-line equality, so an
+appended suffix is invisible to every existing assertion. Confirmed by
+running the full suite: 933/933, unaffected.
+
+Traced the string-parsing logic in `GameBreakdown.java` (test-support,
+not production, so outside the CRAP/DRY/mutation gate) carefully, since
+it's fragile hand-rolled `indexOf` parsing with real room for off-by-one
+errors:
+- The new landlord-name extraction for regular rent (`pays`/`$` substring
+  between them) correctly handles both report line shapes: player-owned
+  colour streets name the landlord (`"cat pays dog $80 rent for X"`), but
+  `LegalEntityRentPaid` has no landlord name at all (`"cat pays $80 rent
+  for X"`) - the `dollars > pays + 6` guard correctly detects and skips
+  the no-name case rather than mis-extracting `"$80"` itself as a name.
+  Verified the index arithmetic by hand for both shapes.
+- Found the diff also fixes a real, previously-uncaught bug: the old rent
+  aggregation (`if (line.contains(" rent ")) rent += rentIn(line);`) had
+  no exclusion for `"The government pays X $Y in rent relief"` lines,
+  which also contain the substring `" rent "` (in "...in rent relief") -
+  `rentIn` would have extracted the relief dollar figure and silently
+  double-counted it as ordinary tenant rent. This means the `rent` totals
+  in configs 11-13's *just-certified* baselines were quietly wrong before
+  this fix; the corrected values are now checked in (visible in the
+  larger, `+3/-2`-shaped diffs for those three fixture files vs. the
+  simple `+1` for configs with no rent-relief). Not a regression - a
+  correction that had to happen for the burden feature's denominator to
+  be right, caught as a natural side effect of implementing it, not
+  something introduced or missed by anyone this round.
+
+Verification:
+- `mvn test`: green. Full acceptance: 933/933.
+- `mvn test -Pcharacterization-tests`: green (17/17: `ReadmeSyncTest` plus
+  all 16 `CharacterizationConfig` entries, `parsesPerPlayerIncomeAndRent
+  ReliefTaxContributions`, and the pre-existing report-parsing unit
+  tests), run as three separate `mvn` invocations given this exact test
+  class's recent determinism history - all three clean.
+- `ReadmeSyncTest` (which recomputes every derived figure, including the
+  burden percentage, from the checked-in baselines and compares against
+  `README.md`'s prose) passing confirms the documentation is genuinely in
+  sync, not just internally consistent.
+- Property-test assessment: this is JSON serialization/parsing logic in a
+  test-support class, and round-trip stability is exactly the kind of
+  property my role calls out. The file already has one such check
+  (`WarProfitsTaxExtras` in `aggregatesWarProfitsTaxAcrossSeedsIncluding
+  ZeroBalances`), matching the same pattern the coder didn't extend to
+  the new fields. Extended `parsesPerPlayerIncomeAndRentReliefTaxContrib
+  utions` (already the natural home - it already builds a `GameResult`
+  exercising every new field) with a `toJson()`/`fromJson()` round trip
+  covering `Income.byPlayer`, the new `RentReliefExtras` record, and
+  `WarProfitsTaxExtras.payerDollars`. This is on top of the *implicit*
+  round-trip validation the full characterization suite already provides
+  (`assertThat(actual.toJson()).isEqualTo(expected.toJson())` across 16
+  configs, several with non-trivial data in these exact new fields) - a
+  faster, more targeted, explicitly-named check for the same property,
+  not a new one.
+
+No defects found beyond what's already documented above (both handled by
+the coder's own diff, not requiring further action). Committing the
+round-trip test addition and handing the verified state to the architect
+under the same task name.
