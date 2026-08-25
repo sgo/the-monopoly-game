@@ -49215,3 +49215,31 @@ Both defects blocking the rent-relief characterization scoping (started
 re-run config13 (asset-rich billionaire + legal-entity + development-loans
 + rent-relief + war-profits-tax) to confirm it's clean now, then update
 `CHARACTERIZATION-TESTS.md` with all three candidate configs together.
+
+## 2026-08-25T12:15:00Z — specified configs 11-13, routed to coder
+
+Re-ran all three candidate configs (`RentReliefConfigsScratch.java`, still
+untracked under `the-monopoly-game-cli/src/test`) now that both blocking
+defects are closed: all 150 seeds (50 each) clean, no crashes.
+
+Updated `CHARACTERIZATION-TESTS.md` with the user's approval: added
+configs 11-13 to the Game setups table (11: all-Greedo + legal-entity +
+stalemate-trading + development-loans + rent-relief; 12: 11 plus
+war-profits-tax; 13: 12 with one Greedo seat replaced by an asset-rich
+Billionaire) and a justification paragraph with real 50-seed headline
+numbers - config 11 resolves in an ordinary win 48/50 times (mean age
+~31yr); adding war-profits-tax in config 12 flips that hard toward
+stalemate (18/50, mean age ~254yr), the same runaway dynamic Greedo-vs-Greedo
+games already exhibit, now at a full 8-player table; swapping in the
+asset-rich Billionaire for config 13 barely moves either number (20/50
+stalemates, ~218yr) - a far milder effect than config 10's win-rate
+collapse, since relief this time is recirculating money back to every
+player rather than letting it concentrate with land ownership. Also added
+a `--optional-rent-relief` Extras bullet to the breakdown schema (relief
+payments plus MegaCorp payments, since the flag binds both mechanisms to
+the same toggle) - the schema had no rent-relief tracking at all before
+this.
+
+Did not touch `CharacterizationConfig.java`, baseline fixtures, or
+README.md sync - that's coder's implementation. Committing the spec
+update and handing off under a new task name, `rent-relief-configs-11-13`.
