@@ -49938,3 +49938,18 @@ game's course), not just reporting a single "when does this happen"
 number in isolation. Updated the README sync check's bullet list.
 Committing and handing off to coder under a new task name,
 `relief-event-age-stats`.
+
+## 2026-08-25T14:35:00Z — implemented relief event age stats
+
+Processed specifier handoff `50_20260825T130053Z_000276_from_specifier_to_coder.handoff`
+at commit `584fb3e33f`. Added min/max/mean/median age-at-event stats for
+relief received and starved rent, preserving per-event ages through
+aggregation and JSON output. Starvation is recorded before applying a
+following turn's `TurnStarted` age, so the stat describes the age at the
+rent event itself. Added focused characterization coverage and refreshed
+the three rent-relief baselines and README synchronization fields.
+
+Verification: focused characterization test, README sync test, and the
+full characterization profile pass. Committed as `603d8df` and handing
+off to refactorer via
+`.swarmforge/handoffs/outbox/50_20260825T130721Z_000280_from_coder_to_refactorer.handoff`.
