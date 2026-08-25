@@ -48573,6 +48573,22 @@ static formation list. Route this tightly characterized follow-up to coder
 under the same task. The red property test must turn green without losing
 the unformed-fixture behavior that motivated the fallback.
 
+## 2026-08-25T07:52:18Z — return all-streets-lost collateral fix to architect
+
+Sent handoff `000270` to architect with commit `beccf73cab`.
+
+type: git_handoff
+to: architect
+priority: 00
+task: entity-dev-loan-dissolution-desync
+commit: beccf73cab
+
+Implemented explicit formation tracking in `Deeds`: unformed entities retain
+the static-street fixture fallback, while formed entities with streets lost to
+individual foreclosure now expose only their current deed ownership, including
+an empty list. Focused foreclosure property test passes; domain tests pass;
+acceptance passes 930/930.
+
 Sent coder handoff `000427` at `b399dc0212`; the coder owns the minimal
 production repair and must return the property suite green.
 
