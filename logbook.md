@@ -49635,3 +49635,17 @@ Updated the README sync check's Detailed Breakdown bullet list and
 derivation note to include both the per-player income breakdown and the
 new derived burden figure. Committing and handing off to coder under a
 new task name, `effective-tax-burden-per-player`.
+
+## 2026-08-25T13:29:16Z — implemented effective tax burden by player
+
+Processed specifier handoff `000273` (commit `0e7a7c1342`) for
+`effective-tax-burden-per-player`. Extended characterization breakdowns with
+per-player salary/rent income, MegaCorp tax attribution, rent-relief totals,
+and tax dollars by payer. Effective burden is derived from gross salary plus
+rent, pooling dollars across seeds; fixtures and README detailed blocks now
+carry the tracked figures for configs 10–13. Updated the report to retain the
+existing acceptance phrase while appending the paying pawn for attribution.
+
+Verification passed: domain tests, characterization suite, README sync, and
+full acceptance (`933/933`). Handed commit `ddf7f51981` to refactorer in
+`50_20260825T112916Z_000276_from_coder_to_refactorer.handoff`.
