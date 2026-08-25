@@ -48761,3 +48761,32 @@ original crash is fixed and independently confirmed, the residual gap my
 property test found is fixed and independently confirmed, and this round
 added no new gaps. Committing the coverage addition and dead-code removal,
 then handing the verified state to the architect under the same task name.
+
+## 2026-08-25T08:25:31Z — refactorer sent entity-dev-loan-dissolution-desync handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T082531Z_000200_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: entity-dev-loan-dissolution-desync
+commit: d0dd06a2b8
+created_at: 2026-08-25T08:25:31.188159Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d0dd06a2b8
+```
+
+Reports from commit `d0dd06a2b8`: `entity-dev-loan-dissolution-desync` is
+verified complete - the original seed-6 repro is fixed (widened to a
+100-seed sweep, all clean) and the all-streets-lost residual gap from my
+prior round is closed (property-test profile 32/32). `mvn test` and
+acceptance (932/932) green. Also improved `forecloseEntity`'s coverage
+(0% -> 52.8%, a pre-existing but now doubly-load-bearing method) and
+removed the now-fully-superseded, uncalled `transferEntityLoans` method
+and its orphaned test. Requesting architect closure of this task.
