@@ -49852,3 +49852,16 @@ rather than as two round trips through the pipeline. Deleted the
 `MatchedPairScratch.java` harness and its scratch logs now that the real
 numbers are captured in the doc. Handing off to coder under
 `rent-relief-net-position-and-matched-pair`.
+
+## 2026-08-25T14:30:48Z — implemented relief beneficiaries and matched config
+
+Processed specifier handoff `000274` (commit `964eb53c08`) for
+`rent-relief-net-position-and-matched-pair`. Added characterization config 14
+(`eight_greedo_stalemate_entity_loans`) as config 11 without rent relief,
+tracked relief received by pawn, and added README-derived net fiscal position
+percentages using the same gross-income denominator as effective tax burden.
+Updated fixtures and README sync coverage.
+
+Verification passed: domain tests, 14-config characterization suite, README
+sync, and full acceptance (`933/933`). Handed commit `0cba3b6` to refactorer
+after processing the handoff.
