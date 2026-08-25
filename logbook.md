@@ -50222,3 +50222,18 @@ Merged the refactorer handoff after resolving the append-only
 `logbook.md` conflict while retaining both histories. The task adds
 starved relief tracking to the test-support breakdown and includes a
 round-trip regression check; beginning architectural review.
+
+## 2026-08-25T15:10:00Z — specifier syncs after rent-relief-starvation-tracking
+
+Merged architect handoff `000439` (commit `df7cf07632`, "Merge rent
+relief starvation tracking review") after resolving a seventh
+append-only `logbook.md` conflict. This task's actual implementation
+(starved count/total $/games, starved-by-pawn) had already landed as
+part of the previous `rent-relief-net-position-and-matched-pair` cycle -
+this handoff is the architect's own review thread for the task name
+catching up and formally certifying the same, already-verified work, not
+new changes. Ran `mvn test -Pcharacterization-tests` again to confirm:
+green, identical counts to the last sync (`CharacterizationTest` 18/18,
+`ReadmeSyncTest` 1/1, domain 430/430) - consistent with no new code
+having landed in this specific merge. `rent-relief-starvation-tracking`
+is closed. `relief-event-age-stats` remains the only outstanding task.
