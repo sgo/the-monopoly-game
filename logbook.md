@@ -48575,3 +48575,17 @@ the unformed-fixture behavior that motivated the fallback.
 
 Sent coder handoff `000427` at `b399dc0212`; the coder owns the minimal
 production repair and must return the property suite green.
+
+## 2026-08-25T10:30:00Z — reject collateral repair pending reliable property gate
+
+Received coder handoff `000270` (commit `beccf73cab`) and merged it as
+`7730d8c`. Its formation-history set in `Deeds` correctly distinguishes an
+unformed fixture from an entity which was formed and subsequently lost all
+streets, so the production direction addresses the diagnosed gap. However,
+`mvn test -Pproperty-tests` is red: the exhaustive `keptMask` property
+generates only eight values for the three pink streets, while JetCheck's
+default uniqueness requirement demands more and raises
+`CannotSatisfyCondition` rather than exercising the assertion. This is a
+test-harness defect, not an acceptable green gate. Route it to coder: retain
+the exhaustive all-subsets coverage but express it in a reliably executable
+test/property form; return the full property suite green.
