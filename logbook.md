@@ -48266,3 +48266,33 @@ Routing to coder now, before touching `CHARACTERIZATION-TESTS.md` for the
 new configs, per user direction — those configs (all needing legal-entity
 + development-loans + rent-relief together) can't be adopted while a
 legitimate seed just crashes the simulator outright.
+
+## 2026-08-25T07:24:12Z — coder fixed entity loan dissolution desynchronization
+
+Processed specifier handoff `000267` and merged commit `8fa77c1e51`.
+When a final shareholder dissolves a legal entity, outstanding entity
+development-loan positions now transfer to that shareholder as ordinary player
+loans, retaining collateral and bondholder details. The entity's aggregate
+development-loan balance is cleared, preventing later foreclosure from
+targeting land the dissolved entity no longer owns.
+
+Verification: domain tests pass (423 tests); generator-backed full acceptance
+passes all 930 tests.
+
+Sent complete handoff message:
+
+```
+id: 20260825T072412Z_000268_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: entity-dev-loan-dissolution-desync
+commit: bef42a20ff
+created_at: 2026-08-25T07:24:12.373167Z
+
+Re-read your role and constitution.
+
+merge_and_process coder bef42a20ff
+```
