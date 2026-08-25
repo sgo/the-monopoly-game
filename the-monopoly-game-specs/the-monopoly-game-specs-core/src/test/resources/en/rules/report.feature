@@ -1360,3 +1360,35 @@ Feature: game report
     Examples:
       | state    |
       | disabled |
+
+  # report-96
+  Scenario Outline: the report narrates that unified income tax is enabled, near the start of the game
+    Given the unified income tax is enabled
+    When we play the game
+    Then the game report says that unified income tax is <state>
+
+    Examples:
+      | state   |
+      | enabled |
+
+  # report-97
+  Scenario Outline: the report narrates that unified income tax is disabled by default, near the start of the game
+    When we play the game
+    Then the game report says that unified income tax is <state>
+
+    Examples:
+      | state    |
+      | disabled |
+
+  # report-98
+  Scenario Outline: the report narrates the unified income tax payment alongside a player's salary
+    Given the unified income tax is enabled
+    And pawn "dog" starts at position <dog_start_position>
+    And pawn "dog" will roll <dog_die_1> and <dog_die_2> for their turn
+    When we play the game
+    Then the game report says that pawn "dog" collects a salary of $<dog_salary>
+    And the game report says that pawn "dog" pays the government a unified income tax of $<unified_tax>
+
+    Examples:
+      | dog_start_position | dog_die_1 | dog_die_2 | dog_salary | unified_tax |
+      | 37                  | 1          | 2          | 200         | 150.88       |
