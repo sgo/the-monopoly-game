@@ -49138,3 +49138,31 @@ mortgage/opening price, so the stated no-winner outcome appears genuinely
 indistinguishable; nevertheless specifier must decide and record precise
 equivalence rationale or add a meaningful observable distinction. Do not
 phase-close until the report is cleared by the mutation tool.
+
+## 2026-08-25T11:05:00Z — classified the two null-winner auction survivors as equivalent
+
+Confirmed the architect's suspicion, not just accepted it. Neither mutated
+bid ever changes any asserted outcome: no code path uses a *losing*
+bidder's exact ceiling for anything beyond deciding whether they can raise
+that round (`Auction.ascendMany`/`raiseRound`), and a losing bid is never
+journaled - grepped `Journalling.java` for `bid` and found nothing, so no
+future assertion (report/journal text included) could ever observe the
+difference either. Concretely: `high_hat_bid` $10->$4 and `iron_box_bid`
+$25->$24 both stay positive (still "qualified" under
+`Auction.qualified`'s `floorOpening=false`) and both stay under Rue Grande
+Dinant's $30 mortgage/opening price (`Street.java`:
+`RueGrandeDinant(ColourStreet.of(brown, 60, 2, 10, 30, 90, 160, 250, 50,
+30))`), so `ascendMany`'s first round still offers everyone the $30
+opening, still exceeds both ceilings, still assigns no winner - identical
+null-winner/return-to-bank result, identical $30 `bank_ending`, identical
+everything else in the scenario, no matter which of the two values is
+used.
+
+Registered both in `acceptance/equivalent-mutations.edn` (now 471
+entries) rather than editing the scenario itself; did not hand-edit
+`acceptance/mutation-survivors-en-rules-development-loans-feature.md` per
+the standing rule. No scenario content changed, so no re-verification of
+`development-loans-18` itself was needed beyond confirming the EDN file
+still parses (`bb -e` read it back cleanly). Committing and handing the
+decision back to the architect under the same task name,
+`loan-foreclosure-null-winner-desync`.
