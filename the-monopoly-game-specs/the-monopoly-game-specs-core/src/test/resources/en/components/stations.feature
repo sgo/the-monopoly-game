@@ -1,6 +1,6 @@
 # mutation-stamp: sha256=d9038457a45efbd281ff7e3f35f75967696736634425af75255db838f093204d
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-08-25T07:37:52.062429Z","feature_name":"stations","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/components/stations.feature","background_hash":"74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b","implementation_hash":"unknown","scenarios":[{"index":0,"name":"station","scenario_hash":"f0308789c04f4673b7b98b0e9e7b7fc4285bbb4fd8a1dfa01735a8a5e138b78e","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-07-27T10:30:42.246640Z"}]}
+# {"version":1,"tested_at":"2026-08-25T08:46:09.610581Z","feature_name":"stations","feature_path":"/Users/sgo/sgo/the-monopoly-game/.worktrees/architect/the-monopoly-game-specs/the-monopoly-game-specs-core/src/test/resources/en/components/stations.feature","background_hash":"74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b","implementation_hash":"unknown","scenarios":[{"index":0,"name":"station","scenario_hash":"f0308789c04f4673b7b98b0e9e7b7fc4285bbb4fd8a1dfa01735a8a5e138b78e","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-07-27T10:30:42.246640Z"}]}
 # acceptance-mutation-manifest-end
 
 # language: en

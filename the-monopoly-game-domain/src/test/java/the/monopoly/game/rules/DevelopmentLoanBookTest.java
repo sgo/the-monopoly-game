@@ -69,22 +69,6 @@ class DevelopmentLoanBookTest {
   }
 
   @Test
-  void anEntityLoanFollowsItsCollateralToTheFinalShareholderWhenTheEntityDissolves() {
-    DevelopmentLoanBook book = new DevelopmentLoanBook(bank);
-    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, List.of(dog), rules);
-    book.recordEntityLoan(entity, street.type(), new Money(20), 0, highHat);
-
-    book.transferEntityLoans(entity, dog);
-
-    DevelopmentLoanBook.Position transferred = book.positions().getFirst();
-    assertThat(transferred.isEntityLoan()).isFalse();
-    assertThat(transferred.borrower()).isEqualTo(dog);
-    assertThat(transferred.entity()).isNull();
-    assertThat(transferred.outstanding()).isEqualTo(new Money(20));
-    assertThat(entity.loan()).isEqualTo(Money.ZERO);
-  }
-
-  @Test
   void anEntityCanRepayItsOutstandingLoanInFullBeforeDissolution() {
     DevelopmentLoanBook book = new DevelopmentLoanBook(bank);
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, List.of(dog), rules);
@@ -96,6 +80,24 @@ class DevelopmentLoanBookTest {
     assertThat(position.outstanding()).isEqualTo(Money.ZERO);
     assertThat(entity.loan()).isEqualTo(Money.ZERO);
     assertThat(entity.bankBalance()).isEqualTo(new Money(60));
+  }
+
+  @Test
+  void forecloseEntitySellsTheCollateralToTheBankAndClearsTheEntitysLoan() {
+    Deeds deeds = new Deeds();
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, List.of(dog), rules);
+    deeds.form(entity);
+    ColourStreet collateral = entity.streets().getFirst();
+    DevelopmentLoanBook book = new DevelopmentLoanBook(bank);
+    DevelopmentLoanBook.Position position = book.recordEntityLoan(entity, collateral.type(), new Money(100), 0, null);
+
+    DevelopmentLoanBook.Foreclosure foreclosure = book.forecloseEntity(
+        position, deeds, rules, List.of(dog, highHat), Strategy.OfPlayers.NOBODY_DECIDES);
+
+    assertThat(position.outstanding()).isEqualTo(Money.ZERO);
+    assertThat(entity.loan()).isEqualTo(Money.ZERO);
+    assertThat(deeds.entityOwnerOf(collateral.type())).isEmpty();
+    assertThat(foreclosure.recovered()).isEqualTo(Money.ZERO);
   }
 
   @Test
