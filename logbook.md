@@ -49852,3 +49852,21 @@ rather than as two round trips through the pipeline. Deleted the
 `MatchedPairScratch.java` harness and its scratch logs now that the real
 numbers are captured in the doc. Handing off to coder under
 `rent-relief-net-position-and-matched-pair`.
+
+Sent handoff to coder:
+
+```
+id: 20260825T122506Z_000274_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: rent-relief-net-position-and-matched-pair
+commit: 964eb53c08
+created_at: 2026-08-25T12:25:06.242813Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 964eb53c08
+```
