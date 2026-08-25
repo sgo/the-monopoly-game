@@ -48607,3 +48607,15 @@ the exhaustive all-subsets coverage but express it in a reliably executable
 test/property form; return the full property suite green.
 
 Sent coder handoff `000428` at `3e3971f7e9` for that gate repair.
+
+## 2026-08-25T10:40:00Z — verify all-streets-lost collateral repair
+
+Received coder handoff `000271` (commit `bd6cfc3f5a`) and merged it as
+`80056a0`. The former undersized JetCheck generator is now a deterministic
+eight-mask exhaustive loop, retaining the same assertion for every subset of
+the pink group without an artificial uniqueness constraint. Verified
+`mvn test -Pproperty-tests`: 32/32 green. Then ran the complete acceptance
+suite green and the complete configured Gherkin mutation suite green; it
+produced no survivor reports and refreshed the standard feature manifests.
+The production repair's formation-history state is now sent to refactorer
+for the final independent structural review before task closure.
