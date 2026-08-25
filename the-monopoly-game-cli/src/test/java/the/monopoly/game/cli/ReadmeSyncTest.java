@@ -100,6 +100,9 @@ class ReadmeSyncTest {
         + dollars(relief.megacorpTaxDollars()) + " total", configLabel);
     assertNameLongMultiset(block, "MegaCorp tax payers", relief.megacorpTaxByPlayer(), configLabel);
     assertNameLongMultiset(block, "Relief received", relief.reliefByPlayer(), configLabel);
+    assertField(block, "Relief starved", group(relief.starvedPayments()) + " payments, \\$"
+        + dollars(relief.starvedDollars()) + " shortfall, " + relief.gamesWithStarvation() + " games", configLabel);
+    assertNameLongMultiset(block, "Starved by pawn", relief.starvedByPlayer(), configLabel);
   }
 
   private static String effectiveTaxBurden(GameBreakdown baseline) {
