@@ -48253,3 +48253,21 @@ Routing to coder now, before touching `CHARACTERIZATION-TESTS.md` for the
 new configs, per user direction — those configs (all needing legal-entity
 + development-loans + rent-relief together) can't be adopted while a
 legitimate seed just crashes the simulator outright.
+
+Sent handoff to coder:
+
+```
+id: 20260825T072051Z_000267_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: entity-dev-loan-dissolution-desync
+commit: 8fa77c1e51
+created_at: 2026-08-25T07:20:51.805827Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 8fa77c1e51
+```
