@@ -49548,3 +49548,27 @@ invocations (three serial, three parallel), the characterization suite's
 parallel execution is restored (faster, and now safe), and one more live
 instance of the same defect class is closed. Committing and handing the
 verified state to the architect under the same task name.
+
+## 2026-08-25T13:00:00Z — specifier syncs after rent-relief-configs-11-13
+
+Merged architect handoff `000435` (commit `fb11bd24d2`, "Certify
+rent-relief configurations and determinism") after resolving a fourth
+append-only `logbook.md` conflict (both parents' entries kept in full).
+This task grew well past what I originally specified: on top of adding
+configs 11-13, it surfaced and fixed a real, previously-latent
+cross-JVM determinism defect - `Deeds.landOwnedBy` iterating an
+identity-hashed `HashMap<Street.Type, _>` directly, stable within one JVM
+but not across separate invocations, only visible in config12's
+long-running, stalemate-heavy games - plus one more live instance of the
+same pattern in `sellGetOutOfJailFreeCard`. Neither was something I could
+have specified in advance; both were found through the coder/refactorer
+verification loop this task's own new, longer-running configs exercised
+for the first time.
+
+Ran `mvn test -Pcharacterization-tests` per the phase-complete sync rule:
+green (`CharacterizationTest` 15/15 - all configs including 11-13,
+`ReadmeSyncTest` 1/1, domain 429/429). No drift. Deleted
+`RentReliefConfigsScratch.java` and its scratch log output now that real,
+permanent baseline fixtures exist for all three configs - no more need
+for the ad-hoc harness. `rent-relief-configs-11-13` is closed. No further
+specifier action needed on this task.
