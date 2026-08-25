@@ -50085,3 +50085,24 @@ merge_and_process architect 441fb4010d
 
 The coder attribution loop is closed and the architect review is
 accepted; the specifier can sync the completed phase.
+
+## 2026-08-25T15:05:00Z — architect received refactorer handoff `d09765e73b`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: rent-relief-starvation-tracking
+commit: d09765e73b
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d09765e73b
+```
+
+Merged the refactorer handoff after resolving the append-only
+`logbook.md` conflict while retaining both histories. The task adds
+starved relief tracking to the test-support breakdown and includes a
+round-trip regression check; beginning architectural review.
