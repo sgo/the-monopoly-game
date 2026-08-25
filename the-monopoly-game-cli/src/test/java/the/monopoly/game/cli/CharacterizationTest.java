@@ -35,11 +35,11 @@ class CharacterizationTest {
         "dog pays a war profits tax of $100\n"
             + "The government's account holds $100\n"
             + "dog's final age is 4 years\n",
-        false, false, false, true);
+        false, false, false, true, false);
     GameBreakdown.GameResult untaxed = new GameBreakdown.GameResult(
         "The government's account holds $0\n"
             + "dog's final age is 5 years\n",
-        false, false, false, true);
+        false, false, false, true, false);
 
     GameBreakdown.WarProfitsTaxExtras tax = GameBreakdown.aggregate(List.of(taxed, untaxed))
         .warProfitsTax().orElseThrow();
@@ -55,7 +55,7 @@ class CharacterizationTest {
     GameBreakdown.WarProfitsTaxExtras roundTripped = GameBreakdown
         .fromJson(new GameBreakdown(Map.of(), Map.of(), GameBreakdown.Stats.of(List.of()),
             GameBreakdown.Core.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-            Optional.of(tax)).toJson())
+            Optional.of(tax), Optional.empty()).toJson())
         .warProfitsTax().orElseThrow();
     assertThat(roundTripped.payments()).isEqualTo(tax.payments());
     assertThat(roundTripped.totalDollars()).isEqualTo(tax.totalDollars());
@@ -71,7 +71,7 @@ class CharacterizationTest {
             + "high hat goes bankrupt to dog\n"
             + "dog pays a war profits tax of $100\n"
             + "The government's account holds $100\n",
-        false, false, false, true);
+        false, false, false, true, false);
 
     GameBreakdown.WarProfitsTaxExtras tax = result.warProfitsTax().orElseThrow();
     assertThat(tax.survivorsAtFirstTax()).hasValueSatisfying(stats -> {
@@ -85,8 +85,25 @@ class CharacterizationTest {
         "The game starts with dog, high hat\n"
             + "dog uses Greedo (legal-entity trading is enabled, stalemate trading is enabled)\n"
             + "dog pays a war profits tax of $100\n",
-        false, false, false, true);
+        false, false, false, true, false);
     assertThat(noBillionaire.warProfitsTax().orElseThrow().survivorsAtFirstTax()).isEmpty();
+  }
+
+  @Test
+  void parsesPerPlayerIncomeAndRentReliefTaxContributions() {
+    GameBreakdown.GameResult result = new GameBreakdown.GameResult("""
+        dog collects a salary of $57
+        cat pays dog $80 rent for Rue de Diekirch Arlon
+        The government pays dog $20 in rent relief
+        MegaCorp pays the government an individual income tax of $43 (dog)
+        dog pays a war profits tax of $10
+        """, false, false, false, true, true);
+
+    assertThat(result.core().income().byPlayer()).containsEntry("dog", new GameBreakdown.Income.PlayerIncome(57, 100));
+    GameBreakdown.RentReliefExtras relief = result.rentRelief().orElseThrow();
+    assertThat(relief.reliefPayments()).isEqualTo(1);
+    assertThat(relief.reliefDollars()).isEqualTo(20);
+    assertThat(relief.megacorpTaxPayers()).containsExactly(Map.entry("dog", 1));
   }
 
   @ParameterizedTest
@@ -130,7 +147,7 @@ class CharacterizationTest {
     Files.createDirectories(logFile.getParent());
     Files.writeString(logFile, result.output());
     return new GameBreakdown.GameResult(result.output(), config.developmentLoans(),
-        config.legalEntityTrading(), config.stalemateTrading(), config.warProfitsTax());
+        config.legalEntityTrading(), config.stalemateTrading(), config.warProfitsTax(), config.rentRelief());
   }
 
   private GameBreakdown loadBaseline(CharacterizationConfig config, GameBreakdown actual) throws IOException {

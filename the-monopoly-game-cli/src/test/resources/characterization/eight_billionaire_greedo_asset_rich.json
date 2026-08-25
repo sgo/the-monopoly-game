@@ -2,7 +2,7 @@
   "outcomes": {"ordinary_win": 50},
   "winners": {"dog": 50},
   "ageAtEnd": {"min": 1, "max": 10, "mean": 4.12, "median": 4},
-  "core": {"bankruptcies": {"dog": 309, "ship": 5, "the bank": 13, "racecar": 5, "high hat": 5, "iron box": 4, "wheelbarrow": 5, "thimble": 1, "shoe": 3}, "auctions": 32, "directPurchases": 994, "mortgages": 824, "income": {"salary": 174600, "rent": 754039, "bankPayments": 23605}},
+  "core": {"bankruptcies": {"dog": 309, "ship": 5, "the bank": 13, "racecar": 5, "high hat": 5, "iron box": 4, "wheelbarrow": 5, "thimble": 1, "shoe": 3}, "auctions": 32, "directPurchases": 994, "mortgages": 824, "income": {"salary": 174600, "rent": 754039, "bankPayments": 23605, "byPlayer": {"racecar": {"salary": 21800, "rent": 6871}, "wheelbarrow": {"salary": 20400, "rent": 9062}, "dog": {"salary": 36200, "rent": 703044}, "iron box": {"salary": 17600, "rent": 4114}, "ship": {"salary": 20400, "rent": 8173}, "shoe": {"salary": 21000, "rent": 6359}, "thimble": {"salary": 18600, "rent": 3725}, "high hat": {"salary": 18600, "rent": 7808}}}},
   "entities": {"formed": 3, "dissolved": 3},
   "trades": {"peerTrades": 0}
 }

@@ -2,5 +2,5 @@
   "outcomes": {"ordinary_win": 49, "stalemate": 1},
   "winners": {"dog": 24, "high hat": 25},
   "ageAtEnd": {"min": 6, "max": 190, "mean": 18.4, "median": 15},
-  "core": {"bankruptcies": {"dog": 22, "high hat": 23, "the bank": 4}, "auctions": 138, "directPurchases": 1044, "mortgages": 661, "income": {"salary": 324600, "rent": 204992, "bankPayments": 39550}}
+  "core": {"bankruptcies": {"dog": 22, "high hat": 23, "the bank": 4}, "auctions": 138, "directPurchases": 1044, "mortgages": 661, "income": {"salary": 324600, "rent": 204992, "bankPayments": 39550, "byPlayer": {"high hat": {"salary": 161200, "rent": 104699}, "dog": {"salary": 163400, "rent": 100293}}}}
 }
