@@ -89,6 +89,25 @@ public final class DevelopmentLoanBook {
     entity.clearDevelopmentLoan();
   }
 
+  /** Pays an entity loan in full from the entity treasury when the treasury can cover it. */
+  public boolean repayEntityLoan(Position position) {
+    if (position.entity() == null) throw new IllegalArgumentException("Only entity loans can be repaid here.");
+    Money principal = position.outstanding();
+    Money repayment = principal;
+    LegalEntity entity = position.entity();
+    if (!entity.bankBalance().covers(repayment)) return false;
+
+    entity.withdrawFromBank(repayment);
+    if (position.bondholder() == null) {
+      bank.accountOf(BANK_OWNER).deposit(repayment);
+    } else {
+      position.bondholder().account().deposit(repayment);
+    }
+    position.loan().serviceToZero();
+    entity.clearDevelopmentLoan();
+    return true;
+  }
+
   /** Whether the requested house can be financed without changing any account. */
   public boolean canRaise(Player borrower, ColourStreet street, boolean fullDraw, List<Player> players) {
     return fundingFor(borrower.account().balance().amount(), borrower.id(), street,
