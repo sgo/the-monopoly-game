@@ -53,7 +53,7 @@ public final class Report {
           + boardSpaceName(it.fromSpace()) + ") to " + it.to() + " (" + boardSpaceName(it.toSpace()) + ")";
       case Entry.SalaryCollected it -> name(it.player()) + " collects a salary of $" + it.salary().amount();
       case Entry.MegacorpSalaryTaxPaid it -> "MegaCorp pays the government an individual income tax of $"
-          + money(it.amount());
+          + money(it.amount()) + " (" + name(it.player()) + ")";
       case Entry.Bought it -> name(it.player()) + " buys " + spaceName(it.land()) + " for $" + it.price().amount();
       case Entry.AuctionWon it ->
           name(it.player()) + " wins the auction for " + spaceName(it.land()) + " at $" + it.price().amount();

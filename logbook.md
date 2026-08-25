@@ -49154,6 +49154,15 @@ mirror-path coverage, and Auction property tests. Merge both audit trails;
 the architect must independently run property, acceptance, and full Gherkin
 mutation gates before closing this new task.
 
+## 2026-08-25T12:40:00Z — certify rent-relief configs and determinism repair
+
+Architect verification is green: the full characterization profile passes
+with config12's baseline stable again, acceptance passes, and the full
+configured Gherkin mutation suite produces no survivor report. The repair
+sorts deed-derived ownership by board order and deterministically selects a
+retained card; parallel characterization is restored after validation.
+Return `rent-relief-configs-11-13` as phase complete to specifier.
+
 ## 2026-08-25T11:45:00Z — route null-winner auction survivor equivalence decision
 
 Architect verification confirms property and acceptance gates green, but the
@@ -49271,6 +49280,24 @@ this.
 Did not touch `CharacterizationConfig.java`, baseline fixtures, or
 README.md sync - that's coder's implementation. Committing the spec
 update and handing off under a new task name, `rent-relief-configs-11-13`.
+
+Sent handoff to coder:
+
+```
+id: 20260825T094428Z_000272_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: rent-relief-configs-11-13
+commit: f9b983d109
+created_at: 2026-08-25T09:44:28.505618Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier f9b983d109
+```
 
 ## 2026-08-25T10:16:32Z — refactorer processes coder handoff `b88d3e37a1` (rent-relief-configs-11-13): configs 11/13 verified, config12's baseline is genuinely unreliable
 
@@ -49550,3 +49577,90 @@ safe. Found and fixed one more live instance of the same defect class
 (`sellGetOutOfJailFreeCard`'s unordered `findFirst()` over an enum-keyed
 map), with a directed test proving determinism. `mvn test`, acceptance,
 and property-tests all green. Requesting architect closure.
+
+## 2026-08-25T13:00:00Z — specifier syncs after rent-relief-configs-11-13
+
+Merged architect handoff `000435` (commit `fb11bd24d2`, "Certify
+rent-relief configurations and determinism") after resolving a fourth
+append-only `logbook.md` conflict (both parents' entries kept in full).
+This task grew well past what I originally specified: on top of adding
+configs 11-13, it surfaced and fixed a real, previously-latent
+cross-JVM determinism defect - `Deeds.landOwnedBy` iterating an
+identity-hashed `HashMap<Street.Type, _>` directly, stable within one JVM
+but not across separate invocations, only visible in config12's
+long-running, stalemate-heavy games - plus one more live instance of the
+same pattern in `sellGetOutOfJailFreeCard`. Neither was something I could
+have specified in advance; both were found through the coder/refactorer
+verification loop this task's own new, longer-running configs exercised
+for the first time.
+
+Ran `mvn test -Pcharacterization-tests` per the phase-complete sync rule:
+green (`CharacterizationTest` 15/15 - all configs including 11-13,
+`ReadmeSyncTest` 1/1, domain 429/429). No drift. Deleted
+`RentReliefConfigsScratch.java` and its scratch log output now that real,
+permanent baseline fixtures exist for all three configs - no more need
+for the ad-hoc harness. `rent-relief-configs-11-13` is closed. No further
+specifier action needed on this task.
+
+## 2026-08-25T13:10:00Z — corrected stale figures in CHARACTERIZATION-TESTS.md's own prose
+
+User asked whether `README.md` was actually in sync with the new
+characterization data. It is (`ReadmeSyncTest` enforces this
+automatically, and reading `README.md` directly confirms configs 11-13's
+real rows and Detailed Breakdown blocks). But checking triggered a
+realization: the justification paragraph I wrote for configs 11-13 in
+`CHARACTERIZATION-TESTS.md` itself was not - it cited my own pre-fix
+ad-hoc 50-seed run, taken before the cross-JVM determinism defect this
+same task surfaced was found and fixed, so config 12 and 13's mean-age
+figures were quietly wrong (config 12: I wrote ~254yr, the real
+deterministic baseline is 152.28yr; config 13: I wrote ~218yr, actually
+132.66yr - not just off, but the wrong *direction*: config 13 shortens
+the average game relative to config 12, not lengthens it). Config 11's
+figures and every config's win/stalemate counts already matched.
+Corrected the paragraph to the real, checked-in baseline numbers.
+`CHARACTERIZATION-TESTS.md`'s own prose isn't covered by `ReadmeSyncTest`
+(that only checks `README.md` against the fixtures), so this drift
+wouldn't have been caught automatically - worth remembering next time
+this doc's prose cites specific figures from a run taken before a task's
+verification loop is fully closed out. Committing directly; no handoff
+needed, no code or spec content changed, nothing for another role to
+process.
+
+## 2026-08-25T13:20:00Z — specified effective tax burden per player, routed to coder
+
+User asked why effective tax burden per player wasn't listed anywhere in
+the characterization output, and confirmed they want it as a permanent
+tracked figure (README.md + baseline fixtures), not a one-off report.
+Extended `CHARACTERIZATION-TESTS.md`'s breakdown schema:
+- Generic core gains a new field, income by player (salary collected and
+  rent collected as landlord, broken down by pawn), alongside the
+  existing aggregate totals - tracked unconditionally rather than gated
+  behind a tax flag, since it's the income side the burden figure needs
+  regardless of which tax extra ends up active.
+- The `--optional-rent-relief` extra gains MegaCorp tax paid broken down
+  by pawn (mirroring war profits tax's existing payer breakdown).
+- A new, not-its-own-extra section: effective tax burden by pawn, a
+  README-only *derived* figure (no new JSON field, same pattern the
+  outcome percentages already use) - `(MegaCorp tax + war profits tax) /
+  (gross salary + rent collected) × 100`, pooled across every seed in the
+  config. Applies to any config with at least one tax extra active -
+  configs 10 through 13 today, not just the new ones, since config 10
+  already has war-profits-tax.
+
+Caught and fixed my own first draft before committing: I'd initially
+specified the denominator as "salary collected" (the generic core's
+*net* figure, after MegaCorp's tax is already withheld), which the user
+correctly flagged as wrong - dividing tax by an already-taxed figure
+overstates the rate and caps the salary-only ratio at 75.4% (43/57)
+instead of the intuitive 0-43% range that makes "effective tax rate" a
+meaningful concept. Net and gross differ only by the tax itself, so no
+new field or division is needed to recover gross: `gross salary = salary
+collected + MegaCorp tax paid`, both already-tracked figures. Rent needs
+no such adjustment - it's never taxed at the point of collection (only
+later, in aggregate, by a war-profits-tax assessment), so "rent
+collected" is already the gross figure.
+
+Updated the README sync check's Detailed Breakdown bullet list and
+derivation note to include both the per-player income breakdown and the
+new derived burden figure. Committing and handing off to coder under a
+new task name, `effective-tax-burden-per-player`.

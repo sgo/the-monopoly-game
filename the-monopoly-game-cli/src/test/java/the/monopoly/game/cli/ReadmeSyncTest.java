@@ -71,6 +71,7 @@ class ReadmeSyncTest {
     String incomeText = "salary \\$" + dollars(income.salary()) + ", rent \\$" + dollars(income.rent())
         + ", bank payments \\$" + dollars(income.bankPayments());
     assertField(block, "Income", incomeText, configLabel);
+    assertField(block, "Income by player", incomeByPlayer(income), configLabel);
 
     baseline.loans().ifPresent(loans -> validateLoans(block, loans, configLabel));
     baseline.entities().ifPresent(entities ->
@@ -78,6 +79,41 @@ class ReadmeSyncTest {
     baseline.trades().ifPresent(trades ->
         assertField(block, "Peer trades", String.valueOf(trades.peerTrades()), configLabel));
     baseline.warProfitsTax().ifPresent(tax -> validateWarProfitsTax(block, tax, configLabel));
+    baseline.rentRelief().ifPresent(relief -> validateRentRelief(block, relief, configLabel));
+    if (baseline.warProfitsTax().isPresent() || baseline.rentRelief().isPresent())
+      assertField(block, "Effective tax burden", effectiveTaxBurden(baseline), configLabel);
+  }
+
+  private static String incomeByPlayer(GameBreakdown.Income income) {
+    return income.byPlayer().entrySet().stream()
+        .map(entry -> entry.getKey() + " salary \\$" + dollars(entry.getValue().salary())
+            + ", rent \\$" + dollars(entry.getValue().rent()))
+        .collect(java.util.stream.Collectors.joining(", "));
+  }
+
+  private void validateRentRelief(String block, GameBreakdown.RentReliefExtras relief, String configLabel) {
+    assertField(block, "Rent relief", group(relief.reliefPayments()) + " payments, \\$"
+        + dollars(relief.reliefDollars()) + " total, " + relief.gamesWithRelief() + " games", configLabel);
+    assertField(block, "MegaCorp salary tax", group(relief.megacorpTaxPayments()) + " payments, \\$"
+        + dollars(relief.megacorpTaxDollars()) + " total", configLabel);
+    assertNameLongMultiset(block, "MegaCorp tax payers", relief.megacorpTaxByPlayer(), configLabel);
+  }
+
+  private static String effectiveTaxBurden(GameBreakdown baseline) {
+    Map<String, Long> taxes = new java.util.LinkedHashMap<>();
+    baseline.warProfitsTax().ifPresent(tax -> taxes.putAll(tax.payerDollars()));
+    baseline.rentRelief().ifPresent(relief -> relief.megacorpTaxByPlayer().forEach(
+        (name, amount) -> taxes.merge(name, amount, Long::sum)));
+    return baseline.core().income().byPlayer().entrySet().stream()
+        .filter(entry -> entry.getValue().salary() + entry.getValue().rent() > 0)
+        .map(entry -> {
+          long tax = taxes.getOrDefault(entry.getKey(), 0L);
+          long grossSalary = entry.getValue().salary();
+          if (baseline.rentRelief().isPresent())
+            grossSalary += baseline.rentRelief().get().megacorpTaxByPlayer().getOrDefault(entry.getKey(), 0L);
+          double burden = tax * 100.0 / (grossSalary + entry.getValue().rent());
+          return entry.getKey() + " " + String.format(java.util.Locale.ROOT, "%.2f%%", burden);
+        }).collect(java.util.stream.Collectors.joining(", "));
   }
 
   private void validateWarProfitsTax(String block, GameBreakdown.WarProfitsTaxExtras tax, String configLabel) {
@@ -125,6 +161,19 @@ class ReadmeSyncTest {
     assertThat(actual)
         .as(configLabel + " " + label + " (parsed from README line '" + raw + "')")
         .containsExactlyInAnyOrderEntriesOf(expected);
+  }
+
+  private void assertNameLongMultiset(String block, String label, Map<String, Long> expected, String configLabel) {
+    String raw = field(block, label);
+    assertThat(raw).as(configLabel + " " + label + " line").isNotNull();
+    Map<String, Long> actual = new java.util.LinkedHashMap<>();
+    for (String part : raw.split(",")) {
+      String trimmed = part.trim();
+      int lastSpace = trimmed.lastIndexOf(' ');
+      actual.put(trimmed.substring(0, lastSpace), Long.parseLong(trimmed.substring(lastSpace + 1)
+          .replace("$", "").replace("\\", "")));
+    }
+    assertThat(actual).as(configLabel + " " + label).containsExactlyInAnyOrderEntriesOf(expected);
   }
 
   private static Map<String, Integer> parseNameCounts(String value) {

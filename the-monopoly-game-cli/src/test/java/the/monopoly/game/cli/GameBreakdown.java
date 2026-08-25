@@ -20,7 +20,8 @@ record GameBreakdown(
     Optional<LoanExtras> loans,
     Optional<EntityExtras> entities,
     Optional<TradeExtras> trades,
-    Optional<WarProfitsTaxExtras> warProfitsTax
+    Optional<WarProfitsTaxExtras> warProfitsTax,
+    Optional<RentReliefExtras> rentRelief
 ) {
 
   static GameBreakdown aggregate(List<GameResult> results) {
@@ -44,10 +45,12 @@ record GameBreakdown(
         .reduce(TradeExtras::merge).orElse(null);
     WarProfitsTaxExtras warProfitsTax = results.stream().map(GameResult::warProfitsTax)
         .filter(Optional::isPresent).map(Optional::get).reduce(WarProfitsTaxExtras::merge).orElse(null);
+    RentReliefExtras rentRelief = results.stream().map(GameResult::rentRelief)
+        .filter(Optional::isPresent).map(Optional::get).reduce(RentReliefExtras::merge).orElse(null);
 
     return new GameBreakdown(outcomes, winners, Stats.of(ages), core,
         Optional.ofNullable(loans), Optional.ofNullable(entities), Optional.ofNullable(trades),
-        Optional.ofNullable(warProfitsTax));
+        Optional.ofNullable(warProfitsTax), Optional.ofNullable(rentRelief));
   }
 
   String toJson() {
@@ -61,6 +64,7 @@ record GameBreakdown(
     entities.ifPresent(it -> json.append(",\n  \"entities\": ").append(it.toJson()));
     trades.ifPresent(it -> json.append(",\n  \"trades\": ").append(it.toJson()));
     warProfitsTax.ifPresent(it -> json.append(",\n  \"warProfitsTax\": ").append(it.toJson()));
+    rentRelief.ifPresent(it -> json.append(",\n  \"rentRelief\": ").append(it.toJson()));
     json.append("\n}");
     return json.toString();
   }
@@ -75,7 +79,8 @@ record GameBreakdown(
         Optional.ofNullable(fields.get("loans")).map(LoanExtras::fromJson),
         Optional.ofNullable(fields.get("entities")).map(EntityExtras::fromJson),
         Optional.ofNullable(fields.get("trades")).map(TradeExtras::fromJson),
-        Optional.ofNullable(fields.get("warProfitsTax")).map(WarProfitsTaxExtras::fromJson));
+        Optional.ofNullable(fields.get("warProfitsTax")).map(WarProfitsTaxExtras::fromJson),
+        Optional.ofNullable(fields.get("rentRelief")).map(RentReliefExtras::fromJson));
   }
 
   private static String mapToJson(Map<String, Integer> map) {
@@ -99,8 +104,20 @@ record GameBreakdown(
     return map;
   }
 
+  private static Map<String, Long> parseStringLongMap(String json) {
+    Map<String, Long> map = new LinkedHashMap<>();
+    for (Map.Entry<String, Integer> entry : parseStringIntMap(json).entrySet())
+      map.put(entry.getKey(), entry.getValue().longValue());
+    if (json == null || json.isBlank()) return map;
+    Map<String, String> fields = parseObject(json);
+    map.clear();
+    fields.forEach((key, value) -> map.put(key, parseLong(value)));
+    return map;
+  }
+
   private static Map<String, String> parseObject(String json) {
     Map<String, String> fields = new LinkedHashMap<>();
+    if (json == null) return fields;
     String content = json.trim();
     if (!content.startsWith("{") || !content.endsWith("}")) return fields;
     content = content.substring(1, content.length() - 1).trim();
@@ -257,18 +274,38 @@ record GameBreakdown(
   /**
    * Income composition, summed across all players.
    */
-  record Income(long salary, long rent, long bankPayments) {
+  record Income(long salary, long rent, long bankPayments, Map<String, PlayerIncome> byPlayer) {
+
+    record PlayerIncome(long salary, long rent) {
+      PlayerIncome merge(PlayerIncome other) {
+        return new PlayerIncome(salary + other.salary, rent + other.rent);
+      }
+
+      String toJson() {
+        return "{\"salary\": " + salary + ", \"rent\": " + rent + "}";
+      }
+
+      static PlayerIncome fromJson(String json) {
+        Map<String, String> fields = parseObject(json);
+        return new PlayerIncome(parseLong(fields.get("salary")), parseLong(fields.get("rent")));
+      }
+    }
 
     static Income empty() {
-      return new Income(0, 0, 0);
+      return new Income(0, 0, 0, new LinkedHashMap<>());
     }
 
     Income merge(Income other) {
-      return new Income(salary + other.salary, rent + other.rent, bankPayments + other.bankPayments);
+      Map<String, PlayerIncome> players = new LinkedHashMap<>(byPlayer);
+      other.byPlayer.forEach((name, income) -> players.merge(name, income, PlayerIncome::merge));
+      return new Income(salary + other.salary, rent + other.rent, bankPayments + other.bankPayments, players);
     }
 
     String toJson() {
-      return "{\"salary\": " + salary + ", \"rent\": " + rent + ", \"bankPayments\": " + bankPayments + "}";
+      return "{\"salary\": " + salary + ", \"rent\": " + rent + ", \"bankPayments\": " + bankPayments
+          + ", \"byPlayer\": " + byPlayer.entrySet().stream()
+          .map(entry -> "\"" + escape(entry.getKey()) + "\": " + entry.getValue().toJson())
+          .collect(Collectors.joining(", ", "{", "}")) + "}";
     }
 
     static Income fromJson(String json) {
@@ -276,7 +313,10 @@ record GameBreakdown(
       return new Income(
           parseLong(fields.get("salary")),
           parseLong(fields.get("rent")),
-          parseLong(fields.get("bankPayments")));
+          parseLong(fields.get("bankPayments")),
+          parseObject(fields.get("byPlayer")).entrySet().stream()
+              .collect(Collectors.toMap(entry -> entry.getKey(), entry -> PlayerIncome.fromJson(entry.getValue()),
+                  (a, b) -> b, LinkedHashMap::new)));
     }
   }
 
@@ -354,7 +394,38 @@ record GameBreakdown(
     }
   }
 
+  record RentReliefExtras(int reliefPayments, long reliefDollars, int gamesWithRelief,
+                          int megacorpTaxPayments, long megacorpTaxDollars,
+                          Map<String, Integer> megacorpTaxPayers,
+                          Map<String, Long> megacorpTaxByPlayer) {
+    RentReliefExtras merge(RentReliefExtras other) {
+      return new RentReliefExtras(reliefPayments + other.reliefPayments,
+          reliefDollars + other.reliefDollars, gamesWithRelief + other.gamesWithRelief,
+          megacorpTaxPayments + other.megacorpTaxPayments,
+          megacorpTaxDollars + other.megacorpTaxDollars,
+          mergeMaps(megacorpTaxPayers, other.megacorpTaxPayers),
+          mergeLongMaps(megacorpTaxByPlayer, other.megacorpTaxByPlayer));
+    }
+
+    String toJson() {
+      return "{\"reliefPayments\": " + reliefPayments + ", \"reliefDollars\": " + reliefDollars
+          + ", \"gamesWithRelief\": " + gamesWithRelief + ", \"megacorpTaxPayments\": "
+          + megacorpTaxPayments + ", \"megacorpTaxDollars\": " + megacorpTaxDollars
+          + ", \"megacorpTaxPayers\": " + mapToJson(megacorpTaxPayers)
+          + ", \"megacorpTaxByPlayer\": " + longMapToJson(megacorpTaxByPlayer) + "}";
+    }
+
+    static RentReliefExtras fromJson(String json) {
+      Map<String, String> fields = parseObject(json);
+      return new RentReliefExtras(Integer.parseInt(fields.get("reliefPayments")),
+          parseLong(fields.get("reliefDollars")), Integer.parseInt(fields.get("gamesWithRelief")),
+          Integer.parseInt(fields.get("megacorpTaxPayments")), parseLong(fields.get("megacorpTaxDollars")),
+          parseStringIntMap(fields.get("megacorpTaxPayers")), parseStringLongMap(fields.get("megacorpTaxByPlayer")));
+    }
+  }
+
   record WarProfitsTaxExtras(int payments, long totalDollars, Map<String, Integer> payers,
+                             Map<String, Long> payerDollars,
                              Stats governmentBalance, List<Integer> governmentBalances,
                              Optional<Stats> survivorsAtFirstTax, List<Integer> survivorCounts) {
 
@@ -367,6 +438,7 @@ record GameBreakdown(
           payments + other.payments,
           totalDollars + other.totalDollars,
           mergeMaps(payers, other.payers),
+          mergeLongMaps(payerDollars, other.payerDollars),
           Stats.of(balances), balances,
           survivors.isEmpty() ? Optional.empty() : Optional.of(Stats.of(survivors)), survivors);
     }
@@ -375,6 +447,7 @@ record GameBreakdown(
       StringBuilder json = new StringBuilder("{\"payments\": ").append(payments)
           .append(", \"totalDollars\": ").append(totalDollars)
           .append(", \"payers\": ").append(mapToJson(payers))
+          .append(", \"payerDollars\": ").append(longMapToJson(payerDollars))
           .append(", \"governmentBalance\": ").append(governmentBalance.toJson());
       survivorsAtFirstTax.ifPresent(stats -> json.append(", \"survivorsAtFirstTax\": ").append(stats.toJson()));
       return json.append("}").toString();
@@ -387,6 +460,7 @@ record GameBreakdown(
           Integer.parseInt(fields.get("payments")),
           parseLong(fields.get("totalDollars")),
           parseStringIntMap(fields.get("payers")),
+          parseStringLongMap(fields.get("payerDollars")),
           Stats.fromJson(fields.get("governmentBalance")),
           List.of(), survivors, List.of());
     }
@@ -396,6 +470,18 @@ record GameBreakdown(
     Map<String, Integer> merged = new LinkedHashMap<>(a);
     b.forEach((k, v) -> merged.merge(k, v, Integer::sum));
     return merged;
+  }
+
+  private static Map<String, Long> mergeLongMaps(Map<String, Long> a, Map<String, Long> b) {
+    Map<String, Long> merged = new LinkedHashMap<>(a);
+    b.forEach((k, v) -> merged.merge(k, v, Long::sum));
+    return merged;
+  }
+
+  private static String longMapToJson(Map<String, Long> map) {
+    return "{" + map.entrySet().stream()
+        .map(e -> "\"" + escape(e.getKey()) + "\": " + e.getValue())
+        .collect(Collectors.joining(", ")) + "}";
   }
 
   /** The number of dollars at the start of {@code rest}, i.e. after {@code marker}. */
@@ -433,9 +519,10 @@ record GameBreakdown(
     private final Optional<EntityExtras> entities;
     private final Optional<TradeExtras> trades;
     private final Optional<WarProfitsTaxExtras> warProfitsTax;
+    private final Optional<RentReliefExtras> rentRelief;
 
     GameResult(String report, boolean developmentLoans, boolean legalEntityTrading, boolean stalemateTrading,
-               boolean warProfitsTax) {
+               boolean warProfitsTax, boolean rentRelief) {
       List<String> lines = report.lines().toList();
       Optional<String> won = lines.stream().filter(line -> line.contains(" wins the game")).findFirst()
           .map(line -> line.substring(0, line.indexOf(" wins the game")));
@@ -474,6 +561,7 @@ record GameBreakdown(
       long salary = 0;
       long rent = 0;
       long bankPayments = 0;
+      Map<String, Income.PlayerIncome> incomeByPlayer = new LinkedHashMap<>();
       long interestPaid = 0;
       long principalPaid = 0;
       long bondInterestReceived = 0;
@@ -484,6 +572,14 @@ record GameBreakdown(
       int taxPayments = 0;
       long taxDollars = 0;
       Map<String, Integer> taxPayers = new LinkedHashMap<>();
+      Map<String, Long> taxByPlayer = new LinkedHashMap<>();
+      int reliefPayments = 0;
+      long reliefDollars = 0;
+      boolean gameHadRelief = false;
+      int megacorpTaxPayments = 0;
+      long megacorpTaxDollars = 0;
+      Map<String, Integer> megacorpTaxPayers = new LinkedHashMap<>();
+      Map<String, Long> megacorpTaxByPlayer = new LinkedHashMap<>();
       List<Integer> governmentBalances = new java.util.ArrayList<>();
       Set<String> survivingPlayers = new java.util.LinkedHashSet<>();
       String billionaire = null;
@@ -548,6 +644,7 @@ record GameBreakdown(
             taxPayments++;
             taxDollars += amount;
             taxPayers.merge(payer, 1, Integer::sum);
+            taxByPlayer.merge(payer, amount, Long::sum);
             if (!survivorsCaptured && payer.equals(billionaire)) {
               survivorCounts.add(survivingPlayers.size());
               survivorsCaptured = true;
@@ -555,6 +652,20 @@ record GameBreakdown(
           }
           if (line.contains("The government's account holds $"))
             governmentBalances.add((int) dollarsAfter(line, "The government's account holds $"));
+        }
+        if (rentRelief) {
+          int megacorpTaxAt = line.indexOf("MegaCorp pays the government an individual income tax of $");
+          if (megacorpTaxAt >= 0) {
+            int payerStart = line.indexOf('(', megacorpTaxAt);
+            int payerEnd = line.indexOf(')', payerStart);
+            String payer = payerStart >= 0 && payerEnd > payerStart
+                ? line.substring(payerStart + 1, payerEnd) : "unknown";
+            long amount = dollarsAfter(line, "MegaCorp pays the government an individual income tax of $");
+            megacorpTaxPayments++;
+            megacorpTaxDollars += amount;
+            megacorpTaxPayers.merge(payer, 1, Integer::sum);
+            megacorpTaxByPlayer.merge(payer, amount, Long::sum);
+          }
         }
 
         // Generic core accounting happens unconditionally: these lines are exactly
@@ -568,14 +679,41 @@ record GameBreakdown(
         if (line.contains(" buys ")) directPurchases++;
         if (line.contains(" mortgages ")) mortgages++;
 
-        if (line.contains("collects a salary of $")) salary += dollarsAfter(line, "collects a salary of $");
-        if (line.contains(" rent ")) rent += rentIn(line);
+        if (line.contains("collects a salary of $")) {
+          long amount = dollarsAfter(line, "collects a salary of $");
+          salary += amount;
+          incomeByPlayer.merge(line.substring(0, line.indexOf(" collects a salary of $")),
+              new Income.PlayerIncome(amount, 0), Income.PlayerIncome::merge);
+        }
+        if (line.contains(" rent ") && !line.startsWith("The government pays ")) {
+          long amount = rentIn(line);
+          rent += amount;
+          int pays = line.indexOf(" pays ");
+          int dollars = pays < 0 ? -1 : line.indexOf(" $", pays);
+          if (pays >= 0 && dollars > pays + 6) {
+            String landlord = line.substring(pays + 6, dollars);
+            incomeByPlayer.merge(landlord, new Income.PlayerIncome(0, amount), Income.PlayerIncome::merge);
+          }
+        }
+        if (rentRelief && line.startsWith("The government pays ")) {
+          reliefPayments++;
+          reliefDollars += dollarsAfter(line, " $");
+          gameHadRelief = true;
+          int nameStart = "The government pays ".length();
+          int nameEnd = line.indexOf(" $", nameStart);
+          if (nameEnd > nameStart) {
+            String landlord = line.substring(nameStart, nameEnd);
+            long amount = dollarsAfter(line, " $");
+            rent += amount;
+            incomeByPlayer.merge(landlord, new Income.PlayerIncome(0, amount), Income.PlayerIncome::merge);
+          }
+        }
         if (line.contains("receives $") && line.contains(" from the bank"))
           bankPayments += dollarsAfter(line, "receives $");
       }
 
       this.core = new Core(bankruptcies, auctions, directPurchases, mortgages,
-          new Income(salary, rent, bankPayments));
+          new Income(salary, rent, bankPayments, incomeByPlayer));
       this.loans = developmentLoans
           ? Optional.of(new LoanExtras(loansRaised, totalDollars, borrowers, bondholders, defaults,
               interestPaid, principalPaid, bondInterestReceived, bondPrincipalReceived))
@@ -587,9 +725,13 @@ record GameBreakdown(
           ? Optional.of(new TradeExtras(peerTrades))
           : Optional.empty();
       this.warProfitsTax = warProfitsTax
-          ? Optional.of(new WarProfitsTaxExtras(taxPayments, taxDollars, taxPayers,
+          ? Optional.of(new WarProfitsTaxExtras(taxPayments, taxDollars, taxPayers, taxByPlayer,
               Stats.of(governmentBalances), governmentBalances,
               survivorCounts.isEmpty() ? Optional.empty() : Optional.of(Stats.of(survivorCounts)), survivorCounts))
+          : Optional.empty();
+      this.rentRelief = rentRelief
+          ? Optional.of(new RentReliefExtras(reliefPayments, reliefDollars, gameHadRelief ? 1 : 0,
+              megacorpTaxPayments, megacorpTaxDollars, megacorpTaxPayers, megacorpTaxByPlayer))
           : Optional.empty();
     }
 
@@ -601,5 +743,6 @@ record GameBreakdown(
     Optional<EntityExtras> entities() { return entities; }
     Optional<TradeExtras> trades() { return trades; }
     Optional<WarProfitsTaxExtras> warProfitsTax() { return warProfitsTax; }
+    Optional<RentReliefExtras> rentRelief() { return rentRelief; }
   }
 }
