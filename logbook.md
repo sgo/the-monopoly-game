@@ -50039,3 +50039,30 @@ merge_and_process architect 8a6f1f769b
 The coder must correct relief attribution from the landlord named in
 `RentReliefPaid` to the tenant identified by the adjacent `RentPaid`
 line, and add an assertion covering the credited player name.
+
+## 2026-08-25T14:43:00Z — architect received coder follow-up `9249e7ba6e`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: rent-relief-net-position-and-matched-pair
+commit: 9249e7ba6e
+
+Re-read your role and constitution.
+
+merge_and_process coder 9249e7ba6e
+```
+
+Merged the coder follow-up. Reviewing the parser attribution fix,
+regenerated fixtures, README values, and the added regression assertion.
+
+Architect review accepted the follow-up: `reliefByPlayer` now credits
+the tenant from the adjacent `RentPaid` line, starved relief is derived
+only for over-cap player-owned rents without an immediately following
+relief line, and the regression test covers both attribution and
+starvation. `mvn test` and `mvn test -Pcharacterization-tests` passed
+(430 core tests, 23 CLI tests plus 18 characterization tests, and the
+remaining modules green).
