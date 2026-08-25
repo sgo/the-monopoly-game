@@ -48366,3 +48366,34 @@ an implementation (new production behavior is the coder's and specifier's
 call, not mine) — handing the verified red state to the architect with
 this diagnosis, under the same task name since it's the same reported
 crash and repro.
+
+## 2026-08-25T07:32:15Z — refactorer sent entity-dev-loan-dissolution-desync handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T073215Z_000198_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: entity-dev-loan-dissolution-desync
+commit: cbd1d2c496
+created_at: 2026-08-25T07:32:15.357834Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer cbd1d2c496
+```
+
+Reports the still-red verification from commit `cbd1d2c496`: the coder's
+`transferEntityLoans` fix is correct for entity dissolution but doesn't
+touch the specifier's actual repro, which never reaches
+`Bankruptcy.liquidateEntity`. Real root cause diagnosed (see prior entry):
+`LegalEntity.operate()` raises a new development loan against a collateral
+street the entity no longer owns after that one street was individually
+foreclosed away while the entity stayed alive — `entity.streets()` is a
+static, formation-time list never updated on partial foreclosure.
+Requesting architect routing; no new production behavior introduced by
+this handoff.
