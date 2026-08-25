@@ -48589,3 +48589,5 @@ default uniqueness requirement demands more and raises
 test-harness defect, not an acceptable green gate. Route it to coder: retain
 the exhaustive all-subsets coverage but express it in a reliably executable
 test/property form; return the full property suite green.
+
+Sent coder handoff `000428` at `3e3971f7e9` for that gate repair.
