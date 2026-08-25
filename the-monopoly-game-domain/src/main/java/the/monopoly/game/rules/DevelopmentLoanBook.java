@@ -80,13 +80,23 @@ public final class DevelopmentLoanBook {
     return position;
   }
 
-  /** Transfers an entity's outstanding loans to its final shareholder when the entity dissolves. */
-  public void transferEntityLoans(LegalEntity entity, Player shareholder) {
-    positions.replaceAll(position -> position.entity() == entity
-        ? new Position(shareholder.id().value(), shareholder, null, position.collateral(),
-            position.loan(), position.bondholder())
-        : position);
+  /** Pays an entity loan in full from the entity treasury when the treasury can cover it. */
+  public boolean repayEntityLoan(Position position) {
+    if (position.entity() == null) throw new IllegalArgumentException("Only entity loans can be repaid here.");
+    Money principal = position.outstanding();
+    Money repayment = principal;
+    LegalEntity entity = position.entity();
+    if (!entity.bankBalance().covers(repayment)) return false;
+
+    entity.withdrawFromBank(repayment);
+    if (position.bondholder() == null) {
+      bank.accountOf(BANK_OWNER).deposit(repayment);
+    } else {
+      position.bondholder().account().deposit(repayment);
+    }
+    position.loan().serviceToZero();
     entity.clearDevelopmentLoan();
+    return true;
   }
 
   /** Whether the requested house can be financed without changing any account. */
