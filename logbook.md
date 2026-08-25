@@ -49997,3 +49997,45 @@ state to the architect under the same task name, with the attribution
 defect flagged for a coder loop-back.
 
 ## 2026-08-25T12:40:00Z — refactorer sent rent-relief-net-position-and-matched-pair handoff to architect
+
+## 2026-08-25T12:41:00Z — architect received refactorer handoff `8a6f1f769b`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: rent-relief-net-position-and-matched-pair
+commit: 8a6f1f769b
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 8a6f1f769b
+```
+
+Merged the refactorer commit into the architect worktree. The handoff
+reports a correctness defect in relief attribution: the new breakdown
+credits the landlord named by `RentReliefPaid`, but the tenant is the
+actual relief beneficiary. Reviewing the coder loop-back under the
+architect role.
+
+## 2026-08-25T12:42:00Z — architect sent priority-00 coder follow-up for `rent-relief-net-position-and-matched-pair`
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: rent-relief-net-position-and-matched-pair
+commit: 8a6f1f769b
+
+Re-read your role and constitution.
+
+merge_and_process architect 8a6f1f769b
+```
+
+The coder must correct relief attribution from the landlord named in
+`RentReliefPaid` to the tenant identified by the adjacent `RentPaid`
+line, and add an assertion covering the credited player name.
