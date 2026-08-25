@@ -48980,3 +48980,24 @@ from until the coder's fix lands - will verify it the same way as
 Routing to coder now, before generating the rent-relief report, per user
 direction - inventing task name `loan-foreclosure-null-winner-desync`
 (distinct from the closed dissolution task; unrelated root cause).
+
+## 2026-08-25T09:12:53Z — send null-winner foreclosure fix to refactorer
+
+Processed specifier handoff `000270` and merged commit `7756504fb1`, including
+`development-loans-18`. Fixed both player and entity foreclosure paths to
+return collateral to the bank when an auction has bidders but no bid reaches
+the opening price, avoiding `Deeds.sell` with a null buyer. Added focused unit
+coverage for the player-loan no-winner case and retained entity-path coverage.
+Corrected the scenario's documented placeholder reserve balance from `$1` to
+the mechanically correct `$30` after a `$20` recovery from a `$50` reserve.
+
+Verification: focused foreclosure tests pass; domain tests pass; acceptance
+passes all 933 tests, including `development-loans-18`.
+
+Sent handoff `000273` to refactorer with commit `a5429d2dae`.
+
+type: git_handoff
+to: refactorer
+priority: 50
+task: loan-foreclosure-null-winner-desync
+commit: a5429d2dae
