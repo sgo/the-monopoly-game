@@ -57,6 +57,7 @@ en/rules/development-loans.feature
 en/rules/war-profits-tax.feature
 en/rules/megacorp-salary-tax.feature
 en/rules/rent-relief.feature
+en/rules/unified-income-tax.feature
 en/monopoly.feature
 specs-cli:en/cli.feature
 specs-cli:en/cli-slf4j-config.feature

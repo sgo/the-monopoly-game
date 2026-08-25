@@ -127,6 +127,16 @@ class CharacterizationTest {
     assertThat(relief.starvedPayments()).isEqualTo(1);
     assertThat(relief.starvedDollars()).isEqualTo(100);
     assertThat(relief.starvedByPlayer()).containsExactly(Map.entry("dog", 100L));
+
+    GameBreakdown breakdown = GameBreakdown.aggregate(List.of(result));
+    GameBreakdown.RentReliefExtras roundTripped = GameBreakdown.fromJson(breakdown.toJson())
+        .rentRelief().orElseThrow();
+    assertThat(roundTripped.reliefPayments()).isEqualTo(relief.reliefPayments());
+    assertThat(roundTripped.reliefDollars()).isEqualTo(relief.reliefDollars());
+    assertThat(roundTripped.reliefByPlayer()).containsExactlyInAnyOrderEntriesOf(relief.reliefByPlayer());
+    assertThat(roundTripped.starvedPayments()).isEqualTo(relief.starvedPayments());
+    assertThat(roundTripped.starvedDollars()).isEqualTo(relief.starvedDollars());
+    assertThat(roundTripped.starvedByPlayer()).containsExactlyInAnyOrderEntriesOf(relief.starvedByPlayer());
   }
 
   @Test
@@ -143,6 +153,12 @@ class CharacterizationTest {
     GameBreakdown.RentReliefExtras relief = result.rentRelief().orElseThrow();
     assertThat(relief.reliefAgeAtEvent()).isEqualTo(GameBreakdown.Stats.of(List.of(12)));
     assertThat(relief.starvedAgeAtEvent()).isEqualTo(GameBreakdown.Stats.of(List.of(17)));
+
+    GameBreakdown breakdown = GameBreakdown.aggregate(List.of(result));
+    GameBreakdown.RentReliefExtras roundTripped = GameBreakdown.fromJson(breakdown.toJson())
+        .rentRelief().orElseThrow();
+    assertThat(roundTripped.reliefAgeAtEvent()).isEqualTo(relief.reliefAgeAtEvent());
+    assertThat(roundTripped.starvedAgeAtEvent()).isEqualTo(relief.starvedAgeAtEvent());
   }
 
   @ParameterizedTest

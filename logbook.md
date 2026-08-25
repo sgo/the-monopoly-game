@@ -49786,6 +49786,37 @@ the coder's own diff, not requiring further action). Committing the
 round-trip test addition and handing the verified state to the architect
 under the same task name.
 
+## 2026-08-25T11:39:05Z — refactorer sent effective-tax-burden-per-player handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T113905Z_000205_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: effective-tax-burden-per-player
+commit: 71ef467812
+created_at: 2026-08-25T11:39:05.449310Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 71ef467812
+```
+
+Reports from commit `71ef467812`: verified the per-player income/tax
+tracking and derived burden figure, including hand-tracing the fragile
+landlord-name parsing for both report line shapes and confirming the
+domain-level `Report.line` change is safe (substring-match acceptance
+harness). Noted (not a defect - already fixed as a side effect of this
+work) that a real pre-existing rent/rent-relief double-counting bug in
+config11-13's baselines is now corrected. `mvn test`, acceptance
+(933/933), and the characterization suite (three separate runs) all
+green. Added explicit JSON round-trip coverage for the new fields.
+Requesting architect closure.
+
 ## 2026-08-25T13:35:00Z — specifier syncs after effective-tax-burden-per-player
 
 Merged architect handoff `000436` (commit `b52370f2f4`, "Certify
@@ -49853,36 +49884,39 @@ rather than as two round trips through the pipeline. Deleted the
 numbers are captured in the doc. Handing off to coder under
 `rent-relief-net-position-and-matched-pair`.
 
-Sent handoff to coder:
+## 2026-08-25T12:35:00Z — refactorer processes coder handoff `0cba3b635d` (rent-relief-net-position-and-matched-pair)
+
+Handoff message received:
 
 ```
-id: 20260825T122506Z_000274_from_specifier
-from: specifier
-to: coder
+id: 20260825T123130Z_000277_from_coder
+from: coder
+to: refactorer
 priority: 50
 type: git_handoff
-role: specifier
+role: coder
 task: rent-relief-net-position-and-matched-pair
-commit: 964eb53c08
-created_at: 2026-08-25T12:25:06.242813Z
+commit: 0cba3b635d
 
 Re-read your role and constitution.
 
-merge_and_process specifier 964eb53c08
+merge_and_process coder 0cba3b635d
 ```
 
-## 2026-08-25T14:00:00Z — specified relief starvation tracking
+Merged `0cba3b635d` into `swarmforge-refactorer`. One conflict, in the
+append-only `logbook.md` (both parents added entries after the same
+common ancestor); resolved by keeping both sides in full, HEAD's
+`effective-tax-burden-per-player` handoff entry first, then the
+incoming specifier/coder entries for this task — same resolution
+pattern used for every prior `logbook.md` conflict.
 
-User asked what it means when tax revenue can't cover relief - does
-financing gradually dry up, does the cap stay too high, or does the
-government run out of money outright. Answered from the actual code
-rather than speculating: `RentRelief.reliefFor` is a hard cliff, not a
-gradual squeeze - `government.balance().covers(difference) ? difference
-: Money.ZERO`. There is no partial relief; either the government's
-*current* balance covers a bill's entire excess over the $200 cap, or
-the tenant pays the full nominal rent with zero cushion, exactly as if
-relief didn't exist for that one bill. User asked to make this
-measurable.
+Coder's diff, all in test-support/docs (`the-monopoly-game-cli/src/
+test`), no production `src/main` files touched: added `reliefByPlayer`
+to `GameBreakdown.RentReliefExtras` (merge/toJson/fromJson extended),
+a new `netFiscalPosition` derived README field in `ReadmeSyncTest`, a
+new `eight_greedo_stalemate_entity_loans` characterization config
+(config 14, the relief/no-relief matched pair the specifier asked
+for), and the four affected JSON baselines regenerated.
 
 Specified a new `--optional-rent-relief` extra field, relief starved:
 count, total $ shortfall, games with at least one starved event, broken
@@ -49939,17 +49973,434 @@ number in isolation. Updated the README sync check's bullet list.
 Committing and handing off to coder under a new task name,
 `relief-event-age-stats`.
 
-## 2026-08-25T14:35:00Z — implemented relief event age stats
+Sent handoff to coder:
 
-Processed specifier handoff `50_20260825T130053Z_000276_from_specifier_to_coder.handoff`
-at commit `584fb3e33f`. Added min/max/mean/median age-at-event stats for
-relief received and starved rent, preserving per-event ages through
-aggregation and JSON output. Starvation is recorded before applying a
-following turn's `TurnStarted` age, so the stat describes the age at the
-rent event itself. Added focused characterization coverage and refreshed
-the three rent-relief baselines and README synchronization fields.
+```
+id: 20260825T130053Z_000276_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: relief-event-age-stats
+commit: 584fb3e33f
+created_at: 2026-08-25T13:00:53.768730Z
 
-Verification: focused characterization test, README sync test, and the
-full characterization profile pass. Committed as `603d8df` and handing
-off to refactorer via
-`.swarmforge/handoffs/outbox/50_20260825T130721Z_000280_from_coder_to_refactorer.handoff`.
+Re-read your role and constitution.
+
+merge_and_process specifier 584fb3e33f
+```
+
+CRAP/DRY/mutation gate: no production file changed, so nothing to run
+there. The three touched files (`GameBreakdown.java`,
+`CharacterizationConfig.java`, `ReadmeSyncTest.java`) are test-support,
+not production — same standing exemption from the CRAP/DRY/mutation
+gate recorded in my own prior entry for this exact file
+(2026-08-25T11:38:17Z). For due diligence, ran `mutate4java --scan`
+anyway: `GameBreakdown.java` 380 sites (141 in the untouched
+`GameResult` parser, 103 in the untouched top-level aggregate/JSON
+methods, the rest spread across eight extras records — all pre-existing,
+not moved by this diff), `CharacterizationConfig.java` and
+`ReadmeSyncTest.java` well under 100. No prior refactorer cycle across
+this file's entire growth history (searched `logbook.md` for every past
+`mutate4java --scan` line) has ever applied the 100-site split rule to
+it; treating it consistently rather than singling this cycle out. `mvn
+test` confirmed coverage stays N/A for all three (jacoco only
+instruments `src/main`, never `src/test`), consistent with `crap4java`
+output.
+
+Property-test assessment: `reliefByPlayer` is a new field on the
+`RentReliefExtras` record. The existing round trip in
+`CharacterizationTest.parsesPerPlayerIncomeAndRentReliefTaxContributions`
+(`assertThat(roundTripped.rentRelief().orElseThrow()).isEqualTo(break
+down.rentRelief().orElseThrow())`) already compares the whole record by
+generated `equals()`, so it automatically covers the new field with no
+change needed — same as `WarProfitsTaxExtras.payerDollars` picked up
+for free last cycle. Confirmed the fixture backing that round trip has
+non-empty data in the new field (`reliefByPlayer` = `{dog: 20}`) so the
+comparison is not vacuous.
+
+**Correctness finding, not fixed here (outside this role's "do not
+introduce new behavior" boundary) — routing to the architect for a
+coder loop-back.** `reliefByPlayer` attributes relief to the wrong
+player. The parser (`GameBreakdown.java:703-716`) extracts the name
+from the `RentReliefPaid` report line ("The government pays X $Y in
+rent relief") and credits X. But `Report.java:104` renders that line
+from `it.landlord()`, and `Journalling.java:311-315` logs
+`RentReliefPaid(owner.id(), ...)` — X is always the *landlord*, not the
+tenant. `CHARACTERIZATION-TESTS.md:222-237` (the specifier's own
+written spec for this exact field) says the opposite is required: "not
+the landlord named in the `RentReliefPaid` line, but the *tenant* whose
+payment it capped," recoverable from the `RentPaid` line
+`Journalling.paid` always logs immediately before it — because
+`RentRelief.pay` (`RentRelief.java:17-22`) always deposits the *full*
+nominal rent into the landlord's account regardless of relief; only the
+tenant's payment is ever reduced. So the landlord's income is
+unaffected by relief either way, and crediting the landlord is not
+just mislabeled, it's crediting the wrong economic actor entirely.
+
+The coder's own new unit test proves it concretely
+(`CharacterizationTest.java:94-100`): `cat pays dog $80 rent` then `The
+government pays dog $20 in rent relief`. Per spec, `cat` (tenant) is
+the beneficiary of the $20 relief — `dog` (landlord) received the same
+$80 either way. The current code credits `reliefByPlayer` with `{dog:
+20}`; it should be `{cat: 20}`. The test doesn't catch this because it
+only asserts `reliefPayments`/`reliefDollars`/`megacorpTaxPayers`
+totals, never the credited *name* in `reliefByPlayer` — the gap that
+let this through.
+
+This is live in the certified README: every "Relief received" line and
+every "Net fiscal position" line published by this commit (three
+detail blocks: configs 11/12/13's rent-relief breakdowns) has the
+figures attached to the wrong pawn. Not fixing it myself — swapping the
+attribution to the tenant via the adjacent-`RentPaid`-line pattern
+(same technique the spec cites for MegaCorp attribution) is a parser
+behavior change, coder's implementation territory, not structure-
+preserving cleanup. Flagging for the architect to loop back to the
+coder per the priority-`00` follow-up rule, same as any other
+architect-caught defect; recommend the fix also add a unit assertion on
+the credited player name specifically (not just aggregate totals) so
+this class of bug fails loudly next time.
+
+Verification: `mvn test` (root): green. `mvn test -Pcharacterization-
+tests`: green (17/17). Full acceptance: 933/933, unaffected (no
+production change). Nothing else to clean up structurally this cycle —
+committing the merged `logbook.md` resolution and handing the verified
+state to the architect under the same task name, with the attribution
+defect flagged for a coder loop-back.
+
+## 2026-08-25T12:40:00Z — refactorer sent rent-relief-net-position-and-matched-pair handoff to architect
+
+## 2026-08-25T12:41:00Z — architect received refactorer handoff `8a6f1f769b`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: rent-relief-net-position-and-matched-pair
+commit: 8a6f1f769b
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 8a6f1f769b
+```
+
+Merged the refactorer commit into the architect worktree. The handoff
+reports a correctness defect in relief attribution: the new breakdown
+credits the landlord named by `RentReliefPaid`, but the tenant is the
+actual relief beneficiary. Reviewing the coder loop-back under the
+architect role.
+
+## 2026-08-25T12:42:00Z — architect sent priority-00 coder follow-up for `rent-relief-net-position-and-matched-pair`
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: rent-relief-net-position-and-matched-pair
+commit: 8a6f1f769b
+
+Re-read your role and constitution.
+
+merge_and_process architect 8a6f1f769b
+```
+
+The coder must correct relief attribution from the landlord named in
+`RentReliefPaid` to the tenant identified by the adjacent `RentPaid`
+line, and add an assertion covering the credited player name.
+
+## 2026-08-25T14:43:00Z — architect received coder follow-up `9249e7ba6e`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: rent-relief-net-position-and-matched-pair
+commit: 9249e7ba6e
+
+Re-read your role and constitution.
+
+merge_and_process coder 9249e7ba6e
+```
+
+Merged the coder follow-up. Reviewing the parser attribution fix,
+regenerated fixtures, README values, and the added regression assertion.
+
+Architect review accepted the follow-up: `reliefByPlayer` now credits
+the tenant from the adjacent `RentPaid` line, starved relief is derived
+only for over-cap player-owned rents without an immediately following
+relief line, and the regression test covers both attribution and
+starvation. `mvn test` and `mvn test -Pcharacterization-tests` passed
+(430 core tests, 23 CLI tests plus 18 characterization tests, and the
+remaining modules green).
+
+## 2026-08-25T14:50:00Z — specifier syncs after rent-relief-net-position-and-matched-pair
+
+Merged architect handoff `000438` (commit `441fb4010d`, "Accept rent
+relief attribution correction") after resolving a sixth append-only
+`logbook.md` conflict. One resolution note: the incoming side's
+continuation picked up mid-entry with no header of its own (the header
+for that same refactorer entry, `` `refactorer processes coder handoff
+`0cba3b635d`` ``, was already present earlier in the file from an
+already-merged, non-conflicting portion) - added a duplicate header by
+reflex, caught it by grepping for the real one before committing, and
+removed it rather than leaving two headers for one entry.
+
+The refactorer caught a real bug before I had to: the coder's first pass
+credited `reliefByPlayer` to the *landlord* named in the
+`RentReliefPaid` line, exactly the mistake my own spec
+(`CHARACTERIZATION-TESTS.md:222-237`) explicitly called out and
+explained why it's wrong (the landlord's income is unaffected by relief
+either way; only the tenant's payment is ever reduced). Routed back to
+the coder via an architect priority-`00` loop, fixed, verified with a
+regression test on the credited *name*, not just aggregate totals - the
+gap that let the original bug through in the first place.
+
+This cycle also picked up and delivered `rent-relief-starvation-tracking`
+(starved count/total $/games, broken down by pawn) and config 14
+alongside the net-position work, ahead of their own separate handoffs
+still queued - confirmed directly in `README.md` (`Relief starved`,
+`Starved by pawn`, and the new "8 players - Greedo - peer-trading +
+legal-entity + dev-loans" detail block are all present and populated).
+Ran `mvn test -Pcharacterization-tests`: green (`CharacterizationTest`
+18/18, `ReadmeSyncTest` 1/1, domain 430/430). No drift.
+
+A striking real number worth flagging to the user once this sync is
+done: config 11's relief *starved* total ($1,484,885 shortfall, 1,297
+events) is more than double its *successful* relief total ($621,670,
+1,274 payments) - relief is already failing more often, and for more
+money, than it succeeds, even without war-profits-tax as a funding
+source. Directly supports the "labour-tax-only funding is inadequate"
+side of the user's hypothesis, independent of the still-pending
+age-at-event data. `rent-relief-net-position-and-matched-pair` is
+closed. `rent-relief-starvation-tracking` also appears closed (confirmed
+in README, but its own handoff mail hasn't arrived yet - will process
+formally when it does). `relief-event-age-stats` remains outstanding.
+
+## 2026-08-25T15:04:00Z — architect sent phase-complete sync to specifier for `rent-relief-net-position-and-matched-pair`
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: rent-relief-net-position-and-matched-pair
+commit: 441fb4010d
+
+Re-read your role and constitution.
+
+merge_and_process architect 441fb4010d
+```
+
+The coder attribution loop is closed and the architect review is
+accepted; the specifier can sync the completed phase.
+
+## 2026-08-25T15:05:00Z — architect received refactorer handoff `d09765e73b`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: rent-relief-starvation-tracking
+commit: d09765e73b
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d09765e73b
+```
+
+Merged the refactorer handoff after resolving the append-only
+`logbook.md` conflict while retaining both histories. The task adds
+starved relief tracking to the test-support breakdown and includes a
+round-trip regression check; beginning architectural review.
+
+## 2026-08-25T15:10:00Z — specifier syncs after rent-relief-starvation-tracking
+
+Merged architect handoff `000439` (commit `df7cf07632`, "Merge rent
+relief starvation tracking review") after resolving a seventh
+append-only `logbook.md` conflict. This task's actual implementation
+(starved count/total $/games, starved-by-pawn) had already landed as
+part of the previous `rent-relief-net-position-and-matched-pair` cycle -
+this handoff is the architect's own review thread for the task name
+catching up and formally certifying the same, already-verified work, not
+new changes. Ran `mvn test -Pcharacterization-tests` again to confirm:
+green, identical counts to the last sync (`CharacterizationTest` 18/18,
+`ReadmeSyncTest` 1/1, domain 430/430) - consistent with no new code
+having landed in this specific merge. `rent-relief-starvation-tracking`
+is closed. `relief-event-age-stats` remains the only outstanding task.
+
+Architect review accepted: the refactorer change is limited to a JSON
+round-trip assertion for the starvation fields in characterization
+test support. No production modules, boundaries, or dependencies were
+changed. `mvn test -pl the-monopoly-game-cli -am` and
+`mvn test -Pcharacterization-tests` passed (430 domain tests, 23 CLI
+tests, 18 characterization tests, and the remaining modules green).
+
+## 2026-08-25T15:08:00Z — architect sent phase-complete sync to specifier for `rent-relief-starvation-tracking`
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: rent-relief-starvation-tracking
+commit: df7cf07632
+
+Re-read your role and constitution.
+
+merge_and_process architect df7cf07632
+```
+
+The refactorer review is accepted with no further architectural
+changes required; the specifier can sync the completed phase.
+
+## 2026-08-25T15:09:00Z — architect received refactorer handoff `685a7c3554`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: relief-event-age-stats
+commit: 685a7c3554
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 685a7c3554
+```
+
+Merged the refactorer handoff after resolving the append-only
+`logbook.md` conflict while retaining the architect history. The change
+adds relief/starvation event-age statistics and makes the round-trip
+test assert only persisted fields, as the event-age lists are ephemeral.
+Reviewing the test-support change for architectural issues.
+
+## 2026-08-25T15:20:00Z — specifier syncs after relief-event-age-stats, last outstanding rent-relief task closed
+
+Merged architect handoff `000440` (commit `1f6d6fa755`, "Merge relief
+event age statistics review") after resolving an eighth append-only
+`logbook.md` conflict (two separate hunks this time; one incoming side
+was empty, resolved by keeping HEAD's content as-is). Ran `mvn test
+-Pcharacterization-tests`: green (`CharacterizationTest` 19/19,
+`ReadmeSyncTest` 1/1, domain 430/430).
+
+Confirmed both age-`Stats` blocks are live in `README.md` for configs
+11-13 ("Relief age at event" / "Starved age at event"), and the
+comparison this whole chain was built to run produced a genuinely
+nuanced result, not a flat confirmation of the original hypothesis:
+- Config 11 (relief only, no war-profits-tax): starved events skew
+  *older* than received ones (mean 26.9yr vs 20.3yr) - the simple
+  "funding gap widens over time" story, as hypothesized, though the
+  effect is modest since these games are short (~28yr mean).
+- Configs 12 and 13 (relief + war-profits-tax): the pattern *reverses* -
+  starved events skew markedly *younger* than received ones (config 12:
+  mean 126.0yr vs 343.8yr; config 13: mean 66.2yr vs 205.8yr). Read this
+  as a regime switch, not a gradual squeeze: before any player
+  accumulates enough land to trigger a first war-profits-tax payment,
+  the government has only MegaCorp's slow, steady inflow to draw on and
+  is fragile, so starvation clusters early; the first big war-tax
+  lump sum then refills the government heavily enough that relief
+  keeps succeeding for the remaining, much longer tail of the game,
+  pulling the *received* mean age far higher instead.
+
+This is a materially better answer than "the gap widens over time" - it
+only widens gradually when labour tax is the sole funding source; adding
+a lumpy, occasional wealth tax instead creates a fragile early period
+followed by an abundant one, with a sharp transition rather than a
+gradual trend. `relief-event-age-stats` is closed, and with it the last
+outstanding task from this session's rent-relief characterization work.
+
+## 2026-08-25T15:35:00Z — brought SIMULATOR.md and tasks.md up to date
+
+User asked to update both with the feature development completed. Found
+both were stale by more than just this session: `development-loans`,
+`war-profits-tax`, `megacorp-salary-tax`, and `rent-relief` were all
+fully shipped, but `SIMULATOR.md` didn't mention any of the four at all,
+and `tasks.md`'s post-plan log still marked `development-loans` as
+"specified, pending implementation" with a "not yet approved" closing
+note contradicted by its own later paragraphs (the bondholder cash-flow
+assertions it called "deferred" already exist a few paragraphs down).
+
+Fixed the stale `development-loans` status and note in `tasks.md`, then
+added five new post-plan entries: `war-profits-tax`,
+`megacorp-salary-tax`, `rent-relief` (mirroring each feature's own
+Gherkin `Feature:` docstring, the authoritative source), and this
+session's two bug fixes (`entity-dev-loan-dissolution-desync`,
+`loan-foreclosure-null-winner-desync`). Added four new "Optional:"
+sections to `SIMULATOR.md` (development-loans plus the three new
+flags), updated its CLI flags list (five new flags including `--seed=N`,
+previously undocumented despite being real and `-h`-visible), and fixed
+an "out of scope" bullet directly contradicted by the characterization
+suite's existence (it now does exactly the "persisting/comparing results
+across many simulated games" `SIMULATOR.md` called future work, just as
+test infrastructure rather than a CLI-exposed feature).
+
+Deliberately did not duplicate ad-hoc empirical numbers into the new
+`SIMULATOR.md` sections the way the older "Known characteristic"
+sections do — those have already gone stale once from unenforced prose;
+pointed to `CHARACTERIZATION-TESTS.md`/`README.md` instead, which
+`ReadmeSyncTest` guards against drift. Committing directly; pure
+documentation, no code or spec content changed, nothing for another
+role to process.
+
+## 2026-08-25T16:00:00Z — specified unified income tax, batched and routed to coder
+
+User proposed a new optional tax: as players pass Start, tax 43% of a
+*unified* gross income combining labour and rent, alongside the existing
+per-source taxes. Settled the design with two clarifying questions before
+writing anything: (1) it's a new, independent flag that *can* combine
+with war profits tax, taxing the same rent twice from two separate
+accumulators — an intentional stacking mode, not guarded against; (2) it
+is its own wholly separate assessment (not a modification of MegaCorp's
+own code), conceptually taxing one combined base (gross salary + gross
+rent collected since this player's own last assessment under this tax)
+at 43%, feeding the same government account MegaCorp and war profits tax
+already feed and rent relief spends from, flag name
+`--optional-unified-income-tax`.
+
+Wrote `unified-income-tax.feature` (this round, isolated-computation
+scope matching how `megacorp-salary-tax.feature`/`war-profits-tax.feature`
+each started) plus a properly-split backlog (interaction/stacking in the
+feature's own backlog; observability in `journal.feature`/`report.feature`/
+`logging.feature`'s own backlogs; CLI wiring in `specs-cli/en/cli.feature`'s -
+correcting an initial draft that wrongly lumped all of it into the
+feature's own backlog file). User then asked whether existing MegaCorp
+scenarios might apply here too - checked directly rather than assuming,
+and found two real gaps: `megacorp-salary-tax-1` tests both $200 and
+$400 salary (the double-salary case), which I'd only covered for $200;
+and `megacorp-salary-tax-3` proves the tax scales under the *real*
+double-salary-on-landing rule in a played mini-game, not just an
+isolated `$400` input. Before deciding where the second one belongs,
+traced both its assertions (`"collects a salary of $X"`,
+`"the government's final account balance is $X"`) to confirm they read
+pre-existing, generic journal entries (`SalaryCollected`,
+`GovernmentBalance`) with nothing MegaCorp-specific - meaning it needs
+zero new observability wiring despite using `"play the game"`, so it
+belongs in the tracked file this round (as `unified-income-tax-7`,
+mirroring `megacorp-salary-tax-3`'s own placement) rather than backlog.
+Added the missing $400 row to `unified-income-tax-2` and the new
+scenario 7.
+
+Verified before committing: `bb gherkin-parser` clean on both the
+tracked file and all five backlog files; `bb gherkin-ir-dry-checker`
+clean (only the same deliberate duplicate-step pattern
+`war-profits-tax-7` already uses, from calling "collects a salary"
+twice in the reset-proof scenario). Added the tracked file to
+`acceptance/pipeline-features.txt` (new tracked files aren't picked up
+automatically) and ran the full suite: red for exactly the right reason
+- `Unsupported step: And the unified income tax is enabled` on all 6
+new scenarios, no glue code existing yet - with every one of the
+933 pre-existing tests still passing (939 total, 6 new failures, zero
+unexpected). Committing and handing off to coder under a new task name,
+`unified-income-tax`.
