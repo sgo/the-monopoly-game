@@ -48532,3 +48532,32 @@ one genuine failure. Handing back to the architect under the same task
 name with this precise, minimal, independently-confirmed diagnosis - the
 specifier's original seed-6 repro is fixed, but the fix has a distinct,
 narrower gap for the "entity loses every street" case.
+
+## 2026-08-25T07:48:00Z — refactorer sent entity-dev-loan-dissolution-desync handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T074800Z_000199_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: entity-dev-loan-dissolution-desync
+commit: 6119bc3951
+created_at: 2026-08-25T07:48:00.068349Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 6119bc3951
+```
+
+Reports from commit `6119bc3951`: the specifier's original seed-6 repro is
+confirmed fixed (verified directly against `Game`, plus a clean 50-seed
+sweep) and `mvn test`/acceptance are green, but a new property test found
+a distinct, narrower residual gap in the same fix — an entity that loses
+*every* street to individual foreclosure falls back to the same stale
+full-street-list bug. `mvn test -Pproperty-tests` is 31/32 on purpose;
+not proposing an implementation. Requesting architect routing before this
+task is declared complete.
