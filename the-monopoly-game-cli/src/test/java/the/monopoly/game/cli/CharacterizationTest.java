@@ -129,6 +129,22 @@ class CharacterizationTest {
     assertThat(relief.starvedByPlayer()).containsExactly(Map.entry("dog", 100L));
   }
 
+  @Test
+  void recordsReliefAndStarvationAtTheMostRecentTurnAge() {
+    GameBreakdown.GameResult result = new GameBreakdown.GameResult("""
+        dog starts a turn aged 12 years with $100 and a $0 reserve
+        cat pays dog $250 rent for Rue de Diekirch Arlon
+        The government pays dog $50 in rent relief
+        dog starts a turn aged 17 years with $100 and a $0 reserve
+        dog pays cat $300 rent for Rue de Diekirch Arlon
+        dog starts a turn aged 18 years with $100 and a $0 reserve
+        """, false, false, false, false, true);
+
+    GameBreakdown.RentReliefExtras relief = result.rentRelief().orElseThrow();
+    assertThat(relief.reliefAgeAtEvent()).isEqualTo(GameBreakdown.Stats.of(List.of(12)));
+    assertThat(relief.starvedAgeAtEvent()).isEqualTo(GameBreakdown.Stats.of(List.of(17)));
+  }
+
   @ParameterizedTest
   @EnumSource(CharacterizationConfig.class)
   void characterization(CharacterizationConfig config) throws IOException {

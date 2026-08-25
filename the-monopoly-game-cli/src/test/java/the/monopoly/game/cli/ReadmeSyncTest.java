@@ -103,6 +103,8 @@ class ReadmeSyncTest {
     assertField(block, "Relief starved", group(relief.starvedPayments()) + " payments, \\$"
         + dollars(relief.starvedDollars()) + " shortfall, " + relief.gamesWithStarvation() + " games", configLabel);
     assertNameLongMultiset(block, "Starved by pawn", relief.starvedByPlayer(), configLabel);
+    assertField(block, "Relief age at event", detailedAgeFromBaseline(relief.reliefAgeAtEvent()), configLabel);
+    assertField(block, "Starved age at event", detailedAgeFromBaseline(relief.starvedAgeAtEvent()), configLabel);
   }
 
   private static String effectiveTaxBurden(GameBreakdown baseline) {
