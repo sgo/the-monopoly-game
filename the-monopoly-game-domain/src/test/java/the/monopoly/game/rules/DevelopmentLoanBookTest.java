@@ -101,6 +101,36 @@ class DevelopmentLoanBookTest {
   }
 
   @Test
+  void forecloseEntityReturnsCollateralToTheBankWhenNoBidReachesTheOpeningPrice() {
+    Deeds deeds = new Deeds();
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, List.of(dog), rules);
+    deeds.form(entity);
+    ColourStreet collateral = entity.streets().getFirst();
+    int belowOpening = collateral.landMortgageValue().amount() / 3;
+    DevelopmentLoanBook book = new DevelopmentLoanBook(bank);
+    DevelopmentLoanBook.Position position = book.recordEntityLoan(entity, collateral.type(), new Money(100), 0, null);
+    Strategy.OfPlayers strategies = player -> player.id().equals(highHat.id())
+        ? new Strategy() {
+          @Override
+          public Money bidFor(Offer offer) {
+            return new Money(belowOpening);
+          }
+        }
+        : new Strategy() {
+          @Override
+          public Money bidFor(Offer offer) {
+            return new Money(belowOpening + 1);
+          }
+        };
+
+    book.forecloseEntity(position, deeds, rules, List.of(dog, highHat), strategies);
+
+    assertThat(deeds.entityOwnerOf(collateral.type())).isEmpty();
+    assertThat(deeds.ownerOf(collateral.type())).isEmpty();
+    assertThat(position.outstanding()).isEqualTo(Money.ZERO);
+  }
+
+  @Test
   void aShortfallAboveTheLoanToValueCapCannotBeRaised() {
     dog.account().deposit(new Money(5));
     highHat.account().deposit(new Money(500));

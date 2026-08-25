@@ -353,3 +353,28 @@ Feature: development loans
     Examples:
       | cash | fresh_bond_cash | recycled | loan |
       | 15   | 500              | 10       | 35   |
+
+  # development-loans-18
+  Scenario Outline: a defaulted loan's collateral returns to the bank when every remaining bidder's ceiling falls short of the opening bid
+    Given we select 3 players
+    And pawn "dog" will roll 10 for initiative
+    And pawn "high hat" will roll 4 for initiative
+    And pawn "iron box" will roll 2 for initiative
+    And every other player can complete their turn
+    And pawn "dog" owes the bank $<principal> on a development loan secured by "Rue Grande Dinant"
+    And the bank's account holds $<bank_starting>
+    And pawn "dog" has $0 to spend
+    And pawn "high hat" will bid $<high_hat_bid> for "Rue Grande Dinant" at auction
+    And pawn "iron box" will bid $<iron_box_bid> for "Rue Grande Dinant" at auction
+    And development loans are enabled for the "Greedo" strategy
+    When pawn "dog" grows a year older
+    Then pawn "dog" does not own "Rue Grande Dinant"
+    And pawn "high hat" does not own "Rue Grande Dinant"
+    And pawn "iron box" does not own "Rue Grande Dinant"
+    And pawn "dog" owns "Diestsestraat Leuven"
+    And pawn "dog" is not bankrupt
+    And the bank's account holds $<bank_ending>
+
+    Examples:
+      | principal | high_hat_bid | iron_box_bid | bank_starting | bank_ending |
+      | 20        | 10           | 25            | 50            | 30          |
