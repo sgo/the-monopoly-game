@@ -50028,3 +50028,47 @@ landlord instead of the tenant, contradicting the specifier's written
 spec — evidence and citations in the prior logbook entry. Requesting
 architect review, with a coder loop-back recommended for the
 attribution fix.
+
+Sent handoff to coder:
+
+```
+id: 20260825T122506Z_000274_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: rent-relief-net-position-and-matched-pair
+commit: 964eb53c08
+created_at: 2026-08-25T12:25:06.242813Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 964eb53c08
+```
+
+## 2026-08-25T14:00:00Z — specified relief starvation tracking
+
+User asked what it means when tax revenue can't cover relief - does
+financing gradually dry up, does the cap stay too high, or does the
+government run out of money outright. Answered from the actual code
+rather than speculating: `RentRelief.reliefFor` is a hard cliff, not a
+gradual squeeze - `government.balance().covers(difference) ? difference
+: Money.ZERO`. There is no partial relief; either the government's
+*current* balance covers a bill's entire excess over the $200 cap, or
+the tenant pays the full nominal rent with zero cushion, exactly as if
+relief didn't exist for that one bill. User asked to make this
+measurable.
+
+Specified a new `--optional-rent-relief` extra field, relief starved:
+count, total $ shortfall, games with at least one starved event, broken
+down by pawn - the natural complement to relief received. Detectable
+from log text via the same adjacency trick already used for the other
+relief fields: a `RentPaid` line over $200, in a config with relief
+active, not immediately followed by a `RentReliefPaid` line is a starved
+event, since that is the only way an uncapped over-cap payment can occur
+once relief is on. Same player-owned-landlord scope as relief received,
+for the same reason (no distinguishable entity-path line to check
+adjacency against). Updated the README sync check's bullet list to
+include it. Committing and handing off to coder under a new task name,
+`rent-relief-starvation-tracking`.

@@ -79,9 +79,11 @@ Full breakdown for any config lives in
 - Rent relief: 1,274 payments, \$621,670 total, 50 games
 - MegaCorp salary tax: 4,768 payments, \$715,200 total
 - MegaCorp tax payers: wheelbarrow \$81450, dog \$67050, ship \$93150, racecar \$115650, shoe \$83850, high hat \$92700, iron box \$95550, thimble \$85800
-- Relief received: iron box \$90940, racecar \$108515, wheelbarrow \$93245, ship \$70035, shoe \$34135, thimble \$38075, high hat \$116655, dog \$70070
+- Relief received: thimble \$80165, wheelbarrow \$91100, racecar \$88400, ship \$80935, shoe \$92540, dog \$62105, high hat \$57500, iron box \$68925
+- Relief starved: 1,297 payments, \$1,484,885 shortfall, 50 games
+- Starved by pawn: dog \$130160, thimble \$191875, ship \$195475, high hat \$121450, wheelbarrow \$188075, iron box \$229425, racecar \$233850, shoe \$194575
 - Effective tax burden: racecar 12.19%, wheelbarrow 13.78%, iron box 19.42%, ship 17.32%, dog 15.53%, shoe 20.95%, thimble 24.47%, high hat 12.03%
-- Net fiscal position: racecar -0.75%, wheelbarrow 2.00%, iron box -0.94%, ship -4.30%, dog 0.70%, shoe -12.42%, thimble -13.61%, high hat 3.11%
+- Net fiscal position: racecar -2.87%, wheelbarrow 1.63%, iron box -5.41%, ship -2.27%, dog -1.15%, shoe 2.17%, thimble -1.61%, high hat -4.57%
 
 </details>
 
@@ -128,9 +130,11 @@ Full breakdown for any config lives in
 - Rent relief: 4,242 payments, \$2,737,245 total, 50 games
 - MegaCorp salary tax: 21,331 payments, \$3,199,650 total
 - MegaCorp tax payers: wheelbarrow \$253500, dog \$199500, ship \$653100, racecar \$310050, shoe \$520800, high hat \$385200, iron box \$281100, thimble \$596400
-- Relief received: iron box \$166495, racecar \$126090, wheelbarrow \$120665, ship \$154460, shoe \$209555, thimble \$851770, high hat \$1012380, dog \$95830
+- Relief received: thimble \$271810, wheelbarrow \$262920, racecar \$272880, ship \$830960, shoe \$633090, dog \$141815, high hat \$121955, iron box \$201815
+- Relief starved: 2,142 payments, \$2,523,695 shortfall, 50 games
+- Starved by pawn: dog \$217010, thimble \$313200, ship \$359175, high hat \$358825, wheelbarrow \$158250, iron box \$472635, racecar \$273750, shoe \$370850
 - Effective tax burden: racecar 27.73%, wheelbarrow 31.69%, iron box 23.72%, ship 31.38%, dog 29.70%, shoe 44.89%, thimble 20.91%, high hat 14.13%
-- Net fiscal position: racecar -18.44%, wheelbarrow -20.42%, iron box -10.16%, ship -25.02%, dog -17.49%, shoe -32.88%, thimble 8.76%, high hat 18.79%
+- Net fiscal position: racecar -7.63%, wheelbarrow -7.14%, iron box -7.28%, ship 2.84%, dog -11.64%, shoe -8.62%, thimble -11.44%, high hat -10.17%
 
 </details>
 
@@ -154,9 +158,11 @@ Full breakdown for any config lives in
 - Rent relief: 4,919 payments, \$2,749,045 total, 49 games
 - MegaCorp salary tax: 20,176 payments, \$3,026,400 total
 - MegaCorp tax payers: wheelbarrow \$314700, dog \$507300, ship \$497700, racecar \$322950, shoe \$450900, high hat \$398100, thimble \$239700, iron box \$295050
-- Relief received: dog \$178960, ship \$630290, racecar \$758590, iron box \$252870, thimble \$30165, high hat \$108180, shoe \$706470, wheelbarrow \$83520
+- Relief received: iron box \$178695, ship \$572805, high hat \$436535, shoe \$399375, wheelbarrow \$160395, thimble \$139585, racecar \$182905, dog \$678750
+- Relief starved: 936 payments, \$830,100 shortfall, 50 games
+- Starved by pawn: iron box \$81650, wheelbarrow \$111150, high hat \$103095, thimble \$91250, ship \$129390, shoe \$85565, racecar \$93125, dog \$134875
 - Effective tax burden: racecar 56.97%, wheelbarrow 34.26%, dog 42.90%, iron box 33.45%, ship 48.37%, shoe 40.78%, thimble 37.37%, high hat 33.88%
-- Net fiscal position: racecar -17.52%, wheelbarrow -25.17%, dog -33.58%, iron box -12.55%, ship -18.89%, shoe -10.54%, thimble -32.71%, high hat -24.88%
+- Net fiscal position: racecar -47.46%, wheelbarrow -16.80%, dog -7.54%, iron box -18.68%, ship -21.58%, shoe -23.69%, thimble -15.80%, high hat 2.44%
 - War-profits tax: 1068 payments, \$2,247,817 total
 - Tax payers: dog 45, shoe 416, iron box 64, thimble 1, ship 236, racecar 302, high hat 4
 - Government balance: min 61, median 1834, mean 26783.32, max 271144
