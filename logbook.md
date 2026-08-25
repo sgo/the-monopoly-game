@@ -48295,6 +48295,19 @@ new configs, per user direction — those configs (all needing legal-entity
 + development-loans + rent-relief together) can't be adopted while a
 legitimate seed just crashes the simulator outright.
 
+## 2026-08-25T07:24:12Z — coder fixed entity loan dissolution desynchronization
+
+Processed specifier handoff `000267` and merged commit `8fa77c1e51`.
+When a final shareholder dissolves a legal entity, outstanding entity
+development-loan positions now transfer to that shareholder as ordinary player
+loans, retaining collateral and bondholder details. The entity's aggregate
+development-loan balance is cleared, preventing later foreclosure from
+targeting land the dissolved entity no longer owns.
+
+Verification: domain tests pass (423 tests); generator-backed full acceptance
+passes all 930 tests.
+
+Sent complete handoff message:
 ## 2026-08-25T07:31:45Z — refactorer processes coder handoff `bef42a20ff` (entity-dev-loan-dissolution-desync): still red, wrong root cause
 
 Handoff message received:
@@ -48308,6 +48321,7 @@ type: git_handoff
 role: coder
 task: entity-dev-loan-dissolution-desync
 commit: bef42a20ff
+created_at: 2026-08-25T07:24:12.373167Z
 
 Re-read your role and constitution.
 
@@ -48397,3 +48411,33 @@ foreclosed away while the entity stayed alive — `entity.streets()` is a
 static, formation-time list never updated on partial foreclosure.
 Requesting architect routing; no new production behavior introduced by
 this handoff.
+
+## 2026-08-25T09:40:00Z — route surviving-entity foreclosure collateral desync to coder
+
+Received refactorer handoff `000198` (commit `cbd1d2c496`). The already
+merged coder fix correctly transfers outstanding entity loans when a legal
+entity dissolves, but it does not address the reported seed-6 crash. The
+refactorer reproduced that crash after the fix and traced the actual path:
+an entity remains alive after `forecloseEntity` sells one collateral street,
+then `LegalEntity.operate()` reuses its static formation-time street list to
+raise another loan against the now-unowned street. The next foreclosure
+correctly rejects the stale entity ownership and crashes. Route this distinct
+surviving-entity collateral-eligibility defect to coder under the existing
+task, while retaining the dissolution fix.
+
+## 2026-08-25T10:05:00Z — verify coder fix for surviving-entity collateral desync
+
+Received coder handoff `000269` (commit `ac36bc2c53`) for
+`entity-dev-loan-dissolution-desync`. The fix makes legal-entity building
+and development-loan planning derive eligible streets from current `Deeds`
+ownership for formed entities, while preserving the formation-time list for
+unformed unit-test fixtures. It includes a characterization test for an
+entity that survives foreclosure and must continue only with streets it
+still owns.
+
+Merged the commit and ran the complete acceptance suite successfully. Ran
+the complete Gherkin mutation suite successfully as well: no survivor
+reports were produced. The suite refreshed its usual feature manifests.
+I am routing the exact seed-6 game reproduction back to the refactorer for
+an independent red-to-green confirmation and structural review before
+declaring this repair complete.
