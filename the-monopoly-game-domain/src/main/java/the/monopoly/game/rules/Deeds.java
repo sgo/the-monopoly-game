@@ -9,6 +9,7 @@ import the.monopoly.game.components.streets.Utility;
 
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -107,6 +108,7 @@ public class Deeds {
     return owners.entrySet().stream()
         .filter(it -> it.getValue().equals(player.id()))
         .map(Map.Entry::getKey)
+        .sorted(Comparator.comparingInt(Enum::ordinal))
         .toList();
   }
 
@@ -114,6 +116,7 @@ public class Deeds {
     return entityOwners.entrySet().stream()
         .filter(it -> it.getValue().equals(entity))
         .map(Map.Entry::getKey)
+        .sorted(Comparator.comparingInt(Enum::ordinal))
         .toList();
   }
 

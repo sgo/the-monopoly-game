@@ -34,6 +34,17 @@ class DeedsTest {
   }
 
   @Test
+  void landOwnedByIsReturnedInStableBoardOrder() {
+    Player owner = playerWith(1500);
+
+    deeds.sell(land(Street.Type.DiestsestraatLeuven), owner, new Money(60));
+    deeds.sell(land(Street.Type.RueGrandeDinant), owner, new Money(60));
+
+    assertThat(deeds.landOwnedBy(owner))
+        .containsExactly(Street.Type.RueGrandeDinant, Street.Type.DiestsestraatLeuven);
+  }
+
+  @Test
   void aBuyerPaysWhatTheLandWentForRatherThanWhatItIsPriced() {
     Player buyer = playerWith(1500);
 

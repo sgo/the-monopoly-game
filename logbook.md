@@ -49353,8 +49353,8 @@ characterization suite, now 15 configs x 50 seeds) is real:
   class with no `equals`/`hashCode` override (default, identity-based),
   and is the element type of `Deeds.formedEntities`, a `HashSet<LegalEntity>`
   added during `entity-dev-loan-dissolution-desync`. Did not chase the
-  exact code path further (real investigative work beyond a verification
-  pass) - config12 is by far the longest-running, most stalemate-heavy of
+exact code path further (real investigative work beyond a verification
+pass) - config12 is by far the longest-running, most stalemate-heavy of
   the three new configs (36% stalemate, mean age 153yr, max 1730yr per
   the README stats just added), which fits a rare tie-break/ordering
   divergence that needs many rounds to compound into a visible aggregate
@@ -49414,3 +49414,16 @@ the exact code path (real investigation, not a verification pass). `mvn
 test`, acceptance, and property-tests all green - isolated to config12's
 long-running baseline specifically. Requesting architect routing; not
 proposing an implementation.
+
+## 2026-08-25T12:30:00Z — route config12 cross-JVM nondeterminism to coder
+
+Received refactorer handoff `000203` (commit `2a512b3dc7`) and merged the
+configs 11–13 implementation plus its verification finding. Config12's
+baseline differs across separate JVM runs despite deterministic per-seed,
+single-JVM repeats; forcing one worker does not solve it. The likely cause is
+an identity-based collection iteration introduced or exposed by
+`Deeds.formedEntities` holding `LegalEntity` values without value equality.
+Route to coder under `rent-relief-configs-11-13`: isolate the exact ordering
+source, make the simulation deterministic across JVMs without weakening the
+config coverage, and return characterization tests reliably green. Do not
+accept baseline updates as a substitute for a deterministic result.
