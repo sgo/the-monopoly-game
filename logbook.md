@@ -50839,3 +50839,38 @@ the `GameTest` fix and handing the verified state to the architect
 under the same task name.
 
 ## 2026-08-25T21:35:00Z — refactorer sent unified-income-tax-followup handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T212602Z_000210_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: unified-income-tax-followup
+commit: d3830f28c8
+created_at: 2026-08-25T21:26:02.281986Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d3830f28c8
+```
+
+Reports from commit `d3830f28c8`: merged coder's `3339da7233`
+(observability narration + the `World.governmentAccountBalance()` fix
+the specifier found). Verified the balance fix is correct, not a
+symptom-patch, by tracing exactly where the bare `governmentBalance`
+field is written (only the isolated war-profits-tax bookkeeping, never
+MegaCorp or unified income tax, both of which use the real shared
+`Bank` account already). Found `mvn test` red -
+`GameTest`'s hard-coded journal-sequence assertion didn't account for
+the new unconditional `UnifiedIncomeTaxEnabled` entry, same pattern its
+three siblings already needed - fixed the one-line fixture gap.
+Recovered a second, independent `logbook.md` content-loss defect during
+the merge (details in the prior entry). CRAP/DRY/mutation scan clean
+relative to what this diff changed; only long-standing, previously
+documented, untouched hotspots exceed threshold. `mvn test`,
+characterization-tests, property-tests, and full acceptance (952/952,
+up from 939) all green. Requesting architect review.
