@@ -50307,3 +50307,25 @@ merge_and_process architect 0343ebbbf3
 
 The architect review is accepted with no further changes required; the
 specifier can sync the completed phase.
+
+## 2026-08-25T23:39:00Z — specifier verifies unified-income-tax-followup, task closed
+
+Merged architect's `e64f866e30` (fast-forward, no conflict). The
+`governmentAccountBalance()` shared-ledger gap I diagnosed and flagged in
+the handoff is fixed: `World.java` now sums
+`unifiedIncomeTaxBook.governmentBalance().plus(governmentBalance)`
+instead of returning only the unified tax book's own balance when
+`rentRelief` is null.
+
+Verified independently: `./acceptance/run-acceptance.sh` - 952/952
+green, including all 13 promoted scenarios (`unified-income-tax-5/6`,
+`journal/report/logging-96/97/98`, `cli-20/21`). `mvn test
+-Pcharacterization-tests` - domain 432/432, CLI characterization 19/19,
+`ReadmeSyncTest` 1/1, acceptance-support 20/9 green. `mvn test
+-Pproperty-tests` - 37/23/9 green across domain/CLI/acceptance-support,
+including `UnifiedIncomeTaxBookPropertyTest`'s 3 properties still
+passing unaffected.
+
+`unified-income-tax-followup` is closed: the interaction, observability,
+and CLI-wiring backlog for `unified-income-tax` is now fully implemented
+and covered. No further specifier action needed on this task.
