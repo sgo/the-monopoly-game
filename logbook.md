@@ -48393,3 +48393,32 @@ raise another loan against the now-unowned street. The next foreclosure
 correctly rejects the stale entity ownership and crashes. Route this distinct
 surviving-entity collateral-eligibility defect to coder under the existing
 task, while retaining the dissolution fix.
+
+## 2026-08-25T07:36:21Z — coder completed architect follow-up 000425
+
+Merged architect commit `1c241e883d`. Constrained surviving legal entities'
+building and development-loan plans to streets they still own after a
+foreclosure, while preserving isolated unit fixtures that do not register
+entities in `Deeds`. Added a regression test proving a surviving entity builds
+on a remaining street rather than a foreclosed one.
+
+Verification: focused `LegalEntityTest` passes; domain tests pass (423 tests);
+generator-backed full acceptance passes all 930 tests.
+
+Sent complete handoff message:
+
+```
+id: 20260825T073621Z_000269_from_coder
+from: coder
+to: architect
+priority: 00
+type: git_handoff
+role: coder
+task: entity-dev-loan-dissolution-desync
+commit: ac36bc2c53
+created_at: 2026-08-25T07:36:21.324141Z
+
+Re-read your role and constitution.
+
+merge_and_process coder ac36bc2c53
+```
