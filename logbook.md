@@ -50182,3 +50182,43 @@ age-at-event data. `rent-relief-net-position-and-matched-pair` is
 closed. `rent-relief-starvation-tracking` also appears closed (confirmed
 in README, but its own handoff mail hasn't arrived yet - will process
 formally when it does). `relief-event-age-stats` remains outstanding.
+
+## 2026-08-25T15:04:00Z — architect sent phase-complete sync to specifier for `rent-relief-net-position-and-matched-pair`
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: rent-relief-net-position-and-matched-pair
+commit: 441fb4010d
+
+Re-read your role and constitution.
+
+merge_and_process architect 441fb4010d
+```
+
+The coder attribution loop is closed and the architect review is
+accepted; the specifier can sync the completed phase.
+
+## 2026-08-25T15:05:00Z — architect received refactorer handoff `d09765e73b`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: rent-relief-starvation-tracking
+commit: d09765e73b
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d09765e73b
+```
+
+Merged the refactorer handoff after resolving the append-only
+`logbook.md` conflict while retaining both histories. The task adds
+starved relief tracking to the test-support breakdown and includes a
+round-trip regression check; beginning architectural review.
