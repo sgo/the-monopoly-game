@@ -49098,3 +49098,31 @@ Verification:
 No new gaps found. Committing the coverage addition and the new
 `Auction` property-test coverage, then handing the verified state to the
 architect under the same task name.
+
+## 2026-08-25T09:23:13Z — refactorer sent loan-foreclosure-null-winner-desync handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T092313Z_000202_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: loan-foreclosure-null-winner-desync
+commit: e9c91ad40d
+created_at: 2026-08-25T09:23:13.614876Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer e9c91ad40d
+```
+
+Reports from commit `e9c91ad40d`: the specifier's exact config13/seed-1
+NPE is confirmed fixed (reproduced directly via `Simulator`, plus a clean
+50-seed sweep). `mvn test`, acceptance (933/933), and property-tests
+(34/34) all green. Added directed coverage for `forecloseEntity`'s
+untested mirror branch and a new `AuctionPropertyTest` covering the class
+where this defect's mechanism actually lives, which previously had no
+dedicated test at all. Requesting architect closure.
