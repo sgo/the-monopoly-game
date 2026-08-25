@@ -84,6 +84,7 @@ cap against a run that never naturally terminates:
 | 11 | 8 | Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-development-loans` `--optional-rent-relief` |
 | 12 | 8 | Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-development-loans` `--optional-rent-relief` `--optional-war-profits-tax` |
 | 13 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-development-loans` `--optional-rent-relief` `--optional-war-profits-tax` `--optional-asset-rich-billionaire` |
+| 14 | 8 | Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-development-loans` |
 
 Configs 7 and 8 are identical except for the one flag that matters
 (`--optional-asset-rich-billionaire`), so a comparison between their two
@@ -137,6 +138,26 @@ null-winner crash (`loan-foreclosure-null-winner-desync`) first surfaced
 and were fixed — both bugs pre-dated this chain but had gone unexercised
 by every existing config until legal-entity trading, development loans,
 and a foreclosure with cash-poor remaining bidders all coincided here.
+
+Config 14 is config 11 with only `--optional-rent-relief` removed — the
+one true matched pair in the whole suite, added specifically to isolate
+relief's own effect on how many players survive to the end of a game,
+something none of configs 11-13 could answer alone since every one of
+them has relief on. Survival rate here means the fraction of all player
+seats across every seed that are never bankrupted (`1 - total
+bankruptcies / (8 x 50)`), derivable from the bankruptcy count both
+configs already track. Config 14 resolves in an ordinary win in all 50
+seeds, with exactly 7 bankruptcies every single time (350 total,
+`350 = 7 x 50`) - a 12.5% survival rate (50 of 400 seats), no exceptions.
+Config 11 barely moves that: 348 bankruptcies against 400 seats, a 13.0%
+survival rate - only 0.5 percentage points higher, from the 2 seeds (of
+50) where a second player survives alongside the winner. Relief alone,
+without war profits tax clawing back concentrated land wealth, keeps
+tenants solvent turn to turn but does essentially nothing to how the game
+*ends* - confirming, now precisely isolated rather than inferred, that
+the dramatic stalemate/survival shift documented for config 12 is a
+war-profits-tax effect (or the interaction of the two), not something
+relief produces on its own.
 
 ## The breakdown
 
@@ -198,6 +219,22 @@ always-empty fields:
   broken down by pawn (mirroring war profits tax's own payer breakdown
   below) — the tax side needed, alongside the generic core's per-player
   income, to compute effective tax burden per player.
+  Also relief received, broken down by pawn — not the landlord named in
+  the `RentReliefPaid` line, but the *tenant* whose payment it capped:
+  `RentRelief.pay` always deposits the full nominal rent into the
+  landlord's account regardless of relief (`landlord.account().deposit(rent)`,
+  the whole amount, not `rent.minus(relief)`), so a landlord's income is
+  identical whether relief exists or not — relief only ever reduces what
+  the *tenant* pays. The tenant is recoverable from the `RentPaid` line
+  `Journalling.paid` always logs immediately before a `RentReliefPaid`
+  line in the same call, the same adjacent-line pattern already used to
+  attribute MegaCorp tax to "whoever last collected salary." Scoped to
+  player-owned landlords only, same as the existing relief-payments
+  count above: the legal-entity rent-payment path caps the tenant's
+  payment identically but logs no distinguishable relief line at all, so
+  entity-landlord relief is invisible to log-parsing entirely, not just
+  to this new field — a pre-existing gap in observability, not something
+  newly introduced by attributing the player-landlord case correctly.
 - `--optional-war-profits-tax`: tax payments (count, total $), payer
   breakdown by pawn — plus final government-account balance as a
   min/max/mean/median `Stats` block, the same shape `ageAtEnd` already
@@ -261,6 +298,22 @@ and is likewise omitted, not zero-filled or shown as an error value.
 Meaningful for any config combining at least one tax extra with the
 generic-core income breakdown — today that's configs 10 through 13.
 
+**Net fiscal position by pawn** — also README-only and derived, not a new
+JSON field: how much a pawn's relief benefit outweighs their tax burden,
+in the same normalized unit so the two are directly comparable rather
+than left as a $ tax figure and a $ relief figure a reader has to
+reconcile by hand:
+```
+relief %(pawn) = relief received(pawn) / (gross salary(pawn) + rent collected(pawn)) × 100
+net position %(pawn) = relief %(pawn) − burden %(pawn)
+```
+Positive means a pawn received more in relief than it paid across
+MegaCorp and war profits tax combined, over its lifetime in the config;
+negative means the reverse. Only meaningful where both burden % and
+relief % are computable, i.e. wherever `--optional-rent-relief` is
+active — today configs 11 through 13 (config 10 has war-profits-tax but
+not relief, so has a burden % with nothing to net it against).
+
 This schema is expected to grow (new extras for new flags) without
 invalidating existing baseline fixtures for configs that don't use the new
 flag — adding a field must not require touching every other config's
@@ -300,8 +353,9 @@ every data point shown for a config matches that config's fixture:
   acquisitions, mortgage count, income composition (both the aggregate
   total and the per-pawn breakdown), and — for whichever configs have
   them — loan origination/servicing, entity, peer-trade, war-profits-tax,
-  and rent-relief figures, plus effective tax burden by pawn for any
-  config where that figure applies.
+  and rent-relief figures (including relief received by pawn), plus
+  effective tax burden by pawn and net fiscal position by pawn for any
+  config where those figures apply.
 
 Only the factual data points are checked, not the hand-written analytical
 asides (e.g. the `eight_greedo` income-scale comment, the "350 total =
@@ -310,7 +364,8 @@ judgment about what's worth pointing out, not something derived
 mechanically from a fixture, so there's nothing to verify them against.
 Some of the checked figures are themselves derived from the fixture rather
 than copied verbatim (the outcome percentages, the auction-vs-purchase
-ratio, effective tax burden by pawn) — the test needs to reproduce that
+ratio, effective tax burden by pawn, net fiscal position by pawn) — the
+test needs to reproduce that
 derivation, not just search for a raw JSON value as a substring.
 
 A failure names the config, the specific figure, and both the value found

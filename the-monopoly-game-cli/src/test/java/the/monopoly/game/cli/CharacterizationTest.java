@@ -104,6 +104,13 @@ class CharacterizationTest {
     assertThat(relief.reliefPayments()).isEqualTo(1);
     assertThat(relief.reliefDollars()).isEqualTo(20);
     assertThat(relief.megacorpTaxPayers()).containsExactly(Map.entry("dog", 1));
+
+    GameBreakdown breakdown = GameBreakdown.aggregate(List.of(result));
+    GameBreakdown roundTripped = GameBreakdown.fromJson(breakdown.toJson());
+    assertThat(roundTripped.core().income().byPlayer()).isEqualTo(breakdown.core().income().byPlayer());
+    assertThat(roundTripped.rentRelief().orElseThrow()).isEqualTo(breakdown.rentRelief().orElseThrow());
+    assertThat(roundTripped.warProfitsTax().orElseThrow().payerDollars())
+        .isEqualTo(breakdown.warProfitsTax().orElseThrow().payerDollars());
   }
 
   @ParameterizedTest
