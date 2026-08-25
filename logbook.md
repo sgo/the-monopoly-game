@@ -49154,6 +49154,15 @@ mirror-path coverage, and Auction property tests. Merge both audit trails;
 the architect must independently run property, acceptance, and full Gherkin
 mutation gates before closing this new task.
 
+## 2026-08-25T12:40:00Z — certify rent-relief configs and determinism repair
+
+Architect verification is green: the full characterization profile passes
+with config12's baseline stable again, acceptance passes, and the full
+configured Gherkin mutation suite produces no survivor report. The repair
+sorts deed-derived ownership by board order and deterministically selects a
+retained card; parallel characterization is restored after validation.
+Return `rent-relief-configs-11-13` as phase complete to specifier.
+
 ## 2026-08-25T11:45:00Z — route null-winner auction survivor equivalence decision
 
 Architect verification confirms property and acceptance gates green, but the
