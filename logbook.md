@@ -47851,6 +47851,18 @@ At the user's direction, sending both changes together as one task,
 `megacorp-salary-tax-cli-wiring`, rather than the two separate handoffs
 suggested earlier.
 
+## 2026-08-24T21:53:18Z — coder completed MegaCorp CLI wiring
+
+Processed specifier handoff `000265` and merged commit `0f56466a25`.
+Implemented the real CLI-path MegaCorp wiring when rent relief is enabled,
+added explicit journal/log/report enabled-state entries, corrected MegaCorp
+tax to 43% of gross from the specified net salary (half-even cent rounding),
+and updated acceptance handlers and report rendering for decimal money.
+
+Verification: domain, CLI, and acceptance support tests pass (422 unit tests);
+the generator-backed full acceptance suite passes all 930 tests.
+
+Sent complete handoff message:
 Handoff sent:
 
 ```
@@ -47874,6 +47886,7 @@ type: git_handoff
 role: coder
 task: megacorp-salary-tax-cli-wiring
 commit: b86a94ff02
+created_at: 2026-08-24T21:53:18.650390Z
 
 Re-read your role and constitution.
 
@@ -48049,6 +48062,29 @@ separate work, not blocking this task.
 Handing back to architect on the same task to certify the mutation gate
 clean.
 
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: megacorp-salary-tax-cli-wiring
+commit: fe0e175fe5
+```
+
+## 2026-08-25T01:00:00Z — specifier certifies megacorp-salary-tax-cli-wiring complete
+
+Merged the architect's clean full-Gherkin-mutation-gate certification
+(commit `b483c013bf`). Ran `mvn test -Pcharacterization-tests` per the
+phase-complete sync rule: green (`CharacterizationTest` 12/12, full
+reactor build success, 422/422 domain tests). No drift to investigate.
+
+`megacorp-salary-tax-cli-wiring` is closed: the CLI-driven simulator path
+now genuinely wires MegaCorp alongside rent relief, the tax formula
+correctly reflects 43% of gross (not net), and both are verified through
+full acceptance and Gherkin mutation. `game-java-mutation-site-debt` is a
+separate, already-opened refactorer task and needs no specifier action.
+
 ## 2026-08-24T22:19:17Z — refactorer processes architect handoff `b483c013bf` (game-java-mutation-site-debt)
 
 Handoff message received:
@@ -48183,3 +48219,78 @@ green, acceptance 930/930, property-test profile 31/31, CRAP/DRY clean (no
 new issues; the two carried-over CRAP figures are the same pre-existing
 methods, moved verbatim). Requesting architect review to close out
 `game-java-mutation-site-debt`.
+
+## 2026-08-25T01:15:00Z — Game.java mutation-site debt resolved and certified
+
+Merged refactorer handoff `000197` (commit `897be88598`). The cohesive
+`LegalEntities` collaborator removes legal-entity trade/buyout, formation,
+and operation/loan-service orchestration from `Game` while retaining the
+same package-level access to `Journalling`. `Game.java` falls from 124 to
+83 mutation sites; `LegalEntities.java` has 41, so both are below the split
+threshold. The public `Game` API is unchanged.
+
+Independently ran the generator-backed full acceptance suite and the full
+Gherkin mutation suite. Both pass cleanly: no acceptance failures,
+survivors, or mutation errors. This resolves the identified `Game.java`
+architectural debt rather than merely recording it.
+
+## 2026-08-25T01:30:00Z — specifier syncs after game-java-mutation-site-debt
+
+Merged the refactorer/architect's certified `Game.java` split (commit
+`71c29f0c47`; new `LegalEntities` collaborator, 124->83 mutation sites,
+public API and observable gameplay unchanged). Ran
+`mvn test -Pcharacterization-tests` per the phase-complete sync rule:
+green (`CharacterizationTest` 12/12, 422/422 domain tests). No drift.
+Pure refactor, no Gherkin involved; no further specifier action needed.
+
+## 2026-08-25T02:15:00Z — dev-loans + legal-entity foreclosure defect found while scoping rent-relief configs
+
+While scoping new characterization configs with the user (all rent relief
+on: an all-Greedo config adding legal-entity trading + development loans,
+a war-profits-tax variant of it, and an asset-rich-billionaire variant of
+that), an ad-hoc 50-seed run of the first candidate (8 Greedo,
+`--optional-greedo-stalemate-trading --optional-greedo-legal-entity
+--optional-development-loans --optional-rent-relief`, `--max-years=2500`)
+crashed outright on seed 6:
+
+```
+Simulation failed: Yellow Realty does not own GroteMarktHasselt.
+```
+
+Reproduced directly against `Game` (bypassing the CLI's
+exception-flattening wrapper, which normally discards the stack trace) to
+get the full picture:
+
+```
+java.lang.IllegalStateException: Yellow Realty does not own GroteMarktHasselt.
+	at the.monopoly.game.rules.Deeds.verifyEntityOwner(Deeds.java:319)
+	at the.monopoly.game.rules.Deeds.sellHouse(Deeds.java:269)
+	at the.monopoly.game.rules.DevelopmentLoanBook.forecloseEntity(DevelopmentLoanBook.java:246)
+	at the.monopoly.game.LegalEntities.serviceEntityDevelopmentLoan(LegalEntities.java:174)
+	at the.monopoly.game.LegalEntities.operateLegalEntities(LegalEntities.java:153)
+	at the.monopoly.game.Game.completeRound(Game.java:332)
+```
+
+This exact combination (legal-entity trading + development loans, with no
+billionaire in the mix) has never been exercised together in the existing
+characterization suite before — config 9 combines both flags but always
+with an asset-rich billionaire present, which may simply never hit this
+path. Root cause, confirmed by reading the source (not just a hypothesis):
+`Bankruptcy.liquidateEntity` (`Bankruptcy.java:101-105`) — reached when a
+distressed player holds shares in an entity with exactly one distinct
+shareholder (themself) — calls `entity.liquidateTo(debtor)` then
+`Deeds.dissolve(entity, debtor)` (`Deeds.java:51-57`), which transfers
+every one of the entity's streets to that player unconditionally. Neither
+step checks `DevelopmentLoanBook` for outstanding positions where
+`position.entity()` is the dissolving entity. Any such position survives
+the dissolution untouched: it still names the now-dissolved entity as
+borrower, with `collateral` pointing at land a specific player now owns
+individually. The next time that position comes up for servicing,
+`forecloseEntity` tries to act on land the entity no longer holds, and
+`Deeds.verifyEntityOwner` correctly rejects it — the crash is the symptom,
+the missing reconciliation at dissolution is the defect.
+
+Routing to coder now, before touching `CHARACTERIZATION-TESTS.md` for the
+new configs, per user direction — those configs (all needing legal-entity
++ development-loans + rent-relief together) can't be adopted while a
+legitimate seed just crashes the simulator outright.

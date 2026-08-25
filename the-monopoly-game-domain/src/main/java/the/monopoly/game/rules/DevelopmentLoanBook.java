@@ -80,6 +80,15 @@ public final class DevelopmentLoanBook {
     return position;
   }
 
+  /** Transfers an entity's outstanding loans to its final shareholder when the entity dissolves. */
+  public void transferEntityLoans(LegalEntity entity, Player shareholder) {
+    positions.replaceAll(position -> position.entity() == entity
+        ? new Position(shareholder.id().value(), shareholder, null, position.collateral(),
+            position.loan(), position.bondholder())
+        : position);
+    entity.clearDevelopmentLoan();
+  }
+
   /** Whether the requested house can be financed without changing any account. */
   public boolean canRaise(Player borrower, ColourStreet street, boolean fullDraw, List<Player> players) {
     return fundingFor(borrower.account().balance().amount(), borrower.id(), street,
