@@ -49166,3 +49166,21 @@ the standing rule. No scenario content changed, so no re-verification of
 still parses (`bb -e` read it back cleanly). Committing and handing the
 decision back to the architect under the same task name,
 `loan-foreclosure-null-winner-desync`.
+
+Sent handoff to architect:
+
+```
+id: 20260825T093440Z_000271_from_specifier
+from: specifier
+to: architect
+priority: 00
+type: git_handoff
+role: specifier
+task: loan-foreclosure-null-winner-desync
+commit: 9c85ad9704
+created_at: 2026-08-25T09:34:40.775196Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 9c85ad9704
+```
