@@ -49786,37 +49786,6 @@ the coder's own diff, not requiring further action). Committing the
 round-trip test addition and handing the verified state to the architect
 under the same task name.
 
-## 2026-08-25T11:39:05Z — refactorer sent effective-tax-burden-per-player handoff to architect
-
-Handoff message sent:
-
-```
-id: 20260825T113905Z_000205_from_refactorer
-from: refactorer
-to: architect
-priority: 50
-type: git_handoff
-role: refactorer
-task: effective-tax-burden-per-player
-commit: 71ef467812
-created_at: 2026-08-25T11:39:05.449310Z
-
-Re-read your role and constitution.
-
-merge_and_process refactorer 71ef467812
-```
-
-Reports from commit `71ef467812`: verified the per-player income/tax
-tracking and derived burden figure, including hand-tracing the fragile
-landlord-name parsing for both report line shapes and confirming the
-domain-level `Report.line` change is safe (substring-match acceptance
-harness). Noted (not a defect - already fixed as a side effect of this
-work) that a real pre-existing rent/rent-relief double-counting bug in
-config11-13's baselines is now corrected. `mvn test`, acceptance
-(933/933), and the characterization suite (three separate runs) all
-green. Added explicit JSON round-trip coverage for the new fields.
-Requesting architect closure.
-
 ## 2026-08-25T13:35:00Z — specifier syncs after effective-tax-burden-per-player
 
 Merged architect handoff `000436` (commit `b52370f2f4`, "Certify
@@ -50195,3 +50164,45 @@ project-local Maven repo, only surfaces when building the cli module
 without `-am`) - documented for future sessions in the prior logbook
 entry. `mvn test`, characterization-tests (18/18), and full acceptance
 (933/933) all green. Requesting architect review.
+
+Sent handoff to coder:
+
+```
+id: 20260825T123542Z_000275_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: rent-relief-starvation-tracking
+commit: 4ab9bea52c
+created_at: 2026-08-25T12:35:42.460076Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 4ab9bea52c
+```
+
+## 2026-08-25T14:10:00Z — specified age-at-event stats for relief received/starved
+
+User asked how an age/timing dimension could be added to relief
+starvation and whether the logs already carry enough to compute it.
+Confirmed rather than assumed: `Game.takeTurn` (`Game.java:408-413`)
+unconditionally logs a `TurnStarted` line with the mover's current age
+before that turn's landings (rent, relief) resolve, for every player,
+every turn - no new production log line needed. Since rent is only ever
+paid as a result of the current mover's own landing, the tenant in any
+`RentPaid`/`RentReliefPaid` pair is always the same player whose
+`TurnStarted` line was the most recent one before it - the same
+"last line wins" attribution already used for MegaCorp tax, just keyed
+on age instead of payer.
+
+Specified an age-at-event `Stats` block (min/max/mean/median, the
+existing shape) for both relief received and relief starved, not just
+one - deliberately comparative, since the point is testing whether
+starved events cluster at an older mean age than received ones (evidence
+the funding gap between flat labour tax and inflating rent widens over a
+game's course), not just reporting a single "when does this happen"
+number in isolation. Updated the README sync check's bullet list.
+Committing and handing off to coder under a new task name,
+`relief-event-age-stats`.
