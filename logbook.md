@@ -50689,3 +50689,16 @@ elsewhere, silently dropping it from the reported total.
 cleanly - that pair composes correctly today.
 
 Committed as `da85cd9` and handed off to the coder.
+
+## 2026-08-25T23:17:00Z — completed unified income tax follow-up
+
+Processed specifier handoff `50_20260825T211127Z_000278_from_specifier_to_coder.handoff`
+at commit `5eac99b545`. Added unified-income-tax enabled and payment journal
+entries, report rendering, and acceptance claims for journal, log, report,
+and CLI observability. Preserved the independent war-tax ledger in the
+acceptance harness when checking the combined government balance.
+
+Verification: unified-income-tax property tests pass and the full generated
+acceptance pipeline passes all 952 tests. Committed as `3339da7` and
+handing off to refactorer via
+`.swarmforge/handoffs/outbox/50_20260825T211627Z_000282_from_coder_to_refactorer.handoff`.
