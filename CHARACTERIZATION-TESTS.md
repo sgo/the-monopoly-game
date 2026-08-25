@@ -235,6 +235,26 @@ always-empty fields:
   entity-landlord relief is invisible to log-parsing entirely, not just
   to this new field — a pre-existing gap in observability, not something
   newly introduced by attributing the player-landlord case correctly.
+  Also relief starved: count and total $ shortfall, plus games with at
+  least one starved event, broken down by pawn (the tenant left exposed)
+  the same way relief received is. `RentRelief.reliefFor` is a hard
+  cliff, not a graceful reduction: `government.balance().covers(difference)
+  ? difference : Money.ZERO` — if the government's *current* balance
+  can't cover a bill's entire excess over the $200 cap, relief doesn't
+  partially apply, it doesn't apply at all, and the tenant pays the full
+  nominal rent with no cushion. This is invisible in the existing relief
+  fields (a starved payment just looks like an ordinary large rent
+  payment) but detectable from the same two-line adjacency: any
+  `RentPaid` line paying more than $200, in a config with relief active,
+  that is *not* immediately followed by a `RentReliefPaid` line is a
+  starved event — relief would have fired for that bill in a no-relief
+  config too (the amount and mechanics are identical either way), so the
+  distinguishing signal is genuinely just "relief is on for this config,
+  and this specific over-cap bill got no relief line." The $ shortfall is
+  `tenant paid - $200`, the exposure relief was supposed to prevent.
+  Same player-owned-landlord scope as relief received, for the same
+  reason (no distinguishable line exists for the entity path to check
+  adjacency against in the first place).
 - `--optional-war-profits-tax`: tax payments (count, total $), payer
   breakdown by pawn — plus final government-account balance as a
   min/max/mean/median `Stats` block, the same shape `ageAtEnd` already
@@ -353,9 +373,9 @@ every data point shown for a config matches that config's fixture:
   acquisitions, mortgage count, income composition (both the aggregate
   total and the per-pawn breakdown), and — for whichever configs have
   them — loan origination/servicing, entity, peer-trade, war-profits-tax,
-  and rent-relief figures (including relief received by pawn), plus
-  effective tax burden by pawn and net fiscal position by pawn for any
-  config where those figures apply.
+  and rent-relief figures (including relief received and relief starved
+  by pawn), plus effective tax burden by pawn and net fiscal position by
+  pawn for any config where those figures apply.
 
 Only the factual data points are checked, not the hand-written analytical
 asides (e.g. the `eight_greedo` income-scale comment, the "350 total =
