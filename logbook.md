@@ -48817,3 +48817,42 @@ observable financial outcome. Route all four to specifier for a behavior
 decision: add necessary observable assertions or register only genuinely
 indistinguishable mutations as equivalences. Do not phase-close until the
 survivor report is empty.
+
+## 2026-08-25T10:40:00Z — closed the four share-sale dissolution survivors
+
+Merged architect handoff `000430` (commit `949ab450a2`) after resolving an
+append-only `logbook.md` conflict (both parents' entries kept in full).
+That merge brought in the coder's full fix (`Bankruptcy.liquidateEntity`
+now settles every outstanding entity loan position from treasury or
+foreclosure *before* `deeds.dissolve` runs), independent re-verification
+(seeds 0-99 clean, no crash), and the architect's own mutation run that
+found these four survivors.
+
+All four trace to one root cause: neither `share-sale-24` nor `share-sale-25`
+asserted `dog`'s own final cash balance, so a mutated input that only
+changes how much surplus or shortfall dog ends up covering — without
+changing which streets he owns, whether the loan gets repaid, or
+bankruptcy status — went unobserved. Not equivalent mutations; a genuine
+assertion gap. Derived the real values by hand (luxury tax $100; land
+mortgage values from `Street.java`: Rue de Diekirch Arlon/Bruul Mechelen
+$70, Place Verte Verviers $80) then verified empirically with a
+deliberately-wrong placeholder first, per usual practice: `share-sale-24`
+(foreclosure covers only $25 of the $40 loan, no surplus to dog; dog
+raises his $60 tax shortfall by mortgaging Bruul Mechelen for $70) ends at
+$10; `share-sale-25` (entity treasury fully covers the $40 loan with $60
+swept to dog, exactly matching the $100 tax) ends at $0. Both matched the
+hand derivation exactly on the first empirical run. Added
+`pawn "dog"'s final balance is $<dog_ending>` (reusing `share-sale-6`'s
+exact existing step text verbatim - no new glue code) to both scenarios.
+
+Verified: `bb gherkin-parser` clean; `bb gherkin-ir-dry-checker` shows the
+same finding count and classes as before this change (89 findings, all
+already-established near-duplicate/synonym/placeholder-variant reuse -
+`unique_steps` stayed at 82, confirming zero new step vocabulary was
+introduced). `./acceptance/run-acceptance.sh`: 932/932, fully green.
+
+Did not hand-edit `acceptance/mutation-survivors-en-rules-greedo-share-sale-feature.md`
+per the standing rule against touching mutation manifests by hand; it will
+refresh on the architect's next Gherkin mutation run and should come back
+empty for these four. Committing and handing the verified state back to
+the architect under the same task name, `entity-dev-loan-dissolution-desync`.
