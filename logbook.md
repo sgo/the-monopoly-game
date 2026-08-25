@@ -48201,3 +48201,55 @@ public API and observable gameplay unchanged). Ran
 `mvn test -Pcharacterization-tests` per the phase-complete sync rule:
 green (`CharacterizationTest` 12/12, 422/422 domain tests). No drift.
 Pure refactor, no Gherkin involved; no further specifier action needed.
+
+## 2026-08-25T02:15:00Z — dev-loans + legal-entity foreclosure defect found while scoping rent-relief configs
+
+While scoping new characterization configs with the user (all rent relief
+on: an all-Greedo config adding legal-entity trading + development loans,
+a war-profits-tax variant of it, and an asset-rich-billionaire variant of
+that), an ad-hoc 50-seed run of the first candidate (8 Greedo,
+`--optional-greedo-stalemate-trading --optional-greedo-legal-entity
+--optional-development-loans --optional-rent-relief`, `--max-years=2500`)
+crashed outright on seed 6:
+
+```
+Simulation failed: Yellow Realty does not own GroteMarktHasselt.
+```
+
+Reproduced directly against `Game` (bypassing the CLI's
+exception-flattening wrapper, which normally discards the stack trace) to
+get the full picture:
+
+```
+java.lang.IllegalStateException: Yellow Realty does not own GroteMarktHasselt.
+	at the.monopoly.game.rules.Deeds.verifyEntityOwner(Deeds.java:319)
+	at the.monopoly.game.rules.Deeds.sellHouse(Deeds.java:269)
+	at the.monopoly.game.rules.DevelopmentLoanBook.forecloseEntity(DevelopmentLoanBook.java:246)
+	at the.monopoly.game.LegalEntities.serviceEntityDevelopmentLoan(LegalEntities.java:174)
+	at the.monopoly.game.LegalEntities.operateLegalEntities(LegalEntities.java:153)
+	at the.monopoly.game.Game.completeRound(Game.java:332)
+```
+
+This exact combination (legal-entity trading + development loans, with no
+billionaire in the mix) has never been exercised together in the existing
+characterization suite before — config 9 combines both flags but always
+with an asset-rich billionaire present, which may simply never hit this
+path. Root cause, confirmed by reading the source (not just a hypothesis):
+`Bankruptcy.liquidateEntity` (`Bankruptcy.java:101-105`) — reached when a
+distressed player holds shares in an entity with exactly one distinct
+shareholder (themself) — calls `entity.liquidateTo(debtor)` then
+`Deeds.dissolve(entity, debtor)` (`Deeds.java:51-57`), which transfers
+every one of the entity's streets to that player unconditionally. Neither
+step checks `DevelopmentLoanBook` for outstanding positions where
+`position.entity()` is the dissolving entity. Any such position survives
+the dissolution untouched: it still names the now-dissolved entity as
+borrower, with `collateral` pointing at land a specific player now owns
+individually. The next time that position comes up for servicing,
+`forecloseEntity` tries to act on land the entity no longer holds, and
+`Deeds.verifyEntityOwner` correctly rejects it — the crash is the symptom,
+the missing reconciliation at dissolution is the defect.
+
+Routing to coder now, before touching `CHARACTERIZATION-TESTS.md` for the
+new configs, per user direction — those configs (all needing legal-entity
++ development-loans + rent-relief together) can't be adopted while a
+legitimate seed just crashes the simulator outright.
