@@ -48620,3 +48620,30 @@ Merged architect commit `3e3971f7e9` and replaced the finite JetCheck mask
 generator with deterministic exhaustive iteration over all eight pink-street
 subsets. The full property profile now passes, regular domain tests pass, and
 the acceptance pipeline passes 930/930.
+
+## 2026-08-25T09:55:00Z — acceptance criteria for entity-dev-loan-dissolution-desync
+
+Specifier handoff `000268` adds two acceptance scenarios for dissolution with
+an outstanding development loan: collateral must be foreclosed first when
+entity cash cannot cover the loan, with any shortfall absorbed by the bank's
+reserve; when entity cash covers it, the loan is repaid and streets transfer
+normally. The scenarios were verified red for the intended dissolution
+desynchronization before implementation.
+
+Sent handoff to coder:
+
+```
+id: 20260825T072051Z_000267_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: entity-dev-loan-dissolution-desync
+commit: 8fa77c1e51
+created_at: 2026-08-25T07:20:51.805827Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 8fa77c1e51
+```
