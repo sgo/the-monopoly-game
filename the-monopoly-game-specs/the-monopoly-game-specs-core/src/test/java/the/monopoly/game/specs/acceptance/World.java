@@ -21,6 +21,7 @@ import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
 import the.monopoly.game.rules.LegalEntity;
 import the.monopoly.game.rules.MegacorpSalaryTax;
+import the.monopoly.game.rules.UnifiedIncomeTaxBook;
 import the.monopoly.game.rules.MonopolyBuyout;
 import the.monopoly.game.rules.RentRelief;
 import the.monopoly.game.rules.Rule;
@@ -117,8 +118,10 @@ public class World {
   private boolean simulatorFullDrawDevelopmentLoans;
   private boolean simulatorWarProfitsTax;
   private boolean simulatorRentRelief;
+  private boolean simulatorUnifiedIncomeTax;
   private boolean namedEntityFormed;
   private boolean warProfitsTaxEnabled;
+  private boolean unifiedIncomeTaxEnabled;
   private final Map<String, Money> pawnLandWorthRent = new HashMap<>();
   private final Map<String, Money> pawnCollectedRent = new HashMap<>();
   private final Map<String, Money> lastWarProfitsTaxPaid = new HashMap<>();
@@ -126,6 +129,7 @@ public class World {
   private Money governmentBalance = Money.ZERO;
   private RentRelief rentRelief;
   private MegacorpSalaryTax megacorpSalaryTax;
+  private UnifiedIncomeTaxBook unifiedIncomeTaxBook;
   private int gameMaxYears = -1;
   private int simulatorMaxYears = -1;
   private Entry selectedEvent;
@@ -145,6 +149,8 @@ public class World {
     developmentLoanBook = null;
     rentRelief = null;
     megacorpSalaryTax = null;
+    unifiedIncomeTaxBook = null;
+    unifiedIncomeTaxEnabled = false;
     jail = new Jail(ruleSet);
   }
 
@@ -267,6 +273,7 @@ public class World {
       }
       case "--optional-war-profits-tax" -> simulatorWarProfitsTax = true;
       case "--optional-rent-relief" -> simulatorRentRelief = true;
+      case "--optional-unified-income-tax" -> simulatorUnifiedIncomeTax = true;
       default -> throw new AssertionError("Unknown simulator argument: " + argument);
     }
   }
@@ -275,7 +282,7 @@ public class World {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
     simulatorResult = Simulator.run(simulatorPlayers, simulatorStrategies, false, false,
         simulatorDevelopmentLoans, simulatorFullDrawDevelopmentLoans, simulatorMaxYears, null, simulatorWarProfitsTax,
-        simulatorRentRelief);
+        simulatorRentRelief, simulatorUnifiedIncomeTax);
   }
 
   public Simulator.Result simulatorResult() {
@@ -293,7 +300,7 @@ public class World {
     if (simulatorPlayers == null) throw new AssertionError("The simulator has not been configured.");
     runningSimulator = Simulator.start(simulatorPlayers, simulatorStrategies, simulatorStalemateTrading,
         simulatorLegalEntityTrading, simulatorDevelopmentLoans, simulatorFullDrawDevelopmentLoans,
-        simulatorMaxYears, null, simulatorWarProfitsTax, simulatorRentRelief);
+        simulatorMaxYears, null, simulatorWarProfitsTax, simulatorRentRelief, simulatorUnifiedIncomeTax);
   }
 
   public void stopSimulator() {
@@ -358,6 +365,7 @@ public class World {
     simulatorFullDrawDevelopmentLoans = arguments.contains("--optional-development-loans-full-draw");
     simulatorWarProfitsTax = arguments.contains("--optional-war-profits-tax");
     simulatorRentRelief = arguments.contains("--optional-rent-relief");
+    simulatorUnifiedIncomeTax = arguments.contains("--optional-unified-income-tax");
     simulatorMaxYears = -1;
     for (String argument : arguments) {
       if (argument.startsWith("--max-years=")) {
@@ -511,12 +519,13 @@ public class World {
         gameMaxYears,
         developmentLoanBook(),
         warProfitsTaxEnabled,
-        rentRelief == null ? null : rentRelief
+        rentRelief,
+        unifiedIncomeTaxBook != null
     );
     Game.Result result = play.apply(game);
     turnOrder = result.turnOrder();
     journal = result.journal();
-    if (warProfitsTaxEnabled && !governmentBalance.equals(Money.ZERO))
+    if ((warProfitsTaxEnabled || unifiedIncomeTaxBook != null) && !governmentBalance.equals(Money.ZERO))
       record(new Entry.GovernmentBalance(governmentBalance));
     deeds = result.deeds();
   }
@@ -851,6 +860,16 @@ public class World {
     pawnCollectedRent.put(pawnName, value);
   }
 
+  public void setCollectedRentSinceUnifiedAssessment(String pawnName, Money value) {
+    if (unifiedIncomeTaxBook == null) enableUnifiedIncomeTax();
+    unifiedIncomeTaxBook.accumulate(pawn(pawnName), value);
+  }
+
+  public void enableUnifiedIncomeTax() {
+    unifiedIncomeTaxEnabled = true;
+    unifiedIncomeTaxBook = new UnifiedIncomeTaxBook(ruleSet.bank());
+  }
+
   public void enableRentRelief() {
     rentRelief = new RentRelief(ruleSet.bank());
     megacorpSalaryTax = new MegacorpSalaryTax(ruleSet.bank());
@@ -862,9 +881,17 @@ public class World {
   }
 
   public void collectSalary(String pawnName, Money salary) {
-    if (megacorpSalaryTax == null) enableRentRelief();
-    Money tax = megacorpSalaryTax.collect(pawn(pawnName), salary);
-    lastMegacorpTaxPaid.put(pawnName, tax);
+    if (megacorpSalaryTax != null) {
+      Money tax = megacorpSalaryTax.collect(pawn(pawnName), salary);
+      lastMegacorpTaxPaid.put(pawnName, tax);
+    } else if (unifiedIncomeTaxEnabled) {
+      pawn(pawnName).account().deposit(salary);
+    } else {
+      enableRentRelief();
+      Money tax = megacorpSalaryTax.collect(pawn(pawnName), salary);
+      lastMegacorpTaxPaid.put(pawnName, tax);
+    }
+    if (unifiedIncomeTaxEnabled) unifiedIncomeTaxBook.assess(pawn(pawnName), salary);
   }
 
   public boolean paysMegacorpTax(Money amount) {
@@ -877,7 +904,9 @@ public class World {
   }
 
   public Money governmentAccountBalance() {
-    return rentRelief == null ? governmentBalance : rentRelief.governmentBalance();
+    if (rentRelief != null) return rentRelief.governmentBalance();
+    if (unifiedIncomeTaxBook != null) return unifiedIncomeTaxBook.governmentBalance();
+    return governmentBalance;
   }
 
   public boolean paysWarProfitsTax(String pawnName, Money amount) {

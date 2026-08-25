@@ -24,6 +24,7 @@ import the.monopoly.game.rules.Stalemate;
 import the.monopoly.game.rules.Taxes;
 import the.monopoly.game.rules.WarProfitsTax;
 import the.monopoly.game.rules.WarProfitsTaxBook;
+import the.monopoly.game.rules.UnifiedIncomeTaxBook;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
 
@@ -64,9 +65,11 @@ public class Game {
   private final DevelopmentLoanBook developmentLoanBook;
   private final boolean warProfitsTax;
   private final boolean rentRelief;
+  private final boolean unifiedIncomeTax;
   private the.monopoly.game.rules.RentRelief rentReliefBook;
   private MegacorpSalaryTax megacorpSalaryTax;
   private final WarProfitsTaxBook warProfitsTaxBook;
+  private final UnifiedIncomeTaxBook unifiedIncomeTaxBook;
   private final LegalEntities legalEntities;
   private final int maxYears;
   private boolean automaticMarketDeadlock = true;
@@ -166,6 +169,18 @@ public class Game {
       boolean developmentLoans, boolean fullDrawDevelopmentLoans, int maxYears,
       DevelopmentLoanBook developmentLoanBook, boolean warProfitsTax, boolean rentRelief
   ) {
+    this(rules, players, cups, strategies, deeds, decks, jail, stalemateTrading, legalEntityTrading,
+        developmentLoans, fullDrawDevelopmentLoans, maxYears, developmentLoanBook, warProfitsTax,
+        rentRelief, false);
+  }
+
+  public Game(
+      Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
+      Cards.Decks decks, Jail jail, boolean stalemateTrading, boolean legalEntityTrading,
+      boolean developmentLoans, boolean fullDrawDevelopmentLoans, int maxYears,
+      DevelopmentLoanBook developmentLoanBook, boolean warProfitsTax, boolean rentRelief,
+      boolean unifiedIncomeTax
+  ) {
     this.rules = rules;
     this.players = players;
     this.cups = cups;
@@ -180,15 +195,31 @@ public class Game {
     this.developmentLoanBook = developmentLoanBook == null ? new DevelopmentLoanBook(rules.bank()) : developmentLoanBook;
     this.warProfitsTax = warProfitsTax;
     this.rentRelief = rentRelief;
+    this.unifiedIncomeTax = unifiedIncomeTax;
     this.rentReliefBook = rentRelief ? new the.monopoly.game.rules.RentRelief(rules.bank()) : null;
     this.megacorpSalaryTax = rentReliefBook == null ? null
         : new MegacorpSalaryTax(rentReliefBook.government());
     this.warProfitsTaxBook = new WarProfitsTaxBook(rules.bank(), WarProfitsTax.boardValue(rules));
+    this.unifiedIncomeTaxBook = unifiedIncomeTax ? new UnifiedIncomeTaxBook(rules.bank()) : null;
     this.legalEntities = new LegalEntities(rules, deeds, players, strategies, this.developmentLoanBook,
         stalemateTrading, legalEntityTrading);
     this.maxYears = maxYears;
     applyOpeningCapital();
     applyAssetRichOpening();
+  }
+
+  public Game(
+      Rule.Set rules, List<Player> players, Cups cups, Strategy.OfPlayers strategies, Deeds deeds,
+      Cards.Decks decks, Jail jail, boolean stalemateTrading, boolean legalEntityTrading,
+      boolean developmentLoans, boolean fullDrawDevelopmentLoans, int maxYears,
+      DevelopmentLoanBook developmentLoanBook, boolean warProfitsTax,
+      the.monopoly.game.rules.RentRelief rentReliefBook, boolean unifiedIncomeTax
+  ) {
+    this(rules, players, cups, strategies, deeds, decks, jail, stalemateTrading, legalEntityTrading,
+        developmentLoans, fullDrawDevelopmentLoans, maxYears, developmentLoanBook, warProfitsTax,
+        rentReliefBook != null, unifiedIncomeTax);
+    this.rentReliefBook = rentReliefBook;
+    this.megacorpSalaryTax = rentReliefBook == null ? null : new MegacorpSalaryTax(rentReliefBook.government());
   }
 
   private static boolean anyStrategyEnablesDevelopmentLoans(List<Player> players, Strategy.OfPlayers strategies) {
@@ -274,7 +305,7 @@ public class Game {
     Map<Player.ID, Integer> ages = new HashMap<>();
     Journalling journalling = new Journalling(journal, ages, deeds, developmentLoanBook,
         rules, players, strategies, warProfitsTaxBook, warProfitsTax,
-        rentReliefBook, megacorpSalaryTax);
+        rentReliefBook, megacorpSalaryTax, unifiedIncomeTaxBook);
     journal.log(new Journal.Entry.Start(ids(players)));
     deeds.legalEntities().forEach(journalling::entityFormed);
     journalling.stalemateTrading(stalemateTrading);
@@ -294,8 +325,7 @@ public class Game {
     players.stream().filter(player -> strategies.forPlayer(player).assetRichOpening())
         .forEach(building::develop);
 
-    Money governmentBalance = rentReliefBook == null ? warProfitsTaxBook.governmentBalance()
-        : rentReliefBook.governmentBalance();
+    Money governmentBalance = governmentBalance();
     if (!governmentBalance.equals(Money.ZERO)
         && journal.entries().stream().noneMatch(entry -> entry instanceof Journal.Entry.GovernmentBalance))
       journal.log(new Journal.Entry.GovernmentBalance(governmentBalance));
@@ -376,9 +406,14 @@ public class Game {
       journal.log(new Journal.Entry.FinalBalance(it.id(), it.account().balance().amount()));
       journal.log(new Journal.Entry.FinalAge(it.id(), journalling.age(it)));
     });
-    Money governmentBalance = rentReliefBook == null ? warProfitsTaxBook.governmentBalance()
-        : rentReliefBook.governmentBalance();
+    Money governmentBalance = governmentBalance();
     if (!governmentBalance.equals(Money.ZERO)) journal.log(new Journal.Entry.GovernmentBalance(governmentBalance));
+  }
+
+  private Money governmentBalance() {
+    if (rentReliefBook != null) return rentReliefBook.governmentBalance();
+    if (unifiedIncomeTaxBook != null) return unifiedIncomeTaxBook.governmentBalance();
+    return warProfitsTaxBook.governmentBalance();
   }
 
   private boolean isPlayerStillSolvent(Player player) {

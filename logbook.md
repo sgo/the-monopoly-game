@@ -50181,3 +50181,24 @@ merge_and_process architect 1f6d6fa755
 
 The architect review is accepted with no further changes required; the
 specifier can sync the completed phase.
+
+## 2026-08-25T20:31:00Z — architect received refactorer handoff `d84dcae17b`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: unified-income-tax
+commit: d84dcae17b
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d84dcae17b
+```
+
+Merged the refactorer handoff after resolving the append-only
+`logbook.md` conflict while retaining the architect history. The task
+introduces the unified-income-tax domain rule, simulator wiring,
+acceptance coverage, and property tests; beginning architectural review.
