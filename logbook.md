@@ -49271,3 +49271,112 @@ this.
 Did not touch `CharacterizationConfig.java`, baseline fixtures, or
 README.md sync - that's coder's implementation. Committing the spec
 update and handing off under a new task name, `rent-relief-configs-11-13`.
+
+## 2026-08-25T10:16:32Z — refactorer processes coder handoff `b88d3e37a1` (rent-relief-configs-11-13): configs 11/13 verified, config12's baseline is genuinely unreliable
+
+Handoff message received:
+
+```
+id: 20260825T095646Z_000274_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: rent-relief-configs-11-13
+commit: b88d3e37a1
+
+Re-read your role and constitution.
+
+merge_and_process coder b88d3e37a1
+```
+
+Non-fast-forward merge from `5fd0943`. Resolved an append-only `logbook.md`
+conflict (both parents' entries kept in full). Brought in the closing of
+`loan-foreclosure-null-winner-desync` (two mutation survivors classified
+equivalent, architect's final mutation certification, specifier's
+phase-complete sync) and the specifier's staging of the three new
+characterization configs, approved by the user: 11 (all-Greedo,
+stalemate-trading + legal-entity + development-loans + rent-relief), 12
+(11 plus war-profits-tax), 13 (12 with one Greedo replaced by an
+asset-rich Billionaire). This commit adds the enum entries, baseline
+fixture JSONs, and README stats.
+
+The diff also includes an unexplained, undocumented change to
+`CharacterizationTest.characterization`: `workers` changed from
+`Math.max(1, Runtime.getRuntime().availableProcessors())` to a hardcoded
+`1`, with a comment claiming "Simulator runs share process-wide strategy/
+game support, so concurrent seeded games can influence one another." This
+affects *every* characterization config, not just the three new ones, and
+appears nowhere in the logbook chain leading up to this commit - it reads
+like an undiscussed change bundled into an otherwise-unrelated task.
+
+Investigated rather than accepting or reverting on inspection alone,
+since the claim is plausible but the cost (serializing the entire
+characterization suite, now 15 configs x 50 seeds) is real:
+- Grepped the whole domain/cli source for non-final `static` fields: none
+  exist. No `ThreadLocal`/`synchronized`/`volatile`/`AtomicInteger` in
+  production code except `Dice`'s documented per-instance `ThreadLocal
+  <Random>` fallback (only reached when no seed is supplied - every
+  characterization run passes one) and `Simulator.Running`'s own
+  per-instance `volatile Result`. No evidence of shared mutable state.
+- Reverted the change and stress-tested the specific claim directly: 150
+  concurrent-vs-isolated comparisons (3 trials x 50 seeds, 8 threads)
+  against config13 (the new config believed most likely to expose it - a
+  billionaire plus every other flag), zero divergence. Concluded the
+  change was unjustified and reverted it.
+- **That conclusion was wrong.** Running the actual full characterization
+  suite (`mvn test -Pcharacterization-tests`, all 15 configs) with the
+  revert in place failed - but on config12 specifically
+  (`eight_greedo_stalemate_entity_loans_rent_relief_war_profits_tax`, not
+  config13), with a real, non-cosmetic mismatch: `outcomes` 32/18 became
+  33/17, auctions 103->109, several bankruptcy/income figures shifted.
+  Restored the coder's `workers=1` exactly as written.
+- **Then found the restored fix doesn't fix anything either.** Reran the
+  full suite twice more with `workers=1` in place: config12 failed *both
+  times*, against the *same* checked-in baseline, with *three different*
+  wrong "but was" values across the three total attempts (outcomes
+  32/18 matching by coincidence on one attempt, but auctions/bankruptcy/
+  income figures differing every time). Serial execution is not immune -
+  the divergence isn't a concurrency artifact at all.
+- Isolated further: every one of config12's 50 seeds, run twice
+  consecutively within one JVM (single-threaded, no `ExecutorService`
+  involved), produces byte-identical output both times - confirmed for
+  all 50 seeds, not just a sample. So determinism holds *within* a JVM
+  process. It's separate `mvn test -Pcharacterization-tests` invocations
+  (separate JVMs) that disagree with each other and with the baseline.
+  That specific signature - stable within one JVM run, unstable across
+  JVM runs, only surfacing in long-running games - points at identity-
+  hashcode-dependent `HashMap`/`HashSet` iteration order (identity hashes
+  are stable for an object's lifetime but differ between JVM invocations
+  due to heap-layout differences). Confirmed `LegalEntity` is a plain
+  class with no `equals`/`hashCode` override (default, identity-based),
+  and is the element type of `Deeds.formedEntities`, a `HashSet<LegalEntity>`
+  added during `entity-dev-loan-dissolution-desync`. Did not chase the
+  exact code path further (real investigative work beyond a verification
+  pass) - config12 is by far the longest-running, most stalemate-heavy of
+  the three new configs (36% stalemate, mean age 153yr, max 1730yr per
+  the README stats just added), which fits a rare tie-break/ordering
+  divergence that needs many rounds to compound into a visible aggregate
+  difference; config11 (shorter, 4% stalemate) and config13 (also long
+  and stalemate-heavy, but passed cleanly in all three attempts) didn't
+  trigger it, consistent with a rare, condition-dependent divergence
+  rather than a certainty.
+
+This is a genuine, newly-surfaced defect, most likely pre-existing (not
+introduced by this task's actual diff, which only adds enum entries and
+fixtures) - not something `workers=1` fixes, papers over, or was ever
+capable of fixing, since the divergence isn't about concurrency. `mvn
+test`, the full acceptance suite, and the property-test profile are all
+unaffected and green - this is specific to config12's long-running
+characterization baseline. Not proposing an implementation; this needs
+real investigation to find the exact non-deterministic collection, which
+is coder/specifier territory, not mine.
+
+Leaving `workers = 1` in place exactly as the coder wrote it (it is at
+minimum harmless, and I have no evidence it's wrong even if I now know it
+isn't sufficient either) and not touching `CharacterizationConfig.java`,
+the new baseline fixtures, or README.md - those are correct as far as I
+can tell for configs 11 and 13. Handing the still-partially-red state to
+the architect under the same task name, flagging config12's baseline
+specifically.
