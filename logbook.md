@@ -49521,3 +49521,32 @@ invocations (three serial, three parallel), the characterization suite's
 parallel execution is restored (faster, and now safe), and one more live
 instance of the same defect class is closed. Committing and handing the
 verified state to the architect under the same task name.
+
+## 2026-08-25T10:49:46Z — refactorer sent rent-relief-configs-11-13 handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T104946Z_000204_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: rent-relief-configs-11-13
+commit: e376e555e5
+created_at: 2026-08-25T10:49:46.341921Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer e376e555e5
+```
+
+Reports from commit `e376e555e5`: config12's determinism defect is fixed
+and independently confirmed across six separate JVM invocations (three
+serial, three parallel) of the full characterization suite - all clean.
+Restored parallel execution (~4x faster) since the real fix makes it
+safe. Found and fixed one more live instance of the same defect class
+(`sellGetOutOfJailFreeCard`'s unordered `findFirst()` over an enum-keyed
+map), with a directed test proving determinism. `mvn test`, acceptance,
+and property-tests all green. Requesting architect closure.
