@@ -35,6 +35,9 @@ fixtures by the same test suite (see `README sync check` in
 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich | 100% win (50) | 1 / 4 / 4.12 / 10 |
 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich + dev-loans | 100% win (50) | 1 / 4 / 4.0 / 12 |
 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich + war-profits-tax | 74% win (37), 26% stalemate (13) | 0 / 17 / 81.62 / 454 |
+| 8 | Greedo | peer-trading + legal-entity + dev-loans + rent relief | 96% win (48), 4% stalemate (2) | 7 / 14 / 28.06 / 170 |
+| 8 | Greedo | peer-trading + legal-entity + dev-loans + rent relief + war-profits-tax | 66% win (33), 34% stalemate (17) | 7 / 68 / 152.28 / 1730 |
+| 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich + dev-loans + rent relief + war-profits-tax | 60% win (30), 40% stalemate (20) | 0 / 57 / 132.66 / 843 |
 
 Full breakdown for any config lives in
 [`the-monopoly-game-cli/src/test/resources/characterization/`](the-monopoly-game-cli/src/test/resources/characterization/).
@@ -51,6 +54,70 @@ Full breakdown for any config lives in
 - Auctions: 138 (11.7% of 1,182 land acquisitions)
 - Mortgages: 661
 - Income: salary \$324,600, rent \$204,992, bank payments \$39,550
+
+</details>
+
+<details>
+<summary>8 players — Greedo — peer-trading + legal-entity + dev-loans + rent relief</summary>
+
+- Outcome: 96% win (48), 4% stalemate (2)
+- Winners: shoe 6, racecar 10, thimble 3, dog 7, high hat 9, ship 7, iron box 2, wheelbarrow 4
+- Age at end: min 7, median 14, mean 28.06, max 170
+- Bankruptcies: racecar 41, iron box 21, the bank 94, thimble 14, dog 32, high hat 52, shoe 26, ship 42, wheelbarrow 26
+- Auctions: 49 (3.2% of 1,551 land acquisitions)
+- Mortgages: 1,006
+- Income: salary \$953,600, rent \$4,501,517, bank payments \$118,855
+- Loans: 478 raised, \$27,157 total, 12 defaults
+  - Borrowers: iron box 42, Green Realty 35, Yellow Realty 49, racecar 39, Pink Realty 52, ship 60, thimble 24, shoe 43, dog 35, high hat 62, wheelbarrow 37
+  - Bondholders: dog 292, high hat 73, iron box 42, racecar 36, shoe 6, thimble 5, ship 12, wheelbarrow 6
+  - Servicing: borrowers paid \$6,744 interest + \$12,279 principal; bondholders received \$3,244 interest + \$12,271 principal
+- Entities: 113 formed, 66 dissolved
+- Peer trades: 6
+
+</details>
+
+<details>
+<summary>8 players — Greedo — peer-trading + legal-entity + dev-loans + rent relief + war-profits-tax</summary>
+
+- Outcome: 66% win (33), 34% stalemate (17)
+- Winners: shoe 5, racecar 8, ship 2, high hat 4, dog 7, thimble 4, wheelbarrow 2, iron box 1
+- Age at end: min 7, median 68, mean 152.28, max 1730
+- Bankruptcies: racecar 31, iron box 19, the bank 115, thimble 14, dog 28, high hat 38, shoe 23, ship 31, wheelbarrow 25
+- Auctions: 109 (6.3% of 1,736 land acquisitions)
+- Mortgages: 741
+- Income: salary \$4,266,200, rent \$11,740,451, bank payments \$518,515
+- Loans: 401 raised, \$24,695 total, 73 defaults
+  - Borrowers: iron box 27, Green Realty 42, Yellow Realty 46, racecar 30, Pink Realty 51, ship 42, thimble 27, shoe 27, high hat 54, dog 34, wheelbarrow 21
+  - Bondholders: dog 242, high hat 62, iron box 30, racecar 19, shoe 5, thimble 5, ship 2
+  - Servicing: borrowers paid \$6,483 interest + \$12,586 principal; bondholders received \$3,005 interest + \$12,070 principal
+- Entities: 115 formed, 44 dissolved
+- Peer trades: 10
+- War-profits tax: 334 payments, \$620,779 total
+- Tax payers: racecar 12, thimble 2, dog 8, high hat 15, wheelbarrow 36, ship 38, iron box 4, shoe 219
+- Government balance: min 2, median 647, mean 12257.92, max 316087
+
+</details>
+
+<details>
+<summary>8 players — 1 Billionaire (asset-rich) + 7 Greedo — peer-trading + legal-entity + asset-rich + dev-loans + rent relief + war-profits-tax</summary>
+
+- Outcome: 60% win (30), 40% stalemate (20)
+- Winners: thimble 2, high hat 5, racecar 8, ship 5, dog 5, iron box 1, shoe 4
+- Age at end: min 0, median 57, mean 132.66, max 843
+- Bankruptcies: dog 141, the bank 90, ship 15, wheelbarrow 6, racecar 18, high hat 18, shoe 13, thimble 2, iron box 6
+- Auctions: 137 (9.8% of 1,400 land acquisitions)
+- Mortgages: 610
+- Income: salary \$4,035,200, rent \$7,644,728, bank payments \$486,435
+- Loans: 310 raised, \$18,243 total, 128 defaults
+  - Borrowers: dog 131, ship 21, racecar 24, Yellow Realty 19, shoe 19, iron box 9, Green Realty 23, Pink Realty 19, thimble 10, high hat 27, wheelbarrow 8
+  - Bondholders: high hat 157, ship 6, wheelbarrow 1, dog 63, racecar 2, iron box 18, shoe 2
+  - Servicing: borrowers paid \$3,401 interest + \$6,986 principal; bondholders received \$1,356 interest + \$5,189 principal
+- Entities: 46 formed, 9 dissolved
+- Peer trades: 4
+- War-profits tax: 1068 payments, \$2,247,817 total
+- Tax payers: dog 45, shoe 416, iron box 64, thimble 1, ship 236, racecar 302, high hat 4
+- Government balance: min 61, median 1834, mean 26783.32, max 271144
+- Survivors at first tax: min 2, median 5, mean 5.177777777777778, max 8
 
 </details>
 
@@ -243,4 +310,3 @@ checkout; set `APS_HOME` or place one at `./tmp/aps`.
   that plays full games across a fixed set of setups and compares the
   outcome against a checked-in baseline, to catch whole-system regressions
   that isolated rule tests can miss.
-

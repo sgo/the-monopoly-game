@@ -9,6 +9,7 @@ import the.monopoly.game.components.streets.Utility;
 
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -107,6 +108,7 @@ public class Deeds {
     return owners.entrySet().stream()
         .filter(it -> it.getValue().equals(player.id()))
         .map(Map.Entry::getKey)
+        .sorted(Comparator.comparingInt(Enum::ordinal))
         .toList();
   }
 
@@ -114,6 +116,7 @@ public class Deeds {
     return entityOwners.entrySet().stream()
         .filter(it -> it.getValue().equals(entity))
         .map(Map.Entry::getKey)
+        .sorted(Comparator.comparingInt(Enum::ordinal))
         .toList();
   }
 
@@ -168,6 +171,10 @@ public class Deeds {
     return retainedCards.containsKey(card);
   }
 
+  boolean holds(RetainedCard card, Player owner) {
+    return owner.id().equals(retainedCards.get(card));
+  }
+
   /** Uses one retained card held by the player, returning whether one was available. */
   public boolean releaseGetOutOfJailFreeCard(Player owner) {
     return retainedCards.entrySet().removeIf(it -> it.getValue().equals(owner.id()));
@@ -177,7 +184,7 @@ public class Deeds {
     RetainedCard card = retainedCards.entrySet().stream()
         .filter(it -> it.getValue().equals(seller.id()))
         .map(Map.Entry::getKey)
-        .findFirst()
+        .min(Comparator.comparingInt(Enum::ordinal))
         .orElseThrow(() -> new IllegalStateException(seller.id().value() + " holds no Get Out of Jail Free card."));
     seller.account().deposit(price);
     buyer.account().withdraw(price);
