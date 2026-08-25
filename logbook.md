@@ -50439,3 +50439,126 @@ new scenarios, no glue code existing yet - with every one of the
 933 pre-existing tests still passing (939 total, 6 new failures, zero
 unexpected). Committing and handing off to coder under a new task name,
 `unified-income-tax`.
+
+## 2026-08-25T20:35:00Z — refactorer processes coder handoff `d8e8f32a0b` (unified-income-tax)
+
+Handoff message received:
+
+```
+id: 20260825T201842Z_000281_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: unified-income-tax
+commit: d8e8f32a0b
+
+Re-read your role and constitution.
+
+merge_and_process coder d8e8f32a0b
+```
+
+Merged `d8e8f32a0b`. Usual append-only `logbook.md` conflict, both sides
+kept in full. First task in this run with real production changes
+(`Game.java`, `Journalling.java`, the new `UnifiedIncomeTaxBook.java`,
+`Simulator.java`/`SimulatorFlags.java`), not just test-support - so the
+CRAP/DRY/mutation gate actually applies this cycle.
+
+Checked the one place this feature could plausibly be wrong: the
+gross-up math. `UnifiedIncomeTaxBook.assess` treats the salary it's
+given as *net* and grosses it up via `/0.57` before taxing, the exact
+same convention `MegacorpSalaryTax.taxOn` uses. Confirmed against
+`unified-income-tax.feature`'s own worked comments before trusting
+it (not assumed): "$200 net -> $350.88 gross" is spec'd explicitly
+as intentional, independent of whether MegaCorp is even enabled -
+the feature deliberately treats the passing-Start salary as
+conceptually net-of-a-43%-tax regardless of which tax mechanism is
+active. Hand-verified the arithmetic for all three worked examples
+(unified-income-tax-1: $1000.00 combined base at exactly $430.00;
+-2: $150.88 and $301.75 for $200/$400 with no rent) against
+`UnifiedIncomeTaxBook.java`'s actual rounding (`setScale(0,
+HALF_EVEN)` on cents) by hand - all three match exactly.
+
+Checked `Game.governmentBalance()`'s new three-way priority chain
+(`rentReliefBook` / `unifiedIncomeTaxBook` / `warProfitsTaxBook`) for
+redundancy, since all three wrap a `GovernmentAccount` on the same
+shared "government" `Bank.Account.Owner` key when constructed from
+`rules.bank()` - initially looked collapsible to a single unconditional
+read. Not actually redundant: the object-accepting `Game` constructor
+overload (used by `World.java`'s acceptance harness) can be handed an
+*externally* constructed `RentRelief` with its own independently-set
+government balance for testing threshold behavior, which can
+legitimately diverge from the internally-constructed books. Left it
+alone - simplifying would have broken that decoupling.
+
+Noted but not acted on (out of this round's spec scope, not a defect
+in what's actually tested): `World.java`'s harness passes
+`unifiedIncomeTaxBook != null` as a *boolean* into `Game`'s
+constructor rather than the actual `UnifiedIncomeTaxBook` object (unlike
+`rentRelief`, which is passed as the real object) - so a pawn's rent
+pre-seeded via `has collected $X in rent since their last unified
+income tax assessment` would not carry into an actual `game.play()`
+run, only into the isolated (non-played) scenarios that call
+`collectSalary` directly. No current scenario combines "play the game"
+with pre-seeded unified-tax rent (scenario 7, the only played-game
+scenario, deliberately has none), so nothing here is actually broken
+today - flagging only because the two backlogged interaction scenarios
+(unified-income-tax-5/6) may need this fixed when they land.
+
+CRAP (`crap4java`, all five changed/new files): every touched or new
+method at or below CRAP 4.5, including the new
+`UnifiedIncomeTaxBook`'s own methods (CRAP 1.0, 100% coverage each,
+before I added the property test below). Three pre-existing hotspots
+exceed the 6.0 threshold - `Simulator.main` (156.0, grew from the
+last-recorded 20.0 many CLI-flag-additions ago), `Journalling.
+mortgageSpareProperty` (72.0), and `Journalling.serviceDevelopmentLoan`
+(42.0) - all confirmed via diff-hunk boundaries to be completely
+untouched by this commit, and all three already on record across many
+prior cycles (`mortgageSpareProperty` alone appears in at least three
+earlier entries) as long-standing, accepted, unrelated debt. Not
+touching them this round.
+
+`dry4java` (same five files): the large list of flagged duplicates is
+entirely the already-accepted "one thin method per sealed `Entry`
+type" dispatch pattern in `Journalling.java` (e.g. `declinedToBuy`/
+`builtHouse`/`sold`/`saleRefused`, none of which this diff touched) and
+the already-accepted telescoping-constructor-overload pattern in
+`Game.java`/`Simulator.java` (the new `Game` constructor at line 211 is
+0.94-similar to the pre-existing one at line 93, extending the same
+family the four other 0.88-similar constructors already belong to).
+Confirmed none of the flagged pairs include any line this diff actually
+changed. Nothing to de-duplicate.
+
+`mutate4java --scan` on all five files: `Game.java` 87, `Simulator.java`
+96, `Journalling.java` 28, `SimulatorFlags.java` 11,
+`UnifiedIncomeTaxBook.java` 3 - all well under the 100-site split
+threshold.
+
+**Property-test gap, filled.** No property test existed for the new
+`UnifiedIncomeTaxBook`, even though its closest sibling,
+`MegacorpSalaryTax`, already has one (`MegacorpSalaryTaxPropertyTest`)
+covering exactly the kind of invariant this class also has: the
+gross-basis tax percentage, and money conservation. Added
+`UnifiedIncomeTaxBookPropertyTest` (jetCheck, `@Tag("property-test")`,
+matching the existing framework and pattern exactly) with three
+properties the example-based `UnifiedIncomeTaxBookTest` only
+spot-checks at one salary/rent pair: (1) the tax is always 43% of the
+combined gross-salary-plus-rent base within half-cent rounding, swept
+across net salary and rent independently; (2) `assess` always resets
+the rent accumulator to `Money.ZERO` regardless of the salary/rent
+values, not just the one reset case the example test covers; (3)
+repeated assessments conserve money exactly - the government balance
+after two assessments equals the exact sum of both returned tax
+amounts, no drift. All three pass.
+
+Verification (domain reinstalled fresh first): `mvn test` (root
+reactor): green. `mvn test -Pproperty-tests` (domain, includes the new
+property test): green. Full acceptance: 939/939 (the 6 new
+`unified-income-tax` scenarios all pass). `mvn test
+-Pcharacterization-tests` (cli, unaffected by this domain-only feature
+since no characterization config enables the new flag yet): green.
+Committing the new property test and handing the verified state to the
+architect under the same task name.
+
+## 2026-08-25T20:45:00Z — refactorer sent unified-income-tax handoff to architect
