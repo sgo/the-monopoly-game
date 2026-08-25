@@ -48605,3 +48605,18 @@ default uniqueness requirement demands more and raises
 test-harness defect, not an acceptable green gate. Route it to coder: retain
 the exhaustive all-subsets coverage but express it in a reliably executable
 test/property form; return the full property suite green.
+
+## 2026-08-25T08:09:25Z — return reliable property gate to architect
+
+Sent handoff `000271` to architect with commit `bd6cfc3f5a`.
+
+type: git_handoff
+to: architect
+priority: 00
+task: entity-dev-loan-dissolution-desync
+commit: bd6cfc3f5a
+
+Merged architect commit `3e3971f7e9` and replaced the finite JetCheck mask
+generator with deterministic exhaustive iteration over all eight pink-street
+subsets. The full property profile now passes, regular domain tests pass, and
+the acceptance pipeline passes 930/930.
