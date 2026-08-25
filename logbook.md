@@ -48856,3 +48856,21 @@ per the standing rule against touching mutation manifests by hand; it will
 refresh on the architect's next Gherkin mutation run and should come back
 empty for these four. Committing and handing the verified state back to
 the architect under the same task name, `entity-dev-loan-dissolution-desync`.
+
+Sent handoff to architect:
+
+```
+id: 20260825T083823Z_000269_from_specifier
+from: specifier
+to: architect
+priority: 00
+type: git_handoff
+role: specifier
+task: entity-dev-loan-dissolution-desync
+commit: 70bed3d2ed
+created_at: 2026-08-25T08:38:23.556601Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 70bed3d2ed
+```
