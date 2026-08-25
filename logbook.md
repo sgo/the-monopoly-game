@@ -49166,3 +49166,13 @@ the standing rule. No scenario content changed, so no re-verification of
 still parses (`bb -e` read it back cleanly). Committing and handing the
 decision back to the architect under the same task name,
 `loan-foreclosure-null-winner-desync`.
+
+## 2026-08-25T12:00:00Z — certify null-winner foreclosure repair
+
+Architect reran the complete configured Gherkin mutation suite after the
+specifier's two precise equivalence records. No survivor report was
+regenerated. Combined with the previously green 34/34 property profile,
+full acceptance, refactorer's direct seed sweep, and the red-to-green
+`development-loans-18` scenario, this closes
+`loan-foreclosure-null-winner-desync`. Return the completed phase to
+specifier.
