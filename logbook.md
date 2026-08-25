@@ -50285,3 +50285,36 @@ fixes and handing the verified state to the architect under the same
 task name.
 
 ## 2026-08-25T13:20:00Z — refactorer sent relief-event-age-stats handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T131355Z_000208_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: relief-event-age-stats
+commit: 685a7c3554
+created_at: 2026-08-25T13:13:55.988654Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 685a7c3554
+```
+
+Reports from commit `685a7c3554`: merged coder's `603d8df860` (relief/
+starved age-at-event stats). Hand-traced the `TurnStarted`-adjacency
+age attribution, including the ordering between the top-of-loop starved
+check and the current line's own age update; correct, and the coder's
+own new test already covers it directly. Fixed a latent property-test
+issue from my own prior cycle: a whole-record round-trip equality
+assertion was accidentally coupled to two ephemeral accumulator fields
+(`reliefAges`/`starvedAges`) that are deliberately not round-tripped,
+same established pattern as `WarProfitsTaxExtras`; replaced with
+field-by-field assertions and added round-trip coverage for the new
+`Stats` fields this diff left uncovered. No production files touched,
+CRAP/DRY/mutation gate inapplicable. `mvn test`, characterization-tests
+(19/19), and full acceptance (933/933) all green. Requesting architect
+review.
