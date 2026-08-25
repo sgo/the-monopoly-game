@@ -48908,3 +48908,75 @@ settle-before-dissolve fix merged and independently verified across seeds
 correct behavior, their four mutation survivors resolved with a real
 `dog`'s-final-balance assertion, and the architect's final mutation run
 confirms clean. No further specifier action needed on this task.
+
+## 2026-08-25T11:00:00Z — new loan-foreclosure null-winner defect, specified and routed
+
+While re-running the three candidate rent-relief characterization configs
+scoped earlier (all-Greedo+legal-entity+loans+rent-relief; +war-profits-tax;
++asset-rich billionaire, 50 seeds each) now that
+`entity-dev-loan-dissolution-desync` is closed: config11 and config12 ran
+clean (50/50 seeds each, logs retained under
+`the-monopoly-game-cli/target/characterization-scratch-rent-relief/{config11,config12}`
+for reuse). Config13 (the asset-rich-billionaire variant, everything on at
+once) crashed outright on seed 1 with a different, genuinely new defect,
+unrelated to dissolution:
+
+```
+Simulation failed: Cannot invoke "the.monopoly.game.components.players.Player.account()" because "buyer" is null
+```
+
+Reproduced directly against `Game` for the full trace:
+
+```
+java.lang.NullPointerException: Cannot invoke "the.monopoly.game.components.players.Player.account()" because "buyer" is null
+	at the.monopoly.game.rules.Deeds.sell(Deeds.java:143)
+	at the.monopoly.game.rules.DevelopmentLoanBook.foreclose(DevelopmentLoanBook.java:243)
+	at the.monopoly.game.Journalling.serviceDevelopmentLoan(Journalling.java:101)
+	at the.monopoly.game.Journalling.collectedSalary(Journalling.java:70)
+```
+
+Root cause, confirmed by reading the source: `DevelopmentLoanBook.foreclose`
+(and `forecloseEntity`, which shares the same call shape) auctions a
+defaulted loan's collateral via `Auction.qualified(players, land,
+ceilingFor, false)` - the `floorOpening=false` variant, which admits any
+bidder with a positive ceiling, even one below the land's mortgage value
+(the auction's opening price). `Auction.ascendMany` initializes
+`winner = null` and only ever assigns a winner to a bidder whose offer
+does *not* exceed their ceiling; its very first round offers everyone the
+opening price. If two or more "qualified" (floorOpening=false) bidders are
+the only ones left and *none* of their ceilings reach the opening price,
+every one of them gets skipped in that first round, `raised` stays false,
+the loop exits after one pass, and `ascend()` returns `Result(null,
+opening)`. `DevelopmentLoanBook.foreclose` then calls `Deeds.sell(land,
+null, ...)`, which crashes on `buyer.account()`. `LandSale.java` and
+`Bankruptcy.java`'s auctions use the default `floorOpening=true`, so
+they're unaffected; only the two `DevelopmentLoanBook` foreclosure paths
+share this exposure (only the player path crashed in this seed, but the
+entity path calls the same `qualified(..., false)` and is exposed in
+principle).
+
+Per the same "can we spec it" question the user asked for the dissolution
+defect: yes, and it is one - the suite never covered "every remaining
+bidder can afford *something*, but not enough to meet the opening bid."
+Added `development-loans-18` to `development-loans.feature`, reusing
+100% pre-existing step vocabulary: the existing `pawn "X" will bid $Y for
+"Z" at auction` step scripts a bidder's ceiling directly regardless of
+their actual cash, so two scripted bids ($10 and $25, both under Rue
+Grande Dinant's $30 mortgage value) reproduce the exact defect
+deterministically, without touching the Greedo strategy at all. Specified
+correct behavior: the collateral returns to the bank (nobody wins it),
+matching the existing "zero bidders" outcome reached via a different path;
+the borrower keeps everything else and isn't bankrupted.
+
+Verified: `bb gherkin-parser` clean. `./acceptance/run-acceptance.sh`:
+933 tests, exactly 1 error - `development-loans-18` itself, throwing the
+identical `NullPointerException` reproduced directly against `Game` above,
+not an authoring mistake. Could not yet pin the scenario's `bank_ending`
+value (a placeholder for now): the scenario currently *errors* before
+reaching any `Then` step, so there is nothing to read a real value back
+from until the coder's fix lands - will verify it the same way as
+`share-sale-24`/`25` once the auction/foreclosure defect is fixed.
+
+Routing to coder now, before generating the rent-relief report, per user
+direction - inventing task name `loan-foreclosure-null-winner-desync`
+(distinct from the closed dissolution task; unrelated root cause).
