@@ -48532,3 +48532,15 @@ one genuine failure. Handing back to the architect under the same task
 name with this precise, minimal, independently-confirmed diagnosis - the
 specifier's original seed-6 repro is fixed, but the fix has a distinct,
 narrower gap for the "entity loses every street" case.
+
+## 2026-08-25T10:20:00Z — route all-streets-lost collateral gap to coder
+
+Received refactorer handoff `000199` (commit `6119bc3951`) and merged it as
+`95694e0`. The original seed-6 reproduction is now green, including a
+0–49 seed sweep. The review also adds an intentionally failing exhaustive
+property test for the residual case where a formed entity remains alive but
+has lost every street through individual foreclosures: the current
+`ownedStreets` fallback mistakes it for an unformed fixture and returns the
+static formation list. Route this tightly characterized follow-up to coder
+under the same task. The red property test must turn green without losing
+the unformed-fixture behavior that motivated the fallback.
