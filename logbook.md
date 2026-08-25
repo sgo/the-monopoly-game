@@ -48696,6 +48696,28 @@ Re-read your role and constitution.
 merge_and_process coder 2d89a14f40
 ```
 
+Committing and handing off to coder under the same task name as the
+original defect report, `entity-dev-loan-dissolution-desync`, since this is
+the specification half of the same fix.
+
+Sent handoff to coder:
+
+```
+id: 20260825T080657Z_000268_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: entity-dev-loan-dissolution-desync
+commit: f6683f071b
+created_at: 2026-08-25T08:06:57.397934Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier f6683f071b
+```
+
 Non-fast-forward merge from `7e0284d`. Resolved an append-only `logbook.md`
 conflict (both parents' final entries kept in full). This brought in a
 whole architect/coder/specifier loop I hadn't seen live: the architect
@@ -48762,92 +48784,84 @@ property test found is fixed and independently confirmed, and this round
 added no new gaps. Committing the coverage addition and dead-code removal,
 then handing the verified state to the architect under the same task name.
 
-## 2026-08-25T08:25:31Z — refactorer sent entity-dev-loan-dissolution-desync handoff to architect
+## 2026-08-25T10:30:00Z — architect property-gate routing and verification
 
-Handoff message sent:
+After receiving coder handoff `000270`, the architect found that the
+finite JetCheck mask generator could not satisfy its uniqueness sampling
+constraint. Coder handoff `000428` required reliable exhaustive coverage;
+handoff `000271` replaced it with deterministic iteration over all eight
+masks. The architect verified `mvn test -Pproperty-tests` (32/32), full
+acceptance, and the full configured Gherkin mutation suite (no survivors),
+then sent refactorer handoff `000429` for final review.
 
-```
-id: 20260825T082531Z_000200_from_refactorer
-from: refactorer
-to: architect
-priority: 50
-type: git_handoff
-role: refactorer
-task: entity-dev-loan-dissolution-desync
-commit: d0dd06a2b8
-created_at: 2026-08-25T08:25:31.188159Z
+## 2026-08-25T10:50:00Z — merge final dissolution-settlement review
 
-Re-read your role and constitution.
+Received refactorer handoff `000200` (commit `d0dd06a2b8`). Its review
+includes the specifier's two new dissolution acceptance scenarios and the
+coder's settlement-before-dissolution repair, plus direct foreclosure
+coverage and removal of the superseded loan-transfer design. Both append-only
+log histories were retained while merging. Architect verification of this
+expanded final state follows before phase closure.
 
-merge_and_process refactorer d0dd06a2b8
-```
+## 2026-08-25T11:05:00Z — route share-sale dissolution mutation survivors
 
-Reports from commit `d0dd06a2b8`: `entity-dev-loan-dissolution-desync` is
-verified complete - the original seed-6 repro is fixed (widened to a
-100-seed sweep, all clean) and the all-streets-lost residual gap from my
-prior round is closed (property-test profile 32/32). `mvn test` and
-acceptance (932/932) green. Also improved `forecloseEntity`'s coverage
-(0% -> 52.8%, a pre-existing but now doubly-load-bearing method) and
-removed the now-fully-superseded, uncalled `transferEntityLoans` method
-and its orphaned test. Requesting architect closure of this task.
+Architect verification of the merged final state: property tests and full
+acceptance are green. The full configured Gherkin mutation suite produced
+four survivors in the two new `greedo-share-sale.feature` dissolution
+scenarios, recorded in
+`acceptance/mutation-survivors-en-rules-greedo-share-sale-feature.md`.
+They mutate `dog_balance` in both scenarios and `entity_balance`/`principal`
+in the cash-repayment scenario. The current assertions distinguish ownership,
+dissolution, loan repayment, and bank balance, but not every mutated input's
+observable financial outcome. Route all four to specifier for a behavior
+decision: add necessary observable assertions or register only genuinely
+indistinguishable mutations as equivalences. Do not phase-close until the
+survivor report is empty.
 
-Sent coder handoff `000428` at `3e3971f7e9` for that gate repair.
+## 2026-08-25T10:40:00Z — closed the four share-sale dissolution survivors
 
-## 2026-08-25T10:40:00Z — verify all-streets-lost collateral repair
+Merged architect handoff `000430` (commit `949ab450a2`) after resolving an
+append-only `logbook.md` conflict (both parents' entries kept in full).
+That merge brought in the coder's full fix (`Bankruptcy.liquidateEntity`
+now settles every outstanding entity loan position from treasury or
+foreclosure *before* `deeds.dissolve` runs), independent re-verification
+(seeds 0-99 clean, no crash), and the architect's own mutation run that
+found these four survivors.
 
-Received coder handoff `000271` (commit `bd6cfc3f5a`) and merged it as
-`80056a0`. The former undersized JetCheck generator is now a deterministic
-eight-mask exhaustive loop, retaining the same assertion for every subset of
-the pink group without an artificial uniqueness constraint. Verified
-`mvn test -Pproperty-tests`: 32/32 green. Then ran the complete acceptance
-suite green and the complete configured Gherkin mutation suite green; it
-produced no survivor reports and refreshed the standard feature manifests.
-The production repair's formation-history state is now sent to refactorer
-for the final independent structural review before task closure.
+All four trace to one root cause: neither `share-sale-24` nor `share-sale-25`
+asserted `dog`'s own final cash balance, so a mutated input that only
+changes how much surplus or shortfall dog ends up covering — without
+changing which streets he owns, whether the loan gets repaid, or
+bankruptcy status — went unobserved. Not equivalent mutations; a genuine
+assertion gap. Derived the real values by hand (luxury tax $100; land
+mortgage values from `Street.java`: Rue de Diekirch Arlon/Bruul Mechelen
+$70, Place Verte Verviers $80) then verified empirically with a
+deliberately-wrong placeholder first, per usual practice: `share-sale-24`
+(foreclosure covers only $25 of the $40 loan, no surplus to dog; dog
+raises his $60 tax shortfall by mortgaging Bruul Mechelen for $70) ends at
+$10; `share-sale-25` (entity treasury fully covers the $40 loan with $60
+swept to dog, exactly matching the $100 tax) ends at $0. Both matched the
+hand derivation exactly on the first empirical run. Added
+`pawn "dog"'s final balance is $<dog_ending>` (reusing `share-sale-6`'s
+exact existing step text verbatim - no new glue code) to both scenarios.
 
-## 2026-08-25T08:28:18Z — refactorer processes architect follow-up `5fe932ae19` (entity-dev-loan-dissolution-desync): no new review needed
+Verified: `bb gherkin-parser` clean; `bb gherkin-ir-dry-checker` shows the
+same finding count and classes as before this change (89 findings, all
+already-established near-duplicate/synonym/placeholder-variant reuse -
+`unique_steps` stayed at 82, confirming zero new step vocabulary was
+introduced). `./acceptance/run-acceptance.sh`: 932/932, fully green.
 
-Handoff message received:
+Did not hand-edit `acceptance/mutation-survivors-en-rules-greedo-share-sale-feature.md`
+per the standing rule against touching mutation manifests by hand; it will
+refresh on the architect's next Gherkin mutation run and should come back
+empty for these four. Committing and handing the verified state back to
+the architect under the same task name, `entity-dev-loan-dissolution-desync`.
 
-```
-id: 20260825T082246Z_000429_from_architect
-from: architect
-to: refactorer
-priority: 00
-type: git_handoff
-role: architect
-task: entity-dev-loan-dissolution-desync
-commit: 5fe932ae19
+## 2026-08-25T11:15:00Z — merge specifier survivor resolution
 
-Re-read your role and constitution.
-
-merge_and_process architect 5fe932ae19
-```
-
-Non-fast-forward merge from `8675e09`. Resolved an append-only `logbook.md`
-conflict; `greedo-share-sale.feature` auto-merged cleanly (no manual
-resolution needed). This was a parallel architect branch that had
-diverged before I processed the coder's final settlement commit
-(`2d89a14f40`) - it independently certified the earlier all-streets-lost
-fix (`bd6cfc3f5a`) through a full acceptance + Gherkin mutation run and
-requested my structural review, which the specifier's/coder's later work
-(already verified last round) overtook. No new production code arrives
-with this merge: the ~46 changed `.feature` files are Gherkin
-mutation-manifest metadata refreshed by the architect's own clean gate
-run, not scenario content.
-
-Re-verified after merge: `mvn test` green, `./acceptance/run-acceptance.sh`
-932/932, `mvn test -Pproperty-tests` 32/32. Nothing beyond what my prior
-round (`d0dd06a2b8`) already covered - no further role-owned changes
-needed. Handing back to the architect on the same task name.
-
-## 2026-08-25T11:05:00Z — architect mutation-survivor decision routing
-
-After merging the final settlement repair, architect verification found four
-Gherkin mutation survivors in the new dissolution scenarios, recorded in
-`acceptance/mutation-survivors-en-rules-greedo-share-sale-feature.md`:
-`dog_balance` in both scenarios and `entity_balance`/`principal` in the
-cash-repayment case. Property tests and full acceptance remain green, but
-the task cannot close until the specifier (handoff `000430`) either creates
-the missing observable distinctions or records justified equivalences and a
-rerun yields an empty survivor report.
+Received specifier handoff `000269` (commit `70bed3d2ed`). It resolves all
+four share-sale dissolution survivors with real final-balance assertions,
+not equivalence records. The merge retains the earlier architect/refactorer
+audit history alongside the specifier's detailed diagnosis. Final architect
+acceptance and Gherkin mutation verification is now required; the prior
+survivor manifest remains tool-owned and will be refreshed only by that run.

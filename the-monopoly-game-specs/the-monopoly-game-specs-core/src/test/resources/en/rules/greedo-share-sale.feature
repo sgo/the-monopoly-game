@@ -261,10 +261,11 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And pawn "dog" owns "Bruul Mechelen"
     And pawn "dog" owns "Place Verte Verviers"
     And the bank's account holds $<bank_ending>
+    And pawn "dog"'s final balance is $<dog_ending>
 
     Examples:
-      | principal | dog_balance | bid | bank_starting | bank_ending |
-      | 40        | 40          | 25  | 50            | 35          |
+      | principal | dog_balance | bid | bank_starting | bank_ending | dog_ending |
+      | 40        | 40          | 25  | 50            | 35          | 10         |
 
   # share-sale-25
   Scenario Outline: an outstanding development loan is fully repaid from the entity's own cash before dissolution transfers its streets to the sole surviving shareholder
@@ -282,7 +283,8 @@ Feature: selling legal-entity shares to avoid bankruptcy
     And Pink Realty is dissolved
     And Pink Realty's development loan on "Rue de Diekirch Arlon" has been fully repaid
     And pawn "dog" owns every street previously held by Pink Realty
+    And pawn "dog"'s final balance is $<dog_ending>
 
     Examples:
-      | principal | entity_balance | dog_balance |
-      | 40        | 100             | 40          |
+      | principal | entity_balance | dog_balance | dog_ending |
+      | 40        | 100             | 40          | 0          |
