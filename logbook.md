@@ -48366,3 +48366,16 @@ an implementation (new production behavior is the coder's and specifier's
 call, not mine) — handing the verified red state to the architect with
 this diagnosis, under the same task name since it's the same reported
 crash and repro.
+
+## 2026-08-25T09:40:00Z — route surviving-entity foreclosure collateral desync to coder
+
+Received refactorer handoff `000198` (commit `cbd1d2c496`). The already
+merged coder fix correctly transfers outstanding entity loans when a legal
+entity dissolves, but it does not address the reported seed-6 crash. The
+refactorer reproduced that crash after the fix and traced the actual path:
+an entity remains alive after `forecloseEntity` sells one collateral street,
+then `LegalEntity.operate()` reuses its static formation-time street list to
+raise another loan against the now-unowned street. The next foreclosure
+correctly rejects the stale entity ownership and crashes. Route this distinct
+surviving-entity collateral-eligibility defect to coder under the existing
+task, while retaining the dissolution fix.
