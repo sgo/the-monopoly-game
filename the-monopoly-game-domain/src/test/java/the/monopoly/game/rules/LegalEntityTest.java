@@ -388,6 +388,21 @@ class LegalEntityTest {
   }
 
   @Test
+  void aSurvivingEntityDoesNotBuildOnAStreetLostToForeclosure() {
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
+        List.of(dog, highHat, ironBox), rules);
+    deeds.form(entity);
+    ColourStreet lost = entity.streets().getFirst();
+    deeds.returnToBank(lost, entity);
+    entity.depositToBank(new Money(100));
+
+    LegalEntity.Operation operation = entity.operate(deeds);
+
+    assertThat(operation).isEqualTo(new LegalEntity.Operation.HouseBuilt(entity.streets().get(1)));
+    assertThat(deeds.entityOwnerOf(lost.type())).isEmpty();
+  }
+
+  @Test
   void developmentLoanFinancesOnlyTheFirstImprovementInAnOperation() {
     LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink,
         List.of(dog, highHat, ironBox), rules);
