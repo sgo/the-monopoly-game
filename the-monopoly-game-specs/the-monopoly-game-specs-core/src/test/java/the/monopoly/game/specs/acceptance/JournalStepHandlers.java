@@ -757,6 +757,9 @@ final class JournalStepHandlers {
         given("^rent relief is enabled$",
             (world, arguments) -> world.enableRentRelief()),
 
+        given("^the unified income tax is enabled$",
+            (world, arguments) -> world.enableUnifiedIncomeTax()),
+
         given("^the government's account already holds \\$" + MONEY + "$",
             (world, arguments) -> world.setGovernmentAccountBalance(money(arguments.text(1)))),
 
@@ -775,6 +778,10 @@ final class JournalStepHandlers {
         given("^pawn \"" + NAME + "\" has collected \\$" + MONEY
                 + " in rent since their last war profits tax assessment$",
             (world, arguments) -> world.setCollectedRentSinceAssessment(arguments.text(1), money(arguments.text(2)))),
+
+        given("^pawn \"" + NAME + "\" has collected \\$" + MONEY
+                + " in rent since their last unified income tax assessment$",
+            (world, arguments) -> world.setCollectedRentSinceUnifiedAssessment(arguments.text(1), money(arguments.text(2)))),
 
         then("^pawn \"" + NAME + "\" pays the government a war profits tax of \\$" + MONEY + "$",
             (world, arguments) -> assertThat(world.paysWarProfitsTax(arguments.text(1), money(arguments.text(2))))
