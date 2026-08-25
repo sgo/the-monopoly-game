@@ -48780,3 +48780,18 @@ coder's settlement-before-dissolution repair, plus direct foreclosure
 coverage and removal of the superseded loan-transfer design. Both append-only
 log histories were retained while merging. Architect verification of this
 expanded final state follows before phase closure.
+
+## 2026-08-25T11:05:00Z — route share-sale dissolution mutation survivors
+
+Architect verification of the merged final state: property tests and full
+acceptance are green. The full configured Gherkin mutation suite produced
+four survivors in the two new `greedo-share-sale.feature` dissolution
+scenarios, recorded in
+`acceptance/mutation-survivors-en-rules-greedo-share-sale-feature.md`.
+They mutate `dog_balance` in both scenarios and `entity_balance`/`principal`
+in the cash-repayment scenario. The current assertions distinguish ownership,
+dissolution, loan repayment, and bank balance, but not every mutated input's
+observable financial outcome. Route all four to specifier for a behavior
+decision: add necessary observable assertions or register only genuinely
+indistinguishable mutations as equivalences. Do not phase-close until the
+survivor report is empty.
