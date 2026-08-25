@@ -50182,6 +50182,39 @@ merge_and_process architect 1f6d6fa755
 The architect review is accepted with no further changes required; the
 specifier can sync the completed phase.
 
+## 2026-08-25T22:45:00Z — architect review found CLI acceptance defect in refactorer follow-up `d3830f28c8`
+
+The merged follow-up commit is structurally sound and `mvn test` passes, but
+the independent full acceptance run is 951/952: CLI scenario `cli-20`
+(`--optional-unified-income-tax`) sees only `Start[...]` when it immediately
+checks the asynchronous simulator journal for `UnifiedIncomeTaxEnabled`. The
+simulator starts the game on a background thread, so the observable journal
+must not expose a partial startup sequence to this assertion. This is a
+functional CLI-path defect; route back to coder before phase completion.
+
+## 2026-08-25T22:46:00Z — architect sent priority-00 coder follow-up for `unified-income-tax-followup`
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: coder
+priority: 00
+task: unified-income-tax-followup
+commit: 37b716d746
+
+Re-read your role and constitution.
+
+merge_and_process architect 37b716d746
+
+Full acceptance is 951/952. CLI scenario `cli-20` fails immediately after
+starting the simulator: the game journal contains only `Start[...]`, not
+`UnifiedIncomeTaxEnabled[enabled=true]`. Trace the asynchronous startup/log
+visibility and fix the CLI path or acceptance adapter so startup entries are
+observed deterministically. Add/adjust a regression; preserve the unified tax
+domain behavior. Return a commit and verification results.
+```
+
 ## 2026-08-25T20:31:00Z — architect received refactorer handoff `d84dcae17b`
 
 Handoff message received:
