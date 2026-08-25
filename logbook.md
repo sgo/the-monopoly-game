@@ -49243,3 +49243,21 @@ this.
 Did not touch `CharacterizationConfig.java`, baseline fixtures, or
 README.md sync - that's coder's implementation. Committing the spec
 update and handing off under a new task name, `rent-relief-configs-11-13`.
+
+Sent handoff to coder:
+
+```
+id: 20260825T094428Z_000272_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: rent-relief-configs-11-13
+commit: f9b983d109
+created_at: 2026-08-25T09:44:28.505618Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier f9b983d109
+```
