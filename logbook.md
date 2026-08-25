@@ -49914,3 +49914,27 @@ Re-read your role and constitution.
 
 merge_and_process specifier 4ab9bea52c
 ```
+
+## 2026-08-25T14:10:00Z — specified age-at-event stats for relief received/starved
+
+User asked how an age/timing dimension could be added to relief
+starvation and whether the logs already carry enough to compute it.
+Confirmed rather than assumed: `Game.takeTurn` (`Game.java:408-413`)
+unconditionally logs a `TurnStarted` line with the mover's current age
+before that turn's landings (rent, relief) resolve, for every player,
+every turn - no new production log line needed. Since rent is only ever
+paid as a result of the current mover's own landing, the tenant in any
+`RentPaid`/`RentReliefPaid` pair is always the same player whose
+`TurnStarted` line was the most recent one before it - the same
+"last line wins" attribution already used for MegaCorp tax, just keyed
+on age instead of payer.
+
+Specified an age-at-event `Stats` block (min/max/mean/median, the
+existing shape) for both relief received and relief starved, not just
+one - deliberately comparative, since the point is testing whether
+starved events cluster at an older mean age than received ones (evidence
+the funding gap between flat labour tax and inflating rent widens over a
+game's course), not just reporting a single "when does this happen"
+number in isolation. Updated the README sync check's bullet list.
+Committing and handing off to coder under a new task name,
+`relief-event-age-stats`.

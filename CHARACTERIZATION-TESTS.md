@@ -255,6 +255,24 @@ always-empty fields:
   Same player-owned-landlord scope as relief received, for the same
   reason (no distinguishable line exists for the entity path to check
   adjacency against in the first place).
+  Both relief received and relief starved also carry an age-at-event
+  `Stats` block (min/max/mean/median, the same shape `ageAtEnd` and the
+  war-profits-tax government-balance stats already use) — needs no new
+  production entry, since `Game.takeTurn` already logs a `TurnStarted`
+  line with the mover's current age unconditionally, every turn, before
+  that turn's landings (including rent and relief) resolve. Because rent
+  is only ever paid as a result of the current mover's own landing, the
+  tenant in any `RentPaid`/`RentReliefPaid` pair is always the same
+  player whose `TurnStarted` line was the most recent one before it — the
+  same "last line wins" attribution already used for MegaCorp tax
+  ("whoever last collected salary"), just keyed on age instead of payer.
+  The point of tracking both age distributions, not just one, is
+  comparison: if starved events cluster at a meaningfully older mean age
+  than received ones, that is direct, checkable evidence that the
+  funding gap between a flat labour tax and inflating rent widens over
+  the course of a game, rather than being a flat, constant risk
+  throughout — the specific hypothesis this pair of fields exists to
+  test, not just "when does starvation happen" in isolation.
 - `--optional-war-profits-tax`: tax payments (count, total $), payer
   breakdown by pawn — plus final government-account balance as a
   min/max/mean/median `Stats` block, the same shape `ageAtEnd` already
@@ -374,8 +392,9 @@ every data point shown for a config matches that config's fixture:
   total and the per-pawn breakdown), and — for whichever configs have
   them — loan origination/servicing, entity, peer-trade, war-profits-tax,
   and rent-relief figures (including relief received and relief starved
-  by pawn), plus effective tax burden by pawn and net fiscal position by
-  pawn for any config where those figures apply.
+  by pawn, plus their age-at-event stats), plus effective tax burden by
+  pawn and net fiscal position by pawn for any config where those
+  figures apply.
 
 Only the factual data points are checked, not the hand-written analytical
 asides (e.g. the `eight_greedo` income-scale comment, the "350 total =
