@@ -101,6 +101,8 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentReliefL
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTax;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTaxLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTaxPaid;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.unifiedIncomeTaxPaid;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.unifiedIncomeTaxLine;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTaxPaidLine;
 import static the.monopoly.game.specs.acceptance.StepHandler.step;
 import static the.monopoly.game.specs.acceptance.StepHandler.then;
@@ -790,6 +792,14 @@ final class GameLogStepHandlers {
             (world, arguments) -> logRecords(world,
                 Claim.of(new Entry.MegacorpSalaryTaxEnabled(arguments.text(1).equals("enabled"))))),
 
+        then("^the game log records that unified income tax is " + NAME + "$",
+            (world, arguments) -> logRecords(world,
+                Claim.of(new Entry.UnifiedIncomeTaxEnabled(arguments.text(1).equals("enabled"))))),
+
+        then("^the game log records that pawn \"" + NAME
+                + "\" pays the government a unified income tax of \\$" + MONEY + "$",
+            (world, arguments) -> logRecords(world, unifiedIncomeTaxPaid(arguments.text(1), arguments.text(2)))),
+
         then("^the game log records that the government pays pawn \"" + NAME + "\" \\$" + MONEY
                 + " in rent relief$",
             (world, arguments) -> logRecords(world, rentReliefPaid(arguments.text(1), Integer.parseInt(arguments.text(2))))),
@@ -1075,6 +1085,14 @@ final class GameLogStepHandlers {
 
         then("^the game report says that MegaCorp salary tax is " + NAME + "$",
             (world, arguments) -> says(world, "MegaCorp salary tax is " + arguments.text(1))),
+
+        then("^the game report says that unified income tax is " + NAME + "$",
+            (world, arguments) -> says(world, unifiedIncomeTaxLine(arguments.text(1)))),
+
+        then("^the game report says that pawn \"" + NAME
+                + "\" pays the government a unified income tax of \\$" + MONEY + "$",
+            (world, arguments) -> says(world,
+                arguments.text(1) + " pays the government a unified income tax of $" + arguments.text(2))),
 
         then("^the game report says that pawn \"" + NAME + "\" sells a house on \"" + NAME
                 + "\" for \\$" + VALUE + "$",

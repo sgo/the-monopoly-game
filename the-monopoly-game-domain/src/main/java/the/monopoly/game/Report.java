@@ -54,6 +54,8 @@ public final class Report {
       case Entry.SalaryCollected it -> name(it.player()) + " collects a salary of $" + it.salary().amount();
       case Entry.MegacorpSalaryTaxPaid it -> "MegaCorp pays the government an individual income tax of $"
           + money(it.amount()) + " (" + name(it.player()) + ")";
+      case Entry.UnifiedIncomeTaxPaid it -> name(it.player()) + " pays the government a unified income tax of $"
+          + money(it.amount());
       case Entry.Bought it -> name(it.player()) + " buys " + spaceName(it.land()) + " for $" + it.price().amount();
       case Entry.AuctionWon it ->
           name(it.player()) + " wins the auction for " + spaceName(it.land()) + " at $" + it.price().amount();
@@ -65,6 +67,8 @@ public final class Report {
       case Entry.WarProfitsTaxEnabled it -> "war profits tax is " + (it.enabled() ? "enabled" : "disabled");
       case Entry.RentReliefEnabled it -> "rent relief is " + (it.enabled() ? "enabled" : "disabled");
       case Entry.MegacorpSalaryTaxEnabled it -> "MegaCorp salary tax is "
+          + (it.enabled() ? "enabled" : "disabled");
+      case Entry.UnifiedIncomeTaxEnabled it -> "unified income tax is "
           + (it.enabled() ? "enabled" : "disabled");
       case Entry.WarProfitsTaxPaid it -> name(it.payer()) + " pays a war profits tax of $" + it.amount().amount();
       case Entry.DevelopmentLoanRaised it -> name(it.borrower()) + " raises a development loan of $"

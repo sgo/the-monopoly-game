@@ -905,7 +905,7 @@ public class World {
 
   public Money governmentAccountBalance() {
     if (rentRelief != null) return rentRelief.governmentBalance();
-    if (unifiedIncomeTaxBook != null) return unifiedIncomeTaxBook.governmentBalance();
+    if (unifiedIncomeTaxBook != null) return unifiedIncomeTaxBook.governmentBalance().plus(governmentBalance);
     return governmentBalance;
   }
 

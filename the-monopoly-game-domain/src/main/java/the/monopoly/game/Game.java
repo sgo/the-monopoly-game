@@ -313,6 +313,7 @@ public class Game {
     journal.log(new Journal.Entry.WarProfitsTaxEnabled(warProfitsTax));
     journal.log(new Journal.Entry.RentReliefEnabled(rentRelief));
     journal.log(new Journal.Entry.MegacorpSalaryTaxEnabled(megacorpSalaryTax != null));
+    journal.log(new Journal.Entry.UnifiedIncomeTaxEnabled(unifiedIncomeTaxBook != null));
     players.forEach(player -> journalling.strategyNamed(player, strategies.forPlayer(player)));
     List<Player> turnOrder = new Initiative(player -> initiativeRollFor(player, journal)).order(players);
     journal.log(new Journal.Entry.InitiativeWon(turnOrder.getFirst().id()));
@@ -551,6 +552,9 @@ public class Game {
       record MegacorpSalaryTaxPaid(Player.ID player, Money amount) implements Entry {
       }
 
+      record UnifiedIncomeTaxPaid(Player.ID player, Money amount) implements Entry {
+      }
+
       /** Land bought from the bank at the price on the board. */
       record Bought(Player.ID player, Street.Type land, Money price) implements Entry {
       }
@@ -735,6 +739,9 @@ public class Game {
       }
 
       record MegacorpSalaryTaxEnabled(boolean enabled) implements Entry {
+      }
+
+      record UnifiedIncomeTaxEnabled(boolean enabled) implements Entry {
       }
 
       record WarProfitsTaxPaid(Player.ID payer, Money amount) implements Entry {

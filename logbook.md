@@ -50203,6 +50203,28 @@ Merged the refactorer handoff after resolving the append-only
 introduces the unified-income-tax domain rule, simulator wiring,
 acceptance coverage, and property tests; beginning architectural review.
 
+## 2026-08-25T22:40:00Z — architect received refactorer follow-up `d3830f28c8`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: unified-income-tax-followup
+commit: d3830f28c8
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d3830f28c8
+```
+
+Merged the follow-up after resolving the append-only `logbook.md`
+conflict while retaining the architect history. The change adds unified
+tax journal/report entries, promotes the related acceptance scenarios,
+and fixes the combined government-balance assertion in the acceptance
+harness.
+
 Architect review accepted: `UnifiedIncomeTaxBook` is a cohesive domain
 boundary; `Game` and `Journalling` depend inward on it, while simulator
 and acceptance code remain adapter layers. The shared government account
