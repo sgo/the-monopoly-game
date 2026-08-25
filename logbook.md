@@ -48878,3 +48878,8 @@ the surviving-entity collateral reuse defect, its all-streets-lost edge case,
 and the acceptance mutation gaps. Return the completed phase to specifier.
 
 Sent phase-complete handoff `000431` to specifier at `601d766d84`.
+
+A final repeat mutation run refreshed seven cached feature-manifest timestamps
+after the certification commit; it generated no survivor reports and no
+mutation process remained running. Record those tool-owned refreshes so the
+certified workspace is clean.
