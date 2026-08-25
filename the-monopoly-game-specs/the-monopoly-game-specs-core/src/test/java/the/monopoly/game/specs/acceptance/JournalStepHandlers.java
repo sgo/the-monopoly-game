@@ -31,6 +31,7 @@ import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.money;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rentRelief;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTax;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.warProfitsTaxPaid;
+import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.unifiedIncomeTaxPaid;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.moved;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.movesFromPosition;
 import static the.monopoly.game.specs.acceptance.MonopolyStepHelpers.rolled;
@@ -497,6 +498,14 @@ final class JournalStepHandlers {
         then("^the game journal records that MegaCorp salary tax is " + NAME + "$",
             (world, arguments) -> records(world,
                 Claim.of(new Entry.MegacorpSalaryTaxEnabled(arguments.text(1).equals("enabled"))))),
+
+        then("^the game journal records that unified income tax is " + NAME + "$",
+            (world, arguments) -> records(world,
+                Claim.of(new Entry.UnifiedIncomeTaxEnabled(arguments.text(1).equals("enabled"))))),
+
+        then("^the game journal records that pawn \"" + NAME
+                + "\" pays the government a unified income tax of \\$" + MONEY + "$",
+            (world, arguments) -> records(world, unifiedIncomeTaxPaid(arguments.text(1), arguments.text(2)))),
 
         then("^the game journal records game start before it records that pawn \"" + NAME
                 + "\" rolls " + VALUE + " for initiative$",
