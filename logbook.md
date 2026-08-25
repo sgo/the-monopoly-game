@@ -48316,3 +48316,21 @@ the state level instead.
 Committing and handing off to coder under the same task name as the
 original defect report, `entity-dev-loan-dissolution-desync`, since this is
 the specification half of the same fix.
+
+Sent handoff to coder:
+
+```
+id: 20260825T080657Z_000268_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: entity-dev-loan-dissolution-desync
+commit: f6683f071b
+created_at: 2026-08-25T08:06:57.397934Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier f6683f071b
+```
