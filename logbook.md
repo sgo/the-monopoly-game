@@ -49635,3 +49635,21 @@ Updated the README sync check's Detailed Breakdown bullet list and
 derivation note to include both the per-player income breakdown and the
 new derived burden figure. Committing and handing off to coder under a
 new task name, `effective-tax-burden-per-player`.
+
+Sent handoff to coder:
+
+```
+id: 20260825T111021Z_000273_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: effective-tax-burden-per-player
+commit: 0e7a7c1342
+created_at: 2026-08-25T11:10:21.960099Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 0e7a7c1342
+```
