@@ -48647,3 +48647,23 @@ Re-read your role and constitution.
 
 merge_and_process specifier 8fa77c1e51
 ```
+
+## 2026-08-25T08:16:50Z — send dissolution settlement implementation to refactorer
+
+Processed specifier handoff `000268` and merged commit `f6683f071b`, including
+the two dissolution/development-loan acceptance scenarios. Added
+`DevelopmentLoanBook.repayEntityLoan` for principal settlement from an
+affordable entity treasury; otherwise `Bankruptcy.liquidateEntity` invokes
+the existing entity foreclosure/recovery path before transferring remaining
+streets. Added focused unit coverage for full entity-loan repayment.
+
+Verification: focused and full domain tests pass; the acceptance pipeline
+passes all 932 tests, including both new scenarios.
+
+Sent handoff `000272` to refactorer with commit `2d89a14f40`.
+
+type: git_handoff
+to: refactorer
+priority: 50
+task: entity-dev-loan-dissolution-desync
+commit: 2d89a14f40
