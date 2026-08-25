@@ -48980,3 +48980,21 @@ from until the coder's fix lands - will verify it the same way as
 Routing to coder now, before generating the rent-relief report, per user
 direction - inventing task name `loan-foreclosure-null-winner-desync`
 (distinct from the closed dissolution task; unrelated root cause).
+
+Sent handoff to coder:
+
+```
+id: 20260825T090730Z_000270_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: loan-foreclosure-null-winner-desync
+commit: 7756504fb1
+created_at: 2026-08-25T09:07:30.433291Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 7756504fb1
+```
