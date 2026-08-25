@@ -49785,3 +49785,25 @@ No defects found beyond what's already documented above (both handled by
 the coder's own diff, not requiring further action). Committing the
 round-trip test addition and handing the verified state to the architect
 under the same task name.
+
+## 2026-08-25T13:35:00Z — specifier syncs after effective-tax-burden-per-player
+
+Merged architect handoff `000436` (commit `b52370f2f4`, "Certify
+effective tax burden reporting") after resolving a fifth append-only
+`logbook.md` conflict (both parents' entries kept in full). Along the way
+the coder's diff fixed a real, previously-uncaught bug as a natural side
+effect: `GameBreakdown`'s rent aggregation matched the bare substring
+`" rent "`, which also matches inside "...in rent relief" lines, silently
+double-counting relief payments as ordinary tenant rent - so configs
+11-13's rent totals (certified just one task ago) were quietly wrong
+until this fix; not a regression, a correction that had to happen for the
+burden figure's denominator to be right.
+
+Ran `mvn test -Pcharacterization-tests` per the phase-complete sync rule:
+green (`CharacterizationTest` 16/16, `ReadmeSyncTest` 1/1, domain
+430/430). No drift. Confirmed directly in `README.md`: real "Effective
+tax burden" lines now published for every applicable config (10-13) -
+config 10's `dog 25.61%` matches, as an independent check, the same
+figure derived by hand from ad-hoc log parsing much earlier this session.
+`effective-tax-burden-per-player` is closed. No further specifier action
+needed on this task.
