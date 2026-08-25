@@ -44,6 +44,10 @@ final class SimulatorFlags {
     return present(arguments, "--optional-rent-relief");
   }
 
+  static boolean unifiedIncomeTax(String... arguments) {
+    return present(arguments, "--optional-unified-income-tax");
+  }
+
   /** Whether {@code token} is a recognised flag rather than a strategy name. */
   static boolean recognized(String argument) {
     return argument.equals("--optional-greedo-stalemate-trading")
@@ -53,6 +57,7 @@ final class SimulatorFlags {
         || argument.equals("--optional-development-loans-full-draw")
         || argument.equals("--optional-war-profits-tax")
         || argument.equals("--optional-rent-relief")
+        || argument.equals("--optional-unified-income-tax")
         || argument.startsWith(MAX_YEARS_FLAG)
         || argument.startsWith(SEED_FLAG);
   }
