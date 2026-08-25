@@ -50320,3 +50320,36 @@ a lumpy, occasional wealth tax instead creates a fragile early period
 followed by an abundant one, with a sharp transition rather than a
 gradual trend. `relief-event-age-stats` is closed, and with it the last
 outstanding task from this session's rent-relief characterization work.
+
+## 2026-08-25T15:35:00Z — brought SIMULATOR.md and tasks.md up to date
+
+User asked to update both with the feature development completed. Found
+both were stale by more than just this session: `development-loans`,
+`war-profits-tax`, `megacorp-salary-tax`, and `rent-relief` were all
+fully shipped, but `SIMULATOR.md` didn't mention any of the four at all,
+and `tasks.md`'s post-plan log still marked `development-loans` as
+"specified, pending implementation" with a "not yet approved" closing
+note contradicted by its own later paragraphs (the bondholder cash-flow
+assertions it called "deferred" already exist a few paragraphs down).
+
+Fixed the stale `development-loans` status and note in `tasks.md`, then
+added five new post-plan entries: `war-profits-tax`,
+`megacorp-salary-tax`, `rent-relief` (mirroring each feature's own
+Gherkin `Feature:` docstring, the authoritative source), and this
+session's two bug fixes (`entity-dev-loan-dissolution-desync`,
+`loan-foreclosure-null-winner-desync`). Added four new "Optional:"
+sections to `SIMULATOR.md` (development-loans plus the three new
+flags), updated its CLI flags list (five new flags including `--seed=N`,
+previously undocumented despite being real and `-h`-visible), and fixed
+an "out of scope" bullet directly contradicted by the characterization
+suite's existence (it now does exactly the "persisting/comparing results
+across many simulated games" `SIMULATOR.md` called future work, just as
+test infrastructure rather than a CLI-exposed feature).
+
+Deliberately did not duplicate ad-hoc empirical numbers into the new
+`SIMULATOR.md` sections the way the older "Known characteristic"
+sections do — those have already gone stale once from unenforced prose;
+pointed to `CHARACTERIZATION-TESTS.md`/`README.md` instead, which
+`ReadmeSyncTest` guards against drift. Committing directly; pure
+documentation, no code or spec content changed, nothing for another
+role to process.

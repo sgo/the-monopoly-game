@@ -45,9 +45,14 @@ everything that happened.
   logic is still future work.
 - Human/interactive players.
 - Persisting, replaying, or comparing results across many simulated games
-  (the existing `en/monopoly.feature` 1000-game scenario already exercises
-  repeated simulation at the spec level, but that's a correctness check, not a
-  reporting feature).
+  as a general CLI feature for an interactive user — no longer entirely
+  future work: the characterization test suite (see
+  [`CHARACTERIZATION-TESTS.md`](CHARACTERIZATION-TESTS.md)) now does
+  exactly this as a reporting feature, not just the correctness-only
+  1000-game `en/monopoly.feature` scenario, but it lives in the test
+  suite (checked-in JSON baselines, a fixed set of configs, the `--seed`
+  flag for reproducibility) rather than as something the CLI itself
+  exposes to a person running one ad-hoc game.
 
 ## Key concepts
 
@@ -299,6 +304,122 @@ billionaire + 7 Greedo, both optional Greedo flags on,
   build so much as a single house before being wiped out; the other 21
   ended with zero opponent development at all.
 
+### Optional: Development loans
+
+An opt-in CLI flag, `--optional-development-loans`, lets a player or legal
+entity short on cash for a development borrow from the bank instead of
+simply being unable to build, without letting the bank conjure money from
+nothing. A second flag, `--optional-development-loans-full-draw`, only
+meaningful alongside the first, changes how much is borrowed.
+
+- **Collateral and sizing.** The loan is secured only by the street and
+  the houses/hotel it finances — nothing else the borrower owns is at
+  risk. The bank never lends more than 80% of the construction cost being
+  financed (an 80% loan-to-value cap, no exceptions). By default it lends
+  only the shortfall between what the borrower has and what the
+  development costs; with the full-draw flag, it always lends the full
+  80%-of-cost amount regardless of the actual shortfall.
+- **Funding.** Every loan is funded, dollar for dollar, by another player
+  or legal entity buying a matching bank bond, issued reactively at the
+  moment the loan is raised. The bond pays 3% annual yield versus the
+  borrower's 5% (the bank keeps the 2-point spread). Without a buyer able
+  to fund it, no loan is raised and the development doesn't happen, flag
+  or no flag.
+- **Repayment and default.** Amortized over 20 years at 5% annual
+  interest, equal annual principal instalments plus interest on the
+  outstanding balance. A borrower who can't cover a payment tries to
+  raise it the same way as any other debt (mortgage a spare property,
+  sell to a peer) before the loan is treated as defaulted; if nothing can
+  be raised, the bank forecloses on just that loan's collateral — houses/
+  hotel sold back at half price, then the bare land auctioned — leaving
+  everything else the borrower owns untouched.
+- **Bank ledger and recycling.** A bondholder is never cashed out at
+  default; the bank recovers the full outstanding loan value (principal
+  plus the missed year's interest) from the foreclosure, topped up from
+  its own accumulated 2-point-spread reserve if the sale falls short, and
+  that recovered capital funds the next loan that needs one rather than
+  sitting idle or paying out.
+
+Both individual players and legal entities can borrow, with entity-specific
+adjustments: no dividend while a bank loan is outstanding (on top of the
+existing rule for a shareholder build loan), a missed payment falls back
+to mortgaging another street in the same colour group rather than the
+shareholder build-loan mechanism, and a foreclosure on one entity street
+leaves the entity otherwise intact. See `development-loans.feature` (and
+its `entity-*` mirror scenarios in `greedo-legal-entity.feature`) for the
+full behavior.
+
+### Optional: War profits tax
+
+An opt-in CLI flag, `--optional-war-profits-tax`, taxes rental income once
+a player's land holdings grow large enough to look like wartime
+profiteering rather than ordinary success. Ownership share is measured by
+the *current* rent value of a player's land as a fraction of the whole
+board's value at full development (the same board-value figure the
+stalemate threshold already uses). Each player accumulates the rent they
+collect from others, and once a year — the same "grows a year older"
+trigger development-loan payments use — that accumulated rent is taxed at
+a rate set by the player's *current* ownership share at that moment, then
+the counter resets to zero:
+
+| Ownership share | Rate |
+|------------------|------|
+| below 25%        | 0%   |
+| 25% – 40%        | 100% |
+| 40% – 60%        | 150% |
+| 60% – 80%        | 200% |
+| 80% – 100%       | 300% |
+| 100%             | 400% |
+
+A rate above 100% means the player owes more than they collected that
+year, out of pocket. All tax collected is paid into a new government
+account — the same account rent relief (below) spends from and MegaCorp's
+salary tax (below) also feeds. See `war-profits-tax.feature`.
+
+### Optional: MegaCorp salary tax
+
+Bound to the same `--optional-rent-relief` flag as rent relief below, not
+a separate flag of its own: every player's salary is paid by a notional
+employer, MegaCorp, rather than the bank directly. The salary a player
+actually collects (the ordinary $200, or the $400 the optional
+double-salary-on-landing rule pays) is the *net* amount after a 43%
+individual income tax on the *gross*: net is 57% of gross, so MegaCorp
+pays the government `tax = net / 0.57 - net`, keeping the player's own
+take unchanged at the net figure they always collected. This feeds the
+same government account war profits tax feeds and rent relief spends
+from — a steady, per-player, per-lap inflow, unlike war profits tax's
+lumpy, occasional-but-heavy one. See `megacorp-salary-tax.feature`.
+
+### Optional: Rent relief
+
+An opt-in CLI flag, `--optional-rent-relief` (which also activates
+MegaCorp salary tax above), caps what a tenant pays in rent at $200 — the
+same amount as the ordinary salary for passing Start — the moment the
+government's account can cover the rest of the bill in full. The
+government pays the *landlord* that difference directly, so the landlord
+always receives the full nominal rent either way; only the tenant's
+payment is ever reduced. If the government's account cannot cover the
+full difference, no relief is given at all — not a partial reduction —
+and the tenant pays the full rent, exactly as without this flag. $200 was
+chosen from the real distribution of rent payments across this project's
+characterization baselines: only 3.5% of payments exceed it, but that
+tail carries roughly 30% of all rent dollars, so it is the threshold that
+catches the hotel-tier spikes capable of ending a game for a player still
+building up cash. See `rent-relief.feature`.
+
+Measured effects of these three flags together (survival rate, effective
+tax burden and net fiscal position by pawn, relief received vs. starved
+and the age at which each happens) are tracked as permanent, checked
+baselines rather than one-off prose here — see
+[`CHARACTERIZATION-TESTS.md`](CHARACTERIZATION-TESTS.md) and the
+"Simulated game characteristics" section of [`README.md`](README.md).
+Headline finding: relief funded by MegaCorp's tax alone already fails
+more often than it succeeds by dollar volume, and barely moves survival
+rate versus no relief at all; adding war profits tax doesn't make the
+funding gap widen gradually so much as switch regimes — fragile before a
+player's first big war-tax payment refills the government, abundant
+after.
+
 ### Known characteristic: legal entity narrows, but doesn't guarantee, 3+-player resolution
 
 The legal-entity mechanism above removes the specific 3+-way colour-group-
@@ -402,7 +523,7 @@ The game result report and journal should have a human-readable format.
 - writes the final game report to a file, which defaults to
   `the-monopoly-game.report` in the system temporary directory
 
-Four optional flags extend the default behaviour (all opt-in; none is on
+These optional flags extend the default behaviour (all opt-in; none is on
 by default):
 - `--optional-greedo-stalemate-trading` — enables the peer-trade/buyout bridge
   described under [Optional: Greedo stalemate trading](#optional-greedo-stalemate-trading).
@@ -412,6 +533,26 @@ by default):
 - `--optional-asset-rich-billionaire` — switches the "Billionaire" strategy
   from its default cash-rich opening to an asset-rich one, described under
   [Optional: Billionaire asset-rich opening](#optional-billionaire-asset-rich-opening).
+- `--optional-development-loans` — lets a cash-short player or legal entity
+  borrow from the bank to finish a development, described under
+  [Optional: Development loans](#optional-development-loans).
+- `--optional-development-loans-full-draw` — only meaningful alongside the
+  flag above; always borrows the full 80% loan-to-value cap regardless of
+  the actual shortfall, described in the same section.
+- `--optional-war-profits-tax` — taxes rental income once a player's land
+  holdings cross an ownership-share threshold, described under
+  [Optional: War profits tax](#optional-war-profits-tax).
+- `--optional-rent-relief` — caps what a tenant pays in rent at $200 when
+  the government can cover the rest, and also activates MegaCorp's salary
+  tax, described under [Optional: Rent relief](#optional-rent-relief) and
+  [Optional: MegaCorp salary tax](#optional-megacorp-salary-tax).
 - `--max-years=N` — caps the simulation at N simulated years (passes through
   Go/jail). The game stops when any remaining player's age reaches N. The
   default (omitted) lets the game play to its natural end.
+- `--seed=N` — makes every source of randomness (dice, card shuffling)
+  deterministic: two runs with the same seed and the same code produce an
+  identical game. The default (omitted) uses real, unseeded randomness, as
+  the CLI does normally. Exists for the characterization test suite (see
+  [`CHARACTERIZATION-TESTS.md`](CHARACTERIZATION-TESTS.md)), which needs a
+  byte-for-byte reproducible run to tell a genuine behavior change from
+  ordinary luck of the dice; not meant to make a real game predictable.

@@ -823,7 +823,7 @@ didn't already call for.
   its own cash. See `turn-development.feature` and the corrected
   fixtures across `greedo-legal-entity.feature`, `journal.feature`,
   `report.feature`, `logging.feature`, and `greedo-share-sale.feature`.
-- **`development-loans`** (specified, pending implementation) — motivated by
+- **`development-loans`** (done) — motivated by
   wanting the asset-rich billionaire above to win over a *longer*, richer
   game rather than making it artificially harder to win: lets cash-short
   opponents borrow to develop instead of just stalling out, without letting
@@ -1061,12 +1061,10 @@ didn't already call for.
     split into separate, diverging branches before when a behavior wasn't
     spec'd identically for two contexts, so the spec itself is the
     guardrail against a coder agent implementing the entity path
-    differently from the individual-player path. Deferred for a later
-    pass, once this slice has been through the coder: asserting the
-    bondholder's own cash-flow (interest spread, principal pass-through)
-    directly, rather than only that a loan requires a willing bondholder to
-    exist. Not yet approved/committed as of this writing — still under
-    specifier review.
+    differently from the individual-player path. The bondholder's own
+    cash-flow (interest spread, principal pass-through) is asserted
+    directly too, not just that a loan requires a willing bondholder to
+    exist — see "The bondholder's own side" below.
   - **Possible gap: no strategy actually prefers buying bonds.** Not yet
     designed. Development loans only work at all if some player or entity
     chooses to buy the bond funding one — right now nothing in either
@@ -1079,3 +1077,92 @@ didn't already call for.
     but the exact condition (how much spare cash, where it ranks against
     buying land or building) still needs to be worked out with the user.
     Flagged 2026-08-18; not yet spec'd.
+- **`war-profits-tax`** (done) — adds an opt-in `--optional-war-profits-tax`
+  flag taxing rental income once a player's land holdings grow large
+  enough to look like wartime profiteering rather than ordinary success.
+  Ownership share is measured by the *current* rent value of a player's
+  land as a fraction of the whole board's value at full development (the
+  same board-value figure `Stalemate.threshold()` already uses). Each
+  player accumulates the rent they collect from others, and once a year —
+  the same "grows a year older" trigger development-loan payments already
+  use — that accumulated rent is taxed at a rate set by the player's
+  *current* ownership share at that moment, then the counter resets to
+  zero: 0% below 25%, then 100/150/200/300/400% in five bands up to full
+  ownership (each band's lower bound inclusive, so a share exactly at a
+  boundary belongs to the higher band). A rate above 100% means the
+  player owes more than they collected that year, out of pocket. All tax
+  collected is paid into a new government account — the same account
+  `rent-relief` below spends from and `megacorp-salary-tax` below also
+  feeds. See `war-profits-tax.feature`.
+- **`megacorp-salary-tax`** (done) — adds a behavior bound to the same
+  `--optional-rent-relief` flag as `rent-relief` below (not a separate
+  flag of its own): every player's salary is now paid by a notional
+  employer, MegaCorp, rather than the bank directly. The salary a player
+  actually collects (the ordinary $200, or the $400 the optional
+  double-salary-on-landing rule pays) is the *net* amount after a 43%
+  individual income tax on the *gross*: net is 57% of gross, so MegaCorp
+  pays the government `tax = net / 0.57 - net`, keeping the player's own
+  take unchanged at the net figure they always collected. This grows the
+  same government account `war-profits-tax` feeds and `rent-relief`
+  spends from — a steady, per-player, per-lap inflow, in contrast to
+  war profits tax's lumpy, occasional-but-heavy one. See
+  `megacorp-salary-tax.feature`.
+- **`rent-relief`** (done) — adds an opt-in `--optional-rent-relief` flag
+  (which also activates `megacorp-salary-tax` above) that caps what a
+  tenant pays in rent at $200 — the same amount as the ordinary salary
+  for passing Start — the moment the government's account can cover the
+  rest of the bill in full; the government pays the *landlord* that
+  difference directly, so the landlord always receives the full nominal
+  rent either way and only the tenant's payment is ever reduced. If the
+  government's account cannot cover the full difference, no relief is
+  given at all — not a partial reduction — and the tenant pays the full
+  rent, exactly as without this flag. $200 was chosen from the real
+  distribution of rent payments across this project's characterization
+  baselines: only 3.5% of payments exceed it, but that tail carries
+  roughly 30% of all rent dollars, so it is the threshold that catches
+  the hotel-tier spikes capable of ending a game for a player still
+  building up cash. See `rent-relief.feature`.
+  - Measured effects across configs 10-14 (survival rate, effective tax
+    burden and net fiscal position by pawn, relief received vs. starved
+    and the age at which each happens) are tracked as permanent, checked
+    baselines rather than one-off prose here — see
+    [`CHARACTERIZATION-TESTS.md`](CHARACTERIZATION-TESTS.md) and the
+    "Simulated game characteristics" section of [`README.md`](README.md),
+    kept in sync with the fixtures by `ReadmeSyncTest`. Headline finding:
+    relief funded by MegaCorp's tax alone (config 11, no war-profits-tax)
+    already fails more often than it succeeds by dollar volume, and barely
+    moves survival rate versus having no relief at all (config 14, the
+    matched pair); adding war-profits-tax (config 12) doesn't make the
+    funding gap widen gradually so much as switch regimes — fragile before
+    a player's first big war-tax payment refills the government, abundant
+    after.
+- **`entity-dev-loan-dissolution-desync`** (done) — fixes a real crash
+  found while scoping new rent-relief characterization configs (not a
+  regression from this session's own changes; a pre-existing defect never
+  exercised until legal-entity trading, development loans, and rent
+  relief all combined for the first time). `Bankruptcy.liquidateEntity`
+  (reached when a distressed player is an entity's sole shareholder)
+  transferred every one of the entity's streets to that player
+  unconditionally via `Deeds.dissolve`, without checking
+  `DevelopmentLoanBook` for an outstanding loan against any of them; the
+  orphaned position later crashed (`Deeds.verifyEntityOwner`,
+  "does not own") the next time it came up for servicing, against land a
+  player now owned individually. Fixed by settling every outstanding
+  entity loan position — from treasury, or foreclosure if that falls
+  short — *before* `deeds.dissolve` runs, rather than letting the debt
+  silently follow the collateral to the new owner. See
+  `greedo-share-sale.feature`'s `share-sale-24`/`25`.
+- **`loan-foreclosure-null-winner-desync`** (done) — fixes a second,
+  unrelated crash found in the same scoping pass, in the *individual*
+  loan-foreclosure path this time: `DevelopmentLoanBook.foreclose` (and
+  its `forecloseEntity` mirror) auction a defaulted loan's collateral via
+  `Auction.qualified(..., floorOpening=false)`, which admits any bidder
+  with a positive ceiling even one below the land's mortgage value (the
+  auction's opening price). If every admitted bidder's ceiling fell short
+  of that opening price, `Auction.ascendMany` correctly returned a null
+  winner, but both foreclosure call sites unconditionally passed that
+  winner to `Deeds.sell`, crashing the moment two or more cash-poor
+  bidders were the only ones left. Fixed by falling back to
+  `Deeds.returnToBank` on a null winner, identical to the existing
+  zero-bidders outcome. See `development-loans.feature`'s
+  `development-loans-18`.
