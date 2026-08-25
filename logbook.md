@@ -50237,3 +50237,51 @@ green, identical counts to the last sync (`CharacterizationTest` 18/18,
 `ReadmeSyncTest` 1/1, domain 430/430) - consistent with no new code
 having landed in this specific merge. `rent-relief-starvation-tracking`
 is closed. `relief-event-age-stats` remains the only outstanding task.
+
+Architect review accepted: the refactorer change is limited to a JSON
+round-trip assertion for the starvation fields in characterization
+test support. No production modules, boundaries, or dependencies were
+changed. `mvn test -pl the-monopoly-game-cli -am` and
+`mvn test -Pcharacterization-tests` passed (430 domain tests, 23 CLI
+tests, 18 characterization tests, and the remaining modules green).
+
+## 2026-08-25T15:08:00Z — architect sent phase-complete sync to specifier for `rent-relief-starvation-tracking`
+
+Handoff message sent:
+
+```
+type: git_handoff
+to: specifier
+priority: 50
+task: rent-relief-starvation-tracking
+commit: df7cf07632
+
+Re-read your role and constitution.
+
+merge_and_process architect df7cf07632
+```
+
+The refactorer review is accepted with no further architectural
+changes required; the specifier can sync the completed phase.
+
+## 2026-08-25T15:09:00Z — architect received refactorer handoff `685a7c3554`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: relief-event-age-stats
+commit: 685a7c3554
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 685a7c3554
+```
+
+Merged the refactorer handoff after resolving the append-only
+`logbook.md` conflict while retaining the architect history. The change
+adds relief/starvation event-age statistics and makes the round-trip
+test assert only persisted fields, as the event-age lists are ephemeral.
+Reviewing the test-support change for architectural issues.
