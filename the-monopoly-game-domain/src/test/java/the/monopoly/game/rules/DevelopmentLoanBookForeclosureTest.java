@@ -17,6 +17,7 @@ class DevelopmentLoanBookForeclosureTest {
   private final Bank bank = rules.bank();
   private final Player dog = player("dog");
   private final Player highHat = player("high hat");
+  private final Player ironBox = player("iron box");
 
   @Test
   void recoveredCollateralRecyclesLoanValueAndReturnsOnlyTheSurplus() {
@@ -59,7 +60,7 @@ class DevelopmentLoanBookForeclosureTest {
     DevelopmentLoanBook book = new DevelopmentLoanBook(bank);
     DevelopmentLoanBook.Position position = book.recordPlayerLoan(
         dog, Street.Type.RueGrandeDinant, new Money(20), 0, highHat);
-    Strategy.OfPlayers strategies = player -> player.id().equals(highHat.id())
+    Strategy.OfPlayers strategies = player -> player.id().equals(highHat.id()) || player.id().equals(ironBox.id())
         ? new Strategy() {
           @Override
           public Money bidFor(Offer offer) {
@@ -68,11 +69,34 @@ class DevelopmentLoanBookForeclosureTest {
         }
         : Strategy.UNDECIDED;
 
-    book.foreclose(position, deeds, rules, List.of(dog, highHat), strategies);
+    book.foreclose(position, deeds, rules, List.of(dog, highHat, ironBox), strategies);
 
     assertThat(deeds.ownerOf(Street.Type.RueGrandeDinant)).contains(highHat.id());
     assertThat(deeds.ownerOf(Street.Type.DiestsestraatLeuven)).contains(dog.id());
     assertThat(deeds.isMortgaged(collateral)).isTrue();
+  }
+
+  @Test
+  void foreclosureReturnsCollateralToTheBankWhenNoBidReachesTheOpeningPrice() {
+    Deeds deeds = new Deeds();
+    ColourStreet collateral = (ColourStreet) rules.create(Street.Type.RueGrandeDinant);
+    deeds.grant(collateral, dog);
+    DevelopmentLoanBook book = new DevelopmentLoanBook(bank);
+    DevelopmentLoanBook.Position position = book.recordPlayerLoan(
+        dog, Street.Type.RueGrandeDinant, new Money(20), 0, null);
+    Strategy.OfPlayers strategies = player -> player.id().equals(highHat.id()) || player.id().equals(ironBox.id())
+        ? new Strategy() {
+          @Override
+          public Money bidFor(Offer offer) {
+            return new Money(10);
+          }
+        }
+        : Strategy.UNDECIDED;
+
+    book.foreclose(position, deeds, rules, List.of(dog, highHat, ironBox), strategies);
+
+    assertThat(deeds.ownerOf(Street.Type.RueGrandeDinant)).isEmpty();
+    assertThat(position.outstanding()).isEqualTo(Money.ZERO);
   }
 
   private Player player(String name) {

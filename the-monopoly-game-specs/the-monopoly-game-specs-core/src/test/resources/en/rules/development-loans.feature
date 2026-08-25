@@ -377,4 +377,4 @@ Feature: development loans
 
     Examples:
       | principal | high_hat_bid | iron_box_bid | bank_starting | bank_ending |
-      | 20        | 10           | 25            | 50            | 1           |
+      | 20        | 10           | 25            | 50            | 30          |

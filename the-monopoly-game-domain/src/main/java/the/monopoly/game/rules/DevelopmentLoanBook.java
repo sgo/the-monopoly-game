@@ -240,8 +240,11 @@ public final class DevelopmentLoanBook {
       deeds.returnToBank(land, borrower);
     } else {
       Auction.Result result = Auction.ascend(bidders);
-      deeds.sell(land, result.winner(), result.bid());
-      proceeds = proceeds.plus(result.bid());
+      if (result.winner() == null) deeds.returnToBank(land, borrower);
+      else {
+        deeds.sell(land, result.winner(), result.bid());
+        proceeds = proceeds.plus(result.bid());
+      }
     }
     Money obligation = position.bondholder() == null
         ? position.outstanding() : position.outstanding().plus(position.outstanding().percentage(5));
@@ -274,8 +277,11 @@ public final class DevelopmentLoanBook {
     if (bidders.players().isEmpty()) deeds.returnToBank(land, borrower);
     else {
       Auction.Result result = Auction.ascend(bidders);
-      deeds.sell(land, result.winner(), result.bid());
-      proceeds = proceeds.plus(result.bid());
+      if (result.winner() == null) deeds.returnToBank(land, borrower);
+      else {
+        deeds.sell(land, result.winner(), result.bid());
+        proceeds = proceeds.plus(result.bid());
+      }
     }
     Money obligation = position.bondholder() == null
         ? position.outstanding() : position.outstanding().plus(position.outstanding().percentage(5));
