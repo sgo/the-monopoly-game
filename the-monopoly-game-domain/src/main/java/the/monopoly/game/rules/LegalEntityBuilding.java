@@ -202,7 +202,7 @@ final class LegalEntityBuilding {
 
   static List<ColourStreet> ownedStreets(LegalEntity entity, Deeds deeds) {
     if (deeds == null) return entity.streets();
-    if (!deeds.legalEntities().contains(entity)) return entity.streets();
+    if (!deeds.hasBeenFormed(entity)) return entity.streets();
     return entity.streets().stream()
         .filter(street -> deeds.entityOwnerOf(street.type()).filter(entity::equals).isPresent())
         .toList();
