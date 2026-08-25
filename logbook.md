@@ -48271,3 +48271,48 @@ Re-read your role and constitution.
 
 merge_and_process specifier 8fa77c1e51
 ```
+
+## 2026-08-25T09:55:00Z — acceptance criteria for entity-dev-loan-dissolution-desync
+
+With the user, settled the correct behavior for the dissolution/development-loan
+desync reported above: at dissolution, any means available (the entity's own
+cash, then foreclosing the specific loan's collateral street the same way an
+ordinary missed payment already forecloses it) are used to settle an
+outstanding development loan first; only once a street is free of an active
+loan does it transfer to the sole surviving shareholder. Any shortfall the
+foreclosure itself doesn't cover is absorbed by the bank's own reserve
+account, reusing the existing default/foreclosure recovery machinery
+verbatim rather than inventing new behavior for this trigger.
+
+Added two scenarios to `greedo-share-sale.feature`, both built entirely from
+pre-existing step vocabulary (no new glue code needed) by combining the
+existing sole-shareholder liquidation setup (`share-sale-6`/`share-sale-7`)
+with the existing entity-development-loan steps
+(`greedo-legal-entity.feature`'s `entity-39`/`entity-44`-family), reusing
+`entity-39`'s exact recovery numbers (principal $40, bid $25, bank $50->$35)
+since it's the identical foreclosure math, just triggered at a different
+moment:
+
+- `share-sale-24`: entity cash can't cover the loan, so the collateral
+  street is foreclosed and auctioned to a third player instead of
+  transferring to the shareholder; the bank's reserve absorbs the shortfall.
+- `share-sale-25`: entity cash alone covers the loan, so it's simply repaid
+  and every street transfers to the shareholder normally, same as today.
+
+Verified both are red for the right reason, not an authoring mistake:
+`bb gherkin-parser` clean; `bb gherkin-ir-dry-checker` shows nothing beyond
+already-established vocabulary reuse (`pawn "dog" has $<value> to spend`
+across the whole file; `the bank's account holds $<value>` as both a
+`Given` setup value and a `Then` assertion value within `share-sale-24`,
+the same Given/Then pattern `development-loans-15` already uses).
+`./acceptance/run-acceptance.sh`: 932 tests, exactly 2 failures, both mine,
+both failing on precisely the defect's symptom (`share-sale-24`: land goes
+to `dog` instead of being foreclosed to `racecar`; `share-sale-25`: the
+loan is never repaid at all) — nothing else moved. Neither scenario reaches
+the actual crash (that only fires later, when the orphaned loan position
+comes up for scheduled servicing), but both cleanly assert the defect at
+the state level instead.
+
+Committing and handing off to coder under the same task name as the
+original defect report, `entity-dev-loan-dissolution-desync`, since this is
+the specification half of the same fix.
