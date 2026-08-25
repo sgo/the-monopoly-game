@@ -50597,3 +50597,130 @@ any scenario): `World.java` passes a boolean instead of the actual
 survive a played game - worth a look before the backlogged interaction
 scenarios land. `mvn test`, property-tests, characterization-tests, and
 full acceptance (939/939) all green. Requesting architect review.
+
+## 2026-08-25T20:31:00Z — architect received refactorer handoff `d84dcae17b`
+
+Handoff message received:
+
+```
+type: git_handoff
+to: architect
+priority: 50
+task: unified-income-tax
+commit: d84dcae17b
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d84dcae17b
+```
+
+Merged the refactorer handoff after resolving the append-only
+`logbook.md` conflict while retaining the architect history. The task
+introduces the unified-income-tax domain rule, simulator wiring,
+acceptance coverage, and property tests; beginning architectural review.
+
+## 2026-08-25T20:50:00Z — recovered a genuine content-loss bug in this merge, not just resolved a conflict
+
+This merge (architect commit `0343ebbbf3`) was not a normal append-append
+conflict. `git merge-base` correctly identified my own `085c8fc9` as the
+common ancestor, but the architect's own merge tip had, at some point in
+its own chain, silently dropped a large stretch of already-shared history
+- everything from my "specifier syncs after
+rent-relief-net-position-and-matched-pair" entry through the refactorer's
+own detailed unified-income-tax verification notes - leaving only a
+terse "Merged the refactorer handoff ... beginning architectural review"
+stub in its place. Caught it because a naive resolution of git's own
+conflict markers produced a nonsensical result (my own commit's content
+spliced *inside* another entry's quoted handoff-message code fence,
+breaking it) - traced the actual cause with `git merge-base`, `git show
+<rev>:logbook.md`, and direct diffs between the merge base, my `HEAD`,
+the refactorer's own commit (`d84dcae`, which turned out to hold the
+complete, correct history), and the architect's final merge (which did
+not), rather than trusting the automatic result or my own first attempt
+at resolving it by hand.
+
+Reconstructed by taking the refactorer's own commit's full logbook.md
+(confirmed to be my own complete history plus their own genuinely new
+material, correctly interleaved) and appending only the one truly new
+stub the architect's merge actually added on top of it. Recorded here
+rather than silently fixed, since this is the second time this session a
+merge on this file produced a subtly wrong result on the first attempt
+(the first was my own mistake, caught before committing; this one
+belonged to the incoming branch) - worth knowing this class of error can
+originate on either side, not just from a careless resolution of my own,
+and that verifying a "clean" merge result actually contains what both
+parents contributed is worth doing before trusting it, not just checking
+that the conflict markers are gone.
+
+## 2026-08-25T21:00:00Z — specifier syncs after unified-income-tax, feature closed
+
+Since the recovered logbook content showed the architect's own review
+ending mid-sentence ("beginning architectural review", no acceptance or
+verification paragraph - possibly itself truncated by the same merge
+issue just recovered from, possibly genuinely not yet run), verified
+independently rather than assuming certification happened. `mvn test
+-Pcharacterization-tests`: green (`CharacterizationTest` 19/19 unchanged
+- confirmed via the refactorer's own recovered note that no
+characterization config enables the new flag yet, so it's expected to be
+unaffected; domain 432/432, up from 430, the two new
+`UnifiedIncomeTaxBookTest` cases; `ReadmeSyncTest` 1/1). Also ran the
+full acceptance suite directly (`./acceptance/run-acceptance.sh`: clean
+build, all green - the 6 `unified-income-tax` scenarios now passing,
+red-to-green) and `mvn test -Pproperty-tests` (37/37, including the new
+`UnifiedIncomeTaxBookPropertyTest`'s 3 properties), since this task
+landed real production code, not just test-support.
+
+`unified-income-tax` is closed: designed from a plain-language proposal
+through two clarifying questions, specified with a deliberate
+isolated-computation-first scope mirroring its two sibling tax features,
+gap-checked directly against `megacorp-salary-tax.feature` (catching two
+real omissions - the $400 double-salary case, and the real double-
+salary-rule interaction - before committing rather than after), and
+implemented cleanly: no defects, no coder loop-back needed, the
+refactorer's own review found only a minor scope note (a test-harness
+detail affecting only the still-backlogged interaction scenarios, not
+anything in this round) and added the missing property-test coverage.
+No further specifier action needed on this task.
+
+## 2026-08-25T23:10:00Z — specifier promotes unified-income-tax's backlogged interaction/observability/CLI scenarios
+
+Promoted all 13 scenarios backlogged during the original
+`unified-income-tax` round into their tracked homes:
+`unified-income-tax-5/6` (independent-accumulator interaction with war
+profits tax and MegaCorp's salary tax) into `unified-income-tax.feature`;
+`journal/report/logging-96/97/98` (enabled/disabled-near-start state, and
+payment narration alongside salary) into their respective tracked files;
+`cli-20/21` (game-wide flag wiring, strategy-mix invariance) into
+`cli.feature`. Deleted the now-empty backlog files. Re-verified
+numbering hadn't drifted since these were drafted (journal/report/
+logging were still at 95, cli at 19) before promoting.
+
+Verified via `bb gherkin-parser` (clean parse on all five files) and `bb
+gherkin-ir-dry-checker` (new findings are all medium-confidence
+"possible-synonym" cross-references against the analogous MegaCorp/war-
+profits-tax/rent-relief sibling scenarios - the same noise class already
+pervasive in these large files, confirmed by diffing before/after
+finding sets rather than trusting the raw count; no new
+high-confidence duplication introduced).
+
+Ran `./acceptance/run-acceptance.sh`: 12 failures, all for the expected
+reason. 9 are "Unsupported step" (journal/report/logging-96/97/98,
+cli-20/21) - the missing narration and CLI wiring this batch exists to
+drive. The 10th and 11th also `Unsupported step`. The remaining one is a
+genuine assertion failure on `unified-income-tax-5` (expected government
+account $5430, got $430) that I traced to a real gap rather than an
+authoring error (confirmed my "grows a year older" / "land is currently
+worth $X in rent" / "has collected $X in rent since their last war
+profits tax assessment" steps match war-profits-tax.feature's own
+established phrasing exactly): `World.java`'s
+`governmentAccountBalance()` (used by "the government's account holds
+$X") reads a fixed priority chain - `rentRelief` if non-null, else
+`unifiedIncomeTaxBook`, else a bare field - rather than one shared
+ledger. With war profits tax and unified income tax both enabled but
+rent relief off, it falls to `unifiedIncomeTaxBook.governmentBalance()`
+and never looks at whatever the war profits tax assessment deposited
+elsewhere, silently dropping it from the reported total.
+`unified-income-tax-6` (MegaCorp + unified income tax) already passes
+cleanly - that pair composes correctly today.
+
+Committed as `da85cd9` and handed off to the coder.

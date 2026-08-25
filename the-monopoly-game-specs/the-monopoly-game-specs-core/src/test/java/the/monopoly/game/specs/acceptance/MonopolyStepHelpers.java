@@ -147,6 +147,10 @@ final class MonopolyStepHelpers {
     return Claim.of(new Entry.MegacorpSalaryTaxPaid(idOf(pawnName), money(amount)));
   }
 
+  static Claim unifiedIncomeTaxPaid(String pawnName, String amount) {
+    return Claim.of(new Entry.UnifiedIncomeTaxPaid(idOf(pawnName), money(amount)));
+  }
+
   static Claim bought(String pawnName, String spaceName, int price) {
     return Claim.of(new Entry.Bought(idOf(pawnName), SpaceNames.of(spaceName), money(price)));
   }
@@ -412,6 +416,10 @@ final class MonopolyStepHelpers {
 
   static String rentReliefLine(String state) {
     return "rent relief is " + state;
+  }
+
+  static String unifiedIncomeTaxLine(String state) {
+    return "unified income tax is " + state;
   }
 
   static String playerPaidLine(String payer, String payee, int amount) {
