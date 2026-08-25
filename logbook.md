@@ -48294,3 +48294,75 @@ Routing to coder now, before touching `CHARACTERIZATION-TESTS.md` for the
 new configs, per user direction — those configs (all needing legal-entity
 + development-loans + rent-relief together) can't be adopted while a
 legitimate seed just crashes the simulator outright.
+
+## 2026-08-25T07:31:45Z — refactorer processes coder handoff `bef42a20ff` (entity-dev-loan-dissolution-desync): still red, wrong root cause
+
+Handoff message received:
+
+```
+id: 20260825T072412Z_000268_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: entity-dev-loan-dissolution-desync
+commit: bef42a20ff
+
+Re-read your role and constitution.
+
+merge_and_process coder bef42a20ff
+```
+
+Non-fast-forward merge from `d80b1d7` — the architect's `game-java-mutation-site-debt`
+certification (`71c29f0c47`), the specifier's phase-complete sync, and this
+task's specifier stage + coder fix had all landed on other branches since.
+Resolved an append-only `logbook.md` conflict (both parents' final entries
+kept in full, nothing dropped). No other files conflicted. `mvn test` and
+`./acceptance/run-acceptance.sh` both green post-merge (930/930).
+
+Diff: `Bankruptcy.liquidateEntity` now calls
+`DevelopmentLoanBook.transferEntityLoans(entity, debtor)` before
+`deeds.dissolve(entity, debtor)`, converting any of the dissolving entity's
+outstanding loan positions into a personal loan on its final shareholder
+(new `DevelopmentLoanBookTest` covers this directly). Correct fix for the
+mechanism it targets, but the specifier's own repro (the seed-6 crash under
+8-Greedo/legal-entity/development-loans/rent-relief) was never actually
+against a *dissolving* entity — nothing in this repro's crash path calls
+`Bankruptcy.liquidateEntity` at all.
+
+Independently re-ran the specifier's exact repro against `Game` directly
+(bypassing `Simulator`'s exception-flattening wrapper, same as the
+specifier's own approach): **identical crash**, same message, same stack
+trace shape (`Deeds.verifyEntityOwner` -> `sellHouse` -> `forecloseEntity`
+-> `LegalEntities.serviceEntityDevelopmentLoan` -> `operateLegalEntities` ->
+`Game.completeRound`). This task's fix does not touch the actual defect.
+
+Root-caused with temporary diagnostic instrumentation (added, verified,
+then fully reverted — no diagnostic code committed; working tree confirmed
+clean via `git diff --stat` before continuing). Traced every development
+loan position "Yellow Realty" carried across the run: it raises successive
+loans against the *same* collateral street (`GroteMarktHasselt`), paying
+each down before or while raising the next — an entirely normal pattern.
+The crash happens the first time this repeats after a *foreclosure*: after
+one position collateralized by `GroteMarktHasselt` gets foreclosed
+(auctioned away to another player via `DevelopmentLoanBook.forecloseEntity`
+-> `Deeds.sell`), `LegalEntity.operate()` raises yet another loan against
+that same street on its very next turn, with no check that the entity
+still owns it. `entity.streets()` is the entity's static, formation-time
+street list (`LegalEntity`'s `streets` field, set once in `form`/`formed`
+and never updated); nothing removes a street from it when
+`forecloseEntity` sells that one street away while the *entity itself*
+stays alive (as opposed to full dissolution, where `Deeds.dissolve`
+does cross-check `entity.streets()` against live ownership). The new,
+now-uncollateralized position then reaches `forecloseEntity` again on a
+later turn and crashes identically to the original report.
+
+This is a distinct defect from the one `entity-dev-loan-dissolution-desync`
+targeted: individual-collateral desync on a *surviving* entity after its
+own foreclosure, not loan/dissolution desync when the *whole entity*
+dissolves. Both are real; only the second is fixed so far. Not proposing
+an implementation (new production behavior is the coder's and specifier's
+call, not mine) — handing the verified red state to the architect with
+this diagnosis, under the same task name since it's the same reported
+crash and repro.
