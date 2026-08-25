@@ -18,13 +18,20 @@ public final class Bankruptcy {
   private final Strategy.OfPlayers strategies;
   private final Events events;
   private final DistressedSale distressedSale;
+  private final DevelopmentLoanBook developmentLoanBook;
 
   public Bankruptcy(Deeds deeds, Rule.Set rules, List<Player> players, Strategy.OfPlayers strategies, Events events) {
+    this(deeds, rules, players, strategies, events, null);
+  }
+
+  public Bankruptcy(Deeds deeds, Rule.Set rules, List<Player> players, Strategy.OfPlayers strategies, Events events,
+                    DevelopmentLoanBook developmentLoanBook) {
     this.deeds = deeds;
     this.rules = rules;
     this.players = players;
     this.strategies = strategies;
     this.events = events;
+    this.developmentLoanBook = developmentLoanBook;
     this.distressedSale = new DistressedSale(deeds, rules, players, strategies, events);
   }
 
@@ -100,6 +107,7 @@ public final class Bankruptcy {
 
   private void liquidateEntity(Player debtor, LegalEntity entity) {
     Money transferred = entity.liquidateTo(debtor);
+    if (developmentLoanBook != null) developmentLoanBook.transferEntityLoans(entity, debtor);
     deeds.dissolve(entity, debtor);
     events.entityLiquidated(debtor, entity, transferred);
   }

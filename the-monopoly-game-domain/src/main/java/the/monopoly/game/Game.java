@@ -419,7 +419,7 @@ public class Game {
     Landings cards = new Cards(deeds, rules, turnOrder, strategies, decks, journalling, cups.forPlayer(player), jail);
     Landings taxes = new Taxes(journalling, journalling.rentRelief() == null
         ? null : journalling.rentRelief().government());
-    Bankruptcy bankruptcy = new Bankruptcy(deeds, rules, turnOrder, strategies, journalling);
+    Bankruptcy bankruptcy = new Bankruptcy(deeds, rules, turnOrder, strategies, journalling, developmentLoanBook);
     return (who, space, roll) -> {
       rent.resolve(who, space, roll);
       landSale.resolve(who, space, roll);

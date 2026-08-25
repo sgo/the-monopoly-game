@@ -5,6 +5,7 @@ import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
+import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
@@ -65,6 +66,22 @@ class DevelopmentLoanBookTest {
     book.recordPlayerLoan(dog, street.type(), new Money(20), 0, highHat);
 
     assertThat(book.canRaise(dog, street, false, List.of(dog, highHat))).isFalse();
+  }
+
+  @Test
+  void anEntityLoanFollowsItsCollateralToTheFinalShareholderWhenTheEntityDissolves() {
+    DevelopmentLoanBook book = new DevelopmentLoanBook(bank);
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, List.of(dog), rules);
+    book.recordEntityLoan(entity, street.type(), new Money(20), 0, highHat);
+
+    book.transferEntityLoans(entity, dog);
+
+    DevelopmentLoanBook.Position transferred = book.positions().getFirst();
+    assertThat(transferred.isEntityLoan()).isFalse();
+    assertThat(transferred.borrower()).isEqualTo(dog);
+    assertThat(transferred.entity()).isNull();
+    assertThat(transferred.outstanding()).isEqualTo(new Money(20));
+    assertThat(entity.loan()).isEqualTo(Money.ZERO);
   }
 
   @Test
