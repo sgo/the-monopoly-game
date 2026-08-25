@@ -50404,3 +50404,21 @@ new scenarios, no glue code existing yet - with every one of the
 933 pre-existing tests still passing (939 total, 6 new failures, zero
 unexpected). Committing and handing off to coder under a new task name,
 `unified-income-tax`.
+
+Sent handoff to coder:
+
+```
+id: 20260825T200740Z_000277_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: unified-income-tax
+commit: 085c8fc926
+created_at: 2026-08-25T20:07:40.816986Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 085c8fc926
+```
