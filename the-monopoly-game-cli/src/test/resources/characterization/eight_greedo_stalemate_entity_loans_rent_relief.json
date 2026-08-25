@@ -2,8 +2,9 @@
   "outcomes": {"ordinary_win": 48, "stalemate": 2},
   "winners": {"shoe": 6, "racecar": 10, "thimble": 3, "dog": 7, "high hat": 9, "ship": 7, "iron box": 2, "wheelbarrow": 4},
   "ageAtEnd": {"min": 7, "max": 170, "mean": 28.06, "median": 14},
-  "core": {"bankruptcies": {"racecar": 41, "iron box": 21, "the bank": 94, "thimble": 14, "dog": 32, "high hat": 52, "shoe": 26, "ship": 42, "wheelbarrow": 26}, "auctions": 49, "directPurchases": 1502, "mortgages": 1006, "income": {"salary": 953600, "rent": 4501517, "bankPayments": 118855}},
+  "core": {"bankruptcies": {"racecar": 41, "iron box": 21, "the bank": 94, "thimble": 14, "dog": 32, "high hat": 52, "shoe": 26, "ship": 42, "wheelbarrow": 26}, "auctions": 49, "directPurchases": 1502, "mortgages": 1006, "income": {"salary": 953600, "rent": 4501517, "bankPayments": 118855, "byPlayer": {"racecar": {"salary": 154200, "rent": 678579}, "wheelbarrow": {"salary": 108600, "rent": 401109}, "iron box": {"salary": 127400, "rent": 269072}, "ship": {"salary": 124200, "rent": 320572}, "dog": {"salary": 89400, "rent": 275312}, "shoe": {"salary": 111800, "rent": 204665}, "thimble": {"salary": 114400, "rent": 150418}, "high hat": {"salary": 123600, "rent": 554069}}}},
   "loans": {"loansRaised": 478, "totalDollars": 27157, "borrowers": {"iron box": 42, "Green Realty": 35, "Yellow Realty": 49, "racecar": 39, "Pink Realty": 52, "ship": 60, "thimble": 24, "shoe": 43, "dog": 35, "high hat": 62, "wheelbarrow": 37}, "bondholders": {"dog": 292, "high hat": 73, "iron box": 42, "racecar": 36, "shoe": 6, "thimble": 5, "ship": 12, "wheelbarrow": 6}, "defaults": 12, "interestPaid": 6744, "principalPaid": 12279, "bondInterestReceived": 3244, "bondPrincipalReceived": 12271},
   "entities": {"formed": 113, "dissolved": 66},
-  "trades": {"peerTrades": 6}
+  "trades": {"peerTrades": 6},
+  "rentRelief": {"reliefPayments": 1274, "reliefDollars": 621670, "gamesWithRelief": 50, "megacorpTaxPayments": 4768, "megacorpTaxDollars": 715200, "megacorpTaxPayers": {"wheelbarrow": 543, "dog": 447, "ship": 621, "racecar": 771, "shoe": 559, "high hat": 618, "iron box": 637, "thimble": 572}, "megacorpTaxByPlayer": {"wheelbarrow": 81450, "dog": 67050, "ship": 93150, "racecar": 115650, "shoe": 83850, "high hat": 92700, "iron box": 95550, "thimble": 85800}}
 }

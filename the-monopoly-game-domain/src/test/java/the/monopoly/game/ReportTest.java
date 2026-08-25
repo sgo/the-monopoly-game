@@ -52,6 +52,12 @@ class ReportTest {
   }
 
   @Test
+  void aReportIdentifiesThePawnPayingMegacorpSalaryTax() {
+    assertThat(report(new Entry.MegacorpSalaryTaxPaid(Pawn.dog.id(), new Money(43))))
+        .isEqualTo("MegaCorp pays the government an individual income tax of $43 (dog)");
+  }
+
+  @Test
   void aReportUsesThePrintedBoardNameForRent() {
     assertThat(report(new Entry.RentPaid(Pawn.high_hat.id(), Pawn.dog.id(),
         Street.Type.RueDeDiekirchArlon, new Money(200))))

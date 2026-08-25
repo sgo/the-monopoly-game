@@ -54,6 +54,7 @@ Full breakdown for any config lives in
 - Auctions: 138 (11.7% of 1,182 land acquisitions)
 - Mortgages: 661
 - Income: salary \$324,600, rent \$204,992, bank payments \$39,550
+- Income by player: high hat salary \$161,200, rent \$104,699, dog salary \$163,400, rent \$100,293
 
 </details>
 
@@ -67,12 +68,17 @@ Full breakdown for any config lives in
 - Auctions: 49 (3.2% of 1,551 land acquisitions)
 - Mortgages: 1,006
 - Income: salary \$953,600, rent \$4,501,517, bank payments \$118,855
+- Income by player: racecar salary \$154,200, rent \$678,579, wheelbarrow salary \$108,600, rent \$401,109, iron box salary \$127,400, rent \$269,072, ship salary \$124,200, rent \$320,572, dog salary \$89,400, rent \$275,312, shoe salary \$111,800, rent \$204,665, thimble salary \$114,400, rent \$150,418, high hat salary \$123,600, rent \$554,069
 - Loans: 478 raised, \$27,157 total, 12 defaults
   - Borrowers: iron box 42, Green Realty 35, Yellow Realty 49, racecar 39, Pink Realty 52, ship 60, thimble 24, shoe 43, dog 35, high hat 62, wheelbarrow 37
   - Bondholders: dog 292, high hat 73, iron box 42, racecar 36, shoe 6, thimble 5, ship 12, wheelbarrow 6
   - Servicing: borrowers paid \$6,744 interest + \$12,279 principal; bondholders received \$3,244 interest + \$12,271 principal
 - Entities: 113 formed, 66 dissolved
 - Peer trades: 6
+- Rent relief: 1,274 payments, \$621,670 total, 50 games
+- MegaCorp salary tax: 4,768 payments, \$715,200 total
+- MegaCorp tax payers: wheelbarrow \$81450, dog \$67050, ship \$93150, racecar \$115650, shoe \$83850, high hat \$92700, iron box \$95550, thimble \$85800
+- Effective tax burden: racecar 12.19%, wheelbarrow 13.78%, iron box 19.42%, ship 17.32%, dog 15.53%, shoe 20.95%, thimble 24.47%, high hat 12.03%
 
 </details>
 
@@ -86,6 +92,7 @@ Full breakdown for any config lives in
 - Auctions: 109 (6.3% of 1,736 land acquisitions)
 - Mortgages: 741
 - Income: salary \$4,266,200, rent \$11,740,451, bank payments \$518,515
+- Income by player: racecar salary \$413,400, rent \$633,704, wheelbarrow salary \$338,000, rent \$479,664, iron box salary \$374,800, rent \$571,569, ship salary \$870,800, rent \$904,256, dog salary \$266,000, rent \$319,661, shoe salary \$694,400, rent \$530,189, thimble salary \$795,200, rent \$1,478,843, high hat salary \$513,600, rent \$2,176,118
 - Loans: 401 raised, \$24,695 total, 73 defaults
   - Borrowers: iron box 27, Green Realty 42, Yellow Realty 46, racecar 30, Pink Realty 51, ship 42, thimble 27, shoe 27, high hat 54, dog 34, wheelbarrow 21
   - Bondholders: dog 242, high hat 62, iron box 30, racecar 19, shoe 5, thimble 5, ship 2
@@ -95,6 +102,10 @@ Full breakdown for any config lives in
 - War-profits tax: 334 payments, \$620,779 total
 - Tax payers: racecar 12, thimble 2, dog 8, high hat 15, wheelbarrow 36, ship 38, iron box 4, shoe 219
 - Government balance: min 2, median 647, mean 12257.92, max 316087
+- Rent relief: 4,242 payments, \$2,737,245 total, 50 games
+- MegaCorp salary tax: 21,331 payments, \$3,199,650 total
+- MegaCorp tax payers: wheelbarrow \$253500, dog \$199500, ship \$653100, racecar \$310050, shoe \$520800, high hat \$385200, iron box \$281100, thimble \$596400
+- Effective tax burden: racecar 27.73%, wheelbarrow 31.69%, iron box 23.72%, ship 31.38%, dog 29.70%, shoe 44.89%, thimble 20.91%, high hat 14.13%
 
 </details>
 
@@ -108,12 +119,17 @@ Full breakdown for any config lives in
 - Auctions: 137 (9.8% of 1,400 land acquisitions)
 - Mortgages: 610
 - Income: salary \$4,035,200, rent \$7,644,728, bank payments \$486,435
+- Income by player: racecar salary \$430,600, rent \$1,169,253, wheelbarrow salary \$419,600, rent \$184,304, dog salary \$676,400, rent \$736,045, iron box salary \$393,400, rent \$521,411, ship salary \$663,600, rent \$976,534, shoe salary \$601,200, rent \$1,284,018, thimble salary \$319,600, rent \$87,911, high hat salary \$530,800, rent \$273,188
 - Loans: 310 raised, \$18,243 total, 128 defaults
   - Borrowers: dog 131, ship 21, racecar 24, Yellow Realty 19, shoe 19, iron box 9, Green Realty 23, Pink Realty 19, thimble 10, high hat 27, wheelbarrow 8
   - Bondholders: high hat 157, ship 6, wheelbarrow 1, dog 63, racecar 2, iron box 18, shoe 2
   - Servicing: borrowers paid \$3,401 interest + \$6,986 principal; bondholders received \$1,356 interest + \$5,189 principal
 - Entities: 46 formed, 9 dissolved
 - Peer trades: 4
+- Rent relief: 4,919 payments, \$2,749,045 total, 49 games
+- MegaCorp salary tax: 20,176 payments, \$3,026,400 total
+- MegaCorp tax payers: wheelbarrow \$314700, dog \$507300, ship \$497700, racecar \$322950, shoe \$450900, high hat \$398100, thimble \$239700, iron box \$295050
+- Effective tax burden: racecar 56.97%, wheelbarrow 34.26%, dog 42.90%, iron box 33.45%, ship 48.37%, shoe 40.78%, thimble 37.37%, high hat 33.88%
 - War-profits tax: 1068 payments, \$2,247,817 total
 - Tax payers: dog 45, shoe 416, iron box 64, thimble 1, ship 236, racecar 302, high hat 4
 - Government balance: min 61, median 1834, mean 26783.32, max 271144
@@ -131,6 +147,7 @@ Full breakdown for any config lives in
 - Auctions: 103 (7.6% of 1,353 land acquisitions)
 - Mortgages: 733
 - Income: salary \$1,736,200, rent \$932,616, bank payments \$208,770
+- Income by player: iron box salary \$585,800, rent \$307,487, dog salary \$565,200, rent \$305,739, high hat salary \$585,200, rent \$319,390
 
 </details>
 
@@ -144,6 +161,7 @@ Full breakdown for any config lives in
 - Auctions: 100 (7.4% of 1,350 land acquisitions)
 - Mortgages: 1,004
 - Income: salary \$341,800, rent \$350,619, bank payments \$41,070
+- Income by player: iron box salary \$114,200, rent \$139,848, dog salary \$110,800, rent \$93,846, high hat salary \$116,800, rent \$116,925
 - Peer trades: 11
 
 </details>
@@ -158,6 +176,7 @@ Full breakdown for any config lives in
 - Auctions: 7 (0.5% of 1,410 land acquisitions)
 - Mortgages: 147
 - Income: salary \$23,597,400, rent \$13,395,646, bank payments \$2,840,320 — the long-running stalemates (up to 1,419 simulated years) dwarf every other config's income totals
+- Income by player: racecar salary \$3,007,800, rent \$1,293,567, wheelbarrow salary \$2,846,000, rent \$2,224,150, iron box salary \$2,900,400, rent \$1,213,430, ship salary \$2,997,800, rent \$1,194,556, dog salary \$3,016,800, rent \$3,037,279, shoe salary \$2,971,000, rent \$1,791,547, thimble salary \$2,997,600, rent \$1,188,549, high hat salary \$2,860,000, rent \$1,452,568
 
 </details>
 
@@ -171,6 +190,7 @@ Full breakdown for any config lives in
 - Auctions: 16 (1.1% of 1,445 land acquisitions)
 - Mortgages: 1,227
 - Income: salary \$531,600, rent \$1,318,641, bank payments \$66,735
+- Income by player: racecar salary \$67,400, rent \$184,311, wheelbarrow salary \$64,400, rent \$155,013, iron box salary \$62,400, rent \$112,116, ship salary \$69,400, rent \$227,561, dog salary \$69,000, rent \$183,205, shoe salary \$68,800, rent \$128,519, thimble salary \$64,600, rent \$106,680, high hat salary \$65,600, rent \$221,236
 - Peer trades: 9
 
 </details>
@@ -185,6 +205,7 @@ Full breakdown for any config lives in
 - Auctions: 96 (6.1% of 1,573 land acquisitions)
 - Mortgages: 1,285
 - Income: salary \$472,400, rent \$1,380,439, bank payments \$59,975
+- Income by player: racecar salary \$61,800, rent \$117,793, wheelbarrow salary \$60,200, rent \$110,695, iron box salary \$55,400, rent \$86,451, ship salary \$59,400, rent \$177,720, dog salary \$59,600, rent \$161,995, shoe salary \$62,000, rent \$118,721, thimble salary \$56,000, rent \$67,505, high hat salary \$58,000, rent \$127,815
 - Entities: 99 formed, 51 dissolved
 - Peer trades: 4
 
@@ -200,6 +221,7 @@ Full breakdown for any config lives in
 - Auctions: 21 (1.4% of 1,537 land acquisitions)
 - Mortgages: 732
 - Income: salary \$606,800, rent \$2,807,207, bank payments \$71,030
+- Income by player: racecar salary \$68,800, rent \$182,918, wheelbarrow salary \$58,600, rent \$123,357, iron box salary \$69,800, rent \$130,802, ship salary \$68,600, rent \$243,006, dog salary \$144,400, rent \$823,101, shoe salary \$60,600, rent \$111,221, thimble salary \$61,400, rent \$88,895, high hat salary \$74,600, rent \$153,106
 - Entities: 106 formed, 54 dissolved
 - Peer trades: 6
 
@@ -215,6 +237,7 @@ Full breakdown for any config lives in
 - Auctions: 32 (3.1% of 1,026 land acquisitions)
 - Mortgages: 824
 - Income: salary \$174,600, rent \$754,039, bank payments \$23,605
+- Income by player: racecar salary \$21,800, rent \$6,871, wheelbarrow salary \$20,400, rent \$9,062, dog salary \$36,200, rent \$703,044, iron box salary \$17,600, rent \$4,114, ship salary \$20,400, rent \$8,173, shoe salary \$21,000, rent \$6,359, thimble salary \$18,600, rent \$3,725, high hat salary \$18,600, rent \$7,808
 - Entities: 3 formed, 3 dissolved
 - Peer trades: 0
 
@@ -230,6 +253,7 @@ Full breakdown for any config lives in
 - Auctions: 24 (2.4% of 995 land acquisitions)
 - Mortgages: 850
 - Income: salary \$166,000, rent \$743,323, bank payments \$22,680
+- Income by player: racecar salary \$18,800, rent \$5,796, wheelbarrow salary \$19,000, rent \$4,674, dog salary \$33,400, rent \$690,300, iron box salary \$17,000, rent \$5,882, ship salary \$22,600, rent \$16,699, thimble salary \$16,600, rent \$3,237, shoe salary \$20,600, rent \$5,204, high hat salary \$18,000, rent \$6,972
 - Loans: 265 raised, \$13,860 total, 0 defaults
   - Borrowers: dog 216, ship 12, high hat 9, wheelbarrow 8, iron box 8, shoe 5, thimble 4, racecar 1, Pink Realty 1, Yellow Realty 1
   - Bondholders: high hat 159, iron box 16, shoe 14, racecar 12, ship 11, dog 47, wheelbarrow 4, thimble 2
@@ -249,12 +273,14 @@ Full breakdown for any config lives in
 - Auctions: 148 (10.9% of 1,360 land acquisitions)
 - Mortgages: 755
 - Income: salary \$1,881,600, rent \$1,910,428, bank payments \$224,990
+- Income by player: racecar salary \$290,800, rent \$55,372, wheelbarrow salary \$258,800, rent \$85,752, dog salary \$512,600, rent \$550,131, iron box salary \$184,200, rent \$77,194, ship salary \$142,200, rent \$24,039, shoe salary \$169,600, rent \$54,239, thimble salary \$143,800, rent \$65,041, high hat salary \$179,600, rent \$63,916
 - Entities: 23 formed, 3 dissolved
 - Peer trades: 1
 - War-profits tax: 52 payments, \$275,456 total
 - Tax payers: dog 48, racecar 2, iron box 2
 - Government balance: min 0, median 5335, mean 5509.12, max 10956
 - Survivors at first tax: min 2, median 4, mean 3.9583333333333335, max 7
+- Effective tax burden: racecar 0.72%, wheelbarrow 0.00%, dog 25.61%, iron box 0.32%, ship 0.00%, shoe 0.00%, thimble 0.00%, high hat 0.00%
 
 </details>
 
