@@ -50646,3 +50646,46 @@ refactorer's own review found only a minor scope note (a test-harness
 detail affecting only the still-backlogged interaction scenarios, not
 anything in this round) and added the missing property-test coverage.
 No further specifier action needed on this task.
+
+## 2026-08-25T23:10:00Z — specifier promotes unified-income-tax's backlogged interaction/observability/CLI scenarios
+
+Promoted all 13 scenarios backlogged during the original
+`unified-income-tax` round into their tracked homes:
+`unified-income-tax-5/6` (independent-accumulator interaction with war
+profits tax and MegaCorp's salary tax) into `unified-income-tax.feature`;
+`journal/report/logging-96/97/98` (enabled/disabled-near-start state, and
+payment narration alongside salary) into their respective tracked files;
+`cli-20/21` (game-wide flag wiring, strategy-mix invariance) into
+`cli.feature`. Deleted the now-empty backlog files. Re-verified
+numbering hadn't drifted since these were drafted (journal/report/
+logging were still at 95, cli at 19) before promoting.
+
+Verified via `bb gherkin-parser` (clean parse on all five files) and `bb
+gherkin-ir-dry-checker` (new findings are all medium-confidence
+"possible-synonym" cross-references against the analogous MegaCorp/war-
+profits-tax/rent-relief sibling scenarios - the same noise class already
+pervasive in these large files, confirmed by diffing before/after
+finding sets rather than trusting the raw count; no new
+high-confidence duplication introduced).
+
+Ran `./acceptance/run-acceptance.sh`: 12 failures, all for the expected
+reason. 9 are "Unsupported step" (journal/report/logging-96/97/98,
+cli-20/21) - the missing narration and CLI wiring this batch exists to
+drive. The 10th and 11th also `Unsupported step`. The remaining one is a
+genuine assertion failure on `unified-income-tax-5` (expected government
+account $5430, got $430) that I traced to a real gap rather than an
+authoring error (confirmed my "grows a year older" / "land is currently
+worth $X in rent" / "has collected $X in rent since their last war
+profits tax assessment" steps match war-profits-tax.feature's own
+established phrasing exactly): `World.java`'s
+`governmentAccountBalance()` (used by "the government's account holds
+$X") reads a fixed priority chain - `rentRelief` if non-null, else
+`unifiedIncomeTaxBook`, else a bare field - rather than one shared
+ledger. With war profits tax and unified income tax both enabled but
+rent relief off, it falls to `unifiedIncomeTaxBook.governmentBalance()`
+and never looks at whatever the war profits tax assessment deposited
+elsewhere, silently dropping it from the reported total.
+`unified-income-tax-6` (MegaCorp + unified income tax) already passes
+cleanly - that pair composes correctly today.
+
+Committed as `da85cd9` and handed off to the coder.
