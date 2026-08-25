@@ -49760,3 +49760,34 @@ No defects found beyond what's already documented above (both handled by
 the coder's own diff, not requiring further action). Committing the
 round-trip test addition and handing the verified state to the architect
 under the same task name.
+
+## 2026-08-25T11:39:05Z — refactorer sent effective-tax-burden-per-player handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T113905Z_000205_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: effective-tax-burden-per-player
+commit: 71ef467812
+created_at: 2026-08-25T11:39:05.449310Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 71ef467812
+```
+
+Reports from commit `71ef467812`: verified the per-player income/tax
+tracking and derived burden figure, including hand-tracing the fragile
+landlord-name parsing for both report line shapes and confirming the
+domain-level `Report.line` change is safe (substring-match acceptance
+harness). Noted (not a defect - already fixed as a side effect of this
+work) that a real pre-existing rent/rent-relief double-counting bug in
+config11-13's baselines is now corrected. `mvn test`, acceptance
+(933/933), and the characterization suite (three separate runs) all
+green. Added explicit JSON round-trip coverage for the new fields.
+Requesting architect closure.
