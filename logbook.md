@@ -50404,3 +50404,17 @@ new scenarios, no glue code existing yet - with every one of the
 933 pre-existing tests still passing (939 total, 6 new failures, zero
 unexpected). Committing and handing off to coder under a new task name,
 `unified-income-tax`.
+
+## 2026-08-25T22:20:00Z — implemented unified income tax
+
+Processed specifier handoff `50_20260825T200740Z_000277_from_specifier_to_coder.handoff`
+at commit `085c8fc926`. Added the independent 43% unified income tax over
+gross salary plus rent collected since the player's prior assessment,
+with per-player accumulator reset after each salary collection and the
+shared government account. Wired the optional CLI flag and acceptance
+harness while preserving existing tax behavior.
+
+Verification: focused domain/CLI tests pass, the six new unified-income-tax
+scenarios pass, and the full acceptance pipeline passes all 939 tests.
+Committed as `d8e8f32` and handing off to refactorer via
+`.swarmforge/handoffs/outbox/50_20260825T201842Z_000281_from_coder_to_refactorer.handoff`.
