@@ -106,8 +106,15 @@ public final class Bankruptcy {
   }
 
   private void liquidateEntity(Player debtor, LegalEntity entity) {
+    if (developmentLoanBook != null) {
+      developmentLoanBook.positions().stream()
+          .filter(position -> position.entity() == entity && !position.outstanding().equals(Money.ZERO))
+          .forEach(position -> {
+            if (!developmentLoanBook.repayEntityLoan(position))
+              developmentLoanBook.forecloseEntity(position, deeds, rules, players, strategies);
+          });
+    }
     Money transferred = entity.liquidateTo(debtor);
-    if (developmentLoanBook != null) developmentLoanBook.transferEntityLoans(entity, debtor);
     deeds.dissolve(entity, debtor);
     events.entityLiquidated(debtor, entity, transferred);
   }

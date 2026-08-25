@@ -34,21 +34,23 @@ class LegalEntityBuildingPropertyTest {
 
   @Test
   void ownedStreetsNeverIncludesAStreetLostToIndividualForeclosure() {
-    PropertyChecker.forAll(Generator.integers(0, (1 << PINK_STREETS.size()) - 1), keptMask -> {
+    for (int keptMask = 0; keptMask < (1 << PINK_STREETS.size()); keptMask++) {
+      int mask = keptMask;
       Deeds deeds = new Deeds();
       LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, players(3), RULES);
       deeds.form(entity);
       List<ColourStreet> expectedOwned = PINK_STREETS.stream()
-          .filter(street -> (keptMask & (1 << PINK_STREETS.indexOf(street))) != 0)
+          .filter(street -> (mask & (1 << PINK_STREETS.indexOf(street))) != 0)
           .toList();
       PINK_STREETS.stream().filter(street -> !expectedOwned.contains(street))
           .forEach(street -> deeds.returnToBank(street, entity));
 
       List<ColourStreet> owned = LegalEntityBuilding.ownedStreets(entity, deeds);
 
-      return owned.equals(expectedOwned)
-          && owned.stream().allMatch(street -> deeds.entityOwnerOf(street.type()).filter(entity::equals).isPresent());
-    });
+      org.assertj.core.api.Assertions.assertThat(owned).isEqualTo(expectedOwned);
+      org.assertj.core.api.Assertions.assertThat(owned).allMatch(street ->
+          deeds.entityOwnerOf(street.type()).filter(entity::equals).isPresent());
+    }
   }
 
   @Test

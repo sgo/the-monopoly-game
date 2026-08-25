@@ -241,3 +241,49 @@ Feature: selling legal-entity shares to avoid bankruptcy
     Examples:
       | dog_balance | high_hat_balance | iron_box_balance | dog_final_balance |
       | 10000       | 150              | 50               | 50                |
+
+  # share-sale-24
+  Scenario Outline: dissolution forecloses an outstanding development loan's collateral street, instead of transferring it to the sole surviving shareholder
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And Pink Realty's bank account holds $0
+    And the bank's account holds $<bank_starting>
+    And pawn "high hat" and pawn "iron box" have both gone bankrupt
+    And pawn "dog" owns no mortgaged property
+    And pawn "dog" has $<dog_balance> to spend
+    And pawn "racecar" will bid $<bid> for "Rue de Diekirch Arlon" at auction
+    And development loans are enabled for the "Greedo" strategy
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then pawn "dog" is not bankrupt
+    And Pink Realty is dissolved
+    And pawn "racecar" owns "Rue de Diekirch Arlon"
+    And pawn "dog" owns "Bruul Mechelen"
+    And pawn "dog" owns "Place Verte Verviers"
+    And the bank's account holds $<bank_ending>
+
+    Examples:
+      | principal | dog_balance | bid | bank_starting | bank_ending |
+      | 40        | 40          | 25  | 50            | 35          |
+
+  # share-sale-25
+  Scenario Outline: an outstanding development loan is fully repaid from the entity's own cash before dissolution transfers its streets to the sole surviving shareholder
+    Given we select 4 players
+    And Pink Realty is formed
+    And Pink Realty owns no outstanding loan
+    And Pink Realty owes the bank $<principal> on a development loan secured by "Rue de Diekirch Arlon"
+    And Pink Realty's bank account holds $<entity_balance>
+    And pawn "high hat" and pawn "iron box" have both gone bankrupt
+    And pawn "dog" owns no mortgaged property
+    And pawn "dog" has $<dog_balance> to spend
+    And development loans are enabled for the "Greedo" strategy
+    When pawn "dog" lands on "Extra Belasting / Taxe de Luxe"
+    Then pawn "dog" is not bankrupt
+    And Pink Realty is dissolved
+    And Pink Realty's development loan on "Rue de Diekirch Arlon" has been fully repaid
+    And pawn "dog" owns every street previously held by Pink Realty
+
+    Examples:
+      | principal | entity_balance | dog_balance |
+      | 40        | 100             | 40          |

@@ -85,6 +85,20 @@ class DevelopmentLoanBookTest {
   }
 
   @Test
+  void anEntityCanRepayItsOutstandingLoanInFullBeforeDissolution() {
+    DevelopmentLoanBook book = new DevelopmentLoanBook(bank);
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, List.of(dog), rules);
+    entity.depositToBank(new Money(100));
+    DevelopmentLoanBook.Position position = book.recordEntityLoan(
+        entity, street.type(), new Money(40), 0, null);
+
+    assertThat(book.repayEntityLoan(position)).isTrue();
+    assertThat(position.outstanding()).isEqualTo(Money.ZERO);
+    assertThat(entity.loan()).isEqualTo(Money.ZERO);
+    assertThat(entity.bankBalance()).isEqualTo(new Money(60));
+  }
+
+  @Test
   void aShortfallAboveTheLoanToValueCapCannotBeRaised() {
     dog.account().deposit(new Money(5));
     highHat.account().deposit(new Money(500));
