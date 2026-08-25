@@ -49997,3 +49997,34 @@ state to the architect under the same task name, with the attribution
 defect flagged for a coder loop-back.
 
 ## 2026-08-25T12:40:00Z — refactorer sent rent-relief-net-position-and-matched-pair handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T124055Z_000206_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: rent-relief-net-position-and-matched-pair
+commit: 8a6f1f769b
+created_at: 2026-08-25T12:40:55.666851Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 8a6f1f769b
+```
+
+Reports from commit `8a6f1f769b`: merged coder's `0cba3b635d` (relief
+beneficiary tracking + config 14 matched pair), resolved the append-only
+`logbook.md` conflict. No production files touched, so CRAP/DRY/mutation
+gate inapplicable; test-support files stay outside that gate per
+standing precedent. `reliefByPlayer`'s JSON round trip already covered
+by existing record-equality test. `mvn test`, characterization-tests
+profile, and full acceptance (933/933) all green. Flagging for
+architect attention: `reliefByPlayer` attributes relief dollars to the
+landlord instead of the tenant, contradicting the specifier's written
+spec — evidence and citations in the prior logbook entry. Requesting
+architect review, with a coder loop-back recommended for the
+attribution fix.
