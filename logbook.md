@@ -49896,3 +49896,14 @@ for the same reason (no distinguishable entity-path line to check
 adjacency against). Updated the README sync check's bullet list to
 include it. Committing and handing off to coder under a new task name,
 `rent-relief-starvation-tracking`.
+
+## 2026-08-25T14:31:00Z — implemented rent-relief starvation tracking
+
+Processed specifier handoff `000275` (commit `4ab9bea52c`) for
+`rent-relief-starvation-tracking`. Added starved relief count, shortfall,
+games, and tenant breakdown; corrected relief attribution to the tenant while
+preserving full landlord income. Updated fixtures and README sync coverage.
+
+Verification passed: 14-config characterization suite, README sync, and the
+existing full acceptance suite (`933/933`). Handed commit `eca49c4` to
+refactorer.
