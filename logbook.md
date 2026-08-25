@@ -50353,3 +50353,54 @@ pointed to `CHARACTERIZATION-TESTS.md`/`README.md` instead, which
 `ReadmeSyncTest` guards against drift. Committing directly; pure
 documentation, no code or spec content changed, nothing for another
 role to process.
+
+## 2026-08-25T16:00:00Z — specified unified income tax, batched and routed to coder
+
+User proposed a new optional tax: as players pass Start, tax 43% of a
+*unified* gross income combining labour and rent, alongside the existing
+per-source taxes. Settled the design with two clarifying questions before
+writing anything: (1) it's a new, independent flag that *can* combine
+with war profits tax, taxing the same rent twice from two separate
+accumulators — an intentional stacking mode, not guarded against; (2) it
+is its own wholly separate assessment (not a modification of MegaCorp's
+own code), conceptually taxing one combined base (gross salary + gross
+rent collected since this player's own last assessment under this tax)
+at 43%, feeding the same government account MegaCorp and war profits tax
+already feed and rent relief spends from, flag name
+`--optional-unified-income-tax`.
+
+Wrote `unified-income-tax.feature` (this round, isolated-computation
+scope matching how `megacorp-salary-tax.feature`/`war-profits-tax.feature`
+each started) plus a properly-split backlog (interaction/stacking in the
+feature's own backlog; observability in `journal.feature`/`report.feature`/
+`logging.feature`'s own backlogs; CLI wiring in `specs-cli/en/cli.feature`'s -
+correcting an initial draft that wrongly lumped all of it into the
+feature's own backlog file). User then asked whether existing MegaCorp
+scenarios might apply here too - checked directly rather than assuming,
+and found two real gaps: `megacorp-salary-tax-1` tests both $200 and
+$400 salary (the double-salary case), which I'd only covered for $200;
+and `megacorp-salary-tax-3` proves the tax scales under the *real*
+double-salary-on-landing rule in a played mini-game, not just an
+isolated `$400` input. Before deciding where the second one belongs,
+traced both its assertions (`"collects a salary of $X"`,
+`"the government's final account balance is $X"`) to confirm they read
+pre-existing, generic journal entries (`SalaryCollected`,
+`GovernmentBalance`) with nothing MegaCorp-specific - meaning it needs
+zero new observability wiring despite using `"play the game"`, so it
+belongs in the tracked file this round (as `unified-income-tax-7`,
+mirroring `megacorp-salary-tax-3`'s own placement) rather than backlog.
+Added the missing $400 row to `unified-income-tax-2` and the new
+scenario 7.
+
+Verified before committing: `bb gherkin-parser` clean on both the
+tracked file and all five backlog files; `bb gherkin-ir-dry-checker`
+clean (only the same deliberate duplicate-step pattern
+`war-profits-tax-7` already uses, from calling "collects a salary"
+twice in the reset-proof scenario). Added the tracked file to
+`acceptance/pipeline-features.txt` (new tracked files aren't picked up
+automatically) and ran the full suite: red for exactly the right reason
+- `Unsupported step: And the unified income tax is enabled` on all 6
+new scenarios, no glue code existing yet - with every one of the
+933 pre-existing tests still passing (939 total, 6 new failures, zero
+unexpected). Committing and handing off to coder under a new task name,
+`unified-income-tax`.
