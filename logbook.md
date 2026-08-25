@@ -50206,3 +50206,82 @@ game's course), not just reporting a single "when does this happen"
 number in isolation. Updated the README sync check's bullet list.
 Committing and handing off to coder under a new task name,
 `relief-event-age-stats`.
+
+## 2026-08-25T13:15:00Z — refactorer processes coder handoff `603d8df860` (relief-event-age-stats)
+
+Handoff message received:
+
+```
+id: 20260825T130721Z_000280_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: relief-event-age-stats
+commit: 603d8df860
+
+Re-read your role and constitution.
+
+merge_and_process coder 603d8df860
+```
+
+Merged `603d8df860`. Two conflicts this time: the usual append-only
+`logbook.md` (both sides kept in full, same pattern as every prior
+conflict), and `CharacterizationTest.java`, which auto-merged cleanly
+(git resolved it - my prior round-trip addition and the coder's new
+test both landed in non-overlapping regions of the file; verified by
+diff after the merge). No production files touched.
+
+Coder adds `reliefAgeAtEvent`/`starvedAgeAtEvent` (`Stats`, min/max/
+mean/median) to `RentReliefExtras`, tracked via a `currentAge` value
+updated from each `"<name> starts a turn aged N years"` `TurnStarted`
+line (`Report.java:49`, confirmed unconditionally logged before any
+landing resolution in `Game.takeTurn`, `Game.java:408-413`) and read at
+the moment a relief/starved event fires - the same last-line-wins
+adjacency idiom already used for MegaCorp attribution and the tenant
+fix. Hand-traced the ordering: the top-of-loop starved check runs
+*before* the current line updates `currentAge`, so a starved event
+correctly gets the age from the tenant's own turn, not the age of
+whoever's `TurnStarted` line happens to be the current line. The
+coder's own new test (`recordsReliefAndStarvationAtTheMostRecentTurnAge`)
+verifies this directly against a three-turn fixture (ages 12/17/18) -
+no assertion gap this time.
+
+**Property-test finding, fixed here.** `RentReliefExtras` gained two
+more fields this cycle, `reliefAges`/`starvedAges` (raw
+`List<Integer>`, needed only so `merge()` can recompute the `Stats`
+summary across seeds) - `toJson()` only serializes the derived
+`Stats`, and `fromJson()` reconstructs both raw lists as `List.of()`,
+same established pattern already used for `WarProfitsTaxExtras`'s
+`governmentBalances`/`survivorCounts`. That means my round-trip
+addition from the last cycle,
+`assertThat(roundTripped).isEqualTo(relief)` on the whole
+`RentReliefExtras` record, was accidentally coupled to those private
+accumulator lists staying empty - it only kept passing because that
+fixture never triggers a non-empty age list (its one `TurnStarted`
+line comes *after* both events). A future extension that added
+non-empty test data would have hit a false failure from an
+implementation-detail field, not a real defect. Replaced it with
+field-by-field assertions on the meaningful data
+(`reliefPayments`/`reliefDollars`/`reliefByPlayer`/`starvedPayments`/
+`starvedDollars`/`starvedByPlayer`) - the same pattern the
+`WarProfitsTaxExtras` round-trip test already uses, for the same
+reason. Also added the round-trip coverage this diff itself left
+uncovered: extended `recordsReliefAndStarvationAtTheMostRecentTurnAge`
+with a `toJson()`/`fromJson()` check on `reliefAgeAtEvent`/
+`starvedAgeAtEvent` (the derived `Stats`, which *do* survive
+round-trip), using the fixture's real non-trivial age data (12 and 17)
+so the assertion isn't vacuous.
+
+CRAP/DRY/mutation gate: still inapplicable, no production file changed;
+touched files remain test-support, same standing exemption.
+
+Verification (domain reinstalled fresh first, per the environment note
+from the prior cycle, to avoid the stale-jar false positive again):
+`mvn test` (root reactor): green. `mvn test -Pcharacterization-tests`
+(cli): green, 19/19. Full acceptance: 933/933. Committing the test
+fixes and handing the verified state to the architect under the same
+task name.
+
+## 2026-08-25T13:20:00Z — refactorer sent relief-event-age-stats handoff to architect
