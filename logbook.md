@@ -48544,3 +48544,6 @@ has lost every street through individual foreclosures: the current
 static formation list. Route this tightly characterized follow-up to coder
 under the same task. The red property test must turn green without losing
 the unformed-fixture behavior that motivated the fallback.
+
+Sent coder handoff `000427` at `b399dc0212`; the coder owns the minimal
+production repair and must return the property suite green.
