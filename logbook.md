@@ -49194,3 +49194,24 @@ full acceptance, refactorer's direct seed sweep, and the red-to-green
 `development-loans-18` scenario, this closes
 `loan-foreclosure-null-winner-desync`. Return the completed phase to
 specifier.
+
+## 2026-08-25T12:05:00Z — specifier syncs after loan-foreclosure-null-winner-desync
+
+Merged architect handoff `000433` (commit `e9519bfeed`) after resolving a
+third append-only `logbook.md` conflict (both parents' entries kept in
+full). Ran `mvn test -Pcharacterization-tests` per the phase-complete sync
+rule: green (`CharacterizationTest` 12/12, `ReadmeSyncTest` 1/1, domain
+427/427). No drift. `loan-foreclosure-null-winner-desync` is closed:
+defect found while re-running rent-relief characterization scoping,
+reproduced and root-caused, specified as `development-loans-18` (verified
+red with the exact NPE), coder's null-winner-falls-back-to-returnToBank
+fix merged and independently verified, two resulting mutation survivors
+classified as genuine equivalences and registered, architect's final
+mutation run confirms clean. No further specifier action needed on this
+task.
+
+Both defects blocking the rent-relief characterization scoping (started
+2026-08-25 with `entity-dev-loan-dissolution-desync`) are now closed. Next:
+re-run config13 (asset-rich billionaire + legal-entity + development-loans
++ rent-relief + war-profits-tax) to confirm it's clean now, then update
+`CHARACTERIZATION-TESTS.md` with all three candidate configs together.
