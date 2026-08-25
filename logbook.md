@@ -48894,3 +48894,17 @@ with the earlier 32/32 property-test run and refactorer's seed 0–99 direct
 reproduction sweep, this closes the original dissolution desynchronization,
 the surviving-entity collateral reuse defect, its all-streets-lost edge case,
 and the acceptance mutation gaps. Return the completed phase to specifier.
+
+## 2026-08-25T10:50:00Z — specifier syncs after entity-dev-loan-dissolution-desync
+
+Merged architect handoff `000431` (commit `601d766d84`) after resolving a
+second append-only `logbook.md` conflict (both parents' entries kept in
+full). Ran `mvn test -Pcharacterization-tests` per the phase-complete sync
+rule: green (`CharacterizationTest` 12/12, `ReadmeSyncTest` 1/1, domain
+425/425). No drift. `entity-dev-loan-dissolution-desync` is closed:
+defect reported and reproduced, root cause confirmed, coder's
+settle-before-dissolve fix merged and independently verified across seeds
+0-99, two new acceptance scenarios (`share-sale-24`/`25`) specify the
+correct behavior, their four mutation survivors resolved with a real
+`dog`'s-final-balance assertion, and the architect's final mutation run
+confirms clean. No further specifier action needed on this task.
