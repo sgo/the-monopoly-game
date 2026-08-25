@@ -50285,3 +50285,38 @@ Merged the refactorer handoff after resolving the append-only
 adds relief/starvation event-age statistics and makes the round-trip
 test assert only persisted fields, as the event-age lists are ephemeral.
 Reviewing the test-support change for architectural issues.
+
+## 2026-08-25T15:20:00Z — specifier syncs after relief-event-age-stats, last outstanding rent-relief task closed
+
+Merged architect handoff `000440` (commit `1f6d6fa755`, "Merge relief
+event age statistics review") after resolving an eighth append-only
+`logbook.md` conflict (two separate hunks this time; one incoming side
+was empty, resolved by keeping HEAD's content as-is). Ran `mvn test
+-Pcharacterization-tests`: green (`CharacterizationTest` 19/19,
+`ReadmeSyncTest` 1/1, domain 430/430).
+
+Confirmed both age-`Stats` blocks are live in `README.md` for configs
+11-13 ("Relief age at event" / "Starved age at event"), and the
+comparison this whole chain was built to run produced a genuinely
+nuanced result, not a flat confirmation of the original hypothesis:
+- Config 11 (relief only, no war-profits-tax): starved events skew
+  *older* than received ones (mean 26.9yr vs 20.3yr) - the simple
+  "funding gap widens over time" story, as hypothesized, though the
+  effect is modest since these games are short (~28yr mean).
+- Configs 12 and 13 (relief + war-profits-tax): the pattern *reverses* -
+  starved events skew markedly *younger* than received ones (config 12:
+  mean 126.0yr vs 343.8yr; config 13: mean 66.2yr vs 205.8yr). Read this
+  as a regime switch, not a gradual squeeze: before any player
+  accumulates enough land to trigger a first war-profits-tax payment,
+  the government has only MegaCorp's slow, steady inflow to draw on and
+  is fragile, so starvation clusters early; the first big war-tax
+  lump sum then refills the government heavily enough that relief
+  keeps succeeding for the remaining, much longer tail of the game,
+  pulling the *received* mean age far higher instead.
+
+This is a materially better answer than "the gap widens over time" - it
+only widens gradually when labour tax is the sole funding source; adding
+a lumpy, occasional wealth tax instead creates a fragile early period
+followed by an abundant one, with a sharp transition rather than a
+gradual trend. `relief-event-age-stats` is closed, and with it the last
+outstanding task from this session's rent-relief characterization work.
