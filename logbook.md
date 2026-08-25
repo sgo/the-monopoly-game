@@ -50139,3 +50139,46 @@ relief line, and the regression test covers both attribution and
 starvation. `mvn test` and `mvn test -Pcharacterization-tests` passed
 (430 core tests, 23 CLI tests plus 18 characterization tests, and the
 remaining modules green).
+
+## 2026-08-25T14:50:00Z — specifier syncs after rent-relief-net-position-and-matched-pair
+
+Merged architect handoff `000438` (commit `441fb4010d`, "Accept rent
+relief attribution correction") after resolving a sixth append-only
+`logbook.md` conflict. One resolution note: the incoming side's
+continuation picked up mid-entry with no header of its own (the header
+for that same refactorer entry, `` `refactorer processes coder handoff
+`0cba3b635d`` ``, was already present earlier in the file from an
+already-merged, non-conflicting portion) - added a duplicate header by
+reflex, caught it by grepping for the real one before committing, and
+removed it rather than leaving two headers for one entry.
+
+The refactorer caught a real bug before I had to: the coder's first pass
+credited `reliefByPlayer` to the *landlord* named in the
+`RentReliefPaid` line, exactly the mistake my own spec
+(`CHARACTERIZATION-TESTS.md:222-237`) explicitly called out and
+explained why it's wrong (the landlord's income is unaffected by relief
+either way; only the tenant's payment is ever reduced). Routed back to
+the coder via an architect priority-`00` loop, fixed, verified with a
+regression test on the credited *name*, not just aggregate totals - the
+gap that let the original bug through in the first place.
+
+This cycle also picked up and delivered `rent-relief-starvation-tracking`
+(starved count/total $/games, broken down by pawn) and config 14
+alongside the net-position work, ahead of their own separate handoffs
+still queued - confirmed directly in `README.md` (`Relief starved`,
+`Starved by pawn`, and the new "8 players - Greedo - peer-trading +
+legal-entity + dev-loans" detail block are all present and populated).
+Ran `mvn test -Pcharacterization-tests`: green (`CharacterizationTest`
+18/18, `ReadmeSyncTest` 1/1, domain 430/430). No drift.
+
+A striking real number worth flagging to the user once this sync is
+done: config 11's relief *starved* total ($1,484,885 shortfall, 1,297
+events) is more than double its *successful* relief total ($621,670,
+1,274 payments) - relief is already failing more often, and for more
+money, than it succeeds, even without war-profits-tax as a funding
+source. Directly supports the "labour-tax-only funding is inadequate"
+side of the user's hypothesis, independent of the still-pending
+age-at-event data. `rent-relief-net-position-and-matched-pair` is
+closed. `rent-relief-starvation-tracking` also appears closed (confirmed
+in README, but its own handoff mail hasn't arrived yet - will process
+formally when it does). `relief-event-age-stats` remains outstanding.
