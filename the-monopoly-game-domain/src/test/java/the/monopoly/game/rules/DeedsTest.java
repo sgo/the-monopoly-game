@@ -215,6 +215,19 @@ class DeedsTest {
     assertThat(thirdOwner.account().balance()).isEqualTo(Balance.of(1440));
   }
 
+  @Test
+  void sellingWithBothCardsHeldAlwaysPicksTheSameOneRegardlessOfHashOrder() {
+    Player owner = playerWith("owner", 1500);
+    Player buyer = playerWith("buyer", 1500);
+    deeds.hold(Deeds.RetainedCard.COMMUNITY_CHEST_GET_OUT_OF_JAIL_FREE, owner);
+    deeds.hold(Deeds.RetainedCard.CHANCE_GET_OUT_OF_JAIL_FREE, owner);
+
+    deeds.sellGetOutOfJailFreeCard(owner, buyer, new Money(50));
+
+    assertThat(deeds.holds(Deeds.RetainedCard.CHANCE_GET_OUT_OF_JAIL_FREE, buyer)).isTrue();
+    assertThat(deeds.holds(Deeds.RetainedCard.COMMUNITY_CHEST_GET_OUT_OF_JAIL_FREE, owner)).isTrue();
+  }
+
   private Ownable land(Street.Type type) {
     return (Ownable) ruleSet.create(type);
   }

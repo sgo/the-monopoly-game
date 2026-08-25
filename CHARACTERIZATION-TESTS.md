@@ -114,21 +114,23 @@ active, so it stays on rather than being isolated as its own axis here.
 Config 12 is config 11 plus only `--optional-war-profits-tax`, isolating
 that flag's effect on an all-Greedo table the same way config 10 isolates
 it for a billionaire. Config 13 is config 12 with one Greedo seat replaced
-by an asset-rich Billionaire, isolating that swap specifically. An ad-hoc
-50-seed run of each found war-profits-tax has a much larger effect here
+by an asset-rich Billionaire, isolating that swap specifically. The
+checked-in baselines show war-profits-tax has a much larger effect here
 than the billionaire does: config 11 resolves in an ordinary win 48/50
-times (2 stalemates), mean age at end around 31 years; adding
-war-profits-tax in config 12 flips that balance hard toward stalemate
-(18/50) and roughly an order of magnitude longer games (mean age around
-254 years) — the same runaway dynamic Greedo-vs-Greedo games are already
+times (4% stalemate), mean age at end 28.06 years; adding war-profits-tax
+in config 12 flips that balance hard toward stalemate (34%, 17/50) and
+more than a five-fold increase in game length (mean age 152.28 years,
+max 1730) — the same runaway dynamic Greedo-vs-Greedo games are already
 known to exhibit, now showing up with a full 8-player table once
 war-profits-tax and rent relief are both recirculating money. Swapping in
-the asset-rich Billionaire for config 13 barely moves either number (30/50
-wins, 20/50 stalemates, mean age around 218 years) — a far milder effect
-than the billionaire's win-rate collapse in config 10, where rent relief
-is absent; with relief active, the Billionaire's usual advantage from an
-early land-heavy opening appears substantially diluted by money flowing
-back to every player rather than concentrating with land ownership. These
+the asset-rich Billionaire for config 13 moves the outcome split only
+slightly (40% stalemate, 30/50 wins) and actually *shortens* the average
+game (mean age 132.66 years) — a far milder, and differently-shaped,
+effect than the billionaire's win-rate collapse in config 10, where rent
+relief is absent; with relief active, the Billionaire's usual advantage
+from an early land-heavy opening appears substantially diluted by money
+flowing back to every player rather than concentrating with land
+ownership. These
 three configs were also where an entity-dissolution/development-loan
 crash (`entity-dev-loan-dissolution-desync`) and a defaulted-loan-auction
 null-winner crash (`loan-foreclosure-null-winner-desync`) first surfaced
@@ -161,6 +163,16 @@ blind to a regression in it:
 - Income composition, summed across all players: salary collected, rent
   collected, direct bank payments (Chance/Community Chest), each as a
   total $.
+- Income by player: salary collected and rent collected (as landlord),
+  each broken down by pawn, alongside the aggregate totals above — a
+  regression that shifts income between specific players without moving
+  the total would otherwise be invisible. This is also the income side
+  needed to compute effective tax burden per player (see the
+  `--optional-rent-relief` extra and the README sync check below);
+  tracking it here in the generic core, rather than gating it behind a
+  tax-related flag, means burden is always computable for any config that
+  goes on to add a tax extra, without a separate income-tracking flag of
+  its own.
 
 **Extras** — present only for a config where the relevant flag is active,
 absent (not zeroed) otherwise, so a baseline never carries meaningless
@@ -182,7 +194,10 @@ always-empty fields:
   MegaCorp's salary tax to the same flag, so a config with relief on
   always has MegaCorp active too) — so this extra also tracks MegaCorp
   payments into the government account (count, total $), the other side
-  of relief's funding besides war profits tax.
+  of relief's funding besides war profits tax, plus that same total
+  broken down by pawn (mirroring war profits tax's own payer breakdown
+  below) — the tax side needed, alongside the generic core's per-player
+  income, to compute effective tax burden per player.
 - `--optional-war-profits-tax`: tax payments (count, total $), payer
   breakdown by pawn — plus final government-account balance as a
   min/max/mean/median `Stats` block, the same shape `ageAtEnd` already
@@ -214,6 +229,37 @@ always-empty fields:
   instead. A war-profits-tax config with no billionaire at all (e.g. an
   all-Greedo variant) would have no billionaire pawn to anchor this on
   and should omit the field entirely, not error.
+
+**Effective tax burden by pawn** — not its own extra, since it has no flag
+of its own and no dedicated JSON field: a README-only figure, derived at
+render/sync-check time the same way the outcome percentages already are,
+from the generic core's per-player income and whichever tax extras are
+active. Salary must be converted from the *net* figure the generic core
+tracks (what a pawn actually collects, after MegaCorp's tax is already
+withheld) to *gross* (before it), since dividing tax by an already-taxed
+income figure overstates the rate; net and gross differ only by the tax
+itself, so no new field or division is needed to recover it:
+```
+gross salary(pawn) = salary collected(pawn) + MegaCorp tax paid(pawn)
+burden %(pawn) = (MegaCorp tax paid(pawn) + war profits tax paid(pawn))
+                  / (gross salary(pawn) + rent collected(pawn)) × 100
+```
+Rent needs no such adjustment — it is never taxed at the point of
+collection (only later, in aggregate, by a war profits tax assessment),
+so the generic core's "rent collected" is already the gross figure.
+Pooled across every seed in the config (not averaged seed-by-seed) —
+summing every dollar of tax and every dollar of income a pawn ever
+touched across the whole config, then taking one ratio, so a long,
+lopsided seed doesn't get diluted down to the same weight as a short one.
+MegaCorp's term is $0 for a config without `--optional-rent-relief` (e.g.
+config 10); war profits tax's term is $0 for a config without
+`--optional-war-profits-tax`; a config with neither tax extra active has
+nothing to show and omits the figure entirely, the same way
+survivors-at-first-tax omits itself for a billionaire-less config. A pawn
+who never collects salary or rent (zero income) has nothing to divide by
+and is likewise omitted, not zero-filled or shown as an error value.
+Meaningful for any config combining at least one tax extra with the
+generic-core income breakdown — today that's configs 10 through 13.
 
 This schema is expected to grow (new extras for new flags) without
 invalidating existing baseline fixtures for configs that don't use the new
@@ -251,9 +297,11 @@ every data point shown for a config matches that config's fixture:
   min/median/mean/max.
 - Detailed Breakdown block: everything the Summary row has, plus winners,
   bankruptcies, auction count and its percentage of total land
-  acquisitions, mortgage count, income composition, and — for whichever
-  configs have them — loan origination/servicing, entity, peer-trade, and
-  war-profits-tax figures.
+  acquisitions, mortgage count, income composition (both the aggregate
+  total and the per-pawn breakdown), and — for whichever configs have
+  them — loan origination/servicing, entity, peer-trade, war-profits-tax,
+  and rent-relief figures, plus effective tax burden by pawn for any
+  config where that figure applies.
 
 Only the factual data points are checked, not the hand-written analytical
 asides (e.g. the `eight_greedo` income-scale comment, the "350 total =
@@ -262,8 +310,8 @@ judgment about what's worth pointing out, not something derived
 mechanically from a fixture, so there's nothing to verify them against.
 Some of the checked figures are themselves derived from the fixture rather
 than copied verbatim (the outcome percentages, the auction-vs-purchase
-ratio) — the test needs to reproduce that derivation, not just search for
-a raw JSON value as a substring.
+ratio, effective tax burden by pawn) — the test needs to reproduce that
+derivation, not just search for a raw JSON value as a substring.
 
 A failure names the config, the specific figure, and both the value found
 in the README and the value the fixture actually holds — same spirit as

@@ -49154,6 +49154,15 @@ mirror-path coverage, and Auction property tests. Merge both audit trails;
 the architect must independently run property, acceptance, and full Gherkin
 mutation gates before closing this new task.
 
+## 2026-08-25T12:40:00Z — certify rent-relief configs and determinism repair
+
+Architect verification is green: the full characterization profile passes
+with config12's baseline stable again, acceptance passes, and the full
+configured Gherkin mutation suite produces no survivor report. The repair
+sorts deed-derived ownership by board order and deterministically selects a
+retained card; parallel characterization is restored after validation.
+Return `rent-relief-configs-11-13` as phase complete to specifier.
+
 ## 2026-08-25T11:45:00Z — route null-winner auction survivor equivalence decision
 
 Architect verification confirms property and acceptance gates green, but the
@@ -49272,6 +49281,24 @@ Did not touch `CharacterizationConfig.java`, baseline fixtures, or
 README.md sync - that's coder's implementation. Committing the spec
 update and handing off under a new task name, `rent-relief-configs-11-13`.
 
+Sent handoff to coder:
+
+```
+id: 20260825T094428Z_000272_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: rent-relief-configs-11-13
+commit: f9b983d109
+created_at: 2026-08-25T09:44:28.505618Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier f9b983d109
+```
+
 ## 2026-08-25T10:16:32Z — refactorer processes coder handoff `b88d3e37a1` (rent-relief-configs-11-13): configs 11/13 verified, config12's baseline is genuinely unreliable
 
 Handoff message received:
@@ -49381,6 +49408,40 @@ can tell for configs 11 and 13. Handing the still-partially-red state to
 the architect under the same task name, flagging config12's baseline
 specifically.
 
+## 2026-08-25T10:17:21Z — refactorer sent rent-relief-configs-11-13 handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T101721Z_000203_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: rent-relief-configs-11-13
+commit: 2a512b3dc7
+created_at: 2026-08-25T10:17:21.749019Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 2a512b3dc7
+```
+
+Reports from commit `2a512b3dc7`: configs 11 and 13 verified clean.
+Config12's baseline is genuinely unreliable - fails against itself on
+2/2 full characterization-suite runs, with different wrong values each
+time, even fully serial (`workers=1` doesn't fix it; the divergence isn't
+a concurrency issue despite the coder's comment). Isolated to something
+deterministic within one JVM but varying between JVM invocations -
+consistent with identity-hashcode-dependent collection iteration order;
+`LegalEntity` has no `equals`/`hashCode` override and is the element type
+of a `HashSet<LegalEntity>` added in the dissolution work. Did not chase
+the exact code path (real investigation, not a verification pass). `mvn
+test`, acceptance, and property-tests all green - isolated to config12's
+long-running baseline specifically. Requesting architect routing; not
+proposing an implementation.
+
 ## 2026-08-25T12:30:00Z — route config12 cross-JVM nondeterminism to coder
 
 Received refactorer handoff `000203` (commit `2a512b3dc7`) and merged the
@@ -49394,13 +49455,183 @@ source, make the simulation deterministic across JVMs without weakening the
 config coverage, and return characterization tests reliably green. Do not
 accept baseline updates as a substitute for a deterministic result.
 
-## 2026-08-25T10:32:41Z — deterministic deed ordering repaired
+## 2026-08-25T10:49:01Z — refactorer processes coder handoff `65e974d34e` (rent-relief-configs-11-13): root cause fixed, verified, and one more instance found
 
-Implemented the architect's config12 determinism repair under
-`rent-relief-configs-11-13`. `Deeds.landOwnedBy` now sorts ownership results by
-stable `Street.Type` ordinal rather than `HashMap` iteration order, with a
-focused unit test. Regenerated the intentionally changed config12 fixture and
-synchronized README values. Domain tests, property tests, and the
-characterization/readme suite pass in a fresh Maven process. Handed commit
-`65e974d34e` to refactorer in
-`50_20260825T103241Z_000275_from_coder_to_refactorer.handoff`.
+Handoff message received:
+
+```
+id: 20260825T103241Z_000275_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: rent-relief-configs-11-13
+commit: 65e974d34e
+
+Re-read your role and constitution.
+
+merge_and_process coder 65e974d34e
+```
+
+Non-fast-forward merge from `c8d1e7c`. Resolved an append-only `logbook.md`
+conflict (both parents' entries kept in full). The architect routed my
+finding to the coder precisely (identified `Deeds.formedEntities` as the
+likely culprit); the coder found the actual one: `Deeds.landOwnedBy(Player)`
+/`landOwnedBy(LegalEntity)` returned raw `owners`/`entityOwners`
+(`HashMap<Street.Type, _>`) iteration order directly, unsorted. `Street.Type`
+is an enum with no `equals`/`hashCode` override, so `HashMap` bucket order
+follows default identity hashcodes - stable within one JVM process, but
+different between separate JVM invocations. Fix: both methods now
+`.sorted(Comparator.comparingInt(Enum::ordinal))` before returning (board
+order, since `Street.Type`'s declaration order *is* board order). My
+mechanism hypothesis (identity-hashcode-dependent collection iteration,
+stable-per-run-but-not-across-runs) was right; I'd just guessed the wrong
+collection (`formedEntities`/`LegalEntity`) instead of the actual one
+(`owners`/`entityOwners` keyed by `Street.Type`).
+
+Independent verification:
+- `mvn test`, full acceptance, and `mvn test -Pproperty-tests` (34/34) all
+  green.
+- **Ran the full characterization suite (`mvn test -Pcharacterization-tests`,
+  all 15 configs) as three separate `mvn` invocations (three separate
+  JVMs)**, with the coder's `workers=1` left in place: all three clean,
+  including config12, which had failed on every single previous attempt.
+- Since the actual root cause is now fixed, tested whether `workers=1` was
+  ever really necessary or just an accidental, incomplete mitigation for a
+  bug it was never actually diagnosing: restored
+  `Math.max(1, Runtime.getRuntime().availableProcessors())` and ran the
+  full suite as three more separate JVM invocations. All three also clean
+  - and ~4x faster (30s vs 125s per run). Kept the restoration: `workers=1`
+  was never the fix (I proved that two rounds ago - it failed with
+  `workers=1` in place, repeatedly, against different wrong values each
+  time), the real fix is the sort, and there's no remaining reason to pay
+  the serialization cost.
+- Given how much investigation this exact defect class took to pin down,
+  audited other unsorted `Map`/`Set` iteration in `Deeds.java` for the same
+  pattern (an enum key, no `.sorted()`, feeding a decision rather than an
+  aggregation): found one live instance.
+  `sellGetOutOfJailFreeCard`'s `retainedCards.entrySet().stream()
+  .filter(...).findFirst()` picks whichever `RetainedCard` (also an enum,
+  `CHANCE_GET_OUT_OF_JAIL_FREE`/`COMMUNITY_CHEST_GET_OUT_OF_JAIL_FREE`) a
+  seller holds via unordered `HashMap` iteration - reachable whenever a
+  player accumulates both cards over a long game (exactly the kind of
+  long, card-drawing-heavy games these new configs characterize). Fixed
+  identically: `.min(Comparator.comparingInt(Enum::ordinal))`. Added a
+  package-private `holds(RetainedCard, Player)` query (testability-only,
+  behavior-preserving) since no existing method could distinguish *which*
+  card a specific player ends up holding, and a directed
+  `DeedsTest` case proving a seller holding both cards always sells
+  `CHANCE_GET_OUT_OF_JAIL_FREE` and keeps `COMMUNITY_CHEST_GET_OUT_OF_JAIL_FREE`
+  regardless of hash order. Did not audit further afield (`Bankruptcy.java`,
+  `Journalling.java`, etc. all either sort/filter through a canonical order
+  already or only use these maps for order-independent aggregation/existence
+  checks, confirmed while tracing `landOwnedBy`'s callers) - this was a
+  targeted, evidence-driven check of the exact same pattern, not an
+  exhaustive sweep.
+- Analysis tools on every file changed since my last checkpoint
+  (`Deeds.java`, `CharacterizationTest.java`): DRY clean. Mutation-site
+  scan on `Deeds.java`: 46, unchanged, nowhere near the split threshold.
+  CRAP: `sellGetOutOfJailFreeCard` and both `holds` overloads are CRAP 1.0
+  at 100% coverage; the one exceedance in the file (`sellHouse`, CRAP 12.0)
+  is confirmed pre-existing and untouched. Property-test assessment: this
+  fix is a mechanical, correct-by-construction `.sorted()`/`.min()` over a
+  JDK-guaranteed comparator - the directed unit tests (the coder's for
+  `landOwnedBy`, mine for `sellGetOutOfJailFreeCard`) cover the actual
+  invariant directly; a property sweep would add little beyond what
+  `List.sorted()`'s own correctness already guarantees, so didn't add one.
+
+`rent-relief-configs-11-13` is now fully green: all three new configs
+verified, the underlying determinism defect that made config12's baseline
+unreliable is fixed and independently confirmed across six separate JVM
+invocations (three serial, three parallel), the characterization suite's
+parallel execution is restored (faster, and now safe), and one more live
+instance of the same defect class is closed. Committing and handing the
+verified state to the architect under the same task name.
+
+## 2026-08-25T13:00:00Z — specifier syncs after rent-relief-configs-11-13
+
+Merged architect handoff `000435` (commit `fb11bd24d2`, "Certify
+rent-relief configurations and determinism") after resolving a fourth
+append-only `logbook.md` conflict (both parents' entries kept in full).
+This task grew well past what I originally specified: on top of adding
+configs 11-13, it surfaced and fixed a real, previously-latent
+cross-JVM determinism defect - `Deeds.landOwnedBy` iterating an
+identity-hashed `HashMap<Street.Type, _>` directly, stable within one JVM
+but not across separate invocations, only visible in config12's
+long-running, stalemate-heavy games - plus one more live instance of the
+same pattern in `sellGetOutOfJailFreeCard`. Neither was something I could
+have specified in advance; both were found through the coder/refactorer
+verification loop this task's own new, longer-running configs exercised
+for the first time.
+
+Ran `mvn test -Pcharacterization-tests` per the phase-complete sync rule:
+green (`CharacterizationTest` 15/15 - all configs including 11-13,
+`ReadmeSyncTest` 1/1, domain 429/429). No drift. Deleted
+`RentReliefConfigsScratch.java` and its scratch log output now that real,
+permanent baseline fixtures exist for all three configs - no more need
+for the ad-hoc harness. `rent-relief-configs-11-13` is closed. No further
+specifier action needed on this task.
+
+## 2026-08-25T13:10:00Z — corrected stale figures in CHARACTERIZATION-TESTS.md's own prose
+
+User asked whether `README.md` was actually in sync with the new
+characterization data. It is (`ReadmeSyncTest` enforces this
+automatically, and reading `README.md` directly confirms configs 11-13's
+real rows and Detailed Breakdown blocks). But checking triggered a
+realization: the justification paragraph I wrote for configs 11-13 in
+`CHARACTERIZATION-TESTS.md` itself was not - it cited my own pre-fix
+ad-hoc 50-seed run, taken before the cross-JVM determinism defect this
+same task surfaced was found and fixed, so config 12 and 13's mean-age
+figures were quietly wrong (config 12: I wrote ~254yr, the real
+deterministic baseline is 152.28yr; config 13: I wrote ~218yr, actually
+132.66yr - not just off, but the wrong *direction*: config 13 shortens
+the average game relative to config 12, not lengthens it). Config 11's
+figures and every config's win/stalemate counts already matched.
+Corrected the paragraph to the real, checked-in baseline numbers.
+`CHARACTERIZATION-TESTS.md`'s own prose isn't covered by `ReadmeSyncTest`
+(that only checks `README.md` against the fixtures), so this drift
+wouldn't have been caught automatically - worth remembering next time
+this doc's prose cites specific figures from a run taken before a task's
+verification loop is fully closed out. Committing directly; no handoff
+needed, no code or spec content changed, nothing for another role to
+process.
+
+## 2026-08-25T13:20:00Z — specified effective tax burden per player, routed to coder
+
+User asked why effective tax burden per player wasn't listed anywhere in
+the characterization output, and confirmed they want it as a permanent
+tracked figure (README.md + baseline fixtures), not a one-off report.
+Extended `CHARACTERIZATION-TESTS.md`'s breakdown schema:
+- Generic core gains a new field, income by player (salary collected and
+  rent collected as landlord, broken down by pawn), alongside the
+  existing aggregate totals - tracked unconditionally rather than gated
+  behind a tax flag, since it's the income side the burden figure needs
+  regardless of which tax extra ends up active.
+- The `--optional-rent-relief` extra gains MegaCorp tax paid broken down
+  by pawn (mirroring war profits tax's existing payer breakdown).
+- A new, not-its-own-extra section: effective tax burden by pawn, a
+  README-only *derived* figure (no new JSON field, same pattern the
+  outcome percentages already use) - `(MegaCorp tax + war profits tax) /
+  (gross salary + rent collected) × 100`, pooled across every seed in the
+  config. Applies to any config with at least one tax extra active -
+  configs 10 through 13 today, not just the new ones, since config 10
+  already has war-profits-tax.
+
+Caught and fixed my own first draft before committing: I'd initially
+specified the denominator as "salary collected" (the generic core's
+*net* figure, after MegaCorp's tax is already withheld), which the user
+correctly flagged as wrong - dividing tax by an already-taxed figure
+overstates the rate and caps the salary-only ratio at 75.4% (43/57)
+instead of the intuitive 0-43% range that makes "effective tax rate" a
+meaningful concept. Net and gross differ only by the tax itself, so no
+new field or division is needed to recover gross: `gross salary = salary
+collected + MegaCorp tax paid`, both already-tracked figures. Rent needs
+no such adjustment - it's never taxed at the point of collection (only
+later, in aggregate, by a war-profits-tax assessment), so "rent
+collected" is already the gross figure.
+
+Updated the README sync check's Detailed Breakdown bullet list and
+derivation note to include both the per-player income breakdown and the
+new derived burden figure. Committing and handing off to coder under a
+new task name, `effective-tax-burden-per-player`.
