@@ -127,6 +127,11 @@ class CharacterizationTest {
     assertThat(relief.starvedPayments()).isEqualTo(1);
     assertThat(relief.starvedDollars()).isEqualTo(100);
     assertThat(relief.starvedByPlayer()).containsExactly(Map.entry("dog", 100L));
+
+    GameBreakdown breakdown = GameBreakdown.aggregate(List.of(result));
+    GameBreakdown.RentReliefExtras roundTripped = GameBreakdown.fromJson(breakdown.toJson())
+        .rentRelief().orElseThrow();
+    assertThat(roundTripped).isEqualTo(relief);
   }
 
   @ParameterizedTest

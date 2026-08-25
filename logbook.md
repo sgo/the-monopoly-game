@@ -50072,3 +50072,95 @@ for the same reason (no distinguishable entity-path line to check
 adjacency against). Updated the README sync check's bullet list to
 include it. Committing and handing off to coder under a new task name,
 `rent-relief-starvation-tracking`.
+
+## 2026-08-25T12:45:00Z — refactorer processes coder handoff `eca49c4454` (rent-relief-starvation-tracking)
+
+Handoff message received:
+
+```
+id: 20260825T124124Z_000278_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: rent-relief-starvation-tracking
+commit: eca49c4454
+
+Re-read your role and constitution.
+
+merge_and_process coder eca49c4454
+```
+
+Merged `eca49c4454`. One conflict, `logbook.md`, same append-only
+resolution as every prior conflict (both sides kept in full, HEAD
+first). No production files touched. Coder's diff adds `starvedByPlayer`
+tracking (a `RentPaid` line over $200, in a relief-active config, not
+immediately followed by a `RentReliefPaid` line) via a `pendingTenant`/
+`pendingShortfall` state machine in `GameBreakdown.GameResult`'s parse
+loop.
+
+**Confirms the `reliefByPlayer` attribution defect I flagged in my last
+handoff is now fixed** (as a side effect of implementing starvation
+tracking, not a formal priority-`00` loop-back — the specifier's own
+motivation this cycle was an unrelated user question about relief
+funding gaps). The starved-detection state machine needed the *tenant's*
+name captured at the `RentPaid` line regardless (`pendingTenant =
+line.substring(0, pays)`, `GameBreakdown.java:723`), and the coder wired
+`reliefByPlayer`'s credit to that same `pendingTenant` instead of the
+old `landlord` variable (`GameBreakdown.java:740`) - exactly the fix I
+described. Verified by hand-tracing the new parsing against
+`Journalling.paid`'s guaranteed adjacency (unchanged reasoning from last
+time) and by the coder's own new test,
+`attributesReliefToTheTenantAndTracksStarvedBills`, which asserts the
+credited name directly (`relief.reliefByPlayer()).containsExactly
+(Map.entry("cat", 50L))` for a `cat pays dog $250 rent` /
+`government pays dog $50 relief` fixture) - the exact assertion gap I
+called out last cycle, now closed. README's "Relief received"/"Net
+fiscal position" figures for configs 11-13 changed accordingly (now
+attached to the correct pawns).
+
+CRAP/DRY/mutation gate: still inapplicable, no production file changed;
+touched files (`GameBreakdown.java`, `CharacterizationTest.java`,
+`ReadmeSyncTest.java`) remain test-support, same standing exemption.
+
+Property-test assessment: the coder's new
+`attributesReliefToTheTenantAndTracksStarvedBills` asserts real,
+non-zero `starvedPayments`/`starvedDollars`/`starvedByPlayer` values
+directly but had no JSON round trip, unlike the sibling test for
+`reliefByPlayer`. Extended it with the same `aggregate().toJson()` /
+`fromJson()` round trip, asserting the whole `RentReliefExtras` record
+by equality - closes the one property-coverage gap this diff left, same
+pattern used every other cycle.
+
+**Environment note, not a defect in this diff - worth recording since it
+cost real time and will bite the next `-pl` verification run:** running
+`-Pcharacterization-tests` via `mvn -pl the-monopoly-game-cli test`
+(without `-am`) initially showed 3 configs failing on `megacorpTax*`
+fields alone (everything else, including the new `reliefByPlayer`/
+`starvedByPlayer` data, matched the baseline exactly). Chased it down:
+without `-am`, Maven resolves the `the-monopoly-game-domain` dependency
+from the installed jar at the project-local repo
+(`~/.m2/mavenonly/.../the-monopoly-game-domain-0.7.0-SNAPSHOT.jar`,
+confirmed via `dependency:build-classpath`) instead of the reactor's
+freshly-built `target/classes`. Byte-compared every relevant `.class`:
+`Game`, `Journalling`, `MegacorpSalaryTax`, `RentRelief` were identical
+in both places, but `Report.class` differed - a stale installed copy
+from an earlier point in this project's history (the CRAP-exempted
+`Report.line` has been reverted/changed multiple times per the
+2026-07-28 decision in this same file). `mvn install -pl
+the-monopoly-game-domain` refreshed the installed jar; re-running
+`-Pcharacterization-tests` (still without `-am`) then passed clean, 18/18.
+No production code changes were needed - this was purely a stale local
+Maven repo, not a bug in anyone's diff. Ruled out flakiness/concurrency
+first (reproduced 100% deterministically with `workers=1` in a scratch
+probe test, never committed, deleted after use) before finding the real
+cause.
+
+Verification, all after the reinstall: `mvn test` (root reactor): green.
+`mvn test -Pcharacterization-tests` (cli, with the fresh domain jar):
+green, 18/18. Full acceptance: 933/933. Committing the round-trip test
+addition and handing the verified state to the architect under the same
+task name.
+
+## 2026-08-25T13:00:00Z — refactorer sent rent-relief-starvation-tracking handoff to architect
