@@ -131,7 +131,34 @@ class CharacterizationTest {
     GameBreakdown breakdown = GameBreakdown.aggregate(List.of(result));
     GameBreakdown.RentReliefExtras roundTripped = GameBreakdown.fromJson(breakdown.toJson())
         .rentRelief().orElseThrow();
-    assertThat(roundTripped).isEqualTo(relief);
+    assertThat(roundTripped.reliefPayments()).isEqualTo(relief.reliefPayments());
+    assertThat(roundTripped.reliefDollars()).isEqualTo(relief.reliefDollars());
+    assertThat(roundTripped.reliefByPlayer()).containsExactlyInAnyOrderEntriesOf(relief.reliefByPlayer());
+    assertThat(roundTripped.starvedPayments()).isEqualTo(relief.starvedPayments());
+    assertThat(roundTripped.starvedDollars()).isEqualTo(relief.starvedDollars());
+    assertThat(roundTripped.starvedByPlayer()).containsExactlyInAnyOrderEntriesOf(relief.starvedByPlayer());
+  }
+
+  @Test
+  void recordsReliefAndStarvationAtTheMostRecentTurnAge() {
+    GameBreakdown.GameResult result = new GameBreakdown.GameResult("""
+        dog starts a turn aged 12 years with $100 and a $0 reserve
+        cat pays dog $250 rent for Rue de Diekirch Arlon
+        The government pays dog $50 in rent relief
+        dog starts a turn aged 17 years with $100 and a $0 reserve
+        dog pays cat $300 rent for Rue de Diekirch Arlon
+        dog starts a turn aged 18 years with $100 and a $0 reserve
+        """, false, false, false, false, true);
+
+    GameBreakdown.RentReliefExtras relief = result.rentRelief().orElseThrow();
+    assertThat(relief.reliefAgeAtEvent()).isEqualTo(GameBreakdown.Stats.of(List.of(12)));
+    assertThat(relief.starvedAgeAtEvent()).isEqualTo(GameBreakdown.Stats.of(List.of(17)));
+
+    GameBreakdown breakdown = GameBreakdown.aggregate(List.of(result));
+    GameBreakdown.RentReliefExtras roundTripped = GameBreakdown.fromJson(breakdown.toJson())
+        .rentRelief().orElseThrow();
+    assertThat(roundTripped.reliefAgeAtEvent()).isEqualTo(relief.reliefAgeAtEvent());
+    assertThat(roundTripped.starvedAgeAtEvent()).isEqualTo(relief.starvedAgeAtEvent());
   }
 
   @ParameterizedTest

@@ -400,7 +400,9 @@ record GameBreakdown(
                           Map<String, Long> megacorpTaxByPlayer,
                           Map<String, Long> reliefByPlayer,
                           int starvedPayments, long starvedDollars, int gamesWithStarvation,
-                          Map<String, Long> starvedByPlayer) {
+                          Map<String, Long> starvedByPlayer,
+                          Stats reliefAgeAtEvent, List<Integer> reliefAges,
+                          Stats starvedAgeAtEvent, List<Integer> starvedAges) {
     RentReliefExtras merge(RentReliefExtras other) {
       return new RentReliefExtras(reliefPayments + other.reliefPayments,
           reliefDollars + other.reliefDollars, gamesWithRelief + other.gamesWithRelief,
@@ -411,7 +413,9 @@ record GameBreakdown(
           mergeLongMaps(reliefByPlayer, other.reliefByPlayer),
           starvedPayments + other.starvedPayments, starvedDollars + other.starvedDollars,
           gamesWithStarvation + other.gamesWithStarvation,
-          mergeLongMaps(starvedByPlayer, other.starvedByPlayer));
+          mergeLongMaps(starvedByPlayer, other.starvedByPlayer),
+          Stats.of(concat(reliefAges, other.reliefAges)), concat(reliefAges, other.reliefAges),
+          Stats.of(concat(starvedAges, other.starvedAges)), concat(starvedAges, other.starvedAges));
     }
 
     String toJson() {
@@ -423,7 +427,9 @@ record GameBreakdown(
           + ", \"reliefByPlayer\": " + longMapToJson(reliefByPlayer)
           + ", \"starvedPayments\": " + starvedPayments + ", \"starvedDollars\": " + starvedDollars
           + ", \"gamesWithStarvation\": " + gamesWithStarvation
-          + ", \"starvedByPlayer\": " + longMapToJson(starvedByPlayer) + "}";
+          + ", \"starvedByPlayer\": " + longMapToJson(starvedByPlayer)
+          + ", \"reliefAgeAtEvent\": " + reliefAgeAtEvent.toJson()
+          + ", \"starvedAgeAtEvent\": " + starvedAgeAtEvent.toJson() + "}";
     }
 
     static RentReliefExtras fromJson(String json) {
@@ -434,7 +440,8 @@ record GameBreakdown(
           parseStringIntMap(fields.get("megacorpTaxPayers")), parseStringLongMap(fields.get("megacorpTaxByPlayer")),
           parseStringLongMap(fields.get("reliefByPlayer")), Integer.parseInt(fields.get("starvedPayments")),
           parseLong(fields.get("starvedDollars")), Integer.parseInt(fields.get("gamesWithStarvation")),
-          parseStringLongMap(fields.get("starvedByPlayer")));
+          parseStringLongMap(fields.get("starvedByPlayer")), Stats.fromJson(fields.get("reliefAgeAtEvent")), List.of(),
+          Stats.fromJson(fields.get("starvedAgeAtEvent")), List.of());
     }
   }
 
@@ -490,6 +497,12 @@ record GameBreakdown(
     Map<String, Long> merged = new LinkedHashMap<>(a);
     b.forEach((k, v) -> merged.merge(k, v, Long::sum));
     return merged;
+  }
+
+  private static List<Integer> concat(List<Integer> a, List<Integer> b) {
+    List<Integer> result = new java.util.ArrayList<>(a);
+    result.addAll(b);
+    return result;
   }
 
   private static String longMapToJson(Map<String, Long> map) {
@@ -594,6 +607,9 @@ record GameBreakdown(
       long starvedDollars = 0;
       boolean gameHadStarvation = false;
       Map<String, Long> starvedByPlayer = new LinkedHashMap<>();
+      List<Integer> reliefAges = new java.util.ArrayList<>();
+      List<Integer> starvedAges = new java.util.ArrayList<>();
+      int currentAge = -1;
       String pendingTenant = null;
       long pendingShortfall = 0;
       boolean gameHadRelief = false;
@@ -613,7 +629,14 @@ record GameBreakdown(
           starvedDollars += pendingShortfall;
           gameHadStarvation = true;
           starvedByPlayer.merge(pendingTenant, pendingShortfall, Long::sum);
+          if (currentAge >= 0) starvedAges.add(currentAge);
           pendingTenant = null;
+        }
+        int agedAt = line.indexOf(" starts a turn aged ");
+        if (agedAt >= 0) {
+          int ageStart = agedAt + " starts a turn aged ".length();
+          int ageEnd = line.indexOf(" years", ageStart);
+          if (ageEnd > ageStart) currentAge = Integer.parseInt(line.substring(ageStart, ageEnd));
         }
         // Loan handling only counts when the config enables development loans,
         // because a plain land game never emits these lines and counting absent
@@ -739,6 +762,7 @@ record GameBreakdown(
             rent += amount;
             incomeByPlayer.merge(landlord, new Income.PlayerIncome(0, amount), Income.PlayerIncome::merge);
             if (pendingTenant != null) reliefByPlayer.merge(pendingTenant, amount, Long::sum);
+            if (currentAge >= 0) reliefAges.add(currentAge);
             pendingTenant = null;
           }
         }
@@ -768,11 +792,13 @@ record GameBreakdown(
         starvedDollars += pendingShortfall;
         gameHadStarvation = true;
         starvedByPlayer.merge(pendingTenant, pendingShortfall, Long::sum);
+        if (currentAge >= 0) starvedAges.add(currentAge);
       }
       this.rentRelief = rentRelief
           ? Optional.of(new RentReliefExtras(reliefPayments, reliefDollars, gameHadRelief ? 1 : 0,
               megacorpTaxPayments, megacorpTaxDollars, megacorpTaxPayers, megacorpTaxByPlayer, reliefByPlayer,
-              starvedPayments, starvedDollars, gameHadStarvation ? 1 : 0, starvedByPlayer))
+              starvedPayments, starvedDollars, gameHadStarvation ? 1 : 0, starvedByPlayer,
+              Stats.of(reliefAges), reliefAges, Stats.of(starvedAges), starvedAges))
           : Optional.empty();
     }
 
