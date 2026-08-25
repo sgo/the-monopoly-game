@@ -49427,3 +49427,97 @@ Route to coder under `rent-relief-configs-11-13`: isolate the exact ordering
 source, make the simulation deterministic across JVMs without weakening the
 config coverage, and return characterization tests reliably green. Do not
 accept baseline updates as a substitute for a deterministic result.
+
+## 2026-08-25T10:49:01Z — refactorer processes coder handoff `65e974d34e` (rent-relief-configs-11-13): root cause fixed, verified, and one more instance found
+
+Handoff message received:
+
+```
+id: 20260825T103241Z_000275_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: rent-relief-configs-11-13
+commit: 65e974d34e
+
+Re-read your role and constitution.
+
+merge_and_process coder 65e974d34e
+```
+
+Non-fast-forward merge from `c8d1e7c`. Resolved an append-only `logbook.md`
+conflict (both parents' entries kept in full). The architect routed my
+finding to the coder precisely (identified `Deeds.formedEntities` as the
+likely culprit); the coder found the actual one: `Deeds.landOwnedBy(Player)`
+/`landOwnedBy(LegalEntity)` returned raw `owners`/`entityOwners`
+(`HashMap<Street.Type, _>`) iteration order directly, unsorted. `Street.Type`
+is an enum with no `equals`/`hashCode` override, so `HashMap` bucket order
+follows default identity hashcodes - stable within one JVM process, but
+different between separate JVM invocations. Fix: both methods now
+`.sorted(Comparator.comparingInt(Enum::ordinal))` before returning (board
+order, since `Street.Type`'s declaration order *is* board order). My
+mechanism hypothesis (identity-hashcode-dependent collection iteration,
+stable-per-run-but-not-across-runs) was right; I'd just guessed the wrong
+collection (`formedEntities`/`LegalEntity`) instead of the actual one
+(`owners`/`entityOwners` keyed by `Street.Type`).
+
+Independent verification:
+- `mvn test`, full acceptance, and `mvn test -Pproperty-tests` (34/34) all
+  green.
+- **Ran the full characterization suite (`mvn test -Pcharacterization-tests`,
+  all 15 configs) as three separate `mvn` invocations (three separate
+  JVMs)**, with the coder's `workers=1` left in place: all three clean,
+  including config12, which had failed on every single previous attempt.
+- Since the actual root cause is now fixed, tested whether `workers=1` was
+  ever really necessary or just an accidental, incomplete mitigation for a
+  bug it was never actually diagnosing: restored
+  `Math.max(1, Runtime.getRuntime().availableProcessors())` and ran the
+  full suite as three more separate JVM invocations. All three also clean
+  - and ~4x faster (30s vs 125s per run). Kept the restoration: `workers=1`
+  was never the fix (I proved that two rounds ago - it failed with
+  `workers=1` in place, repeatedly, against different wrong values each
+  time), the real fix is the sort, and there's no remaining reason to pay
+  the serialization cost.
+- Given how much investigation this exact defect class took to pin down,
+  audited other unsorted `Map`/`Set` iteration in `Deeds.java` for the same
+  pattern (an enum key, no `.sorted()`, feeding a decision rather than an
+  aggregation): found one live instance.
+  `sellGetOutOfJailFreeCard`'s `retainedCards.entrySet().stream()
+  .filter(...).findFirst()` picks whichever `RetainedCard` (also an enum,
+  `CHANCE_GET_OUT_OF_JAIL_FREE`/`COMMUNITY_CHEST_GET_OUT_OF_JAIL_FREE`) a
+  seller holds via unordered `HashMap` iteration - reachable whenever a
+  player accumulates both cards over a long game (exactly the kind of
+  long, card-drawing-heavy games these new configs characterize). Fixed
+  identically: `.min(Comparator.comparingInt(Enum::ordinal))`. Added a
+  package-private `holds(RetainedCard, Player)` query (testability-only,
+  behavior-preserving) since no existing method could distinguish *which*
+  card a specific player ends up holding, and a directed
+  `DeedsTest` case proving a seller holding both cards always sells
+  `CHANCE_GET_OUT_OF_JAIL_FREE` and keeps `COMMUNITY_CHEST_GET_OUT_OF_JAIL_FREE`
+  regardless of hash order. Did not audit further afield (`Bankruptcy.java`,
+  `Journalling.java`, etc. all either sort/filter through a canonical order
+  already or only use these maps for order-independent aggregation/existence
+  checks, confirmed while tracing `landOwnedBy`'s callers) - this was a
+  targeted, evidence-driven check of the exact same pattern, not an
+  exhaustive sweep.
+- Analysis tools on every file changed since my last checkpoint
+  (`Deeds.java`, `CharacterizationTest.java`): DRY clean. Mutation-site
+  scan on `Deeds.java`: 46, unchanged, nowhere near the split threshold.
+  CRAP: `sellGetOutOfJailFreeCard` and both `holds` overloads are CRAP 1.0
+  at 100% coverage; the one exceedance in the file (`sellHouse`, CRAP 12.0)
+  is confirmed pre-existing and untouched. Property-test assessment: this
+  fix is a mechanical, correct-by-construction `.sorted()`/`.min()` over a
+  JDK-guaranteed comparator - the directed unit tests (the coder's for
+  `landOwnedBy`, mine for `sellGetOutOfJailFreeCard`) cover the actual
+  invariant directly; a property sweep would add little beyond what
+  `List.sorted()`'s own correctness already guarantees, so didn't add one.
+
+`rent-relief-configs-11-13` is now fully green: all three new configs
+verified, the underlying determinism defect that made config12's baseline
+unreliable is fixed and independently confirmed across six separate JVM
+invocations (three serial, three parallel), the characterization suite's
+parallel execution is restored (faster, and now safe), and one more live
+instance of the same defect class is closed. Committing and handing the
+verified state to the architect under the same task name.
