@@ -93,7 +93,10 @@ class CharacterizationTest {
   @EnumSource(CharacterizationConfig.class)
   void characterization(CharacterizationConfig config) throws IOException {
     List<GameBreakdown.GameResult> results = new ArrayList<>();
-    int workers = Math.max(1, Runtime.getRuntime().availableProcessors());
+    // Simulator runs share process-wide strategy/game support, so concurrent
+    // seeded games can influence one another and make characterization
+    // baselines drift. Keep each seed isolated and deterministic.
+    int workers = 1;
     try (ExecutorService pool = Executors.newFixedThreadPool(workers)) {
       List<Future<GameBreakdown.GameResult>> futures = Arrays.stream(SEEDS)
           .mapToObj(seed -> pool.submit(() -> runSeed(config, seed)))

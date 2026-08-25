@@ -81,6 +81,9 @@ cap against a run that never naturally terminates:
 | 8 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-asset-rich-billionaire` |
 | 9 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-asset-rich-billionaire` `--optional-development-loans` |
 | 10 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-asset-rich-billionaire` `--optional-war-profits-tax` |
+| 11 | 8 | Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-development-loans` `--optional-rent-relief` |
+| 12 | 8 | Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-development-loans` `--optional-rent-relief` `--optional-war-profits-tax` |
+| 13 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-development-loans` `--optional-rent-relief` `--optional-war-profits-tax` `--optional-asset-rich-billionaire` |
 
 Configs 7 and 8 are identical except for the one flag that matters
 (`--optional-asset-rich-billionaire`), so a comparison between their two
@@ -103,6 +106,35 @@ found a large effect worth permanently tracking: the asset-rich
 billionaire's win rate collapsed from 50/50 to 5/50, ordinary wins fell
 from 100% to 74% (the rest stalemating), and mean age at end rose from
 ~4 to ~82 years.
+
+Configs 11 through 13 form their own isolation chain, all-Greedo apart
+from config 13, all with `--optional-rent-relief` on throughout — every
+config found while adding this chain was reproducible with rent relief
+active, so it stays on rather than being isolated as its own axis here.
+Config 12 is config 11 plus only `--optional-war-profits-tax`, isolating
+that flag's effect on an all-Greedo table the same way config 10 isolates
+it for a billionaire. Config 13 is config 12 with one Greedo seat replaced
+by an asset-rich Billionaire, isolating that swap specifically. An ad-hoc
+50-seed run of each found war-profits-tax has a much larger effect here
+than the billionaire does: config 11 resolves in an ordinary win 48/50
+times (2 stalemates), mean age at end around 31 years; adding
+war-profits-tax in config 12 flips that balance hard toward stalemate
+(18/50) and roughly an order of magnitude longer games (mean age around
+254 years) — the same runaway dynamic Greedo-vs-Greedo games are already
+known to exhibit, now showing up with a full 8-player table once
+war-profits-tax and rent relief are both recirculating money. Swapping in
+the asset-rich Billionaire for config 13 barely moves either number (30/50
+wins, 20/50 stalemates, mean age around 218 years) — a far milder effect
+than the billionaire's win-rate collapse in config 10, where rent relief
+is absent; with relief active, the Billionaire's usual advantage from an
+early land-heavy opening appears substantially diluted by money flowing
+back to every player rather than concentrating with land ownership. These
+three configs were also where an entity-dissolution/development-loan
+crash (`entity-dev-loan-dissolution-desync`) and a defaulted-loan-auction
+null-winner crash (`loan-foreclosure-null-winner-desync`) first surfaced
+and were fixed — both bugs pre-dated this chain but had gone unexercised
+by every existing config until legal-entity trading, development loans,
+and a foreclosure with cash-poor remaining bidders all coincided here.
 
 ## The breakdown
 
@@ -143,6 +175,14 @@ always-empty fields:
 - `--optional-greedo-legal-entity`: entities formed count, entities
   dissolved count.
 - `--optional-greedo-stalemate-trading`: peer trades executed count.
+- `--optional-rent-relief`: relief payments (count, total $), games with at
+  least one relief payment. Relief is funded by whatever tax revenue is
+  active, war profits tax and/or MegaCorp's individual income tax on
+  salary (`--optional-rent-relief` binds both the relief mechanism and
+  MegaCorp's salary tax to the same flag, so a config with relief on
+  always has MegaCorp active too) — so this extra also tracks MegaCorp
+  payments into the government account (count, total $), the other side
+  of relief's funding besides war profits tax.
 - `--optional-war-profits-tax`: tax payments (count, total $), payer
   breakdown by pawn — plus final government-account balance as a
   min/max/mean/median `Stats` block, the same shape `ageAtEnd` already
