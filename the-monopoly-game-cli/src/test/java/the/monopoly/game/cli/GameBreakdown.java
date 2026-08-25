@@ -397,14 +397,21 @@ record GameBreakdown(
   record RentReliefExtras(int reliefPayments, long reliefDollars, int gamesWithRelief,
                           int megacorpTaxPayments, long megacorpTaxDollars,
                           Map<String, Integer> megacorpTaxPayers,
-                          Map<String, Long> megacorpTaxByPlayer) {
+                          Map<String, Long> megacorpTaxByPlayer,
+                          Map<String, Long> reliefByPlayer,
+                          int starvedPayments, long starvedDollars, int gamesWithStarvation,
+                          Map<String, Long> starvedByPlayer) {
     RentReliefExtras merge(RentReliefExtras other) {
       return new RentReliefExtras(reliefPayments + other.reliefPayments,
           reliefDollars + other.reliefDollars, gamesWithRelief + other.gamesWithRelief,
           megacorpTaxPayments + other.megacorpTaxPayments,
           megacorpTaxDollars + other.megacorpTaxDollars,
           mergeMaps(megacorpTaxPayers, other.megacorpTaxPayers),
-          mergeLongMaps(megacorpTaxByPlayer, other.megacorpTaxByPlayer));
+          mergeLongMaps(megacorpTaxByPlayer, other.megacorpTaxByPlayer),
+          mergeLongMaps(reliefByPlayer, other.reliefByPlayer),
+          starvedPayments + other.starvedPayments, starvedDollars + other.starvedDollars,
+          gamesWithStarvation + other.gamesWithStarvation,
+          mergeLongMaps(starvedByPlayer, other.starvedByPlayer));
     }
 
     String toJson() {
@@ -412,7 +419,11 @@ record GameBreakdown(
           + ", \"gamesWithRelief\": " + gamesWithRelief + ", \"megacorpTaxPayments\": "
           + megacorpTaxPayments + ", \"megacorpTaxDollars\": " + megacorpTaxDollars
           + ", \"megacorpTaxPayers\": " + mapToJson(megacorpTaxPayers)
-          + ", \"megacorpTaxByPlayer\": " + longMapToJson(megacorpTaxByPlayer) + "}";
+          + ", \"megacorpTaxByPlayer\": " + longMapToJson(megacorpTaxByPlayer)
+          + ", \"reliefByPlayer\": " + longMapToJson(reliefByPlayer)
+          + ", \"starvedPayments\": " + starvedPayments + ", \"starvedDollars\": " + starvedDollars
+          + ", \"gamesWithStarvation\": " + gamesWithStarvation
+          + ", \"starvedByPlayer\": " + longMapToJson(starvedByPlayer) + "}";
     }
 
     static RentReliefExtras fromJson(String json) {
@@ -420,7 +431,10 @@ record GameBreakdown(
       return new RentReliefExtras(Integer.parseInt(fields.get("reliefPayments")),
           parseLong(fields.get("reliefDollars")), Integer.parseInt(fields.get("gamesWithRelief")),
           Integer.parseInt(fields.get("megacorpTaxPayments")), parseLong(fields.get("megacorpTaxDollars")),
-          parseStringIntMap(fields.get("megacorpTaxPayers")), parseStringLongMap(fields.get("megacorpTaxByPlayer")));
+          parseStringIntMap(fields.get("megacorpTaxPayers")), parseStringLongMap(fields.get("megacorpTaxByPlayer")),
+          parseStringLongMap(fields.get("reliefByPlayer")), Integer.parseInt(fields.get("starvedPayments")),
+          parseLong(fields.get("starvedDollars")), Integer.parseInt(fields.get("gamesWithStarvation")),
+          parseStringLongMap(fields.get("starvedByPlayer")));
     }
   }
 
@@ -575,6 +589,13 @@ record GameBreakdown(
       Map<String, Long> taxByPlayer = new LinkedHashMap<>();
       int reliefPayments = 0;
       long reliefDollars = 0;
+      Map<String, Long> reliefByPlayer = new LinkedHashMap<>();
+      int starvedPayments = 0;
+      long starvedDollars = 0;
+      boolean gameHadStarvation = false;
+      Map<String, Long> starvedByPlayer = new LinkedHashMap<>();
+      String pendingTenant = null;
+      long pendingShortfall = 0;
       boolean gameHadRelief = false;
       int megacorpTaxPayments = 0;
       long megacorpTaxDollars = 0;
@@ -587,6 +608,13 @@ record GameBreakdown(
       List<Integer> survivorCounts = new java.util.ArrayList<>();
 
       for (String line : lines) {
+        if (rentRelief && pendingTenant != null && pendingShortfall > 0 && !line.startsWith("The government pays ")) {
+          starvedPayments++;
+          starvedDollars += pendingShortfall;
+          gameHadStarvation = true;
+          starvedByPlayer.merge(pendingTenant, pendingShortfall, Long::sum);
+          pendingTenant = null;
+        }
         // Loan handling only counts when the config enables development loans,
         // because a plain land game never emits these lines and counting absent
         // mechanics would be misleading under a loans extra.
@@ -693,6 +721,10 @@ record GameBreakdown(
           if (pays >= 0 && dollars > pays + 6) {
             String landlord = line.substring(pays + 6, dollars);
             incomeByPlayer.merge(landlord, new Income.PlayerIncome(0, amount), Income.PlayerIncome::merge);
+            if (rentRelief) {
+              pendingTenant = line.substring(0, pays);
+              pendingShortfall = Math.max(0, amount - 200);
+            }
           }
         }
         if (rentRelief && line.startsWith("The government pays ")) {
@@ -706,6 +738,8 @@ record GameBreakdown(
             long amount = dollarsAfter(line, " $");
             rent += amount;
             incomeByPlayer.merge(landlord, new Income.PlayerIncome(0, amount), Income.PlayerIncome::merge);
+            if (pendingTenant != null) reliefByPlayer.merge(pendingTenant, amount, Long::sum);
+            pendingTenant = null;
           }
         }
         if (line.contains("receives $") && line.contains(" from the bank"))
@@ -729,9 +763,16 @@ record GameBreakdown(
               Stats.of(governmentBalances), governmentBalances,
               survivorCounts.isEmpty() ? Optional.empty() : Optional.of(Stats.of(survivorCounts)), survivorCounts))
           : Optional.empty();
+      if (rentRelief && pendingTenant != null && pendingShortfall > 0) {
+        starvedPayments++;
+        starvedDollars += pendingShortfall;
+        gameHadStarvation = true;
+        starvedByPlayer.merge(pendingTenant, pendingShortfall, Long::sum);
+      }
       this.rentRelief = rentRelief
           ? Optional.of(new RentReliefExtras(reliefPayments, reliefDollars, gameHadRelief ? 1 : 0,
-              megacorpTaxPayments, megacorpTaxDollars, megacorpTaxPayers, megacorpTaxByPlayer))
+              megacorpTaxPayments, megacorpTaxDollars, megacorpTaxPayers, megacorpTaxByPlayer, reliefByPlayer,
+              starvedPayments, starvedDollars, gameHadStarvation ? 1 : 0, starvedByPlayer))
           : Optional.empty();
     }
 

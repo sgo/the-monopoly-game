@@ -82,6 +82,8 @@ class ReadmeSyncTest {
     baseline.rentRelief().ifPresent(relief -> validateRentRelief(block, relief, configLabel));
     if (baseline.warProfitsTax().isPresent() || baseline.rentRelief().isPresent())
       assertField(block, "Effective tax burden", effectiveTaxBurden(baseline), configLabel);
+    if (baseline.rentRelief().isPresent())
+      assertField(block, "Net fiscal position", netFiscalPosition(baseline), configLabel);
   }
 
   private static String incomeByPlayer(GameBreakdown.Income income) {
@@ -97,6 +99,10 @@ class ReadmeSyncTest {
     assertField(block, "MegaCorp salary tax", group(relief.megacorpTaxPayments()) + " payments, \\$"
         + dollars(relief.megacorpTaxDollars()) + " total", configLabel);
     assertNameLongMultiset(block, "MegaCorp tax payers", relief.megacorpTaxByPlayer(), configLabel);
+    assertNameLongMultiset(block, "Relief received", relief.reliefByPlayer(), configLabel);
+    assertField(block, "Relief starved", group(relief.starvedPayments()) + " payments, \\$"
+        + dollars(relief.starvedDollars()) + " shortfall, " + relief.gamesWithStarvation() + " games", configLabel);
+    assertNameLongMultiset(block, "Starved by pawn", relief.starvedByPlayer(), configLabel);
   }
 
   private static String effectiveTaxBurden(GameBreakdown baseline) {
@@ -113,6 +119,23 @@ class ReadmeSyncTest {
             grossSalary += baseline.rentRelief().get().megacorpTaxByPlayer().getOrDefault(entry.getKey(), 0L);
           double burden = tax * 100.0 / (grossSalary + entry.getValue().rent());
           return entry.getKey() + " " + String.format(java.util.Locale.ROOT, "%.2f%%", burden);
+        }).collect(java.util.stream.Collectors.joining(", "));
+  }
+
+  private static String netFiscalPosition(GameBreakdown baseline) {
+    GameBreakdown.RentReliefExtras relief = baseline.rentRelief().orElseThrow();
+    Map<String, Long> taxes = new java.util.LinkedHashMap<>();
+    baseline.warProfitsTax().ifPresent(tax -> taxes.putAll(tax.payerDollars()));
+    relief.megacorpTaxByPlayer().forEach((name, amount) -> taxes.merge(name, amount, Long::sum));
+    return baseline.core().income().byPlayer().entrySet().stream()
+        .filter(entry -> entry.getValue().salary() + entry.getValue().rent() > 0)
+        .map(entry -> {
+          long grossSalary = entry.getValue().salary()
+              + relief.megacorpTaxByPlayer().getOrDefault(entry.getKey(), 0L);
+          double denominator = grossSalary + entry.getValue().rent();
+          double burden = taxes.getOrDefault(entry.getKey(), 0L) * 100.0 / denominator;
+          double reliefRate = relief.reliefByPlayer().getOrDefault(entry.getKey(), 0L) * 100.0 / denominator;
+          return entry.getKey() + " " + String.format(java.util.Locale.ROOT, "%.2f%%", reliefRate - burden);
         }).collect(java.util.stream.Collectors.joining(", "));
   }
 
