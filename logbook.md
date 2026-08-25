@@ -50164,3 +50164,34 @@ addition and handing the verified state to the architect under the same
 task name.
 
 ## 2026-08-25T13:00:00Z — refactorer sent rent-relief-starvation-tracking handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T125717Z_000207_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: rent-relief-starvation-tracking
+commit: d09765e73b
+created_at: 2026-08-25T12:57:17.496555Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer d09765e73b
+```
+
+Reports from commit `d09765e73b`: merged coder's `eca49c4454` (relief
+starvation tracking). Confirms the tenant-attribution defect flagged in
+my prior handoff is now fixed, as a side effect of this diff's parsing
+changes - verified by hand-trace and by the coder's own new test.
+Extended that test with a JSON round-trip assertion covering the new
+`starved*` fields. No production files touched, CRAP/DRY/mutation gate
+inapplicable. Chased down and resolved an unrelated false-positive
+characterization-tests failure (stale installed domain jar in the
+project-local Maven repo, only surfaces when building the cli module
+without `-am`) - documented for future sessions in the prior logbook
+entry. `mvn test`, characterization-tests (18/18), and full acceptance
+(933/933) all green. Requesting architect review.
