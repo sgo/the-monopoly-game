@@ -50724,3 +50724,118 @@ elsewhere, silently dropping it from the reported total.
 cleanly - that pair composes correctly today.
 
 Committed as `da85cd9` and handed off to the coder.
+
+## 2026-08-25T21:20:00Z — refactorer processes coder handoff `3339da7233` (unified-income-tax-followup)
+
+Handoff message received:
+
+```
+id: 20260825T211627Z_000282_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: unified-income-tax-followup
+commit: 3339da7233
+
+Re-read your role and constitution.
+
+merge_and_process coder 3339da7233
+```
+
+**Merge note, not a normal conflict.** The `logbook.md` conflict here
+was against a branch that had *already* lost content in an earlier
+merge (documented in its own history as "recovered a genuine
+content-loss bug" - the architect's own reconstruction, done by
+appending only the "truly new" material onto my prior commit's full
+history). That reconstruction was itself still incomplete: the incoming
+tip had my own "refactorer sent unified-income-tax handoff" header line
+with an *empty* body - the "Handoff message sent:" quote and the full
+"Reports from commit d84dcae17b..." paragraph were missing, exactly the
+same class of loss already described one entry later in the same file.
+Did not trust the automatic three-way result or assume a second
+recovery attempt by another role is necessarily complete; diffed my own
+commit's full `logbook.md` (which has my complete original entry)
+against the incoming tip directly and reconstructed by hand: my full
+entry first, then the architect's "received" entry, then their
+content-loss writeup, then both specifier entries, all in the order
+their own timestamps and cross-references already establish. Noting
+this here since it's now the *second* independent content-loss on this
+exact entry, on two different branches - worth treating "keep both
+sides in full" as something to verify against a known-good copy when
+available, not just trust after the markers are gone.
+
+Coder's diff (all in `the-monopoly-game-domain/src/main/java` +
+acceptance glue, promoting the observability/CLI backlog items
+specified at 23:10): adds `UnifiedIncomeTaxPaid`/`UnifiedIncomeTaxEnabled`
+journal entries and their `Report.line` narration (the sealed-switch
+dispatch, CRAP-exempted per the 2026-07-28 decision - confirmed the new
+`case` arms are plain, straight-line branches, nothing tangled), wires
+`collectedSalary` to log the payment instead of silently calling
+`assess`, and fixes the real `World.governmentAccountBalance()` gap the
+specifier found: `unifiedIncomeTaxBook.governmentBalance().plus
+(governmentBalance)` instead of returning `unifiedIncomeTaxBook`'s
+balance alone. Verified this fix is correct rather than a
+symptom-patch: traced `governmentBalance` (the bare `World` field) to
+confirm it's *only* ever written by `assessWarProfitsTax`'s hand-rolled
+isolated-scenario bookkeeping (`governmentBalance = governmentBalance.
+plus(tax)`, `World.java:828`), never by MegaCorp's or unified income
+tax's own paths, which both deposit into the real shared `Bank`
+`GovernmentAccount` instead - so the fix adds exactly the one pool of
+money `unifiedIncomeTaxBook.governmentBalance()` couldn't already see
+on its own, without double-counting MegaCorp (already visible via the
+shared bank) or risking `unified-income-tax-6`, which the specifier
+confirmed already passed before this fix.
+
+**Found a real regression, fixed here.** `mvn test` was red:
+`GameTest.aGameAccountsForWhoIsPlayingAndWhatEachOfThemRolledForInitiative`
+hard-codes the exact journal-entry sequence a game logs at start
+(`startsWith(Entry.Start, ..., MegacorpSalaryTaxEnabled(false), ...)`);
+the new unconditional `journal.log(new Entry.UnifiedIncomeTaxEnabled(...))`
+in `Game.play()` (mirroring `WarProfitsTaxEnabled`/`RentReliefEnabled`/
+`MegacorpSalaryTaxEnabled`, all logged regardless of whether the flag is
+on) now inserts one more entry between `MegacorpSalaryTaxEnabled` and
+the first `StrategyNamed`, which this test's fixture didn't account
+for. Same class of update every one of those three prior additions must
+have already needed when *they* were added. Added the missing
+`new Entry.UnifiedIncomeTaxEnabled(false)` line in the expected
+sequence - a one-line fixture fix to match already-intentional,
+already-covered-elsewhere production behavior, not new behavior of my
+own.
+
+CRAP (`crap4java`, `Game.java`/`Journalling.java`/`Report.java`):
+`collectedSalary` (the one method this diff meaningfully changed) sits
+at CRAP 5.0, under threshold. `Report.line` remains the one
+constitution-exempted violation (628.1, grew from 156-ish worth of new
+`case` arms accumulated since the exemption was recorded - width of the
+sealed type, not tangled control flow, so still exempt). `playTurns`
+(9.1) and `playTurn` (7.0) also exceed 6.0 but are completely untouched
+by this diff (confirmed via hunk boundaries) and were already at these
+exact same figures in my prior unified-income-tax review - pre-existing
+debt I didn't call out explicitly last time, calling it out now for the
+record. `dry4java`: the ~99 flagged duplicates are the same
+already-accepted "one thin method/record per sealed `Entry` type"
+pattern reviewed last cycle; none touch a line this diff changed.
+`mutate4java --scan`: `Game.java` 88, `Journalling.java` 28,
+`Report.java` 8 - all well under the split threshold.
+
+Property tests: no new numeric/computational logic this round (pure
+narration plus a test-harness bookkeeping fix), nothing to add.
+
+Still open, unrelated to this task (repeating from last cycle since it
+remains unaddressed): `World.java` still passes a boolean rather than
+the actual `UnifiedIncomeTaxBook` object into `Game`'s constructor, so
+pre-seeded rent still wouldn't survive a played game. Not touched by
+this diff either.
+
+Verification (domain reinstalled fresh first): `mvn test` (root,
+after the `GameTest` fix): green, 432/432 domain. `mvn test
+-Pcharacterization-tests`: green, 19/19 (unaffected). `mvn test
+-Pproperty-tests`: green (unaffected). Full acceptance: 952/952 (up
+from 939 - the 13 promoted scenarios, including both
+`unified-income-tax-5/6` interaction scenarios, all green). Committing
+the `GameTest` fix and handing the verified state to the architect
+under the same task name.
+
+## 2026-08-25T21:35:00Z — refactorer sent unified-income-tax-followup handoff to architect
