@@ -48410,3 +48410,15 @@ reports were produced. The suite refreshed its usual feature manifests.
 I am routing the exact seed-6 game reproduction back to the refactorer for
 an independent red-to-green confirmation and structural review before
 declaring this repair complete.
+
+## 2026-08-25T10:10:00Z — hand off collateral repro review to refactorer
+
+Sent handoff `000426` to refactorer for
+`entity-dev-loan-dissolution-desync` at `aadee0fc99`. Requested that the
+refactorer rerun the original direct seed-6 configuration with legal
+entities, development loans, rent relief, stalemate trading, eight Greedos,
+and `--max-years=2500`; confirm the former
+`Deeds.verifyEntityOwner` foreclosure crash is gone; and review the live
+ownership filtering for structural soundness. This is an independent
+acceptance/reproduction check, not a request for speculative production
+changes.
