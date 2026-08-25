@@ -48676,3 +48676,88 @@ Re-read your role and constitution.
 
 merge_and_process specifier 8fa77c1e51
 ```
+
+## 2026-08-25T08:24:52Z — refactorer processes coder handoff `2d89a14f40` (entity-dev-loan-dissolution-desync): verified complete
+
+Handoff message received:
+
+```
+id: 20260825T081650Z_000272_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: entity-dev-loan-dissolution-desync
+commit: 2d89a14f40
+
+Re-read your role and constitution.
+
+merge_and_process coder 2d89a14f40
+```
+
+Non-fast-forward merge from `7e0284d`. Resolved an append-only `logbook.md`
+conflict (both parents' final entries kept in full). This brought in a
+whole architect/coder/specifier loop I hadn't seen live: the architect
+routed my all-streets-lost diagnosis to the coder, who added explicit
+`formedEntities` tracking to `Deeds` (`hasBeenFormed`, set at `form`,
+cleared at `dissolve`) so `LegalEntityBuilding.ownedStreets` can correctly
+distinguish "never formed" from "formed, then lost every street" - closing
+the exact gap my property test found. Along the way my own JetCheck-based
+property test hit a harness limitation (`CannotSatisfyCondition` - too few
+distinct values for JetCheck's uniqueness sampling over only 8 possible
+3-bit masks) and was correctly replaced with deterministic exhaustive
+iteration over all 8 subsets instead - the right tool for a domain this
+small. The specifier separately staged two new acceptance scenarios
+(`share-sale-24`/`25`) for the *original* dissolution-desync mechanism
+(collateral foreclosed first when entity cash can't cover an outstanding
+loan; loan repaid and streets transfer normally when it can), verified red,
+then handed to coder. This final commit implements that: `Bankruptcy.
+liquidateEntity` now settles every outstanding entity loan position -
+`repayEntityLoan` from treasury when it covers the debt, else
+`forecloseEntity` - *before* `deeds.dissolve` runs, replacing the earlier
+"transfer the loan to the final shareholder" design entirely.
+
+Independent verification:
+- `mvn test`: green. `./acceptance/run-acceptance.sh`: 932/932 (the two new
+  share-sale scenarios included). `mvn test -Pproperty-tests`: 32/32 - the
+  all-streets-lost gap I found last round is now closed.
+- **Re-ran the specifier's original seed-6 repro directly against `Game`
+  once more, and widened the sweep to seeds 0-99** (up from my earlier
+  0-49): all 100 clean, no crash.
+- Analysis tools on every file changed since my last checkpoint
+  (`Bankruptcy.java`, `Deeds.java`, `DevelopmentLoanBook.java`,
+  `LegalEntityBuilding.java`): DRY clean, no duplicates. Mutation-site scan
+  all comfortably under the split threshold (59/46/73/93). CRAP: the one
+  pre-existing exceedance (`buildAsMuchAsAffordable`, 156.0, confirmed
+  unchanged CC=12 against the pre-this-saga revision) is untouched debt,
+  same as every prior round. A *second* exceedance surfaced this round,
+  though: `DevelopmentLoanBook.forecloseEntity` at CRAP 56.0, 0% coverage
+  - confirmed pre-existing too (CC=7, identical, at my very first
+  checkpoint this session, long before any of this saga's diffs touched
+  it) but now load-bearing for *two* separate fixes (the original crash
+  and this round's dissolution settlement) with zero direct unit coverage.
+  Added `forecloseEntitySellsTheCollateralToTheBankAndClearsTheEntitysLoan`
+  to `DevelopmentLoanBookTest` (a genuinely reasonable, proportionate
+  coverage increase given its now-higher criticality, not a push for 100%):
+  covers the core no-bidder/no-bondholder/zero-reserve path.
+  `forecloseEntity` moves from CRAP 56.0/0% to CRAP 12.1/52.8% - still
+  technically over threshold (auction-bidder-present and
+  hotel/house-liquidation branches remain uncovered), but a real
+  improvement; the residual is pre-existing debt outside this round's own
+  diff, consistent with every prior round's precedent, not blocking.
+- Dead-code cleanup: `DevelopmentLoanBook.transferEntityLoans` - the
+  earlier, now-fully-superseded "transfer loan to shareholder on
+  dissolution" design - had no callers left anywhere except its own unit
+  test once this commit replaced `Bankruptcy.liquidateEntity`'s call to it
+  with the settle-before-dissolve approach. Confirmed via repo-wide grep
+  before removing. Removed the method and its now-purposeless test
+  (`anEntityLoanFollowsItsCollateralToTheFinalShareholderWhenTheEntityDissolves`)
+  rather than leaving two conflicting designs for the same concern
+  coexisting in the codebase. Re-verified green after removal.
+
+`entity-dev-loan-dissolution-desync` is genuinely closed this time: the
+original crash is fixed and independently confirmed, the residual gap my
+property test found is fixed and independently confirmed, and this round
+added no new gaps. Committing the coverage addition and dead-code removal,
+then handing the verified state to the architect under the same task name.
