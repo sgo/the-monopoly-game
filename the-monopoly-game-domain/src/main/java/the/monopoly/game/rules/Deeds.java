@@ -22,6 +22,7 @@ import java.util.Optional;
 public class Deeds {
   private final Map<Street.Type, Player.ID> owners = new HashMap<>();
   private final Map<Street.Type, LegalEntity> entityOwners = new HashMap<>();
+  private final java.util.Set<LegalEntity> formedEntities = new java.util.HashSet<>();
   private final Map<Street.Type, Improvement> improvements = new HashMap<>();
   private final Map<Street.Type, Mortgage> mortgages = new HashMap<>();
   private final Map<RetainedCard, Player.ID> retainedCards = new HashMap<>();
@@ -41,6 +42,7 @@ public class Deeds {
   }
 
   public void form(LegalEntity entity) {
+    formedEntities.add(entity);
     entity.streets().forEach(street -> {
       owners.remove(street.type());
       entityOwners.put(street.type(), entity);
@@ -54,6 +56,11 @@ public class Deeds {
         owners.put(street.type(), shareholder.id());
     });
     entityOwners.entrySet().removeIf(entry -> entry.getValue().equals(entity));
+    formedEntities.remove(entity);
+  }
+
+  boolean hasBeenFormed(LegalEntity entity) {
+    return formedEntities.contains(entity);
   }
 
   public List<LegalEntity> legalEntities() {

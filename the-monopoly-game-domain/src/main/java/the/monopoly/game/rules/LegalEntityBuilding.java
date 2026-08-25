@@ -18,7 +18,7 @@ final class LegalEntityBuilding {
   /** Whether every shareholder would fund their share of the entity's next standard-cost improvement. */
   static boolean canFundNextImprovement(LegalEntity entity, Strategy.OfPlayers strategies, Rule.Set rules,
                                         Deeds deeds) {
-    return entity.streets().stream().anyMatch(street -> !deeds.hasHotelOn(street))
+    return ownedStreets(entity, deeds).stream().anyMatch(street -> !deeds.hasHotelOn(street))
         && allAgreeToBuild(entity, standardBuildCost(entity, deeds), strategies, rules, deeds);
   }
 
@@ -110,7 +110,7 @@ final class LegalEntityBuilding {
       if (next == null) break;
       Money candidateCost = totalCost.plus(next.houseConstructionCost());
       Money shortfall = candidateCost.minus(entity.bankBalance());
-      if (cannotExtendPlan(entity, shortfall, startedWithTreasuryFunds, plan)) break;
+      if (cannotExtendPlan(entity, deeds, shortfall, startedWithTreasuryFunds, plan)) break;
       plan.add(next);
       totalCost = candidateCost;
     }
@@ -124,11 +124,11 @@ final class LegalEntityBuilding {
         && entity.bankBalance().amount() > 0 && entity.bankBalance().amount() < 150;
   }
 
-  private static boolean cannotExtendPlan(LegalEntity entity, Money shortfall, boolean startedWithTreasuryFunds,
+  private static boolean cannotExtendPlan(LegalEntity entity, Deeds deeds, Money shortfall, boolean startedWithTreasuryFunds,
                                           List<ColourStreet> plan) {
     if (shortfall.amount() <= 0) return false;
     if (startedWithTreasuryFunds && !plan.isEmpty()
-        && (entity.buildCommitmentsEmpty() || plan.size() >= entity.streets().size())) return true;
+        && (entity.buildCommitmentsEmpty() || plan.size() >= ownedStreets(entity, deeds).size())) return true;
     return !canBorrowForBuilding(entity, shortfall);
   }
 
@@ -144,7 +144,7 @@ final class LegalEntityBuilding {
 
   private static ColourStreet cheapestBuildableStreet(LegalEntity entity, Deeds deeds, List<ColourStreet> plan,
                                                        boolean canReachHotels) {
-    return entity.streets().stream()
+    return ownedStreets(entity, deeds).stream()
         .filter(street -> !deeds.hasHotelOn(street)
             && ((deeds.housesBuiltOn(street)
                 + (int) plan.stream().filter(street::equals).count())
@@ -196,8 +196,16 @@ final class LegalEntityBuilding {
   }
 
   private static Money standardBuildCost(LegalEntity entity, Deeds deeds) {
-    return entity.streets().stream().filter(street -> !deeds.hasHotelOn(street))
+    return ownedStreets(entity, deeds).stream().filter(street -> !deeds.hasHotelOn(street))
         .map(ColourStreet::houseConstructionCost).reduce(Money.ZERO, Money::plus);
+  }
+
+  static List<ColourStreet> ownedStreets(LegalEntity entity, Deeds deeds) {
+    if (deeds == null) return entity.streets();
+    if (!deeds.hasBeenFormed(entity)) return entity.streets();
+    return entity.streets().stream()
+        .filter(street -> deeds.entityOwnerOf(street.type()).filter(entity::equals).isPresent())
+        .toList();
   }
 
   private static Money borrowShortfall(LegalEntity entity, Money shortfall) {

@@ -5,6 +5,7 @@ import the.monopoly.game.components.finance.Bank;
 import the.monopoly.game.components.finance.Money;
 import the.monopoly.game.components.players.Player;
 import the.monopoly.game.components.streets.ColourStreet;
+import the.monopoly.game.components.streets.Street;
 import the.monopoly.game.strategies.Strategy;
 
 import java.util.List;
@@ -65,6 +66,38 @@ class DevelopmentLoanBookTest {
     book.recordPlayerLoan(dog, street.type(), new Money(20), 0, highHat);
 
     assertThat(book.canRaise(dog, street, false, List.of(dog, highHat))).isFalse();
+  }
+
+  @Test
+  void anEntityCanRepayItsOutstandingLoanInFullBeforeDissolution() {
+    DevelopmentLoanBook book = new DevelopmentLoanBook(bank);
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, List.of(dog), rules);
+    entity.depositToBank(new Money(100));
+    DevelopmentLoanBook.Position position = book.recordEntityLoan(
+        entity, street.type(), new Money(40), 0, null);
+
+    assertThat(book.repayEntityLoan(position)).isTrue();
+    assertThat(position.outstanding()).isEqualTo(Money.ZERO);
+    assertThat(entity.loan()).isEqualTo(Money.ZERO);
+    assertThat(entity.bankBalance()).isEqualTo(new Money(60));
+  }
+
+  @Test
+  void forecloseEntitySellsTheCollateralToTheBankAndClearsTheEntitysLoan() {
+    Deeds deeds = new Deeds();
+    LegalEntity entity = LegalEntity.formed("Pink Realty", Street.Colour.pink, List.of(dog), rules);
+    deeds.form(entity);
+    ColourStreet collateral = entity.streets().getFirst();
+    DevelopmentLoanBook book = new DevelopmentLoanBook(bank);
+    DevelopmentLoanBook.Position position = book.recordEntityLoan(entity, collateral.type(), new Money(100), 0, null);
+
+    DevelopmentLoanBook.Foreclosure foreclosure = book.forecloseEntity(
+        position, deeds, rules, List.of(dog, highHat), Strategy.OfPlayers.NOBODY_DECIDES);
+
+    assertThat(position.outstanding()).isEqualTo(Money.ZERO);
+    assertThat(entity.loan()).isEqualTo(Money.ZERO);
+    assertThat(deeds.entityOwnerOf(collateral.type())).isEmpty();
+    assertThat(foreclosure.recovered()).isEqualTo(Money.ZERO);
   }
 
   @Test

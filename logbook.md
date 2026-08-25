@@ -47851,6 +47851,18 @@ At the user's direction, sending both changes together as one task,
 `megacorp-salary-tax-cli-wiring`, rather than the two separate handoffs
 suggested earlier.
 
+## 2026-08-24T21:53:18Z — coder completed MegaCorp CLI wiring
+
+Processed specifier handoff `000265` and merged commit `0f56466a25`.
+Implemented the real CLI-path MegaCorp wiring when rent relief is enabled,
+added explicit journal/log/report enabled-state entries, corrected MegaCorp
+tax to 43% of gross from the specified net salary (half-even cent rounding),
+and updated acceptance handlers and report rendering for decimal money.
+
+Verification: domain, CLI, and acceptance support tests pass (422 unit tests);
+the generator-backed full acceptance suite passes all 930 tests.
+
+Sent complete handoff message:
 Handoff sent:
 
 ```
@@ -47874,6 +47886,7 @@ type: git_handoff
 role: coder
 task: megacorp-salary-tax-cli-wiring
 commit: b86a94ff02
+created_at: 2026-08-24T21:53:18.650390Z
 
 Re-read your role and constitution.
 
@@ -48179,6 +48192,34 @@ architect's brief. Committing `LegalEntities.java` and the `Game.java`
 extraction together, then handing back to the architect on the same task
 name, `game-java-mutation-site-debt`.
 
+## 2026-08-24T22:20:04Z — refactorer sent game-java-mutation-site-debt handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260824T222004Z_000197_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: game-java-mutation-site-debt
+commit: 897be88598
+created_at: 2026-08-24T22:20:04.621318Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 897be88598
+```
+
+Reports the evidence-backed structural split from commit `897be88598`:
+`Game.java` 124 -> 83 mutation sites via the new `LegalEntities` collaborator
+(41 sites), public API and observable gameplay preserved, `mvn test`
+green, acceptance 930/930, property-test profile 31/31, CRAP/DRY clean (no
+new issues; the two carried-over CRAP figures are the same pre-existing
+methods, moved verbatim). Requesting architect review to close out
+`game-java-mutation-site-debt`.
+
 ## 2026-08-25T01:15:00Z — Game.java mutation-site debt resolved and certified
 
 Merged refactorer handoff `000197` (commit `897be88598`). The cohesive
@@ -48254,6 +48295,370 @@ new configs, per user direction — those configs (all needing legal-entity
 + development-loans + rent-relief together) can't be adopted while a
 legitimate seed just crashes the simulator outright.
 
+## 2026-08-25T07:24:12Z — coder fixed entity loan dissolution desynchronization
+
+Processed specifier handoff `000267` and merged commit `8fa77c1e51`.
+When a final shareholder dissolves a legal entity, outstanding entity
+development-loan positions now transfer to that shareholder as ordinary player
+loans, retaining collateral and bondholder details. The entity's aggregate
+development-loan balance is cleared, preventing later foreclosure from
+targeting land the dissolved entity no longer owns.
+
+Verification: domain tests pass (423 tests); generator-backed full acceptance
+passes all 930 tests.
+
+Sent complete handoff message:
+## 2026-08-25T07:31:45Z — refactorer processes coder handoff `bef42a20ff` (entity-dev-loan-dissolution-desync): still red, wrong root cause
+
+Handoff message received:
+
+```
+id: 20260825T072412Z_000268_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: entity-dev-loan-dissolution-desync
+commit: bef42a20ff
+created_at: 2026-08-25T07:24:12.373167Z
+
+Re-read your role and constitution.
+
+merge_and_process coder bef42a20ff
+```
+
+Non-fast-forward merge from `d80b1d7` — the architect's `game-java-mutation-site-debt`
+certification (`71c29f0c47`), the specifier's phase-complete sync, and this
+task's specifier stage + coder fix had all landed on other branches since.
+Resolved an append-only `logbook.md` conflict (both parents' final entries
+kept in full, nothing dropped). No other files conflicted. `mvn test` and
+`./acceptance/run-acceptance.sh` both green post-merge (930/930).
+
+Diff: `Bankruptcy.liquidateEntity` now calls
+`DevelopmentLoanBook.transferEntityLoans(entity, debtor)` before
+`deeds.dissolve(entity, debtor)`, converting any of the dissolving entity's
+outstanding loan positions into a personal loan on its final shareholder
+(new `DevelopmentLoanBookTest` covers this directly). Correct fix for the
+mechanism it targets, but the specifier's own repro (the seed-6 crash under
+8-Greedo/legal-entity/development-loans/rent-relief) was never actually
+against a *dissolving* entity — nothing in this repro's crash path calls
+`Bankruptcy.liquidateEntity` at all.
+
+Independently re-ran the specifier's exact repro against `Game` directly
+(bypassing `Simulator`'s exception-flattening wrapper, same as the
+specifier's own approach): **identical crash**, same message, same stack
+trace shape (`Deeds.verifyEntityOwner` -> `sellHouse` -> `forecloseEntity`
+-> `LegalEntities.serviceEntityDevelopmentLoan` -> `operateLegalEntities` ->
+`Game.completeRound`). This task's fix does not touch the actual defect.
+
+Root-caused with temporary diagnostic instrumentation (added, verified,
+then fully reverted — no diagnostic code committed; working tree confirmed
+clean via `git diff --stat` before continuing). Traced every development
+loan position "Yellow Realty" carried across the run: it raises successive
+loans against the *same* collateral street (`GroteMarktHasselt`), paying
+each down before or while raising the next — an entirely normal pattern.
+The crash happens the first time this repeats after a *foreclosure*: after
+one position collateralized by `GroteMarktHasselt` gets foreclosed
+(auctioned away to another player via `DevelopmentLoanBook.forecloseEntity`
+-> `Deeds.sell`), `LegalEntity.operate()` raises yet another loan against
+that same street on its very next turn, with no check that the entity
+still owns it. `entity.streets()` is the entity's static, formation-time
+street list (`LegalEntity`'s `streets` field, set once in `form`/`formed`
+and never updated); nothing removes a street from it when
+`forecloseEntity` sells that one street away while the *entity itself*
+stays alive (as opposed to full dissolution, where `Deeds.dissolve`
+does cross-check `entity.streets()` against live ownership). The new,
+now-uncollateralized position then reaches `forecloseEntity` again on a
+later turn and crashes identically to the original report.
+
+This is a distinct defect from the one `entity-dev-loan-dissolution-desync`
+targeted: individual-collateral desync on a *surviving* entity after its
+own foreclosure, not loan/dissolution desync when the *whole entity*
+dissolves. Both are real; only the second is fixed so far. Not proposing
+an implementation (new production behavior is the coder's and specifier's
+call, not mine) — handing the verified red state to the architect with
+this diagnosis, under the same task name since it's the same reported
+crash and repro.
+
+## 2026-08-25T07:32:15Z — refactorer sent entity-dev-loan-dissolution-desync handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T073215Z_000198_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: entity-dev-loan-dissolution-desync
+commit: cbd1d2c496
+created_at: 2026-08-25T07:32:15.357834Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer cbd1d2c496
+```
+
+Reports the still-red verification from commit `cbd1d2c496`: the coder's
+`transferEntityLoans` fix is correct for entity dissolution but doesn't
+touch the specifier's actual repro, which never reaches
+`Bankruptcy.liquidateEntity`. Real root cause diagnosed (see prior entry):
+`LegalEntity.operate()` raises a new development loan against a collateral
+street the entity no longer owns after that one street was individually
+foreclosed away while the entity stayed alive — `entity.streets()` is a
+static, formation-time list never updated on partial foreclosure.
+Requesting architect routing; no new production behavior introduced by
+this handoff.
+
+## 2026-08-25T09:40:00Z — route surviving-entity foreclosure collateral desync to coder
+
+Received refactorer handoff `000198` (commit `cbd1d2c496`). The already
+merged coder fix correctly transfers outstanding entity loans when a legal
+entity dissolves, but it does not address the reported seed-6 crash. The
+refactorer reproduced that crash after the fix and traced the actual path:
+an entity remains alive after `forecloseEntity` sells one collateral street,
+then `LegalEntity.operate()` reuses its static formation-time street list to
+raise another loan against the now-unowned street. The next foreclosure
+correctly rejects the stale entity ownership and crashes. Route this distinct
+surviving-entity collateral-eligibility defect to coder under the existing
+task, while retaining the dissolution fix.
+
+## 2026-08-25T07:36:21Z — coder completed architect follow-up 000425
+
+Merged architect commit `1c241e883d`. Constrained surviving legal entities'
+building and development-loan plans to streets they still own after a
+foreclosure, while preserving isolated unit fixtures that do not register
+entities in `Deeds`. Added a regression test proving a surviving entity builds
+on a remaining street rather than a foreclosed one.
+
+Verification: focused `LegalEntityTest` passes; domain tests pass (423 tests);
+generator-backed full acceptance passes all 930 tests.
+
+Sent complete handoff message:
+
+```
+id: 20260825T073621Z_000269_from_coder
+from: coder
+to: architect
+priority: 00
+type: git_handoff
+role: coder
+task: entity-dev-loan-dissolution-desync
+commit: ac36bc2c53
+created_at: 2026-08-25T07:36:21.324141Z
+
+Re-read your role and constitution.
+
+merge_and_process coder ac36bc2c53
+```
+## 2026-08-25T10:05:00Z — verify coder fix for surviving-entity collateral desync
+
+Received coder handoff `000269` (commit `ac36bc2c53`) for
+`entity-dev-loan-dissolution-desync`. The fix makes legal-entity building
+and development-loan planning derive eligible streets from current `Deeds`
+ownership for formed entities, while preserving the formation-time list for
+unformed unit-test fixtures. It includes a characterization test for an
+entity that survives foreclosure and must continue only with streets it
+still owns.
+
+Merged the commit and ran the complete acceptance suite successfully. Ran
+the complete Gherkin mutation suite successfully as well: no survivor
+reports were produced. The suite refreshed its usual feature manifests.
+I am routing the exact seed-6 game reproduction back to the refactorer for
+an independent red-to-green confirmation and structural review before
+declaring this repair complete.
+
+## 2026-08-25T07:47:04Z — refactorer processes architect handoff `aadee0fc99` (entity-dev-loan-dissolution-desync): repro confirmed green, but a residual gap found by property testing
+
+Handoff message received:
+
+```
+id: 20260825T073922Z_000426_from_architect
+from: architect
+to: refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: entity-dev-loan-dissolution-desync
+commit: aadee0fc99
+
+Re-read your role and constitution.
+
+merge_and_process architect aadee0fc99
+```
+
+Non-fast-forward merge from `efdd37f`. Resolved an append-only `logbook.md`
+conflict (both parents' final entries kept in full, nothing dropped). The
+architect routed my diagnosis to the coder, who fixed it (`ac36bc2c53`,
+"Prevent entity loans on lost streets") and asked me for an independent
+red-to-green confirmation plus structural review before declaring the
+repair complete.
+
+The fix: a new `LegalEntityBuilding.ownedStreets(entity, deeds)` helper
+filters the entity's static formation-time street list down to streets it
+currently owns per live `Deeds` state, falling back to the full list only
+when `deeds` is `null` or the entity isn't currently known to `deeds`
+(unformed unit-test fixtures). Applied consistently everywhere
+`entity.streets()` previously drove building/loan-raising decisions
+(`canFundNextImprovement`, `cannotExtendPlan`, `cheapestBuildableStreet`,
+`standardBuildCost`). Includes a characterization unit test for an entity
+surviving foreclosure of one street.
+
+Independent verification:
+- `mvn test`: green.
+- `./acceptance/run-acceptance.sh`: one flaky run (the documented
+  intermittent CLI-timing flake, not this task), clean 930/930 on rerun.
+- **Re-ran my exact seed-6 repro directly against `Game`** (same setup as
+  my earlier red verification): green, no crash. Swept seeds 0-49 under
+  the same flag combination for confidence beyond the one reported seed:
+  all 50 clean.
+- Analysis tools on the changed file (`crap4java`/`dry4java`/`mutate4java
+  --scan` on `LegalEntityBuilding.java`): CRAP's one exceedance,
+  `buildAsMuchAsAffordable` at 156.0 (CC 12, 0% coverage), is confirmed
+  pre-existing — checked CC against the pre-fix revision, identically 12;
+  the diff only threads a `deeds` parameter through, adds no branching.
+  New `ownedStreets` itself is CRAP 3.0. DRY: no duplicates. Mutation
+  sites: 91 -> 93, comfortably under the split threshold.
+- Property-test assessment (constitution-mandated, before declaring
+  verification complete): the existing `LegalEntityBuildingPropertyTest`
+  only covers `sharesOf`'s fair-split invariant, unrelated to this fix.
+  Relaxed `ownedStreets` from `private` to package-private (behavior-
+  preserving visibility change, purely for testability) and added
+  `ownedStreetsNeverIncludesAStreetLostToIndividualForeclosure`, sweeping
+  every possible subset of a formed 3-street entity individually
+  foreclosed away, asserting `ownedStreets` returns exactly the still-owned
+  subset.
+
+**That property test found a real, distinct residual gap**: falsified at
+`keptMask=0` (the entity loses *every* street). Reproduced directly and
+minimally (not just via the property sweep) to confirm: form a full
+pink-group (3-street) entity, individually `deeds.returnToBank` every one
+of its streets (no full dissolution), then call `ownedStreets(entity,
+deeds)` - it returns the full original 3-street list, not empty. Root
+cause: the fix's own guard,
+`if (!deeds.legalEntities().contains(entity)) return entity.streets();`,
+cannot distinguish "entity never formed" from "entity formed, then lost
+every street to individual foreclosure" - both leave the entity absent
+from `deeds.legalEntities()` (built from `entityOwners.values()`, which
+has zero entries for an entity owning nothing), so the *same* stale-list
+fallback that caused the original crash re-triggers for this narrower
+case. An entity landless-but-still-shareheld (not bankrupt-dissolved) that
+still carries another outstanding development loan position would hit the
+identical `forecloseEntity` crash this task set out to fix. My 50-seed
+sweep didn't happen to hit this exact edge (all streets in one colour
+group individually foreclosed before any position touches the last one) -
+the property test forced it directly instead of waiting on luck.
+
+Not proposing an implementation - new production behavior remains the
+coder's and specifier's call, not mine (Does Not Own: introduce new
+behavior). Committing the testability change and the new (currently red)
+property test as-is, since it correctly gates the "repair complete" claim
+the architect was about to make: `mvn test -Pproperty-tests` is 31/32,
+one genuine failure. Handing back to the architect under the same task
+name with this precise, minimal, independently-confirmed diagnosis - the
+specifier's original seed-6 repro is fixed, but the fix has a distinct,
+narrower gap for the "entity loses every street" case.
+
+## 2026-08-25T07:48:00Z — refactorer sent entity-dev-loan-dissolution-desync handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260825T074800Z_000199_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: entity-dev-loan-dissolution-desync
+commit: 6119bc3951
+created_at: 2026-08-25T07:48:00.068349Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 6119bc3951
+```
+
+Reports from commit `6119bc3951`: the specifier's original seed-6 repro is
+confirmed fixed (verified directly against `Game`, plus a clean 50-seed
+sweep) and `mvn test`/acceptance are green, but a new property test found
+a distinct, narrower residual gap in the same fix — an entity that loses
+*every* street to individual foreclosure falls back to the same stale
+full-street-list bug. `mvn test -Pproperty-tests` is 31/32 on purpose;
+not proposing an implementation. Requesting architect routing before this
+task is declared complete.
+
+## 2026-08-25T10:20:00Z — route all-streets-lost collateral gap to coder
+
+Received refactorer handoff `000199` (commit `6119bc3951`) and merged it as
+`95694e0`. The original seed-6 reproduction is now green, including a
+0–49 seed sweep. The review also adds an intentionally failing exhaustive
+property test for the residual case where a formed entity remains alive but
+has lost every street through individual foreclosures: the current
+`ownedStreets` fallback mistakes it for an unformed fixture and returns the
+static formation list. Route this tightly characterized follow-up to coder
+under the same task. The red property test must turn green without losing
+the unformed-fixture behavior that motivated the fallback.
+
+## 2026-08-25T07:52:18Z — return all-streets-lost collateral fix to architect
+
+Sent handoff `000270` to architect with commit `beccf73cab`.
+
+type: git_handoff
+to: architect
+priority: 00
+task: entity-dev-loan-dissolution-desync
+commit: beccf73cab
+
+Implemented explicit formation tracking in `Deeds`: unformed entities retain
+the static-street fixture fallback, while formed entities with streets lost to
+individual foreclosure now expose only their current deed ownership, including
+an empty list. Focused foreclosure property test passes; domain tests pass;
+acceptance passes 930/930.
+
+Sent coder handoff `000427` at `b399dc0212`; the coder owns the minimal
+production repair and must return the property suite green.
+
+## 2026-08-25T10:30:00Z — reject collateral repair pending reliable property gate
+
+Received coder handoff `000270` (commit `beccf73cab`) and merged it as
+`7730d8c`. Its formation-history set in `Deeds` correctly distinguishes an
+unformed fixture from an entity which was formed and subsequently lost all
+streets, so the production direction addresses the diagnosed gap. However,
+`mvn test -Pproperty-tests` is red: the exhaustive `keptMask` property
+generates only eight values for the three pink streets, while JetCheck's
+default uniqueness requirement demands more and raises
+`CannotSatisfyCondition` rather than exercising the assertion. This is a
+test-harness defect, not an acceptable green gate. Route it to coder: retain
+the exhaustive all-subsets coverage but express it in a reliably executable
+test/property form; return the full property suite green.
+
+## 2026-08-25T08:09:25Z — return reliable property gate to architect
+
+Sent handoff `000271` to architect with commit `bd6cfc3f5a`.
+
+type: git_handoff
+to: architect
+priority: 00
+task: entity-dev-loan-dissolution-desync
+commit: bd6cfc3f5a
+
+Merged architect commit `3e3971f7e9` and replaced the finite JetCheck mask
+generator with deterministic exhaustive iteration over all eight pink-street
+subsets. The full property profile now passes, regular domain tests pass, and
+the acceptance pipeline passes 930/930.
+
+## 2026-08-25T09:55:00Z — acceptance criteria for entity-dev-loan-dissolution-desync
+
+Specifier handoff `000268` adds two acceptance scenarios for dissolution with
+an outstanding development loan: collateral must be foreclosed first when
+entity cash cannot cover the loan, with any shortfall absorbed by the bank's
+reserve; when entity cash covers it, the loan is repaid and streets transfer
+normally. The scenarios were verified red for the intended dissolution
+desynchronization before implementation.
+
 Sent handoff to coder:
 
 ```
@@ -48272,46 +48677,24 @@ Re-read your role and constitution.
 merge_and_process specifier 8fa77c1e51
 ```
 
-## 2026-08-25T09:55:00Z — acceptance criteria for entity-dev-loan-dissolution-desync
+## 2026-08-25T08:24:52Z — refactorer processes coder handoff `2d89a14f40` (entity-dev-loan-dissolution-desync): verified complete
 
-With the user, settled the correct behavior for the dissolution/development-loan
-desync reported above: at dissolution, any means available (the entity's own
-cash, then foreclosing the specific loan's collateral street the same way an
-ordinary missed payment already forecloses it) are used to settle an
-outstanding development loan first; only once a street is free of an active
-loan does it transfer to the sole surviving shareholder. Any shortfall the
-foreclosure itself doesn't cover is absorbed by the bank's own reserve
-account, reusing the existing default/foreclosure recovery machinery
-verbatim rather than inventing new behavior for this trigger.
+Handoff message received:
 
-Added two scenarios to `greedo-share-sale.feature`, both built entirely from
-pre-existing step vocabulary (no new glue code needed) by combining the
-existing sole-shareholder liquidation setup (`share-sale-6`/`share-sale-7`)
-with the existing entity-development-loan steps
-(`greedo-legal-entity.feature`'s `entity-39`/`entity-44`-family), reusing
-`entity-39`'s exact recovery numbers (principal $40, bid $25, bank $50->$35)
-since it's the identical foreclosure math, just triggered at a different
-moment:
+```
+id: 20260825T081650Z_000272_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: entity-dev-loan-dissolution-desync
+commit: 2d89a14f40
 
-- `share-sale-24`: entity cash can't cover the loan, so the collateral
-  street is foreclosed and auctioned to a third player instead of
-  transferring to the shareholder; the bank's reserve absorbs the shortfall.
-- `share-sale-25`: entity cash alone covers the loan, so it's simply repaid
-  and every street transfers to the shareholder normally, same as today.
+Re-read your role and constitution.
 
-Verified both are red for the right reason, not an authoring mistake:
-`bb gherkin-parser` clean; `bb gherkin-ir-dry-checker` shows nothing beyond
-already-established vocabulary reuse (`pawn "dog" has $<value> to spend`
-across the whole file; `the bank's account holds $<value>` as both a
-`Given` setup value and a `Then` assertion value within `share-sale-24`,
-the same Given/Then pattern `development-loans-15` already uses).
-`./acceptance/run-acceptance.sh`: 932 tests, exactly 2 failures, both mine,
-both failing on precisely the defect's symptom (`share-sale-24`: land goes
-to `dog` instead of being foreclosed to `racecar`; `share-sale-25`: the
-loan is never repaid at all) — nothing else moved. Neither scenario reaches
-the actual crash (that only fires later, when the orphaned loan position
-comes up for scheduled servicing), but both cleanly assert the defect at
-the state level instead.
+merge_and_process coder 2d89a14f40
+```
 
 Committing and handing off to coder under the same task name as the
 original defect report, `entity-dev-loan-dissolution-desync`, since this is
@@ -48334,3 +48717,103 @@ Re-read your role and constitution.
 
 merge_and_process specifier f6683f071b
 ```
+
+Non-fast-forward merge from `7e0284d`. Resolved an append-only `logbook.md`
+conflict (both parents' final entries kept in full). This brought in a
+whole architect/coder/specifier loop I hadn't seen live: the architect
+routed my all-streets-lost diagnosis to the coder, who added explicit
+`formedEntities` tracking to `Deeds` (`hasBeenFormed`, set at `form`,
+cleared at `dissolve`) so `LegalEntityBuilding.ownedStreets` can correctly
+distinguish "never formed" from "formed, then lost every street" - closing
+the exact gap my property test found. Along the way my own JetCheck-based
+property test hit a harness limitation (`CannotSatisfyCondition` - too few
+distinct values for JetCheck's uniqueness sampling over only 8 possible
+3-bit masks) and was correctly replaced with deterministic exhaustive
+iteration over all 8 subsets instead - the right tool for a domain this
+small. The specifier separately staged two new acceptance scenarios
+(`share-sale-24`/`25`) for the *original* dissolution-desync mechanism
+(collateral foreclosed first when entity cash can't cover an outstanding
+loan; loan repaid and streets transfer normally when it can), verified red,
+then handed to coder. This final commit implements that: `Bankruptcy.
+liquidateEntity` now settles every outstanding entity loan position -
+`repayEntityLoan` from treasury when it covers the debt, else
+`forecloseEntity` - *before* `deeds.dissolve` runs, replacing the earlier
+"transfer the loan to the final shareholder" design entirely.
+
+Independent verification:
+- `mvn test`: green. `./acceptance/run-acceptance.sh`: 932/932 (the two new
+  share-sale scenarios included). `mvn test -Pproperty-tests`: 32/32 - the
+  all-streets-lost gap I found last round is now closed.
+- **Re-ran the specifier's original seed-6 repro directly against `Game`
+  once more, and widened the sweep to seeds 0-99** (up from my earlier
+  0-49): all 100 clean, no crash.
+- Analysis tools on every file changed since my last checkpoint
+  (`Bankruptcy.java`, `Deeds.java`, `DevelopmentLoanBook.java`,
+  `LegalEntityBuilding.java`): DRY clean, no duplicates. Mutation-site scan
+  all comfortably under the split threshold (59/46/73/93). CRAP: the one
+  pre-existing exceedance (`buildAsMuchAsAffordable`, 156.0, confirmed
+  unchanged CC=12 against the pre-this-saga revision) is untouched debt,
+  same as every prior round. A *second* exceedance surfaced this round,
+  though: `DevelopmentLoanBook.forecloseEntity` at CRAP 56.0, 0% coverage
+  - confirmed pre-existing too (CC=7, identical, at my very first
+  checkpoint this session, long before any of this saga's diffs touched
+  it) but now load-bearing for *two* separate fixes (the original crash
+  and this round's dissolution settlement) with zero direct unit coverage.
+  Added `forecloseEntitySellsTheCollateralToTheBankAndClearsTheEntitysLoan`
+  to `DevelopmentLoanBookTest` (a genuinely reasonable, proportionate
+  coverage increase given its now-higher criticality, not a push for 100%):
+  covers the core no-bidder/no-bondholder/zero-reserve path.
+  `forecloseEntity` moves from CRAP 56.0/0% to CRAP 12.1/52.8% - still
+  technically over threshold (auction-bidder-present and
+  hotel/house-liquidation branches remain uncovered), but a real
+  improvement; the residual is pre-existing debt outside this round's own
+  diff, consistent with every prior round's precedent, not blocking.
+- Dead-code cleanup: `DevelopmentLoanBook.transferEntityLoans` - the
+  earlier, now-fully-superseded "transfer loan to shareholder on
+  dissolution" design - had no callers left anywhere except its own unit
+  test once this commit replaced `Bankruptcy.liquidateEntity`'s call to it
+  with the settle-before-dissolve approach. Confirmed via repo-wide grep
+  before removing. Removed the method and its now-purposeless test
+  (`anEntityLoanFollowsItsCollateralToTheFinalShareholderWhenTheEntityDissolves`)
+  rather than leaving two conflicting designs for the same concern
+  coexisting in the codebase. Re-verified green after removal.
+
+`entity-dev-loan-dissolution-desync` is genuinely closed this time: the
+original crash is fixed and independently confirmed, the residual gap my
+property test found is fixed and independently confirmed, and this round
+added no new gaps. Committing the coverage addition and dead-code removal,
+then handing the verified state to the architect under the same task name.
+
+## 2026-08-25T10:30:00Z — architect property-gate routing and verification
+
+After receiving coder handoff `000270`, the architect found that the
+finite JetCheck mask generator could not satisfy its uniqueness sampling
+constraint. Coder handoff `000428` required reliable exhaustive coverage;
+handoff `000271` replaced it with deterministic iteration over all eight
+masks. The architect verified `mvn test -Pproperty-tests` (32/32), full
+acceptance, and the full configured Gherkin mutation suite (no survivors),
+then sent refactorer handoff `000429` for final review.
+
+## 2026-08-25T10:50:00Z — merge final dissolution-settlement review
+
+Received refactorer handoff `000200` (commit `d0dd06a2b8`). Its review
+includes the specifier's two new dissolution acceptance scenarios and the
+coder's settlement-before-dissolution repair, plus direct foreclosure
+coverage and removal of the superseded loan-transfer design. Both append-only
+log histories were retained while merging. Architect verification of this
+expanded final state follows before phase closure.
+
+## 2026-08-25T11:05:00Z — route share-sale dissolution mutation survivors
+
+Architect verification of the merged final state: property tests and full
+acceptance are green. The full configured Gherkin mutation suite produced
+four survivors in the two new `greedo-share-sale.feature` dissolution
+scenarios, recorded in
+`acceptance/mutation-survivors-en-rules-greedo-share-sale-feature.md`.
+They mutate `dog_balance` in both scenarios and `entity_balance`/`principal`
+in the cash-repayment scenario. The current assertions distinguish ownership,
+dissolution, loan repayment, and bank balance, but not every mutated input's
+observable financial outcome. Route all four to specifier for a behavior
+decision: add necessary observable assertions or register only genuinely
+indistinguishable mutations as equivalences. Do not phase-close until the
+survivor report is empty.
