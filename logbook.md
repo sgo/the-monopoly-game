@@ -49896,3 +49896,21 @@ for the same reason (no distinguishable entity-path line to check
 adjacency against). Updated the README sync check's bullet list to
 include it. Committing and handing off to coder under a new task name,
 `rent-relief-starvation-tracking`.
+
+Sent handoff to coder:
+
+```
+id: 20260825T123542Z_000275_from_specifier
+from: specifier
+to: coder
+priority: 50
+type: git_handoff
+role: specifier
+task: rent-relief-starvation-tracking
+commit: 4ab9bea52c
+created_at: 2026-08-25T12:35:42.460076Z
+
+Re-read your role and constitution.
+
+merge_and_process specifier 4ab9bea52c
+```
