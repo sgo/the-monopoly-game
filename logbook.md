@@ -47863,6 +47863,19 @@ Verification: domain, CLI, and acceptance support tests pass (422 unit tests);
 the generator-backed full acceptance suite passes all 930 tests.
 
 Sent complete handoff message:
+Handoff sent:
+
+```
+type: git_handoff
+to: coder
+priority: 50
+task: megacorp-salary-tax-cli-wiring
+commit: 0f56466a25
+```
+
+## 2026-08-24T22:01:29Z — refactorer processes coder handoff `b86a94ff02` (megacorp-salary-tax-cli-wiring)
+
+Handoff message received:
 
 ```
 id: 20260824T215318Z_000267_from_coder
@@ -47879,3 +47892,377 @@ Re-read your role and constitution.
 
 merge_and_process coder b86a94ff02
 ```
+
+Fast-forward merge from `08c7074` (my last checkpoint), no conflicts. This
+brings in everything since: the completed and closed `rent-relief-megacorp-
+live-play` task (live rent-relief wiring, the `rent-relief-3` queued-roll
+collision fix, the canonical rent report name fix, and the full soft
+Gherkin mutation gate going clean — all independently reviewed and
+committed by a prior refactorer round before I picked this up, per the
+logbook), then this new task's two changes: the CLI-wiring gap (`Game`'s
+`Simulator`-facing constructor never built `megacorpSalaryTax`, so the real
+CLI path silently dropped the mechanic despite the acceptance suite being
+green through `World.java`) and the salary-tax formula correction (43% of
+*gross* salary, not of the $200/$400 net figure — $150.88/$301.75 instead
+of $86/$172, keeping cent precision via a `Report.money` helper that only
+trims to a whole dollar when the amount is a whole dollar).
+
+Verification: `mvn test` green (domain/CLI/specs-core all passing, no
+failures). `./acceptance/run-acceptance.sh`: 930/930, no failures — both
+of this task's previously-red scenario groups (`journal-94/95`,
+`logging-94/95`, `report-94/95`, `cli-19` for the wiring gap;
+`megacorp-salary-tax-1/2/3`, `journal-90`, `logging-90`, `report-90` for
+the formula) now pass.
+
+Analysis tools (`crap4java`/`dry4java`/`mutate4java --scan` on every file
+changed since my last checkpoint: `Game.java`, `Journalling.java`,
+`Report.java`, `MegacorpSalaryTax.java`, `Rent.java`, `RentRelief.java`,
+`Taxes.java`):
+- CRAP: every new/changed method in this diff is well under the threshold
+  (`MegacorpSalaryTax.taxOn`/`payTax`/`collect` all CRAP <=2.0; `Report`'s
+  new `money` helper 2.1; `Journalling.collectedSalary` 3.1, `paid` 3.7;
+  `Rent`'s two `collect` overloads 3.0/5.0; `Taxes.resolve` 3.2). The one
+  breach, `Report.line` at 609.6, is the documented sealed-switch exemption
+  (2026-07-28 decision) — still a single exhaustive, straight-line switch
+  over `Journal.Entry`, just two cases wider (`MegacorpSalaryTaxEnabled`).
+  The other high-CRAP entries the tool reports on these files
+  (`Journalling.mortgageSpareProperty` 72.0, `Game.journalOperation` 56.0 —
+  itself the same sealed-switch exemption, `Journalling.serviceDevelopmentLoan`
+  42.0, `Game.serviceEntityDevelopmentLoan` 12.0) are pre-existing and
+  untouched by any diff since my last checkpoint, consistent with every
+  prior round's documented precedent.
+- DRY: clean. All flagged pairs are confined to `Journalling.java`/
+  `Game.java`'s established one-liner-per-entry-type event-adapter and
+  constructor-telescoping shapes (documented pre-existing noise across many
+  prior rounds). Neither of this task's two new lines (`Journalling.java:65-66`'s
+  `MegacorpSalaryTaxPaid` log, `Journalling.java:314-315`'s `RentReliefPaid`
+  log) appears in any flagged pair.
+- Mutation-site scan: `MegacorpSalaryTax.java` 2, `Taxes.java` 3,
+  `RentRelief.java` 3, `Rent.java` 14, `Journalling.java` 25, `Report.java` 8
+  — all well under the split threshold, and each file's own diff since my
+  last checkpoint is a handful of lines. `Game.java` is at 124 (was 112 at
+  my last checkpoint, a PRE-EXISTING breach carried in by the rent-relief
+  round before this task started); this task's own diff to `Game.java` is 6
+  lines (a null-check `megacorpSalaryTax` field derivation in one
+  constructor, one `journal.log` call). Per the 2026-08-20T10:36:00Z and
+  2026-08-24T~19:22Z precedents, not splitting the 2941-line core engine for
+  a single-digit-line increment — but the growth trend across four
+  consecutive rounds (104 -> 106 -> 112 -> 124) is worth flagging explicitly
+  to the architect this time, rather than only noting it here, since each
+  round keeps deferring the same standing candidate.
+
+Property testing: added `MegacorpSalaryTaxPropertyTest` (JetCheck,
+`@Tag("property-test")`, mirroring `WarProfitsTaxPropertyTest`'s shape),
+since the example-based `MegacorpSalaryTaxTest` only pins three exact net
+salaries and this round's whole defect was a wrong closed-form tax formula.
+Three properties over a swept range of net salaries (0 to $100,000):
+`taxOn` is always exactly 43% of the resulting gross (net + tax) within
+half-cent rounding — the property that would have caught the original
+net-basis bug directly; tax is non-decreasing as net salary grows; and
+`collect` conserves money exactly (player receives the full net salary,
+government receives exactly the returned tax, no more, no less). Verified
+green standalone (3/3) and as part of the full property-test profile
+(31/31, `mvn test -Pproperty-tests`), and confirmed the default `mvn test`
+profile still excludes it (`excludedGroups=property-test`) and stays green.
+
+No defects found. Committing the property test and this log entry, then
+handing the verified state to the architect under the same task name,
+`megacorp-salary-tax-cli-wiring`, with an explicit note about the `Game.java`
+mutation-site growth trend.
+
+## 2026-08-24T22:02:24Z — refactorer sent megacorp-salary-tax-cli-wiring handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260824T220224Z_000196_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: megacorp-salary-tax-cli-wiring
+commit: 736ecc8559
+created_at: 2026-08-24T22:02:24.982669Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer 736ecc8559
+```
+
+Reports the verified state from commit `736ecc8559`: `mvn test` green,
+930/930 acceptance, 31/31 property tests (added `MegacorpSalaryTaxPropertyTest`
+this round), CRAP/DRY/mutation-site analysis clean on every file changed
+since my last checkpoint. Requesting architect review; the same task name
+carries the note (recorded above) that `Game.java`'s mutation-site count
+has grown across four consecutive refactorer rounds (104 -> 106 -> 112 ->
+124) without ever being split, each time individually justified as
+disproportionate for that round's small diff — worth the architect's
+attention as a standing candidate for a dedicated structural-split task.
+
+## 2026-08-25T00:20:00Z — architect verifies MegaCorp CLI wiring; two casing equivalents remain
+
+Received and fast-forwarded refactorer handoff `000196` (commit
+`736ecc8559`) for `megacorp-salary-tax-cli-wiring`. Independently ran the
+generator-backed full acceptance suite: green. The full soft Gherkin
+mutation run then completed with exactly two survivors, both casing-only
+mutations of the disabled-state example: `disabled -> disableD` in
+`journal.feature` and `disabled -> diSabled` in `logging.feature`. They
+are candidate equivalents because the state vocabulary is intentionally
+case-insensitive, but require specifier records before final certification.
+The same refactorer review flags `Game.java`'s mutation-site count (124)
+as standing architectural debt; this task added only six lines there, so
+it is recorded for separate debt work rather than expanding this completed
+feature.
+
+## 2026-08-25T00:45:00Z — MegaCorp mutation gate certified; Game debt work opened
+
+Merged the specifier's two casing-equivalence records and reran the full
+`./acceptance/run-acceptance-mutation.sh` gate. It completed cleanly with
+no survivors or errors; the tool removed both prior survivor reports.
+`megacorp-salary-tax-cli-wiring` is therefore certified through full
+acceptance and Gherkin mutation.
+
+Per the user's direction, opened a separate `game-java-mutation-site-debt`
+refactorer task. Objective: reduce `Game.java` below the mutation-site split
+threshold by extracting cohesive, behavior-preserving orchestration seams
+from the core engine; preserve the public `Game` API and all observable
+gameplay, and return an evidence-backed refactor rather than another debt
+deferral.
+
+## 2026-08-25T00:30:00Z — specifier classifies the two MegaCorp casing survivors as equivalent
+
+Verified against the actual step implementation rather than assuming the
+architect's "case-insensitive by design" framing:
+
+```java
+then("^the game journal records that MegaCorp salary tax is " + NAME + "$",
+    (world, arguments) -> records(world,
+        Claim.of(new Entry.MegacorpSalaryTaxEnabled(arguments.text(1).equals("enabled")))));
+```
+
+The disabled-state check isn't actually case-insensitive - it's a
+catch-all negative: only an exact, case-sensitive match against the
+literal string `"enabled"` parses true, so `"disableD"`/`"diSabled"` parse
+to `false` exactly the same as `"disabled"` does. This is the identical,
+already-established mechanism behind every other "X is disabled by
+default" equivalent-mutation record in `equivalent-mutations.edn`
+(development-loans, war-profits-tax, rent-relief - `equivalent-mutations.edn`
+lines 308-454), so classified the same way rather than re-deriving new
+reasoning. Recorded both (466 -> 468). No Gherkin changes.
+
+`megacorp-salary-tax-cli-wiring` is otherwise complete per the architect's
+and refactorer's verification: full acceptance green (930/930), formula
+correction and CLI-wiring both confirmed, property test added, CRAP/DRY/
+mutation-site checks clean (the one exemption is the documented
+sealed-switch case in `Report.line`). `Game.java`'s mutation-site growth
+(104->106->112->124 across four rounds) is noted as standing debt for
+separate work, not blocking this task.
+
+Handing back to architect on the same task to certify the mutation gate
+clean.
+
+Handoff sent:
+
+```
+type: git_handoff
+to: architect
+priority: 00
+task: megacorp-salary-tax-cli-wiring
+commit: fe0e175fe5
+```
+
+## 2026-08-25T01:00:00Z — specifier certifies megacorp-salary-tax-cli-wiring complete
+
+Merged the architect's clean full-Gherkin-mutation-gate certification
+(commit `b483c013bf`). Ran `mvn test -Pcharacterization-tests` per the
+phase-complete sync rule: green (`CharacterizationTest` 12/12, full
+reactor build success, 422/422 domain tests). No drift to investigate.
+
+`megacorp-salary-tax-cli-wiring` is closed: the CLI-driven simulator path
+now genuinely wires MegaCorp alongside rent relief, the tax formula
+correctly reflects 43% of gross (not net), and both are verified through
+full acceptance and Gherkin mutation. `game-java-mutation-site-debt` is a
+separate, already-opened refactorer task and needs no specifier action.
+
+## 2026-08-24T22:19:17Z — refactorer processes architect handoff `b483c013bf` (game-java-mutation-site-debt)
+
+Handoff message received:
+
+```
+id: 20260824T220836Z_000423_from_architect
+from: architect
+to: refactorer
+priority: 00
+type: git_handoff
+role: architect
+task: game-java-mutation-site-debt
+commit: b483c013bf
+
+Re-read your role and constitution.
+
+merge_and_process architect b483c013bf
+```
+
+Non-fast-forward merge (my `megacorp-salary-tax-cli-wiring` handoff and the
+architect/specifier's parallel MegaCorp mutation-gate certification chain
+had diverged from the same base). Resolved an append-only `logbook.md`
+conflict — both parents' final entries kept in full, nothing dropped, order
+preserved by timestamp. No other files conflicted. Re-verified after merge:
+`mvn test` green, acceptance 930/930.
+
+Per the architect's brief: reduce `Game.java` below the mutation-site split
+threshold by extracting a cohesive, behavior-preserving orchestration seam;
+preserve the public `Game` API and all observable gameplay.
+
+Bucketed all 124 of `Game.java`'s current mutation sites by source region
+before picking an extraction: the constructor-telescoping chain (14 sites)
+and the `Journal`/`Entry` sealed-interface data declarations (5 sites) are
+both required public surface or pure data with little to gain; the actual
+turn-loop core (`play`/`playTurns`/`playTurn`/`landingsFor`/etc., 62 sites)
+is Game's own tightly-coupled heart and a poor, high-risk split candidate.
+The remaining 43 sites cluster into one cohesive concern already: how legal
+entities behave in the market — turn-start peer trades and monopoly buyouts
+(21 sites: `resolveSplitOwnershipAtStart`, `tradeAtStart`,
+`resolveBuyoutAtStart`, `resolvableBuyout`, `anySplitExists`,
+`isTiedWithItsPartner`, `applyBuyout`, `completeTrade`,
+`allOwnableSpacesOwned`), entity formation at a quiet round boundary (6
+sites: `resolveMarketDeadlockAtRoundBoundary`, `canFormAtMarketDeadlock`,
+`fundableEntityAtMarketDeadlock`, `formIfFundable`), and an entity servicing
+its own development loans or otherwise operating on its turn (16 sites:
+`operateLegalEntities`, `serviceEntityDevelopmentLoan`,
+`mortgageEntitySpareProperty`, `operateEntity`, `journalOperation`,
+`entityName`).
+
+Extracted all three into a new package-private `LegalEntities` collaborator
+(`the.monopoly.game` package, alongside `Game`/`Journalling`, since several
+of its methods take `Journalling` — itself package-private — as a
+parameter; matching `Building`'s established pattern of a rules-orchestration
+class constructed once and held by `Game` would have required a new
+`Events`-interface indirection for no behavioral gain). Held as a `private
+final` field on `Game`, constructed once in the canonical constructor from
+fields already there (`rules`, `deeds`, `players`, `strategies`,
+`developmentLoanBook`, `stalemateTrading`, `legalEntityTrading`) rather than
+per-`play()`, because the public `resolveMarketDeadlockAtRoundBoundary`
+entry point is callable outside of any `play()` invocation and has no
+per-play() `Journalling` to build it from — the same reason it already
+passed `journalling = null` into its own private 3-arg overload before this
+change.
+
+The one non-mechanical change: `roundHadConsolidatingAction` was a `Game`
+field mutated directly, as a side effect, from inside `applyBuyout` and
+`completeTrade` — no longer possible once those methods live on a separate
+object with no access to `Game`'s private state. Re-threaded as a return
+value instead: `resolveSplitOwnershipAtStart` now returns `boolean`
+("did this consolidate ownership") rather than `void`, true exactly when
+`tradeAtStart` completed a trade or `resolveBuyoutAtStart` applied a
+buyout — the same two conditions that previously wrote the field directly.
+`Game`'s own call site sets its field from that return value. Verified this
+preserves the existing behavior exactly: `resolveBuyoutAtStart`'s return
+value was previously *discarded* by its only caller regardless of whether
+the `anySplitExists` fallback branch ran (a pure, side-effect-free query
+confirmed by reading `MonopolyBuyout.hasSplit`/`splitGroup`), so redefining
+what that branch returns changes nothing observable. `operateLegalEntities`
+and `resolveMarketDeadlockAtRoundBoundary` needed no such rework — neither
+ever touched `roundHadConsolidatingAction`.
+
+Verification: `mvn test` green (no failures). `./acceptance/run-acceptance.sh`:
+930/930, unchanged — the peer-trade, buyout, and legal-entity-formation
+scenarios this touches all still pass. `mvn test -Pproperty-tests`: 31/31.
+
+Analysis tools:
+- Mutation-site scan: `Game.java` 124 -> 83, comfortably under the 100-site
+  threshold. New `LegalEntities.java`: 41 sites, also well under.
+- CRAP: no new breach. The one exceedance, `LegalEntities.journalOperation`
+  at 56.0 (CC 7, 0% coverage), is the exact same pre-existing exhaustive
+  switch over sealed `LegalEntity.Operation` previously reported as
+  `Game.journalOperation` — moved verbatim, same coverage, same shape;
+  documented sealed-switch-exemption reasoning applies unchanged (not the
+  2026-07-28 `Report.line` decision itself, but the same category of
+  exhaustive-by-compilation straight-line dispatch). `serviceEntityDevelopmentLoan`
+  at 12.0 (CC 3, 0%) is likewise the identical pre-existing figure, just
+  reattributed. Every other method in both files is CRAP <=9.1.
+- DRY: clean. No pair in the full report involves `LegalEntities.java`; all
+  flagged pairs remain confined to `Journalling.java`'s and `Game.java`'s
+  own pre-existing, previously-documented event-adapter and
+  constructor-telescoping noise.
+
+An evidence-backed structural split rather than another deferral, per the
+architect's brief. Committing `LegalEntities.java` and the `Game.java`
+extraction together, then handing back to the architect on the same task
+name, `game-java-mutation-site-debt`.
+
+## 2026-08-25T01:15:00Z — Game.java mutation-site debt resolved and certified
+
+Merged refactorer handoff `000197` (commit `897be88598`). The cohesive
+`LegalEntities` collaborator removes legal-entity trade/buyout, formation,
+and operation/loan-service orchestration from `Game` while retaining the
+same package-level access to `Journalling`. `Game.java` falls from 124 to
+83 mutation sites; `LegalEntities.java` has 41, so both are below the split
+threshold. The public `Game` API is unchanged.
+
+Independently ran the generator-backed full acceptance suite and the full
+Gherkin mutation suite. Both pass cleanly: no acceptance failures,
+survivors, or mutation errors. This resolves the identified `Game.java`
+architectural debt rather than merely recording it.
+
+## 2026-08-25T01:30:00Z — specifier syncs after game-java-mutation-site-debt
+
+Merged the refactorer/architect's certified `Game.java` split (commit
+`71c29f0c47`; new `LegalEntities` collaborator, 124->83 mutation sites,
+public API and observable gameplay unchanged). Ran
+`mvn test -Pcharacterization-tests` per the phase-complete sync rule:
+green (`CharacterizationTest` 12/12, 422/422 domain tests). No drift.
+Pure refactor, no Gherkin involved; no further specifier action needed.
+
+## 2026-08-25T02:15:00Z — dev-loans + legal-entity foreclosure defect found while scoping rent-relief configs
+
+While scoping new characterization configs with the user (all rent relief
+on: an all-Greedo config adding legal-entity trading + development loans,
+a war-profits-tax variant of it, and an asset-rich-billionaire variant of
+that), an ad-hoc 50-seed run of the first candidate (8 Greedo,
+`--optional-greedo-stalemate-trading --optional-greedo-legal-entity
+--optional-development-loans --optional-rent-relief`, `--max-years=2500`)
+crashed outright on seed 6:
+
+```
+Simulation failed: Yellow Realty does not own GroteMarktHasselt.
+```
+
+Reproduced directly against `Game` (bypassing the CLI's
+exception-flattening wrapper, which normally discards the stack trace) to
+get the full picture:
+
+```
+java.lang.IllegalStateException: Yellow Realty does not own GroteMarktHasselt.
+	at the.monopoly.game.rules.Deeds.verifyEntityOwner(Deeds.java:319)
+	at the.monopoly.game.rules.Deeds.sellHouse(Deeds.java:269)
+	at the.monopoly.game.rules.DevelopmentLoanBook.forecloseEntity(DevelopmentLoanBook.java:246)
+	at the.monopoly.game.LegalEntities.serviceEntityDevelopmentLoan(LegalEntities.java:174)
+	at the.monopoly.game.LegalEntities.operateLegalEntities(LegalEntities.java:153)
+	at the.monopoly.game.Game.completeRound(Game.java:332)
+```
+
+This exact combination (legal-entity trading + development loans, with no
+billionaire in the mix) has never been exercised together in the existing
+characterization suite before — config 9 combines both flags but always
+with an asset-rich billionaire present, which may simply never hit this
+path. Root cause, confirmed by reading the source (not just a hypothesis):
+`Bankruptcy.liquidateEntity` (`Bankruptcy.java:101-105`) — reached when a
+distressed player holds shares in an entity with exactly one distinct
+shareholder (themself) — calls `entity.liquidateTo(debtor)` then
+`Deeds.dissolve(entity, debtor)` (`Deeds.java:51-57`), which transfers
+every one of the entity's streets to that player unconditionally. Neither
+step checks `DevelopmentLoanBook` for outstanding positions where
+`position.entity()` is the dissolving entity. Any such position survives
+the dissolution untouched: it still names the now-dissolved entity as
+borrower, with `collateral` pointing at land a specific player now owns
+individually. The next time that position comes up for servicing,
+`forecloseEntity` tries to act on land the entity no longer holds, and
+`Deeds.verifyEntityOwner` correctly rejects it — the crash is the symptom,
+the missing reconciliation at dissolution is the defect.
+
+Routing to coder now, before touching `CHARACTERIZATION-TESTS.md` for the
+new configs, per user direction — those configs (all needing legal-entity
++ development-loans + rent-relief together) can't be adopted while a
+legitimate seed just crashes the simulator outright.

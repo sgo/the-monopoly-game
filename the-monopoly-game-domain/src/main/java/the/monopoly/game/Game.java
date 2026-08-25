@@ -17,10 +17,7 @@ import the.monopoly.game.rules.Initiative;
 import the.monopoly.game.rules.Jail;
 import the.monopoly.game.rules.LandSale;
 import the.monopoly.game.rules.Landings;
-import the.monopoly.game.rules.LegalEntity;
 import the.monopoly.game.rules.MegacorpSalaryTax;
-import the.monopoly.game.rules.MonopolyBuyout;
-import the.monopoly.game.rules.PeerTrading;
 import the.monopoly.game.rules.Rent;
 import the.monopoly.game.rules.Rule;
 import the.monopoly.game.rules.Stalemate;
@@ -29,7 +26,6 @@ import the.monopoly.game.rules.WarProfitsTax;
 import the.monopoly.game.rules.WarProfitsTaxBook;
 import the.monopoly.game.rules.Turn;
 import the.monopoly.game.strategies.Strategy;
-import the.monopoly.game.strategies.Greedo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,6 +67,7 @@ public class Game {
   private the.monopoly.game.rules.RentRelief rentReliefBook;
   private MegacorpSalaryTax megacorpSalaryTax;
   private final WarProfitsTaxBook warProfitsTaxBook;
+  private final LegalEntities legalEntities;
   private final int maxYears;
   private boolean automaticMarketDeadlock = true;
   private boolean roundHadConsolidatingAction;
@@ -187,6 +184,8 @@ public class Game {
     this.megacorpSalaryTax = rentReliefBook == null ? null
         : new MegacorpSalaryTax(rentReliefBook.government());
     this.warProfitsTaxBook = new WarProfitsTaxBook(rules.bank(), WarProfitsTax.boardValue(rules));
+    this.legalEntities = new LegalEntities(rules, deeds, players, strategies, this.developmentLoanBook,
+        stalemateTrading, legalEntityTrading);
     this.maxYears = maxYears;
     applyOpeningCapital();
     applyAssetRichOpening();
@@ -330,9 +329,9 @@ public class Game {
 
   private void completeRound(Journal journal, int roundJournalStart, Journalling journalling) {
     if (roundLoggedABankruptcy(journal, roundJournalStart)) roundHadConsolidatingAction = true;
-    operateLegalEntities(journalling);
+    legalEntities.operateLegalEntities(journalling);
     if (automaticMarketDeadlock) {
-      resolveMarketDeadlockAtRoundBoundary(!roundHadConsolidatingAction, true, journalling);
+      legalEntities.resolveMarketDeadlockAtRoundBoundary(!roundHadConsolidatingAction, true, journalling);
     }
   }
 
@@ -350,12 +349,12 @@ public class Game {
   private boolean playTurn(Player player, List<Player> turnOrder, Journal journal,
                            Journalling journalling, Building building) {
     if (deeds.isBankrupt(player)) return false;
-    resolveSplitOwnershipAtStart(player, turnOrder, journalling);
+    if (legalEntities.resolveSplitOwnershipAtStart(player, turnOrder, journalling)) roundHadConsolidatingAction = true;
     takeTurn(player, journal, journalling, landingsFor(player, turnOrder, journalling));
     if (isPlayerStillSolvent(player)) building.develop(player);
     if (remainingPlayers().size() <= 1) return true;
     if (!Stalemate.reached(rules, players, deeds)) return false;
-    if (player.id().equals(turnOrder.getLast().id())) operateLegalEntities(journalling);
+    if (player.id().equals(turnOrder.getLast().id())) legalEntities.operateLegalEntities(journalling);
     logStalemate(journal, journalling);
     return true;
   }
@@ -382,176 +381,13 @@ public class Game {
     if (!governmentBalance.equals(Money.ZERO)) journal.log(new Journal.Entry.GovernmentBalance(governmentBalance));
   }
 
-  private boolean operateLegalEntities(Journalling journalling) {
-    deeds.legalEntities().forEach(entity -> {
-      boolean loanServiced = developmentLoanBook.positions().stream()
-          .filter(position -> position.entity() == entity && !position.outstanding().equals(Money.ZERO))
-          .map(position -> serviceEntityDevelopmentLoan(position, journalling))
-          .reduce(false, (serviced, current) -> serviced || current);
-      if (!loanServiced) operateEntity(entity, journalling);
-    });
-    return true;
-  }
-
-  private boolean serviceEntityDevelopmentLoan(DevelopmentLoanBook.Position position, Journalling journalling) {
-    Optional<DevelopmentLoanBook.Payment> payment = developmentLoanBook.service(position);
-    if (payment.isEmpty()) {
-      mortgageEntitySpareProperty(position);
-      payment = developmentLoanBook.service(position);
-    }
-    if (payment.isPresent()) {
-      journalling.serviceDevelopmentLoan(position, payment.orElseThrow());
-      return true;
-    }
-    DevelopmentLoanBook.Foreclosure foreclosure =
-        developmentLoanBook.forecloseEntity(position, deeds, rules, players, strategies);
-    journalling.developmentLoanDefaulted(position);
-    journalling.developmentLoanRecovered(position, foreclosure.recovered());
-    return true;
-  }
-
-  private void mortgageEntitySpareProperty(DevelopmentLoanBook.Position position) {
-    LegalEntity entity = position.entity();
-    rules.streets()
-        .filter(Ownable.class::isInstance)
-        .map(Ownable.class::cast)
-        .filter(land -> deeds.entityOwnerOf(land.type()).filter(entity::equals).isPresent())
-        .filter(land -> land.type() != position.collateral())
-        .filter(land -> !deeds.isMortgaged(land))
-        .findFirst()
-        .ifPresent(land -> deeds.mortgage(land, entity));
-  }
-
-  private void operateEntity(LegalEntity entity, Journalling journalling) {
-    if (!entity.hasShareholders()) return;
-    journalOperation(entity, journalling);
-  }
-
-  private void journalOperation(LegalEntity entity, Journalling journalling) {
-    switch (entity.operate(deeds, strategies, rules, developmentLoanBook, players)) {
-      case LegalEntity.Operation.LoanRepaid it ->
-          journalling.entityLoanRepaid(entity, it.shareholder(), it.principal(), it.repayment());
-      case LegalEntity.Operation.HouseBuilt it -> journalling.entityHouseBuilt(entity, it.street());
-      case LegalEntity.Operation.LoanRaisedAndHouseBuilt it -> {
-        journalling.entityLoanRaised(entity, it.loan());
-        journalling.entityHouseBuilt(entity, it.street());
-      }
-      case LegalEntity.Operation.DevelopmentLoanRaisedAndHouseBuilt it -> {
-        journalling.entityDevelopmentLoanRaised(entity, it.position());
-        journalling.entityHouseBuilt(entity, it.street());
-      }
-      case LegalEntity.Operation.DividendPaid it -> journalling.entityDividendPaid(entity, it.amount());
-      case LegalEntity.Operation.NoAction ignored -> { }
-    }
-  }
-
   private boolean isPlayerStillSolvent(Player player) {
     return !deeds.isBankrupt(player);
   }
 
-  private String entityName(Street.Colour colour) {
-    String name = colour.name().replace('_', ' ');
-    return Character.toUpperCase(name.charAt(0)) + name.substring(1) + " Realty";
-  }
-
-  private void resolveSplitOwnershipAtStart(Player trader, List<Player> turnOrder, Journalling journalling) {
-    if (!tradeAtStart(trader, turnOrder, journalling)) resolveBuyoutAtStart(trader, turnOrder, journalling);
-  }
-
-  private boolean tradeAtStart(Player trader, List<Player> turnOrder, Journalling journalling) {
-    if (!stalemateTrading || !allOwnableSpacesOwned()) return false;
-    return PeerTrading.select(trader, strategies.forPlayer(trader), turnOrder, rules, deeds)
-        .map(offer -> {
-          completeTrade(trader, offer, journalling);
-          return true;
-        }).orElse(false);
-  }
-
-  private boolean resolveBuyoutAtStart(Player trader, List<Player> turnOrder, Journalling journalling) {
-    if (!stalemateTrading || !allOwnableSpacesOwned()) return false;
-    if (!(strategies.forPlayer(trader) instanceof Greedo)) return false;
-    if (isTiedWithItsPartner(trader, turnOrder)) return false;
-    List<Player> partners = turnOrder.stream().filter(partner -> partner != trader).toList();
-    return resolvableBuyout(trader, partners)
-        .map(outcome -> applyBuyout(outcome, journalling))
-        .orElseGet(() -> anySplitExists(trader, partners));
-  }
-
-  private Optional<MonopolyBuyout.Outcome> resolvableBuyout(Player trader, List<Player> partners) {
-    return partners.stream()
-        .map(partner -> MonopolyBuyout.resolve(trader, partner, rules, deeds))
-        .filter(Optional::isPresent).map(Optional::orElseThrow).findFirst();
-  }
-
-  private boolean anySplitExists(Player trader, List<Player> partners) {
-    return partners.stream().anyMatch(partner -> MonopolyBuyout.hasSplit(trader, partner, rules, deeds));
-  }
-
-  /**
-   * Turn-start resolution leaves an equal-cash tie to the established peer-trade
-   * behavior — but only when every other player is tied; a lower-balance partner
-   * elsewhere in turn order still leaves a real buyout to resolve against.
-   */
-  private boolean isTiedWithItsPartner(Player trader, List<Player> turnOrder) {
-    return turnOrder.stream().filter(partner -> partner != trader)
-        .allMatch(partner -> partner.account().balance().amount()
-            .equals(trader.account().balance().amount()));
-  }
-
-  private boolean applyBuyout(MonopolyBuyout.Outcome outcome, Journalling journalling) {
-    roundHadConsolidatingAction = true;
-    journalling.splitMonopolyWon(outcome.winner(), outcome.loser());
-    if (!outcome.payment().equals(Money.ZERO)) journalling.splitMonopolyPaid(
-        outcome.winner(), outcome.loser(), outcome.payment());
-    return true;
-  }
-
-  private void completeTrade(Player trader, Strategy.TradeOffer offer, Journalling journalling) {
-    roundHadConsolidatingAction = true;
-    deeds.transferWithoutPayment(offer.offered(), trader, offer.partner());
-    deeds.transferWithoutPayment(offer.wanted(), offer.partner(), trader);
-    journalling.peerTrade(trader, offer.offered(), offer.partner(), offer.wanted());
-  }
-
-  private boolean allOwnableSpacesOwned() {
-    return rules.streets().filter(Ownable.class::isInstance).map(Ownable.class::cast)
-        .allMatch(it -> !deeds.isUnowned(it.type()));
-  }
-
   /** Applies the automatic legal-entity formation check at a completed quiet round boundary. */
   public void resolveMarketDeadlockAtRoundBoundary(boolean quietRound, boolean collectiveFunding) {
-    resolveMarketDeadlockAtRoundBoundary(quietRound, collectiveFunding, null);
-  }
-
-  private void resolveMarketDeadlockAtRoundBoundary(boolean quietRound, boolean collectiveFunding,
-                                                    Journalling journalling) {
-    if (!canFormAtMarketDeadlock(quietRound, collectiveFunding)) return;
-    fundableEntityAtMarketDeadlock().ifPresent(entity -> {
-      deeds.form(entity);
-      if (journalling != null) journalling.entityFormed(entity);
-    });
-  }
-
-  private boolean canFormAtMarketDeadlock(boolean quietRound, boolean collectiveFunding) {
-    return quietRound && collectiveFunding && legalEntityTrading && allOwnableSpacesOwned();
-  }
-
-  private Optional<LegalEntity> fundableEntityAtMarketDeadlock() {
-    return rules.streets().filter(ColourStreet.class::isInstance).map(ColourStreet.class::cast)
-        .map(ColourStreet::colourGroup).distinct()
-        .map(this::formIfFundable)
-        .filter(Optional::isPresent).map(Optional::orElseThrow).findFirst();
-  }
-
-  private Optional<LegalEntity> formIfFundable(Street.Colour colour) {
-    List<ColourStreet> streets = LegalEntity.streetsOf(colour, rules);
-    List<Player> shareholders = players.stream()
-        .filter(player -> streets.stream().anyMatch(street -> deeds.ownerOf(street.type())
-            .filter(player.id()::equals).isPresent()))
-        .toList();
-    return LegalEntity.form(entityName(colour), colour, shareholders, rules, deeds,
-        street -> Strategy.priorityOf(street) == Strategy.Priority.HIGHEST)
-        .filter(entity -> entity.canFundNextImprovement(strategies, rules, deeds));
+    legalEntities.resolveMarketDeadlockAtRoundBoundary(quietRound, collectiveFunding, null);
   }
 
   private List<Player> remainingPlayers() {
