@@ -49393,3 +49393,14 @@ Route to coder under `rent-relief-configs-11-13`: isolate the exact ordering
 source, make the simulation deterministic across JVMs without weakening the
 config coverage, and return characterization tests reliably green. Do not
 accept baseline updates as a substitute for a deterministic result.
+
+## 2026-08-25T10:32:41Z — deterministic deed ordering repaired
+
+Implemented the architect's config12 determinism repair under
+`rent-relief-configs-11-13`. `Deeds.landOwnedBy` now sorts ownership results by
+stable `Street.Type` ordinal rather than `HashMap` iteration order, with a
+focused unit test. Regenerated the intentionally changed config12 fixture and
+synchronized README values. Domain tests, property tests, and the
+characterization/readme suite pass in a fresh Maven process. Handed commit
+`65e974d34e` to refactorer in
+`50_20260825T103241Z_000275_from_coder_to_refactorer.handoff`.
