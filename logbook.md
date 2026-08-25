@@ -49107,3 +49107,16 @@ the null-winner auction path, with refactorer's direct reproduction sweep,
 mirror-path coverage, and Auction property tests. Merge both audit trails;
 the architect must independently run property, acceptance, and full Gherkin
 mutation gates before closing this new task.
+
+## 2026-08-25T11:45:00Z — route null-winner auction survivor equivalence decision
+
+Architect verification confirms property and acceptance gates green, but the
+full configured Gherkin mutation suite reports two survivors in
+`development-loans-18`, recorded in
+`acceptance/mutation-survivors-en-rules-development-loans-feature.md`.
+They lower `high_hat_bid` from $10 to $4 and `iron_box_bid` from $25 to $24.
+Both original and mutated ceilings remain below Rue Grande Dinant's $30
+mortgage/opening price, so the stated no-winner outcome appears genuinely
+indistinguishable; nevertheless specifier must decide and record precise
+equivalence rationale or add a meaningful observable distinction. Do not
+phase-close until the report is cleared by the mutation tool.
