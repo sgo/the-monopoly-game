@@ -36,7 +36,7 @@ fixtures by the same test suite (see `README sync check` in
 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich + dev-loans | 100% win (50) | 1 / 4 / 4.0 / 12 |
 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich + war-profits-tax | 74% win (37), 26% stalemate (13) | 0 / 17 / 81.62 / 454 |
 | 8 | Greedo | peer-trading + legal-entity + dev-loans + rent relief | 96% win (48), 4% stalemate (2) | 7 / 14 / 28.06 / 170 |
-| 8 | Greedo | peer-trading + legal-entity + dev-loans + rent relief + war-profits-tax | 64% win (32), 36% stalemate (18) | 7 / 69 / 153.56 / 1730 |
+| 8 | Greedo | peer-trading + legal-entity + dev-loans + rent relief + war-profits-tax | 66% win (33), 34% stalemate (17) | 7 / 68 / 152.28 / 1730 |
 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich + dev-loans + rent relief + war-profits-tax | 60% win (30), 40% stalemate (20) | 0 / 57 / 132.66 / 843 |
 
 Full breakdown for any config lives in
@@ -79,22 +79,22 @@ Full breakdown for any config lives in
 <details>
 <summary>8 players — Greedo — peer-trading + legal-entity + dev-loans + rent relief + war-profits-tax</summary>
 
-- Outcome: 64% win (32), 36% stalemate (18)
-- Winners: shoe 5, racecar 8, ship 2, high hat 4, dog 6, thimble 4, wheelbarrow 2, iron box 1
-- Age at end: min 7, median 69, mean 153.56, max 1730
-- Bankruptcies: racecar 31, iron box 19, the bank 113, thimble 14, dog 29, high hat 38, shoe 23, ship 31, wheelbarrow 25
-- Auctions: 103 (6.0% of 1,730 land acquisitions)
-- Mortgages: 737
-- Income: salary \$4,279,200, rent \$11,616,524, bank payments \$521,200
+- Outcome: 66% win (33), 34% stalemate (17)
+- Winners: shoe 5, racecar 8, ship 2, high hat 4, dog 7, thimble 4, wheelbarrow 2, iron box 1
+- Age at end: min 7, median 68, mean 152.28, max 1730
+- Bankruptcies: racecar 31, iron box 19, the bank 115, thimble 14, dog 28, high hat 38, shoe 23, ship 31, wheelbarrow 25
+- Auctions: 109 (6.3% of 1,736 land acquisitions)
+- Mortgages: 741
+- Income: salary \$4,266,200, rent \$11,740,451, bank payments \$518,515
 - Loans: 401 raised, \$24,695 total, 73 defaults
   - Borrowers: iron box 27, Green Realty 42, Yellow Realty 46, racecar 30, Pink Realty 51, ship 42, thimble 27, shoe 27, high hat 54, dog 34, wheelbarrow 21
   - Bondholders: dog 242, high hat 62, iron box 30, racecar 19, shoe 5, thimble 5, ship 2
-  - Servicing: borrowers paid \$6,483 interest + \$12,588 principal; bondholders received \$3,005 interest + \$12,070 principal
+  - Servicing: borrowers paid \$6,483 interest + \$12,586 principal; bondholders received \$3,005 interest + \$12,070 principal
 - Entities: 115 formed, 44 dissolved
 - Peer trades: 10
 - War-profits tax: 334 payments, \$620,779 total
 - Tax payers: racecar 12, thimble 2, dog 8, high hat 15, wheelbarrow 36, ship 38, iron box 4, shoe 219
-- Government balance: min 2, median 630, mean 12244.54, max 316087
+- Government balance: min 2, median 647, mean 12257.92, max 316087
 
 </details>
 
