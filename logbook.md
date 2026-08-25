@@ -50182,6 +50182,16 @@ merge_and_process architect 1f6d6fa755
 The architect review is accepted with no further changes required; the
 specifier can sync the completed phase.
 
+## 2026-08-25T23:37:00Z — verified architect priority-00 follow-up
+
+Processed architect handoff `00_20260825T213333Z_000442_from_architect_to_coder.handoff`
+at commit `37b716d746`. Merged the expected `GameTest` assertion for the
+unified-income-tax disabled journal entry; no additional coder-owned
+implementation changes were needed.
+
+Verification: focused domain tests and the full generated acceptance
+pipeline pass all 952 tests. Returning the verified state to architect.
+
 ## 2026-08-25T20:31:00Z — architect received refactorer handoff `d84dcae17b`
 
 Handoff message received:
