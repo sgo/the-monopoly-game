@@ -50556,3 +50556,74 @@ both unaffected.
 empirical study against this corrected build next, per the user's
 request, since the original comparison (before this fix) was confounded
 by the double-labour-tax bug.
+
+## 2026-08-26T05:30:00Z — specifier requests a new characterization config + outcome-split age stats
+
+At the user's request, ran an ad-hoc 50-seed empirical comparison (see
+memory `unified-income-tax-relief-funding-study` for the full numbers)
+of `--optional-unified-income-tax` against the already-tracked
+`eight_greedo_stalemate_entity_loans_rent_relief_war_profits_tax`
+characterization config (config 12 in `CHARACTERIZATION-TESTS.md`),
+using the same base (8 all-Greedo, stalemate-trading, legal-entity,
+development-loans, rent-relief) and the same 50 seeds/max-years=2500.
+Found unified income tax funds relief almost as well as war profits tax
+(49.3%/64.6% $/event coverage vs 52.0%/66.4%, both far above labour-tax-
+alone's 29.5%/49.6%) - but only after fixing a real bug the user caught
+along the way, where unified income tax and MegaCorp were independently
+taxing the same salary (see `unified-income-tax-labour-fix`).
+
+While discussing the result with the user, a second real finding
+emerged, this one about the existing `ageAtEnd` generic-core field
+itself: it lumps together two fundamentally different termination
+modes - a bankruptcy-driven `ordinary_win`/`year_limit` end, and
+`Stalemate.reached()`'s deliberate equilibrium detection (every
+surviving player's cash covers a fixed, board-derived worst-case-rent
+threshold, independent of tax policy) - so a flat aggregate age
+comparison across two configs with very different stalemate rates is
+comparing different things, not "which one lasts longer." Split by hand
+this time (parsing the same log lines `GameBreakdown.GameResult` already
+parses, from a scratch Python script, not committed): unified income tax
+reaches stalemate in 80% of games (40/50) vs war profits tax's 34%
+(17/50), and ~4x faster when it does (mean age 74 vs 325 years); but
+restricted to only the bankruptcy-driven games, war profits tax's
+surviving games run longer on average and at the extreme (mean 63.2 /
+max 390, n=33) than unified income tax's (mean 43.6 / max 131, n=10).
+
+This is the user's own request: capture this - both the new config and
+the outcome-split age stats - permanently in the characterization
+suite, the same way config 10's ad-hoc finding was promoted into a
+permanent config. Two things needed, both outside specifier's Gherkin
+ownership (`CharacterizationConfig.java` and `GameBreakdown.java` are
+plain Java test infrastructure, not Gherkin), so routing to the coder
+rather than writing them directly:
+
+1. A new `CharacterizationConfig` entry,
+   `eight_greedo_stalemate_entity_loans_rent_relief_unified_income_tax`
+   - identical base to config 12
+   (`eight_greedo_stalemate_entity_loans_rent_relief_war_profits_tax`:
+   8 all-Greedo, `--optional-greedo-stalemate-trading
+   --optional-greedo-legal-entity --optional-development-loans
+   --optional-rent-relief`), swapping in
+   `--optional-unified-income-tax` for `--optional-war-profits-tax` -
+   isolating that one flag's effect the same way config 12 isolates war
+   profits tax's, and the same way configs 7/8, 8/9, and 8/10 each
+   isolate one flag elsewhere in the suite.
+
+2. A new generic-core field splitting `ageAtEnd` by outcome (e.g.
+   `ageAtEndByOutcome: Map<String, Stats>`), since the plain aggregate
+   is actively misleading once two configs have meaningfully different
+   stalemate rates - exactly what happened here. This is a generic-core
+   change (applies to every config, not gated behind a flag), so per
+   `CHARACTERIZATION-TESTS.md`'s own stated rule ("Adding a *generic
+   core* field... all baselines need regenerating together"), every
+   existing fixture needs regenerating alongside the new config's own
+   fixture - not just the new config's. The README's characterization
+   section and its sync-check test need the matching update.
+
+Left the exact implementation (how `GameResult` tracks age per outcome,
+whether `ageAtEndByOutcome` omits an outcome that never occurred rather
+than zero-filling it, mirroring how `survivorsAtFirstTax` and other
+conditional stats already handle absence) to the coder - the
+requirement is precise, the mechanism isn't specifier's to prescribe.
+Sending a `note` handoff pointing here rather than a full `git_handoff`,
+since there is no Gherkin/spec change of my own to commit for this task.
