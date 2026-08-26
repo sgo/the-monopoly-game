@@ -21,7 +21,7 @@ summarize them here.
 - They do not trade as a rule as their greed does not allow win-win relationships.
     - Inversely, they won't accept a trade in which they are the losing side
 
-For more details see [simulator.md](../SIMULATOR.md#Greedo)
+For more details see [simulator.md](https://github.com/sgo/the-monopoly-game/blob/main/SIMULATOR.md#greedo)
 
 ### The Billionaire
 
