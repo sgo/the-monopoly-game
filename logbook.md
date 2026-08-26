@@ -50785,3 +50785,43 @@ Independent characterization verification passed: 23 CLI tests, 432 domain
 tests, and 9 acceptance-support tests. The unified-income-tax baseline and
 per-payer burden aggregation round-trip correctly, and README synchronization
 passes. No further changes are required.
+
+## 2026-08-26T09:45:00Z — specifier verifies unified-income-tax-burden, task closed
+
+Merged architect's `b0bb4322f7` - another clean append-append conflict
+in `logbook.md`, resolved the same way as the last two (keep both,
+chronological order), verified by the same line-count arithmetic: base
+(`4c09181651`) 50546 + my 220 added + their 21 added = 50787, exact
+match with the merged file.
+
+The fix landed exactly as requested: a new `UnifiedIncomeTaxExtras`
+record in `GameBreakdown` (payments, totalDollars, payerDollars),
+parsed from `"<pawn> pays the government a unified income tax of
+$<amount>"`; merged into both `effectiveTaxBurden`'s and
+`netFiscalPosition`'s `taxes` numerator maps in `ReadmeSyncTest`; and a
+new `grossSalary(baseline, player, netSalary)` helper that uses `netSalary
+/ 0.57` whenever unified income tax is active, falling back to the old
+MegaCorp add-back otherwise - precisely the mechanism-agnostic fix
+requested, not a special case bolted onto the old one.
+
+Verified independently: `./acceptance/run-acceptance.sh` - 952/952
+green. `mvn test -Pcharacterization-tests` - domain 432/432, CLI
+characterization 22/22 (up one for `UnifiedIncomeTaxExtras`'s own JSON
+round-trip test, alongside the config), README sync 1/1,
+acceptance-support 23/9 green. `mvn test -Pproperty-tests` - 37/23/9
+green, unaffected. Checked the actual numbers, not just green tests: the
+unified-income-tax config's `Effective tax burden` now reads 42.34% to
+42.67% per pawn (the small per-player spread is real, not noise -
+individual transactions round independently) - a world away from the
+uniform 0.00% before. Also explicitly diffed the other three
+tax-bearing configs' `Effective tax burden` lines against what they
+showed before this change: byte-identical (12.19%/13.78%/... labour-tax-
+only, 27.73%/31.69%/... war-profits-tax, 56.97%/34.26%/... billionaire+
+war-profits) - confirming the reformulated gross-salary recovery really
+is mathematically equivalent for every config that doesn't use unified
+income tax, not just equivalent in theory.
+
+`unified-income-tax-burden` is closed. The relief-funding comparison,
+the outcome-split age insight, and now the burden/fiscal-position
+figures are all correctly and permanently tracked for unified income
+tax. No further specifier action needed on this task.
