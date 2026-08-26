@@ -50505,3 +50505,20 @@ and handing the verified state to the architect under the same task
 name.
 
 ## 2026-08-26T03:00:00Z — refactorer sent unified-income-tax-labour-fix handoff to architect
+
+## 2026-08-26T03:01:00Z — architect received refactorer handoff `a2c03d1db9`
+
+Handoff message received:
+type: git_handoff
+to: architect
+priority: 50
+task: unified-income-tax-labour-fix
+commit: a2c03d1db9
+Re-read your role and constitution.
+merge_and_process refactorer a2c03d1db9
+
+Merged the refactorer verification. The reviewed change makes unified income
+tax supersede MegaCorp salary tax in both the domain journalling adapter and
+the acceptance harness's isolated salary helper, matching the clarified
+labour-tax rule. The refactorer reports full unit, property, characterization,
+and 952-scenario acceptance verification.
