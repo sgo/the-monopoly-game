@@ -50567,3 +50567,65 @@ produces no MegaCorp payer entries because it supersedes MegaCorp labour tax.
 Verification: `mvn test -Pcharacterization-tests` passes — 432 domain tests,
 22 CLI characterization/sync tests, and all supporting modules green. The
 characterization run covers 15 configs and 50 seeds each.
+
+## 2026-08-26T07:15:00Z — refactorer processes coder handoff `34eab00354` (unified-income-tax-characterization)
+
+Handoff message received:
+
+```
+id: 20260826T070522Z_000285_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: unified-income-tax-characterization
+commit: 34eab00354
+
+Re-read your role and constitution.
+
+merge_and_process coder 34eab00354
+```
+
+Merged `34eab00354`. Usual append-only `logbook.md` conflict, both
+sides kept in full - checked against my own prior commit before
+trusting the resolution, same discipline as the last few cycles; a
+normal append-append conflict this time, nothing missing.
+
+No production files touched (confirmed: `git diff --stat` against
+`src/main` is empty) - this is entirely test-support/docs/data: a new
+characterization config 15 (config 12's base with war-profits tax
+swapped for unified income tax), a new generic `ageAtEndByOutcome`
+field on `GameBreakdown` (age `Stats` split by termination outcome,
+alongside the existing aggregate `ageAtEnd`), and all 15 baselines plus
+`README.md`/`CHARACTERIZATION-TESTS.md` regenerated accordingly.
+CRAP/DRY/mutation gate inapplicable, same standing exemption for these
+files.
+
+Checked the one place this could have silently gone wrong:
+`aggregate()`'s new `ageAtEndByOutcome` computation filters to results
+with a present `finalAge` before grouping by outcome, so an outcome
+that never occurs among a config's seeds correctly produces no key at
+all (not a zero-filled one) - confirmed against the coder's own new
+test, which asserts `containsOnlyKeys("ordinary_win", "stalemate")`
+for a two-result fixture with no year-limit case. The round trip
+(`toJson`/`fromJson`) is exercised directly in the same test with
+non-trivial data, so no property-coverage gap here unlike a few
+earlier cycles this session.
+
+Also checked `ReadmeSyncTest.assertNameLongMultiset`'s new blank-line
+guard: config 15's unified income tax supersedes MegaCorp entirely, so
+its "MegaCorp tax payers"/"MegaCorp tax by player" README lines are
+genuinely empty strings rather than absent - the old comma-splitting
+parser would have mis-parsed that as one empty-named entry rather than
+zero entries. The guard (`if (raw.isBlank()) { assert expected is
+empty; return; }`) is the right fix for exactly that case.
+
+Verification (domain reinstalled fresh first): `mvn test -Pcharacterization-tests`
+(cli): green - all 15 configs, 50 seeds each, matching their
+regenerated baselines exactly. `mvn test` (root reactor): green.
+Full acceptance: 952/952 (unaffected, no production change). `mvn test
+-Pproperty-tests`: green (unaffected). Nothing to fix this cycle -
+handing the verified state to the architect under the same task name.
+
+## 2026-08-26T07:20:00Z — refactorer sent unified-income-tax-characterization handoff to architect
