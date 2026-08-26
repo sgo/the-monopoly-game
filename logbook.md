@@ -50505,3 +50505,36 @@ and handing the verified state to the architect under the same task
 name.
 
 ## 2026-08-26T03:00:00Z — refactorer sent unified-income-tax-labour-fix handoff to architect
+
+Handoff message sent:
+
+```
+id: 20260826T025658Z_000211_from_refactorer
+from: refactorer
+to: architect
+priority: 50
+type: git_handoff
+role: refactorer
+task: unified-income-tax-labour-fix
+commit: a2c03d1db9
+created_at: 2026-08-26T02:56:58.004934Z
+
+Re-read your role and constitution.
+
+merge_and_process refactorer a2c03d1db9
+```
+
+Reports from commit `a2c03d1db9`: merged coder's `955864664b`
+(`Journalling.collectedSalary` now supersedes MegaCorp with unified
+income tax, correctly). Ran the full acceptance suite before trusting
+the merge and found it genuinely red - `World.java`'s `collectSalary`
+reimplements the same MegaCorp/unified priority independently for
+isolated-computation scenarios, and the coder's diff only added
+`paysNoMegacorpTax()` there without reordering the dispatch itself, so
+`unified-income-tax-6` still failed. Reordered `collectSalary` to check
+`unifiedIncomeTaxEnabled` first, mirroring `Journalling`'s corrected
+priority; every other scenario is structurally unaffected. CRAP/DRY/
+mutation scan clean relative to what this diff changed. `mvn test`,
+characterization-tests, property-tests, and full acceptance (952/952,
+confirmed red before the fix, green after) all green. Requesting
+architect review.
