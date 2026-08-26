@@ -6,6 +6,8 @@ using different characteristics.
 Every game event is narrated through a journal so a completed game can be
 read back afterward as a plain-English report.
 
+[Project blog](docs/README.md)
+
 ## Purpose of this project
 
 I started this project with 2 distinct objectives in mind.
