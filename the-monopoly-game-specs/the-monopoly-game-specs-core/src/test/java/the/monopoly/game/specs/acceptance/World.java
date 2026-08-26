@@ -898,6 +898,10 @@ public class World {
     return lastMegacorpTaxPaid.values().stream().anyMatch(amount::equals);
   }
 
+  public boolean paysNoMegacorpTax() {
+    return lastMegacorpTaxPaid.isEmpty();
+  }
+
   public void payRent(String tenantName, String landlordName, Money rent) {
     if (rentRelief == null) enableRentRelief();
     rentRelief.pay(pawn(tenantName), pawn(landlordName), rent);

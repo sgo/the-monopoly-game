@@ -63,10 +63,10 @@ record Journalling(Journal journal, Map<Player.ID, Integer> ages, Deeds deeds,
     ageAfter(player);
     deeds.legalEntities().forEach(entity -> entity.shareholderGrewOlder(player));
     journal.log(new Journal.Entry.SalaryCollected(player.id(), salary));
-    if (megacorpSalaryTax != null)
-      journal.log(new Journal.Entry.MegacorpSalaryTaxPaid(player.id(), megacorpSalaryTax.payTax(salary)));
     if (unifiedIncomeTaxBook != null)
       journal.log(new Journal.Entry.UnifiedIncomeTaxPaid(player.id(), unifiedIncomeTaxBook.assess(player, salary)));
+    else if (megacorpSalaryTax != null)
+      journal.log(new Journal.Entry.MegacorpSalaryTaxPaid(player.id(), megacorpSalaryTax.payTax(salary)));
     assessWarProfitsTax(player);
     developmentLoanBook.positions().stream()
         .filter(position -> position.borrower() != null && position.borrower().id().equals(player.id()))

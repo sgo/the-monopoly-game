@@ -778,6 +778,9 @@ final class JournalStepHandlers {
         then("^MegaCorp pays the government an individual income tax of \\$" + MONEY + "$",
             (world, arguments) -> assertThat(world.paysMegacorpTax(money(arguments.text(1)))).isTrue()),
 
+        then("^MegaCorp pays no individual income tax$",
+            (world, arguments) -> assertThat(world.paysNoMegacorpTax()).isTrue()),
+
         step("^pawn \"" + NAME + "\" pays pawn \"" + NAME + "\" \\$" + VALUE + " rent$",
             (world, arguments) -> world.payRent(arguments.text(1), arguments.text(2), money(arguments.number(3)))),
 
