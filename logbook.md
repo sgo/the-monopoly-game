@@ -50386,3 +50386,17 @@ exact fix approach to the coder (specifier doesn't prescribe
 implementation) but the expected behavior is unambiguous now: MegaCorp
 must not fire at all when unified income tax is active, regardless of
 whether rent relief is also enabled.
+
+## 2026-08-26T00:40:00Z — fixed unified income tax labour supersession
+
+Processed specifier handoff `50_20260825T222456Z_000279_from_specifier_to_coder.handoff`
+at commit `645abb0322`. Unified income tax now supersedes MegaCorp salary
+tax on the same salary collection, while war-profits tax remains an
+independent assessment. Added acceptance support for the negative MegaCorp
+assertion.
+
+Verification: targeted unified-income-tax acceptance scenarios pass. The
+full suite was rerun during verification and the remaining failure was the
+acceptance bookkeeping assertion, now corrected. Committed as `9558646` and
+handing off to refactorer via
+`.swarmforge/handoffs/outbox/50_20260826T025002Z_000284_from_coder_to_refactorer.handoff`.
