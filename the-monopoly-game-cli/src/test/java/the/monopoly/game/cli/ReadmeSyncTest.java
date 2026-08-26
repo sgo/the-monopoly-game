@@ -80,7 +80,13 @@ class ReadmeSyncTest {
         assertField(block, "Peer trades", String.valueOf(trades.peerTrades()), configLabel));
     baseline.warProfitsTax().ifPresent(tax -> validateWarProfitsTax(block, tax, configLabel));
     baseline.rentRelief().ifPresent(relief -> validateRentRelief(block, relief, configLabel));
-    if (baseline.warProfitsTax().isPresent() || baseline.rentRelief().isPresent())
+    baseline.unifiedIncomeTax().ifPresent(tax -> {
+      assertField(block, "Unified income tax", tax.payments() + " payments, \\$"
+          + dollars(tax.totalDollars()) + " total", configLabel);
+      assertNameLongMultiset(block, "Unified income tax payers", tax.payerDollars(), configLabel);
+    });
+    if (baseline.warProfitsTax().isPresent() || baseline.rentRelief().isPresent()
+        || baseline.unifiedIncomeTax().isPresent())
       assertField(block, "Effective tax burden", effectiveTaxBurden(baseline), configLabel);
     if (baseline.rentRelief().isPresent())
       assertField(block, "Net fiscal position", netFiscalPosition(baseline), configLabel);
@@ -113,13 +119,13 @@ class ReadmeSyncTest {
     baseline.warProfitsTax().ifPresent(tax -> taxes.putAll(tax.payerDollars()));
     baseline.rentRelief().ifPresent(relief -> relief.megacorpTaxByPlayer().forEach(
         (name, amount) -> taxes.merge(name, amount, Long::sum)));
+    baseline.unifiedIncomeTax().ifPresent(tax -> tax.payerDollars().forEach(
+        (name, amount) -> taxes.merge(name, amount, Long::sum)));
     return baseline.core().income().byPlayer().entrySet().stream()
         .filter(entry -> entry.getValue().salary() + entry.getValue().rent() > 0)
         .map(entry -> {
           long tax = taxes.getOrDefault(entry.getKey(), 0L);
-          long grossSalary = entry.getValue().salary();
-          if (baseline.rentRelief().isPresent())
-            grossSalary += baseline.rentRelief().get().megacorpTaxByPlayer().getOrDefault(entry.getKey(), 0L);
+          double grossSalary = grossSalary(baseline, entry.getKey(), entry.getValue().salary());
           double burden = tax * 100.0 / (grossSalary + entry.getValue().rent());
           return entry.getKey() + " " + String.format(java.util.Locale.ROOT, "%.2f%%", burden);
         }).collect(java.util.stream.Collectors.joining(", "));
@@ -130,16 +136,23 @@ class ReadmeSyncTest {
     Map<String, Long> taxes = new java.util.LinkedHashMap<>();
     baseline.warProfitsTax().ifPresent(tax -> taxes.putAll(tax.payerDollars()));
     relief.megacorpTaxByPlayer().forEach((name, amount) -> taxes.merge(name, amount, Long::sum));
+    baseline.unifiedIncomeTax().ifPresent(tax -> tax.payerDollars().forEach(
+        (name, amount) -> taxes.merge(name, amount, Long::sum)));
     return baseline.core().income().byPlayer().entrySet().stream()
         .filter(entry -> entry.getValue().salary() + entry.getValue().rent() > 0)
         .map(entry -> {
-          long grossSalary = entry.getValue().salary()
-              + relief.megacorpTaxByPlayer().getOrDefault(entry.getKey(), 0L);
+          double grossSalary = grossSalary(baseline, entry.getKey(), entry.getValue().salary());
           double denominator = grossSalary + entry.getValue().rent();
           double burden = taxes.getOrDefault(entry.getKey(), 0L) * 100.0 / denominator;
           double reliefRate = relief.reliefByPlayer().getOrDefault(entry.getKey(), 0L) * 100.0 / denominator;
           return entry.getKey() + " " + String.format(java.util.Locale.ROOT, "%.2f%%", reliefRate - burden);
         }).collect(java.util.stream.Collectors.joining(", "));
+  }
+
+  private static double grossSalary(GameBreakdown baseline, String player, long netSalary) {
+    if (baseline.unifiedIncomeTax().isPresent()) return netSalary / 0.57;
+    return netSalary + baseline.rentRelief().map(relief ->
+        relief.megacorpTaxByPlayer().getOrDefault(player, 0L)).orElse(0L);
   }
 
   private void validateWarProfitsTax(String block, GameBreakdown.WarProfitsTaxExtras tax, String configLabel) {

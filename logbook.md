@@ -50415,3 +50415,18 @@ produces no MegaCorp payer entries because it supersedes MegaCorp labour tax.
 Verification: `mvn test -Pcharacterization-tests` passes — 432 domain tests,
 22 CLI characterization/sync tests, and all supporting modules green. The
 characterization run covers 15 configs and 50 seeds each.
+
+## 2026-08-26T09:31:00Z — coder tracks unified tax burden correctly
+
+Processed specifier note `50_20260826T072552Z_000281_from_specifier_to_coder.handoff`.
+Added per-pawn unified-income-tax payment counts and dollars to
+`GameBreakdown`, and included them in the README sync check's effective tax
+burden and net fiscal position calculations. Unified tax uses direct gross
+salary recovery (`net salary / 0.57`) because its payment combines salary and
+rent; existing MegaCorp fixtures retain their exact prior derived values.
+Updated the unified-tax baseline and README figures: burden is approximately
+42% per pawn rather than 0%.
+
+Verification: `mvn test -Pcharacterization-tests` passes — 432 domain tests,
+23 CLI tests (including the new parser regression and README sync), and all
+supporting modules green.
