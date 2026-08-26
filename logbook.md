@@ -50649,3 +50649,43 @@ domain tests, 22 CLI characterization tests, and 9 acceptance-support tests)
 and the generated acceptance suite (952/952). The characterization baseline,
 age-at-end-by-outcome aggregation, README synchronization, and unified-tax
 configuration are accepted with no further changes required.
+
+## 2026-08-26T09:20:00Z — specifier verifies unified-income-tax-characterization, task closed
+
+Merged architect's `4c09181651` - a genuine, straightforward append-append
+conflict in `logbook.md` this time (both sides added complete,
+non-overlapping entries after a shared line; no partial/missing content
+like the two earlier incidents this session). Resolved by keeping both
+in chronological order and verified with the line-count arithmetic
+check: base (`5e2d6ea02a`) 50524 lines + my 105 added + their 22 added =
+50651, exactly matching the merged file.
+
+The coder/refactorer/architect delivered precisely what was requested:
+a new `CharacterizationConfig` entry
+(`eight_greedo_stalemate_entity_loans_rent_relief_unified_income_tax`,
+mirroring the war-profits-tax sibling exactly) and a new generic-core
+`ageAtEndByOutcome: Map<String, Stats>` field, with every existing
+baseline regenerated alongside it and the README's characterization
+section kept in sync.
+
+Verified independently rather than trusting the report: `./acceptance/
+run-acceptance.sh` - 952/952 green. `mvn test -Pcharacterization-tests`
+- domain 432/432, CLI characterization 21/21 (up from 19, the new config
+plus one new unit test), README sync 1/1, acceptance-support 22/9 green.
+`mvn test -Pproperty-tests` - 37/23/9 green, unaffected. Spot-checked the
+new baseline fixture's numbers directly against my own independent
+ad-hoc study from earlier this session - they match exactly (outcomes
+40 stalemate/10 ordinary_win, ageAtEnd mean 68.04/median 56/max 259,
+ageAtEndByOutcome stalemate mean 74.15 / ordinary_win mean 43.6,
+reliefDollars 4002490 / starvedDollars 4115725) - the only difference is
+the ordinary_win median (30 in the fixture vs my own script's 30.5),
+which is just `Stats`'s existing integer-division median formula for an
+even-sized sample, the same convention already used everywhere else in
+this suite, not a discrepancy. Also confirmed the README's Summary table
+and Detailed Breakdown block for the new config match the fixture
+exactly.
+
+`unified-income-tax-characterization` is closed: the relief-funding
+comparison and the outcome-split age insight are now permanently tracked
+regression coverage, not just an ad-hoc finding that could silently go
+stale. No further specifier action needed on this task.
