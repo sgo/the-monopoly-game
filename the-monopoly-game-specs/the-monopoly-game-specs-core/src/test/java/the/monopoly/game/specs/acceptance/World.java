@@ -881,11 +881,11 @@ public class World {
   }
 
   public void collectSalary(String pawnName, Money salary) {
-    if (megacorpSalaryTax != null) {
+    if (unifiedIncomeTaxEnabled) {
+      pawn(pawnName).account().deposit(salary);
+    } else if (megacorpSalaryTax != null) {
       Money tax = megacorpSalaryTax.collect(pawn(pawnName), salary);
       lastMegacorpTaxPaid.put(pawnName, tax);
-    } else if (unifiedIncomeTaxEnabled) {
-      pawn(pawnName).account().deposit(salary);
     } else {
       enableRentRelief();
       Money tax = megacorpSalaryTax.collect(pawn(pawnName), salary);

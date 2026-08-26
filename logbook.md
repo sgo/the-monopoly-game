@@ -50423,3 +50423,85 @@ exact fix approach to the coder (specifier doesn't prescribe
 implementation) but the expected behavior is unambiguous now: MegaCorp
 must not fire at all when unified income tax is active, regardless of
 whether rent relief is also enabled.
+
+## 2026-08-26T02:50:00Z — refactorer processes coder handoff `955864664b` (unified-income-tax-labour-fix)
+
+Handoff message received:
+
+```
+id: 20260826T025002Z_000284_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: unified-income-tax-labour-fix
+commit: 955864664b
+
+Re-read your role and constitution.
+
+merge_and_process coder 955864664b
+```
+
+Merged `955864664b`. Usual append-only `logbook.md` conflict, both
+sides kept in full - checked carefully against my own known-good commit
+before trusting it, given the last two cycles each had a genuine
+content-loss defect on this exact file; this one was a normal
+append-append conflict with nothing missing.
+
+Coder's fix in `Journalling.collectedSalary` is minimal and correct:
+turned the two independent `if` blocks (MegaCorp, unified income tax)
+into `if (unifiedIncomeTaxBook != null) {...} else if
+(megacorpSalaryTax != null) {...}`, exactly the "unified supersedes
+MegaCorp" priority the user chose. Matches `unified-income-tax-6`'s
+corrected assertion exactly.
+
+**Found and fixed a real gap the coder's diff left behind: the
+acceptance harness's own parallel dispatch was never updated to match.**
+`World.java`'s `collectSalary` (used by every *isolated*-computation
+scenario, i.e. every one of these tax features' scenarios that doesn't
+use "play the game") reimplements this same MegaCorp/unified priority
+independently of `Journalling`, for its own non-`Game`-backed test
+setup. The coder's diff touched `World.java` only to add
+`paysNoMegacorpTax()` - the dispatch method itself (`collectSalary`)
+was untouched, still checking `megacorpSalaryTax != null` *before*
+`unifiedIncomeTaxEnabled`. Ran the full acceptance suite before trusting
+the merge (habit reinforced by the last two cycles' logbook issues) and
+it was genuinely red: `unified-income-tax-6` failed exactly as the old
+priority order predicts - "Given rent relief is enabled" makes
+`megacorpSalaryTax` non-null, so the first branch still fired MegaCorp
+even with unified income tax also active, and "Then MegaCorp pays no
+individual income tax" failed. Reordered `collectSalary` to check
+`unifiedIncomeTaxEnabled` first, mirroring `Journalling`'s corrected
+priority exactly; the `else if`/`else` fallback chain is otherwise
+unchanged, so every scenario that doesn't touch unified income tax
+(all of MegaCorp's and rent relief's own pre-existing scenarios) is
+unaffected by construction - only reachable when both mechanisms are
+active. Confirmed the specific fix, not just re-ran the suite blind:
+`unified-income-tax-6` was the only prior failure, and is the one now
+passing.
+
+CRAP (`crap4java`, `Journalling.java`): `collectedSalary` (the only
+method this diff meaningfully changed, plus my own `World.java` fix
+which is test-support and outside the gate) sits at CRAP 5.1, under
+threshold - unchanged in kind from before, just a reordered
+branch. `mutate4java --scan`: 28 sites, well under the split threshold.
+`dry4java`: 91 duplicates, the same already-accepted per-`Entry`-type
+dispatch pattern reviewed every prior cycle this session, none touching
+this diff's lines.
+
+Property tests: this is a dispatch-priority fix, not new numeric logic
+- both mechanisms' own computations are already covered by
+`MegacorpSalaryTaxPropertyTest`/`UnifiedIncomeTaxBookPropertyTest`, and
+the interaction itself is exactly what the acceptance scenario tests.
+Nothing to add.
+
+Verification (domain reinstalled fresh first): `mvn test` (root):
+green. `mvn test -Pcharacterization-tests`: green, 19/19 (unaffected).
+`mvn test -Pproperty-tests`: green (unaffected). Full acceptance:
+952/952 - confirmed red before my fix (1 failure,
+`unified-income-tax-6`), green after. Committing the `World.java` fix
+and handing the verified state to the architect under the same task
+name.
+
+## 2026-08-26T03:00:00Z — refactorer sent unified-income-tax-labour-fix handoff to architect
