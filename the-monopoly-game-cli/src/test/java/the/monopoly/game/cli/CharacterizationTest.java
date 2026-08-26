@@ -56,7 +56,7 @@ class CharacterizationTest {
         .fromJson(new GameBreakdown(Map.of(), Map.of(), GameBreakdown.Stats.of(List.of()),
             Map.of(),
             GameBreakdown.Core.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-            Optional.of(tax), Optional.empty()).toJson())
+            Optional.of(tax), Optional.empty(), Optional.empty()).toJson())
         .warProfitsTax().orElseThrow();
     assertThat(roundTripped.payments()).isEqualTo(tax.payments());
     assertThat(roundTripped.totalDollars()).isEqualTo(tax.totalDollars());
@@ -77,6 +77,22 @@ class CharacterizationTest {
     assertThat(breakdown.ageAtEndByOutcome().get("ordinary_win")).isEqualTo(GameBreakdown.Stats.of(List.of(10)));
     assertThat(GameBreakdown.fromJson(breakdown.toJson()).ageAtEndByOutcome())
         .isEqualTo(breakdown.ageAtEndByOutcome());
+  }
+
+  @Test
+  void parsesUnifiedIncomeTaxByPlayerAndRoundTripsIt() {
+    GameBreakdown.GameResult result = new GameBreakdown.GameResult(
+        "dog pays the government a unified income tax of $150\ndog is 4 years\n",
+        false, false, false, false, false, true);
+
+    GameBreakdown.UnifiedIncomeTaxExtras tax = GameBreakdown.aggregate(List.of(result))
+        .unifiedIncomeTax().orElseThrow();
+
+    assertThat(tax.payerDollars()).containsEntry("dog", 150L);
+    assertThat(GameBreakdown.fromJson(new GameBreakdown(Map.of(), Map.of(), GameBreakdown.Stats.of(List.of()),
+        Map.of(), GameBreakdown.Core.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+        Optional.empty(), Optional.empty(), Optional.of(tax)).toJson()).unifiedIncomeTax().orElseThrow().payerDollars())
+        .containsEntry("dog", 150L);
   }
 
   @Test
@@ -218,7 +234,8 @@ class CharacterizationTest {
     Files.createDirectories(logFile.getParent());
     Files.writeString(logFile, result.output());
     return new GameBreakdown.GameResult(result.output(), config.developmentLoans(),
-        config.legalEntityTrading(), config.stalemateTrading(), config.warProfitsTax(), config.rentRelief());
+        config.legalEntityTrading(), config.stalemateTrading(), config.warProfitsTax(), config.rentRelief(),
+        config.unifiedIncomeTax());
   }
 
   private GameBreakdown loadBaseline(CharacterizationConfig config, GameBreakdown actual) throws IOException {

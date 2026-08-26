@@ -60,6 +60,10 @@ enum CharacterizationConfig {
     return flags.contains("--optional-rent-relief");
   }
 
+  boolean unifiedIncomeTax() {
+    return flags.contains("--optional-unified-income-tax");
+  }
+
   private static List<String> allGreedo(int count) {
     return java.util.Collections.nCopies(count, "greedo");
   }

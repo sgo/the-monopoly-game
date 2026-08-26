@@ -274,6 +274,10 @@ always-empty fields:
   the course of a game, rather than being a flat, constant risk
   throughout — the specific hypothesis this pair of fields exists to
   test, not just "when does starvation happen" in isolation.
+- `--optional-unified-income-tax`: unified income-tax payments (count, total
+  $), with payer counts and dollars by pawn. This is tracked separately from
+  MegaCorp because unified income tax supersedes MegaCorp's salary tax when
+  both are active, and its payment base combines salary and rent.
 - `--optional-war-profits-tax`: tax payments (count, total $), payer
   breakdown by pawn — plus final government-account balance as a
   min/max/mean/median `Stats` block, the same shape `ageAtEnd` already
