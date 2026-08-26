@@ -12,8 +12,8 @@ read back afterward as a plain-English report.
 
 I started this project with 2 distinct objectives in mind.
 
-1. [Gain experience with using AI for software development.](about-ai.md)
-2. [Apply real-world economic policies to a simulation and observe its effects.](economics.md)
+1. [Gain experience with using AI for software development.](docs/about-ai.md)
+2. [Apply real-world economic policies to a simulation and observe its effects.](docs/economics.md)
 
 ## Simulated game characteristics
 
