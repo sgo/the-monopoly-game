@@ -50674,3 +50674,77 @@ Updated the unified-tax baseline and README figures: burden is approximately
 Verification: `mvn test -Pcharacterization-tests` passes — 432 domain tests,
 23 CLI tests (including the new parser regression and README sync), and all
 supporting modules green.
+
+## 2026-08-26T07:40:00Z — refactorer processes coder handoff `4f001b6d9f` (unified-income-tax-burden)
+
+Handoff message received:
+
+```
+id: 20260826T073215Z_000286_from_coder
+from: coder
+to: refactorer
+priority: 50
+type: git_handoff
+role: coder
+task: unified-income-tax-burden
+commit: 4f001b6d9f
+
+Re-read your role and constitution.
+
+merge_and_process coder 4f001b6d9f
+```
+
+Merged `4f001b6d9f`. Usual append-only `logbook.md` conflict, both
+sides kept in full, checked against my own prior commit first - a
+normal append-append conflict, nothing missing. No production files
+touched; CRAP/DRY/mutation gate inapplicable, same standing exemption.
+
+Coder adds `UnifiedIncomeTaxExtras` (payments/total/payer breakdown,
+mirroring `WarProfitsTaxExtras`/`RentReliefExtras` exactly) and folds
+it into `effectiveTaxBurden`/`netFiscalPosition` via a new
+`grossSalary()` helper that recovers gross salary as `netSalary / 0.57`
+for unified-tax configs, instead of the MegaCorp path's `netSalary +
+actualTaxPaid`.
+
+**Hand-verified the new math is actually correct, not just internally
+consistent with its own baseline (`ReadmeSyncTest` regenerating both
+the baseline and the assertions it checks against is otherwise
+circular).** Checked linearity first: since `grossSalary_i =
+netSalary_i / 0.57` for every individual salary collection, `sum(gross_i)
+= sum(net_i) / 0.57` - so applying the division once to the
+already-summed per-player total (`entry.getValue().salary()`, an
+aggregate across the whole game) is exactly equivalent to summing each
+event's own gross-up, not an approximation of it. Then hand-computed
+two pawns from config 15's actual regenerated README figures against
+the formula: racecar (salary \$304,000, rent \$1,564,843, unified tax
+\$888,418) - gross \$533,333.33, denominator \$2,098,176.33, burden
+42.341% -> matches the published 42.34% exactly; thimble (salary
+\$330,400, rent \$626,538, tax \$514,729) - gross \$579,649.12,
+denominator \$1,206,187.12, burden 42.674% -> matches 42.67%. Also
+verified net fiscal position for racecar (relief rate 20.746% minus
+burden 42.341% = -21.595%, matches the published -21.60%). All three
+hand-computed figures land within README's own 2-decimal rounding of
+the checked-in numbers - the formula is correct, not merely
+self-consistent.
+
+Also confirmed the denominator convention (`entry.getValue().rent()`,
+total rent collected as landlord over the whole game, not "rent
+actually taxed under this specific mechanism") is unchanged from the
+pre-existing `effectiveTaxBurden`/`netFiscalPosition` definitions for
+every other tax combination - this diff extends the existing
+denominator convention consistently rather than introducing a new one
+for just this case.
+
+Property tests: the coder's own new
+`parsesUnifiedIncomeTaxByPlayerAndRoundTripsIt` covers the parsing and
+JSON round trip with real, non-trivial data (`dog` -> \$150). No gap to
+fill.
+
+Verification (domain reinstalled fresh first): `mvn test
+-Pcharacterization-tests` (cli): green, config 15 matches its
+regenerated baseline exactly. `mvn test` (root reactor): green. Full
+acceptance: 952/952 (unaffected, no production change). `mvn test
+-Pproperty-tests`: green (unaffected). Nothing to fix this cycle -
+handing the verified state to the architect under the same task name.
+
+## 2026-08-26T07:45:00Z — refactorer sent unified-income-tax-burden handoff to architect
