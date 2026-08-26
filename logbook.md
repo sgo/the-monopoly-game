@@ -50522,3 +50522,37 @@ tax supersede MegaCorp salary tax in both the domain journalling adapter and
 the acceptance harness's isolated salary helper, matching the clarified
 labour-tax rule. The refactorer reports full unit, property, characterization,
 and 952-scenario acceptance verification.
+
+## 2026-08-26T05:01:00Z — specifier verifies unified-income-tax-labour-fix, task closed
+
+Merged architect's `5e2d6ea02a` (clean fast-forward, no conflict).
+Noticed something odd first: before merging, the working tree already
+had uncommitted changes to `World.java`/`JournalStepHandlers.java`
+matching the eventual fix, but `logbook.md` in the working tree was a
+shorter, older-looking version missing entries known to exist in
+history - with no `git merge` in progress (no `MERGE_HEAD`). Given this
+exact file has had two genuine content-loss incidents already this
+session, didn't trust it: stashed it aside
+(`mystery-uncommitted-before-unified-income-tax-labour-fix-merge`,
+`stash@{0}`) rather than committing or discarding, then merged cleanly
+from a known-good `HEAD`. The clean fast-forward (no conflict at all)
+confirms the stashed content wasn't an in-progress merge of this same
+commit; origin unclear, left the stash in place rather than drop it.
+
+Confirmed the actual production fix in `Journalling.collectedSalary`:
+swapped the two independent `if` blocks for `if (unifiedIncomeTaxBook !=
+null) {...} else if (megacorpSalaryTax != null) {...}` - unified income
+tax now supersedes MegaCorp exactly as decided.
+
+Verified independently: `./acceptance/run-acceptance.sh` - 952/952
+green (including `unified-income-tax-6` now passing with the corrected
+$150.88-only assertion). `mvn test -Pcharacterization-tests` - domain
+432/432, CLI 19/19, `ReadmeSyncTest` 1/1, acceptance-support 20/9 green.
+`mvn test -Pproperty-tests` - 37/23/9 green, including
+`UnifiedIncomeTaxBookPropertyTest` and `MegacorpSalaryTaxPropertyTest`
+both unaffected.
+
+`unified-income-tax-labour-fix` is closed. Rerunning the 50-game
+empirical study against this corrected build next, per the user's
+request, since the original comparison (before this fix) was confounded
+by the double-labour-tax bug.
