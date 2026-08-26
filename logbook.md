@@ -50689,3 +50689,78 @@ exactly.
 comparison and the outcome-split age insight are now permanently tracked
 regression coverage, not just an ad-hoc finding that could silently go
 stale. No further specifier action needed on this task.
+
+## 2026-08-26T09:35:00Z — specifier finds a real gap: effective tax burden shows 0.00% for unified income tax
+
+The user, reading the just-landed unified-income-tax characterization
+config in `README.md`, was surprised the "Effective tax burden" figures
+weren't close to 43% per pawn. Checked directly: it's not "different for
+everyone" as first read - it's literally 0.00% for every single pawn:
+
+```
+Effective tax burden: racecar 0.00%, wheelbarrow 0.00%, iron box 0.00%, ship 0.00%, dog 0.00%, shoe 0.00%, thimble 0.00%, high hat 0.00%
+```
+
+The visibly-different numbers are the "Net fiscal position" line right
+below it - with burden at a flat 0, that line collapses to each pawn's
+raw relief-received rate, not a genuine relief-minus-tax figure.
+
+Root cause, in `ReadmeSyncTest.effectiveTaxBurden`/`netFiscalPosition`
+(the-monopoly-game-cli/src/test/java/the/monopoly/game/cli/
+ReadmeSyncTest.java:111-142): the `taxes` numerator map is built purely
+from `baseline.warProfitsTax().payerDollars()` and
+`baseline.rentRelief().megacorpTaxByPlayer()` - there is no parsing
+anywhere in `GameBreakdown` for unified income tax's own payment line
+(`Report.java:57`, `"<pawn> pays the government a unified income tax of
+$<amount>"`), so no per-player unified-income-tax breakdown exists at
+all. In this config, war profits tax is off and MegaCorp correctly pays
+$0 (superseded by unified income tax per the recent labour-fix), so the
+numerator is 0 for every pawn regardless of what they actually paid via
+unified income tax. This is a gap in my own prior request - when I asked
+for the new config plus the age-at-end-by-outcome split, I didn't think
+to also ask for the burden/fiscal-position formulas to recognize unified
+income tax as a third tax source. Confirmed via `grep`: no
+`unifiedIncomeTax` boolean parameter exists anywhere in
+`GameResult`'s constructor or `GameBreakdown`, so nothing currently
+gates a parse of that log line for any config.
+
+A second, subtler defect to fix in the same pass: the existing
+"recover gross salary" step (`salary + megacorpTaxByPlayer.getOrDefault
+(...)`) only works because MegaCorp's payment is 100% salary-derived.
+Unified income tax's payment mixes salary and rent into one 43%-of-
+combined-base figure, so naively adding the whole payment back would
+also pull in the rent-derived portion and inflate the salary figure
+incorrectly - there's no way to cleanly decompose "how much of this one
+payment was the salary share" from the total alone. The correct,
+mechanism-agnostic fix is to compute gross salary directly as `salary /
+0.57` (the same `NET_TO_GROSS` constant `MegacorpSalaryTax` and
+`UnifiedIncomeTaxBook` already share identically), which sidesteps the
+decomposition problem entirely and is mathematically identical to the
+current add-back approach for every existing MegaCorp-based config
+(verified: $200 salary -> $200/0.57 = $350.88 = $200 + $150.88, matching
+exactly).
+
+Requesting, again routed to the coder as Java test-infrastructure work
+outside specifier's Gherkin ownership:
+
+1. Track a per-player unified-income-tax-paid breakdown in
+   `GameBreakdown` (a new extra, or folded into an existing one -
+   coder's call), parsed from `"<pawn> pays the government a unified
+   income tax of $<amount>"`, the same way `megacorpTaxByPlayer` and
+   `warProfitsTax().payerDollars()` are already tracked.
+
+2. Merge that new per-player breakdown into both `effectiveTaxBurden`'s
+   and `netFiscalPosition`'s `taxes` numerator map in `ReadmeSyncTest`.
+
+3. Replace the "add back whichever tax was paid" gross-salary recovery
+   with a direct `salary / 0.57` calculation in both methods, so it's
+   correct regardless of which salary-tax mechanism (MegaCorp, unified
+   income tax, or neither) is active for a given pawn.
+
+This will change the unified-income-tax config's own baseline/README
+figures (burden should land near 43% given the combined-base math, not
+0%) but should leave every other existing config's already-baselined
+burden/fiscal-position figures numerically unchanged (mathematically
+equivalent recovery formula) - worth confirming that explicitly during
+verification rather than assuming it, given the schema/formula change
+touches every config that uses these two derived fields.
