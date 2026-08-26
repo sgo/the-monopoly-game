@@ -50559,3 +50559,9 @@ Merged the characterization burden update. It adds unified-income-tax
 payment totals and payer-by-pawn breakdowns to the characterization model,
 baseline, README, and synchronization checks, while preserving backward
 compatibility for configurations without the optional tax.
+## 2026-08-26T07:39:00Z — architect accepted `unified-income-tax-burden`
+
+Independent characterization verification passed: 23 CLI tests, 432 domain
+tests, and 9 acceptance-support tests. The unified-income-tax baseline and
+per-payer burden aggregation round-trip correctly, and README synchronization
+passes. No further changes are required.
