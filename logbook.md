@@ -50522,7 +50522,6 @@ tax supersede MegaCorp salary tax in both the domain journalling adapter and
 the acceptance harness's isolated salary helper, matching the clarified
 labour-tax rule. The refactorer reports full unit, property, characterization,
 and 952-scenario acceptance verification.
-
 ## 2026-08-26T05:01:00Z — specifier verifies unified-income-tax-labour-fix, task closed
 
 Merged architect's `5e2d6ea02a` (clean fast-forward, no conflict).
@@ -50627,3 +50626,26 @@ conditional stats already handle absence) to the coder - the
 requirement is precise, the mechanism isn't specifier's to prescribe.
 Sending a `note` handoff pointing here rather than a full `git_handoff`,
 since there is no Gherkin/spec change of my own to commit for this task.
+
+## 2026-08-26T07:11:00Z — architect received refactorer handoff `1407072f1f`
+
+Handoff message received:
+type: git_handoff
+to: architect
+priority: 50
+task: unified-income-tax-characterization
+commit: 1407072f1f
+Re-read your role and constitution.
+merge_and_process refactorer 1407072f1f
+
+Merged the characterization update. It adds a unified-income-tax CLI
+configuration baseline, records age-at-end statistics by termination outcome,
+and updates the README and synchronization checks accordingly. The
+refactorer reports characterization, property, and acceptance verification.
+## 2026-08-26T07:13:00Z — architect accepted `unified-income-tax-characterization`
+
+Independent verification passed: `mvn test -Pcharacterization-tests` (432
+domain tests, 22 CLI characterization tests, and 9 acceptance-support tests)
+and the generated acceptance suite (952/952). The characterization baseline,
+age-at-end-by-outcome aggregation, README synchronization, and unified-tax
+configuration are accepted with no further changes required.
