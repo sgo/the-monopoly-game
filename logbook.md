@@ -50537,3 +50537,10 @@ Merged the characterization update. It adds a unified-income-tax CLI
 configuration baseline, records age-at-end statistics by termination outcome,
 and updates the README and synchronization checks accordingly. The
 refactorer reports characterization, property, and acceptance verification.
+## 2026-08-26T07:13:00Z — architect accepted `unified-income-tax-characterization`
+
+Independent verification passed: `mvn test -Pcharacterization-tests` (432
+domain tests, 22 CLI characterization tests, and 9 acceptance-support tests)
+and the generated acceptance suite (952/952). The characterization baseline,
+age-at-end-by-outcome aggregation, README synchronization, and unified-tax
+configuration are accepted with no further changes required.
