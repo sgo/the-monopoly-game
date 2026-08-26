@@ -1,3 +1,9 @@
+---
+layout: page
+title: Economics
+permalink: /economics/
+---
+
 # Economics
 
 I wanted to build a simulator based on the game of Monopoly as it is often used by people who talk about inequality. The
@@ -15,7 +21,7 @@ summarize them here.
 - They do not trade as a rule as their greed does not allow win-win relationships.
     - Inversely, they won't accept a trade in which they are the losing side
 
-For more details see [simulator.md](SIMULATOR.md#Greedo)
+For more details see [simulator.md](../SIMULATOR.md#Greedo)
 
 ### The Billionaire
 
@@ -255,5 +261,6 @@ Here's the effect of the tax.
 
 The Billionaire is no longer guaranteed a win. In fact, among those 37 bankruptcies, our Billionaire only represents 13% of the wins. While representing 12,5% of the players. Thus, the war profits tax guarantees equal opportunity if not a happily ever after for everyone.
 
-Because, by the time the war profits tax neutralizes the threat of the Billionaire, he's already had the time to wipe out ~4 of his opponents. 
+Because, by the time the war profits tax neutralizes the threat of the Billionaire, he's already had the time to wipe out ~4 of his opponents.
 
+{% include rent-relief-and-unified-income-tax.md %}

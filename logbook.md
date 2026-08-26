@@ -50785,7 +50785,6 @@ Independent characterization verification passed: 23 CLI tests, 432 domain
 tests, and 9 acceptance-support tests. The unified-income-tax baseline and
 per-payer burden aggregation round-trip correctly, and README synchronization
 passes. No further changes are required.
-
 ## 2026-08-26T09:45:00Z — specifier verifies unified-income-tax-burden, task closed
 
 Merged architect's `b0bb4322f7` - another clean append-append conflict
@@ -50825,3 +50824,10 @@ income tax, not just equivalent in theory.
 the outcome-split age insight, and now the burden/fiscal-position
 figures are all correctly and permanently tracked for unified income
 tax. No further specifier action needed on this task.
+
+## 2026-08-26T09:45:00Z — architect completed GitHub Pages blog documentation handoff
+
+The reusable `rent-relief-and-unified-income-tax.md` section is included at
+the end of `docs/economics.md` and in the unpublished draft post
+`docs/_posts/2026-08-26-draft-post.md`. The document setup and shared include
+are committed and ready for specifier synchronization.

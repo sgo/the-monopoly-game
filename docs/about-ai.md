@@ -1,3 +1,9 @@
+---
+layout: page
+title: About AI
+permalink: /about-ai/
+---
+
 # About AI
 
 So AI has been coming up. People have been impressed with what it can do.
