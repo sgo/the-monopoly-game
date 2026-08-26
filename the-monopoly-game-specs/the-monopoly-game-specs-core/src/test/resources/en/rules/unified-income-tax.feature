@@ -6,9 +6,11 @@
 # isolated-computation scope megacorp-salary-tax.feature and
 # war-profits-tax.feature each started from; interaction with the two
 # existing income taxes when enabled at the same time
-# (unified-income-tax-5/6), proving each keeps its own independent
-# accumulator rather than sharing or conflating one; and one played-game
-# scenario (unified-income-tax-7, mirroring megacorp-salary-tax-3)
+# (unified-income-tax-5/6) - stacking with war profits tax deliberately
+# double-taxes the same rent from two independent accumulators, while
+# stacking with MegaCorp's salary tax must NOT double-tax the same
+# salary, since this tax supersedes MegaCorp entirely; and one
+# played-game scenario (unified-income-tax-7, mirroring megacorp-salary-tax-3)
 # proving the real double-salary-on-landing rule scales this tax
 # correctly too, using only pre-existing generic journal entries so it
 # needs no new observability wiring despite not being an isolated
@@ -17,11 +19,16 @@
 # logging.feature, and ../../backlog/specs-cli/en/cli.feature.
 
 Feature: unified income tax
-  An opt-in flag, `--optional-unified-income-tax`, is a third, independent
-  income tax, separate from both MegaCorp's salary tax and the war profits
-  tax on rent — it can be enabled on its own, or alongside either or both
-  of those, in which case the same income is taxed again under this
-  mechanism too; that overlap is intentional, not guarded against.
+  An opt-in flag, `--optional-unified-income-tax`, taxes a player's gross
+  salary and gross rent together in one 43% assessment. It can be enabled
+  alongside the war profits tax, in which case the same rent is
+  deliberately taxed again under that separate mechanism too - war
+  profits tax computes from ownership share, a genuinely different base,
+  so the overlap is intentional there. Labour is not meant to be taxed
+  twice, though: whenever this tax is active, it supersedes MegaCorp's
+  own salary tax entirely - MegaCorp does not also fire on the same
+  salary collection, even when rent relief (which would otherwise enable
+  MegaCorp on its own) is enabled at the same time.
 
   Whenever a player collects their salary (the same passing-Start trigger
   MegaCorp's own tax already uses), this tax combines two things into one
@@ -125,19 +132,25 @@ Feature: unified income tax
       | 5000             | 5430.00              |
 
   # unified-income-tax-6
-  # MegaCorp's own tax ($150.88, from megacorp-salary-tax-1) and this
-  # tax's own salary-only figure (also $150.88, from unified-income-tax-2)
-  # both fire from the same salary collection, independently, landing on
-  # the same government account: $301.76 total, not $150.88.
-  Scenario Outline: enabling this alongside MegaCorp's salary tax taxes the same salary twice, independently
+  # Unlike war profits tax (unified-income-tax-5), which computes from a
+  # genuinely separate base - ownership share, not gross salary - so
+  # stacking there deliberately double-taxes the same rent, MegaCorp's
+  # own tax and this tax's own salary component would tax the exact same
+  # gross salary if both fired. That's not wanted: labour is taxed once.
+  # Enabling rent relief would normally enable MegaCorp on its own, but
+  # unified income tax supersedes it - MegaCorp does not also fire - so
+  # the government account holds only this tax's own $150.88 (the same
+  # salary-only figure unified-income-tax-2 already establishes for a
+  # $200 net collection with no rent involved), not $301.76.
+  Scenario Outline: enabling this alongside rent relief still taxes salary only once - unified income tax supersedes MegaCorp
     Given rent relief is enabled
     When pawn "dog" collects a salary of $<salary>
-    Then MegaCorp pays the government an individual income tax of $<megacorp_tax>
+    Then MegaCorp pays no individual income tax
     And the government's account holds $<government_account>
 
     Examples:
-      | salary | megacorp_tax | government_account |
-      | 200    | 150.88        | 301.76               |
+      | salary | government_account |
+      | 200    | 150.88               |
 
   # unified-income-tax-7
   # Numbered 7 rather than 5 to leave room for the two interaction
