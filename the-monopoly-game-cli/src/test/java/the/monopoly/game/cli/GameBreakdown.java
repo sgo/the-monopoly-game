@@ -22,7 +22,8 @@ record GameBreakdown(
     Optional<EntityExtras> entities,
     Optional<TradeExtras> trades,
     Optional<WarProfitsTaxExtras> warProfitsTax,
-    Optional<RentReliefExtras> rentRelief
+    Optional<RentReliefExtras> rentRelief,
+    Optional<UnifiedIncomeTaxExtras> unifiedIncomeTax
 ) {
 
   static GameBreakdown aggregate(List<GameResult> results) {
@@ -54,10 +55,12 @@ record GameBreakdown(
         .filter(Optional::isPresent).map(Optional::get).reduce(WarProfitsTaxExtras::merge).orElse(null);
     RentReliefExtras rentRelief = results.stream().map(GameResult::rentRelief)
         .filter(Optional::isPresent).map(Optional::get).reduce(RentReliefExtras::merge).orElse(null);
+    UnifiedIncomeTaxExtras unifiedIncomeTax = results.stream().map(GameResult::unifiedIncomeTax)
+        .filter(Optional::isPresent).map(Optional::get).reduce(UnifiedIncomeTaxExtras::merge).orElse(null);
 
     return new GameBreakdown(outcomes, winners, Stats.of(ages), ageAtEndByOutcome, core,
         Optional.ofNullable(loans), Optional.ofNullable(entities), Optional.ofNullable(trades),
-        Optional.ofNullable(warProfitsTax), Optional.ofNullable(rentRelief));
+        Optional.ofNullable(warProfitsTax), Optional.ofNullable(rentRelief), Optional.ofNullable(unifiedIncomeTax));
   }
 
   String toJson() {
@@ -73,6 +76,7 @@ record GameBreakdown(
     trades.ifPresent(it -> json.append(",\n  \"trades\": ").append(it.toJson()));
     warProfitsTax.ifPresent(it -> json.append(",\n  \"warProfitsTax\": ").append(it.toJson()));
     rentRelief.ifPresent(it -> json.append(",\n  \"rentRelief\": ").append(it.toJson()));
+    unifiedIncomeTax.ifPresent(it -> json.append(",\n  \"unifiedIncomeTax\": ").append(it.toJson()));
     json.append("\n}");
     return json.toString();
   }
@@ -89,7 +93,8 @@ record GameBreakdown(
         Optional.ofNullable(fields.get("entities")).map(EntityExtras::fromJson),
         Optional.ofNullable(fields.get("trades")).map(TradeExtras::fromJson),
         Optional.ofNullable(fields.get("warProfitsTax")).map(WarProfitsTaxExtras::fromJson),
-        Optional.ofNullable(fields.get("rentRelief")).map(RentReliefExtras::fromJson));
+        Optional.ofNullable(fields.get("rentRelief")).map(RentReliefExtras::fromJson),
+        Optional.ofNullable(fields.get("unifiedIncomeTax")).map(UnifiedIncomeTaxExtras::fromJson));
   }
 
   private static String mapToJson(Map<String, Integer> map) {
@@ -508,6 +513,27 @@ record GameBreakdown(
     }
   }
 
+  record UnifiedIncomeTaxExtras(int payments, long totalDollars, Map<String, Integer> payers,
+                                Map<String, Long> payerDollars) {
+    UnifiedIncomeTaxExtras merge(UnifiedIncomeTaxExtras other) {
+      return new UnifiedIncomeTaxExtras(payments + other.payments, totalDollars + other.totalDollars,
+          mergeMaps(payers, other.payers), mergeLongMaps(payerDollars, other.payerDollars));
+    }
+
+    String toJson() {
+      return "{\"payments\": " + payments + ", \"totalDollars\": " + totalDollars
+          + ", \"payers\": " + mapToJson(payers)
+          + ", \"payerDollars\": " + longMapToJson(payerDollars) + "}";
+    }
+
+    static UnifiedIncomeTaxExtras fromJson(String json) {
+      Map<String, String> fields = parseObject(json);
+      return new UnifiedIncomeTaxExtras(Integer.parseInt(fields.get("payments")),
+          parseLong(fields.get("totalDollars")), parseStringIntMap(fields.get("payers")),
+          parseStringLongMap(fields.get("payerDollars")));
+    }
+  }
+
   private static Map<String, Integer> mergeMaps(Map<String, Integer> a, Map<String, Integer> b) {
     Map<String, Integer> merged = new LinkedHashMap<>(a);
     b.forEach((k, v) -> merged.merge(k, v, Integer::sum));
@@ -568,9 +594,15 @@ record GameBreakdown(
     private final Optional<TradeExtras> trades;
     private final Optional<WarProfitsTaxExtras> warProfitsTax;
     private final Optional<RentReliefExtras> rentRelief;
+    private final Optional<UnifiedIncomeTaxExtras> unifiedIncomeTax;
 
     GameResult(String report, boolean developmentLoans, boolean legalEntityTrading, boolean stalemateTrading,
                boolean warProfitsTax, boolean rentRelief) {
+      this(report, developmentLoans, legalEntityTrading, stalemateTrading, warProfitsTax, rentRelief, false);
+    }
+
+    GameResult(String report, boolean developmentLoans, boolean legalEntityTrading, boolean stalemateTrading,
+               boolean warProfitsTax, boolean rentRelief, boolean unifiedIncomeTax) {
       List<String> lines = report.lines().toList();
       Optional<String> won = lines.stream().filter(line -> line.contains(" wins the game")).findFirst()
           .map(line -> line.substring(0, line.indexOf(" wins the game")));
@@ -638,6 +670,10 @@ record GameBreakdown(
       long megacorpTaxDollars = 0;
       Map<String, Integer> megacorpTaxPayers = new LinkedHashMap<>();
       Map<String, Long> megacorpTaxByPlayer = new LinkedHashMap<>();
+      int unifiedTaxPayments = 0;
+      long unifiedTaxDollars = 0;
+      Map<String, Integer> unifiedTaxPayers = new LinkedHashMap<>();
+      Map<String, Long> unifiedTaxByPlayer = new LinkedHashMap<>();
       List<Integer> governmentBalances = new java.util.ArrayList<>();
       Set<String> survivingPlayers = new java.util.LinkedHashSet<>();
       String billionaire = null;
@@ -739,6 +775,17 @@ record GameBreakdown(
             megacorpTaxByPlayer.merge(payer, amount, Long::sum);
           }
         }
+        if (unifiedIncomeTax) {
+          int unifiedTaxAt = line.indexOf(" pays the government a unified income tax of $");
+          if (unifiedTaxAt >= 0) {
+            String payer = line.substring(0, unifiedTaxAt);
+            long amount = dollarsAfter(line, " pays the government a unified income tax of $");
+            unifiedTaxPayments++;
+            unifiedTaxDollars += amount;
+            unifiedTaxPayers.merge(payer, 1, Integer::sum);
+            unifiedTaxByPlayer.merge(payer, amount, Long::sum);
+          }
+        }
 
         // Generic core accounting happens unconditionally: these lines are exactly
         // the mechanics the spec wants visible for every config.
@@ -821,6 +868,10 @@ record GameBreakdown(
               starvedPayments, starvedDollars, gameHadStarvation ? 1 : 0, starvedByPlayer,
               Stats.of(reliefAges), reliefAges, Stats.of(starvedAges), starvedAges))
           : Optional.empty();
+      this.unifiedIncomeTax = unifiedIncomeTax
+          ? Optional.of(new UnifiedIncomeTaxExtras(unifiedTaxPayments, unifiedTaxDollars,
+              unifiedTaxPayers, unifiedTaxByPlayer))
+          : Optional.empty();
     }
 
     String outcome() { return outcome; }
@@ -832,5 +883,6 @@ record GameBreakdown(
     Optional<TradeExtras> trades() { return trades; }
     Optional<WarProfitsTaxExtras> warProfitsTax() { return warProfitsTax; }
     Optional<RentReliefExtras> rentRelief() { return rentRelief; }
+    Optional<UnifiedIncomeTaxExtras> unifiedIncomeTax() { return unifiedIncomeTax; }
   }
 }

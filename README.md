@@ -169,13 +169,15 @@ termination modes.
 - Rent relief: 6,200 payments, \$4,002,490 total, 50 games
 - MegaCorp salary tax: 0 payments, \$0 total
 - MegaCorp tax payers:
+- Unified income tax: 12440 payments, \$6,353,207 total
+- Unified income tax payers: wheelbarrow \$664722, dog \$789847, ship \$1058388, racecar \$888418, shoe \$729649, high hat \$1224122, iron box \$483332, thimble \$514729
 - Relief received: thimble \$569120, wheelbarrow \$460920, racecar \$435305, ship \$564605, shoe \$577255, dog \$547480, high hat \$498785, iron box \$349020
 - Relief age at event: min 0, median 27, mean 42.22032258064516, max 258
 - Relief starved: 3,393 payments, \$4,115,725 shortfall, 50 games
 - Starved age at event: min 1, median 36, mean 49.27615679339817, max 257
 - Starved by pawn: iron box \$390650, racecar \$482750, thimble \$669975, dog \$488575, wheelbarrow \$503825, shoe \$479325, high hat \$586950, ship \$513675
-- Effective tax burden: racecar 0.00%, wheelbarrow 0.00%, iron box 0.00%, ship 0.00%, dog 0.00%, shoe 0.00%, thimble 0.00%, high hat 0.00%
-- Net fiscal position: racecar 23.29%, wheelbarrow 34.25%, iron box 35.98%, ship 25.28%, dog 33.70%, shoe 38.65%, thimble 59.47%, high hat 19.43%
+- Effective tax burden: racecar 42.34%, wheelbarrow 42.34%, iron box 42.56%, ship 42.62%, dog 42.54%, shoe 42.58%, thimble 42.67%, high hat 42.60%
+- Net fiscal position: racecar -21.60%, wheelbarrow -12.98%, iron box -11.83%, ship -19.88%, dog -13.05%, shoe -8.89%, thimble 4.51%, high hat -25.24%
 
 </details>
 

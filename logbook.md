@@ -50544,3 +50544,18 @@ domain tests, 22 CLI characterization tests, and 9 acceptance-support tests)
 and the generated acceptance suite (952/952). The characterization baseline,
 age-at-end-by-outcome aggregation, README synchronization, and unified-tax
 configuration are accepted with no further changes required.
+## 2026-08-26T07:39:00Z — architect received refactorer handoff `485eb2f839`
+
+Handoff message received:
+type: git_handoff
+to: architect
+priority: 50
+task: unified-income-tax-burden
+commit: 485eb2f839
+Re-read your role and constitution.
+merge_and_process refactorer 485eb2f839
+
+Merged the characterization burden update. It adds unified-income-tax
+payment totals and payer-by-pawn breakdowns to the characterization model,
+baseline, README, and synchronization checks, while preserving backward
+compatibility for configurations without the optional tax.
