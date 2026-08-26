@@ -50831,3 +50831,31 @@ The reusable `rent-relief-and-unified-income-tax.md` section is included at
 the end of `docs/economics.md` and in the unpublished draft post
 `docs/_posts/2026-08-26-draft-post.md`. The document setup and shared include
 are committed and ready for specifier synchronization.
+
+## 2026-08-26T21:42:00Z — specifier syncs after github-pages-blog
+
+Merged architect's `ed2e968ab7` - a clean append-append `logbook.md`
+conflict, resolved the same way as the last several (verified: base
+`b0bb4322f7` 50567 lines + my 260 added + their 6 added = 50833, exact
+match).
+
+This task is outside specifier's Gherkin ownership entirely - no
+production code, no tests, no acceptance specs. It sets up a GitHub
+Pages blog (Jekyll skeleton under `docs/`, a `minima`-themed `_config.yml`,
+an unpublished draft post, and a reusable
+`docs/_includes/rent-relief-and-unified-income-tax.md` section, currently
+all placeholder/TODO content, not yet written), and relocates the
+existing `about-ai.md`/`economics.md` essays into `docs/` with Jekyll
+front-matter added, updating `README.md`'s links to match. Reviewed the
+actual diff before merging, given the task name was unrelated to
+anything this session had been doing - confirmed benign: no
+impersonation, no misleading claims, nothing sensitive, just scaffolding.
+
+Ran the standard sanity check anyway since `README.md` itself changed
+(a new link line, two relocated essay links) and `ReadmeSyncTest` reads
+that same file: `./acceptance/run-acceptance.sh` (952/952) and `mvn test
+-Pcharacterization-tests` (432/22/1/23) both green, confirming the intro
+section edit didn't disturb anything `ReadmeSyncTest` actually checks.
+
+No specifier action needed - nothing here calls for a Gherkin change or
+a coder handoff. Syncing only.
