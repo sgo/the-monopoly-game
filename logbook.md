@@ -50522,3 +50522,18 @@ tax supersede MegaCorp salary tax in both the domain journalling adapter and
 the acceptance harness's isolated salary helper, matching the clarified
 labour-tax rule. The refactorer reports full unit, property, characterization,
 and 952-scenario acceptance verification.
+## 2026-08-26T07:11:00Z — architect received refactorer handoff `1407072f1f`
+
+Handoff message received:
+type: git_handoff
+to: architect
+priority: 50
+task: unified-income-tax-characterization
+commit: 1407072f1f
+Re-read your role and constitution.
+merge_and_process refactorer 1407072f1f
+
+Merged the characterization update. It adds a unified-income-tax CLI
+configuration baseline, records age-at-end statistics by termination outcome,
+and updates the README and synchronization checks accordingly. The
+refactorer reports characterization, property, and acceptance verification.

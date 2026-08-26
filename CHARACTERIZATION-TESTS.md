@@ -85,6 +85,7 @@ cap against a run that never naturally terminates:
 | 12 | 8 | Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-development-loans` `--optional-rent-relief` `--optional-war-profits-tax` |
 | 13 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-development-loans` `--optional-rent-relief` `--optional-war-profits-tax` `--optional-asset-rich-billionaire` |
 | 14 | 8 | Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-development-loans` |
+| 15 | 8 | Greedo | `--optional-greedo-stalemate-trading` `--optional-greedo-legal-entity` `--optional-development-loans` `--optional-rent-relief` `--optional-unified-income-tax` |
 
 Configs 7 and 8 are identical except for the one flag that matters
 (`--optional-asset-rich-billionaire`), so a comparison between their two
@@ -171,7 +172,7 @@ blind to a regression in it:
 - Outcome distribution: how each of the config's runs ended (ordinary win,
   stalemate, year-limit reached), and, for ordinary wins, which pawn won
   how many times.
-- Age at game end: min, max, mean, median across the config's runs.
+- Age at game end: min, max, mean, median across the config's runs, plus the same `Stats` block split by termination outcome (`ageAtEndByOutcome`) so bankruptcy-driven endings can be compared separately from deliberate stalemates and year-limit endings.
 - Bankruptcy count, broken down by who received the assets (a specific
   pawn, or "the bank"). Today only the eventual winner is visible in the
   breakdown; a regression that changes how or when a *non*-winning player

@@ -38,10 +38,16 @@ fixtures by the same test suite (see `README sync check` in
 | 8 | Greedo | peer-trading + legal-entity + dev-loans + rent relief | 96% win (48), 4% stalemate (2) | 7 / 14 / 28.06 / 170 |
 | 8 | Greedo | peer-trading + legal-entity + dev-loans | 100% win (50) | 5 / 10 / 11.6 / 32 |
 | 8 | Greedo | peer-trading + legal-entity + dev-loans + rent relief + war-profits-tax | 66% win (33), 34% stalemate (17) | 7 / 68 / 152.28 / 1730 |
+| 8 | Greedo | peer-trading + legal-entity + dev-loans + rent relief + unified-income-tax | 20% win (10), 80% stalemate (40) | 11 / 56 / 68.04 / 259 |
 | 8 | 1 Billionaire (asset-rich) + 7 Greedo | peer-trading + legal-entity + asset-rich + dev-loans + rent relief + war-profits-tax | 60% win (30), 40% stalemate (20) | 0 / 57 / 132.66 / 843 |
 
 Full breakdown for any config lives in
 [`the-monopoly-game-cli/src/test/resources/characterization/`](the-monopoly-game-cli/src/test/resources/characterization/).
+
+The characterization JSON also records `ageAtEndByOutcome`, splitting the
+age statistics by `ordinary_win`, `stalemate`, and `year_limit` where those
+outcomes occur. This avoids comparing aggregate ages that mix distinct
+termination modes.
 
 ### Detailed Breakdown
 
@@ -139,6 +145,37 @@ Full breakdown for any config lives in
 - Starved by pawn: dog \$217010, thimble \$313200, ship \$359175, high hat \$358825, wheelbarrow \$158250, iron box \$472635, racecar \$273750, shoe \$370850
 - Effective tax burden: racecar 27.73%, wheelbarrow 31.69%, iron box 23.72%, ship 31.38%, dog 29.70%, shoe 44.89%, thimble 20.91%, high hat 14.13%
 - Net fiscal position: racecar -7.63%, wheelbarrow -7.14%, iron box -7.28%, ship 2.84%, dog -11.64%, shoe -8.62%, thimble -11.44%, high hat -10.17%
+
+</details>
+
+<details>
+<summary>8 players — Greedo — peer-trading + legal-entity + dev-loans + rent relief + unified-income-tax</summary>
+
+- Outcome: 20% win (10), 80% stalemate (40)
+- Winners: racecar 2, dog 1, wheelbarrow 2, shoe 1, high hat 2, ship 2
+- Age at end: min 11, median 56, mean 68.04, max 259
+- Age at end by outcome: stalemate min 21, median 60, mean 74.15, max 259; ordinary_win min 11, median 30, mean 43.6, max 131
+- Bankruptcies: the bank 118, racecar 15, thimble 16, dog 18, shoe 18, high hat 31, wheelbarrow 22, ship 37, iron box 8
+- Auctions: 16 (1.0% of 1,550 land acquisitions)
+- Mortgages: 406
+- Income: salary \$2,488,000, rent \$15,487,797, bank payments \$299,860
+- Income by player: racecar salary \$304,000, rent \$1,564,843, wheelbarrow salary \$297,000, rent \$1,048,831, iron box salary \$219,600, rent \$750,402, ship salary \$331,200, rent \$1,902,470, dog salary \$307,600, rent \$1,317,137, shoe salary \$291,600, rent \$1,201,845, thimble salary \$330,400, rent \$626,538, high hat salary \$406,600, rent \$2,160,507
+- Loans: 281 raised, \$18,102 total, 6 defaults
+  - Borrowers: iron box 21, Green Realty 36, Yellow Realty 45, wheelbarrow 13, racecar 21, Pink Realty 44, thimble 14, shoe 20, high hat 23, dog 18, ship 26
+  - Bondholders: dog 199, high hat 58, iron box 16, racecar 5, ship 1
+  - Servicing: borrowers paid \$6,451 interest + \$14,188 principal; bondholders received \$3,066 interest + \$14,183 principal
+- Entities: 114 formed, 19 dissolved
+- Peer trades: 4
+- Rent relief: 6,200 payments, \$4,002,490 total, 50 games
+- MegaCorp salary tax: 0 payments, \$0 total
+- MegaCorp tax payers:
+- Relief received: thimble \$569120, wheelbarrow \$460920, racecar \$435305, ship \$564605, shoe \$577255, dog \$547480, high hat \$498785, iron box \$349020
+- Relief age at event: min 0, median 27, mean 42.22032258064516, max 258
+- Relief starved: 3,393 payments, \$4,115,725 shortfall, 50 games
+- Starved age at event: min 1, median 36, mean 49.27615679339817, max 257
+- Starved by pawn: iron box \$390650, racecar \$482750, thimble \$669975, dog \$488575, wheelbarrow \$503825, shoe \$479325, high hat \$586950, ship \$513675
+- Effective tax burden: racecar 0.00%, wheelbarrow 0.00%, iron box 0.00%, ship 0.00%, dog 0.00%, shoe 0.00%, thimble 0.00%, high hat 0.00%
+- Net fiscal position: racecar 23.29%, wheelbarrow 34.25%, iron box 35.98%, ship 25.28%, dog 33.70%, shoe 38.65%, thimble 59.47%, high hat 19.43%
 
 </details>
 
