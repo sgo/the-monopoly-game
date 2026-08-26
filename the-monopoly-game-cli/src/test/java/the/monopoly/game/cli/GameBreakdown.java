@@ -16,6 +16,7 @@ record GameBreakdown(
     Map<String, Integer> outcomes,
     Map<String, Integer> winners,
     Stats ageAtEnd,
+    Map<String, Stats> ageAtEndByOutcome,
     Core core,
     Optional<LoanExtras> loans,
     Optional<EntityExtras> entities,
@@ -29,6 +30,12 @@ record GameBreakdown(
     Map<String, Integer> winners = new LinkedHashMap<>();
     List<Integer> ages = results.stream().map(GameResult::finalAge)
         .filter(OptionalInt::isPresent).mapToInt(OptionalInt::getAsInt).boxed().toList();
+    Map<String, Stats> ageAtEndByOutcome = results.stream()
+        .filter(result -> result.finalAge().isPresent())
+        .collect(Collectors.groupingBy(GameResult::outcome, LinkedHashMap::new,
+            Collectors.collectingAndThen(
+                Collectors.mapping(result -> result.finalAge().getAsInt(), Collectors.toList()),
+                Stats::of)));
 
     for (GameResult result : results) {
       String outcome = result.outcome();
@@ -48,7 +55,7 @@ record GameBreakdown(
     RentReliefExtras rentRelief = results.stream().map(GameResult::rentRelief)
         .filter(Optional::isPresent).map(Optional::get).reduce(RentReliefExtras::merge).orElse(null);
 
-    return new GameBreakdown(outcomes, winners, Stats.of(ages), core,
+    return new GameBreakdown(outcomes, winners, Stats.of(ages), ageAtEndByOutcome, core,
         Optional.ofNullable(loans), Optional.ofNullable(entities), Optional.ofNullable(trades),
         Optional.ofNullable(warProfitsTax), Optional.ofNullable(rentRelief));
   }
@@ -59,6 +66,7 @@ record GameBreakdown(
     json.append("  \"outcomes\": ").append(mapToJson(outcomes)).append(",\n");
     json.append("  \"winners\": ").append(mapToJson(winners)).append(",\n");
     json.append("  \"ageAtEnd\": ").append(ageAtEnd.toJson()).append(",\n");
+    json.append("  \"ageAtEndByOutcome\": ").append(statsMapToJson(ageAtEndByOutcome)).append(",\n");
     json.append("  \"core\": ").append(core.toJson());
     loans.ifPresent(it -> json.append(",\n  \"loans\": ").append(it.toJson()));
     entities.ifPresent(it -> json.append(",\n  \"entities\": ").append(it.toJson()));
@@ -75,6 +83,7 @@ record GameBreakdown(
         parseStringIntMap(fields.get("outcomes")),
         parseStringIntMap(fields.get("winners")),
         Stats.fromJson(fields.get("ageAtEnd")),
+        parseStatsMap(fields.get("ageAtEndByOutcome")),
         Core.fromJson(fields.get("core")),
         Optional.ofNullable(fields.get("loans")).map(LoanExtras::fromJson),
         Optional.ofNullable(fields.get("entities")).map(EntityExtras::fromJson),
@@ -102,6 +111,18 @@ record GameBreakdown(
       map.put(key, value);
     }
     return map;
+  }
+
+  private static String statsMapToJson(Map<String, Stats> map) {
+    return "{" + map.entrySet().stream()
+        .map(e -> "\"" + escape(e.getKey()) + "\": " + e.getValue().toJson())
+        .collect(Collectors.joining(", ")) + "}";
+  }
+
+  private static Map<String, Stats> parseStatsMap(String json) {
+    return parseObject(json).entrySet().stream().collect(Collectors.toMap(
+        Map.Entry::getKey, entry -> Stats.fromJson(entry.getValue()),
+        (a, b) -> b, LinkedHashMap::new));
   }
 
   private static Map<String, Long> parseStringLongMap(String json) {

@@ -2,6 +2,7 @@
   "outcomes": {"ordinary_win": 50},
   "winners": {"dog": 13, "high hat": 16, "iron box": 21},
   "ageAtEnd": {"min": 5, "max": 28, "mean": 14.7, "median": 13},
+  "ageAtEndByOutcome": {"ordinary_win": {"min": 5, "max": 28, "mean": 14.7, "median": 13}},
   "core": {"bankruptcies": {"dog": 22, "high hat": 33, "iron box": 40, "the bank": 5}, "auctions": 100, "directPurchases": 1250, "mortgages": 1004, "income": {"salary": 341800, "rent": 350619, "bankPayments": 41070, "byPlayer": {"iron box": {"salary": 114200, "rent": 139848}, "dog": {"salary": 110800, "rent": 93846}, "high hat": {"salary": 116800, "rent": 116925}}}},
   "trades": {"peerTrades": 11}
 }

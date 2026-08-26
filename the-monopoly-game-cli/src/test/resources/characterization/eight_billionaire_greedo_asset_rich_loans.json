@@ -2,6 +2,7 @@
   "outcomes": {"ordinary_win": 50},
   "winners": {"dog": 49, "ship": 1},
   "ageAtEnd": {"min": 1, "max": 12, "mean": 4.0, "median": 4},
+  "ageAtEndByOutcome": {"ordinary_win": {"min": 1, "max": 12, "mean": 4.0, "median": 4}},
   "core": {"bankruptcies": {"dog": 310, "ship": 6, "the bank": 16, "racecar": 2, "high hat": 5, "thimble": 2, "iron box": 5, "shoe": 3, "wheelbarrow": 1}, "auctions": 24, "directPurchases": 971, "mortgages": 850, "income": {"salary": 166000, "rent": 743323, "bankPayments": 22680, "byPlayer": {"racecar": {"salary": 18800, "rent": 5796}, "wheelbarrow": {"salary": 19000, "rent": 4674}, "dog": {"salary": 33400, "rent": 690300}, "iron box": {"salary": 17000, "rent": 5882}, "ship": {"salary": 22600, "rent": 16699}, "thimble": {"salary": 16600, "rent": 3237}, "shoe": {"salary": 20600, "rent": 5204}, "high hat": {"salary": 18000, "rent": 6972}}}},
   "loans": {"loansRaised": 265, "totalDollars": 13860, "borrowers": {"dog": 216, "ship": 12, "wheelbarrow": 8, "shoe": 5, "iron box": 8, "racecar": 1, "high hat": 9, "Pink Realty": 1, "Yellow Realty": 1, "thimble": 4}, "bondholders": {"high hat": 159, "racecar": 12, "shoe": 14, "dog": 47, "thimble": 2, "iron box": 16, "wheelbarrow": 4, "ship": 11}, "defaults": 0, "interestPaid": 1193, "principalPaid": 1495, "bondInterestReceived": 629, "bondPrincipalReceived": 1495},
   "entities": {"formed": 3, "dissolved": 3},

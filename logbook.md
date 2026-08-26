@@ -50400,3 +50400,18 @@ full suite was rerun during verification and the remaining failure was the
 acceptance bookkeeping assertion, now corrected. Committed as `9558646` and
 handing off to refactorer via
 `.swarmforge/handoffs/outbox/50_20260826T025002Z_000284_from_coder_to_refactorer.handoff`.
+
+## 2026-08-26T09:04:00Z — coder adds unified-tax characterization and outcome-split ages
+
+Processed specifier note `50_20260826T065828Z_000280_from_specifier_to_coder.handoff`.
+Added characterization config 15, matching the config-12 base while replacing
+war-profits tax with unified income tax. Extended `GameBreakdown` JSON with
+`ageAtEndByOutcome`, preserving the aggregate `ageAtEnd` and splitting the
+same statistics by `ordinary_win`, `stalemate`, and `year_limit` where present.
+Regenerated all characterization baselines because the new field is generic,
+and updated `README.md` plus `CHARACTERIZATION-TESTS.md`; unified income tax
+produces no MegaCorp payer entries because it supersedes MegaCorp labour tax.
+
+Verification: `mvn test -Pcharacterization-tests` passes — 432 domain tests,
+22 CLI characterization/sync tests, and all supporting modules green. The
+characterization run covers 15 configs and 50 seeds each.

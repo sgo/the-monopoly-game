@@ -54,6 +54,7 @@ class CharacterizationTest {
 
     GameBreakdown.WarProfitsTaxExtras roundTripped = GameBreakdown
         .fromJson(new GameBreakdown(Map.of(), Map.of(), GameBreakdown.Stats.of(List.of()),
+            Map.of(),
             GameBreakdown.Core.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
             Optional.of(tax), Optional.empty()).toJson())
         .warProfitsTax().orElseThrow();
@@ -61,6 +62,21 @@ class CharacterizationTest {
     assertThat(roundTripped.totalDollars()).isEqualTo(tax.totalDollars());
     assertThat(roundTripped.payers()).containsExactlyInAnyOrderEntriesOf(tax.payers());
     assertThat(roundTripped.governmentBalance()).isEqualTo(tax.governmentBalance());
+  }
+
+  @Test
+  void splitsAgeStatsByTerminationOutcomeAndRoundTripsThem() {
+    GameBreakdown.GameResult win = new GameBreakdown.GameResult("dog wins the game\ndog is 10 years\n",
+        false, false, false, false, false);
+    GameBreakdown.GameResult stalemate = new GameBreakdown.GameResult(
+        "The game ends in a stalemate\ndog is 20 years\n", false, false, false, false, false);
+
+    GameBreakdown breakdown = GameBreakdown.aggregate(List.of(win, stalemate));
+
+    assertThat(breakdown.ageAtEndByOutcome()).containsOnlyKeys("ordinary_win", "stalemate");
+    assertThat(breakdown.ageAtEndByOutcome().get("ordinary_win")).isEqualTo(GameBreakdown.Stats.of(List.of(10)));
+    assertThat(GameBreakdown.fromJson(breakdown.toJson()).ageAtEndByOutcome())
+        .isEqualTo(breakdown.ageAtEndByOutcome());
   }
 
   @Test

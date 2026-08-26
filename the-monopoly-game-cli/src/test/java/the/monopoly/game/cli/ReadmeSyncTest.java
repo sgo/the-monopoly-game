@@ -93,6 +93,7 @@ class ReadmeSyncTest {
         .collect(java.util.stream.Collectors.joining(", "));
   }
 
+
   private void validateRentRelief(String block, GameBreakdown.RentReliefExtras relief, String configLabel) {
     assertField(block, "Rent relief", group(relief.reliefPayments()) + " payments, \\$"
         + dollars(relief.reliefDollars()) + " total, " + relief.gamesWithRelief() + " games", configLabel);
@@ -191,6 +192,10 @@ class ReadmeSyncTest {
   private void assertNameLongMultiset(String block, String label, Map<String, Long> expected, String configLabel) {
     String raw = field(block, label);
     assertThat(raw).as(configLabel + " " + label + " line").isNotNull();
+    if (raw.isBlank()) {
+      assertThat(expected).as(configLabel + " " + label).isEmpty();
+      return;
+    }
     Map<String, Long> actual = new java.util.LinkedHashMap<>();
     for (String part : raw.split(",")) {
       String trimmed = part.trim();

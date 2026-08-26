@@ -8,6 +8,7 @@ enum CharacterizationConfig {
   eight_greedo_stalemate_entity_loans_rent_relief(8, allGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity", "--optional-development-loans", "--optional-rent-relief")),
   eight_greedo_stalemate_entity_loans(8, allGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity", "--optional-development-loans")),
   eight_greedo_stalemate_entity_loans_rent_relief_war_profits_tax(8, allGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity", "--optional-development-loans", "--optional-rent-relief", "--optional-war-profits-tax")),
+  eight_greedo_stalemate_entity_loans_rent_relief_unified_income_tax(8, allGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity", "--optional-development-loans", "--optional-rent-relief", "--optional-unified-income-tax")),
   eight_billionaire_greedo_asset_rich_loans_rent_relief_war_profits_tax(8, billionaireThenGreedo(8), List.of("--optional-greedo-stalemate-trading", "--optional-greedo-legal-entity", "--optional-development-loans", "--optional-rent-relief", "--optional-war-profits-tax", "--optional-asset-rich-billionaire")),
   three_greedo(3, List.of("greedo", "greedo", "greedo"), List.of()),
   three_greedo_stalemate(3, List.of("greedo", "greedo", "greedo"), List.of("--optional-greedo-stalemate-trading")),
